@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="WindowHeaders">
+      <UniqueIdentifier>{837aeaef-0e56-4969-8718-b2d4b5cb05ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WindowCpps">
+      <UniqueIdentifier>{9b9501b3-167a-4e42-8675-aacf6b63c42e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Global Headers">
+      <UniqueIdentifier>{26c3e9dc-1221-4d09-aafc-fbcc5ea64a11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Custom Headers">
+      <UniqueIdentifier>{c6964ee2-c9ea-41ff-a7dd-784f867abc20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Custom sources">
+      <UniqueIdentifier>{de5ce1b7-f3be-4178-93b0-d5e9931c67ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Global sources">
+      <UniqueIdentifier>{4a732ee4-25f0-445e-b277-e15c4958f200}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Zdeny_PhD_Shenanigans.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowIPCparameters.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowIPCoptimize.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowTemplate.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files\Global sources</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files\Global sources</Filter>
+    </ClCompile>
+    <ClCompile Include="filtering.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="FITS.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="fourier.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="fractal.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="functionsAstro.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="functionsBaseCV.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="functionsBaseSTL.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="inverseMapping.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="IPC.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="neural.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="optimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="graphOptimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowIPC2PicAlign.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="qtlogger.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="filtering.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FITS.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="fourier.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="fractal.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="functionsAstro.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="functionsBaseCV.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="functionsBaseSTL.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="neural.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="optimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="inverseMapping.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="graphOptimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Zdeny_PhD_Shenanigans.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="WindowIPCparameters.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="WindowIPCoptimize.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="WindowTemplate.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="WindowIPC2PicAlign.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Zdeny_PhD_Shenanigans.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowIPCparameters.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowIPCoptimize.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowTemplate.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowIPC2PicAlign.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Zdeny_PhD_Shenanigans.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Zdeny_PhD_Shenanigans.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
