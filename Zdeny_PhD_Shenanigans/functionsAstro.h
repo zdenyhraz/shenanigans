@@ -144,7 +144,6 @@ struct FlowResults
 
 void makeOutputDirs(std::string path);
 
-
 double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, Mat& src, double noisestddev, double maxShiftRatio, double accuracy);
 
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, Mat& source, double noisestddev, double maxShiftRatio, double accuracy);
