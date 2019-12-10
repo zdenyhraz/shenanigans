@@ -14,17 +14,15 @@ struct QtLogger : Logger
 	{
 		if (loglevel <= m_loglevel)
 		{
-			QString qmsg = QString::fromUtf8((" [" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg).c_str());
 			m_TextBrowser->setTextColor(LOGLEVEL_CLR[loglevel]);
-			m_TextBrowser->append(qmsg);
+			m_TextBrowser->append(QString::fromUtf8((" [" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg).c_str()));
 		}
 	}
 
 	inline void LogValue(const std::string& name, double value) override
 	{
-		QString qmsg = QString::fromUtf8((" [" + currentTime() + "] [VALUE]: " + name + " = " + to_string(value)).c_str());
-		m_TextBrowser->setTextColor(LOGLEVEL_CLR[DEBUG]);
-		m_TextBrowser->append(qmsg);
+		m_TextBrowser->setTextColor(LOGLEVEL_CLR[SPECIAL]);
+		m_TextBrowser->append(QString::fromUtf8((" [" + currentTime() + "] [VALUE]: " + name + " = " + to_string(value)).c_str()));
 	}
 };
 
