@@ -6,7 +6,424 @@
 #include "stdafx.h"
 #include "optimization.h"
 
-#ifdef OPT_WITH_CV
+std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger)
+{
+	if (logger) logger->Log("Optimization started (evolution)", EVENT);
+
+	vector<vector<double>> visitedPointsMainThisRun;
+	vector<vector<double>> visitedPointsAllThisRun;
+	double averageImprovement = 0;
+	funEvals = 0;
+	success = false;
+	vector<double> boundsRange = upperBounds - lowerBounds;
+
+	//establish population matrix, fitness vector and other intrinsics
+	vector<vector<double>> population(NP, zerovect(N));
+	vector<queue<double>> histories(NP);
+	bool historyConstant = false;
+	vector<double> fitness = zerovect(NP);
+	vector<double> bestEntity = zerovect(N);
+	double bestFitness = std::numeric_limits<double>::max();
+	double fitness_prev = std::numeric_limits<double>::max();
+	double fitness_curr = std::numeric_limits<double>::max();
+	success = false;
+
+	//initialize random starting population matrix within bounds
+	if (logger) logger->Log("Initializing population within bounds ... ", SUBEVENT);
+	double initialMinAvgDist = 0.5;
+	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+	{
+		int distinctEntityTrials = 0;
+		bool distinctEntity = false;//entities may not be too close together
+		while (!distinctEntity)//loop until they are distinct enough
+		{
+			distinctEntity = true;//assume entity is distinct
+			distinctEntityTrials++;
+			for (int indexParam = 0; indexParam < N; indexParam++)//generate initial entity
+			{
+				population[indexEntity][indexParam] = randInRange(lowerBounds[indexParam], upperBounds[indexParam]);
+			}
+			if (distincEntityMaxTrials == 0) break;
+			for (int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++)//check distance to all other entities
+			{
+				double avgDist = averageVectorDistance(population[indexEntity], population[indexEntity2], boundsRange);//calculate how distinct the entity is to another entity
+				if (logger) logger->Log("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist), INFO);
+				if (avgDist < initialMinAvgDist)//check if entity is distinct
+				{
+					distinctEntity = false;
+					if (logger) logger->Log("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment", INFO);
+					break;//needs to be distinct from all entities
+				}
+			}
+			if (distinctEntityTrials >= distincEntityMaxTrials)
+			{
+				initialMinAvgDist *= 0.8;
+				distinctEntityTrials = 0;
+			}
+		}
+	}
+
+	if (logger) logger->Log("Initial population created\n", SUBEVENT);
+	//calculate initial fitness vector
+	#pragma omp parallel for
+	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+	{
+		fitness[indexEntity] = f(population[indexEntity]);
+		if (logPointsAll)
+		{
+			#pragma omp critical
+			visitedPointsAllThisRun.push_back(population[indexEntity]);
+		}
+	}
+	funEvals += NP;
+
+	//run main evolution cycle
+	for (int generation = 1; generation < 1e8; generation++)
+	{
+		#pragma omp parallel for
+		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+		{
+			//create new potential entity
+			vector<double> newEntity(N, 0.);
+			newEntity = population[indexEntity];
+			double newFitness = 0.;
+
+			//select distinct parents different from the current entity
+			int numberOfParents;
+			//calculate the number of parents
+			switch (mutStrat)
+			{
+			case MutationStrategy::RAND1: numberOfParents = 3; break;
+			case MutationStrategy::BEST1: numberOfParents = 2; break;
+			case MutationStrategy::RAND2: numberOfParents = 5; break;
+			case MutationStrategy::BEST2: numberOfParents = 4; break;
+			}
+			vector<int> parentIndices(numberOfParents, 0);
+			for (auto& idx : parentIndices)
+			{
+				int idxTst;
+				do { idxTst = rand() % NP; } while (!isDistinct(idxTst, parentIndices, indexEntity));
+				idx = idxTst;
+			}
+
+			//decide which parameters undergo crossover
+			vector<bool> paramIsCrossed(N, false);
+			switch (crossStrat)
+			{
+			case CrossoverStrategy::BIN:
+			{
+				int definite = rand() % N;//at least one param undergoes crossover
+				for (int indexParam = 0; indexParam < N; indexParam++)
+				{
+					double random = randInRange();
+					if (random < CR || indexParam == definite) paramIsCrossed[indexParam] = true;
+				}
+				break;
+			}
+			case CrossoverStrategy::EXP:
+			{
+				int L = 0;
+				do { L++; } while ((randInRange() < CR) && (L < N));//at least one param undergoes crossover
+				int indexParam = rand() % N;
+				for (int i = 0; i < L; i++)
+				{
+					paramIsCrossed[indexParam] = true;
+					indexParam++;
+					indexParam %= N;
+				}
+				break;
+			}
+			}
+
+			//perform the crossover
+			for (int indexParam = 0; indexParam < N; indexParam++)
+			{
+				if (paramIsCrossed[indexParam])
+				{
+					switch (mutStrat)
+					{
+					case MutationStrategy::RAND1: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]); break;
+					case MutationStrategy::BEST1: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]); break;
+					case MutationStrategy::RAND2: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + F * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]); break;
+					case MutationStrategy::BEST2: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + F * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]); break;
+					}
+				}
+				//check for boundaries, effectively clamp
+				newEntity[indexParam] = clampSmooth(newEntity[indexParam], population[indexEntity][indexParam], lowerBounds[indexParam], upperBounds[indexParam]);
+			}
+
+			//evaluate fitness of new entity
+			newFitness = f(newEntity);
+
+			if (logPointsAll)
+			{
+				#pragma omp critical 
+				visitedPointsAllThisRun.push_back(newEntity);
+			}
+
+			//select the more fit entity
+			if (newFitness <= fitness[indexEntity])
+			{
+				population[indexEntity] = newEntity;
+				fitness[indexEntity] = newFitness;
+			}
+		}//entity cycle end
+		funEvals += NP;
+
+		//determine the best entity
+		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+		{
+			if (fitness[indexEntity] <= bestFitness)
+			{
+				bestEntity = population[indexEntity];
+				bestFitness = fitness[indexEntity];
+				fitness_prev = fitness_curr;
+				fitness_curr = bestFitness;
+				if (logPointsMain) visitedPointsMainThisRun.push_back(bestEntity);
+				if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2))
+				{
+					logger->Log("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), INFO);
+					logger->Log("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", DEBUG);
+					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) logger->Log("Big improvement!", SUBEVENT);
+					logger->Log("", DEBUG);
+				}
+			}
+		}
+
+		//fill history ques for all entities - termination criterion
+		historyConstant = true;//assume history is constant
+		averageImprovement = 0;
+		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+		{
+			if (histories[indexEntity].size() == historySize)
+			{
+				histories[indexEntity].pop();//remove first element - keep que size constant
+				histories[indexEntity].push(fitness[indexEntity]);//insert at the end
+				if (stopCrit == StoppingCriterion::ALLIMPROVBOOL) { if (histories[indexEntity].front() != histories[indexEntity].back()) historyConstant = false; } //fitness is constant for all entities
+				if (stopCrit == StoppingCriterion::ALLIMPROVPERC) { if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100) historyConstant = false; }//fitness improved less than x% for all entities
+			}
+			else
+			{
+				histories[indexEntity].push(fitness[indexEntity]);//insert at the end
+				historyConstant = false;//too early to stop, go on
+			}
+			if (histories[indexEntity].size() > 2) averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
+		}
+		averageImprovement /= NP;
+		if (stopCrit == StoppingCriterion::AVGIMPROVPERC) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
+
+		if (OnGenerationSUBEVENT)
+			OnGenerationSUBEVENT({ static_cast<double>(generation),bestFitness, averageImprovement });
+
+		//termination criterions
+		if (bestFitness < optimalFitness)//fitness goal reached
+		{
+			if (logger) logger->Log("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
+			success = true;
+			break;
+		}
+		if (generation == maxGen)//maximum generation reached
+		{
+			if (logger) logger->Log("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
+			success = false;
+			break;
+		}
+		if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
+		{
+			if (logger) logger->Log("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
+			success = false;
+			break;
+		}
+		if (historyConstant)//no entity improved last (historySize) generations
+		{
+			if (logger) logger->Log("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
+			success = false;
+			break;
+		}
+	}//generation cycle end
+	if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
+	if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
+	return bestEntity;
+}//optimize function end
+
+std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger)
+{
+	//if (logger) logger->Log    ">> Optimization started (pattern search)"  ;
+
+	vector<double> boundsRange = upperBounds - lowerBounds;
+	double initialStep = vectorMax(boundsRange) / 4;
+	funEvals = 0;
+	multistartCnt = 0;
+	//multistart algorithm - initialize global results     
+	vector<double> topPoint = zerovect(N);
+	double topPointFitness = std::numeric_limits<double>::max();
+	//generate all starting points
+	vector<vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N));
+	for (int run = 0; run < multistartMaxCnt; run++)
+	{
+		for (int indexParam = 0; indexParam < N; indexParam++)
+		{
+			mainPointsInitial[run][indexParam] = randInRange(lowerBounds[indexParam], upperBounds[indexParam]);//idk dude
+		}
+	}
+
+	//multistart pattern search
+	volatile bool flag = false;
+#pragma omp parallel for shared(flag)
+	for (int run = 0; run < multistartMaxCnt; run++)
+	{
+		if (flag) continue;
+
+		vector<vector<double>> visitedPointsAllThisRun;
+		vector<vector<double>> visitedPointsMainThisRun;
+		int funEvalsThisRun = 0;
+		//initialize vectors
+		double step = initialStep;
+		vector<double> mainPoint = mainPointsInitial[run];
+		double mainPointFitness = f(mainPoint);
+		if (logPointsMain) visitedPointsMainThisRun.push_back(mainPoint);
+		if (logPointsAll) visitedPointsAllThisRun.push_back(mainPoint);
+		vector<vector<vector<double>>> pattern;//N-2-N (N pairs of N-dimensional points)
+		vector<vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max()));//N-2 (N pairs of fitness)
+		pattern.resize(N);
+		for (int dim = 0; dim < N; dim++)
+		{
+			pattern[dim].resize(2);
+			for (int pm = 0; pm < 2; pm++)
+			{
+				pattern[dim][pm].resize(N);
+			}
+		}
+
+		//main search cycle
+		for (int generation = 1; generation < 1e8; generation++)
+		{
+			bool smallerStep = true;
+			//asign values to pattern vertices - exploration
+			for (int dim = 0; dim < N; dim++)
+			{
+				for (int pm = 0; pm < 2; pm++)
+				{
+					pattern[dim][pm] = mainPoint;
+					pattern[dim][pm][dim] += pm == 0 ? step : -step;
+					pattern[dim][pm][dim] = clampSmooth(pattern[dim][pm][dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
+
+					//evaluate vertices
+					patternFitness[dim][pm] = f(pattern[dim][pm]);
+					funEvalsThisRun++;
+
+					if (logPointsAll) visitedPointsAllThisRun.push_back(pattern[dim][pm]);
+
+					//select best pattern vertex and replace
+					if (patternFitness[dim][pm] < mainPointFitness)
+					{
+						mainPoint = pattern[dim][pm];
+						mainPointFitness = patternFitness[dim][pm];
+						if (logPointsMain) visitedPointsMainThisRun.push_back(pattern[dim][pm]);
+						smallerStep = false;
+						//if (logger) logger->Log  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
+						if (maxExploitCnt > 0)
+						{
+							double testPointFitness = mainPointFitness;
+							for (int exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
+							{
+								vector<double> testPoint = mainPoint;
+								testPoint[dim] += pm == 0 ? step : -step;
+								testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
+								testPointFitness = f(testPoint);
+								funEvalsThisRun++;
+								if (logPointsAll) visitedPointsAllThisRun.push_back(testPoint);
+								if (testPointFitness < mainPointFitness)
+								{
+									mainPoint = testPoint;
+									mainPointFitness = testPointFitness;
+									if (logPointsMain) visitedPointsMainThisRun.push_back(testPoint);
+									//if (logger) logger->Log  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			//no improvement - mainPoint is the best point - lower the step size
+			if (smallerStep)
+				step *= stepReducer;
+
+			//termination criterions
+			if (step < minStep)
+			{
+#pragma omp critical
+				{
+					//if (logger) logger->Log  "> minStep value reached, terminating - generation "  generation  "."  ;
+					success = false;
+					terminationReason = "minStep value reached, final fitness: " + to_string(mainPointFitness);
+				}
+				break;
+			}
+			if (mainPointFitness < optimalFitness)
+			{
+#pragma omp critical
+				{
+					//if (logger) logger->Log  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
+					success = true;
+					terminationReason = "optimalFitness value reached, final fitness: " + to_string(mainPointFitness);
+				}
+				break;
+			}
+			if (generation == maxGen)
+			{
+#pragma omp critical
+				{
+					//if (logger) logger->Log  "> maxGen value reached, terminating - generation "  generation  "."  ;
+					success = false;
+					terminationReason = "maxGen value reached, final fitness: " + to_string(mainPointFitness);
+				}
+				break;
+			}
+			if ((funEvals >= maxFunEvals) || (funEvalsThisRun >= maxFunEvals))
+			{
+#pragma omp critical
+				{
+					//if (logger) logger->Log  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
+					terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
+					success = false;
+					flag = true;//dont do other runs, out of funEvals
+				}
+				break;
+			}
+		}//generations end
+
+		//multistart result update
+#pragma omp critical
+		{
+			multistartCnt++;
+			funEvals += funEvalsThisRun;
+			if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
+			if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
+			//if (logger) logger->Log  "> run "  run  ": ";
+			if (mainPointFitness < topPointFitness)
+			{
+				topPoint = mainPoint;
+				topPointFitness = mainPointFitness;
+				//if (logger) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
+				if (topPointFitness < optimalFitness) flag = true;//dont do other runs, fitness goal reached
+			}
+			else
+			{
+				//if (logger) logger->Log  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
+			}
+		}
+
+	}//multistart end
+	return topPoint;
+}//opt end
+
+#ifdef OPTIMIZE_WITH_CV
 using namespace cv;
 
 Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY)

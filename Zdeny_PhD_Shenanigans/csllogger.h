@@ -6,11 +6,12 @@ struct CslLogger : Logger
 {
 	CslLogger(LOGLEVEL loglevel) : Logger(loglevel) {};
 
-	inline void LogMessage(const std::string& msg, LOGLEVEL loglevel) override
+	inline void Log(const std::string& msg, LOGLEVEL loglevel) override
 	{
 		if (loglevel <= m_loglevel)
 		{
-			std::cout << LOGLEVEL_STR2[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg + "\n";
+			if (loglevel != DEBUG) cout << LOGLEVEL_STRS[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg + "\n";
+			else cout << LOGLEVEL_STRS[loglevel] + msg + "\n";
 		}
 	}
 };

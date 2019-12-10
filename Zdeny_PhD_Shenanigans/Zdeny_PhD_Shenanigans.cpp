@@ -20,7 +20,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	globals->Logger = new CslLogger(g_loglevel);
 	#endif
 
-	globals->Logger->LogMessage("Welcome back, my friend.", SPECIAL);//log a welcome message
+	globals->Logger->Log("Welcome back, my friend.", SPECIAL);//log a welcome message
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);
@@ -52,18 +52,18 @@ void Zdeny_PhD_Shenanigans::about()
 void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
-	globals->Logger->LogMessage("All image windows closed", INFO);
+	globals->Logger->Log("All image windows closed", INFO);
 }
 
 void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
 {
 	for (int i = 0; i < 100; i++)
 	{
-		globals->Logger->LogMessage("boziiinku, co ted budeme delat?", FATAL);
-		globals->Logger->LogMessage("jejda, nebude v tom nahodou nejaky probljhbemek?", EVENT);
-		globals->Logger->LogMessage("trololooo niga xdxd 5", SUBEVENT);
-		globals->Logger->LogMessage("objednal jsem ti ten novy monitor, jak jsi chtel", INFO);
-		globals->Logger->LogMessage("tak tenhle zapeklity problemek budeme muset", DEBUG);
+		globals->Logger->Log("boziiinku, co ted budeme delat?", FATAL);
+		globals->Logger->Log("jejda, nebude v tom nahodou nejaky probljhbemek?", EVENT);
+		globals->Logger->Log("trololooo niga xdxd 5", SUBEVENT);
+		globals->Logger->Log("objednal jsem ti ten novy monitor, jak jsi chtel", INFO);
+		globals->Logger->Log("tak tenhle zapeklity problemek budeme muset", DEBUG);
 	}
 }
 
