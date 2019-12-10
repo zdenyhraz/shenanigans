@@ -18,7 +18,7 @@ struct QtLogger : Logger
 			if (loglevel != DEBUG) m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STRS[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg).c_str()));
 			else m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STRS[loglevel] + msg).c_str()));
 
-			QCoreApplication::processEvents();
+			QCoreApplication::processEvents();//this can be prolly avoided with Qthreads
 		}
 	}
 };
