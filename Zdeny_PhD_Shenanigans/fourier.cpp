@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "fourier.h"
 
-//#define FOURIER_WITH_FFTW//optional use of the fftw library
-
 #ifdef FOURIER_WITH_FFTW
 #include <fftw3.h>
 #endif

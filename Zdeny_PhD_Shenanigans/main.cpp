@@ -1,16 +1,14 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
 
-#define WITHCONSOLE
-
-#ifdef WITHCONSOLE
+#ifdef ATTACH_CONSOLE
 #include <windows.h>
 #include <stdio.h>
 #endif
 
 int main(int argc, char *argv[])
 {
-#ifdef WITHCONSOLE
+	#ifdef ATTACH_CONSOLE
 	// detach from the current console window
 	// if launched from a console window, that will still run waiting for the new console (below) to close
 	// it is useful to detach from Qt Creator's <Application output> panel
@@ -26,7 +24,7 @@ int main(int argc, char *argv[])
 	freopen("CON", "w", stdout);
 	freopen("CON", "w", stderr);
 	freopen("CON", "r", stdin);
-#endif
+	#endif
 
 	QApplication a(argc, argv);
 	Zdeny_PhD_Shenanigans w;
