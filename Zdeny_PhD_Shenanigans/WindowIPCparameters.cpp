@@ -28,7 +28,7 @@ void WindowIPCparameters::refreshIPCparameters()
 	globals->IPCsettings->normInput = ui.checkBox_6->isChecked();
 	globals->IPCsettings->crossCorrel = ui.checkBox_7->isChecked();
 
-	globals->Logger->LogMessage("IPC parameter values updated", INFO);
+	globals->Logger->LogMessage("IPC parameter values updated", EVENT);
 }
 
 void WindowIPCparameters::refreshIPCparametersAndExit()

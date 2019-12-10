@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "functionsAstro.h"
+#include "logger.h"
 
 void makeOutputDirs(std::string path)
 {
@@ -87,7 +88,7 @@ double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster
 	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShiftRatio, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger)
 {
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
 
@@ -106,7 +107,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 		Evo.mutStrat = MutationStrategy::RAND1;
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 		Evo.upperBounds = vector<double>{ 10,200,(double)settingsMaster.Cwin / 2,1 };
-		auto Result = Evo.optimize(f);
+		auto Result = Evo.optimize(f, logger);
 		listing << pathInput << "," << settingsMaster.Cwin << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 	}
 	destroyWindow(windowname);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>799</width>
-    <height>464</height>
+    <width>1261</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="cursor">
@@ -22,8 +22,8 @@
      <rect>
       <x>350</x>
       <y>0</y>
-      <width>441</width>
-      <height>421</height>
+      <width>901</width>
+      <height>681</height>
      </rect>
     </property>
     <property name="palette">
@@ -234,10 +234,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>205</x>
       <y>0</y>
-      <width>96</width>
-      <height>83</height>
+      <width>141</width>
+      <height>151</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -269,7 +269,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>241</width>
+      <width>181</width>
       <height>41</height>
      </rect>
     </property>
@@ -326,7 +326,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>350</y>
       <width>331</width>
       <height>331</height>
      </rect>
@@ -341,8 +341,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>799</width>
-     <height>21</height>
+     <width>1261</width>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

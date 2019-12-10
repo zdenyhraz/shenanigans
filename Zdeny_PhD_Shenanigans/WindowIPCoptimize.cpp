@@ -11,6 +11,12 @@ WindowIPCoptimize::WindowIPCoptimize(QWidget* parent, Globals* globals) : QMainW
 
 void WindowIPCoptimize::optimize()
 {
-	optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt());
-	globals->Logger->LogMessage("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), INFO);
+
+	Evolution Evo(2);
+	Evo.NP = 144;
+	Evo.optimalFitness = 0;
+	Evo.optimize([&](std::vector<double> arg) {return sqr(arg[0]) + sqr(arg[1]); }, globals->Logger);
+
+	//optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger);
+	globals->Logger->LogMessage("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), EVENT);
 }

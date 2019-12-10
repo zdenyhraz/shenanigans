@@ -2,8 +2,10 @@
 #include "stdafx.h"
 #include "functionsBaseSTL.h"
 
-enum LOGLEVEL { FATAL, WARN, SPECIAL, INFO, DEBUG };
-const std::vector<std::string> LOGLEVEL_STR{ "FATAL", "WARN", "SPECIAL", "INFO", "DEBUG" };
+enum LOGLEVEL { SPECIAL, FATAL, EVENT, SUBEVENT, INFO, DEBUG };
+const std::vector<std::string> LOGLEVEL_STR{ "SPECIAL", "FATAL", "main", "sub", "info", "debug" };
+const std::vector<std::string> LOGLEVEL_STR2{ "", "", "", "       ", "       ", "       " };
+
 
 struct Logger
 {
@@ -12,6 +14,4 @@ struct Logger
 	Logger(LOGLEVEL loglevel) : m_loglevel(loglevel) {};
 
 	inline virtual void LogMessage(const std::string& msg, LOGLEVEL loglevel) = 0;
-	
-	inline virtual void LogValue(const std::string& name, double value) = 0;
 };

@@ -62,7 +62,8 @@ void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
 	for (int i = 0; i < 100; i++)
 	{
 		globals->Logger->LogMessage("boziiinku, co ted budeme delat?", FATAL);
-		globals->Logger->LogMessage("jejda, nebude v tom nahodou nejaky probljhbemek?", WARN);
+		globals->Logger->LogMessage("jejda, nebude v tom nahodou nejaky probljhbemek?", EVENT);
+		globals->Logger->LogMessage("trololooo niga xdxd 5", SUBEVENT);
 		globals->Logger->LogMessage("objednal jsem ti ten novy monitor, jak jsi chtel", INFO);
 		globals->Logger->LogMessage("tak tenhle zapeklity problemek budeme muset", DEBUG);
 	}

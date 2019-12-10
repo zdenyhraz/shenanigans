@@ -5,6 +5,7 @@
 #include "FITS.h"
 #include "IPC.h"
 #include "optimization.h"
+#include "logger.h"
 
 using namespace std;
 using namespace cv;
@@ -148,7 +149,7 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, Mat& src, double 
 
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, Mat& source, double noisestddev, double maxShiftRatio, double accuracy);
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs);
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger);
 
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, const GUIsettings& guiset, double maxShiftRatio, double accuracy);
 
