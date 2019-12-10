@@ -1,5 +1,6 @@
 #pragma once
 #include "functionsBaseSTL.h"
+#include "logger.h"
 
 #define OPT_WITH_CV//additional graphical functionality with OpenCV
 
@@ -104,7 +105,7 @@ struct Evolution : OptimizationAlgorithm
 
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
-	std::vector<double> optimize(std::function<double(std::vector<double>)> f, std::ofstream* listing = nullptr)
+	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* = nullptr, std::ofstream* listing = nullptr)
 	{
 		if (speakAll) speakMain = true;
 		if (speakMain) cout << endl << ">> Optimization started (evolution)" << endl;
