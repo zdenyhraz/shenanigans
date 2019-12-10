@@ -245,7 +245,11 @@ struct Evolution : OptimizationAlgorithm
 					fitness_prev = fitness_curr;
 					fitness_curr = bestFitness;
 					if (logPointsMain) visitedPointsMainThisRun.push_back(bestEntity);
-					if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)) { showEntity(bestEntity, bestFitness, "Gen " + to_string(generation) + " best entity", true, true, "curr_best_Improv = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, avg_hist_Improv = " + to_string(averageImprovement * 100) + "%"); logger->LogMessage  ; }
+					if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)) 
+					{ 
+						logger->LogMessage("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness),SPECIAL);
+						logger->LogMessage("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", INFO);
+					}
 				}
 			}
 
@@ -271,42 +275,34 @@ struct Evolution : OptimizationAlgorithm
 			averageImprovement /= NP;
 			if (stopCrit == StoppingCriterion::AVGIMPROVPERC) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
 
-			//output progress to the console
-			if (logger)
-			{
-				logger->LogMessage  "################################################### generation "  generation  " ###################################################"  ;
-				for (int indexEntity = 0; indexEntity < NP; indexEntity++)
-					showEntity(population[indexEntity], fitness[indexEntity], "entity " + to_string(indexEntity));
-				showEntity(bestEntity, bestFitness, "Best entity", true, true); logger->LogMessage  ;
-			}
 			if (OnGenerationEvent)
-				OnGenerationEvent({ static_cast<double>(generation),bestFitness, averageImprovement });
+				OnGenerationEvent({static_cast<double>(generation),bestFitness, averageImprovement});
 
 			//termination criterions
 			if (bestFitness < optimalFitness)//fitness goal reached
 			{
-				if (logger) logger->LogMessage  "OptimalFitness value reached, terminating - generation "  generation  "."  ;
+				if (logger) logger->LogMessage("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
 				terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
 				success = true;
 				break;
 			}
 			if (generation == maxGen)//maximum generation reached
 			{
-				if (logger) logger->LogMessage  "MaxGen value reached, terminating - generation "  generation  "."  ;
+				if (logger) logger->LogMessage("MaxGen value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
 				terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
 			{
-				if (logger) logger->LogMessage  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
+				if (logger) logger->LogMessage("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
 				terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (historyConstant)//no entity improved last (historySize) generations
 			{
-				if (logger) logger->LogMessage  "historyConstant value reached, terminating - generation "  generation  "."  ;
+				if (logger) logger->LogMessage("historyConstant value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
 				terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
@@ -330,7 +326,7 @@ struct PatternSearch : OptimizationAlgorithm
 
 	vector<double> optimize(std::function<double(vector<double>)> f, Logger* logger = nullptr)
 	{
-		if (logger) logger->LogMessage    ">> Optimization started (pattern search)"  ;
+		//if (logger) logger->LogMessage    ">> Optimization started (pattern search)"  ;
 
 		vector<double> boundsRange = upperBounds - lowerBounds;
 		double initialStep = vectorMax(boundsRange) / 4;
@@ -403,7 +399,7 @@ struct PatternSearch : OptimizationAlgorithm
 							mainPointFitness = patternFitness[dim][pm];
 							if (logPointsMain) visitedPointsMainThisRun.push_back(pattern[dim][pm]);
 							smallerStep = false;
-							if (logger) logger->LogMessage  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
+							//if (logger) logger->LogMessage  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
 							if (maxExploitCnt > 0)
 							{
 								double testPointFitness = mainPointFitness;
@@ -420,7 +416,7 @@ struct PatternSearch : OptimizationAlgorithm
 										mainPoint = testPoint;
 										mainPointFitness = testPointFitness;
 										if (logPointsMain) visitedPointsMainThisRun.push_back(testPoint);
-										if (logger) logger->LogMessage  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
+										//if (logger) logger->LogMessage  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
 									}
 								}
 							}
@@ -437,7 +433,7 @@ struct PatternSearch : OptimizationAlgorithm
 				{
 					#pragma omp critical
 					{
-						if (logger) logger->LogMessage  "> minStep value reached, terminating - generation "  generation  "."  ;
+						//if (logger) logger->LogMessage  "> minStep value reached, terminating - generation "  generation  "."  ;
 						success = false;
 						terminationReason = "minStep value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -447,7 +443,7 @@ struct PatternSearch : OptimizationAlgorithm
 				{
 					#pragma omp critical
 					{
-						if (logger) logger->LogMessage  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
+						//if (logger) logger->LogMessage  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
 						success = true;
 						terminationReason = "optimalFitness value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -457,7 +453,7 @@ struct PatternSearch : OptimizationAlgorithm
 				{
 					#pragma omp critical
 					{
-						if (logger) logger->LogMessage  "> maxGen value reached, terminating - generation "  generation  "."  ;
+						//if (logger) logger->LogMessage  "> maxGen value reached, terminating - generation "  generation  "."  ;
 						success = false;
 						terminationReason = "maxGen value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -467,7 +463,7 @@ struct PatternSearch : OptimizationAlgorithm
 				{
 					#pragma omp critical
 					{
-						if (logger) logger->LogMessage  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
+						//if (logger) logger->LogMessage  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
 						terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
 						success = false;
 						flag = true;//dont do other runs, out of funEvals
@@ -483,17 +479,17 @@ struct PatternSearch : OptimizationAlgorithm
 				funEvals += funEvalsThisRun;
 				if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
 				if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
-				if (logger) logger->LogMessage  "> run "  run  ": ";
+				//if (logger) logger->LogMessage  "> run "  run  ": ";
 				if (mainPointFitness < topPointFitness)
 				{
 					topPoint = mainPoint;
 					topPointFitness = mainPointFitness;
-					if (logger) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
+					//if (logger) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
 					if (topPointFitness < optimalFitness) flag = true;//dont do other runs, fitness goal reached
 				}
 				else
 				{
-					if (logger) logger->LogMessage  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
+					//if (logger) logger->LogMessage  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
 				}
 			}
 
