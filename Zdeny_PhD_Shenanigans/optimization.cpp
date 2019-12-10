@@ -100,7 +100,7 @@ vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double
 	drawPoint2D(optimizedFuncLandscapeCLRlog, minloc, stretchFactorX, stretchFactorY, Scalar(0, 0, 255));
 	//showimg(optimizedFuncLandscapeCLR, "optimizedFuncLandscape");
 	//showimg(optimizedFuncLandscapeCLRlog, "optimizedFuncLandscape-log");
-	showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
+	//showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
 	cout << "done." << endl;
 
 	if (1)
@@ -109,11 +109,7 @@ vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double
 
 		//logPointsAll = true;//needed for pretty pictures - all trial points
 		Evo.logPointsMain = true;//needed for pretty pictures - main directed path
-		Evo.speakAll = false;//dont spam that much
-		Evo.speakMain = true;//but say smth pls
 		Pat.logPointsMain = true;//needed for pretty pictures - main directed path
-		Pat.speakAll = false;//dont spam that much
-		Pat.speakMain = true;//but say smth pls
 
 		vector<double> resultPat = zerovect(Evo.N), resultEvo = zerovect(Evo.N);
 		if (optPat)
@@ -131,9 +127,9 @@ vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double
 		if (optEvo) cout << "Termination reason - EVO: " << Evo.terminationReason << endl;
 		if (optPat) cout << "Function evals - PAT: " << Pat.funEvals << " (multistartCnt: " << Pat.multistartCnt << ")" << endl;
 		if (optEvo) cout << "Function evals - EVO: " << Evo.funEvals << endl;
-		if (optPat) showEntity(resultPat, f(resultPat), "Result - PAT", true);
-		if (optEvo) showEntity(resultEvo, f(resultEvo), "Result - EVO", true);
-		showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
+		//if (optPat) showEntity(resultPat, f(resultPat), "Result - PAT", true);
+		//if (optEvo) showEntity(resultEvo, f(resultEvo), "Result - EVO", true);
+		//showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
 		Mat optimizedFuncLandscapeWithPathPAT = optimizedFuncLandscapeCLR, optimizedFuncLandscapeWithPathEVO = optimizedFuncLandscapeCLR;
 		if (optPat) optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPointsAll, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
 		if (optEvo) optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPointsAll, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);

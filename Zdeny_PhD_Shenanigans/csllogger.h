@@ -10,12 +10,7 @@ struct CslLogger : Logger
 	{
 		if (loglevel <= m_loglevel)
 		{
-			std::cout << " [" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg + "\n";
+			std::cout << LOGLEVEL_STR2[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg + "\n";
 		}
-	}
-
-	inline void LogValue(const std::string& name, double value) override
-	{
-		std::cout << " [" + currentTime() + "] [VALUE]: " + name + " = " + to_string(value) + "\n";
 	}
 };

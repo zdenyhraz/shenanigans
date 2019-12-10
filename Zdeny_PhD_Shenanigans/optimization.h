@@ -67,13 +67,13 @@ struct Evolution : OptimizationAlgorithm
 	int distincEntityMaxTrials = 0;//spread the initial population abit
 	int historySize = 10;
 	double historyImprovTresholdPercent = 1;
-	std::function<void(std::vector<double>)> OnGenerationEvent;
+	std::function<void(std::vector<double>)> OnGenerationSUBEVENT;
 
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
 	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr)
 	{
-		if (logger) logger->LogMessage(">> Optimization started (evolution)", SPECIAL);
+		if (logger) logger->LogMessage("Optimization started (evolution)", EVENT);
 		
 		vector<vector<double>> visitedPointsMainThisRun;
 		vector<vector<double>> visitedPointsAllThisRun;
@@ -94,7 +94,7 @@ struct Evolution : OptimizationAlgorithm
 		success = false;
 
 		//initialize random starting population matrix within bounds
-		if (logger) logger->LogMessage("Initializing population within bounds ... ", SPECIAL);
+		if (logger) logger->LogMessage("Initializing population within bounds ... ", SUBEVENT);
 		double initialMinAvgDist = 0.5;
 		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
 		{
@@ -128,7 +128,7 @@ struct Evolution : OptimizationAlgorithm
 			}
 		}
 
-		if (logger) logger->LogMessage("Initial population created", SPECIAL);
+		if (logger) logger->LogMessage("Initial population created", SUBEVENT);
 		//calculate initial fitness vector
 		#pragma omp parallel for
 		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -247,8 +247,8 @@ struct Evolution : OptimizationAlgorithm
 					if (logPointsMain) visitedPointsMainThisRun.push_back(bestEntity);
 					if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)) 
 					{ 
-						logger->LogMessage("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness),SPECIAL);
-						logger->LogMessage("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", INFO);
+						logger->LogMessage("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), INFO);
+						logger->LogMessage("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", DEBUG);
 					}
 				}
 			}
@@ -275,34 +275,34 @@ struct Evolution : OptimizationAlgorithm
 			averageImprovement /= NP;
 			if (stopCrit == StoppingCriterion::AVGIMPROVPERC) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
 
-			if (OnGenerationEvent)
-				OnGenerationEvent({static_cast<double>(generation),bestFitness, averageImprovement});
+			if (OnGenerationSUBEVENT)
+				OnGenerationSUBEVENT({static_cast<double>(generation),bestFitness, averageImprovement});
 
 			//termination criterions
 			if (bestFitness < optimalFitness)//fitness goal reached
 			{
-				if (logger) logger->LogMessage("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
+				if (logger) logger->LogMessage("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".", SUBEVENT);
 				terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
 				success = true;
 				break;
 			}
 			if (generation == maxGen)//maximum generation reached
 			{
-				if (logger) logger->LogMessage("MaxGen value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
+				if (logger) logger->LogMessage("MaxGen value reached, terminating - generation " + to_string(generation) + ".", SUBEVENT);
 				terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
 			{
-				if (logger) logger->LogMessage("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
+				if (logger) logger->LogMessage("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".", SUBEVENT);
 				terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (historyConstant)//no entity improved last (historySize) generations
 			{
-				if (logger) logger->LogMessage("historyConstant value reached, terminating - generation " + to_string(generation) + ".", SPECIAL);
+				if (logger) logger->LogMessage("historyConstant value reached, terminating - generation " + to_string(generation) + ".", SUBEVENT);
 				terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
