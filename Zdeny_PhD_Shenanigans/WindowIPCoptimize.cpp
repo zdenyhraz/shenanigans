@@ -11,7 +11,6 @@ WindowIPCoptimize::WindowIPCoptimize(QWidget* parent, Globals* globals) : QMainW
 
 void WindowIPCoptimize::optimize()
 {
-	//ok
 	optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt());
 	globals->Logger->LogMessage("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), INFO);
 }

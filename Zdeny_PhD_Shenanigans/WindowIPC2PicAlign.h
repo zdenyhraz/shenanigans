@@ -16,4 +16,5 @@ private:
 private slots:
 	void align();
 	void flowMap();
+	void features();
 };

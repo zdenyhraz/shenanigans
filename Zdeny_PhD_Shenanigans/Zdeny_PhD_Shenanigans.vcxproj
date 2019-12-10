@@ -132,6 +132,8 @@
     <ClCompile Include="Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="csllogger.h" />
     <ClInclude Include="filtering.h" />
     <ClInclude Include="FITS.h" />
     <ClInclude Include="fourier.h" />
@@ -143,6 +145,7 @@
     <ClInclude Include="graphOptimization.h" />
     <ClInclude Include="inverseMapping.h" />
     <ClInclude Include="IPC.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="neural.h" />
     <ClInclude Include="optimization.h" />
     <ClInclude Include="qtlogger.h" />

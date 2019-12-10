@@ -265,7 +265,7 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 		succload = params1.succload && params2.succload;
 		if (succload)//load succesfull
 		{
-#pragma omp critical
+			#pragma omp critical
 			itersSucc++;
 
 			if (0 && (i == 0))
@@ -285,7 +285,7 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 			for (int mimosloupeciter = 0; mimosloupeciter < itersX; mimosloupeciter++)//X cyklus
 			{
 				cout << "> pic " << i + 1 << " / " << iters << ", X >>> " << mimosloupeciter + 1 << " / " << itersX << endl;
-#pragma omp parallel for
+				#pragma omp parallel for
 				for (int meridianiter = 0; meridianiter < itersY; meridianiter++)//Y cyklus
 				{
 					Mat crop1, crop2;
