@@ -3,8 +3,10 @@
 #include "functionsBaseSTL.h"
 #include "logger.h"
 
-#define LOGGER_QT
-//#define LOGGER_CSL
-#define PLOTTER_QT
+#define ATTACH_CONSOLE//windows console for logging
+#define LOGGER_QT//Qt text browser colorful logging
+#define PLOTTER_QT//Qt QCustomPlot plotting
+#define OPT_WITH_CV//additional optimization graphical functionality with OpenCV
+//#define FOURIER_WITH_FFTW//optional use of the fftw library
 
 constexpr LOGLEVEL g_loglevel = DEBUG;

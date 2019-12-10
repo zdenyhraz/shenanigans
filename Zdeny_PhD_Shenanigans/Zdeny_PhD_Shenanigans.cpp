@@ -16,9 +16,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
 	#ifdef LOGGER_QT
 	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
-	#endif
-
-	#ifdef LOGGER_CSL
+	#else
 	globals->Logger = new CslLogger(g_loglevel);
 	#endif
 

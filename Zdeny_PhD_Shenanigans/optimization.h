@@ -2,8 +2,6 @@
 #include "functionsBaseSTL.h"
 #include "logger.h"
 
-#define OPT_WITH_CV//additional graphical functionality with OpenCV
-
 #ifdef OPT_WITH_CV
 #include "functionsBaseCV.h"
 #endif
