@@ -24,8 +24,6 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	int funEvals = 0;//current # of function evaluations
 	int maxFunEvals = 1e10;//maximum # of function evaluations
 	int maxGen = 1000;//maximum # of algorithm iterations
-	bool speakMain = true;//sparse console verbosity
-	bool speakAll = false;//dense console verbosity
 	bool success = false;//success in reaching satisfactory function value
 	bool logPointsMain = false;//switch for sparse logging of explored points
 	bool logPointsAll = false;//switch for dense logging of explored points
@@ -34,38 +32,6 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
 	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};
 };
-
-inline ostream& operator<<(ostream& out, MutationStrategy& mutStrat)
-{
-	switch (mutStrat)
-	{
-	case MutationStrategy::RAND1: out << "RAND1"; break;
-	case MutationStrategy::BEST1: out << "BEST1"; break;
-	case MutationStrategy::RAND2: out << "RAND2"; break;
-	case MutationStrategy::BEST2: out << "BEST2"; break;
-	}
-	return out;
-}
-
-inline ostream& operator<<(ostream& out, CrossoverStrategy& crossStrat)
-{
-	switch (crossStrat)
-	{
-	case CrossoverStrategy::BIN: out << "BIN"; break;
-	case CrossoverStrategy::EXP: out << "EXP"; break;
-	}
-	return out;
-}
-
-inline void showEntity(std::vector<double>& arg, double fitness, std::string name, bool showFitness=true, bool special=false, std::string extraInfo="")
-{
-	//cout << scientific << setprecision(3);
-	cout << "<" << name << "> " << endl << arg;
-	if (special) cout << endl;
-	if (extraInfo != "") cout << ">> " << extraInfo << endl;
-	if (showFitness) cout << ">>> fitness: " << fitness;
-	cout << endl;
-}
 
 inline double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange)
 {
@@ -105,20 +71,10 @@ struct Evolution : OptimizationAlgorithm
 
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
-	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, std::ofstream* listing = nullptr)
+	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr)
 	{
-		if (speakAll) speakMain = true;
-		if (speakMain && logger) cout << endl << ">> Optimization started (evolution)" << endl;
-		if (listing)
-		{
-			*listing << ">> Optimization started (evolution)" << endl;
-			*listing << "NP=" << NP;
-			*listing << "; CR=" << CR;
-			*listing << "; F=" << F << endl;
-			*listing << "mutStrat," << mutStrat << endl;
-			*listing << "crossStrat," << crossStrat << endl;
-		}
-
+		if (logger) logger->LogMessage(">> Optimization started (evolution)", SPECIAL);
+		
 		vector<vector<double>> visitedPointsMainThisRun;
 		vector<vector<double>> visitedPointsAllThisRun;
 		double averageImprovement = 0;
@@ -138,8 +94,7 @@ struct Evolution : OptimizationAlgorithm
 		success = false;
 
 		//initialize random starting population matrix within bounds
-		if (speakMain) cout << "> Initializing population within bounds ... " << endl;
-		if (listing) *listing << "> Initializing population within bounds ... " << endl;
+		if (logger) logger->LogMessage("Initializing population within bounds ... ", SPECIAL);
 		double initialMinAvgDist = 0.5;
 		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
 		{
@@ -157,11 +112,11 @@ struct Evolution : OptimizationAlgorithm
 				for (int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++)//check distance to all other entities
 				{
 					double avgDist = averageVectorDistance(population[indexEntity], population[indexEntity2], boundsRange);//calculate how distinct the entity is to another entity
-					if (speakAll) cout << "entity" << indexEntity << " trial " << distinctEntityTrials << " avgDist to entity" << indexEntity2 << ": " << avgDist << ", minimum dist: " << initialMinAvgDist << endl;
+					if (logger) logger->LogMessage("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist), INFO);
 					if (avgDist < initialMinAvgDist)//check if entity is distinct
 					{
 						distinctEntity = false;
-						if (speakAll) cout << "entity" << indexEntity << " is not distinct to entity" << indexEntity2 << ", bruh moment" << endl;
+						if (logger) logger->LogMessage("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment", INFO);
 						break;//needs to be distinct from all entities
 					}
 				}
@@ -173,8 +128,7 @@ struct Evolution : OptimizationAlgorithm
 			}
 		}
 
-		if (speakMain) cout << "> Initial population created" << endl;
-		if (listing) *listing << "> Initial population created" << endl;
+		if (logger) logger->LogMessage("Initial population created", SPECIAL);
 		//calculate initial fitness vector
 		#pragma omp parallel for
 		for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -187,7 +141,6 @@ struct Evolution : OptimizationAlgorithm
 			}
 		}
 		funEvals += NP;
-		if (listing) *listing << "generation,fitness,logfitness,avgImprov,,bestPars" << endl;
 
 		//run main evolution cycle
 		for (int generation = 1; generation < 1e8; generation++)
@@ -292,8 +245,7 @@ struct Evolution : OptimizationAlgorithm
 					fitness_prev = fitness_curr;
 					fitness_curr = bestFitness;
 					if (logPointsMain) visitedPointsMainThisRun.push_back(bestEntity);
-					if (speakMain && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)) { showEntity(bestEntity, bestFitness, "Gen " + to_string(generation) + " best entity", true, true, "curr_best_Improv = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, avg_hist_Improv = " + to_string(averageImprovement * 100) + "%"); cout << endl; }
-					if (listing) *listing << generation << "," << bestFitness << "," << log(bestFitness) << "," << averageImprovement << ",," << bestEntity << endl;
+					if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)) { showEntity(bestEntity, bestFitness, "Gen " + to_string(generation) + " best entity", true, true, "curr_best_Improv = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, avg_hist_Improv = " + to_string(averageImprovement * 100) + "%"); logger->LogMessage  ; }
 				}
 			}
 
@@ -320,12 +272,12 @@ struct Evolution : OptimizationAlgorithm
 			if (stopCrit == StoppingCriterion::AVGIMPROVPERC) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
 
 			//output progress to the console
-			if (speakAll)
+			if (logger)
 			{
-				cout << "################################################### generation " << generation << " ###################################################" << endl;
+				logger->LogMessage  "################################################### generation "  generation  " ###################################################"  ;
 				for (int indexEntity = 0; indexEntity < NP; indexEntity++)
 					showEntity(population[indexEntity], fitness[indexEntity], "entity " + to_string(indexEntity));
-				showEntity(bestEntity, bestFitness, "Best entity", true, true); cout << endl;
+				showEntity(bestEntity, bestFitness, "Best entity", true, true); logger->LogMessage  ;
 			}
 			if (OnGenerationEvent)
 				OnGenerationEvent({ static_cast<double>(generation),bestFitness, averageImprovement });
@@ -333,28 +285,28 @@ struct Evolution : OptimizationAlgorithm
 			//termination criterions
 			if (bestFitness < optimalFitness)//fitness goal reached
 			{
-				if (speakMain) cout << "OptimalFitness value reached, terminating - generation " << generation << "." << endl;
+				if (logger) logger->LogMessage  "OptimalFitness value reached, terminating - generation "  generation  "."  ;
 				terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
 				success = true;
 				break;
 			}
 			if (generation == maxGen)//maximum generation reached
 			{
-				if (speakMain) cout << "MaxGen value reached, terminating - generation " << generation << "." << endl;
+				if (logger) logger->LogMessage  "MaxGen value reached, terminating - generation "  generation  "."  ;
 				terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
 			{
-				if (speakMain) cout << "MaxFunEvals value reached, terminating - generation " << generation << "." << endl;
+				if (logger) logger->LogMessage  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
 				terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
 			}
 			if (historyConstant)//no entity improved last (historySize) generations
 			{
-				if (speakMain) cout << "historyConstant value reached, terminating - generation " << generation << "." << endl;
+				if (logger) logger->LogMessage  "historyConstant value reached, terminating - generation "  generation  "."  ;
 				terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
 				success = false;
 				break;
@@ -362,7 +314,6 @@ struct Evolution : OptimizationAlgorithm
 		}//generation cycle end
 		if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
 		if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
-		if (listing) *listing << endl;
 		return bestEntity;
 	}//optimize function end
 };
@@ -377,10 +328,9 @@ struct PatternSearch : OptimizationAlgorithm
 
 	PatternSearch(int N) : OptimizationAlgorithm(N) {};
 
-	vector<double> optimize(std::function<double(vector<double>)> f)
+	vector<double> optimize(std::function<double(vector<double>)> f, Logger* logger = nullptr)
 	{
-		if (speakAll) speakMain = true;
-		if (speakMain) cout << endl << ">> Optimization started (pattern search)" << endl;
+		if (logger) logger->LogMessage    ">> Optimization started (pattern search)"  ;
 
 		vector<double> boundsRange = upperBounds - lowerBounds;
 		double initialStep = vectorMax(boundsRange) / 4;
@@ -401,7 +351,7 @@ struct PatternSearch : OptimizationAlgorithm
 
 		//multistart pattern search
 		volatile bool flag = false;
-#pragma omp parallel for shared(flag)
+		#pragma omp parallel for shared(flag)
 		for (int run = 0; run < multistartMaxCnt; run++)
 		{
 			if (flag) continue;
@@ -453,7 +403,7 @@ struct PatternSearch : OptimizationAlgorithm
 							mainPointFitness = patternFitness[dim][pm];
 							if (logPointsMain) visitedPointsMainThisRun.push_back(pattern[dim][pm]);
 							smallerStep = false;
-							if (speakAll) cout << "> run " << run << " current best entity fitness: " << patternFitness[dim][pm] << endl;
+							if (logger) logger->LogMessage  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
 							if (maxExploitCnt > 0)
 							{
 								double testPointFitness = mainPointFitness;
@@ -470,7 +420,7 @@ struct PatternSearch : OptimizationAlgorithm
 										mainPoint = testPoint;
 										mainPointFitness = testPointFitness;
 										if (logPointsMain) visitedPointsMainThisRun.push_back(testPoint);
-										if (speakAll) cout << "> run " << run << " - exploitation " << exploitCnt << " just improved the fitness: " << testPointFitness << endl;
+										if (logger) logger->LogMessage  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
 									}
 								}
 							}
@@ -485,9 +435,9 @@ struct PatternSearch : OptimizationAlgorithm
 				//termination criterions
 				if (step < minStep)
 				{
-#pragma omp critical
+					#pragma omp critical
 					{
-						if (speakAll) cout << "> minStep value reached, terminating - generation " << generation << "." << endl;
+						if (logger) logger->LogMessage  "> minStep value reached, terminating - generation "  generation  "."  ;
 						success = false;
 						terminationReason = "minStep value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -495,9 +445,9 @@ struct PatternSearch : OptimizationAlgorithm
 				}
 				if (mainPointFitness < optimalFitness)
 				{
-#pragma omp critical
+					#pragma omp critical
 					{
-						if (speakAll) cout << "> optimalFitness value reached, terminating - generation " << generation << "." << endl;
+						if (logger) logger->LogMessage  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
 						success = true;
 						terminationReason = "optimalFitness value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -505,9 +455,9 @@ struct PatternSearch : OptimizationAlgorithm
 				}
 				if (generation == maxGen)
 				{
-#pragma omp critical
+					#pragma omp critical
 					{
-						if (speakAll) cout << "> maxGen value reached, terminating - generation " << generation << "." << endl;
+						if (logger) logger->LogMessage  "> maxGen value reached, terminating - generation "  generation  "."  ;
 						success = false;
 						terminationReason = "maxGen value reached, final fitness: " + to_string(mainPointFitness);
 					}
@@ -515,9 +465,9 @@ struct PatternSearch : OptimizationAlgorithm
 				}
 				if ((funEvals >= maxFunEvals) || (funEvalsThisRun >= maxFunEvals))
 				{
-#pragma omp critical
+					#pragma omp critical
 					{
-						if (speakAll) cout << "MaxFunEvals value reached, terminating - generation " << generation << "." << endl;
+						if (logger) logger->LogMessage  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
 						terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
 						success = false;
 						flag = true;//dont do other runs, out of funEvals
@@ -527,23 +477,23 @@ struct PatternSearch : OptimizationAlgorithm
 			}//generations end
 
 			//multistart result update
-#pragma omp critical
+			#pragma omp critical
 			{
 				multistartCnt++;
 				funEvals += funEvalsThisRun;
 				if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
 				if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
-				if (speakMain) cout << "> run " << run << ": ";
+				if (logger) logger->LogMessage  "> run "  run  ": ";
 				if (mainPointFitness < topPointFitness)
 				{
 					topPoint = mainPoint;
 					topPointFitness = mainPointFitness;
-					if (speakMain) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
+					if (logger) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
 					if (topPointFitness < optimalFitness) flag = true;//dont do other runs, fitness goal reached
 				}
 				else
 				{
-					if (speakMain) cout << "- run has ended with no improvement, fitness: " << mainPointFitness << endl;
+					if (logger) logger->LogMessage  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
 				}
 			}
 
