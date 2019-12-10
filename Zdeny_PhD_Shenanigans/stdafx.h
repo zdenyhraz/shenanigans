@@ -27,6 +27,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
+//custom
+#include "constants.h"
+
 
 
 

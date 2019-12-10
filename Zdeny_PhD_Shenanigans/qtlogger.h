@@ -10,13 +10,15 @@ struct QtLogger : Logger
 
 	QtLogger(LOGLEVEL loglevel, QTextBrowser* TextBrowser) : Logger(loglevel), m_TextBrowser(TextBrowser) {};
 
-	inline void LogMessage(const std::string& msg, LOGLEVEL loglevel) override
+	inline void Log(const std::string& msg, LOGLEVEL loglevel) override
 	{
 		if (loglevel <= m_loglevel)
 		{
 			m_TextBrowser->setTextColor(LOGLEVEL_CLR[loglevel]);
-			if (loglevel != DEBUG) m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STR2[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg).c_str()));
-			else m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STR2[loglevel] + msg).c_str()));
+			if (loglevel != DEBUG) m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STRS[loglevel] + "[" + currentTime() + "] [" + LOGLEVEL_STR[loglevel] + "]: " + msg).c_str()));
+			else m_TextBrowser->append(QString::fromUtf8((LOGLEVEL_STRS[loglevel] + msg).c_str()));
+
+			QCoreApplication::processEvents();
 		}
 	}
 };
