@@ -105,10 +105,10 @@ struct Evolution : OptimizationAlgorithm
 
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
-	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* = nullptr, std::ofstream* listing = nullptr)
+	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, std::ofstream* listing = nullptr)
 	{
 		if (speakAll) speakMain = true;
-		if (speakMain) cout << endl << ">> Optimization started (evolution)" << endl;
+		if (speakMain && logger) cout << endl << ">> Optimization started (evolution)" << endl;
 		if (listing)
 		{
 			*listing << ">> Optimization started (evolution)" << endl;
