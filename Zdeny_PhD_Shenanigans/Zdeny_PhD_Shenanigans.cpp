@@ -13,11 +13,16 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
 	globals->IPCsettings = new IPCsettings();
-	globals->Logger = new QtLogger(DEBUG, ui.textBrowser);
 
-	//log a welcome message
-	globals->Logger->LogMessage("Welcome back, my friend.", SPECIAL);
+	#ifdef LOGGER_QT
+	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
+	#endif
 
+	#ifdef LOGGER_CSL
+	globals->Logger = new CslLogger(g_loglevel);
+	#endif
+
+	globals->Logger->LogMessage("Welcome back, my friend.", SPECIAL);//log a welcome message
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);

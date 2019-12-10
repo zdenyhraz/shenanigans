@@ -147,6 +147,15 @@
     <ClInclude Include="graphOptimization.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
+    <ClInclude Include="logger.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="csllogger.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Zdeny_PhD_Shenanigans.h">

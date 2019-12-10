@@ -377,8 +377,8 @@
      <string>IPC</string>
     </property>
     <addaction name="actionIPC_parameters"/>
-    <addaction name="actionIPC_optimize"/>
     <addaction name="actionIPC_2pic_align"/>
+    <addaction name="actionIPC_optimize"/>
     <addaction name="actionIPC_duel"/>
    </widget>
    <widget class="QMenu" name="menuNeural">
@@ -511,6 +511,11 @@
   <action name="actionIPC_2pic_align">
    <property name="text">
     <string>IPC 2 pic</string>
+   </property>
+  </action>
+  <action name="actionFeature_matching">
+   <property name="text">
+    <string>feature matching</string>
    </property>
   </action>
  </widget>
