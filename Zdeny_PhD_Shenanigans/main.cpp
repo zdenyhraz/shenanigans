@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
 	freopen("CON", "r", stdin);
 	#endif
 
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
+	QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
+	//qputenv("QT_SCALE_FACTOR", "1.0");
+
 	QApplication a(argc, argv);
 	Zdeny_PhD_Shenanigans w;
 	w.show();
