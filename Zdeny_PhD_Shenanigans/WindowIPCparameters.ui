@@ -6,33 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>341</width>
-    <height>317</height>
+    <width>218</width>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WindowIPCparameters</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>220</y>
-      <width>131</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save and exit</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>130</x>
       <y>10</y>
-      <width>102</width>
+      <width>81</width>
       <height>181</height>
      </rect>
     </property>
@@ -106,25 +93,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>220</y>
-      <width>131</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>11</y>
-      <width>61</width>
+      <x>80</x>
+      <y>-2</y>
+      <width>42</width>
       <height>204</height>
      </rect>
     </property>
@@ -211,12 +185,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>10</y>
-      <width>99</width>
+      <x>-2</x>
+      <y>0</y>
+      <width>81</width>
       <height>201</height>
      </rect>
     </property>
@@ -303,14 +277,40 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>204</y>
+      <width>201</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Save and exit</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>341</width>
-     <height>21</height>
+     <width>218</width>
+     <height>18</height>
     </rect>
    </property>
   </widget>
