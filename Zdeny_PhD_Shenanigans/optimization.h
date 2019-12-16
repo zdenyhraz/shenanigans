@@ -30,28 +30,6 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr) = 0;
 };
 
-inline double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange)
-{
-	double result = 0;
-	for (int i = 0; i < vec1.size(); i++)
-	{
-		result += abs(vec1[i] - vec2[i]) / boundsRange[i];//normalize -> 0 to 1
-	}
-	result /= vec1.size();//coordinate average
-	return result;
-}
-
-inline bool isDistinct(int inpindex, std::vector<int>& indices, int currindex)
-{
-	bool isdist = true;
-	for (auto& idx : indices)
-	{
-		if (inpindex == idx || inpindex == currindex)
-			isdist = false;
-	}
-	return isdist;
-}
-
 struct Evolution : OptimizationAlgorithm
 {
 	int NP = 4;
@@ -64,8 +42,6 @@ struct Evolution : OptimizationAlgorithm
 	int distincEntityMaxTrials = 0;//spread the initial population abit
 	int historySize = 10;
 	double historyImprovTresholdPercent = 1;
-	std::function<void(std::vector<double>)> OnGenerationSUBEVENT;
-
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
 	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr) override;

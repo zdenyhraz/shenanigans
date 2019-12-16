@@ -93,10 +93,10 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			//calculate the number of parents
 			switch (mutStrat)
 			{
-			case MutationStrategy::RAND1: numberOfParents = 3; break;
-			case MutationStrategy::BEST1: numberOfParents = 2; break;
-			case MutationStrategy::RAND2: numberOfParents = 5; break;
-			case MutationStrategy::BEST2: numberOfParents = 4; break;
+				case MutationStrategy::RAND1: numberOfParents = 3; break;
+				case MutationStrategy::BEST1: numberOfParents = 2; break;
+				case MutationStrategy::RAND2: numberOfParents = 5; break;
+				case MutationStrategy::BEST2: numberOfParents = 4; break;
 			}
 			vector<int> parentIndices(numberOfParents, 0);
 			for (auto& idx : parentIndices)
@@ -110,29 +110,29 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			vector<bool> paramIsCrossed(N, false);
 			switch (crossStrat)
 			{
-			case CrossoverStrategy::BIN:
-			{
-				int definite = rand() % N;//at least one param undergoes crossover
-				for (int indexParam = 0; indexParam < N; indexParam++)
+				case CrossoverStrategy::BIN:
 				{
-					double random = randInRange();
-					if (random < CR || indexParam == definite) paramIsCrossed[indexParam] = true;
+					int definite = rand() % N;//at least one param undergoes crossover
+					for (int indexParam = 0; indexParam < N; indexParam++)
+					{
+						double random = randInRange();
+						if (random < CR || indexParam == definite) paramIsCrossed[indexParam] = true;
+					}
+					break;
 				}
-				break;
-			}
-			case CrossoverStrategy::EXP:
-			{
-				int L = 0;
-				do { L++; } while ((randInRange() < CR) && (L < N));//at least one param undergoes crossover
-				int indexParam = rand() % N;
-				for (int i = 0; i < L; i++)
+				case CrossoverStrategy::EXP:
 				{
-					paramIsCrossed[indexParam] = true;
-					indexParam++;
-					indexParam %= N;
+					int L = 0;
+					do { L++; } while ((randInRange() < CR) && (L < N));//at least one param undergoes crossover
+					int indexParam = rand() % N;
+					for (int i = 0; i < L; i++)
+					{
+						paramIsCrossed[indexParam] = true;
+						indexParam++;
+						indexParam %= N;
+					}
+					break;
 				}
-				break;
-			}
 			}
 
 			//perform the crossover
@@ -142,10 +142,10 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 				{
 					switch (mutStrat)
 					{
-					case MutationStrategy::RAND1: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]); break;
-					case MutationStrategy::BEST1: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]); break;
-					case MutationStrategy::RAND2: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + F * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]); break;
-					case MutationStrategy::BEST2: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + F * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]); break;
+						case MutationStrategy::RAND1: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]); break;
+						case MutationStrategy::BEST1: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]); break;
+						case MutationStrategy::RAND2: newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + F * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]); break;
+						case MutationStrategy::BEST2: newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + F * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]); break;
 					}
 				}
 				//check for boundaries, effectively clamp
@@ -209,9 +209,6 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		}
 		averageImprovement /= NP;
 		if (stopCrit == StoppingCriterion::AVGIMPPER) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
-
-		if (OnGenerationSUBEVENT)
-			OnGenerationSUBEVENT({ static_cast<double>(generation),bestFitness, averageImprovement });
 
 		//termination criterions
 		if (bestFitness < optimalFitness)//fitness goal reached
@@ -411,7 +408,6 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 				//if (logger) logger->Log  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
 			}
 		}
-
 	}//multistart end
 	return topPoint;
 }//opt end
@@ -480,7 +476,7 @@ Mat drawPath2D(Mat funcLandscape, vector<vector<vector<double>>> points, double 
 	return resultMat;
 }
 
-vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> lowerBounds, vector<double> upperBounds, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, Mat* landscape)
+std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> lowerBounds, vector<double> upperBounds, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, Mat* landscape)
 {
 	Mat optimizedFuncLandscapeCLR = Mat::zeros(steps[0], steps[1], CV_64F);
 	cv::Point2i minloc, maxloc;

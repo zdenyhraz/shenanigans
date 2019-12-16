@@ -358,3 +358,25 @@ inline double linregPosition(int n, const std::vector<double>&x, const std::vect
 	linreg(n, x, y, k, q);
 	return k * x_ + q;
 }
+
+inline double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange)
+{
+	double result = 0;
+	for (int i = 0; i < vec1.size(); i++)
+	{
+		result += abs(vec1[i] - vec2[i]) / boundsRange[i];//normalize -> 0 to 1
+	}
+	result /= vec1.size();//coordinate average
+	return result;
+}
+
+inline bool isDistinct(int inpindex, std::vector<int>& indices, int currindex)
+{
+	bool isdist = true;
+	for (auto& idx : indices)
+	{
+		if (inpindex == idx || inpindex == currindex)
+			isdist = false;
+	}
+	return isdist;
+}
