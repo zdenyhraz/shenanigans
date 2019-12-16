@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1261</width>
-    <height>715</height>
+    <width>614</width>
+    <height>387</height>
    </rect>
   </property>
   <property name="cursor">
@@ -20,10 +20,10 @@
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>288</x>
       <y>0</y>
-      <width>901</width>
-      <height>681</height>
+      <width>321</width>
+      <height>351</height>
      </rect>
     </property>
     <property name="palette">
@@ -231,46 +231,13 @@
      </font>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>205</x>
-      <y>0</y>
-      <width>141</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButtonClearLogs">
-       <property name="text">
-        <string>Clear Logs</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonAddLogs">
-       <property name="text">
-        <string>Log</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonClose">
-       <property name="text">
-        <string>Close All Windows</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
+      <x>9</x>
+      <y>43</y>
       <width>181</width>
-      <height>41</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="palette">
@@ -313,7 +280,7 @@
     <property name="font">
      <font>
       <family>Berlin Sans FB</family>
-      <pointsize>16</pointsize>
+      <pointsize>17</pointsize>
       <weight>50</weight>
       <bold>false</bold>
      </font>
@@ -325,14 +292,53 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>350</y>
-      <width>331</width>
-      <height>331</height>
+      <x>5</x>
+      <y>70</y>
+      <width>280</width>
+      <height>280</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonClearLogs">
+    <property name="geometry">
+     <rect>
+      <x>195</x>
+      <y>0</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear Logs</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonAddLogs">
+    <property name="geometry">
+     <rect>
+      <x>195</x>
+      <y>21</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonClose">
+    <property name="geometry">
+     <rect>
+      <x>195</x>
+      <y>42</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Close All Windows</string>
     </property>
    </widget>
   </widget>
@@ -341,7 +347,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1261</width>
+     <width>614</width>
      <height>18</height>
     </rect>
    </property>
