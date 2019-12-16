@@ -100,6 +100,9 @@
     <ClCompile Include="WindowIPC2PicAlign.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
+    <ClCompile Include="WindowDiffrot.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -173,6 +176,9 @@
     <QtMoc Include="WindowIPC2PicAlign.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
+    <QtMoc Include="WindowDiffrot.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Zdeny_PhD_Shenanigans.ui">
@@ -188,6 +194,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="WindowIPC2PicAlign.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowDiffrot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

@@ -125,6 +125,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WindowDiffrot.cpp" />
     <ClCompile Include="WindowIPC2PicAlign.cpp" />
     <ClCompile Include="WindowIPCoptimize.cpp" />
     <ClCompile Include="WindowIPCparameters.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="optimization.h" />
     <ClInclude Include="qtlogger.h" />
     <ClInclude Include="stdafx.h" />
+    <QtMoc Include="WindowDiffrot.h" />
     <QtMoc Include="WindowIPC2PicAlign.h" />
     <QtMoc Include="WindowTemplate.h" />
     <QtMoc Include="WindowIPCoptimize.h" />
@@ -157,6 +159,7 @@
     <QtMoc Include="Zdeny_PhD_Shenanigans.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="WindowDiffrot.ui" />
     <QtUic Include="WindowIPC2PicAlign.ui" />
     <QtUic Include="WindowIPCoptimize.ui" />
     <QtUic Include="WindowIPCparameters.ui" />

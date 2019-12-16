@@ -3,6 +3,7 @@
 #include "WindowIPCparameters.h"
 #include "WindowIPCoptimize.h"
 #include "WindowIPC2PicAlign.h"
+#include "WindowDiffrot.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {
@@ -19,6 +20,7 @@ private:
 	WindowIPCparameters* windowIPCparameters;
 	WindowIPCoptimize* windowIPCoptimize;
 	WindowIPC2PicAlign* windowIPC2PicAlign;
+	WindowDiffrot* windowDiffrot;
 
 private slots:
 	void exit();
@@ -30,4 +32,5 @@ private slots:
 	void showWindowIPC2PicAlign();
 	void closeCV();
 	void debug();
+	void showWindowDiffrot();
 };
