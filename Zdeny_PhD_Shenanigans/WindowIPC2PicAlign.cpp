@@ -42,7 +42,7 @@ void WindowIPC2PicAlign::align()
 	showimg(img1, "img1");
 	showimg(img2, "img2");
 	showimg(AlignStereovision(img1, img2), "img 1n2 not aligned");
-	alignPics(img1, img2, img2, IPC_set, true, false);
+	alignPics(img1, img2, img2, IPC_set);
 	showimg(AlignStereovision(img1, img2), "img 1n2 yes aligned");
 }
 

@@ -31,7 +31,6 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 		}
 	}
 	if (IPC_set.IPCshow) { showimg(sourceimg1, "src1"); showimg(sourceimg2, "src2"); }
-	//if (IPC_set.IPCshow) { showfourier(fourier(windowMat), true, false, "windowFFTmagn", "windowFFTphase"); }
 
 	if (sourceimg1.channels() == 1)//grayscale images
 	{
@@ -71,14 +70,20 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 			dft(CrossPower, L3complex, DFT_INVERSE + DFT_SCALE);
 			Mat L3planes[2];
 			split(L3complex, L3planes);
-			//if (IPCspeak) std::cout << "L3 real min/max: " << minMaxMat(L3planes[0]) << std::endl;
-			//if (IPCspeak) std::cout << "L3 imag min/max: " << minMaxMat(L3planes[1]) << std::endl;
+			if (0)
+			{
+				auto minmaxReal = minMaxMat(L3planes[0]);
+				auto minmaxImag = minMaxMat(L3planes[1]);
+
+				std::cout << "L3 real min/max: " << std::get<0>(minmaxReal) << " / " << std::get<1>(minmaxReal) << std::endl;
+				std::cout << "L3 imag min/max: " << std::get<0>(minmaxImag) << " / " << std::get<1>(minmaxImag) << std::endl;
+			}
 			magnitude(L3planes[0], L3planes[1], L3);
 			Mat L3phase;
 			phase(L3planes[0], L3planes[1], L3phase);
 			if (IPC_set.IPCshow) { Mat L3pv; resize(L3phase, L3pv, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(L3pv, "L3phase", true); }
 		}
-		if (0)//real only (assume pure real input)
+		else//real only (assume pure real input)
 		{
 			dft(CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
 		}
@@ -92,7 +97,7 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 			*corrQuality = maxRQ;
 		}
 	}
-	else return Point2d(0, 0);
+	else return Point2d(0, 0);//no RGB support
 
 	normalize(L3, L3, 0, 1, CV_MINMAX);
 	if (IPC_set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, IPC_set.minimalShift));
@@ -125,7 +130,9 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 	if (IPC_set.IPCspeak) std::cout << "phase correlation calculated with pixel accuracy" << std::endl;
 	output.x = imageshiftX_PIXEL;
 	output.y = imageshiftY_PIXEL;
-	///SUBPIXEL------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	//SUBPIXEL------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	//first check for degenerate peaklocs
 	int L2size = IPC_set.L2size;
 	if (!(L2size % 2)) L2size++;//odd!
@@ -226,7 +233,7 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 	return output;
 }
 
-void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set, bool calcShift, bool calcRotScale)
+void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set)
 {
 	Mat estR, estT;
 	Point2f center((float)input1.cols / 2, (float)input1.rows / 2);
@@ -234,7 +241,7 @@ void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set, bool 
 
 	Mat window = edgemask(input1.rows, input1.cols);
 	Mat bandpass = bandpassian(input1.rows, input1.cols, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier);
-	if (calcRotScale)//calculate rotation and scale
+	if (1)//calculate rotation and scale
 	{
 		Mat img1FT = fourier(input1);
 		Mat img2FT = fourier(input2);
@@ -272,7 +279,7 @@ void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set, bool 
 		warpAffine(output, output, estR, cv::Size(input1.cols, input1.rows));
 	}
 
-	if (calcShift)//calculate shift
+	if (1)//calculate shift
 	{
 		auto shifts = phasecorrel(input1, output, IPC_set, window, bandpass);
 		cout << "shifts: " << shifts << endl;
@@ -370,7 +377,7 @@ void alignPicsDebug(Mat& img1In, Mat& img2In, IPCsettings& IPC_settings)
 	if (0) saveimg("D:\\MainOutput\\align\\ASV_notAligned.png", gammaCorrect(filterContrastBrightness(AlignStereovision(img1, img2), filterSetASV.contrast, filterSetASV.brightness), filterSetASV.gamma));
 
 	//now align them
-	alignPics(img1, img2, img2, IPC_settings, 1, 1);
+	alignPics(img1, img2, img2, IPC_settings);
 
 	//show aligned pics
 	showimg(gammaCorrect(filterContrastBrightness(AlignStereovision(img1, img2), filterSetASV.contrast, filterSetASV.brightness), filterSetASV.gamma), "aligned_stereo");

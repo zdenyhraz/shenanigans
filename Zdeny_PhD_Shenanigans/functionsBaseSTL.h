@@ -43,6 +43,8 @@ struct Timerr//benchmarking struct
 	}
 };
 
+enum class Norm : char { L1, L2 };
+
 inline std::vector<double> zerovect(int N, double value = 0)
 {
 	return std::vector<double>(N, value);

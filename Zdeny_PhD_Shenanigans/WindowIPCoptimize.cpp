@@ -7,6 +7,7 @@ WindowIPCoptimize::WindowIPCoptimize(QWidget* parent, Globals* globals) : QMainW
 {
 	ui.setupUi(this);
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(optimize()));
+	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(optimizeAll()));
 }
 
 void WindowIPCoptimize::optimize()
@@ -22,4 +23,9 @@ void WindowIPCoptimize::optimize()
 
 	optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger);
 	globals->Logger->Log("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), EVENT);
+}
+
+void WindowIPCoptimize::optimizeAll()
+{
+	optimizeIPCParametersForAllWavelengths(*globals->IPCsettings, ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger);
 }
