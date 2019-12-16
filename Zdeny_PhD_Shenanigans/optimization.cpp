@@ -198,7 +198,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			{
 				histories[indexEntity].pop();//remove first element - keep que size constant
 				histories[indexEntity].push(fitness[indexEntity]);//insert at the end
-				if (stopCrit == StoppingCriterion::ALLIMPPER) { if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100) historyConstant = false; }//fitness improved less than x% for all entities
+				if (stopCrit == StoppingCriterion::ALLIMP) { if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100) historyConstant = false; }//fitness improved less than x% for all entities
 			}
 			else
 			{
@@ -208,7 +208,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			if (histories[indexEntity].size() > 2) averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
 		}
 		averageImprovement /= NP;
-		if (stopCrit == StoppingCriterion::AVGIMPPER) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
+		if (stopCrit == StoppingCriterion::AVGIMP) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
 
 		//termination criterions
 		if (bestFitness < optimalFitness)//fitness goal reached
@@ -421,7 +421,7 @@ Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax
 	int progress = 0;
 	bool OpenMPparallelism = true;
 
-	RunInParallelOrInSerialZdeny(0, resultMat.rows, true, OpenMPparallelism, [&](int r)//WS needs windows parallelism affinity to utilize all 4 NUMA cpu nodes
+	RunInParallelOrInSerial(0, resultMat.rows, true, OpenMPparallelism, [&](int r)//WS needs windows parallelism affinity to utilize all 4 NUMA cpu nodes
 	{
 		for (int c = 0; c < resultMat.cols; c++)
 		{

@@ -179,13 +179,13 @@ inline double median(std::vector<T>& vec)
 }
 
 template <typename Func>
-inline void RunInParallelOrInSerialZdeny(int zeroIndex, int maxIndex, bool isParallelRunEnabled, bool openMP, Func fnc)
+inline void RunInParallelOrInSerial(int zeroIndex, int maxIndex, bool isParallelRunEnabled, bool openMP, Func fnc)
 {
 	if (isParallelRunEnabled)
 	{
 		if (openMP)//OpenMP parallelism
 		{
-#pragma omp parallel for
+			#pragma omp parallel for
 			for (int i = zeroIndex; i < maxIndex; i++)
 			{
 				fnc(i);

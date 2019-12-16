@@ -104,7 +104,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 	{
 		Evolution Evo(4);
 		Evo.NP = 24;
-		Evo.mutStrat = MutationStrategy::RAND1;
+		Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 		Evo.upperBounds = vector<double>{ 10,200,15,1 };
 		auto Result = Evo.optimize(f, logger);
@@ -170,7 +170,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 				{
 					Evolution Evo(4);
 					Evo.NP = 25;
-					Evo.mutStrat = MutationStrategy::RAND1;
+					Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 					Evo.optimalFitness = 0;
 					Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 					Evo.upperBounds = vector<double>{ 20,200,19,1 };
