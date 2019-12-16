@@ -13,53 +13,9 @@ using namespace cv;
 static std::vector<string> WAVELENGTHS_STR = { "HMI", "94_AIA", "131_AIA", "171_AIA", "171_SECCHIA", "171_SECCHIB", "193_AIA", "195_SECCHIA", "195_SECCHIB", "211_AIA", "284_SECCHIA", "284_SECCHIB", "304_AIA", "304_SECCHIA", "304_SECCHIB", "335_AIA" };
 static std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
 
-struct GUIsettings
-{
-	int PCWINDOW;
-	double PCroiL2Size;
-	double PCroiL1SizeRatio;
-	int delta_pic;
-	int upsamplecoeff;
-	double stdevLmult;
-	double stdevHmult;
-	double snrshit;
-	bool usePredicted_shift;
-	bool speakYN;
-	bool showYN;
-	bool writeYN;
-	bool useInterp;
-	bool useIterate;
-	bool useBandpass;
-	bool useWindow;
-	bool useSubpixel;
-	int iters_horizontal;
-	int iters_vertical;
-	int iters_pic;
-	int stride_pic;
-	bool useCrossCorrel;
-	bool useNorminput;
-	bool alternate;
-	bool colorr;
-	double quanBot;
-	double quanTop;
-	int medSize;
-	double mergeAlp;
-	int vertical_fov;
-	double sigmaa;
-	double contrastt;
-	double brightnesss;
-	double gamaa;
-	int iters_median;
-	bool twoCorrels;
-	std::string diskk;
-	std::string pathMasterIn;
-	std::string pathMasterOut;
-	std::string urlstart;
-};
-
 std::vector<double> diffrotProfileAverage(Mat& flow, int colS = 0);
 
-struct FlowResults
+static struct FlowResults
 {
 	Mat FlowPic;
 	Mat FlowX;

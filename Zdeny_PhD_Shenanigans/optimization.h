@@ -8,15 +8,11 @@
 
 using namespace std;
 
-enum class MutationStrategy : char { RAND1, BEST1, RAND2, BEST2 };
-enum class CrossoverStrategy : char { BIN, EXP };
-enum class StoppingCriterion : char { ALLIMPPER, AVGIMPPER };
-
 struct OptimizationAlgorithm//the main parent optimizer class
 {
 	int N = 1;//the problem dimension
 	vector<double> lowerBounds = zerovect(N, -1);//lower search space bounds
-	vector<double> upperBounds = zerovect(N, 1);//upper search space bounds
+	vector<double> upperBounds = zerovect(N, +1);//upper search space bounds
 	double optimalFitness = std::numeric_limits<double>::lowest();//satisfactory function value
 	int funEvals = 0;//current # of function evaluations
 	int maxFunEvals = 1e10;//maximum # of function evaluations
@@ -25,21 +21,24 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	bool logPoints = false;//switch for logging of explored points
 	vector<vector<vector<double>>> visitedPoints;//the 3D vector of visited points [run][iter][dim]
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
-	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};
+	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};//construct some default bounds
 
 	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr) = 0;
 };
 
 struct Evolution : OptimizationAlgorithm
 {
+	static enum class MutationStrategy : char { RAND1, BEST1, RAND2, BEST2 };
+	static enum class CrossoverStrategy : char { BIN, EXP };
+	static enum class StoppingCriterion : char { ALLIMP, AVGIMP };
 	int NP = 4;
-	double F = 0.65;//large is more exploration
-	double CR = 0.95;//close to 1 for dependent variables close to 0 for independent variables (separable / non-separable objective function)
+	double F = 0.65;
+	double CR = 0.95;
 	double iNPm = 8;
 	MutationStrategy mutStrat = MutationStrategy::RAND1;
 	CrossoverStrategy crossStrat = CrossoverStrategy::BIN;
-	StoppingCriterion stopCrit = StoppingCriterion::AVGIMPPER;
-	int distincEntityMaxTrials = 0;//spread the initial population abit
+	StoppingCriterion stopCrit = StoppingCriterion::AVGIMP;
+	int distincEntityMaxTrials = 0;
 	int historySize = 10;
 	double historyImprovTresholdPercent = 1;
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
