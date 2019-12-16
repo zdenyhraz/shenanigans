@@ -25,6 +25,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);
 	windowIPC2PicAlign = new WindowIPC2PicAlign(this, globals);
+	windowDiffrot = new WindowDiffrot(this, globals);
 
 	//make signal to slot connections
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
@@ -36,6 +37,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
 	connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
+	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -105,4 +107,9 @@ void Zdeny_PhD_Shenanigans::showWindowIPCoptimize()
 void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign()
 {
 	windowIPC2PicAlign->show();
+}
+
+void Zdeny_PhD_Shenanigans::showWindowDiffrot()
+{
+	windowDiffrot->show();
 }
