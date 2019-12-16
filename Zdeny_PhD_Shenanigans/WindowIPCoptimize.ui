@@ -6,84 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>234</height>
+    <width>272</width>
+    <height>155</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WindowIPCoptimize</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>80</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Optimize</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>96</x>
-      <y>10</y>
-      <width>371</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>D:\\MainOutput\\S-wind\\03_calib.PNG</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>80</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>input image path</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>36</y>
-      <width>80</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>output .csv path</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>96</x>
-      <y>36</y>
-      <width>371</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>D:\\MainOutput\\IPCparameterOptimizationS-wind.csv</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>12</x>
-      <y>63</y>
+      <x>10</x>
+      <y>40</y>
       <width>141</width>
       <height>74</height>
      </rect>
@@ -142,18 +77,71 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>130</y>
-      <width>171</width>
-      <height>51</height>
+      <x>160</x>
+      <y>40</y>
+      <width>101</width>
+      <height>71</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Optimize all</string>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Optimize</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Optimize all</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>271</width>
+      <height>36</height>
+     </rect>
     </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>input image path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\03_calib.PNG</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>output .csv path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="text">
+        <string>D:\\MainOutput\\IPCparameterOptimizationS-wind.csv</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -161,7 +149,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>476</width>
+     <width>272</width>
      <height>18</height>
     </rect>
    </property>
