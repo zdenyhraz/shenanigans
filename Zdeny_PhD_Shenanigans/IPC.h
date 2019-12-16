@@ -10,31 +10,29 @@ using namespace cv;
 
 struct IPCsettings
 {
-	int Cwin;
-	double L2size;
-	double L1ratio;
-	int UC;
-	double stdevLmultiplier;
-	double stdevHmultiplier;
-	double epsilon;
-	bool interpolate;
-	bool window;
-	bool bandpass;
-	bool subpixel;
-	bool crossCorrel;
-	bool normInput;
-	bool iterate;
+	int Cwin = 32;
+	double L2size = 11;
+	double L1ratio = 0.35;
+	int UC = 31;
+	double stdevLmultiplier = 1.2;
+	double stdevHmultiplier = 13;
+	double epsilon = 0;
+	bool interpolate = 1;
+	bool window = 1;
+	bool bandpass = 1;
+	bool subpixel = 1;
+	bool crossCorrel = 0;
+	bool normInput = 0;
+	bool iterate = 1;
 
 	bool IPCshow = false;
 	bool IPCspeak = false;
 	double minimalShift = 0;
-
-	IPCsettings() : Cwin(0) {}
 };
 
 Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, Mat& windowMat, Mat& bandpassMat, double* corrQuality = nullptr);
 
-void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set, bool calcShift, bool calcRotScale);
+void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set);
 
 Mat AlignStereovision(Mat& img1In, Mat& img2In);
 

@@ -10,8 +10,7 @@ using namespace std;
 
 enum class MutationStrategy : char { RAND1, BEST1, RAND2, BEST2 };
 enum class CrossoverStrategy : char { BIN, EXP };
-enum class StoppingCriterion : char { ALLIMPROVBOOL, ALLIMPROVPERC, AVGIMPROVPERC };
-enum class LpNorm : char { L1, L2 };
+enum class StoppingCriterion : char { ALLIMPPER, AVGIMPPER };
 
 struct OptimizationAlgorithm//the main parent optimizer class
 {
@@ -23,10 +22,8 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	int maxFunEvals = 1e10;//maximum # of function evaluations
 	int maxGen = 1000;//maximum # of algorithm iterations
 	bool success = false;//success in reaching satisfactory function value
-	bool logPointsMain = false;//switch for sparse logging of explored points
-	bool logPointsAll = false;//switch for dense logging of explored points
-	vector<vector<vector<double>>> visitedPointsMain;//the 3D sparse vector of visited points [run][iter][dim]
-	vector<vector<vector<double>>> visitedPointsAll;//the 3D dense vector of visited points [run][iter][dim]
+	bool logPoints = false;//switch for logging of explored points
+	vector<vector<vector<double>>> visitedPoints;//the 3D vector of visited points [run][iter][dim]
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
 	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};
 
@@ -63,7 +60,7 @@ struct Evolution : OptimizationAlgorithm
 	double iNPm = 8;
 	MutationStrategy mutStrat = MutationStrategy::RAND1;
 	CrossoverStrategy crossStrat = CrossoverStrategy::BIN;
-	StoppingCriterion stopCrit = StoppingCriterion::AVGIMPROVPERC;
+	StoppingCriterion stopCrit = StoppingCriterion::AVGIMPPER;
 	int distincEntityMaxTrials = 0;//spread the initial population abit
 	int historySize = 10;
 	double historyImprovTresholdPercent = 1;

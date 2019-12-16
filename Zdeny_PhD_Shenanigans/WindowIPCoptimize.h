@@ -15,4 +15,5 @@ private:
 
 private slots:
 	void optimize();
+	void optimizeAll();
 };

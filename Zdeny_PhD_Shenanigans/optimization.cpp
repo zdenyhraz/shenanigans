@@ -11,7 +11,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	if (logger) logger->Log("Optimization started (evolution)", EVENT);
 
 	vector<vector<double>> visitedPointsMainThisRun;
-	vector<vector<double>> visitedPointsAllThisRun;
+	vector<vector<double>> visitedPointsThisRun;
 	double averageImprovement = 0;
 	funEvals = 0;
 	success = false;
@@ -69,10 +69,10 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
 	{
 		fitness[indexEntity] = f(population[indexEntity]);
-		if (logPointsAll)
+		if (logPoints)
 		{
 			#pragma omp critical
-			visitedPointsAllThisRun.push_back(population[indexEntity]);
+			visitedPointsThisRun.push_back(population[indexEntity]);
 		}
 	}
 	funEvals += NP;
@@ -155,10 +155,10 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			//evaluate fitness of new entity
 			newFitness = f(newEntity);
 
-			if (logPointsAll)
+			if (logPoints)
 			{
 				#pragma omp critical 
-				visitedPointsAllThisRun.push_back(newEntity);
+				visitedPointsThisRun.push_back(newEntity);
 			}
 
 			//select the more fit entity
@@ -179,7 +179,6 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 				bestFitness = fitness[indexEntity];
 				fitness_prev = fitness_curr;
 				fitness_curr = bestFitness;
-				if (logPointsMain) visitedPointsMainThisRun.push_back(bestEntity);
 				if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2))
 				{
 					logger->Log("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), INFO);
@@ -199,8 +198,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			{
 				histories[indexEntity].pop();//remove first element - keep que size constant
 				histories[indexEntity].push(fitness[indexEntity]);//insert at the end
-				if (stopCrit == StoppingCriterion::ALLIMPROVBOOL) { if (histories[indexEntity].front() != histories[indexEntity].back()) historyConstant = false; } //fitness is constant for all entities
-				if (stopCrit == StoppingCriterion::ALLIMPROVPERC) { if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100) historyConstant = false; }//fitness improved less than x% for all entities
+				if (stopCrit == StoppingCriterion::ALLIMPPER) { if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100) historyConstant = false; }//fitness improved less than x% for all entities
 			}
 			else
 			{
@@ -210,7 +208,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			if (histories[indexEntity].size() > 2) averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
 		}
 		averageImprovement /= NP;
-		if (stopCrit == StoppingCriterion::AVGIMPROVPERC) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
+		if (stopCrit == StoppingCriterion::AVGIMPPER) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
 
 		if (OnGenerationSUBEVENT)
 			OnGenerationSUBEVENT({ static_cast<double>(generation),bestFitness, averageImprovement });
@@ -245,8 +243,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			break;
 		}
 	}//generation cycle end
-	if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
-	if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
+	if (logPoints) visitedPoints.push_back(visitedPointsThisRun);
 	return bestEntity;
 }//optimize function end
 
@@ -273,20 +270,19 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 
 	//multistart pattern search
 	volatile bool flag = false;
-#pragma omp parallel for shared(flag)
+	#pragma omp parallel for shared(flag)
 	for (int run = 0; run < multistartMaxCnt; run++)
 	{
 		if (flag) continue;
 
-		vector<vector<double>> visitedPointsAllThisRun;
+		vector<vector<double>> visitedPointsThisRun;
 		vector<vector<double>> visitedPointsMainThisRun;
 		int funEvalsThisRun = 0;
 		//initialize vectors
 		double step = initialStep;
 		vector<double> mainPoint = mainPointsInitial[run];
 		double mainPointFitness = f(mainPoint);
-		if (logPointsMain) visitedPointsMainThisRun.push_back(mainPoint);
-		if (logPointsAll) visitedPointsAllThisRun.push_back(mainPoint);
+		if (logPoints) visitedPointsThisRun.push_back(mainPoint);
 		vector<vector<vector<double>>> pattern;//N-2-N (N pairs of N-dimensional points)
 		vector<vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max()));//N-2 (N pairs of fitness)
 		pattern.resize(N);
@@ -316,14 +312,13 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 					patternFitness[dim][pm] = f(pattern[dim][pm]);
 					funEvalsThisRun++;
 
-					if (logPointsAll) visitedPointsAllThisRun.push_back(pattern[dim][pm]);
+					if (logPoints) visitedPointsThisRun.push_back(pattern[dim][pm]);
 
 					//select best pattern vertex and replace
 					if (patternFitness[dim][pm] < mainPointFitness)
 					{
 						mainPoint = pattern[dim][pm];
 						mainPointFitness = patternFitness[dim][pm];
-						if (logPointsMain) visitedPointsMainThisRun.push_back(pattern[dim][pm]);
 						smallerStep = false;
 						//if (logger) logger->Log  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
 						if (maxExploitCnt > 0)
@@ -336,12 +331,11 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 								testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
 								testPointFitness = f(testPoint);
 								funEvalsThisRun++;
-								if (logPointsAll) visitedPointsAllThisRun.push_back(testPoint);
+								if (logPoints) visitedPointsThisRun.push_back(testPoint);
 								if (testPointFitness < mainPointFitness)
 								{
 									mainPoint = testPoint;
 									mainPointFitness = testPointFitness;
-									if (logPointsMain) visitedPointsMainThisRun.push_back(testPoint);
 									//if (logger) logger->Log  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
 								}
 							}
@@ -357,7 +351,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			//termination criterions
 			if (step < minStep)
 			{
-#pragma omp critical
+				#pragma omp critical
 				{
 					//if (logger) logger->Log  "> minStep value reached, terminating - generation "  generation  "."  ;
 					success = false;
@@ -367,7 +361,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			}
 			if (mainPointFitness < optimalFitness)
 			{
-#pragma omp critical
+				#pragma omp critical
 				{
 					//if (logger) logger->Log  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
 					success = true;
@@ -377,7 +371,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			}
 			if (generation == maxGen)
 			{
-#pragma omp critical
+				#pragma omp critical
 				{
 					//if (logger) logger->Log  "> maxGen value reached, terminating - generation "  generation  "."  ;
 					success = false;
@@ -387,7 +381,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			}
 			if ((funEvals >= maxFunEvals) || (funEvalsThisRun >= maxFunEvals))
 			{
-#pragma omp critical
+				#pragma omp critical
 				{
 					//if (logger) logger->Log  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
 					terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
@@ -399,12 +393,11 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 		}//generations end
 
 		//multistart result update
-#pragma omp critical
+		#pragma omp critical
 		{
 			multistartCnt++;
 			funEvals += funEvalsThisRun;
-			if (logPointsMain) visitedPointsMain.push_back(visitedPointsMainThisRun);
-			if (logPointsAll) visitedPointsAll.push_back(visitedPointsAllThisRun);
+			if (logPoints) visitedPoints.push_back(visitedPointsThisRun);
 			//if (logger) logger->Log  "> run "  run  ": ";
 			if (mainPointFitness < topPointFitness)
 			{
@@ -524,9 +517,7 @@ vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double
 	{
 		if (logLandscapeOpt) optimizedFuncLandscapeCLR = optimizedFuncLandscapeCLRlog;
 
-		//logPointsAll = true;//needed for pretty pictures - all trial points
-		Evo.logPointsMain = true;//needed for pretty pictures - main directed path
-		Pat.logPointsMain = true;//needed for pretty pictures - main directed path
+		Evo.logPoints = true;//needed for pretty pictures - main directed path
 
 		vector<double> resultPat = zerovect(Evo.N), resultEvo = zerovect(Evo.N);
 		if (optPat)
@@ -548,10 +539,10 @@ vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double
 		//if (optEvo) showEntity(resultEvo, f(resultEvo), "Result - EVO", true);
 		//showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
 		Mat optimizedFuncLandscapeWithPathPAT = optimizedFuncLandscapeCLR, optimizedFuncLandscapeWithPathEVO = optimizedFuncLandscapeCLR;
-		if (optPat) optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPointsAll, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
-		if (optEvo) optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPointsAll, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
-		if (optPat) optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPointsMain, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
-		if (optEvo) optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPointsMain, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
+		if (optPat) optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
+		if (optEvo) optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
+		if (optPat) optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
+		if (optEvo) optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
 
 		if (optPat) drawPoint2D(optimizedFuncLandscapeWithPathPAT, minloc, stretchFactorX, stretchFactorY, Scalar(0, 0, 255));
 		if (optEvo) drawPoint2D(optimizedFuncLandscapeWithPathEVO, minloc, stretchFactorX, stretchFactorY, Scalar(0, 0, 255));

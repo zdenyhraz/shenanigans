@@ -35,11 +35,31 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
 	connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
 	connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
+	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
 }
 
 void Zdeny_PhD_Shenanigans::exit()
 {
 	QApplication::exit();
+}
+
+void Zdeny_PhD_Shenanigans::debug()
+{
+	Mat img1 = imread("test.png", IMREAD_ANYDEPTH);
+	Mat img2 = imread("test.png", IMREAD_ANYDEPTH);
+
+	double shiftX = 950;//-958;
+	double shiftY = 1050;//1050;
+
+	Point2f center((float)img1.cols / 2, (float)img1.rows / 2);
+	Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
+	warpAffine(img2, img2, T, cv::Size(img1.cols, img1.rows));
+
+	IPCsettings IPCset;
+	Mat mask = edgemask(img1.rows, img1.cols);
+	Mat bandpass = bandpassian(img1.rows, img1.cols, IPCset.stdevLmultiplier, IPCset.stdevHmultiplier);
+	IPCset.IPCshow = true;
+	cout << phasecorrel(img1, img2, IPCset, mask, bandpass) << endl;
 }
 
 void Zdeny_PhD_Shenanigans::about()

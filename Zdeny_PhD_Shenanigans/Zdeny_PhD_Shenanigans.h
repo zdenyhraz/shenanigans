@@ -29,5 +29,5 @@ private slots:
 	void showWindowIPCoptimize();
 	void showWindowIPC2PicAlign();
 	void closeCV();
-
+	void debug();
 };

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>476</width>
-    <height>193</height>
+    <height>234</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -142,6 +142,19 @@
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>130</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Optimize all</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -149,7 +162,7 @@
      <x>0</x>
      <y>0</y>
      <width>476</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>

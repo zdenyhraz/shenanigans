@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-static std::vector<string> WAVELENGTHS_STR = { "HMI" };
+static std::vector<string> WAVELENGTHS_STR = { "HMI", "94_AIA", "131_AIA", "171_AIA", "171_SECCHIA", "171_SECCHIB", "193_AIA", "195_SECCHIA", "195_SECCHIB", "211_AIA", "284_SECCHIA", "284_SECCHIB", "304_AIA", "304_SECCHIA", "304_SECCHIB", "335_AIA" };
 static std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
 
 struct GUIsettings
@@ -151,6 +151,6 @@ double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster
 
 void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger);
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, const GUIsettings& guiset, double maxShiftRatio, double accuracy);
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger);
 
 void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, FlowResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut);
