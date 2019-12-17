@@ -12,5 +12,5 @@ struct Logger
 
 	Logger(LOGLEVEL loglevel) : m_loglevel(loglevel) {};
 
-	inline virtual void Log(const std::string& msg, LOGLEVEL loglevel) = 0;
+	inline virtual void Log(const std::string& msg, LOGLEVEL loglevel = INFO) = 0;
 };

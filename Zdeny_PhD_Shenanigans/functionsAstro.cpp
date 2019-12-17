@@ -175,7 +175,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut)
+void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut)
 {
 	cout << ">> Starting PC MainFlow calculation" << endl;
 	//2D stuff
@@ -190,14 +190,14 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 	std::vector<double> thetasAverage(itersY, 0);
 	std::vector<double> omegasPredicted(itersY, 0);
 
-	std::ofstream listingTemp1D_x("D:\\" + pathMasterOut + "CSVs\\temp1D_x.csv", std::ios::out | std::ios::trunc);
-	std::ofstream listingTempJottings("D:\\" + pathMasterOut + "CSVs\\tempJottings.csv", std::ios::out | std::ios::trunc);
-	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << pcwindowsize << delimiter << iters << endl;
+	std::ofstream listingTemp1D_x(pathMasterOut + "temp1D_x.csv", std::ios::out | std::ios::trunc);
+	std::ofstream listingTempJottings(pathMasterOut + "tempJottings.csv", std::ios::out | std::ios::trunc);
+	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << IPC_settings.Cwin << delimiter << iters << endl;
 
-	Mat window = edgemask(pcwindowsize, pcwindowsize);
-	Mat bandpass = bandpassian(pcwindowsize, pcwindowsize, IPC_settings.stdevLmultiplier, IPC_settings.stdevHmultiplier);
-	Mat bandpass1 = bandpassian(pcwindowsize, pcwindowsize, IPC_settings1.stdevLmultiplier, IPC_settings1.stdevHmultiplier);
-	Mat bandpass2 = bandpassian(pcwindowsize, pcwindowsize, IPC_settings2.stdevLmultiplier, IPC_settings2.stdevHmultiplier);
+	Mat window = edgemask(IPC_settings.Cwin, IPC_settings.Cwin);
+	Mat bandpass = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings.stdevLmultiplier, IPC_settings.stdevHmultiplier);
+	Mat bandpass1 = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings1.stdevLmultiplier, IPC_settings1.stdevHmultiplier);
+	Mat bandpass2 = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings2.stdevLmultiplier, IPC_settings2.stdevHmultiplier);
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//this even!
@@ -294,9 +294,9 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 					for (int medianiter = 0; medianiter < medianiters; medianiter++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, pcwindowsize, pcwindowsize);
+						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.Cwin, IPC_settings.Cwin);
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, pcwindowsize, pcwindowsize);
+						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.Cwin, IPC_settings.Cwin);
 
 						if (twoCorrels)
 						{
