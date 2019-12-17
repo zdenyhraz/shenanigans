@@ -6,13 +6,6 @@
 #include "functionsAstro.h"
 #include "logger.h"
 
-void makeOutputDirs(std::string path)
-{
-	std::experimental::filesystem::create_directory(path + "CSVs");
-	std::experimental::filesystem::create_directory(path + "Lpics");
-	std::experimental::filesystem::create_directory(path + "plots");
-}
-
 std::vector<double> diffrotProfileAverage(Mat& flow, int colS)
 {
 	int cols = colS ? colS : flow.cols;
@@ -182,10 +175,9 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, FlowResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut)
+void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut)
 {
 	cout << ">> Starting PC MainFlow calculation" << endl;
-	makeOutputDirs("D:\\");
 	//2D stuff
 	Mat omegasMainX = Mat::zeros(itersY, itersX*iters, CV_64F);
 	Mat omegasMainY = Mat::zeros(itersY, itersX*iters, CV_64F);

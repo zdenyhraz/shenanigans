@@ -15,7 +15,7 @@ static std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
 
 std::vector<double> diffrotProfileAverage(Mat& flow, int colS = 0);
 
-static struct FlowResults
+static struct DiffrotResults
 {
 	Mat FlowPic;
 	Mat FlowX;
@@ -99,8 +99,6 @@ static struct FlowResults
 	}
 };
 
-void makeOutputDirs(std::string path);
-
 double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, Mat& src, double noisestddev, double maxShiftRatio, double accuracy);
 
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, Mat& source, double noisestddev, double maxShiftRatio, double accuracy);
@@ -109,4 +107,4 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger);
 
-void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, FlowResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut);
+void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int pcwindowsize, int deltasec, string pathMasterOut);

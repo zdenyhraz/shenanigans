@@ -227,7 +227,7 @@ inline double clampSmooth(double x_new, double x_prev, double clampMin, double c
 }
 
 template <typename T>
-inline T vectorMax(std::vector<T>& input)
+inline T vectorMax(const std::vector<T>& input)
 {
 	T vectmax = input[0];
 	for (int i = 0; i < input.size(); i++)
@@ -239,7 +239,7 @@ inline T vectorMax(std::vector<T>& input)
 }
 
 template <typename T>
-inline T vectorMin(std::vector<T>& input)
+inline T vectorMin(const std::vector<T>& input)
 {
 	T vectmin = input[0];
 	for (int i = 0; i < input.size(); i++)
@@ -379,4 +379,26 @@ inline bool isDistinct(int inpindex, std::vector<int>& indices, int currindex)
 			isdist = false;
 	}
 	return isdist;
+}
+
+inline void exportToMATLAB(const std::vector<double>& Ydata, double xmin, double xmax, std::string path)
+{
+	std::ofstream listing(path, std::ios::out | std::ios::trunc);
+	listing << xmin << "," << xmax << endl;
+	for (auto& y : Ydata)
+		listing << y << endl;
+}
+
+inline void exportToMATLAB(const std::vector<std::vector<double>>& Zdata, double xmin, double xmax, double ymin, double ymax, std::string path)
+{
+	std::ofstream listing(path, std::ios::out | std::ios::trunc);
+	listing << xmin << "," << xmax << "," << ymin << "," << ymax << endl;
+	for (int r = 0; r < Zdata.size(); r++)
+		for (int c = 0; c < Zdata[0].size(); c++)
+			listing << Zdata[r][c] << endl;
+}
+
+inline void makeDir(std::string path, std::string dirname)
+{
+	std::experimental::filesystem::create_directory(path + "//" + dirname);
 }

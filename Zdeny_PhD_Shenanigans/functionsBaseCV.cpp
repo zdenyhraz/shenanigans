@@ -425,3 +425,5 @@ void colorMapDebug(double sigmaa)
 	}
 	showimg(colormap, "colormap");
 }
+
+
