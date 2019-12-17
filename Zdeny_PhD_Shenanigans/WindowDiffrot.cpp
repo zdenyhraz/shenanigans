@@ -9,8 +9,6 @@ WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(pa
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(showResults()));
 }
 
-
-
 void WindowDiffrot::calculateDiffrot()
 {
 	globals->Logger->Log("Calculating diffrot profile...", EVENT);

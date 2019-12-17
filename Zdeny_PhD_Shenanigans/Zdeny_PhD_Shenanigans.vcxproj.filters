@@ -103,6 +103,9 @@
     <ClCompile Include="WindowDiffrot.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
+    <ClCompile Include="qcustomplot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -178,6 +181,9 @@
     </QtMoc>
     <QtMoc Include="WindowDiffrot.h">
       <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="qcustomplot.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
