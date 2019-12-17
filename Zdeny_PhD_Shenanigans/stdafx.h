@@ -2,8 +2,10 @@
 #pragma once
 //Qt
 #include <QtWidgets>
+#include <QtWidgets>
 #include <QtWidgets/QApplication>
 #include <QPixmap>
+#include <QWidget>
 //STL
 #include <iostream>
 #include <fstream>
@@ -29,7 +31,8 @@
 #include <opencv2/features2d.hpp>
 //custom
 #include "constants.h"
-
+//QCustomPlot
+#include "qcustomplot.h"
 
 
 
