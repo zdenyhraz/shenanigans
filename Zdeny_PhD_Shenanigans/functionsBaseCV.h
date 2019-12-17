@@ -8,8 +8,8 @@
 using namespace std;
 using namespace cv;
 
-enum ColorMapStyle { CM_JET, CM_BINARY };
-enum CombinePicsStyle { HUEBRIGHT, BINARYBLUERED };
+static enum ColorMapStyle { CM_JET, CM_BINARY };
+static enum CombinePicsStyle { HUEBRIGHT, BINARYBLUERED };
 
 std::tuple<double, double> minMaxMat(Mat& sourceimg);
 
@@ -194,3 +194,12 @@ inline std::vector<double> matToVect(Mat& mat)
 }
 
 void colorMapDebug(double sigmaa);
+
+inline void exportToMATLAB(const Mat& Zdata, double xmin, double xmax, double ymin, double ymax, std::string path)
+{
+	std::ofstream listing(path, std::ios::out | std::ios::trunc);
+	listing << xmin << "," << xmax << "," << ymin << "," << ymax << endl;
+	for (int r = 0; r < Zdata.rows; r++)
+		for (int c = 0; c < Zdata.cols; c++)
+			listing << Zdata.at<double>(r, c) << endl;
+}
