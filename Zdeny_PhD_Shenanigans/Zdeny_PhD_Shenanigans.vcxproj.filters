@@ -216,4 +216,9 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.png" />
+    <Image Include="test.png" />
+    <Image Include="Zdeny_PhD_Shenanigans.ico" />
+  </ItemGroup>
 </Project>
