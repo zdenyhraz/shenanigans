@@ -24,18 +24,29 @@ struct fitsParams
 struct FITStime
 {
 private:
+	int startyear;
+	int startmonth;
+	int startday;
+	int starthour;
+	int startminute;
+	int startsecond;
+
 	int year;
 	int month;
 	int day;
 	int hour;
 	int minute;
 	int second;
+
+	std::string dirpath;
+
 	std::string yearS;
 	std::string monthS;
 	std::string dayS;
 	std::string hourS;
 	std::string minuteS;
 	std::string secondS;
+
 	void timeToStringS()
 	{
 		yearS = to_string(year);
@@ -88,26 +99,32 @@ private:
 public:
 	void resetTime()
 	{
-		year = 2014;
-		month = 10;
-		day = 23;
-		hour = 00;
-		minute = 00;
-		second = 30;
+		year = startyear;
+		month = startmonth;
+		day = startday;
+		hour = starthour;
+		minute = startminute;
+		second = startsecond;
 	}
 
-	FITStime()
+	FITStime(std::string dirpathh, int yearr, int monthh, int dayy, int hourr, int minutee, int secondd)
 	{
+		dirpath = dirpathh;
+		startyear = yearr;
+		startmonth = monthh;
+		startday = dayy;
+		starthour = hourr;
+		startminute = minutee;
+		startsecond = secondd;
 		resetTime();
+		advanceTime(0);
+		timeToStringS();
 	}
-
-	std::string disk = "";
-	std::string dir = "";
 
 	std::string path()
 	{
 		timeToStringS();
-		return disk + dir + yearS + "_" + monthS + "_" + dayS + "__" + hourS + "_" + minuteS + "_" + secondS + "__CONT.fits";
+		return dirpath + yearS + "_" + monthS + "_" + dayS + "__" + hourS + "_" + minuteS + "_" + secondS + "__CONT.fits";
 	}
 
 	void advanceTime(int deltasec)

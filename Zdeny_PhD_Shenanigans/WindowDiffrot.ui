@@ -288,7 +288,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_17">
        <property name="text">
-        <string>D:\\SDOpics\\</string>
+        <string>D:\\SDOpics\\Sunspot\\</string>
        </property>
       </widget>
      </item>
