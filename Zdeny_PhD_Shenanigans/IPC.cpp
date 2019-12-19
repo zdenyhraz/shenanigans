@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "IPC.h"
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, const Mat& windowMat, const Mat& bandpassMat, double* corrQuality)
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, double* corrQuality)
 {
 	Mat sourceimg1 = sourceimg1In.clone();
 	Mat sourceimg2 = sourceimg2In.clone();
@@ -14,91 +14,76 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		normalize(sourceimg1, sourceimg1, 0, 1, CV_MINMAX);
 		normalize(sourceimg2, sourceimg2, 0, 1, CV_MINMAX);
 	}
-	if (IPC_set.window)
+	if (IPC_set.applyWindow)
 	{
-		if (sourceimg1.channels() == 1)//grayscale images
-		{
-			multiply(sourceimg1, windowMat, sourceimg1);
-			multiply(sourceimg2, windowMat, sourceimg2);
-		}
-		else if (sourceimg1.channels() == 3)//colored images
-		{
-			Mat windowPlanes[3] = { windowMat, windowMat, windowMat };
-			Mat windowCLR;
-			merge(windowPlanes, 3, windowCLR);
-			multiply(sourceimg1, windowCLR, sourceimg1);
-			multiply(sourceimg2, windowCLR, sourceimg2);
-		}
+		multiply(sourceimg1, IPC_set.window, sourceimg1);
+		multiply(sourceimg2, IPC_set.window, sourceimg2);
 	}
 	if (IPC_set.IPCshow) { showimg(sourceimg1, "src1"); showimg(sourceimg2, "src2"); }
 
-	if (sourceimg1.channels() == 1)//grayscale images
+	Mat DFT1 = fourier(sourceimg1);
+	Mat DFT2 = fourier(sourceimg2);
+	Mat planes1[2];
+	Mat planes2[2];
+	Mat CrossPowerPlanes[2];
+	split(DFT1, planes1);
+	split(DFT2, planes2);
+	planes1[1] = planes1[1].mul(-1.0);//complex conjugate of second pic
+	CrossPowerPlanes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);//pointwise multiplications real
+	CrossPowerPlanes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);//imag
+	if (!IPC_set.crossCorrel)
 	{
-		Mat DFT1 = fourier(sourceimg1);
-		Mat DFT2 = fourier(sourceimg2);
-		Mat planes1[2];
-		Mat planes2[2];
-		Mat CrossPowerPlanes[2];
-		split(DFT1, planes1);
-		split(DFT2, planes2);
-		planes1[1] = planes1[1].mul(-1.0);//complex conjugate of second pic
-		CrossPowerPlanes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);//pointwise multiplications real
-		CrossPowerPlanes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);//imag
-		if (!IPC_set.crossCorrel)
-		{
-			Mat magnre, magnim;
-			pow(CrossPowerPlanes[0], 2, magnre);
-			pow(CrossPowerPlanes[1], 2, magnim);
-			Mat normalizationdenominator = magnre + magnim;
-			sqrt(normalizationdenominator, normalizationdenominator);
-			CrossPowerPlanes[0] /= (normalizationdenominator + IPC_set.epsilon);
-			CrossPowerPlanes[1] /= (normalizationdenominator + IPC_set.epsilon);
-		}
-		if (IPC_set.IPCspeak) std::cout << "cross-power spectrum calculated" << std::endl;
-		Mat CrossPower;
-		merge(CrossPowerPlanes, 2, CrossPower);
-		if (IPC_set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
-		if (IPC_set.bandpass)
-		{
-			CrossPower = bandpass(CrossPower, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier, bandpassMat);
-			if (IPC_set.IPCshow) showimg(bandpassian(sourceimg1.rows, sourceimg1.cols, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier), "bandpass", true);
-			if (IPC_set.IPCspeak) std::cout << "cross-power spectrum bandpassed" << std::endl;
-		}
-		if (1)//CORRECT - complex magnitude - input can be real or complex whatever
-		{
-			Mat L3complex;
-			dft(CrossPower, L3complex, DFT_INVERSE + DFT_SCALE);
-			Mat L3planes[2];
-			split(L3complex, L3planes);
-			if (0)
-			{
-				auto minmaxReal = minMaxMat(L3planes[0]);
-				auto minmaxImag = minMaxMat(L3planes[1]);
-
-				std::cout << "L3 real min/max: " << std::get<0>(minmaxReal) << " / " << std::get<1>(minmaxReal) << std::endl;
-				std::cout << "L3 imag min/max: " << std::get<0>(minmaxImag) << " / " << std::get<1>(minmaxImag) << std::endl;
-			}
-			magnitude(L3planes[0], L3planes[1], L3);
-			Mat L3phase;
-			phase(L3planes[0], L3planes[1], L3phase);
-			if (IPC_set.IPCshow) { Mat L3pv; resize(L3phase, L3pv, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(L3pv, "L3phase", true); }
-		}
-		else//real only (assume pure real input)
-		{
-			dft(CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
-		}
-
-		L3 = quadrantswap(L3);
-		if (IPC_set.IPCspeak) std::cout << "inverse fourier of cross-power spectrum calculated" << std::endl;
-		if (corrQuality)
-		{
-			double minRQ, maxRQ;
-			minMaxLoc(L3, &minRQ, &maxRQ, nullptr, nullptr);
-			*corrQuality = maxRQ;
-		}
+		Mat magnre, magnim;
+		pow(CrossPowerPlanes[0], 2, magnre);
+		pow(CrossPowerPlanes[1], 2, magnim);
+		Mat normalizationdenominator = magnre + magnim;
+		sqrt(normalizationdenominator, normalizationdenominator);
+		CrossPowerPlanes[0] /= (normalizationdenominator + IPC_set.epsilon);
+		CrossPowerPlanes[1] /= (normalizationdenominator + IPC_set.epsilon);
 	}
-	else return Point2d(0, 0);//no RGB support
+	if (IPC_set.IPCspeak) std::cout << "cross-power spectrum calculated" << std::endl;
+	Mat CrossPower;
+	merge(CrossPowerPlanes, 2, CrossPower);
+	if (IPC_set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
+	if (IPC_set.applyBandpass)
+	{
+		CrossPower = bandpass(CrossPower, IPC_set.bandpass);
+		if (IPC_set.IPCshow) showimg(IPC_set.bandpass, "bandpass", true);
+		if (IPC_set.IPCspeak) std::cout << "cross-power spectrum bandpassed" << std::endl;
+	}
+	if (1)//CORRECT - complex magnitude - input can be real or complex whatever
+	{
+		Mat L3complex;
+		dft(CrossPower, L3complex, DFT_INVERSE + DFT_SCALE);
+		Mat L3planes[2];
+		split(L3complex, L3planes);
+		if (0)
+		{
+			auto minmaxReal = minMaxMat(L3planes[0]);
+			auto minmaxImag = minMaxMat(L3planes[1]);
 
+			std::cout << "L3 real min/max: " << std::get<0>(minmaxReal) << " / " << std::get<1>(minmaxReal) << std::endl;
+			std::cout << "L3 imag min/max: " << std::get<0>(minmaxImag) << " / " << std::get<1>(minmaxImag) << std::endl;
+		}
+		magnitude(L3planes[0], L3planes[1], L3);
+		Mat L3phase;
+		phase(L3planes[0], L3planes[1], L3phase);
+		if (IPC_set.IPCshow) { Mat L3pv; resize(L3phase, L3pv, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(L3pv, "L3phase", true); }
+	}
+	else//real only (assume pure real input)
+	{
+		dft(CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+	}
+
+	L3 = quadrantswap(L3);
+	if (IPC_set.IPCspeak) std::cout << "inverse fourier of cross-power spectrum calculated" << std::endl;
+	if (corrQuality)
+	{
+		double minRQ, maxRQ;
+		minMaxLoc(L3, &minRQ, &maxRQ, nullptr, nullptr);
+		*corrQuality = maxRQ;
+	}
+	
 	normalize(L3, L3, 0, 1, CV_MINMAX);
 	if (IPC_set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, IPC_set.minimalShift));
 	Point2i L3peak;
@@ -239,8 +224,6 @@ void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IP
 	Point2f center((float)input1.cols / 2, (float)input1.rows / 2);
 	output = input2.clone();
 
-	Mat window = edgemask(input1.rows, input1.cols);
-	Mat bandpass = bandpassian(input1.rows, input1.cols, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier);
 	if (1)//calculate rotation and scale
 	{
 		Mat img1FT = fourier(input1);
@@ -269,7 +252,7 @@ void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IP
 		int flags = INTER_LINEAR + WARP_FILL_OUTLIERS;
 		warpPolar(img1FTm, img1LP, cv::Size(input1.cols, input1.rows), center, maxRadius, flags + WARP_POLAR_LOG);    // semilog Polar
 		warpPolar(img2FTm, img2LP, cv::Size(input1.cols, input1.rows), center, maxRadius, flags + WARP_POLAR_LOG);    // semilog Polar
-		auto LPshifts = phasecorrel(img1LP, img2LP, IPC_set, window, bandpass);
+		auto LPshifts = phasecorrel(img1LP, img2LP, IPC_set);
 		cout << "LPshifts: " << LPshifts << endl;
 		double anglePredicted = -LPshifts.y / input1.rows * 360;
 		double scalePredicted = exp(LPshifts.x * log(maxRadius) / input1.cols);
@@ -281,7 +264,7 @@ void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IP
 
 	if (1)//calculate shift
 	{
-		auto shifts = phasecorrel(input1, output, IPC_set, window, bandpass);
+		auto shifts = phasecorrel(input1, output, IPC_set);
 		cout << "shifts: " << shifts << endl;
 		double shiftXPredicted = shifts.x;
 		double shiftYPredicted = shifts.y;
@@ -388,38 +371,35 @@ void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_setti
 
 void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings2)
 {
-	if (IPC_settings1.Cwin == 0 || IPC_settings2.Cwin == 0)
+	if (IPC_settings1.getcols() == 0 || IPC_settings2.getcols() == 0)
 	{
 		cout << "> please initialize IPC_settings1 and IPC_settings2 to run benchmarks" << endl;
 		return;
 	}
 	//initialize main parameters
-	double artificialShiftRange = IPC_settings1.Cwin / 8;
+	double artificialShiftRange = IPC_settings1.getcols() / 8;
 	int trialsPerStartPos = 1000;
 	vector<double> startFractionX = { 0.5 };
 	vector<double> startFractionY = { 0.5 };
 	int progress = 0;
-	Mat window = edgemask(IPC_settings1.Cwin, IPC_settings1.Cwin);
-	Mat bandpass1 = bandpassian(IPC_settings1.Cwin, IPC_settings1.Cwin, IPC_settings1.stdevLmultiplier, IPC_settings1.stdevHmultiplier);
-	Mat bandpass2 = bandpassian(IPC_settings2.Cwin, IPC_settings2.Cwin, IPC_settings2.stdevLmultiplier, IPC_settings2.stdevHmultiplier);
 
 	//load the test picture
 	fitsParams params;
 	Mat src1 = loadfits("D:\\MainOutput\\HMI.fits", params);
 	//Mat src1 = imread("D:\\MainOutput\\png\\HMI_proc.png", IMREAD_ANYDEPTH);
-	Mat edgemaska = edgemask(IPC_settings1.Cwin, IPC_settings1.Cwin);
+	Mat edgemaska = edgemask(IPC_settings1.getcols(), IPC_settings1.getcols());
 
 	//initialize .csv output
 	std::ofstream listing("D:\\MainOutput\\CSVs\\tempBenchmarks.csv", std::ios::out | std::ios::trunc);
-	listing << IPC_settings1.Cwin << endl;
+	listing << IPC_settings1.getcols() << endl;
 
-#pragma omp parallel for
+	#pragma omp parallel for
 	for (int startPos = 0; startPos < startFractionX.size(); startPos++)
 	{
 		//testing shifts @different picture positions
 		int startX = src1.cols * startFractionX[startPos];
 		int startY = src1.rows * startFractionY[startPos];
-#pragma omp parallel for
+		#pragma omp parallel for
 		for (int trial = 0; trial < trialsPerStartPos; trial++)
 		{
 			//shift entire src2 pic
@@ -430,15 +410,15 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
 			warpAffine(src1, src2, T, cv::Size(src1.cols, src1.rows));
 
 			//crop both pics
-			Mat crop1 = roicrop(src1, startX, startY, IPC_settings1.Cwin, IPC_settings1.Cwin);
-			Mat crop2 = roicrop(src2, startX, startY, IPC_settings2.Cwin, IPC_settings2.Cwin);
+			Mat crop1 = roicrop(src1, startX, startY, IPC_settings1.getcols(), IPC_settings1.getcols());
+			Mat crop2 = roicrop(src2, startX, startY, IPC_settings2.getcols(), IPC_settings2.getcols());
 
 			//calculate shifts
-			Point2d shifts1 = phasecorrel(crop1, crop2, IPC_settings1, window, bandpass1);
-			Point2d shifts2 = phasecorrel(crop1, crop2, IPC_settings2, window, bandpass2);
+			Point2d shifts1 = phasecorrel(crop1, crop2, IPC_settings1);
+			Point2d shifts2 = phasecorrel(crop1, crop2, IPC_settings2);
 
 			//list results to .csv
-#pragma omp critical
+			#pragma omp critical
 			{
 				listing << shiftX << delimiter << shifts1.x << delimiter << shifts2.x << endl;
 				progress++;
@@ -455,13 +435,10 @@ std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCs
 
 	int rows = qualityRatio * img1.rows;
 	int cols = qualityRatio * img1.cols;
-	int win = IPC_settings.Cwin;
+	int win = IPC_settings.getcols();
 
 	Mat flowX = Mat::zeros(rows, cols, CV_64F);
 	Mat flowY = Mat::zeros(rows, cols, CV_64F);
-
-	Mat window = edgemask(win, win);
-	Mat bandpass = bandpassian(win, win, IPC_settings.stdevLmultiplier, IPC_settings.stdevHmultiplier);
 
 	int pad = win / 2 + 1;
 	volatile int progress = 0;
@@ -483,7 +460,7 @@ std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCs
 			{
 				Mat crop1 = roicrop(img1, c_, r_, win, win);
 				Mat crop2 = roicrop(img2, c_, r_, win, win);
-				auto shift = phasecorrel(crop1, crop2, IPC_settings, window, bandpass);
+				auto shift = phasecorrel(crop1, crop2, IPC_settings);
 				flowX.at<double>(r, c) = shift.x;
 				flowY.at<double>(r, c) = shift.y;
 			}		

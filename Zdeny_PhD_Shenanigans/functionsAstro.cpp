@@ -26,26 +26,24 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, d
 	double returnVal = 0;
 	Mat srcCrop1, srcCrop2;
 	Mat crop1, crop2;
-	Mat window = edgemask(IPC_set.Cwin, IPC_set.Cwin);
-	Mat bandpass = bandpassian(IPC_set.Cwin, IPC_set.Cwin, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier);
 	//vector<double> startFractionX = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
 	//vector<double> startFractionY = { 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 };
 	vector<double> startFractionX = { 0.5 };
 	vector<double> startFractionY = { 0.5 };
-	int trials = ceil((double)IPC_set.Cwin * maxShiftRatio / accuracy) + 1;
+	int trials = ceil((double)IPC_set.getcols() * maxShiftRatio / accuracy) + 1;
 	for (int startposition = 0; startposition < startFractionX.size(); startposition++)
 	{
 		int startX = src.cols * startFractionX[startposition];
 		int startY = src.rows * startFractionY[startposition];
-		srcCrop1 = roicrop(src, startX, startY, 1.5*IPC_set.Cwin + 2, 1.5*IPC_set.Cwin + 2);
-		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, IPC_set.Cwin, IPC_set.Cwin);
+		srcCrop1 = roicrop(src, startX, startY, 1.5*IPC_set.getcols() + 2, 1.5*IPC_set.getcols() + 2);
+		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, IPC_set.getcols(), IPC_set.getcols());
 		for (int i = 0; i < trials; i++)
 		{
-			double shiftX = (double)i / (trials - 1) * (double)IPC_set.Cwin * maxShiftRatio;
+			double shiftX = (double)i / (trials - 1) * (double)IPC_set.getcols() * maxShiftRatio;
 			double shiftY = 0.;
 			Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
 			warpAffine(srcCrop1, srcCrop2, T, cv::Size(srcCrop1.cols, srcCrop1.rows));
-			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, IPC_set.Cwin, IPC_set.Cwin);
+			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, IPC_set.getcols(), IPC_set.getcols());
 			if (noisestddev)
 			{
 				crop1.convertTo(crop1, CV_32F);
@@ -57,7 +55,7 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, d
 				crop1 += noise1;
 				crop2 += noise2;
 			}
-			auto shift = phasecorrel(crop1, crop2, IPC_set, window, bandpass);
+			auto shift = phasecorrel(crop1, crop2, IPC_set);
 			returnVal += abs(shift.x - shiftX);
 			if (0)//DEBUG
 			{
@@ -74,10 +72,9 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, d
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShiftRatio, double accuracy)
 {
 	IPCsettings settings = settingsMaster;
-	settings.stdevLmultiplier = args[0];
-	settings.stdevHmultiplier = args[1];
+	settings.setBandpassParameters(args[0], args[1]);
 	if (args.size() > 2) settings.L2size = max(3., abs(round(args[2])));
-	if (args.size() > 3) settings.window = args[3] > 0 ? true : false;
+	if (args.size() > 3) settings.applyWindow = args[3] > 0 ? true : false;
 	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShiftRatio, accuracy);
 }
 
@@ -86,7 +83,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
 
 	listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
-	listing << "filename,Cwin,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
+	listing << "filename,size,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
 	Mat pic = loadImage(pathInput);
 	std::string windowname = "objective function source";
 	showimg(pic, windowname);
@@ -101,7 +98,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 		Evo.upperBounds = vector<double>{ 10,200,15,1 };
 		auto Result = Evo.optimize(f, logger);
-		listing << pathInput << "," << settingsMaster.Cwin << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+		listing << pathInput << "," << settingsMaster.getcols() << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 	}
 	destroyWindow(windowname);
 }
@@ -109,46 +106,9 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger)
 {
 	std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
-	/*
-	if (0)//BRUTE 2par
-	{
-		int stepss;
-		double u1, u2;
-		cout << endl << "Please specify the number of steps: ";
-		cin >> stepss;
-		cout << endl << "Please specify param1 upper bound: ";
-		cin >> u1;
-		cout << endl << "Please specify param2 upper bound: ";
-		cin >> u2;
-		cout << endl;
-		//for (int wavelength = 0; wavelength < WAVELENGTHS_STR.size(); wavelength++)
-		for (int wavelength = 0; wavelength < 1; wavelength++)
-		{
-			listing << "Running IPC parameter BRUTE optimization for " << WAVELENGTHS_STR[wavelength] << " (" << currentDateTime() << ")" << endl;
-			std::string path = "D:\\" + "MainOutput\\" + WAVELENGTHS_STR[wavelength] + ".png";
-			cout << "BRUTE .png load path: " << path << endl;
-			Mat pic = imread(path, IMREAD_ANYDEPTH);
-			showimg(pic, "objfun source");
-			auto f = [&](std::vector<double>& args) {return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShiftRatio, accuracy); };
-			vector<double> lowerBounds = { 0,0 };
-			vector<double> upperBounds = { u1,u2 };//10/25 with 15 L2 + Hann
-			vector<int> steps = { stepss,stepss };
-			Mat landscape;
-			Evolution Evo(2);
-			PatternSearch Pat(2);
-			auto Result = drawFuncLandscapeAndOptimize2D(f, lowerBounds, upperBounds, steps, Evo, Pat, 1, 0, 0, 0, 0.95, &landscape);
-			saveMatToCsv("D:\\" + "MainOutput\\IPC_parOpt_landscape_" + WAVELENGTHS_STR[wavelength] + ".csv", landscape);
-			landscape + Scalar::all(1.);
-			log(landscape, landscape);
-			saveimg("D:\\" + "MainOutput\\IPC_parOpt_landscape_" + WAVELENGTHS_STR[wavelength] + ".png", applyColorMapZdeny(landscape));
-			listing << "wavelength,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
-			listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << settingsMaster.L2size << "," << settingsMaster.window << "," << f(Result) << "," << currentDateTime() << endl << endl;
-		}
-	}
-	*/
 	if (1)//OPT 4par
 	{
-		listing << "Running IPC parameter optimization (" << currentDateTime() << "), image size " << settingsMaster.Cwin << endl;
+		listing << "Running IPC parameter optimization (" << currentDateTime() << "), image size " << settingsMaster.getcols() << endl;
 		listing << "wavelength,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
 		for (int wavelength = 0; wavelength < WAVELENGTHS_STR.size(); wavelength++)
 		{
@@ -192,12 +152,7 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 
 	std::ofstream listingTemp1D_x(pathMasterOut + "temp1D_x.csv", std::ios::out | std::ios::trunc);
 	std::ofstream listingTempJottings(pathMasterOut + "tempJottings.csv", std::ios::out | std::ios::trunc);
-	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << IPC_settings.Cwin << delimiter << iters << endl;
-
-	Mat window = edgemask(IPC_settings.Cwin, IPC_settings.Cwin);
-	Mat bandpass = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings.stdevLmultiplier, IPC_settings.stdevHmultiplier);
-	Mat bandpass1 = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings1.stdevLmultiplier, IPC_settings1.stdevHmultiplier);
-	Mat bandpass2 = bandpassian(IPC_settings.Cwin, IPC_settings.Cwin, IPC_settings2.stdevLmultiplier, IPC_settings2.stdevHmultiplier);
+	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << IPC_settings.getcols() << delimiter << iters << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//this even!
@@ -294,18 +249,18 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 					for (int medianiter = 0; medianiter < medianiters; medianiter++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.Cwin, IPC_settings.Cwin);
+						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.getcols(), IPC_settings.getcols());
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.Cwin, IPC_settings.Cwin);
+						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.getcols(), IPC_settings.getcols());
 
 						if (twoCorrels)
 						{
-							shifts1[medianiter] = phasecorrel(crop1, crop2, IPC_settings1, window, bandpass1);
-							shifts2[medianiter] = phasecorrel(crop1, crop2, IPC_settings2, window, bandpass2);
+							shifts1[medianiter] = phasecorrel(crop1, crop2, IPC_settings1);
+							shifts2[medianiter] = phasecorrel(crop1, crop2, IPC_settings2);
 						}
 						else
 						{
-							shifts[medianiter] = phasecorrel(crop1, crop2, IPC_settings, window, bandpass);
+							shifts[medianiter] = phasecorrel(crop1, crop2, IPC_settings);
 						}
 					}
 

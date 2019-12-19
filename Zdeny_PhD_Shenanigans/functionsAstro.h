@@ -1,4 +1,3 @@
-
 #pragma once
 #include "functionsBaseSTL.h"
 #include "functionsBaseCV.h"
@@ -15,7 +14,7 @@ static std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
 
 std::vector<double> diffrotProfileAverage(const Mat& flow, int colS = 0);
 
-static struct DiffrotResults
+struct DiffrotResults
 {
 	Mat FlowPic;
 	Mat FlowX;

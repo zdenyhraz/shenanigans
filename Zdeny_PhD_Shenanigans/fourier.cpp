@@ -223,21 +223,13 @@ Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 	return sinian;
 }
 
-Mat bandpass(const Mat& sourceimgDFTIn, double stdevG, double stdevL, const Mat& bandpassMat)
+Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
 {
 	Mat sourceimgDFT = sourceimgDFTIn.clone();
 	Mat filterGS = quadrantswap(bandpassMat);
 	Mat filter;
-	if (sourceimgDFT.channels() == 2)
-	{
-		Mat filterPlanes[2] = { filterGS, filterGS };
-		merge(filterPlanes, 2, filter);
-	}
-	else if (sourceimgDFT.channels() == 4)
-	{
-		Mat filterPlanes[4] = { filterGS, filterGS, filterGS, filterGS };
-		merge(filterPlanes, 4, filter);
-	}
+	Mat filterPlanes[2] = { filterGS, filterGS };
+	merge(filterPlanes, 2, filter);
 	return sourceimgDFT.mul(filter);
 }
 
