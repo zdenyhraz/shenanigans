@@ -23,7 +23,7 @@ Mat edgemask(int rows, int cols);
 
 Mat sinian(int rows, int cols, double frequencyX, double frequencyY);
 
-Mat bandpass(const Mat& sourceimgDFTIn, double stdevG, double stdevL, const Mat& bandpassMat);
+Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat);
 
 Mat convolute(Mat sourceimg, Mat PSFimg);
 

@@ -8,29 +8,62 @@
 using namespace std;
 using namespace cv;
 
-struct IPCsettings
+class IPCsettings
 {
-	int Cwin = 32;
+	double stdevLmultiplier = 1.2;
+	double stdevHmultiplier = 13;
+	int rows = 0;
+	int cols = 0;
+public:
 	double L2size = 11;
 	double L1ratio = 0.35;
 	int UC = 31;
-	double stdevLmultiplier = 1.2;
-	double stdevHmultiplier = 13;
 	double epsilon = 0;
 	bool interpolate = 1;
-	bool window = 1;
-	bool bandpass = 1;
+	bool applyWindow = 1;
+	bool applyBandpass = 1;
 	bool subpixel = 1;
 	bool crossCorrel = 0;
 	bool normInput = 0;
 	bool iterate = 1;
-
 	bool IPCshow = false;
 	bool IPCspeak = false;
 	double minimalShift = 0;
+	Mat bandpass;
+	Mat window;
+
+	IPCsettings(int rows, int cols, double stdevLmultiplier, double stdevHmultiplier) : rows(rows), cols(cols), stdevLmultiplier(stdevLmultiplier), stdevHmultiplier(stdevHmultiplier)
+	{
+		bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
+		window = edgemask(rows, cols);
+	}
+
+	void setBandpassParameters(double StdevLmultiplier, double StdevHmultiplier)
+	{
+		stdevLmultiplier = StdevLmultiplier;
+		stdevHmultiplier = StdevHmultiplier;
+		bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
+	}
+
+	void setSize(int Rows, int Cols)
+	{
+		rows = Rows;
+		cols = Cols;
+		window = edgemask(rows, cols);
+	}
+
+	int getrows() const
+	{
+		return rows;
+	}
+
+	int getcols() const
+	{
+		return cols;
+	}
 };
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, const Mat& windowMat, const Mat& bandpassMat, double* corrQuality = nullptr);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, double* corrQuality = nullptr);
 
 void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IPC_set);
 

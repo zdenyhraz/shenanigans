@@ -11,12 +11,11 @@ WindowIPCparameters::WindowIPCparameters(QWidget* parent, Globals* globals) : QM
 
 void WindowIPCparameters::refreshIPCparameters()
 {
-	globals->IPCsettings->Cwin = ui.lineEdit->text().toInt();
+	globals->IPCsettings->setSize(ui.lineEdit->text().toInt(), ui.lineEdit->text().toInt());
 	globals->IPCsettings->L2size = ui.lineEdit_2->text().toInt();
 	globals->IPCsettings->L1ratio = ui.lineEdit_3->text().toDouble();
 	globals->IPCsettings->UC = ui.lineEdit_4->text().toInt();
-	globals->IPCsettings->stdevLmultiplier = ui.lineEdit_5->text().toDouble();
-	globals->IPCsettings->stdevHmultiplier = ui.lineEdit_6->text().toDouble();
+	globals->IPCsettings->setBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
 	globals->IPCsettings->epsilon = ui.lineEdit_7->text().toDouble();
 	globals->IPCsettings->minimalShift = ui.lineEdit_8->text().toDouble();
 

@@ -12,7 +12,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
-	globals->IPCsettings = new IPCsettings();
+	globals->IPCsettings = new IPCsettings(32, 32, 5, 200);
 
 	#ifdef LOGGER_QT
 	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
@@ -83,11 +83,11 @@ void Zdeny_PhD_Shenanigans::debug()
 	if (1)//plot in optimization
 	{
 		Evolution Evo(2);
-		Evo.NP = 1000;
+		Evo.NP = 10;
 		Plot1D* plt = new Plot1D(ui.widget);
 		auto f = [&](std::vector<double> args) 
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+			std::this_thread::sleep_for(std::chrono::milliseconds(10)); 
 			return abs(args[0] - args[1]); 
 		};
 		auto result = Evo.optimize(f, globals->Logger, plt);
