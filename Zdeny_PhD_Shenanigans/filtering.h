@@ -14,12 +14,12 @@ struct filterSettings
 	filterSettings(double contrast, double brightness, double gamma) : contrast(contrast), brightness(brightness), gamma(gamma) {}
 };
 
-Mat filterContrastBrightness(Mat& sourceimg, double contrast, double brightness);
+Mat filterContrastBrightness(const Mat& sourceimg, double contrast, double brightness);
 
-Mat histogramEqualize(Mat& sourceimgIn);
+Mat histogramEqualize(const Mat& sourceimgIn);
 
-Mat gammaCorrect(Mat& sourceimgIn, double gamma);
+Mat gammaCorrect(const Mat& sourceimgIn, double gamma);
 
-Mat addnoise(Mat& sourceimgIn);
+Mat addnoise(const Mat& sourceimgIn);
 
-void showhistogram(Mat& sourceimgIn, int channels, int minimum = 0, int maximum = 255, std::string winname = "histogram");
+void showhistogram(const Mat& sourceimgIn, int channels, int minimum = 0, int maximum = 255, std::string winname = "histogram");

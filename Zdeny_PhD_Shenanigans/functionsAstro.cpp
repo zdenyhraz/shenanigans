@@ -6,7 +6,7 @@
 #include "functionsAstro.h"
 #include "logger.h"
 
-std::vector<double> diffrotProfileAverage(Mat& flow, int colS)
+std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 {
 	int cols = colS ? colS : flow.cols;
 	std::vector<double> averageFlow(flow.rows, 0);
@@ -21,7 +21,7 @@ std::vector<double> diffrotProfileAverage(Mat& flow, int colS)
 	return averageFlow;
 }
 
-double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, Mat& src, double noisestddev, double maxShiftRatio, double accuracy)
+double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy)
 {
 	double returnVal = 0;
 	Mat srcCrop1, srcCrop2;
@@ -71,7 +71,7 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, Mat& src, double 
 	return returnVal;
 }
 
-double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, Mat& source, double noisestddev, double maxShiftRatio, double accuracy)
+double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShiftRatio, double accuracy)
 {
 	IPCsettings settings = settingsMaster;
 	settings.stdevLmultiplier = args[0];

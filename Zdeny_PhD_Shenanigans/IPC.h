@@ -30,14 +30,14 @@ struct IPCsettings
 	double minimalShift = 0;
 };
 
-Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, Mat& windowMat, Mat& bandpassMat, double* corrQuality = nullptr);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, const Mat& windowMat, const Mat& bandpassMat, double* corrQuality = nullptr);
 
-void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set);
+void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IPC_set);
 
-Mat AlignStereovision(Mat& img1In, Mat& img2In);
+Mat AlignStereovision(const Mat& img1In, const Mat& img2In);
 
-void alignPicsDebug(Mat& img1In, Mat& img2In, IPCsettings& IPC_settings);
+void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_settings);
 
 void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings2);
 
-std::tuple<Mat, Mat> calculateFlowMap(Mat& img1In, Mat& img2In, IPCsettings& IPC_settings, double qualityRatio);
+std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_settings, double qualityRatio);

@@ -11,25 +11,25 @@ using namespace cv;
 static enum ColorMapStyle { CM_JET, CM_BINARY };
 static enum CombinePicsStyle { HUEBRIGHT, BINARYBLUERED };
 
-std::tuple<double, double> minMaxMat(Mat& sourceimg);
+std::tuple<double, double> minMaxMat(const Mat& sourceimg);
 
 std::vector<double> polyfit(std::vector<double> data, int degree);
 
-Mat crosshair(Mat& sourceimgIn, cv::Point point);
+Mat crosshair(const Mat& sourceimgIn, cv::Point point);
 
-Mat xko(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType);
+Mat xko(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType);
 
-Mat pointik(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType);
+Mat pointik(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType);
 
-Mat roicrop(Mat& sourceimgIn, int x, int y, int w, int h);
+Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h);
 
 Mat kirkl(unsigned size);
 
 Mat kirkl(int rows, int cols, unsigned radius);
 
-Mat kirklcrop(Mat& sourceimgIn, int x, int y, int diameter);
+Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter);
 
-Point2d findCentroidDouble(Mat& sourceimg);
+Point2d findCentroidDouble(const Mat& sourceimg);
 
 inline std::tuple<int, int, int> colorMapJET(int x, int caxisMin=0, int caxisMax=255)
 {
@@ -153,15 +153,15 @@ inline std::tuple<int, int, int> HUE_to_BGR(std::tuple<double, double, double> H
 	return std::make_tuple(B, G, R);
 }
 
-Mat combineTwoPics(Mat& source1In, Mat& source2In, CombinePicsStyle style, double sigma = 1);
+Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle style, double sigma = 1);
 
-Mat applyColorMapZdeny(Mat& sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = true);
+Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = true);
 
 Mat matFromVector(std::vector<double> vec, int cols);
 
-void showimg(Mat& sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i(0, 0));
+void showimg(const Mat& sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i(0, 0));
 
-void saveimg(std::string path, Mat& sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i(0, 0));
+void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i(0, 0));
 
 void saveMatToCsv(const std::string& path, const Mat& matIn);
 
@@ -185,7 +185,7 @@ inline std::vector<Mat> vect2ToMats(std::vector<std::vector<double>>& vec)
 	return result;
 }
 
-inline std::vector<double> matToVect(Mat& mat)
+inline std::vector<double> matToVect(const Mat& mat)
 {
 	std::vector<double> result(mat.rows, 0);
 	for (int r = 0; r < mat.rows; r++)

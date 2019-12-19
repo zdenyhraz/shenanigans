@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "optimization.h"
 
-std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger)
+std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger, AbstractPlot1D* plt)
 {
 	if (logger) logger->Log("Optimization started (evolution)", EVENT);
 
@@ -76,6 +76,15 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		}
 	}
 	funEvals += NP;
+
+	std::vector<double> x_plot;
+	std::vector<double> y_plot;
+	if (plt)
+	{
+		plt->setAxisNames("generation", "fitness");
+		x_plot.reserve(500);
+		y_plot.reserve(500);
+	}
 
 	//run main evolution cycle
 	for (int generation = 1; generation < 1e8; generation++)
@@ -189,6 +198,13 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			}
 		}
 
+		if (plt)//plt
+		{
+			x_plot.push_back(generation);
+			y_plot.push_back(bestFitness);
+			plt->plot(x_plot, y_plot);
+		}
+
 		//fill history ques for all entities - termination criterion
 		historyConstant = true;//assume history is constant
 		averageImprovement = 0;
@@ -208,7 +224,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			if (histories[indexEntity].size() > 2) averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
 		}
 		averageImprovement /= NP;
-		if (stopCrit == StoppingCriterion::AVGIMP) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; } //average fitness improved less than x%
+		if (stopCrit == StoppingCriterion::AVGIMP) { if (100 * averageImprovement > historyImprovTresholdPercent) historyConstant = false; }//average fitness improved less than x%
 
 		//termination criterions
 		if (bestFitness < optimalFitness)//fitness goal reached
@@ -244,7 +260,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	return bestEntity;
 }//optimize function end
 
-std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger)
+std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger, AbstractPlot1D* plt)
 {
 	//if (logger) logger->Log    ">> Optimization started (pattern search)"  ;
 

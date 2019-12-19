@@ -162,6 +162,9 @@
     <ClInclude Include="constants.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
+    <ClInclude Include="qtplotter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="plotter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
