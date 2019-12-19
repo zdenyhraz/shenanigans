@@ -10,6 +10,7 @@ using namespace cv;
 
 class IPCsettings
 {
+private:
 	double stdevLmultiplier = 1.2;
 	double stdevHmultiplier = 13;
 	int rows = 0;

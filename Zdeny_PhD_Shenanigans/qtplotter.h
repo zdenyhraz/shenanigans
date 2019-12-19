@@ -7,6 +7,7 @@ struct Plot1D : AbstractPlot1D
 {
 	QCustomPlot* widget;
 
+public:
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y") : widget(widget)
 	{
 		widget->addGraph();//create graph
@@ -47,6 +48,7 @@ struct Plot2D : AbstractPlot2D
 	int nx;
 	int ny;
 
+public:
 	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
 	{
 		widget->addGraph();//create graph
