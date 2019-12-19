@@ -19,7 +19,14 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		multiply(sourceimg1, IPC_set.window, sourceimg1);
 		multiply(sourceimg2, IPC_set.window, sourceimg2);
 	}
-	if (IPC_set.IPCshow) { showimg(sourceimg1, "src1"); showimg(sourceimg2, "src2"); }
+	if (IPC_set.IPCshow) 
+	{ 
+		showimg(sourceimg1, "IPC src1"); 
+		showimg(sourceimg2, "IPC src2"); 
+		showimg(IPC_set.bandpass, "IPC bandpass");
+		showimg(IPC_set.window, "IPC window");
+	}
+
 
 	Mat DFT1 = fourier(sourceimg1);
 	Mat DFT2 = fourier(sourceimg2);

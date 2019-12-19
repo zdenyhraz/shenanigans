@@ -208,7 +208,7 @@ public: std::vector<double> predictValue(std::vector<double>& input)
 	Mat input_ = vectToMat(input);//input vector to mat conversion
 	auto z = copyVectorMat(b), a = copyVectorMat(b);
 	feedForward(input_, z, a);
-	return matToVect(a.back());//return last activation vector
+	return mat1ToVect(a.back());//return last activation vector
 }
 
 public: int predictCategory(std::vector<double>& input)

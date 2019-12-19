@@ -33,7 +33,7 @@ public:
 	Mat bandpass;
 	Mat window;
 
-	IPCsettings(int rows, int cols, double stdevLmultiplier, double stdevHmultiplier) : rows(rows), cols(cols), stdevLmultiplier(stdevLmultiplier), stdevHmultiplier(stdevHmultiplier)
+	IPCsettings(int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
 	{
 		bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
 		window = edgemask(rows, cols);
@@ -61,6 +61,16 @@ public:
 	int getcols() const
 	{
 		return cols;
+	}
+
+	int getL() const
+	{
+		return stdevLmultiplier;
+	}
+
+	int getH() const
+	{
+		return stdevHmultiplier;
 	}
 };
 

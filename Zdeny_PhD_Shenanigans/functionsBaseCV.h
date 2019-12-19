@@ -185,11 +185,20 @@ inline std::vector<Mat> vect2ToMats(std::vector<std::vector<double>>& vec)
 	return result;
 }
 
-inline std::vector<double> matToVect(const Mat& mat)
+inline std::vector<double> mat1ToVect(const Mat& mat)
 {
 	std::vector<double> result(mat.rows, 0);
 	for (int r = 0; r < mat.rows; r++)
 		result[r] = mat.at<double>(r, 0);
+	return result;
+}
+
+inline std::vector<std::vector<double>> matToVect2(const Mat& mat)
+{
+	std::vector<std::vector<double>> result = zerovect2(mat.rows, mat.cols);
+	for (int r = 0; r < mat.rows; r++)
+		for (int c = 0; c < mat.cols; c++)
+			result[r][c] = mat.at<double>(r, c);
 	return result;
 }
 
