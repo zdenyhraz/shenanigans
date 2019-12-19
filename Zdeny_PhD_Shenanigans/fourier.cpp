@@ -5,54 +5,6 @@
 #include <fftw3.h>
 #endif
 
-Mat fourier(const Mat& sourceimgIn)
-{
-	Mat sourceimg = sourceimgIn.clone();
-	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
-
-	Mat sourceimgcomplex[2] = { sourceimg, Mat::zeros(sourceimg.size(),CV_64F) };
-	Mat sourceimgcomplexmerged;
-	merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
-	dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
-	return sourceimgcomplexmerged;
-}
-
-Mat fourierinv(const Mat& realIn, const Mat& imagIn)
-{
-	Mat real = realIn.clone();
-	Mat imag = imagIn.clone();
-	Mat invDFT;
-	Mat DFTcomplex[2] = { real, imag };
-	Mat DFTcomplexmerged;
-	merge(DFTcomplex, 2, DFTcomplexmerged);
-	dft(DFTcomplexmerged, invDFT, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
-	normalize(invDFT, invDFT, 0, 65535, CV_MINMAX);
-	invDFT.convertTo(invDFT, CV_16UC1);
-	std::cout << "inverse fourier calculated" << std::endl;
-	return invDFT;
-}
-
-Mat quadrantswap(const Mat& sourceimgDFT)
-{
-	Mat centeredDFT = sourceimgDFT.clone();
-	int centerX = centeredDFT.cols / 2;
-	int centerY = centeredDFT.rows / 2;
-	Mat q1(centeredDFT, Rect(0, 0, centerX, centerY));
-	Mat q2(centeredDFT, Rect(centerX, 0, centerX, centerY));
-	Mat q3(centeredDFT, Rect(0, centerY, centerX, centerY));
-	Mat q4(centeredDFT, Rect(centerX, centerY, centerX, centerY));
-	Mat temp;
-
-	q1.copyTo(temp);
-	q4.copyTo(q1);
-	temp.copyTo(q4);
-
-	q2.copyTo(temp);
-	q3.copyTo(q2);
-	temp.copyTo(q3);
-	return centeredDFT;
-}
-
 void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
 {
 	Mat DFTimg = DFTimgIn.clone();
@@ -96,13 +48,6 @@ void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwi
 	}
 }
 
-Mat edgemask(int rows, int cols)
-{
-	Mat edgemask;
-	createHanningWindow(edgemask, cv::Size(cols, rows), CV_64F);
-	return edgemask;
-}
-
 Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 {
 	Mat sinian = Mat::zeros(rows, cols, CV_64F);
@@ -120,16 +65,6 @@ Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 	Mat sinianfourier = fourier(sinian);
 	showfourier(sinianfourier, true, false);
 	return sinian;
-}
-
-Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
-{
-	Mat sourceimgDFT = sourceimgDFTIn.clone();
-	Mat filterGS = quadrantswap(bandpassMat);
-	Mat filter;
-	Mat filterPlanes[2] = { filterGS, filterGS };
-	merge(filterPlanes, 2, filter);
-	return sourceimgDFT.mul(filter);
 }
 
 Mat convolute(Mat sourceimg, Mat PSFimg)
