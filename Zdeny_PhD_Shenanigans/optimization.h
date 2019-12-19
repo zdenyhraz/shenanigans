@@ -1,6 +1,7 @@
 #pragma once
 #include "functionsBaseSTL.h"
 #include "logger.h"
+#include "plotter.h"
 
 #ifdef OPTIMIZE_WITH_CV
 #include "functionsBaseCV.h"
@@ -13,7 +14,7 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	int N = 1;//the problem dimension
 	vector<double> lowerBounds = zerovect(N, -1);//lower search space bounds
 	vector<double> upperBounds = zerovect(N, +1);//upper search space bounds
-	double optimalFitness = std::numeric_limits<double>::lowest();//satisfactory function value
+	double optimalFitness = 0;//satisfactory function value
 	int funEvals = 0;//current # of function evaluations
 	int maxFunEvals = 1e10;//maximum # of function evaluations
 	int maxGen = 1000;//maximum # of algorithm iterations
@@ -23,14 +24,14 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
 	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};//construct some default bounds
 
-	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr) = 0;
+	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, AbstractPlot1D* plot = nullptr) = 0;
 };
 
 struct Evolution : OptimizationAlgorithm
 {
-	static enum class MutationStrategy : char { RAND1, BEST1, RAND2, BEST2 };
-	static enum class CrossoverStrategy : char { BIN, EXP };
-	static enum class StoppingCriterion : char { ALLIMP, AVGIMP };
+	enum class MutationStrategy : char { RAND1, BEST1, RAND2, BEST2 };
+	enum class CrossoverStrategy : char { BIN, EXP };
+	enum class StoppingCriterion : char { ALLIMP, AVGIMP};
 	int NP = 4;
 	double F = 0.65;
 	double CR = 0.95;
@@ -43,7 +44,7 @@ struct Evolution : OptimizationAlgorithm
 	double historyImprovTresholdPercent = 1;
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
-	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr) override;
+	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, AbstractPlot1D* plot = nullptr) override;
 };
 
 struct PatternSearch : OptimizationAlgorithm
@@ -56,7 +57,7 @@ struct PatternSearch : OptimizationAlgorithm
 
 	PatternSearch(int N) : OptimizationAlgorithm(N) {};
 
-	vector<double> optimize(std::function<double(vector<double>)> f, Logger* logger = nullptr) override;
+	vector<double> optimize(std::function<double(vector<double>)> f, Logger* logger = nullptr, AbstractPlot1D* plot = nullptr) override;
 };
 
 struct Simplex : OptimizationAlgorithm
@@ -119,7 +120,7 @@ using namespace cv;
 
 Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY);
 
-inline void drawPoint2D(Mat& funcLandscape, cv::Point point, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(255 * 0.7, 0, 255 * 0.7))
+inline void drawPoint2D(const Mat& funcLandscape, cv::Point point, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(255 * 0.7, 0, 255 * 0.7))
 {
 	//Scalar(255 * 0.7, 0, 255 * 0.7) - magenta
 	int linePxLength = max(funcLandscape.cols / 120, 1);
@@ -134,7 +135,7 @@ inline void drawPoint2D(Mat& funcLandscape, cv::Point point, double stretchFacto
 	line(funcLandscape, NE, SW, CrosshairColor, thickness);
 }
 
-inline void drawArrow2D(Mat& funcLandscape, cv::Point point1, cv::Point point2, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(0, 0, 255))
+inline void drawArrow2D(const Mat& funcLandscape, cv::Point point1, cv::Point point2, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(0, 0, 255))
 {
 	point1.x *= stretchFactorX;
 	point1.y *= stretchFactorY;

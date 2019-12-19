@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "filtering.h"
 
-Mat filterContrastBrightness(Mat& sourceimg, double contrast, double brightness)
+Mat filterContrastBrightness(const Mat& sourceimg, double contrast, double brightness)
 {
 	Mat filtered = sourceimg.clone();
 	filtered.convertTo(filtered, CV_16U);
@@ -26,7 +26,7 @@ Mat filterContrastBrightness(Mat& sourceimg, double contrast, double brightness)
 	return filtered;
 }
 
-Mat histogramEqualize(Mat& sourceimgIn)
+Mat histogramEqualize(const Mat& sourceimgIn)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	normalize(sourceimg, sourceimg, 0, 255, CV_MINMAX);
@@ -38,7 +38,7 @@ Mat histogramEqualize(Mat& sourceimgIn)
 	return sourceimg;
 }
 
-Mat gammaCorrect(Mat& sourceimgIn, double gamma)//returns CV_16UC1/3
+Mat gammaCorrect(const Mat& sourceimgIn, double gamma)//returns CV_16UC1/3
 {
 	Mat sourceimg = sourceimgIn.clone();
 
@@ -51,7 +51,7 @@ Mat gammaCorrect(Mat& sourceimgIn, double gamma)//returns CV_16UC1/3
 	return sourceimg;
 }
 
-Mat addnoise(Mat& sourceimgIn)
+Mat addnoise(const Mat& sourceimgIn)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	sourceimg.convertTo(sourceimg, CV_64F);
@@ -63,7 +63,7 @@ Mat addnoise(Mat& sourceimgIn)
 	return noised;
 }
 
-void showhistogram(Mat& sourceimgIn, int channels, int minimum, int maximum, std::string winname)
+void showhistogram(const Mat& sourceimgIn, int channels, int minimum, int maximum, std::string winname)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	/// Separate the image in 3 places ( B, G and R )

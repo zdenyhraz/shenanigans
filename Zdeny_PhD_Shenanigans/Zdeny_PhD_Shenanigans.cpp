@@ -47,19 +47,52 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
-	auto x = zerovect(1000);
-	auto y = zerovect(1000);
-
-	makePlot(x, y, ui.widget);
-
-	for (int i = 0; i < 100001; i++)
+	if (0)//1D plot
 	{
-		x.push_back((double)i/5000);
-		y.push_back(sin(x[i]));
+		int n = 10001;
+		auto x = zerovect(n);
+		auto y = zerovect(n);
+		for (int i = 0; i < n; i++)
+		{
+			x[i] = (double)i/(n-1);
+			y[i] = sin(2 * PI*x[i]);
+		}
 
-		rePlot(x, y, ui.widget);
+		Plot1D plt(ui.widget, "x", "y");
+		plt.plot(x, y);
 	}
+	if (0)//2D plot
+	{
+		int nx = 1001;
+		int ny = 1051;
+		auto z = zerovect2(ny, nx);
+		for (int xIndex = 0; xIndex < nx; ++xIndex)
+		{
+			for (int yIndex = 0; yIndex < ny; ++yIndex)
+			{
+				z[yIndex][xIndex] = sqrt(sqr(xIndex - nx / 2) + sqr(yIndex - ny / 2));
+			}
+		}
 
+		Plot2D plt(ui.widget, "x", "y", "z", nx, ny, -1, 7, -5, 8);
+		plt.plot(z);
+
+		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
+		globals->Logger->Log("Z min = " + to_string(sqr(0) + sqr(0)), DEBUG);
+	}
+	if (1)//plot in optimization
+	{
+		Evolution Evo(2);
+		Evo.NP = 1000;
+		Plot1D* plt = new Plot1D(ui.widget);
+		auto f = [&](std::vector<double> args) 
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+			return abs(args[0] - args[1]); 
+		};
+		auto result = Evo.optimize(f, globals->Logger, plt);
+	}
+	globals->Logger->Log("Debug finished.", EVENT);
 }
 
 void Zdeny_PhD_Shenanigans::about()

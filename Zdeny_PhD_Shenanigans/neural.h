@@ -9,7 +9,7 @@ enum CostFunction : char { MSE, XENT };
 enum ActivationFunction : char { SIGMOID, RELU, RELUL, IDENTITY };
 enum PredictionType : char { VALUE, CATEGORY };
 
-inline Mat sigmoid(Mat& z)
+inline Mat sigmoid(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
@@ -17,12 +17,12 @@ inline Mat sigmoid(Mat& z)
 	return result;
 }
 
-inline Mat sigmoidPrime(Mat& z)
+inline Mat sigmoidPrime(const Mat& z)
 {
 	return sigmoid(z).mul(1. - sigmoid(z));
 }
 
-inline Mat relu(Mat& z)
+inline Mat relu(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
@@ -30,7 +30,7 @@ inline Mat relu(Mat& z)
 	return result;
 }
 
-inline Mat reluPrime(Mat& z)
+inline Mat reluPrime(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
@@ -38,7 +38,7 @@ inline Mat reluPrime(Mat& z)
 	return result;
 }
 
-inline Mat reluLeaky(Mat& z)
+inline Mat reluLeaky(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
@@ -46,7 +46,7 @@ inline Mat reluLeaky(Mat& z)
 	return result;
 }
 
-inline Mat reluLeakyPrime(Mat& z)
+inline Mat reluLeakyPrime(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
@@ -54,7 +54,7 @@ inline Mat reluLeakyPrime(Mat& z)
 	return result;
 }
 
-inline Mat activate(Mat& z, ActivationFunction& activationFunction)
+inline Mat activate(const Mat& z, ActivationFunction& activationFunction)
 {
 	switch (activationFunction)
 	{
@@ -65,7 +65,7 @@ inline Mat activate(Mat& z, ActivationFunction& activationFunction)
 	}
 }
 
-inline Mat activatePrime(Mat& z, ActivationFunction& activationFunction)
+inline Mat activatePrime(const Mat& z, ActivationFunction& activationFunction)
 {
 	switch (activationFunction)
 	{
@@ -76,21 +76,21 @@ inline Mat activatePrime(Mat& z, ActivationFunction& activationFunction)
 	}
 }
 
-inline Mat mse(Mat& a, Mat& y)
+inline Mat mse(const Mat& a, const Mat& y)
 {
 	Mat result = a.clone();
 	pow(a - y, 2, result);
 	return result * 0.5;
 }
 
-inline Mat msePrime(Mat& a, Mat& y)
+inline Mat msePrime(const Mat& a, const Mat& y)
 {
 	Mat result = a.clone();
 	result = (a - y);
 	return result;
 }
 
-inline Mat crossentropy(Mat& a, Mat& y)
+inline Mat crossentropy(const Mat& a, const Mat& y)
 {
 	Mat result = a.clone();
 	Mat loga = a.clone();
@@ -101,14 +101,14 @@ inline Mat crossentropy(Mat& a, Mat& y)
 	return result;
 }
 
-inline Mat crossentropyPrime(Mat& a, Mat& y)
+inline Mat crossentropyPrime(const Mat& a, const Mat& y)
 {
 	Mat result = a.clone();
 	result = (1. - y) / (1 - a) - y / a;
 	return result;
 }
 
-inline Mat cost(Mat& a, Mat& y, CostFunction& costFunction)
+inline Mat cost(const Mat& a, const Mat& y, CostFunction& costFunction)
 {
 	switch (costFunction)
 	{
@@ -117,7 +117,7 @@ inline Mat cost(Mat& a, Mat& y, CostFunction& costFunction)
 	}
 }
 
-inline Mat costPrime(Mat& a, Mat& y, CostFunction& costFunction)
+inline Mat costPrime(const Mat& a, const Mat& y, CostFunction& costFunction)
 {
 	switch (costFunction)
 	{
@@ -166,11 +166,11 @@ private: void initialize()
 		w[L] = L > 0 ? Mat::zeros(layerSizes[L], layerSizes[L - 1], CV_64FC1) : Mat::zeros(layerSizes[L], inputSize, CV_64FC1);//allocate weight matrices
 		b[L] = Mat::zeros(layerSizes[L], 1, CV_64FC1);
 	}
-	for (Mat& w_ : w)
+	for (const Mat& w_ : w)
 	{
 		randu(w_, -1, 1);//initialize weight matrices randomly
 	}
-	for (Mat& b_ : b)
+	for (const Mat& b_ : b)
 	{
 		randu(b_, -1, 1);//initialize biases randomly
 	}
@@ -183,7 +183,7 @@ private: void initialize()
 	}
 }
 
-private: Mat feedForward(Mat& input, std::vector<Mat>& z, std::vector<Mat>& a)
+private: Mat feedForward(const Mat& input, std::vector<Mat>& z, std::vector<Mat>& a)
 {
 	for (int L = 0; L < layerCount; L++)
 	{

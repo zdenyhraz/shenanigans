@@ -154,6 +154,7 @@
     <ClInclude Include="optimization.h" />
     <QtMoc Include="qcustomplot.h" />
     <ClInclude Include="plotter.h" />
+    <ClInclude Include="qtplotter.h" />
     <ClInclude Include="qtlogger.h" />
     <ClInclude Include="stdafx.h" />
     <QtMoc Include="WindowDiffrot.h" />

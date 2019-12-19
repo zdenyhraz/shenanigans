@@ -5,7 +5,7 @@
 #include <fftw3.h>
 #endif
 
-Mat fourier(Mat& sourceimgIn)
+Mat fourier(const Mat& sourceimgIn)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
@@ -18,7 +18,7 @@ Mat fourier(Mat& sourceimgIn)
 }
 
 #ifdef FOURIER_WITH_FFTW
-Mat fourierFFTW(Mat& sourceimgIn, int fftw)
+Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
@@ -81,7 +81,7 @@ Mat fourierFFTW(Mat& sourceimgIn, int fftw)
 }
 #endif
 
-Mat fourierinv(Mat& realIn, Mat& imagIn)
+Mat fourierinv(const Mat& realIn, const Mat& imagIn)
 {
 	Mat real = realIn.clone();
 	Mat imag = imagIn.clone();
@@ -96,7 +96,7 @@ Mat fourierinv(Mat& realIn, Mat& imagIn)
 	return invDFT;
 }
 
-Mat quadrantswap(Mat& sourceimgDFT)
+Mat quadrantswap(const Mat& sourceimgDFT)
 {
 	Mat centeredDFT = sourceimgDFT.clone();
 	int centerX = centeredDFT.cols / 2;
@@ -117,7 +117,7 @@ Mat quadrantswap(Mat& sourceimgDFT)
 	return centeredDFT;
 }
 
-void showfourier(Mat& DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
+void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
 {
 	Mat DFTimg = DFTimgIn.clone();
 	if (DFTimg.channels() == 2)
@@ -223,12 +223,10 @@ Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 	return sinian;
 }
 
-Mat bandpass(const Mat& sourceimgDFTIn, double stdevG, double stdevL, Mat* bandpassMat)
+Mat bandpass(const Mat& sourceimgDFTIn, double stdevG, double stdevL, const Mat& bandpassMat)
 {
 	Mat sourceimgDFT = sourceimgDFTIn.clone();
-	Mat filterGS;
-	if (!bandpassMat) filterGS = quadrantswap(bandpassian(sourceimgDFT.rows, sourceimgDFT.cols, stdevG, stdevL));
-	else filterGS = quadrantswap(*bandpassMat);
+	Mat filterGS = quadrantswap(bandpassMat);
 	Mat filter;
 	if (sourceimgDFT.channels() == 2)
 	{
@@ -302,7 +300,7 @@ Mat deconvolute(Mat sourceimg, Mat PSFimg)
 	return deconvimg;
 }
 
-Mat deconvoluteWiener(Mat& sourceimg, Mat& PSFimg)
+Mat deconvoluteWiener(const Mat& sourceimg, const Mat& PSFimg)
 {
 	Mat DFT1 = fourier(sourceimg);
 	Mat DFT2 = fourier(PSFimg);
@@ -341,7 +339,7 @@ Mat deconvoluteWiener(Mat& sourceimg, Mat& PSFimg)
 	return deconvimg;
 }
 
-Mat frequencyFilter(Mat& sourceimg, Mat& mask)
+Mat frequencyFilter(const Mat& sourceimg, const Mat& mask)
 {
 	Mat sourceimgDFT = fourier(sourceimg);
 	Mat planesold[2];

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "IPC.h"
 
-Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, Mat& windowMat, Mat& bandpassMat, double* corrQuality)
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, const Mat& windowMat, const Mat& bandpassMat, double* corrQuality)
 {
 	Mat sourceimg1 = sourceimg1In.clone();
 	Mat sourceimg2 = sourceimg2In.clone();
@@ -60,7 +60,7 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 		if (IPC_set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
 		if (IPC_set.bandpass)
 		{
-			CrossPower = bandpass(CrossPower, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier, &bandpassMat);
+			CrossPower = bandpass(CrossPower, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier, bandpassMat);
 			if (IPC_set.IPCshow) showimg(bandpassian(sourceimg1.rows, sourceimg1.cols, IPC_set.stdevLmultiplier, IPC_set.stdevHmultiplier), "bandpass", true);
 			if (IPC_set.IPCspeak) std::cout << "cross-power spectrum bandpassed" << std::endl;
 		}
@@ -233,7 +233,7 @@ Point2d phasecorrel(Mat& sourceimg1In, Mat& sourceimg2In, IPCsettings& IPC_set, 
 	return output;
 }
 
-void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set)
+void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IPC_set)
 {
 	Mat estR, estT;
 	Point2f center((float)input1.cols / 2, (float)input1.rows / 2);
@@ -292,7 +292,7 @@ void alignPics(Mat& input1, Mat& input2, Mat &output, IPCsettings IPC_set)
 	}
 }
 
-Mat AlignStereovision(Mat& img1In, Mat& img2In)
+Mat AlignStereovision(const Mat& img1In, const Mat& img2In)
 {
 	Mat img1 = img1In.clone();
 	Mat img2 = img2In.clone();
@@ -328,7 +328,7 @@ Mat AlignStereovision(Mat& img1In, Mat& img2In)
 	return result;
 }
 
-void alignPicsDebug(Mat& img1In, Mat& img2In, IPCsettings& IPC_settings)
+void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_settings)
 {
 	/*
 	fitsParams params;
@@ -448,7 +448,7 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
 	}
 }
 
-std::tuple<Mat, Mat> calculateFlowMap(Mat& img1In, Mat& img2In, IPCsettings& IPC_settings, double qualityRatio)
+std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_settings, double qualityRatio)
 {
 	Mat img1 = img1In.clone();
 	Mat img2 = img2In.clone();

@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "functionsBaseCV.h"
 
-std::tuple<double, double> minMaxMat(Mat& sourceimg)
+std::tuple<double, double> minMaxMat(const Mat& sourceimg)
 {
 	double minR, maxR;
 	minMaxLoc(sourceimg, &minR, &maxR, nullptr, nullptr);
@@ -39,7 +39,7 @@ std::vector<double> polyfit(std::vector<double> data, int degree)
 	return fit;
 }
 
-Mat crosshair(Mat& sourceimgIn, cv::Point point)
+Mat crosshair(const Mat& sourceimgIn, cv::Point point)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	Scalar CrosshairColor = Scalar(0.3);
@@ -61,7 +61,7 @@ Mat crosshair(Mat& sourceimgIn, cv::Point point)
 	return sourceimg;
 }
 
-Mat xko(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
+Mat xko(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	int inner = 0;
@@ -101,7 +101,7 @@ Mat xko(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string in
 	return sourceimgCLR;
 }
 
-Mat pointik(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
+Mat pointik(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	int inner = 1;
@@ -135,7 +135,7 @@ Mat pointik(Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::strin
 	return sourceimgCLR;
 }
 
-Mat roicrop(Mat& sourceimgIn, int x, int y, int w, int h)//x,y souradnice stredu, cols, rows
+Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)//x,y souradnice stredu, cols, rows
 {
 	Rect roi = Rect(x - std::floor((double)w / 2.), y - std::floor((double)h / 2.), w, h);
 	Mat crop = sourceimgIn(roi);
@@ -182,14 +182,14 @@ Mat kirkl(int rows, int cols, unsigned radius)
 	return kirkl;
 }
 
-Mat kirklcrop(Mat& sourceimgIn, int x, int y, int diameter)
+Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter)
 {
 	Mat crop = roicrop(sourceimgIn, x, y, diameter, diameter);
 	Mat kirklik = kirkl(diameter);
 	return crop.mul(kirklik);
 }
 
-Point2d findCentroidDouble(Mat& sourceimg)
+Point2d findCentroidDouble(const Mat& sourceimg)
 {
 	double M00 = 0.0;
 	double M01 = 0.0;
@@ -210,7 +210,7 @@ Point2d findCentroidDouble(Mat& sourceimg)
 	return CentroidDouble;
 }
 
-Mat combineTwoPics(Mat& source1In, Mat& source2In, CombinePicsStyle style, double sigma)
+Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle style, double sigma)
 {
 	Mat source1 = source1In.clone();
 	Mat source2 = source2In.clone();
@@ -254,7 +254,7 @@ Mat combineTwoPics(Mat& source1In, Mat& source2In, CombinePicsStyle style, doubl
 	return result;
 }
 
-Mat applyColorMapZdeny(Mat& sourceimgIn, double quantileB, double quantileT, bool color)
+Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB, double quantileT, bool color)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	//input is grayscale, output is colored
@@ -331,7 +331,7 @@ Mat matFromVector(std::vector<double> vec, int cols)
 	return result;
 }
 
-void showimg(Mat& sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize)
+void showimg(const Mat& sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	double RowColRatio = (double)sourceimg.rows / (double)sourceimg.cols;
@@ -353,7 +353,7 @@ void showimg(Mat& sourceimgIn, std::string windowname, bool color, double quanti
 	waitKey(1);
 }
 
-void saveimg(std::string path, Mat& sourceimgIn, bool bilinear, Size2i exportSize)
+void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear, Size2i exportSize)
 {
 	Mat sourceimg = sourceimgIn.clone();
 	normalize(sourceimg, sourceimg, 0, 255, CV_MINMAX);
