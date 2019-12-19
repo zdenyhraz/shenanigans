@@ -17,70 +17,6 @@ Mat fourier(const Mat& sourceimgIn)
 	return sourceimgcomplexmerged;
 }
 
-#ifdef FOURIER_WITH_FFTW
-Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
-{
-	Mat sourceimg = sourceimgIn.clone();
-	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
-	sourceimg.reserve(sourceimg.rows * 2);//space for imaginary part
-	if (fftw == 1)//fftw slowest version
-	{
-		int r, c;
-		fftw_complex* in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows*sourceimg.cols);
-		fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows*sourceimg.cols);
-		fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-		for (r = 0; r < sourceimg.rows; r++)
-		{
-			for (c = 0; c < sourceimg.cols; c++)
-			{
-				in[r*sourceimg.cols + c][0] = sourceimg.at<double>(r, c);
-				in[r*sourceimg.cols + c][1] = 0;
-			}
-		}
-		fftw_execute(plan);
-		Mat result2[2] = { Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F), Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F) };
-		for (r = 0; r < sourceimg.rows; r++)
-		{
-			for (c = 0; c < sourceimg.cols; c++)
-			{
-				result2[0].at<double>(r, c) = out[r*sourceimg.cols + c][0];
-				result2[1].at<double>(r, c) = out[r*sourceimg.cols + c][1];
-			}
-		}
-		Mat result;
-		merge(result2, 2, result);
-		fftw_free(in);
-		fftw_free(out);
-		fftw_destroy_plan(plan);
-		return result;
-	}
-	if (fftw == 2)
-	{
-		fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
-		fftw_execute(plan);
-		fftw_destroy_plan(plan);
-		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
-		Mat result2[2] = { resultRe,resultIm };
-		Mat result;
-		merge(result2, 2, result);
-		return result;
-	}
-	if (fftw == 3)
-	{
-		fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
-		fftw_execute(plan);
-		fftw_destroy_plan(plan);
-		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
-		Mat result2[2] = { resultRe,resultIm };
-		Mat result;
-		merge(result2, 2, result);
-		return result;
-	}
-}
-#endif
-
 Mat fourierinv(const Mat& realIn, const Mat& imagIn)
 {
 	Mat real = realIn.clone();
@@ -158,43 +94,6 @@ void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwi
 		}
 		showimg(DFTimgcentered, magnwindowname, true);
 	}
-}
-
-Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
-{
-	Mat gaussian = Mat::ones(rows, cols, CV_64F);
-	double centerX = floor((double)cols / 2);
-	double centerY = floor((double)rows / 2);
-	int x, y;
-	for (y = 0; y < rows; y++)
-	{
-		for (x = 0; x < cols; x++)
-		{
-			gaussian.at<double>(y, x) = std::exp(-(std::pow(x - centerX, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(y - centerY, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
-		}
-	}
-	normalize(gaussian, gaussian, 0, 1, CV_MINMAX);
-	return gaussian;
-}
-
-Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmult)
-{
-	Mat laplacian = Mat::ones(rows, cols, CV_64F);
-	if (stdevXmult == 0) return laplacian;
-	if (stdevYmult == 0) return laplacian;
-	laplacian = Scalar::all(1) - gaussian(rows, cols, stdevYmult, stdevXmult);
-	normalize(laplacian, laplacian, 0, 1, CV_MINMAX);
-	return laplacian;
-}
-
-Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
-{
-	Mat bandpassian = Mat::ones(rows, cols, CV_64F);
-	double centerX = cols / 2.;
-	double centerY = rows / 2.;
-	bandpassian = gaussian(rows, cols, stdevLmult, stdevLmult).mul(laplacian(rows, cols, stdevHmult, stdevHmult));
-	normalize(bandpassian, bandpassian, 0, 1, CV_MINMAX);
-	return bandpassian;
 }
 
 Mat edgemask(int rows, int cols)
@@ -352,3 +251,67 @@ Mat frequencyFilter(const Mat& sourceimg, const Mat& mask)
 	newimg.convertTo(newimg, CV_16UC1);
 	return newimg;
 }
+
+#ifdef FOURIER_WITH_FFTW
+Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
+{
+	Mat sourceimg = sourceimgIn.clone();
+	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
+	sourceimg.reserve(sourceimg.rows * 2);//space for imaginary part
+	if (fftw == 1)//fftw slowest version
+	{
+		int r, c;
+		fftw_complex* in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows*sourceimg.cols);
+		fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows*sourceimg.cols);
+		fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+		for (r = 0; r < sourceimg.rows; r++)
+		{
+			for (c = 0; c < sourceimg.cols; c++)
+			{
+				in[r*sourceimg.cols + c][0] = sourceimg.at<double>(r, c);
+				in[r*sourceimg.cols + c][1] = 0;
+			}
+		}
+		fftw_execute(plan);
+		Mat result2[2] = { Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F), Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F) };
+		for (r = 0; r < sourceimg.rows; r++)
+		{
+			for (c = 0; c < sourceimg.cols; c++)
+			{
+				result2[0].at<double>(r, c) = out[r*sourceimg.cols + c][0];
+				result2[1].at<double>(r, c) = out[r*sourceimg.cols + c][1];
+			}
+		}
+		Mat result;
+		merge(result2, 2, result);
+		fftw_free(in);
+		fftw_free(out);
+		fftw_destroy_plan(plan);
+		return result;
+	}
+	if (fftw == 2)
+	{
+		fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
+		fftw_execute(plan);
+		fftw_destroy_plan(plan);
+		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+		Mat result2[2] = { resultRe,resultIm };
+		Mat result;
+		merge(result2, 2, result);
+		return result;
+	}
+	if (fftw == 3)
+	{
+		fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_execute(plan);
+		fftw_destroy_plan(plan);
+		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+		Mat result2[2] = { resultRe,resultIm };
+		Mat result;
+		merge(result2, 2, result);
+		return result;
+	}
+}
+#endif

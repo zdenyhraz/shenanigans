@@ -12,7 +12,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
-	globals->IPCsettings = new IPCsettings(32, 32, 5, 200);
+	globals->IPCsettings = new IPCsettings(100, 100, 5, 20);
 
 	#ifdef LOGGER_QT
 	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
@@ -80,7 +80,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
 		globals->Logger->Log("Z min = " + to_string(sqr(0) + sqr(0)), DEBUG);
 	}
-	if (1)//plot in optimization
+	if (0)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
@@ -91,6 +91,27 @@ void Zdeny_PhD_Shenanigans::debug()
 			return abs(args[0] - args[1]); 
 		};
 		auto result = Evo.optimize(f, globals->Logger, plt);
+	}
+	if (0)//ipc bandpass & window 
+	{
+		showimg(globals->IPCsettings->bandpass, "global bandpass");
+		showimg(globals->IPCsettings->window, "global window");
+
+		globals->Logger->Log("global cols = " + to_string(globals->IPCsettings->getcols()));
+		globals->Logger->Log("global rows = " + to_string(globals->IPCsettings->getrows()));
+		globals->Logger->Log("global L = " + to_string(globals->IPCsettings->getL()));
+		globals->Logger->Log("global H = " + to_string(globals->IPCsettings->getH()));
+		globals->Logger->Log("logdebug = " + to_string(3.75654));
+
+		Plot2D plt(ui.widget, "x", "y", "bandpass", globals->IPCsettings->getcols(), globals->IPCsettings->getrows(), 0, 1, 0, 1);
+		plt.plot(matToVect2(globals->IPCsettings->window));
+	}
+	if (1)
+	{
+		Plot2D plt(ui.widget, "x", "y", "bandpass", 101, 101, 0, 1, 0, 1);
+		plt.plot(matToVect2(bandpassian(101, 101, 5, 200)));
+		//plt.plot(matToVect2(edgemask(101, 101)));
+
 	}
 	globals->Logger->Log("Debug finished.", EVENT);
 }
