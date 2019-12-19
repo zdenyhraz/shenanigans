@@ -21,7 +21,7 @@ std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 	return averageFlow;
 }
 
-double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy)
+double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy)
 {
 	double returnVal = 0;
 	Mat srcCrop1, srcCrop2;
@@ -30,20 +30,20 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, d
 	//vector<double> startFractionY = { 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 };
 	vector<double> startFractionX = { 0.5 };
 	vector<double> startFractionY = { 0.5 };
-	int trials = ceil((double)IPC_set.getcols() * maxShiftRatio / accuracy) + 1;
+	int trials = ceil((double)set.getcols() * maxShiftRatio / accuracy) + 1;
 	for (int startposition = 0; startposition < startFractionX.size(); startposition++)
 	{
 		int startX = src.cols * startFractionX[startposition];
 		int startY = src.rows * startFractionY[startposition];
-		srcCrop1 = roicrop(src, startX, startY, 1.5*IPC_set.getcols() + 2, 1.5*IPC_set.getcols() + 2);
-		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, IPC_set.getcols(), IPC_set.getcols());
+		srcCrop1 = roicrop(src, startX, startY, 1.5*set.getcols() + 2, 1.5*set.getcols() + 2);
+		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, set.getcols(), set.getcols());
 		for (int i = 0; i < trials; i++)
 		{
-			double shiftX = (double)i / (trials - 1) * (double)IPC_set.getcols() * maxShiftRatio;
+			double shiftX = (double)i / (trials - 1) * (double)set.getcols() * maxShiftRatio;
 			double shiftY = 0.;
 			Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
 			warpAffine(srcCrop1, srcCrop2, T, cv::Size(srcCrop1.cols, srcCrop1.rows));
-			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, IPC_set.getcols(), IPC_set.getcols());
+			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, set.getcols(), set.getcols());
 			if (noisestddev)
 			{
 				crop1.convertTo(crop1, CV_32F);
@@ -55,7 +55,7 @@ double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, d
 				crop1 += noise1;
 				crop2 += noise2;
 			}
-			auto shift = phasecorrel(crop1, crop2, IPC_set);
+			auto shift = phasecorrel(crop1, crop2, set);
 			returnVal += abs(shift.x - shiftX);
 			if (0)//DEBUG
 			{

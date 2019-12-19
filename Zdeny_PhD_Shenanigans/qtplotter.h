@@ -68,6 +68,7 @@ public:
 		marginGroup = new QCPMarginGroup(widget);//make sure the axis rect and color scale synchronize their bottom and top margins (so they line up)
 		widget->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);//align plot
 		colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);//align colorbar
+		colorMap->setInterpolate(true);//interpolate bro
 	};
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::string zlabel) override

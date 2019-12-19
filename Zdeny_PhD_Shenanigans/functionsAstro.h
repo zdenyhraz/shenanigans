@@ -98,7 +98,7 @@ struct DiffrotResults
 	}
 };
 
-double absoluteSubpixelRegistrationError(IPCsettings& IPC_set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy);
+double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy);
 
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShiftRatio, double accuracy);
 

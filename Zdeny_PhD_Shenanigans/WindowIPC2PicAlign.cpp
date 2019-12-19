@@ -5,6 +5,7 @@ WindowIPC2PicAlign::WindowIPC2PicAlign(QWidget* parent, Globals* globals) : QMai
 {
 	ui.setupUi(this);
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(align()));
+	connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(alignXY()));
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(flowMap()));
 	connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(features()));
 }
@@ -20,9 +21,9 @@ void WindowIPC2PicAlign::align()
 	img1 = roicrop(img1, 0.375*img1.cols, 0.7*img1.rows, size, size);
 	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
 
-	IPCsettings IPC_set = *globals->IPCsettings;
-	IPC_set.IPCspeak = true;
-	IPC_set.IPCshow = true;
+	IPCsettings set = *globals->IPCsettings;
+	set.IPCspeak = true;
+	set.IPCshow = true;
 
 	if (0)//artificial misalign
 	{
@@ -42,8 +43,26 @@ void WindowIPC2PicAlign::align()
 	showimg(img1, "img1");
 	showimg(img2, "img2");
 	showimg(AlignStereovision(img1, img2), "img 1n2 not aligned");
-	alignPics(img1, img2, img2, IPC_set);
+	alignPics(img1, img2, img2, set);
 	showimg(AlignStereovision(img1, img2), "img 1n2 yes aligned");
+}
+
+void WindowIPC2PicAlign::alignXY()
+{
+	std::string path1 = ui.lineEdit->text().toStdString();
+	std::string path2 = ui.lineEdit_2->text().toStdString();
+	Mat img1 = loadImage(path1);
+	Mat img2 = loadImage(path2);
+
+	int size = globals->IPCsettings->getcols();
+	img1 = roicrop(img1, 0.375*img1.cols, 0.7*img1.rows, size, size);
+	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
+
+	IPCsettings set = *globals->IPCsettings;
+	set.IPCspeak = true;
+	set.IPCshow = true;
+
+	auto shifts = phasecorrel(img1, img2, set);
 }
 
 void WindowIPC2PicAlign::flowMap()
