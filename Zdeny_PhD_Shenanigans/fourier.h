@@ -51,8 +51,6 @@ inline Mat quadrantswap(const Mat& sourceimgDFT)
 	return centeredDFT;
 }
 
-void showfourier(const Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
-
 inline Mat edgemask(int rows, int cols)
 {
 	Mat edgemask;
@@ -92,7 +90,21 @@ inline Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
 	return bandpassian;
 }
 
-Mat sinian(int rows, int cols, double frequencyX, double frequencyY);
+inline Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
+{
+	Mat sinian = Mat::zeros(rows, cols, CV_64F);
+	for (int y = 0; y < rows; y++)
+	{
+		for (int x = 0; x < cols; x++)
+		{
+			//sinian.at<double>(y, x) = std::cos(2 * PI * x * frequencyX)*std::sin(2 * PI * y * frequencyY);//sin or cos just cahnges the phase spectum
+			sinian.at<double>(y, x) = std::sin(2 * PI * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
+		}
+	}
+	normalize(sinian, sinian, 0, 1, CV_MINMAX);
+	sinian = sinian.mul(edgemask(rows, cols));
+	return sinian;
+}
 
 inline Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
 {
@@ -103,6 +115,8 @@ inline Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
 	merge(filterPlanes, 2, filter);
 	return sourceimgDFT.mul(filter);
 }
+
+void showfourier(const Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
 
 Mat convolute(Mat sourceimg, Mat PSFimg);
 

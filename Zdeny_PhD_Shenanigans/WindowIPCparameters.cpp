@@ -21,8 +21,8 @@ void WindowIPCparameters::refreshIPCparameters()
 
 	globals->IPCsettings->subpixel = ui.checkBox->isChecked();
 	globals->IPCsettings->iterate = ui.checkBox_2->isChecked();
-	globals->IPCsettings->bandpass = ui.checkBox_3->isChecked();
-	globals->IPCsettings->window = ui.checkBox_4->isChecked();
+	globals->IPCsettings->applyBandpass = ui.checkBox_3->isChecked();
+	globals->IPCsettings->applyWindow = ui.checkBox_4->isChecked();
 	globals->IPCsettings->interpolate = ui.checkBox_5->isChecked();
 	globals->IPCsettings->normInput = ui.checkBox_6->isChecked();
 	globals->IPCsettings->crossCorrel = ui.checkBox_7->isChecked();

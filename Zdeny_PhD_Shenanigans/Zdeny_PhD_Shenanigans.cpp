@@ -92,26 +92,14 @@ void Zdeny_PhD_Shenanigans::debug()
 		};
 		auto result = Evo.optimize(f, globals->Logger, plt);
 	}
-	if (0)//ipc bandpass & window 
+	if (1)//ipc bandpass & window 
 	{
-		showimg(globals->IPCsettings->bandpass, "global bandpass");
-		showimg(globals->IPCsettings->window, "global window");
-
-		globals->Logger->Log("global cols = " + to_string(globals->IPCsettings->getcols()));
-		globals->Logger->Log("global rows = " + to_string(globals->IPCsettings->getrows()));
 		globals->Logger->Log("global L = " + to_string(globals->IPCsettings->getL()));
 		globals->Logger->Log("global H = " + to_string(globals->IPCsettings->getH()));
-		globals->Logger->Log("logdebug = " + to_string(3.75654));
+		globals->Logger->Log("logdebug = " + to_string(1.2345));
 
 		Plot2D plt(ui.widget, "x", "y", "bandpass", globals->IPCsettings->getcols(), globals->IPCsettings->getrows(), 0, 1, 0, 1);
-		plt.plot(matToVect2(globals->IPCsettings->window));
-	}
-	if (1)
-	{
-		Plot2D plt(ui.widget, "x", "y", "bandpass", 101, 101, 0, 1, 0, 1);
-		plt.plot(matToVect2(bandpassian(101, 101, 5, 200)));
-		//plt.plot(matToVect2(edgemask(101, 101)));
-
+		plt.plot(matToVect2(globals->IPCsettings->bandpass));
 	}
 	globals->Logger->Log("Debug finished.", EVENT);
 }

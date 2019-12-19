@@ -319,17 +319,7 @@ Mat loadImage(std::string path)
 	{
 		result = imread(path, IMREAD_ANYDEPTH);
 	}
-	if (0)//DEBUG
-	{
-		double RowColRatio = (double)result.rows / (double)result.cols;
-		int namedWindowRows = 600;
-		int namedWindowCols = (double)namedWindowRows / RowColRatio;
-		namedWindow("result_imshow_raw", WINDOW_NORMAL);
-		resizeWindow("result_imshow_raw", namedWindowCols, namedWindowRows);
-		imshow("result_imshow_raw", result);
-	}
 	result.convertTo(result, CV_16U);
 	normalize(result, result, 0, 65535, CV_MINMAX);
-	//showimg(result, "result");
 	return result;
 }

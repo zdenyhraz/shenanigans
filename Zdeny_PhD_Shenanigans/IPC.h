@@ -11,12 +11,12 @@ using namespace cv;
 class IPCsettings
 {
 private:
-	double stdevLmultiplier = 1.2;
-	double stdevHmultiplier = 13;
+	double stdevLmultiplier = 5;
+	double stdevHmultiplier = 100;
 	int rows = 0;
 	int cols = 0;
 public:
-	double L2size = 11;
+	double L2size = 17;
 	double L1ratio = 0.35;
 	int UC = 31;
 	double epsilon = 0;
@@ -63,20 +63,20 @@ public:
 		return cols;
 	}
 
-	int getL() const
+	double getL() const
 	{
 		return stdevLmultiplier;
 	}
 
-	int getH() const
+	double getH() const
 	{
 		return stdevHmultiplier;
 	}
 };
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& IPC_set, double* corrQuality = nullptr);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& set, double* corrQuality = nullptr);
 
-void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings IPC_set);
+void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings set);
 
 Mat AlignStereovision(const Mat& img1In, const Mat& img2In);
 
