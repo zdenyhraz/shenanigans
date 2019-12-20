@@ -54,7 +54,6 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 	if (set.applyBandpass)
 	{
 		CrossPower = bandpass(CrossPower, set.bandpass);
-		if (set.IPCshow) showimg(set.bandpass, "bandpass", true);
 		if (set.IPCspeak) std::cout << "cross-power spectrum bandpassed" << std::endl;
 	}
 	if (1)//CORRECT - complex magnitude - input can be real or complex whatever
@@ -67,7 +66,6 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		{
 			auto minmaxReal = minMaxMat(L3planes[0]);
 			auto minmaxImag = minMaxMat(L3planes[1]);
-
 			std::cout << "L3 real min/max: " << std::get<0>(minmaxReal) << " / " << std::get<1>(minmaxReal) << std::endl;
 			std::cout << "L3 imag min/max: " << std::get<0>(minmaxImag) << " / " << std::get<1>(minmaxImag) << std::endl;
 		}
@@ -97,15 +95,9 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 	double maxR, minR;
 	minMaxLoc(L3, &minR, &maxR, &minRloc, &L3peak);
 	if (set.IPCspeak) std::cout << "Phase correlation max: " << maxR << " at location: " << L3peak << std::endl;
-	double imageshiftX_PIXEL;
-	double imageshiftY_PIXEL;
-	Point2d L3mid;
-	L3mid.x = L3.cols / 2;
-	L3mid.y = L3.rows / 2;
-	imageshiftX_PIXEL = L3peak.x - L3mid.x;
-	imageshiftY_PIXEL = L3peak.y - L3mid.y;
-	if (set.IPCspeak) std::cout << "Calculated shiftX with pixel accuracy: " << imageshiftX_PIXEL << " pixels" << std::endl;
-	if (set.IPCspeak) std::cout << "Calculated shiftY with pixel accuracy: " << imageshiftY_PIXEL << " pixels" << std::endl;
+	Point2d L3mid(L3.cols / 2, L3.rows / 2);
+	Point2d imageshift_PIXEL(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
+	if (set.IPCspeak) std::cout << "Calculated shiftX with pixel accuracy: " << imageshift_PIXEL << " pixels" << std::endl;
 	if (set.IPCshow) { Mat L3v; resize(L3, L3v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L3v, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3", true, 0, 1); }
 	if (set.IPCshow) 
 	{ 
@@ -119,108 +111,93 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		showimg(crosshair(L3vl, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3 log", true, 0, 1); 
 	}
 	if (set.IPCspeak) std::cout << "phase correlation calculated with pixel accuracy" << std::endl;
-	output.x = imageshiftX_PIXEL;
-	output.y = imageshiftY_PIXEL;
+	output = imageshift_PIXEL;
 
-	//SUBPIXEL------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-	//first check for degenerate peaklocs
-	int L2size = set.L2size;
-	if (!(L2size % 2)) L2size++;//odd!
-	if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > sourceimg1.cols) || ((L3peak.y + L2size / 2 + 1) > sourceimg1.rows))
-	{
-		if (set.IPCspeak) cout << "degenerate peak, results might be inaccurate!" << endl;
-		//cout << "-!";
-		set.subpixel = false;
-	}
 	if (set.subpixel)
 	{
-		double imageshiftX_SUBPIXEL, imageshiftY_SUBPIXEL;
-		Mat L2 = roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
-		Point2d L2mid;
-		L2mid.x = L2.cols / 2;
-		L2mid.y = L2.rows / 2;
-		Mat L2U;
-		if (set.interpolate)
-			resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_LINEAR);
-		else
-			resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST);
-		Point2d L2Umid;
-		L2Umid.x = L2U.cols / 2;
-		L2Umid.y = L2U.rows / 2;
-		if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
-		if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
-		Point2d L2Upeak;
-		L2Upeak.x = L2U.cols / 2;
-		L2Upeak.y = L2U.rows / 2;
-		if (set.IPCspeak) std::cout << "L2Upeak location before iterations: " << L2Upeak << std::endl;
-		if (set.IPCspeak) std::cout << "L2Upeak location before iterations findCentroid double: " << findCentroidDouble(L2U) << std::endl;
-		int L1size = std::round((double)L2U.cols*set.L1ratio);
-		if (!(L1size % 2)) L1size++;//odd!
-		Mat L1;
-		Point2d L1mid;
-		if (!set.iterate)
+		//first check for degenerate peaklocs
+		int L2size = set.L2size;
+		if (!(L2size % 2)) L2size++;//odd!+
+		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > sourceimg1.cols) || ((L3peak.y + L2size / 2 + 1) > sourceimg1.rows))
 		{
-			L1 = roicrop(L3, L3peak.x, L3peak.y, 5, 5);
-			L1mid.x = L1.cols / 2;
-			L1mid.y = L1.rows / 2;
-			imageshiftX_SUBPIXEL = (double)L3peak.x - (double)L3mid.x + findCentroidDouble(L1).x - L1mid.x;
-			imageshiftY_SUBPIXEL = (double)L3peak.y - (double)L3mid.y + findCentroidDouble(L1).y - L1mid.y;
-			if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L1v, findCentroidDouble(L1) * 2000 / L1.cols), "L1 a4r", true); }
+			if (set.IPCspeak) cout << "degenerate peak, results might be inaccurate!" << endl;
 		}
 		else
 		{
-			L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-			L1mid.x = L1.cols / 2;
-			L1mid.y = L1.rows / 2;
-			if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
-			int maxPCit = 50;
-			for (int i = 0; i < maxPCit; i++)
+			Point2d imageshift_SUBPIXEL;
+			Mat L2 = roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
+			Point2d L2mid(L2.cols / 2, L2.rows / 2);
+			Mat L2U;
+			if (set.interpolate)
+				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_LINEAR);
+			else
+				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST);
+			Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
+			if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
+			if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
+			Point2d L2Upeak(L2U.cols / 2, L2U.rows / 2);
+			if (set.IPCspeak) std::cout << "L2Upeak location before iterations: " << L2Upeak << std::endl;
+			if (set.IPCspeak) std::cout << "L2Upeak location before iterations findCentroid double: " << findCentroidDouble(L2U) << std::endl;
+			int L1size = std::round((double)L2U.cols*set.L1ratio);
+			if (!(L1size % 2)) L1size++;//odd!+
+			Mat L1;
+			Point2d L1mid;
+			if (!set.iterate)
 			{
-				if (set.IPCspeak) std::cout << "====================================" << " iterace " << i << " ====================================" << std::endl;
-				L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-				Point2d L1peak = findCentroidDouble(L1);
-				if (set.IPCspeak) std::cout << "L1peak: " << L1peak << std::endl;
-				L2Upeak.x += round(L1peak.x - L1mid.x);
-				L2Upeak.y += round(L1peak.y - L1mid.y);
-				if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
-				{
-					if (set.IPCspeak) cout << "breaking out of pc iterations, centroid diverges" << endl;
-					//cout << "!";
-					break;
-				}
-				if (set.IPCspeak) std::cout << "L1peak findCentroid double delta: " << findCentroidDouble(L1).x - L1mid.x << " , " << findCentroidDouble(L1).y - L1mid.y << std::endl;
-				if (set.IPCspeak) std::cout << "Resulting L2Upeak in this iteration: " << L2Upeak << std::endl;
-				if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
-				{
-					L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-					if (set.IPCspeak) std::cout << "Iterative PC accuracy reached <<<" << std::endl;
-					if (set.IPCspeak) std::cout << "L2Upeak: " << L2Upeak << std::endl;
-					if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 a4r", true); }
-					if (set.IPCspeak) std::cout << "===================================================================================" << std::endl;
-					break;
-				}
-				if (i == (maxPCit - 1))
-				{
-					if (set.IPCspeak) cout << "PC out of iterations - diverges" << endl;
-					//cout << "!";
-				}
+				L1 = roicrop(L3, L3peak.x, L3peak.y, 5, 5);
+				L1mid = Point2d(L1.cols / 2, L1.rows / 2);
+				imageshift_SUBPIXEL = (Point2d)L3peak - L3mid + findCentroidDouble(L1) - L1mid;
+				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L1v, findCentroidDouble(L1) * 2000 / L1.cols), "L1 a4r", true); }
 			}
-			imageshiftX_SUBPIXEL = (double)L3peak.x - (double)L3mid.x + 1.0 / (double)set.UC*((double)L2Upeak.x - (double)L2Umid.x + findCentroidDouble(L1).x - (double)L1mid.x);//image shift in L3 - final
-			imageshiftY_SUBPIXEL = (double)L3peak.y - (double)L3mid.y + 1.0 / (double)set.UC*((double)L2Upeak.y - (double)L2Umid.y + findCentroidDouble(L1).y - (double)L1mid.y);
+			else
+			{
+				L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
+				L1mid = Point2d(L1.cols / 2, L1.rows / 2);
+				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
+				int maxPCit = 50;
+				for (int i = 0; i < maxPCit; i++)
+				{
+					if (set.IPCspeak) std::cout << "====================================" << " iterace " << i << " ====================================" << std::endl;
+					L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
+					Point2d L1peak = findCentroidDouble(L1);
+					if (set.IPCspeak) std::cout << "L1peak: " << L1peak << std::endl;
+					L2Upeak.x += round(L1peak.x - L1mid.x);
+					L2Upeak.y += round(L1peak.y - L1mid.y);
+					if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
+					{
+						if (set.IPCspeak) cout << "breaking out of pc iterations, centroid diverges" << endl;
+						break;
+					}
+					if (set.IPCspeak) std::cout << "L1peak findCentroid double delta: " << findCentroidDouble(L1).x - L1mid.x << " , " << findCentroidDouble(L1).y - L1mid.y << std::endl;
+					if (set.IPCspeak) std::cout << "Resulting L2Upeak in this iteration: " << L2Upeak << std::endl;
+					if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
+					{
+						L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
+						if (set.IPCspeak) std::cout << "Iterative PC accuracy reached <<<" << std::endl;
+						if (set.IPCspeak) std::cout << "L2Upeak: " << L2Upeak << std::endl;
+						if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 a4r", true); }
+						if (set.IPCspeak) std::cout << "===================================================================================" << std::endl;
+						break;
+					}
+					if (i == (maxPCit - 1))
+					{
+						if (set.IPCspeak) cout << "PC out of iterations - diverges" << endl;
+					}
+				}
+				imageshift_SUBPIXEL.x = (double)L3peak.x - (double)L3mid.x + 1.0 / (double)set.UC*((double)L2Upeak.x - (double)L2Umid.x + findCentroidDouble(L1).x - (double)L1mid.x);//image shift in L3 - final
+				imageshift_SUBPIXEL.y = (double)L3peak.y - (double)L3mid.y + 1.0 / (double)set.UC*((double)L2Upeak.y - (double)L2Umid.y + findCentroidDouble(L1).y - (double)L1mid.y);//image shift in L3 - final
+			}
+
+			if (set.IPCspeak) std::cout << "phase correlation calculated with subpixel accuracy" << std::endl;
+			if (set.IPCspeak) std::cout << "Calculated shift with pixel accuracy: " << imageshift_PIXEL << " pixels " << std::endl;
+			if (set.IPCspeak) std::cout << "Calculated shift with SUBpixel accuracy1: " << imageshift_SUBPIXEL << " pixels " << std::endl;
+			if (set.IPCspeak) std::cout << "L3 size: " << L3.size << ", L2 size: " << L2.size << ", L2U size: " << L2U.size << ", L1 size: " << L1.size << std::endl;
+			if (set.IPCspeak) std::cout << "Upsample pixel accuracy theoretical maximum: " << 1.0 / (double)set.UC << std::endl;
+
+			output = imageshift_SUBPIXEL;
 		}
-
-		if (set.IPCspeak) std::cout << "phase correlation calculated with subpixel accuracy" << std::endl;
-		if (set.IPCspeak) std::cout << "Calculated shiftX with pixel accuracy: " << imageshiftX_PIXEL << " pixels " << std::endl;
-		if (set.IPCspeak) std::cout << "Calculated shiftY with pixel accuracy: " << imageshiftY_PIXEL << " pixels " << std::endl;
-		if (set.IPCspeak) std::cout << "Calculated shiftX with SUBpixel accuracy1: " << imageshiftX_SUBPIXEL << " pixels " << std::endl;
-		if (set.IPCspeak) std::cout << "Calculated shiftY with SUBpixel accuracy1: " << imageshiftY_SUBPIXEL << " pixels " << std::endl;
-		if (set.IPCspeak) std::cout << "L3 size: " << L3.size << ", L2 size: " << L2.size << ", L2U size: " << L2U.size << ", L1 size: " << L1.size << std::endl;
-		if (set.IPCspeak) std::cout << "Upsample pixel accuracy theoretical maximum: " << 1.0 / (double)set.UC << std::endl;
-
-		output.x = imageshiftX_SUBPIXEL;
-		output.y = imageshiftY_SUBPIXEL;
 	}
+	
 	return output;
 }
 
