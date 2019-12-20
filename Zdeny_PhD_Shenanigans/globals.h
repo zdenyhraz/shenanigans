@@ -1,8 +1,8 @@
 #pragma once
 #include "constants.h"
 #include "IPC.h"
-#include "csllogger.h"
-#include "qtlogger.h"
+#include "loggercsl.h"
+#include "loggerqt.h"
 
 struct Globals
 {
