@@ -114,9 +114,6 @@
     <ClInclude Include="globals.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="qtlogger.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
     <ClInclude Include="filtering.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
@@ -156,17 +153,20 @@
     <ClInclude Include="logger.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="csllogger.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
     <ClInclude Include="constants.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="qtplotter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="plotter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loggerqt.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="plotterqt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loggercsl.h">
+      <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

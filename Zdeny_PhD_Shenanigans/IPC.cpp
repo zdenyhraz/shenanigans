@@ -100,10 +100,10 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 	double imageshiftX_PIXEL;
 	double imageshiftY_PIXEL;
 	Point2d L3mid;
-	L3mid.x = floor((double)L3.cols / 2.);
-	L3mid.y = floor((double)L3.rows / 2.);
-	imageshiftX_PIXEL = (double)(L3peak.x) - L3mid.x;
-	imageshiftY_PIXEL = (double)(L3peak.y) - L3mid.y;
+	L3mid.x = L3.cols / 2;
+	L3mid.y = L3.rows / 2;
+	imageshiftX_PIXEL = L3peak.x - L3mid.x;
+	imageshiftY_PIXEL = L3peak.y - L3mid.y;
 	if (set.IPCspeak) std::cout << "Calculated shiftX with pixel accuracy: " << imageshiftX_PIXEL << " pixels" << std::endl;
 	if (set.IPCspeak) std::cout << "Calculated shiftY with pixel accuracy: " << imageshiftY_PIXEL << " pixels" << std::endl;
 	if (set.IPCshow) { Mat L3v; resize(L3, L3v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L3v, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3", true, 0, 1); }
@@ -138,21 +138,21 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		double imageshiftX_SUBPIXEL, imageshiftY_SUBPIXEL;
 		Mat L2 = roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
 		Point2d L2mid;
-		L2mid.x = floor((double)L2.cols / 2.0);
-		L2mid.y = floor((double)L2.rows / 2.0);
+		L2mid.x = L2.cols / 2;
+		L2mid.y = L2.rows / 2;
 		Mat L2U;
 		if (set.interpolate)
 			resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_LINEAR);
 		else
 			resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST);
 		Point2d L2Umid;
-		L2Umid.x = floor((double)(L2U.cols) / 2.0);
-		L2Umid.y = floor((double)(L2U.rows) / 2.0);
+		L2Umid.x = L2U.cols / 2;
+		L2Umid.y = L2U.rows / 2;
 		if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
 		if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
 		Point2d L2Upeak;
-		L2Upeak.x = floor((double)(L2U.cols) / 2.0);
-		L2Upeak.y = floor((double)(L2U.rows) / 2.0);
+		L2Upeak.x = L2U.cols / 2;
+		L2Upeak.y = L2U.rows / 2;
 		if (set.IPCspeak) std::cout << "L2Upeak location before iterations: " << L2Upeak << std::endl;
 		if (set.IPCspeak) std::cout << "L2Upeak location before iterations findCentroid double: " << findCentroidDouble(L2U) << std::endl;
 		int L1size = std::round((double)L2U.cols*set.L1ratio);
@@ -162,8 +162,8 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		if (!set.iterate)
 		{
 			L1 = roicrop(L3, L3peak.x, L3peak.y, 5, 5);
-			L1mid.x = floor((double)(L1.cols) / 2.);
-			L1mid.y = floor((double)(L1.rows) / 2.);
+			L1mid.x = L1.cols / 2;
+			L1mid.y = L1.rows / 2;
 			imageshiftX_SUBPIXEL = (double)L3peak.x - (double)L3mid.x + findCentroidDouble(L1).x - L1mid.x;
 			imageshiftY_SUBPIXEL = (double)L3peak.y - (double)L3mid.y + findCentroidDouble(L1).y - L1mid.y;
 			if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L1v, findCentroidDouble(L1) * 2000 / L1.cols), "L1 a4r", true); }
@@ -171,8 +171,8 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		else
 		{
 			L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-			L1mid.x = floor((double)(L1.cols) / 2.);
-			L1mid.y = floor((double)(L1.rows) / 2.);
+			L1mid.x = L1.cols / 2;
+			L1mid.y = L1.rows / 2;
 			if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
 			int maxPCit = 50;
 			for (int i = 0; i < maxPCit; i++)

@@ -137,7 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constants.h" />
-    <ClInclude Include="csllogger.h" />
+    <ClInclude Include="loggercsl.h" />
     <ClInclude Include="filtering.h" />
     <ClInclude Include="FITS.h" />
     <ClInclude Include="fourier.h" />
@@ -154,8 +154,8 @@
     <ClInclude Include="optimization.h" />
     <QtMoc Include="qcustomplot.h" />
     <ClInclude Include="plotter.h" />
-    <ClInclude Include="qtplotter.h" />
-    <ClInclude Include="qtlogger.h" />
+    <ClInclude Include="plotterqt.h" />
+    <ClInclude Include="loggerqt.h" />
     <ClInclude Include="stdafx.h" />
     <QtMoc Include="WindowDiffrot.h" />
     <QtMoc Include="WindowIPC2PicAlign.h" />

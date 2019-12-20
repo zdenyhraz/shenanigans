@@ -4,7 +4,7 @@
 #include "WindowIPCoptimize.h"
 #include "WindowIPC2PicAlign.h"
 #include "WindowDiffrot.h"
-#include "qtplotter.h"
+#include "plotterqt.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {

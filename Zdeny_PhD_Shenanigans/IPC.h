@@ -50,6 +50,7 @@ public:
 	{
 		rows = Rows;
 		cols = Cols;
+		bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
 		window = edgemask(rows, cols);
 	}
 
