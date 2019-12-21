@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "IPC.h"
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& set, double* corrQuality)
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& set)
 {
 	Mat sourceimg1 = sourceimg1In.clone();
 	Mat sourceimg2 = sourceimg2In.clone();
@@ -26,7 +26,6 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		showimg(set.bandpass, "IPC bandpass");
 		showimg(set.window, "IPC window");
 	}
-
 	Mat DFT1 = fourier(sourceimg1);
 	Mat DFT2 = fourier(sourceimg2);
 	Mat planes1[2];
@@ -78,29 +77,20 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 	{
 		dft(CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
 	}
-
 	L3 = quadrantswap(L3);
 	if (set.IPCspeak) std::cout << "inverse fourier of cross-power spectrum calculated" << std::endl;
-	if (corrQuality)
-	{
-		double minRQ, maxRQ;
-		minMaxLoc(L3, &minRQ, &maxRQ, nullptr, nullptr);
-		*corrQuality = maxRQ;
-	}
-	
 	//normalize(L3, L3, 0, 1, CV_MINMAX);//unnecessary?
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
-	Point2i L3peak;
-	Point2i minRloc;
+	Point2i L3peak, L3bot;
 	double maxR, minR;
-	minMaxLoc(L3, &minR, &maxR, &minRloc, &L3peak);
-	if (set.IPCspeak) std::cout << "Phase correlation max: " << maxR << " at location: " << L3peak << std::endl;
+	minMaxLoc(L3, &minR, &maxR, &L3bot, &L3peak);
 	Point2d L3mid(L3.cols / 2, L3.rows / 2);
 	Point2d imageshift_PIXEL(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
-	if (set.IPCspeak) std::cout << "Calculated shiftX with pixel accuracy: " << imageshift_PIXEL << " pixels" << std::endl;
-	if (set.IPCshow) { Mat L3v; resize(L3, L3v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L3v, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3", true, 0, 1); }
 	if (set.IPCshow) 
 	{ 
+		Mat L3v; 
+		resize(L3, L3v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); 
+		showimg(crosshair(L3v, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3", true, 0, 1);
 		Mat L3vl; resize(L3, L3vl, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); 
 		for (int j = 0; j < 10; j++)
 		{
@@ -110,7 +100,12 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		}
 		showimg(crosshair(L3vl, Point2d(round((double)(L3peak.x) * 2000. / (double)L3.cols), round((double)(L3peak.y) * 2000. / (double)L3.rows))), "L3 log", true, 0, 1); 
 	}
-	if (set.IPCspeak) std::cout << "phase correlation calculated with pixel accuracy" << std::endl;
+	if (set.IPCspeak)
+	{
+		std::cout << "Phase correlation max: " << maxR << " at location: " << L3peak << std::endl;
+		std::cout << "Calculated shiftX with pixel accuracy: " << imageshift_PIXEL << " pixels" << std::endl;
+		std::cout << "phase correlation calculated with pixel accuracy" << std::endl;
+	}
 	output = imageshift_PIXEL;
 
 	if (set.subpixel)
@@ -136,8 +131,11 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 			if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
 			if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
 			Point2d L2Upeak(L2U.cols / 2, L2U.rows / 2);
-			if (set.IPCspeak) std::cout << "L2Upeak location before iterations: " << L2Upeak << std::endl;
-			if (set.IPCspeak) std::cout << "L2Upeak location before iterations findCentroid double: " << findCentroidDouble(L2U) << std::endl;
+			if (set.IPCspeak)
+			{
+				std::cout << "L2Upeak location before iterations: " << L2Upeak << std::endl;
+				std::cout << "L2Upeak location before iterations findCentroid double: " << findCentroidDouble(L2U) << std::endl;
+			}
 			int L1size = std::round((double)L2U.cols*set.L1ratio);
 			if (!(L1size % 2)) L1size++;//odd!+
 			Mat L1;
@@ -188,12 +186,15 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 				imageshift_SUBPIXEL.y = (double)L3peak.y - (double)L3mid.y + 1.0 / (double)set.UC*((double)L2Upeak.y - (double)L2Umid.y + findCentroidDouble(L1).y - (double)L1mid.y);//image shift in L3 - final
 			}
 
-			if (set.IPCspeak) std::cout << "phase correlation calculated with subpixel accuracy" << std::endl;
-			if (set.IPCspeak) std::cout << "Calculated shift with pixel accuracy: " << imageshift_PIXEL << " pixels " << std::endl;
-			if (set.IPCspeak) std::cout << "Calculated shift with SUBpixel accuracy1: " << imageshift_SUBPIXEL << " pixels " << std::endl;
-			if (set.IPCspeak) std::cout << "L3 size: " << L3.size << ", L2 size: " << L2.size << ", L2U size: " << L2U.size << ", L1 size: " << L1.size << std::endl;
-			if (set.IPCspeak) std::cout << "Upsample pixel accuracy theoretical maximum: " << 1.0 / (double)set.UC << std::endl;
-
+			if (set.IPCspeak)
+			{
+				std::cout << "phase correlation calculated with subpixel accuracy" << std::endl;
+				std::cout << "Calculated shift with pixel accuracy: " << imageshift_PIXEL << " pixels " << std::endl;
+				std::cout << "Calculated shift with SUBpixel accuracy1: " << imageshift_SUBPIXEL << " pixels " << std::endl;
+				std::cout << "L3 size: " << L3.size << ", L2 size: " << L2.size << ", L2U size: " << L2U.size << ", L1 size: " << L1.size << std::endl;
+				std::cout << "Upsample pixel accuracy theoretical maximum: " << 1.0 / (double)set.UC << std::endl;
+			}
+			
 			output = imageshift_SUBPIXEL;
 		}
 	}
