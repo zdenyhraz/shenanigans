@@ -108,10 +108,12 @@ void WindowIPC2PicAlign::features()
 
 void WindowIPC2PicAlign::linearFlow()
 {
-	auto xy = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
-	auto x = std::get<0>(xy);
-	auto y = std::get<1>(xy);
+	auto xyi = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
+	auto xshifts = std::get<0>(xyi);
+	auto yshifts = std::get<1>(xyi);
+	auto indices = std::get<2>(xyi);
 	Plot1D plt(globals->widget, "picture index", "pixel shift X");
-	plt.plot(x, y);
+	plt.plot(indices, xshifts);
+	//plt.plot(xaxis, yshifts);
 	globals->Logger->Log("Linear solar wind speed calculated", EVENT);
 }
