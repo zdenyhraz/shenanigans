@@ -13,6 +13,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
 	globals->IPCsettings = new IPCsettings(100, 100, 5, 20);
+	globals->widget = ui.widget;
 
 	#ifdef LOGGER_QT
 	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
