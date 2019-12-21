@@ -3,17 +3,25 @@
 #include "qcustomplot.h"
 #include "plotter.h"
 
+static const QFont fontTicks("Newyork", 9);
+static const QFont fontLabels("Newyork", 12);
+static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+
 struct Plot1D : AbstractPlot1D
 {
 	QCustomPlot* widget;
 
-public:
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y") : widget(widget)
 	{
 		widget->addGraph();//create graph
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
 		widget->yAxis->setLabel(ylabel);//give the axes some labels
 		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
+		widget->xAxis->setTickLabelFont(fontTicks);
+		widget->yAxis->setTickLabelFont(fontTicks);
+		widget->xAxis->setLabelFont(fontLabels);
+		widget->yAxis->setLabelFont(fontLabels);
+		widget->graph(0)->setPen(plotPen);
 	};
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel) override
@@ -28,10 +36,14 @@ public:
 	{
 		QVector<double> qx = QVector<double>::fromStdVector(x);
 		QVector<double> qy = QVector<double>::fromStdVector(y);
-
 		widget->graph(0)->setData(qx, qy);
 		widget->rescaleAxes();
 		widget->replot();
+	}
+
+	inline void save(std::string path)
+	{
+		widget->savePng(QString::fromStdString(path), 0, 0, 3, -1);
 	}
 };
 
@@ -48,7 +60,6 @@ struct Plot2D : AbstractPlot2D
 	int nx;
 	int ny;
 
-public:
 	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
 	{
 		widget->addGraph();//create graph
@@ -69,6 +80,12 @@ public:
 		widget->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);//align plot
 		colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);//align colorbar
 		colorMap->setInterpolate(true);//interpolate bro
+		widget->xAxis->setTickLabelFont(fontTicks);
+		widget->yAxis->setTickLabelFont(fontTicks);
+		colorScale->axis()->setTickLabelFont(fontTicks);
+		widget->xAxis->setLabelFont(fontLabels);
+		widget->yAxis->setLabelFont(fontLabels);
+		colorScale->axis()->setLabelFont(fontLabels);
 	};
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::string zlabel) override
@@ -91,9 +108,13 @@ public:
 				colorMap->data()->setCell(xIndex, yIndex, z[yIndex][xIndex]);
 			}
 		}
-
 		colorMap->rescaleDataRange();//rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
 		widget->rescaleAxes();
 		widget->replot();
+	}
+
+	inline void save(std::string path)
+	{
+		widget->savePng(QString::fromStdString(path), 0, 0, 3, -1);
 	}
 };
