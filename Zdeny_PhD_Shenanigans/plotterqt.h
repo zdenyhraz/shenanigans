@@ -6,22 +6,33 @@
 static const QFont fontTicks("Newyork", 9);
 static const QFont fontLabels("Newyork", 12);
 static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+static const QPen plotPenn(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+
 
 struct Plot1D : AbstractPlot1D
 {
 	QCustomPlot* widget;
 
-	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y") : widget(widget)
+	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y", QString ylabel2 = "none") : widget(widget)
 	{
 		widget->addGraph();//create graph
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
 		widget->yAxis->setLabel(ylabel);//give the axes some labels
-		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 		widget->xAxis->setTickLabelFont(fontTicks);
 		widget->yAxis->setTickLabelFont(fontTicks);
 		widget->xAxis->setLabelFont(fontLabels);
 		widget->yAxis->setLabelFont(fontLabels);
 		widget->graph(0)->setPen(plotPen);
+		if (ylabel2 != "none")
+		{
+			widget->addGraph(widget->xAxis, widget->yAxis2);
+			widget->yAxis2->setVisible(true);
+			widget->yAxis2->setLabel(ylabel2);
+			widget->yAxis2->setTickLabelFont(fontTicks);
+			widget->yAxis2->setLabelFont(fontLabels);
+			widget->graph(1)->setPen(plotPenn);
+		}
+		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 	};
 
 	inline ~Plot1D()
@@ -42,6 +53,17 @@ struct Plot1D : AbstractPlot1D
 		QVector<double> qx = QVector<double>::fromStdVector(x);
 		QVector<double> qy = QVector<double>::fromStdVector(y);
 		widget->graph(0)->setData(qx, qy);
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
+	inline void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) override
+	{
+		QVector<double> qx = QVector<double>::fromStdVector(x);
+		QVector<double> qy1 = QVector<double>::fromStdVector(y1);
+		QVector<double> qy2 = QVector<double>::fromStdVector(y2);
+		widget->graph(0)->setData(qx, qy1);
+		widget->graph(1)->setData(qx, qy2);
 		widget->rescaleAxes();
 		widget->replot();
 	}
