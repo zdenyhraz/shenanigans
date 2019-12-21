@@ -112,8 +112,12 @@ void WindowIPC2PicAlign::linearFlow()
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
-	Plot1D plt(globals->widget, "picture index", "pixel shift X");
-	plt.plot(indices, xshifts);
-	//plt.plot(xaxis, yshifts);
+	Plot1D plt(globals->widget, "picture index", "pixel shift X", "pixel shift Y");
+	plt.plot(indices, xshifts, yshifts);
+
+	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);
+	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
+	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
+	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
 	globals->Logger->Log("Linear solar wind speed calculated", EVENT);
 }
