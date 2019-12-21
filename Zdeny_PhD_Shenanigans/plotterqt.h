@@ -6,8 +6,7 @@
 static const QFont fontTicks("Newyork", 9);
 static const QFont fontLabels("Newyork", 12);
 static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-static const QPen plotPenn(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-
+static const QPen plotPen2(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
 struct Plot1D : AbstractPlot1D
 {
@@ -23,21 +22,21 @@ struct Plot1D : AbstractPlot1D
 		widget->xAxis->setLabelFont(fontLabels);
 		widget->yAxis->setLabelFont(fontLabels);
 		widget->graph(0)->setPen(plotPen);
-		if (ylabel2 != "none")
-		{
-			widget->addGraph(widget->xAxis, widget->yAxis2);
-			widget->yAxis2->setVisible(true);
-			widget->yAxis2->setLabel(ylabel2);
-			widget->yAxis2->setTickLabelFont(fontTicks);
-			widget->yAxis2->setLabelFont(fontLabels);
-			widget->graph(1)->setPen(plotPenn);
-		}
+		if (ylabel2 != "none") setupSecondGraph(ylabel, ylabel2);
 		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 	};
 
-	inline ~Plot1D()
+	inline void setupSecondGraph(QString ylabel1, QString ylabel2)
 	{
-		widget->removeGraph(0);
+		widget->addGraph(widget->xAxis, widget->yAxis2);
+		widget->yAxis2->setVisible(true);
+		widget->yAxis2->setLabel(ylabel2);
+		widget->yAxis2->setTickLabelFont(fontTicks);
+		widget->yAxis2->setLabelFont(fontLabels);
+		widget->graph(1)->setPen(plotPen2);
+		widget->legend->setVisible(true);
+		widget->graph(0)->setName(ylabel1);
+		widget->graph(1)->setName(ylabel2);
 	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel) override
@@ -51,19 +50,12 @@ struct Plot1D : AbstractPlot1D
 	inline void setAxisNames(std::string xlabel, std::string ylabel1, std::string ylabel2) override
 	{
 		QString qxlabel = QString::fromStdString(xlabel);
-		QString qy1label = QString::fromStdString(ylabel1);
-		QString qy2label = QString::fromStdString(ylabel2);
-
-		widget->addGraph(widget->xAxis, widget->yAxis2);
-		widget->yAxis2->setVisible(true);
-		widget->yAxis2->setLabel(qy2label);
-		widget->yAxis2->setTickLabelFont(fontTicks);
-		widget->yAxis2->setLabelFont(fontLabels);
-		widget->graph(1)->setPen(plotPenn);
-
+		QString qylabel1 = QString::fromStdString(ylabel1);
+		QString qylabel2 = QString::fromStdString(ylabel2);
 		widget->xAxis->setLabel(qxlabel);
-		widget->yAxis->setLabel(qy1label);
-		widget->yAxis2->setLabel(qy2label);
+		widget->yAxis->setLabel(qylabel1);
+		widget->yAxis2->setLabel(qylabel2);
+		setupSecondGraph(qylabel1, qylabel2);
 	}
 
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y) override
@@ -132,11 +124,6 @@ struct Plot2D : AbstractPlot2D
 		widget->yAxis->setLabelFont(fontLabels);
 		colorScale->axis()->setLabelFont(fontLabels);
 	};
-
-	inline ~Plot2D()
-	{
-		widget->removeGraph(0);
-	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::string zlabel) override
 	{

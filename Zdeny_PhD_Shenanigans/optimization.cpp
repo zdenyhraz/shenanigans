@@ -82,7 +82,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	std::vector<double> y2_plot;
 	if (plt)
 	{
-		plt->setAxisNames("generation", "fitness", "log(fitness)");
+		plt->setAxisNames("generation", "fitness", "log (fitness)");
 		x_plot.reserve(500);
 		y1_plot.reserve(500);
 		y2_plot.reserve(500);
