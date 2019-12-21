@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "functionsAstro.h"
 #include "logger.h"
+#include "plotter.h"
 
 std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 {
@@ -327,7 +328,28 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	MainResults->FlowPic = picture;
 }
 
-void calculateLinearSwindFlow(const IPCsettings& set, std::string path)
+std::tuple<std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path)
 {
+	int picCnt = 10;
+	double cropFocusX = 0.35;
+	double cropFocusY = 0.65;
 
+	//load pics
+	std::vector<Mat> pics(picCnt);
+	for (int i = 0; i < picCnt; i++)
+	{
+		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
+		pics[i] = roicrop(pics[i], cropFocusX*pics[i].cols, cropFocusY*pics[i].rows, set.getcols(), set.getrows());
+	}
+	
+	//calculate shifts
+	std::vector<double> shiftsX(picCnt - 1);
+	std::vector<double> shiftsY(picCnt - 1);
+	for (int i = 0; i < picCnt - 1; i++)
+	{
+		auto shift = phasecorrel(pics[i], pics[i + 1], set);
+		shiftsX[i] = shift.x;
+		shiftsY[i] = shift.y;
+	}
+	return std::make_tuple(shiftsX, shiftsY);
 }
