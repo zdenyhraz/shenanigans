@@ -402,3 +402,11 @@ inline void makeDir(std::string path, std::string dirname)
 {
 	std::experimental::filesystem::create_directory(path + "//" + dirname);
 }
+
+inline std::vector<int> iota(int first, int last)
+{
+	std::vector<int> vec(first - last + 1);
+	for (int i = 0; i < vec.size(); i++)
+		vec[i] = first + i;
+	return vec;
+}
