@@ -58,11 +58,12 @@ void WindowIPC2PicAlign::alignXY()
 	Mat img2 = loadImage(path2);
 
 	int size = globals->IPCsettings->getcols();
-	img1 = roicrop(img1, 0.375*img1.cols, 0.7*img1.rows, size, size);
-	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
+	img1 = roicrop(img1, 0.38*img1.cols, 0.74*img1.rows, size, size);
+	img2 = roicrop(img2, 0.38*img2.cols, 0.74*img2.rows, size, size);
 
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
+	set.setSize(img1.rows, img1.cols);
 
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
 	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
