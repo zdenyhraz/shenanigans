@@ -81,7 +81,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
 		globals->Logger->Log("Z min = " + to_string(sqr(0) + sqr(0)), DEBUG);
 	}
-	if (0)//plot in optimization
+	if (1)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
@@ -94,14 +94,13 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto result = Evo.optimize(f, globals->Logger, plt);
 		plt->save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
-	if (1)//ipc bandpass & window 
+	if (0)//ipc bandpass & window 
 	{
-		globals->Logger->Log("global L = " + to_string(globals->IPCsettings->getL()));
-		globals->Logger->Log("global H = " + to_string(globals->IPCsettings->getH()));
-		globals->Logger->Log("logdebug = " + to_string(1.2345));
-
-		Plot2D plt(ui.widget, "columns", "rows", "bandpass", globals->IPCsettings->getcols(), globals->IPCsettings->getrows(), 0, 1, 0, 1);
-		plt.plot(matToVect2(globals->IPCsettings->bandpass));
+		IPCsettings set = *globals->IPCsettings;
+		set.setSize(1000, 1000);
+		set.setBandpassParameters(5, 1);
+		Plot2D plt(ui.widget, "columns", "rows", "bandpass", set.getcols(), set.getrows(), 0, 1, 0, 1);
+		plt.plot(matToVect2(set.bandpass));
 		plt.save("D:\\MainOutput\\Debug\\plot2D.png");
 	}
 	globals->Logger->Log("Debug finished.", EVENT);

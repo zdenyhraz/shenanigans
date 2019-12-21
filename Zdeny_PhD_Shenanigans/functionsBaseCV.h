@@ -212,3 +212,8 @@ inline void exportToMATLAB(const Mat& Zdata, double xmin, double xmax, double ym
 		for (int c = 0; c < Zdata.cols; c++)
 			listing << Zdata.at<double>(r, c) << endl;
 }
+
+inline std::string to_string(const Point2d& point)
+{
+	return std::string("[" + to_string(point.x) + "," + to_string(point.y) + "]");
+}

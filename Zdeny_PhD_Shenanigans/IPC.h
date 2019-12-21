@@ -28,7 +28,6 @@ public:
 	bool normInput = 0;
 	bool iterate = 1;
 	bool IPCshow = false;
-	bool IPCspeak = false;
 	double minimalShift = 0;
 	Mat bandpass;
 	Mat window;
@@ -75,7 +74,7 @@ public:
 	}
 };
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* Logger = nullptr);
 
 void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings set);
 

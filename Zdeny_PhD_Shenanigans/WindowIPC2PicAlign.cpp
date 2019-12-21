@@ -25,7 +25,6 @@ void WindowIPC2PicAlign::align()
 	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
 
 	IPCsettings set = *globals->IPCsettings;
-	set.IPCspeak = true;
 	set.IPCshow = true;
 
 	if (0)//artificial misalign
@@ -52,6 +51,7 @@ void WindowIPC2PicAlign::align()
 
 void WindowIPC2PicAlign::alignXY()
 {
+	globals->Logger->Log("Starting IPC image align process (XY)", EVENT);
 	std::string path1 = ui.lineEdit->text().toStdString();
 	std::string path2 = ui.lineEdit_2->text().toStdString();
 	Mat img1 = loadImage(path1);
@@ -62,10 +62,10 @@ void WindowIPC2PicAlign::alignXY()
 	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
 
 	IPCsettings set = *globals->IPCsettings;
-	set.IPCspeak = true;
 	set.IPCshow = true;
 
-	auto shifts = phasecorrel(img1, img2, set);
+	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
+	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
 }
 
 void WindowIPC2PicAlign::flowMap()
