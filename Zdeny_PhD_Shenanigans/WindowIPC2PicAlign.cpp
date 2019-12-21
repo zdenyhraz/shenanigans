@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "WindowIPC2PicAlign.h"
+#include "functionsAstro.h"
+#include "plotterqt.h"
 
 WindowIPC2PicAlign::WindowIPC2PicAlign(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
@@ -8,6 +10,7 @@ WindowIPC2PicAlign::WindowIPC2PicAlign(QWidget* parent, Globals* globals) : QMai
 	connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(alignXY()));
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(flowMap()));
 	connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(features()));
+	connect(ui.pushButton_5, SIGNAL(clicked()), this, SLOT(linearFlow()));
 }
 
 void WindowIPC2PicAlign::align()
@@ -101,5 +104,14 @@ void WindowIPC2PicAlign::features()
 	std::string path2 = ui.lineEdit_2->text().toStdString();
 	Mat img1 = loadImage(path1);
 	Mat img2 = loadImage(path2);
+}
 
+void WindowIPC2PicAlign::linearFlow()
+{
+	auto xy = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
+	auto x = std::get<0>(xy);
+	auto y = std::get<1>(xy);
+	Plot1D plt(globals->widget, "picture index", "pixel shift X");
+	plt.plot(x, y);
+	globals->Logger->Log("Linear solar wind speed calculated", EVENT);
 }
