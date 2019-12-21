@@ -135,7 +135,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut)
+void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut)
 {
 	cout << ">> Starting PC MainFlow calculation" << endl;
 	//2D stuff
@@ -152,7 +152,7 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 
 	std::ofstream listingTemp1D_x(pathMasterOut + "temp1D_x.csv", std::ios::out | std::ios::trunc);
 	std::ofstream listingTempJottings(pathMasterOut + "tempJottings.csv", std::ios::out | std::ios::trunc);
-	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << IPC_settings.getcols() << delimiter << iters << endl;
+	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << set.getcols() << delimiter << iters << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//this even!
@@ -249,18 +249,18 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 					for (int medianiter = 0; medianiter < medianiters; medianiter++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.getcols(), IPC_settings.getcols());
+						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, set.getcols(), set.getcols());
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, IPC_settings.getcols(), IPC_settings.getcols());
+						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, set.getcols(), set.getcols());
 
 						if (twoCorrels)
 						{
-							shifts1[medianiter] = phasecorrel(crop1, crop2, IPC_settings1);
-							shifts2[medianiter] = phasecorrel(crop1, crop2, IPC_settings2);
+							shifts1[medianiter] = phasecorrel(crop1, crop2, set1);
+							shifts2[medianiter] = phasecorrel(crop1, crop2, set2);
 						}
 						else
 						{
-							shifts[medianiter] = phasecorrel(crop1, crop2, IPC_settings);
+							shifts[medianiter] = phasecorrel(crop1, crop2, set);
 						}
 					}
 
@@ -325,4 +325,9 @@ void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_setting
 	MainResults->FlowX = omegasMainX;
 	MainResults->FlowY = omegasMainY;
 	MainResults->FlowPic = picture;
+}
+
+void calculateLinearSwindFlow(const IPCsettings& set, std::string path)
+{
+
 }

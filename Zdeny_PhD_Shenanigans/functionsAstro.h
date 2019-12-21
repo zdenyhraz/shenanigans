@@ -91,11 +91,6 @@ struct DiffrotResults
 			showimg(phas, "Flow phase relative", false, quantileBot, quantileTop, exportSize);
 		}
 	}
-
-	void saveResults(double quantileBot, double quantileTop, int medianSize, double mergeAlpha)
-	{
-
-	}
 };
 
 double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy);
@@ -106,4 +101,6 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger);
 
-void calculateDiffrotProfile(IPCsettings& IPC_settings, IPCsettings& IPC_settings1, IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut);
+void calculateDiffrotProfile(const IPCsettings& IPC_settings, const IPCsettings& IPC_settings1, const IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut);
+
+void calculateLinearSwindFlow(const IPCsettings& set, std::string path);
