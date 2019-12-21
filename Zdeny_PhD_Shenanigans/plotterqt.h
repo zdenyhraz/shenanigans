@@ -14,9 +14,11 @@ struct Plot1D : AbstractPlot1D
 
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y", QString ylabel2 = "none") : widget(widget)
 	{
-		widget->addGraph();//create graph
-		widget->xAxis->setLabel(xlabel);//give the axes some labels
-		widget->yAxis->setLabel(ylabel);//give the axes some labels
+		widget->clearGraphs();
+		widget->clearItems();
+		widget->addGraph();
+		widget->xAxis->setLabel(xlabel);
+		widget->yAxis->setLabel(ylabel);
 		widget->xAxis->setTickLabelFont(fontTicks);
 		widget->yAxis->setTickLabelFont(fontTicks);
 		widget->xAxis->setLabelFont(fontLabels);
@@ -99,6 +101,8 @@ struct Plot2D : AbstractPlot2D
 
 	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
 	{
+		widget->clearGraphs();//clear all the graphs in the widget
+		widget->clearItems();//clear auxiliary widget stuff
 		widget->addGraph();//create graph
 		widget->axisRect()->setupFullAxesBox(true);//configure axis rect
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
