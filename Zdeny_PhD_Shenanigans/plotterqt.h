@@ -13,7 +13,6 @@ struct Plot1D : AbstractPlot1D
 
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y") : widget(widget)
 	{
-		widget->clearGraphs();//clean up the widget
 		widget->addGraph();//create graph
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
 		widget->yAxis->setLabel(ylabel);//give the axes some labels
@@ -24,6 +23,11 @@ struct Plot1D : AbstractPlot1D
 		widget->yAxis->setLabelFont(fontLabels);
 		widget->graph(0)->setPen(plotPen);
 	};
+
+	inline ~Plot1D()
+	{
+		widget->removeGraph(0);
+	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel) override
 	{
@@ -63,7 +67,6 @@ struct Plot2D : AbstractPlot2D
 
 	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
 	{
-		widget->clearGraphs();//clean up the widget
 		widget->addGraph();//create graph
 		widget->axisRect()->setupFullAxesBox(true);//configure axis rect
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
@@ -89,6 +92,11 @@ struct Plot2D : AbstractPlot2D
 		widget->yAxis->setLabelFont(fontLabels);
 		colorScale->axis()->setLabelFont(fontLabels);
 	};
+
+	inline ~Plot2D()
+	{
+		widget->removeGraph(0);
+	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::string zlabel) override
 	{

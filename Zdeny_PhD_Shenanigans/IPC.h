@@ -75,7 +75,7 @@ public:
 	}
 };
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& set, double* corrQuality = nullptr);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsettings& set);
 
 void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings set);
 
