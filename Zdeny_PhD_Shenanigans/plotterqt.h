@@ -14,8 +14,8 @@ struct Plot1D : AbstractPlot1D
 
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y", QString ylabel2 = "none") : widget(widget)
 	{
-		widget->clearGraphs();
-		widget->clearItems();
+		widget->clearPlottables();
+
 		widget->addGraph();
 		widget->xAxis->setLabel(xlabel);
 		widget->yAxis->setLabel(ylabel);
@@ -37,8 +37,11 @@ struct Plot1D : AbstractPlot1D
 		widget->yAxis2->setLabelFont(fontLabels);
 		widget->graph(1)->setPen(plotPen2);
 		widget->legend->setVisible(true);
+		widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignRight);
 		widget->graph(0)->setName(ylabel1);
 		widget->graph(1)->setName(ylabel2);
+		widget->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+		widget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel) override
@@ -101,8 +104,7 @@ struct Plot2D : AbstractPlot2D
 
 	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
 	{
-		widget->clearGraphs();//clear all the graphs in the widget
-		widget->clearItems();//clear auxiliary widget stuff
+		widget->clearPlottables();
 		widget->addGraph();//create graph
 		widget->axisRect()->setupFullAxesBox(true);//configure axis rect
 		widget->xAxis->setLabel(xlabel);//give the axes some labels

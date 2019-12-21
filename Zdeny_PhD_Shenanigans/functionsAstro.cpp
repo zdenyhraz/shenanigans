@@ -331,8 +331,8 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path)
 {
 	int picCnt = 10;
-	double cropFocusX = 0.375;
-	double cropFocusY = 0.7;
+	double cropFocusX = 0.45;
+	double cropFocusY = 0.8;
 
 	//load pics
 	std::vector<Mat> pics(picCnt);
@@ -343,15 +343,21 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	}
 	
 	//calculate shifts
-	std::vector<double> shiftsX(picCnt - 1);
-	std::vector<double> shiftsY(picCnt - 1);
-	std::vector<double> indices(picCnt - 1);
-	for (int i = 0; i < picCnt - 1; i++)
+	auto shiftsX = zerovect(picCnt);
+	auto shiftsY = zerovect(picCnt);
+	auto indices = iota(0, picCnt);
+
+	for (int i = 0; i < picCnt; i++)
 	{
-		auto shift = phasecorrel(pics[0], pics[i + 1], set);
+		auto shift = phasecorrel(pics[0], pics[i], set);
 		shiftsX[i] = shift.x;
 		shiftsY[i] = shift.y;
-		indices[i] = i + 1;
+		indices[i] = i;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		shiftsX[i] = 0;
+		shiftsY[i] = 0;
 	}
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }

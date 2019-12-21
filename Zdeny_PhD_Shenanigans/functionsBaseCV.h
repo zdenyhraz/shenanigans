@@ -217,3 +217,19 @@ inline std::string to_string(const Point2d& point)
 {
 	return std::string("[" + to_string(point.x) + "," + to_string(point.y) + "]");
 }
+
+inline Mat quadrantMask(int rows, int cols)
+{
+	Mat qmask = Mat::zeros(rows, cols, CV_64F);
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (r > (rows / 2) && c < (cols / 2))//3rd quadrant
+			{
+				qmask.at<double>(r, c) = 1;
+			}
+		}
+	}
+	return qmask;
+}

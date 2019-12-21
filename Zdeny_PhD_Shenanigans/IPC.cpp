@@ -79,6 +79,7 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCs
 		dft(CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
 	}
 	L3 = quadrantswap(L3);
+	//L3 = L3.mul(quadrantMask(L3.rows, L3.cols));//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< this is jsut swind hardcode
 	if (logger) logger->Log("inverse fourier of cross-power spectrum calculated", INFO);
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 	Point2i L3peak, L3bot;
