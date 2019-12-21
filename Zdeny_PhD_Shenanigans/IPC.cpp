@@ -88,7 +88,7 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, IPCsetting
 		*corrQuality = maxRQ;
 	}
 	
-	normalize(L3, L3, 0, 1, CV_MINMAX);
+	//normalize(L3, L3, 0, 1, CV_MINMAX);//unnecessary?
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 	Point2i L3peak;
 	Point2i minRloc;
