@@ -93,7 +93,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto result = Evo.optimize(f, globals->Logger, plt);
 		plt->save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
-	if (0)//ipc bandpass & window 
+	if (1)//ipc bandpass & window 
 	{
 		globals->Logger->Log("global L = " + to_string(globals->IPCsettings->getL()));
 		globals->Logger->Log("global H = " + to_string(globals->IPCsettings->getH()));
