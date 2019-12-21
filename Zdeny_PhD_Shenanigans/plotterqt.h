@@ -48,6 +48,24 @@ struct Plot1D : AbstractPlot1D
 		widget->yAxis->setLabel(qylabel);
 	}
 
+	inline void setAxisNames(std::string xlabel, std::string ylabel1, std::string ylabel2) override
+	{
+		QString qxlabel = QString::fromStdString(xlabel);
+		QString qy1label = QString::fromStdString(ylabel1);
+		QString qy2label = QString::fromStdString(ylabel2);
+
+		widget->addGraph(widget->xAxis, widget->yAxis2);
+		widget->yAxis2->setVisible(true);
+		widget->yAxis2->setLabel(qy2label);
+		widget->yAxis2->setTickLabelFont(fontTicks);
+		widget->yAxis2->setLabelFont(fontLabels);
+		widget->graph(1)->setPen(plotPenn);
+
+		widget->xAxis->setLabel(qxlabel);
+		widget->yAxis->setLabel(qy1label);
+		widget->yAxis2->setLabel(qy2label);
+	}
+
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y) override
 	{
 		QVector<double> qx = QVector<double>::fromStdVector(x);
