@@ -330,25 +330,21 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path)
 {
-	int picCnt = 10;
-	double cropFocusX = 0.38;
-	double cropFocusY = 0.74;
-
 	//load pics
-	std::vector<Mat> pics(picCnt);
-	for (int i = 0; i < picCnt; i++)
+	std::vector<Mat> pics(SwindPicCnt);
+	for (int i = 0; i < SwindPicCnt; i++)
 	{
 		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-		pics[i] = roicrop(pics[i], cropFocusX*pics[i].cols, cropFocusY*pics[i].rows, set.getcols(), set.getrows());
+		pics[i] = roicrop(pics[i], SwindCropFocusX*pics[i].cols, SwindCropFocusY*pics[i].rows, set.getcols(), set.getrows());
 		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(2000, 2000));
 	}
 	
 	//calculate shifts
-	auto shiftsX = zerovect(picCnt);
-	auto shiftsY = zerovect(picCnt);
-	auto indices = iota(0, picCnt);
+	auto shiftsX = zerovect(SwindPicCnt);
+	auto shiftsY = zerovect(SwindPicCnt);
+	auto indices = iota(0, SwindPicCnt);
 
-	for (int i = 0; i < picCnt; i++)
+	for (int i = 0; i < SwindPicCnt; i++)
 	{
 		auto shift = phasecorrel(pics[0], pics[i], set);
 		shiftsX[i] = shift.x;
@@ -365,25 +361,21 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path)
 {
-	int picCnt = 10;
-	double cropFocusX = 0.38;
-	double cropFocusY = 0.74;
-
 	//load pics
-	std::vector<Mat> pics(picCnt);
-	for (int i = 0; i < picCnt; i++)
+	std::vector<Mat> pics(SwindPicCnt);
+	for (int i = 0; i < SwindPicCnt; i++)
 	{
 		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-		pics[i] = roicrop(pics[i], cropFocusX*pics[i].cols, cropFocusY*pics[i].rows, set.getcols(), set.getrows());
+		pics[i] = roicrop(pics[i], SwindCropFocusX*pics[i].cols, SwindCropFocusY*pics[i].rows, set.getcols(), set.getrows());
 		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(2000, 2000));
 	}
 
 	//calculate shifts
-	auto shiftsX = zerovect(picCnt - 1);
-	auto shiftsY = zerovect(picCnt - 1);
-	auto indices = iota(1, picCnt - 1);
+	auto shiftsX = zerovect(SwindPicCnt - 1);
+	auto shiftsY = zerovect(SwindPicCnt - 1);
+	auto indices = iota(1, SwindPicCnt - 1);
 
-	for (int i = 0; i < picCnt - 1; i++)
+	for (int i = 0; i < SwindPicCnt - 1; i++)
 	{
 		auto shift = phasecorrel(pics[i], pics[i + 1], set);
 		shiftsX[i] = shift.x;

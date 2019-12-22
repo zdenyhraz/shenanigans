@@ -9,8 +9,11 @@
 using namespace std;
 using namespace cv;
 
-static std::vector<string> WAVELENGTHS_STR = { "HMI", "94_AIA", "131_AIA", "171_AIA", "171_SECCHIA", "171_SECCHIB", "193_AIA", "195_SECCHIA", "195_SECCHIB", "211_AIA", "284_SECCHIA", "284_SECCHIB", "304_AIA", "304_SECCHIA", "304_SECCHIB", "335_AIA" };
-static std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
+static const std::vector<string> WAVELENGTHS_STR = { "HMI", "94_AIA", "131_AIA", "171_AIA", "171_SECCHIA", "171_SECCHIB", "193_AIA", "195_SECCHIA", "195_SECCHIB", "211_AIA", "284_SECCHIA", "284_SECCHIB", "304_AIA", "304_SECCHIA", "304_SECCHIB", "335_AIA" };
+static const std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
+static const double SwindCropFocusX = 0.38;
+static const double SwindCropFocusY = 0.71;
+static const int SwindPicCnt = 10;
 
 std::vector<double> diffrotProfileAverage(const Mat& flow, int colS = 0);
 
