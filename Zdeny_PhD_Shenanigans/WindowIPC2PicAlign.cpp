@@ -11,6 +11,7 @@ WindowIPC2PicAlign::WindowIPC2PicAlign(QWidget* parent, Globals* globals) : QMai
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(flowMap()));
 	connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(features()));
 	connect(ui.pushButton_5, SIGNAL(clicked()), this, SLOT(linearFlow()));
+	connect(ui.pushButton_6, SIGNAL(clicked()), this, SLOT(constantFlow()));
 }
 
 void WindowIPC2PicAlign::align()
@@ -64,7 +65,7 @@ void WindowIPC2PicAlign::alignXY()
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
 	set.setSize(img1.rows, img1.cols);
-	Plot2D plt(globals->widget, "pixel x", "pixel y", "r");
+	Plot2D plt(globals->widget, "pixel x", "pixel y", "phase correlation");
 
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger, &plt);
 	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
@@ -122,4 +123,20 @@ void WindowIPC2PicAlign::linearFlow()
 	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
 	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
 	globals->Logger->Log("Linear solar wind speed calculated", EVENT);
+}
+
+void WindowIPC2PicAlign::constantFlow()
+{
+	auto xyi = calculateConstantSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
+	auto xshifts = std::get<0>(xyi);
+	auto yshifts = std::get<1>(xyi);
+	auto indices = std::get<2>(xyi);
+	Plot1D plt(globals->widget, "picture index", "pixel shift X", "pixel shift Y");
+	plt.plot(indices, xshifts, yshifts);
+
+	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);
+	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
+	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
+	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
+	globals->Logger->Log("Constant solar wind speed calculated", EVENT);
 }
