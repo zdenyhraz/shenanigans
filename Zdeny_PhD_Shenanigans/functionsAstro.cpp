@@ -331,8 +331,8 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path)
 {
 	int picCnt = 10;
-	double cropFocusX = 0.45;
-	double cropFocusY = 0.8;
+	double cropFocusX = 0.38;
+	double cropFocusY = 0.74;
 
 	//load pics
 	std::vector<Mat> pics(picCnt);
@@ -340,6 +340,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	{
 		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
 		pics[i] = roicrop(pics[i], cropFocusX*pics[i].cols, cropFocusY*pics[i].rows, set.getcols(), set.getrows());
+		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(2000, 2000));
 	}
 	
 	//calculate shifts
