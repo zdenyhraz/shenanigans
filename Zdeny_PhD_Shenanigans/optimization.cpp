@@ -77,16 +77,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	}
 	funEvals += NP;
 
-	std::vector<double> x_plot;
-	std::vector<double> y1_plot;
-	std::vector<double> y2_plot;
-	if (plt)
-	{
-		plt->setAxisNames("generation", "fitness", "log (fitness)");
-		x_plot.reserve(500);
-		y1_plot.reserve(500);
-		y2_plot.reserve(500);
-	}
+	if (plt) plt->setAxisNames("generation", "fitness", "log (fitness)");
 
 	//run main evolution cycle
 	for (int generation = 1; generation < 1e8; generation++)
@@ -200,14 +191,8 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			}
 		}
 
-		if (plt)//plt
-		{
-			x_plot.push_back(generation);
-			y1_plot.push_back(bestFitness);
-			y2_plot.push_back(log(bestFitness));
-			plt->plot(x_plot, y1_plot, y2_plot);
-		}
-
+		if (plt) plt->plot(generation, bestFitness, log(bestFitness));
+		
 		//fill history ques for all entities - termination criterion
 		historyConstant = true;//assume history is constant
 		averageImprovement = 0;

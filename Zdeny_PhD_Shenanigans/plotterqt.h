@@ -72,6 +72,27 @@ struct Plot1D : AbstractPlot1D
 		widget->replot();
 	}
 
+	inline void plot(const double x, const double y) override
+	{
+		widget->graph(0)->addData(x, y);
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
+	inline void plot(const double x, const double y1, const double y2) override
+	{
+		widget->graph(0)->addData(x, y1);
+		widget->graph(1)->addData(x, y2);
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
+	inline void clear(bool second) override
+	{
+		widget->graph(0)->data()->clear();
+		if (second) widget->graph(1)->data()->clear();
+	}
+
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) override
 	{
 		QVector<double> qx = QVector<double>::fromStdVector(x);
@@ -162,6 +183,7 @@ struct Plot2D : AbstractPlot2D
 		}
 		colorMap->rescaleDataRange();//rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
 		widget->rescaleAxes();
+		colorScale->rescaleDataRange(0);
 		widget->replot();
 	}
 

@@ -66,7 +66,7 @@ void WindowIPC2PicAlign::alignXY()
 	set.setSize(img1.rows, img1.cols);
 	Plot2D plt(globals->widget, "pixel x", "pixel y", "r");
 
-	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
+	auto shifts = phasecorrel(img1, img2, set, globals->Logger, &plt);
 	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
 }
 
