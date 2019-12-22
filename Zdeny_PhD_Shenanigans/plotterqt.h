@@ -145,7 +145,7 @@ struct Plot2D : AbstractPlot2D
 		colorScale->axis()->setTickLabelFont(fontTicks);
 		widget->xAxis->setLabelFont(fontLabels);
 		widget->yAxis->setLabelFont(fontLabels);
-		widget->yAxis->setRangeReversed(true);
+		//widget->yAxis->setRangeReversed(true);
 		colorScale->axis()->setLabelFont(fontLabels);
 	};
 

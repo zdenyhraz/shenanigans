@@ -11,7 +11,7 @@ WindowIPCparameters::WindowIPCparameters(QWidget* parent, Globals* globals) : QM
 
 void WindowIPCparameters::refreshIPCparameters()
 {
-	globals->IPCsettings->setSize(ui.lineEdit->text().toInt(), ui.lineEdit->text().toInt());
+	globals->IPCsettings->setSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
 	globals->IPCsettings->L2size = ui.lineEdit_2->text().toInt();
 	globals->IPCsettings->L1ratio = ui.lineEdit_3->text().toDouble();
 	globals->IPCsettings->UC = ui.lineEdit_4->text().toInt();
