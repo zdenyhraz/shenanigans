@@ -362,3 +362,34 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	}
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
+
+std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path)
+{
+	int picCnt = 10;
+	double cropFocusX = 0.38;
+	double cropFocusY = 0.74;
+
+	//load pics
+	std::vector<Mat> pics(picCnt);
+	for (int i = 0; i < picCnt; i++)
+	{
+		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
+		pics[i] = roicrop(pics[i], cropFocusX*pics[i].cols, cropFocusY*pics[i].rows, set.getcols(), set.getrows());
+		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(2000, 2000));
+	}
+
+	//calculate shifts
+	auto shiftsX = zerovect(picCnt - 1);
+	auto shiftsY = zerovect(picCnt - 1);
+	auto indices = iota(1, picCnt - 1);
+
+	for (int i = 0; i < picCnt - 1; i++)
+	{
+		auto shift = phasecorrel(pics[i], pics[i + 1], set);
+		shiftsX[i] = shift.x;
+		shiftsY[i] = shift.y;
+		indices[i] = i;
+	}
+
+	return std::make_tuple(shiftsX, shiftsY, indices);
+}

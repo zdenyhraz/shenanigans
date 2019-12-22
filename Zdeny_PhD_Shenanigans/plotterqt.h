@@ -154,7 +154,6 @@ struct Plot2D : AbstractPlot2D
 		QString qxlabel = QString::fromStdString(xlabel);
 		QString qylabel = QString::fromStdString(ylabel);
 		QString qzlabel = QString::fromStdString(zlabel);
-
 		widget->xAxis->setLabel(qxlabel);
 		widget->yAxis->setLabel(qylabel);
 		colorScale->axis()->setLabel(qzlabel);

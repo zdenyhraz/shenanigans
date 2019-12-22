@@ -19,4 +19,5 @@ private slots:
 	void flowMap();
 	void features();
 	void linearFlow();
+	void constantFlow();
 };
