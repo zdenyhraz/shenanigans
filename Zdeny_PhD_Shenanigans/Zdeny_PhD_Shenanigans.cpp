@@ -75,7 +75,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			}
 		}
 
-		Plot2D plt(ui.widget, "x", "y", "z", nx, ny, -1, 7, -5, 8);
+		Plot2D plt(ui.widget, "x", "y", "z");
 		plt.plot(z);
 
 		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
@@ -99,7 +99,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(1000, 1000);
 		set.setBandpassParameters(5, 1);
-		Plot2D plt(ui.widget, "columns", "rows", "bandpass", set.getcols(), set.getrows(), 0, 1, 0, 1);
+		Plot2D plt(ui.widget, "columns", "rows", "bandpass");
 		plt.plot(matToVect2(set.bandpass));
 		plt.save("D:\\MainOutput\\Debug\\plot2D.png");
 	}

@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "IPC.h"
-#include "logger.h"
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger)
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger, AbstractPlot2D* plt)
 {
 	Mat sourceimg1 = sourceimg1In.clone();
 	Mat sourceimg2 = sourceimg2In.clone();
@@ -174,7 +173,13 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCs
 						L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 						if (logger) logger->Log("Iterative PC accuracy reached", SUBEVENT);
 						if (logger) logger->Log("L2Upeak: " + to_string(L2Upeak), INFO);
-						if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 a4r", true); }
+						if (set.IPCshow) 
+						{ 
+							Mat L1v; 
+							resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); 
+							showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 a4r", true); 
+							plt->plot(matToVect2(crosshair(L1v, L1mid * 2000 / L1.cols)));
+						}
 						if (logger) logger->Log("===================================================================================" , INFO);
 						break;
 					}

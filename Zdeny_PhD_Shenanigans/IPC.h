@@ -4,6 +4,8 @@
 #include "fourier.h"
 #include "FITS.h"
 #include "filtering.h"
+#include "logger.h"
+#include "plotter.h"
 
 using namespace std;
 using namespace cv;
@@ -74,7 +76,7 @@ public:
 	}
 };
 
-Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* Logger = nullptr);
+Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* Logger = nullptr, AbstractPlot2D* plot = nullptr);
 
 void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsettings set);
 

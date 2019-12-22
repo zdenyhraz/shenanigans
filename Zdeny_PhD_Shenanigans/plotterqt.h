@@ -95,14 +95,10 @@ struct Plot2D : AbstractPlot2D
 	QCPColorMap* colorMap;
 	QCPColorScale* colorScale;
 	QCPMarginGroup* marginGroup;
-	double xmin;
-	double xmax;
-	double ymin;
-	double ymax;
 	int nx;
 	int ny;
 
-	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel, int nx, int ny, double xmin, double xmax, double ymin, double ymax) : widget(widget), nx(nx), ny(ny), xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax)
+	inline Plot2D(QCustomPlot* widget, QString xlabel, QString ylabel, QString zlabel) : widget(widget)
 	{
 		widget->clearPlottables();
 		widget->addGraph();//create graph
@@ -110,8 +106,8 @@ struct Plot2D : AbstractPlot2D
 		widget->xAxis->setLabel(xlabel);//give the axes some labels
 		widget->yAxis->setLabel(ylabel);//give the axes some labels
 		colorMap = new QCPColorMap(widget->xAxis, widget->yAxis);//set up the QCPColorMap
-		colorMap->data()->setSize(nx, ny);//we want the color map to have nx * ny data points
-		colorMap->data()->setRange(QCPRange(xmin, xmax), QCPRange(ymin, ymax));//and span the coordinate range in both key (x) and value (y) dimensions
+		colorMap->data()->setSize(100, 100);//we want the color map to have nx * ny data points
+		colorMap->data()->setRange(QCPRange(0, 1), QCPRange(0, 1));//and span the coordinate range in both key (x) and value (y) dimensions
 		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 		colorScale = new QCPColorScale(widget);//add a color scale
 		widget->plotLayout()->addElement(0, 1, colorScale);//add it to the right of the main axis rect
@@ -142,8 +138,21 @@ struct Plot2D : AbstractPlot2D
 		colorScale->axis()->setLabel(qzlabel);
 	}
 
+	inline void setSize(int nxx, int nyy) override
+	{
+		nx = nxx;
+		ny = nyy;
+		colorMap->data()->setSize(nx, ny);
+	}
+
+	inline void setRange(double xmin, double xmax, double ymin, double ymax) override
+	{
+		colorMap->data()->setRange(QCPRange(xmin, xmax), QCPRange(ymin, ymax));
+	}
+
 	inline void plot(const std::vector<std::vector<double>>& z) override
 	{
+		setSize(z[0].size(), z.size());
 		for (int xIndex = 0; xIndex < nx; ++xIndex)
 		{
 			for (int yIndex = 0; yIndex < ny; ++yIndex)
