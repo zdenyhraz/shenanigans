@@ -88,7 +88,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>image 1 input file path</string>
+        <string>image 2 input file path</string>
        </property>
       </widget>
      </item>
