@@ -134,6 +134,7 @@
     <ClCompile Include="WindowIPC2PicAlign.cpp" />
     <ClCompile Include="WindowIPCoptimize.cpp" />
     <ClCompile Include="WindowIPCparameters.cpp" />
+    <ClCompile Include="WindowPlot.cpp" />
     <ClCompile Include="WindowTemplate.cpp" />
     <ClCompile Include="Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="logger.h" />
     <ClInclude Include="neural.h" />
     <ClInclude Include="optimization.h" />
+    <QtMoc Include="WindowPlot.h" />
     <QtMoc Include="qcustomplot.h" />
     <ClInclude Include="plotter.h" />
     <ClInclude Include="plotterqt.h" />
@@ -171,6 +173,7 @@
     <QtUic Include="WindowIPC2PicAlign.ui" />
     <QtUic Include="WindowIPCoptimize.ui" />
     <QtUic Include="WindowIPCparameters.ui" />
+    <QtUic Include="WindowPlot.ui" />
     <QtUic Include="WindowTemplate.ui" />
     <QtUic Include="Zdeny_PhD_Shenanigans.ui" />
   </ItemGroup>
