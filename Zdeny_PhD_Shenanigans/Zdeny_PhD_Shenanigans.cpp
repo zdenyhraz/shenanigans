@@ -75,7 +75,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			}
 		}
 
-		Plot2D plt(ui.widget, "x", "y", "z");
+		Plot2D plt(globals->windowPlots, "x", "y", "z");
 		plt.plot(z);
 
 		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
@@ -94,16 +94,16 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto result = Evo.optimize(f, globals->Logger, plt);
 		plt->save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
-	if (0)//ipc bandpass & window 
+	if (1)//ipc bandpass & window 
 	{
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(1000, 1000);
 		set.setBandpassParameters(5, 1);
-		Plot2D plt(ui.widget, "columns", "rows", "bandpass");
+		Plot2D plt(globals->windowPlots, "columns", "rows", "bandpass");
 		plt.plot(matToVect2(set.bandpass));
 		plt.save("D:\\MainOutput\\Debug\\plot2D.png");
 	}
-	if (1)
+	if (0)
 	{
 		std::string path1 = "D:\\MainOutput\\Debug\\test1.PNG";
 		std::string path2 = "D:\\MainOutput\\Debug\\test2.PNG";
@@ -113,7 +113,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		IPCsettings set = *globals->IPCsettings;
 		set.IPCshow = true;
 		set.setSize(img1.rows, img1.cols);
-		Plot2D plt(globals->widget, "pixel x", "pixel y", "r");
+		Plot2D plt(globals->windowPlots, "pixel x", "pixel y", "r");
 
 		auto shifts = phasecorrel(img1, img2, set, globals->Logger, &plt);
 	}

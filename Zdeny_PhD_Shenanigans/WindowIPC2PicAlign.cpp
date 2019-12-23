@@ -66,7 +66,7 @@ void WindowIPC2PicAlign::alignXY()
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
 	set.setSize(img1.rows, img1.cols);
-	Plot2D plt(globals->widget, "pixel x", "pixel y", "phase correlation");
+	Plot2D plt(globals->windowPlots, "pixel x", "pixel y", "phase correlation");
 
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger, &plt);
 	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);

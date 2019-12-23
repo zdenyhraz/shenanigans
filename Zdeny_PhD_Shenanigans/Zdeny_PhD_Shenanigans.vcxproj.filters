@@ -106,6 +106,9 @@
     <ClCompile Include="qcustomplot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WindowPlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -191,6 +194,9 @@
     <QtMoc Include="qcustomplot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="WindowPlot.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Zdeny_PhD_Shenanigans.ui">
@@ -209,6 +215,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="WindowDiffrot.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="WindowPlot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
