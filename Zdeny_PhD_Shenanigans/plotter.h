@@ -15,9 +15,6 @@ struct AbstractPlot1D
 
 struct AbstractPlot2D
 {
-	inline virtual void plot(const std::vector<std::vector<double>>& z) = 0;
-	inline virtual void setAxisNames(std::string xlabel, std::string ylabel, std::string zlabel) = 0;
-	inline virtual void save(std::string path) = 0;
-	inline virtual void setSize(int nx, int ny) = 0;
-	inline virtual void setRange(double xmin, double xmax, double ymin, double ymax) = 0;
+	inline virtual void plot(const std::vector<std::vector<double>>& z, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1) = 0;
+	inline virtual void save(std::string path, int index) = 0;
 };

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
 
+
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -14,6 +15,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	globals = new Globals();
 	globals->IPCsettings = new IPCsettings(100, 100, 5, 20);
 	globals->widget = ui.widget;
+	globals->plotter2D = new Plotter2D();
 
 	#ifdef LOGGER_QT
 	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
@@ -62,25 +64,6 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D plt(ui.widget, "x", "y");
 		plt.plot(x, y);
 	}
-	if (0)//2D plot
-	{
-		int nx = 1001;
-		int ny = 1051;
-		auto z = zerovect2(ny, nx);
-		for (int xIndex = 0; xIndex < nx; ++xIndex)
-		{
-			for (int yIndex = 0; yIndex < ny; ++yIndex)
-			{
-				z[yIndex][xIndex] = sqrt(sqr(xIndex - nx / 2) + sqr(yIndex - ny / 2));
-			}
-		}
-
-		Plot2D plt(globals->windowPlots, "x", "y", "z");
-		plt.plot(z);
-
-		globals->Logger->Log("Z max = " + to_string(sqr(nx - 1 - nx / 2) + sqr(ny - 1 - ny / 2)), DEBUG);
-		globals->Logger->Log("Z min = " + to_string(sqr(0) + sqr(0)), DEBUG);
-	}
 	if (0)//plot in optimization
 	{
 		Evolution Evo(2);
@@ -99,9 +82,8 @@ void Zdeny_PhD_Shenanigans::debug()
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(1000, 1000);
 		set.setBandpassParameters(5, 1);
-		Plot2D plt(globals->windowPlots, "columns", "rows", "bandpass");
-		plt.plot(matToVect2(set.bandpass));
-		plt.save("D:\\MainOutput\\Debug\\plot2D.png");
+		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
+		globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
 	if (0)
 	{
@@ -113,9 +95,8 @@ void Zdeny_PhD_Shenanigans::debug()
 		IPCsettings set = *globals->IPCsettings;
 		set.IPCshow = true;
 		set.setSize(img1.rows, img1.cols);
-		Plot2D plt(globals->windowPlots, "pixel x", "pixel y", "r");
 
-		auto shifts = phasecorrel(img1, img2, set, globals->Logger, &plt);
+		auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
 	}
 	globals->Logger->Log("Debug finished.", EVENT);
 }
