@@ -178,7 +178,6 @@ Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCs
 							Mat L1v; 
 							resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); 
 							showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 a4r", true); 
-							if (plt) plt->setRange(0, L1.cols, 0, L1.rows);
 							if (plt) plt->plot(matToVect2(L1v));
 						}
 						if (logger) logger->Log("===================================================================================" , INFO);
