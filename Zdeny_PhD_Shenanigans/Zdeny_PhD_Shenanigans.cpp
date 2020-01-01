@@ -61,21 +61,21 @@ void Zdeny_PhD_Shenanigans::debug()
 			y[i] = sin(2 * PI*x[i]);
 		}
 
-		Plot1D plt(ui.widget, "x", "y");
+		Plot1D plt(ui.widget);
 		plt.plot(x, y);
 	}
 	if (0)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
-		Plot1D* plt = new Plot1D(ui.widget);
+		Plot1D plt(ui.widget);
 		auto f = [&](std::vector<double> args) 
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(10)); 
 			return abs(args[0] - args[1]); 
 		};
-		auto result = Evo.optimize(f, globals->Logger, plt);
-		plt->save("D:\\MainOutput\\Debug\\plot1D.png");
+		auto result = Evo.optimize(f, globals->Logger, &plt);
+		plt.save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
 	if (1)//ipc bandpass & window 
 	{

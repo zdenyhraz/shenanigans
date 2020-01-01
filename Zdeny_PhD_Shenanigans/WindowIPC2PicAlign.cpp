@@ -114,7 +114,8 @@ void WindowIPC2PicAlign::linearFlow()
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
-	Plot1D plt(globals->widget, "picture index", "pixel shift X", "pixel shift Y");
+	Plot1D plt(globals->widget);
+	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
 	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);
@@ -131,7 +132,8 @@ void WindowIPC2PicAlign::constantFlow()
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
-	Plot1D plt(globals->widget, "picture index", "pixel shift X", "pixel shift Y");
+	Plot1D plt(globals->widget);
+	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
 	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);

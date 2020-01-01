@@ -6,6 +6,7 @@
 
 static const QFont fontTicks("Newyork", 9);
 static const QFont fontLabels("Newyork", 12);
+static const std::vector<QPen> plotPens{ QPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin), QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin), QPen(Qt::green, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin), QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin) };
 static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 static const QPen plotPen2(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
@@ -13,18 +14,15 @@ struct Plot1D : AbstractPlot1D
 {
 	QCustomPlot* widget;
 
-	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y", QString ylabel2 = "none") : widget(widget)
+	inline Plot1D(QCustomPlot* widget) : widget(widget)
 	{
 		widget->clearPlottables();
 		widget->addGraph();
-		widget->xAxis->setLabel(xlabel);
-		widget->yAxis->setLabel(ylabel);
 		widget->xAxis->setTickLabelFont(fontTicks);
 		widget->yAxis->setTickLabelFont(fontTicks);
 		widget->xAxis->setLabelFont(fontLabels);
 		widget->yAxis->setLabelFont(fontLabels);
 		widget->graph(0)->setPen(plotPen);
-		if (ylabel2 != "none") setupSecondGraph(ylabel, ylabel2);
 		widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);//allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 	};
 
@@ -44,41 +42,61 @@ struct Plot1D : AbstractPlot1D
 		widget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 	}
 
+	inline void setupMultipleGraph(std::vector<std::string> ylabels)
+	{
+		for (int i = 0; i < ylabels.size(); i++)
+		{
+			if (i) widget->addGraph();
+			widget->graph(i)->setPen(plotPens[i]);
+			widget->graph(i)->setName(QString::fromStdString(ylabels[i]));
+			//widget->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+		}
+		widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignRight);
+		widget->legend->setVisible(true);
+	}
+
 	inline void setAxisNames(std::string xlabel, std::string ylabel) override
 	{
-		QString qxlabel = QString::fromStdString(xlabel);
-		QString qylabel = QString::fromStdString(ylabel);
-		widget->xAxis->setLabel(qxlabel);
-		widget->yAxis->setLabel(qylabel);
+		widget->xAxis->setLabel(QString::fromStdString(xlabel));
+		widget->yAxis->setLabel(QString::fromStdString(ylabel));
 	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel1, std::string ylabel2) override
 	{
-		QString qxlabel = QString::fromStdString(xlabel);
-		QString qylabel1 = QString::fromStdString(ylabel1);
-		QString qylabel2 = QString::fromStdString(ylabel2);
-		widget->xAxis->setLabel(qxlabel);
-		widget->yAxis->setLabel(qylabel1);
-		widget->yAxis2->setLabel(qylabel2);
-		setupSecondGraph(qylabel1, qylabel2);
+		widget->xAxis->setLabel(QString::fromStdString(xlabel));
+		widget->yAxis->setLabel(QString::fromStdString(ylabel1));
+		widget->yAxis2->setLabel(QString::fromStdString(ylabel2));
+		setupSecondGraph(QString::fromStdString(ylabel1), QString::fromStdString(ylabel2));
+	}
+
+	inline void setAxisNames(std::string xlabel, std::string ylabel, std::vector<std::string> ylabels) override
+	{
+		widget->xAxis->setLabel(QString::fromStdString(xlabel));
+		widget->yAxis->setLabel(QString::fromStdString(ylabel));
+		setupMultipleGraph(ylabels);
 	}
 
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y) override
 	{
-		QVector<double> qx = QVector<double>::fromStdVector(x);
-		QVector<double> qy = QVector<double>::fromStdVector(y);
-		widget->graph(0)->setData(qx, qy);
+		widget->graph(0)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y));
 		widget->rescaleAxes();
 		widget->replot();
 	}
 
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) override
 	{
-		QVector<double> qx = QVector<double>::fromStdVector(x);
-		QVector<double> qy1 = QVector<double>::fromStdVector(y1);
-		QVector<double> qy2 = QVector<double>::fromStdVector(y2);
-		widget->graph(0)->setData(qx, qy1);
-		widget->graph(1)->setData(qx, qy2);
+		widget->graph(0)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y1));
+		widget->graph(1)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y2));
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
+	inline void plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys) override
+	{
+		for (int i = 0; i < ys.size(); i++)
+		{
+			widget->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(ys[i]));
+		}
 		widget->rescaleAxes();
 		widget->replot();
 	}
