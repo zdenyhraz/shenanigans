@@ -83,7 +83,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		set.setSize(1000, 1000);
 		set.setBandpassParameters(5, 1);
 		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
-		globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
+		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
 	if (0)
 	{

@@ -60,8 +60,8 @@ void WindowIPC2PicAlign::alignXY()
 
 	int sizeX = globals->IPCsettings->getcols();
 	int sizeY = globals->IPCsettings->getrows();
-	img1 = roicrop(img1, SwindCropFocusX*img1.cols, SwindCropFocusY*img1.rows, sizeX, sizeY);
-	img2 = roicrop(img2, SwindCropFocusX*img2.cols, SwindCropFocusY*img2.rows, sizeX, sizeY);
+	img1 = roicrop(img1, ui.lineEdit_4->text().toDouble()*img1.cols, ui.lineEdit_5->text().toDouble()*img1.rows, sizeX, sizeY);
+	img2 = roicrop(img2, ui.lineEdit_4->text().toDouble()*img2.cols, ui.lineEdit_5->text().toDouble()*img2.rows, sizeX, sizeY);
 
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
@@ -111,7 +111,7 @@ void WindowIPC2PicAlign::features()
 
 void WindowIPC2PicAlign::linearFlow()
 {
-	auto xyi = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
+	auto xyi = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
@@ -127,7 +127,7 @@ void WindowIPC2PicAlign::linearFlow()
 
 void WindowIPC2PicAlign::constantFlow()
 {
-	auto xyi = calculateConstantSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString());
+	auto xyi = calculateConstantSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
