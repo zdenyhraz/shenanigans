@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "functionsAstro.h"
-#include "logger.h"
-#include "plotter.h"
 
 std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 {
@@ -38,9 +36,9 @@ double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, doubl
 		int startY = src.rows * startFractionY[startposition];
 		srcCrop1 = roicrop(src, startX, startY, 1.5*set.getcols() + 2, 1.5*set.getcols() + 2);
 		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, set.getcols(), set.getcols());
-		for (int i = 0; i < trials; i++)
+		for (int iterPic = 0; iterPic < trials; iterPic++)
 		{
-			double shiftX = (double)i / (trials - 1) * (double)set.getcols() * maxShiftRatio;
+			double shiftX = (double)iterPic / (trials - 1) * (double)set.getcols() * maxShiftRatio;
 			double shiftY = 0.;
 			Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
 			warpAffine(srcCrop1, srcCrop2, T, cv::Size(srcCrop1.cols, srcCrop1.rows));
@@ -136,13 +134,13 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger)
+void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plot)
 {
-	if (logger) logger->Log("Starting PC MainFlow calculation", EVENT);
+	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	//2D stuff
-	Mat omegasMainX = Mat::zeros(itersY, itersX*iters, CV_64F);
-	Mat omegasMainY = Mat::zeros(itersY, itersX*iters, CV_64F);
-	Mat picture = Mat::zeros(itersY, itersX*iters, CV_64F);
+	Mat omegasMainX = Mat::zeros(itersY, itersX*itersPic, CV_64F);
+	Mat omegasMainY = Mat::zeros(itersY, itersX*itersPic, CV_64F);
+	Mat picture = Mat::zeros(itersY, itersX*itersPic, CV_64F);
 	//1D stuff
 	std::vector<double> omegasAverageX1(itersY, 0);
 	std::vector<double> omegasAverageX2(itersY, 0);
@@ -153,7 +151,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 
 	std::ofstream listingTemp1D_x(pathMasterOut + "temp1D_x.csv", std::ios::out | std::ios::trunc);
 	std::ofstream listingTempJottings(pathMasterOut + "tempJottings.csv", std::ios::out | std::ios::trunc);
-	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << set.getcols() << delimiter << iters << endl;
+	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << set.getcols() << delimiter << itersPic << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
@@ -162,17 +160,19 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	fitsParams params1, params2;
 	int itersSucc = 0;
 
-	for (int i = 0; i < iters; i++)//main cycle - going through pairs of pics
+	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
-		listingTempJottings << "> Calculating pics " << i << " and " << i + 1 << "...";
+		logger->Log("Calculating picture pair " + to_string(iterPic + 1) + " / " + itersPic, SUBEVENT);
+		listingTempJottings << "> Calculating pics " << iterPic << " and " << iterPic + 1 << "...";
 		//pic1
-		FITS_time.advanceTime((bool)i*timeDelta*(strajdPic - deltaPic));
+		FITS_time.advanceTime((bool)iterPic*timeDelta*(strajdPic - deltaPic));
+		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
 		pic1 = loadfits(FITS_time.path(), params1);
 		if (!params1.succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				cout << "<plusminus> " << pm << ": ";
+				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
 				if (pm % 2 == 0)
 					FITS_time.advanceTime(pm);
 				else
@@ -184,18 +184,19 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 		}
 		if (!params1.succload)
 		{
-			cout << "> picture not loaded succesfully - stopping current block execution" << endl;
+			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
 		//pic2
 		FITS_time.advanceTime(deltasec);
+		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
 		pic2 = loadfits(FITS_time.path(), params2);
 		if (!params2.succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				cout << "<plusminus> " << pm << ": ";
+				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
 				if (pm % 2 == 0)
 					FITS_time.advanceTime(pm);
 				else
@@ -207,61 +208,57 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 		}
 		if (!params2.succload)
 		{
-			cout << "> picture not loaded succesfully - stopping current block execution" << endl;
+			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 		succload = params1.succload && params2.succload;
 		if (succload)//load succesfull
 		{
-			#pragma omp critical
 			itersSucc++;
 
-			if (0 && (i == 0))
+			if (iterPic == 0)
 			{
-				showimg(pic1, "pic001");
-				showimg(pic2, "pic002");
-				//cout << "press any key to continue IPC mainflow ..." << endl;
-				//cin.ignore();
+				showimg(pic1, "diffrot pic 1");
+				showimg(pic2, "diffrot pic 2");
 			}
 
 			//average fits values for pics 1 and 2
-			double R = (params1.R + params2.R) / 2.;
-			double theta0 = (params1.theta0 + params2.theta0) / 2.;
+			double R = (params1.R + params2.R) / 2;
+			double theta0 = (params1.theta0 + params2.theta0) / 2;
 			int vertikalniskok = verticalFov / itersY;//px vertical jump
-			int vertikalniShift = 600;//abych videl sunspot hezky - 600
+			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
 
-			for (int mimosloupeciter = 0; mimosloupeciter < itersX; mimosloupeciter++)//X cyklus
+			for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
 			{
-				cout << "> pic " << i + 1 << " / " << iters << ", X >>> " << mimosloupeciter + 1 << " / " << itersX << endl;
 				#pragma omp parallel for
-				for (int meridianiter = 0; meridianiter < itersY; meridianiter++)//Y cyklus
+				for (int iterY = 0; iterY < itersY; iterY++)//Y cyklus
 				{
 					Mat crop1, crop2;
 					Point2d shift(0, 0), shift1, shift2;
 					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
-					theta = asin(((double)vertikalniskok*(floor((double)itersY / 2) - (double)meridianiter) - vertikalniShift) / R) + theta0;//latitude
+					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
 					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
 					predicted_phi = predicted_omega * (double)deltasec;//predicted shift in radians
 
 					//reduce shift noise by computing multiple shifts near central meridian and then working with their median
-					std::vector<Point2d> shifts(medianiters);
-					std::vector<Point2d> shifts1(medianiters);
-					std::vector<Point2d> shifts2(medianiters);
-					for (int medianiter = 0; medianiter < medianiters; medianiter++)
+					std::vector<Point2d> shifts(itersMedian);
+					std::vector<Point2d> shifts1(itersMedian);
+					std::vector<Point2d> shifts2(itersMedian);
+					for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, set.getcols(), set.getcols());
+						crop1 = roicrop(pic1, params1.fitsMidX - itersX / 2 + iterX - itersMedian / 2 + iterMedian, params1.fitsMidY + vertikalniskok * (- itersY / 2 + iterY) + vertikalniShift, set.getcols(), set.getrows());
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX - floor((double)itersX / 2) + mimosloupeciter - floor((double)medianiters / 2) + medianiter, params2.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, set.getcols(), set.getcols());
+						crop2 = roicrop(pic2, params2.fitsMidX - itersX / 2 + iterX - itersMedian / 2 + iterMedian, params2.fitsMidY + vertikalniskok * (- itersY / 2 + iterY) + vertikalniShift, set.getcols(), set.getrows());
 
 						if (twoCorrels)
 						{
-							shifts1[medianiter] = phasecorrel(crop1, crop2, set1);
-							shifts2[medianiter] = phasecorrel(crop1, crop2, set2);
+							shifts1[iterMedian] = phasecorrel(crop1, crop2, set1);
+							shifts2[iterMedian] = phasecorrel(crop1, crop2, set2);
 						}
 						else
 						{
-							shifts[medianiter] = phasecorrel(crop1, crop2, set);
+							shifts[iterMedian] = phasecorrel(crop1, crop2, set);
 						}
 					}
 
@@ -274,26 +271,26 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 						phi_x2 = asin(shift2.x / (R*cos(theta)));
 						omega_x1 = phi_x1 / deltasec;
 						omega_x2 = phi_x2 / deltasec;
-						omegasAverageX1[meridianiter] += omega_x1;
-						omegasAverageX2[meridianiter] += omega_x2;
+						omegasAverageX1[iterY] += omega_x1;
+						omegasAverageX2[iterY] += omega_x2;
 					}
 					else
 					{
 						shift = median(shifts);
 						phi_x = asin(shift.x / (R*cos(theta)));
 						omega_x = phi_x / deltasec;
-						omegasAverageX[meridianiter] += omega_x;
+						omegasAverageX[iterY] += omega_x;
 					}
 
 					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
 					omega_y = phi_y / deltasec;
-					omegasAverageY[meridianiter] += omega_y;
-					thetasAverage[meridianiter] += theta;
-					omegasPredicted[meridianiter] += predicted_omega;
+					omegasAverageY[iterY] += omega_y;
+					thetasAverage[iterY] += theta;
+					omegasPredicted[iterY] += predicted_omega;
 
-					omegasMainX.at<double>(meridianiter, (iters - 1)*itersX - i * itersX - mimosloupeciter) = omega_x;
-					omegasMainY.at<double>(meridianiter, (iters - 1)*itersX - i * itersX - mimosloupeciter) = omega_y;
-					picture.at<double>(meridianiter, (iters - 1)*itersX - i * itersX - mimosloupeciter) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (meridianiter - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + mimosloupeciter);
+					omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
+					omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
+					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 			listingTempJottings << " success - done" << endl;
@@ -303,40 +300,41 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 
 	cout << "> processing results ... " << endl;
 
-	for (int i = 0; i < itersY; i++)//compute averages
+	for (int iterPic = 0; iterPic < itersY; iterPic++)//compute averages
 	{
 		if (twoCorrels)
 		{
-			omegasAverageX1[i] /= (itersX*itersSucc);
-			omegasAverageX2[i] /= (itersX*itersSucc);
+			omegasAverageX1[iterPic] /= (itersX*itersSucc);
+			omegasAverageX2[iterPic] /= (itersX*itersSucc);
 		}
 		else
-			omegasAverageX[i] /= (itersX*itersSucc);
+			omegasAverageX[iterPic] /= (itersX*itersSucc);
 
-		omegasAverageY[i] /= (itersX*itersSucc);
-		thetasAverage[i] /= (itersX*itersSucc);
-		omegasPredicted[i] /= (itersX*itersSucc);
-		thetasAverage[i] *= (360. / 2. / PI);//deg
+		omegasAverageY[iterPic] /= (itersX*itersSucc);
+		thetasAverage[iterPic] /= (itersX*itersSucc);
+		omegasPredicted[iterPic] /= (itersX*itersSucc);
+		thetasAverage[iterPic] *= (360. / 2. / PI);//deg
 		if (twoCorrels)
-			listingTemp1D_x << thetasAverage[i] << delimiter << omegasPredicted[i] << delimiter << omegasAverageX1[i] << delimiter << omegasAverageX2[i] << endl;
+			listingTemp1D_x << thetasAverage[iterPic] << delimiter << omegasPredicted[iterPic] << delimiter << omegasAverageX1[iterPic] << delimiter << omegasAverageX2[iterPic] << endl;
 		else
-			listingTemp1D_x << thetasAverage[i] << delimiter << omegasPredicted[i] << delimiter << omegasAverageX[i] << endl;
+			listingTemp1D_x << thetasAverage[iterPic] << delimiter << omegasPredicted[iterPic] << delimiter << omegasAverageX[iterPic] << endl;
 	}
 
 	MainResults->FlowX = omegasMainX;
 	MainResults->FlowY = omegasMainY;
 	MainResults->FlowPic = picture;
+	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 }
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY)
 {
 	//load pics
 	std::vector<Mat> pics(SwindPicCnt);
-	for (int i = 0; i < SwindPicCnt; i++)
+	for (int iterPic = 0; iterPic < SwindPicCnt; iterPic++)
 	{
-		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-		pics[i] = roicrop(pics[i], SwindCropFocusX*pics[i].cols, SwindCropFocusY*pics[i].rows, set.getcols(), set.getrows());
-		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(5*pics[i].cols, 5*pics[i].rows));
+		pics[iterPic] = imread(path + "0" + to_string(iterPic + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
+		pics[iterPic] = roicrop(pics[iterPic], SwindCropFocusX*pics[iterPic].cols, SwindCropFocusY*pics[iterPic].rows, set.getcols(), set.getrows());
+		//saveimg(path + "cropped//crop" + to_string(iterPic) + ".PNG", pics[iterPic], false, cv::Size2i(5*pics[iterPic].cols, 5*pics[iterPic].rows));
 	}
 	
 	//calculate shifts
@@ -344,17 +342,17 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	auto shiftsY = zerovect(SwindPicCnt);
 	auto indices = iota(0, SwindPicCnt);
 
-	for (int i = 0; i < SwindPicCnt; i++)
+	for (int iterPic = 0; iterPic < SwindPicCnt; iterPic++)
 	{
-		auto shift = phasecorrel(pics[0], pics[i], set);
-		shiftsX[i] = shift.x;
-		shiftsY[i] = shift.y;
-		indices[i] = i;
+		auto shift = phasecorrel(pics[0], pics[iterPic], set);
+		shiftsX[iterPic] = shift.x;
+		shiftsY[iterPic] = shift.y;
+		indices[iterPic] = iterPic;
 	}
-	for (int i = 0; i < 3; i++)//starting things merge with zero peak - omit
+	for (int iterPic = 0; iterPic < 3; iterPic++)//starting things merge with zero peak - omit
 	{
-		//shiftsX[i] = 0;
-		//shiftsY[i] = 0;
+		//shiftsX[iterPic] = 0;
+		//shiftsY[iterPic] = 0;
 	}
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
@@ -363,11 +361,11 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 {
 	//load pics
 	std::vector<Mat> pics(SwindPicCnt);
-	for (int i = 0; i < SwindPicCnt; i++)
+	for (int iterPic = 0; iterPic < SwindPicCnt; iterPic++)
 	{
-		pics[i] = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-		pics[i] = roicrop(pics[i], SwindCropFocusX*pics[i].cols, SwindCropFocusY*pics[i].rows, set.getcols(), set.getrows());
-		//saveimg(path + "cropped//crop" + to_string(i) + ".PNG", pics[i], false, cv::Size2i(2000, 2000));
+		pics[iterPic] = imread(path + "0" + to_string(iterPic + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
+		pics[iterPic] = roicrop(pics[iterPic], SwindCropFocusX*pics[iterPic].cols, SwindCropFocusY*pics[iterPic].rows, set.getcols(), set.getrows());
+		//saveimg(path + "cropped//crop" + to_string(iterPic) + ".PNG", pics[iterPic], false, cv::Size2i(2000, 2000));
 	}
 
 	//calculate shifts
@@ -375,12 +373,12 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	auto shiftsY = zerovect(SwindPicCnt - 1);
 	auto indices = iota(1, SwindPicCnt - 1);
 
-	for (int i = 0; i < SwindPicCnt - 1; i++)
+	for (int iterPic = 0; iterPic < SwindPicCnt - 1; iterPic++)
 	{
-		auto shift = phasecorrel(pics[i], pics[i + 1], set);
-		shiftsX[i] = shift.x;
-		shiftsY[i] = shift.y;
-		indices[i] = i;
+		auto shift = phasecorrel(pics[iterPic], pics[iterPic + 1], set);
+		shiftsX[iterPic] = shift.x;
+		shiftsY[iterPic] = shift.y;
+		indices[iterPic] = iterPic;
 	}
 
 	return std::make_tuple(shiftsX, shiftsY, indices);

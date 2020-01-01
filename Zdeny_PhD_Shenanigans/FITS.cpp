@@ -24,7 +24,6 @@ Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<st
 	}
 	else
 	{
-		//cout << "<loadfits> Loading file '" << path << "'..." << endl;
 		bool ENDfound = false;
 		char lajnaText[lineBYTEcnt];
 		int fitsSize, fitsMid, fitsSize2, angle, lajny = 0;
