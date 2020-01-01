@@ -40,7 +40,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -63,7 +63,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>32</string>
+        <string>512</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -83,7 +83,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_9">
        <property name="text">
-        <string>32</string>
+        <string>512</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -103,7 +103,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>11</string>
+        <string>7</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -143,7 +143,7 @@
      <item row="4" column="1">
       <widget class="QLineEdit" name="lineEdit_4">
        <property name="text">
-        <string>31</string>
+        <string>51</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -183,7 +183,7 @@
      <item row="6" column="1">
       <widget class="QLineEdit" name="lineEdit_6">
        <property name="text">
-        <string>13</string>
+        <string>20</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -232,7 +232,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -268,7 +268,7 @@
         <string>apply bandpass</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>

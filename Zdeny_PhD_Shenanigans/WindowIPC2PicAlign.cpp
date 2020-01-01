@@ -63,11 +63,10 @@ void WindowIPC2PicAlign::alignXY()
 	img1 = roicrop(img1, ui.lineEdit_4->text().toDouble()*img1.cols, ui.lineEdit_5->text().toDouble()*img1.rows, sizeX, sizeY);
 	img2 = roicrop(img2, ui.lineEdit_4->text().toDouble()*img2.cols, ui.lineEdit_5->text().toDouble()*img2.rows, sizeX, sizeY);
 
-	IPCsettings set = *globals->IPCsettings;
-	set.IPCshow = true;
-	set.setSize(img1.rows, img1.cols);
+	IPCsettings set = *globals->IPCsettings;//copy
+	set.IPCshow = true;//show
 
-	auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
+	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
 	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
 }
 

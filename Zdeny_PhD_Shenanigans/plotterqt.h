@@ -15,6 +15,7 @@ struct Plot1D : AbstractPlot1D
 
 	inline Plot1D(QCustomPlot* widget, QString xlabel = "x", QString ylabel = "y", QString ylabel2 = "none") : widget(widget)
 	{
+		widget->clearPlottables();
 		widget->addGraph();
 		widget->xAxis->setLabel(xlabel);
 		widget->yAxis->setLabel(ylabel);
@@ -71,6 +72,17 @@ struct Plot1D : AbstractPlot1D
 		widget->replot();
 	}
 
+	inline void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) override
+	{
+		QVector<double> qx = QVector<double>::fromStdVector(x);
+		QVector<double> qy1 = QVector<double>::fromStdVector(y1);
+		QVector<double> qy2 = QVector<double>::fromStdVector(y2);
+		widget->graph(0)->setData(qx, qy1);
+		widget->graph(1)->setData(qx, qy2);
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
 	inline void plot(const double x, const double y) override
 	{
 		widget->graph(0)->addData(x, y);
@@ -90,17 +102,6 @@ struct Plot1D : AbstractPlot1D
 	{
 		widget->graph(0)->data()->clear();
 		if (second) widget->graph(1)->data()->clear();
-	}
-
-	inline void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) override
-	{
-		QVector<double> qx = QVector<double>::fromStdVector(x);
-		QVector<double> qy1 = QVector<double>::fromStdVector(y1);
-		QVector<double> qy2 = QVector<double>::fromStdVector(y2);
-		widget->graph(0)->setData(qx, qy1);
-		widget->graph(1)->setData(qx, qy2);
-		widget->rescaleAxes();
-		widget->replot();
 	}
 
 	inline void save(std::string path) override
