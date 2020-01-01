@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "logger.h"
 
- const std::vector<QColor> LOGLEVEL_CLR{ QColor(0, 255, 0), QColor(255, 0, 0), QColor(255, 255, 0), QColor(0,250,154), QColor(0, 170, 255), QColor(150, 150, 150) };
+ const std::vector<QColor> LOGLEVEL_CLR{ QColor(0, 255, 0), QColor(255, 0, 0), QColor(255, 255, 0), QColor(0,250,154), QColor(255, 140, 0), QColor(0, 170, 255), QColor(150, 150, 150) };
 
 struct QtLogger : Logger
 {
