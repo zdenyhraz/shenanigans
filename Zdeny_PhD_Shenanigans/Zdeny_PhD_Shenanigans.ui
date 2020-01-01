@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1066</width>
+    <width>1255</width>
     <height>387</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
      <rect>
       <x>288</x>
       <y>0</y>
-      <width>321</width>
+      <width>511</width>
       <height>351</height>
      </rect>
     </property>
@@ -302,54 +302,48 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButtonClearLogs">
-    <property name="geometry">
-     <rect>
-      <x>195</x>
-      <y>0</y>
-      <width>90</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Clear Logs</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonAddLogs">
-    <property name="geometry">
-     <rect>
-      <x>195</x>
-      <y>21</y>
-      <width>90</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Log</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonClose">
-    <property name="geometry">
-     <rect>
-      <x>195</x>
-      <y>42</y>
-      <width>90</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Close All Windows</string>
-    </property>
-   </widget>
    <widget class="QCustomPlot" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>801</x>
       <y>0</y>
       <width>451</width>
       <height>351</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>195</x>
+      <y>0</y>
+      <width>91</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushButtonClearLogs">
+       <property name="text">
+        <string>Clear Logs</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButtonAddLogs">
+       <property name="text">
+        <string>Log</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="pushButtonClose">
+       <property name="text">
+        <string>Close All Windows</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -357,7 +351,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1066</width>
+     <width>1255</width>
      <height>18</height>
     </rect>
    </property>

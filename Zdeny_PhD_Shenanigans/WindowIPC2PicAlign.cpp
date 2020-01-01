@@ -67,7 +67,6 @@ void WindowIPC2PicAlign::alignXY()
 	set.IPCshow = true;//show
 
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
-	globals->Logger->Log("Images aligned & IPC process shown (XY)", SUBEVENT);
 }
 
 void WindowIPC2PicAlign::flowMap()
