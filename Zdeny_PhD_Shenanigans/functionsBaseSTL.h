@@ -410,3 +410,14 @@ inline std::vector<double> iota(int first, int size)
 		vec[i] = first + i;
 	return vec;
 }
+
+inline std::string operator+(const std::string& str, const int val)
+{
+	return str + to_string(val);
+}
+
+inline std::string operator+(const int val, const std::string& str)
+{
+	return to_string(val) + str;
+}
+

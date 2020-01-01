@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
+    <width>332</width>
     <height>196</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -150,7 +150,7 @@
        <item row="2" column="1">
         <widget class="QLineEdit" name="lineEdit_7">
          <property name="text">
-          <string>1499</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -172,12 +172,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>240</x>
       <y>8</y>
-      <width>81</width>
+      <width>90</width>
       <height>112</height>
      </rect>
     </property>
@@ -268,7 +268,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>221</x>
@@ -294,7 +294,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -340,7 +340,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>324</width>
+     <width>332</width>
      <height>18</height>
     </rect>
    </property>
