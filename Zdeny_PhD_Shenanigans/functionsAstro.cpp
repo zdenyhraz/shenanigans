@@ -136,9 +136,9 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut)
+void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger)
 {
-	cout << ">> Starting PC MainFlow calculation" << endl;
+	if (logger) logger->Log("Starting PC MainFlow calculation", EVENT);
 	//2D stuff
 	Mat omegasMainX = Mat::zeros(itersY, itersX*iters, CV_64F);
 	Mat omegasMainY = Mat::zeros(itersY, itersX*iters, CV_64F);
@@ -156,7 +156,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	listingTemp1D_x << deltaPic << delimiter << itersX << delimiter << itersY << delimiter << set.getcols() << delimiter << iters << endl;
 
 	//omp_set_num_threads(6);
-	int plusminusbufer = 6;//this even!
+	int plusminusbufer = 6;//even!
 	bool succload;
 	Mat pic1, pic2;
 	fitsParams params1, params2;
