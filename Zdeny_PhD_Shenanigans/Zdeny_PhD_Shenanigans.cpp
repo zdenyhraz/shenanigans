@@ -144,6 +144,7 @@ void Zdeny_PhD_Shenanigans::showWindowIPCoptimize()
 void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign()
 {
 	windowIPC2PicAlign->show();
+	windowIPCparameters->show();
 }
 
 void Zdeny_PhD_Shenanigans::showWindowDiffrot()
