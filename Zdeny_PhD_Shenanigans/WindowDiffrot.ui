@@ -136,7 +136,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_6">
          <property name="text">
-          <string>10</string>
+          <string>100</string>
          </property>
         </widget>
        </item>
@@ -192,7 +192,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_10">
        <property name="text">
-        <string>2014</string>
+        <string>2011</string>
        </property>
       </widget>
      </item>
@@ -206,7 +206,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_11">
        <property name="text">
-        <string>10</string>
+        <string>3</string>
        </property>
       </widget>
      </item>
@@ -220,7 +220,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_12">
        <property name="text">
-        <string>23</string>
+        <string>12</string>
        </property>
       </widget>
      </item>
@@ -234,7 +234,7 @@
      <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_13">
        <property name="text">
-        <string>0</string>
+        <string>15</string>
        </property>
       </widget>
      </item>
@@ -248,7 +248,7 @@
      <item row="4" column="1">
       <widget class="QLineEdit" name="lineEdit_14">
        <property name="text">
-        <string>0</string>
+        <string>25</string>
        </property>
       </widget>
      </item>
@@ -262,7 +262,7 @@
      <item row="5" column="1">
       <widget class="QLineEdit" name="lineEdit_15">
        <property name="text">
-        <string>30</string>
+        <string>15</string>
        </property>
       </widget>
      </item>
@@ -314,7 +314,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_17">
        <property name="text">
-        <string>D:\\SDOpics\\Sunspot\\</string>
+        <string>D:\\SDOpics\\</string>
        </property>
       </widget>
      </item>

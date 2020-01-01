@@ -4,7 +4,7 @@
 
  enum LOGLEVEL { SPECIAL, FATAL, EVENT, SUBEVENT, WARN, INFO, DEBUG };
  const std::vector<std::string> LOGLEVEL_STR{ "SPECIAL", "FATAL", "main", "sub", "warning", "info", "debug" };
- const std::vector<std::string> LOGLEVEL_STRS{ "", "", "", "       ", "       ", "       ", "       " };
+ const std::vector<std::string> LOGLEVEL_STRS{ "", "       ", "", "       ", "       ", "       ", "       " };
 
 struct Logger
 {
