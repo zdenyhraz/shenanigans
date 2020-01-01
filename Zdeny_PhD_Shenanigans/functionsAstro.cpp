@@ -281,6 +281,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 						phi_x = asin(shift.x / (R*cos(theta)));
 						omega_x = phi_x / deltasec;
 						omegasAverageX[iterY] += omega_x;
+						pltXaccum[iterY] += theta;//plt
 						pltYaccum[0][iterY] += predicted_omega;//plt
 						pltYaccum[1][iterY] += omega_x;//plt
 					}
@@ -289,7 +290,6 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 					omega_y = phi_y / deltasec;
 					omegasAverageY[iterY] += omega_y;
 					thetasAverage[iterY] += theta;
-					pltXaccum[iterY] += theta;//plt
 					omegasPredicted[iterY] += predicted_omega;
 
 					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;//plt
