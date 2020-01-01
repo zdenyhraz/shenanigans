@@ -328,7 +328,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	MainResults->FlowPic = picture;
 }
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path)
+std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY)
 {
 	//load pics
 	std::vector<Mat> pics(SwindPicCnt);
@@ -359,7 +359,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path)
+std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY)
 {
 	//load pics
 	std::vector<Mat> pics(SwindPicCnt);

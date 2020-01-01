@@ -11,8 +11,6 @@ using namespace cv;
 
 static const std::vector<string> WAVELENGTHS_STR = { "HMI", "94_AIA", "131_AIA", "171_AIA", "171_SECCHIA", "171_SECCHIB", "193_AIA", "195_SECCHIA", "195_SECCHIB", "211_AIA", "284_SECCHIA", "284_SECCHIB", "304_AIA", "304_SECCHIA", "304_SECCHIB", "335_AIA" };
 static const std::vector<double> STDDEVS(WAVELENGTHS_STR.size(), 0);
-static const double SwindCropFocusX = 0.38;
-static const double SwindCropFocusY = 0.71;
 static const int SwindPicCnt = 10;
 
 std::vector<double> diffrotProfileAverage(const Mat& flow, int colS = 0);
@@ -106,6 +104,6 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 
 void calculateDiffrotProfile(const IPCsettings& IPC_settings, const IPCsettings& IPC_settings1, const IPCsettings& IPC_settings2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut);
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path);
+std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
 
-std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path);
+std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
