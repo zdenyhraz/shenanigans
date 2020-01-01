@@ -52,7 +52,7 @@ void WindowIPC2PicAlign::align()
 
 void WindowIPC2PicAlign::alignXY()
 {
-	globals->Logger->Log("Starting IPC image align process (XY)", EVENT);
+	globals->Logger->Log("Starting IPC image align process(XY)...", EVENT);
 	std::string path1 = ui.lineEdit->text().toStdString();
 	std::string path2 = ui.lineEdit_2->text().toStdString();
 	Mat img1 = loadImage(path1);
@@ -67,7 +67,7 @@ void WindowIPC2PicAlign::alignXY()
 	set.IPCshow = true;//show
 
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
-	globals->Logger->Log("Images aligned & IPC process shown (XY)", EVENT);
+	globals->Logger->Log("Images aligned & IPC process shown (XY)", SUBEVENT);
 }
 
 void WindowIPC2PicAlign::flowMap()
@@ -110,6 +110,7 @@ void WindowIPC2PicAlign::features()
 
 void WindowIPC2PicAlign::linearFlow()
 {
+	globals->Logger->Log("Starting linear solar wind speed calculation...", EVENT);
 	auto xyi = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
@@ -121,11 +122,12 @@ void WindowIPC2PicAlign::linearFlow()
 	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
 	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
 	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
-	globals->Logger->Log("Linear solar wind speed calculated", EVENT);
+	globals->Logger->Log("Linear solar wind speed calculated", SUBEVENT);
 }
 
 void WindowIPC2PicAlign::constantFlow()
 {
+	globals->Logger->Log("Starting constant solar wind speed calculation...", EVENT);
 	auto xyi = calculateConstantSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
@@ -137,5 +139,5 @@ void WindowIPC2PicAlign::constantFlow()
 	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
 	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
 	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
-	globals->Logger->Log("Constant solar wind speed calculated", EVENT);
+	globals->Logger->Log("Constant solar wind speed calculated", SUBEVENT);
 }
