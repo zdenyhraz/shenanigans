@@ -351,10 +351,10 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 		shiftsY[i] = shift.y;
 		indices[i] = i;
 	}
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)//starting things merge with zero peak - omit
 	{
-		shiftsX[i] = 0;
-		shiftsY[i] = 0;
+		//shiftsX[i] = 0;
+		//shiftsY[i] = 0;
 	}
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }

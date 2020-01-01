@@ -205,4 +205,19 @@ void checkFitsDownloadsAndCreateFile(int delta, int step, int pics, string urlma
 
 void loadImageDebug(Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop);
 
-Mat loadImage(std::string path);
+inline Mat loadImage(std::string path)
+{
+	Mat result;
+	if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
+	{
+		fitsParams params;
+		result = loadfits(path, params, fitsType::HMI);
+	}
+	else
+	{
+		result = imread(path, IMREAD_ANYDEPTH);
+	}
+	result.convertTo(result, CV_16U);
+	normalize(result, result, 0, 65535, CV_MINMAX);
+	return result;
+}
