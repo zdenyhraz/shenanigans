@@ -13,7 +13,7 @@ void WindowDiffrot::calculateDiffrot()
 {
 	globals->Logger->Log("Calculating diffrot profile...", EVENT);
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-	Plot1D plt(globals->widget, "latitude [deg]", "omega [rad/s]");
+	Plot1D plt(globals->widget);
 	calculateDiffrotProfile(*globals->IPCsettings, *globals->IPCsettings, *globals->IPCsettings, fitsTime, diffrotResults, 0, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), ui.lineEdit_9->text().toStdString(), globals->Logger, &plt);
 }
 
