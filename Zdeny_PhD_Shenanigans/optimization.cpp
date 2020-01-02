@@ -78,6 +78,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	funEvals += NP;
 
 	if (plt) plt->setAxisNames("generation", "fitness", "log (fitness)");
+	if (plt) plt->clear(true);
 
 	//run main evolution cycle
 	for (int generation = 1; generation < 1e8; generation++)
