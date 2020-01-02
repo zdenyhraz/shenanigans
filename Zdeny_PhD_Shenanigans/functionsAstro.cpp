@@ -255,20 +255,24 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 
 					//calculate omega from shift
 					shift = median(shifts);
+
 					phi_x = asin(shift.x / (R*cos(theta)));
+					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
+
 					omega_x = phi_x / deltasec;
+					omega_y = phi_y / deltasec;
+
 					omegasAverageX[iterY] += omega_x;
-					pltXaccum[iterY] += theta;
+					omegasAverageY[iterY] += omega_y;
+					thetasAverage[iterY] += theta;
+					omegasPredicted[iterY] += predicted_omega;
+
+					pltXaccum[iterY] += theta * 360 / 2 / PI;
 					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;
 					pltYaccum[0][iterY] += omega_x;
 					pltYavg[0][iterY] = pltYaccum[0][iterY] / itersSucc;
 					pltYaccum[3][iterY] += predicted_omega;
 					pltYavg[3][iterY] = pltYaccum[3][iterY] / itersSucc;
-					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
-					omega_y = phi_y / deltasec;
-					omegasAverageY[iterY] += omega_y;
-					thetasAverage[iterY] += theta;
-					omegasPredicted[iterY] += predicted_omega;
 
 					omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
 					omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
@@ -282,6 +286,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 		}//load unsuccessful
 		if (!(iterPic % 5))
 		{
+			logger->Log("Updating differential rotation plot...", SUBEVENT);
 			pltYavg[1] = polyfit(pltYavg[0], 2);//plt
 			pltYavg[2] = polyfit(pltYavg[0], 4);//plt
 			plt->plot(pltXavg, pltYavg);
