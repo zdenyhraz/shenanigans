@@ -37,7 +37,6 @@ void WindowDiffrot::showIPC()
 
 void WindowDiffrot::optimizeDiffrot()
 {
-	globals->Logger->Log("Optimizing IPC parameters for diffrot profile measurement...", EVENT);
 	fitsParams params1, params2;
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	std::vector<int> sizes{ 16,32,64,128 };
@@ -45,10 +44,11 @@ void WindowDiffrot::optimizeDiffrot()
 	std::ofstream listing(path, std::ios::out | std::ios::trunc);//just delete
 	for (auto& size : sizes)
 	{
+		globals->Logger->Log("Optimizing IPC parameters for diffrot profile measurement " + to_string(size) + "x" + to_string(size) + "...", EVENT);
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(size, size);
 		Plot1D* plt = new Plot1D(globals->widget);
-		optimizeIPCParameters(set, fitsTime.path(), path, 1, 0.01, 3, globals->Logger, plt);
+		optimizeIPCParameters(set, fitsTime.path(), path, 5, 0.01, 3, globals->Logger, plt);
 		delete plt;
 	}
 	globals->Logger->Log("IPC parameters optimization for diffrot profile measurement finished", SUBEVENT);
