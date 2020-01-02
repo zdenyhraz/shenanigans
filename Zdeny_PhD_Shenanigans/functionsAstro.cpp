@@ -134,7 +134,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
+void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, DiffrotResults* MainResults, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	if (plt) plt->setAxisNames("latitude [deg]", "omega [rad/s]", std::vector<std::string>{"measured - raw", "measured - fit(2)", "measured - fit(4)", "predicted"});
@@ -284,7 +284,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 		{
 			continue;//no need to replot
 		}//load unsuccessful
-		if (!(iterPic % 5))
+		if (!(iterPic % 5) || iterPic < 10)
 		{
 			logger->Log("Updating differential rotation plot...", SUBEVENT);
 			pltYavg[1] = polyfit(pltYavg[0], 2);//plt
