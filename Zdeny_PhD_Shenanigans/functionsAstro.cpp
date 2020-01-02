@@ -20,29 +20,29 @@ std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 	return averageFlow;
 }
 
-double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShiftRatio, double accuracy)
+double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShift, double accuracy)
 {
 	double returnVal = 0;
 	Mat srcCrop1, srcCrop2;
 	Mat crop1, crop2;
-	//vector<double> startFractionX = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
-	//vector<double> startFractionY = { 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 };
-	vector<double> startFractionX = { 0.5 };
-	vector<double> startFractionY = { 0.5 };
-	int trials = ceil((double)set.getcols() * maxShiftRatio / accuracy) + 1;
+	std::vector<double> startFractionX = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+	std::vector<double> startFractionY = { 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7 };
+	//std::vector<double> startFractionX = { 0.5 };
+	//std::vector<double> startFractionY = { 0.5 };
+	int trials = (double)maxShift / accuracy + 1;
 	for (int startposition = 0; startposition < startFractionX.size(); startposition++)
 	{
 		int startX = src.cols * startFractionX[startposition];
 		int startY = src.rows * startFractionY[startposition];
-		srcCrop1 = roicrop(src, startX, startY, 1.5*set.getcols() + 2, 1.5*set.getcols() + 2);
-		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, set.getcols(), set.getcols());
+		srcCrop1 = roicrop(src, startX, startY, 1.5*set.getcols() + 2, 1.5*set.getrows() + 2);
+		crop1 = roicrop(srcCrop1, srcCrop1.cols / 2, srcCrop1.rows / 2, set.getcols(), set.getrows());
 		for (int iterPic = 0; iterPic < trials; iterPic++)
 		{
-			double shiftX = (double)iterPic / (trials - 1) * (double)set.getcols() * maxShiftRatio;
+			double shiftX = (double)iterPic / (trials - 1) * maxShift;
 			double shiftY = 0.;
 			Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
 			warpAffine(srcCrop1, srcCrop2, T, cv::Size(srcCrop1.cols, srcCrop1.rows));
-			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, set.getcols(), set.getcols());
+			crop2 = roicrop(srcCrop2, srcCrop2.cols / 2, srcCrop2.rows / 2, set.getcols(), set.getrows());
 			if (noisestddev)
 			{
 				crop1.convertTo(crop1, CV_32F);
@@ -68,26 +68,25 @@ double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, doubl
 	return returnVal;
 }
 
-double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShiftRatio, double accuracy)
+double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShift, double accuracy)
 {
 	IPCsettings settings = settingsMaster;
 	settings.setBandpassParameters(args[0], args[1]);
 	if (args.size() > 2) settings.L2size = max(3., abs(round(args[2])));
 	if (args.size() > 3) settings.applyWindow = args[3] > 0 ? true : false;
-	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShiftRatio, accuracy);
+	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShift, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, Logger* logger, AbstractPlot1D* plt)
 {
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
-
 	listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
 	listing << "filename,size,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
 	Mat pic = loadImage(pathInput);
 	std::string windowname = "objective function source";
 	showimg(pic, windowname);
 	double noisestdev = 0;
-	auto f = [&](std::vector<double>& args) {return IPCparOptFun(args, settingsMaster, pic, noisestdev, maxShiftRatio, accuracy); };
+	auto f = [&](std::vector<double>& args) {return IPCparOptFun(args, settingsMaster, pic, noisestdev, maxShift, accuracy); };
 
 	for (int iterOpt = 0; iterOpt < runs; iterOpt++)
 	{
@@ -95,14 +94,14 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 		Evo.NP = 24;
 		Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
-		Evo.upperBounds = vector<double>{ 10,200,15,1 };
-		auto Result = Evo.optimize(f, logger);
-		listing << pathInput << "," << settingsMaster.getcols() << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+		Evo.upperBounds = vector<double>{ 10,200,19,1 };
+		auto Result = Evo.optimize(f, logger, plt);
+		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 	}
 	destroyWindow(windowname);
 }
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShiftRatio, double accuracy, unsigned runs, Logger* logger)
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs, Logger* logger)
 {
 	std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
 	if (1)//OPT 4par
@@ -117,7 +116,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 			showimg(pic, "objfun current source");
 			if (1)//optimize
 			{
-				auto f = [&](std::vector<double>& args) {return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShiftRatio, accuracy); };
+				auto f = [&](std::vector<double>& args) {return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy); };
 				for (int iterOpt = 0; iterOpt < runs; iterOpt++)
 				{
 					Evolution Evo(4);

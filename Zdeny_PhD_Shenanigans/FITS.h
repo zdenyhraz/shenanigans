@@ -216,8 +216,8 @@ inline Mat loadImage(std::string path)
 	else
 	{
 		result = imread(path, IMREAD_ANYDEPTH);
+		result.convertTo(result, CV_16U);
+		normalize(result, result, 0, 65535, CV_MINMAX);
 	}
-	result.convertTo(result, CV_16U);
-	normalize(result, result, 0, 65535, CV_MINMAX);
 	return result;
 }

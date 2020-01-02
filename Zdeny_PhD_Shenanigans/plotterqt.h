@@ -66,14 +66,14 @@ struct Plot1D : AbstractPlot1D
 		widget->xAxis->setLabel(QString::fromStdString(xlabel));
 		widget->yAxis->setLabel(QString::fromStdString(ylabel1));
 		widget->yAxis2->setLabel(QString::fromStdString(ylabel2));
-		setupSecondGraph(QString::fromStdString(ylabel1), QString::fromStdString(ylabel2));
+		if (widget->graphCount() < 2) setupSecondGraph(QString::fromStdString(ylabel1), QString::fromStdString(ylabel2));
 	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::vector<std::string> ylabels) override
 	{
 		widget->xAxis->setLabel(QString::fromStdString(xlabel));
 		widget->yAxis->setLabel(QString::fromStdString(ylabel));
-		setupMultipleGraph(ylabels);
+		if (widget->graphCount() < ylabels.size()) setupMultipleGraph(ylabels);
 	}
 
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y) override
