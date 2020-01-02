@@ -17,11 +17,7 @@ using namespace std;
 
 constexpr double PI = 3.1415926535897932384626433;
 constexpr double E = 2.7182818284590452353602874;
-constexpr int dummyInt = 12345;
-constexpr double dummyDouble = 12345.6789;
-
 const std::string delimiter = ",";
-const std::string consoleDivider = "<<================================================================================>>";
 
 struct Timerr//benchmarking struct
 {

@@ -277,7 +277,7 @@ void loadImageDebug(Mat& activeimg, double gamaa, bool colorr, double quanBot, d
 		fitsParams params;
 		std::vector<std::string> header;
 		activeimg = gammaCorrect(loadfits(path, params, fitsType::HMI, &header), gamaa);
-		std::cout << endl << "fits header:" << endl << consoleDivider << endl << header << endl << consoleDivider << endl;
+		std::cout << endl << "fits header:" << endl << endl << header << endl << endl;
 		std::cout << "fitsMidX: " << params.fitsMidX << std::endl;
 		std::cout << "fitsMidY: " << params.fitsMidY << std::endl;
 		std::cout << "R: " << params.R << std::endl;
