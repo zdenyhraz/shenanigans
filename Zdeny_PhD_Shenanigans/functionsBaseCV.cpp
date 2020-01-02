@@ -13,7 +13,7 @@ std::tuple<double, double> minMaxMat(const Mat& sourceimg)
 	return make_tuple(minR, maxR);
 }
 
-std::vector<double> polyfit(std::vector<double> data, int degree)
+std::vector<double> polyfit(const std::vector<double>& data, int degree)
 {
 	int dataCount = data.size();
 	Mat X = Mat::zeros(dataCount, degree + 1, CV_64F);//matice planu
@@ -23,7 +23,7 @@ std::vector<double> polyfit(std::vector<double> data, int degree)
 		Y.at<double>(r, 0) = data[r];
 		for (int c = 0; c < X.cols; c++)
 		{
-			if (c == 0)
+			if (!c)
 				X.at<double>(r, c) = 1;
 			else
 				X.at<double>(r, c) = pow(r, c);
