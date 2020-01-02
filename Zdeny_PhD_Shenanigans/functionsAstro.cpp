@@ -134,7 +134,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
+void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	if (plt) plt->setAxisNames("latitude [deg]", "omega [rad/s]", std::vector<std::string>{"measured - raw", "measured - fit(2)", "measured - fit(4)", "predicted"});
@@ -143,8 +143,6 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	Mat omegasMainY = Mat::zeros(itersY, itersX*itersPic, CV_64F);
 	Mat picture = Mat::zeros(itersY, itersX*itersPic, CV_64F);
 	//1D stuff
-	std::vector<double> omegasAverageX1(itersY, 0);
-	std::vector<double> omegasAverageX2(itersY, 0);
 	std::vector<double> omegasAverageX(itersY, 0);
 	std::vector<double> omegasAverageY(itersY, 0);
 	std::vector<double> thetasAverage(itersY, 0);
@@ -252,81 +250,52 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 						//crop2
 						crop2 = roicrop(pic2, params2.fitsMidX - itersX / 2 + iterX - itersMedian / 2 + iterMedian, params2.fitsMidY + vertikalniskok * (- itersY / 2 + iterY) + vertikalniShift, set.getcols(), set.getrows());
 
-						if (twoCorrels)
-						{
-							shifts1[iterMedian] = phasecorrel(crop1, crop2, set1);
-							shifts2[iterMedian] = phasecorrel(crop1, crop2, set2);
-						}
-						else
-						{
-							shifts[iterMedian] = phasecorrel(crop1, crop2, set);
-						}
+						shifts[iterMedian] = phasecorrel(crop1, crop2, set);	
 					}
 
 					//calculate omega from shift
-					if (twoCorrels)
-					{
-						shift1 = median(shifts1);
-						shift2 = median(shifts2);
-						phi_x1 = asin(shift1.x / (R*cos(theta)));
-						phi_x2 = asin(shift2.x / (R*cos(theta)));
-						omega_x1 = phi_x1 / deltasec;
-						omega_x2 = phi_x2 / deltasec;
-						omegasAverageX1[iterY] += omega_x1;
-						omegasAverageX2[iterY] += omega_x2;
-					}
-					else
-					{
-						shift = median(shifts);
-						phi_x = asin(shift.x / (R*cos(theta)));
-						omega_x = phi_x / deltasec;
-						omegasAverageX[iterY] += omega_x;
-						pltXaccum[iterY] += theta;//plt
-						pltYaccum[0][iterY] += omega_x;//plt
-						pltYaccum[3][iterY] += predicted_omega;//plt
-					}
-
+					shift = median(shifts);
+					phi_x = asin(shift.x / (R*cos(theta)));
+					omega_x = phi_x / deltasec;
+					omegasAverageX[iterY] += omega_x;
+					pltXaccum[iterY] += theta;
+					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;
+					pltYaccum[0][iterY] += omega_x;
+					pltYavg[0][iterY] = pltYaccum[0][iterY] / itersSucc;
+					pltYaccum[3][iterY] += predicted_omega;
+					pltYavg[3][iterY] = pltYaccum[3][iterY] / itersSucc;
 					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
 					omega_y = phi_y / deltasec;
 					omegasAverageY[iterY] += omega_y;
 					thetasAverage[iterY] += theta;
 					omegasPredicted[iterY] += predicted_omega;
 
-					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;//plt
-					pltYavg[0][iterY] = pltYaccum[0][iterY] / itersSucc;//plt
-					pltYavg[3][iterY] = pltYaccum[3][iterY] / itersSucc;//plt
-
 					omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
 					omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
 					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
-		}//load succesfull
-		pltYavg[1] = polyfit(pltYavg[0], 2);//plt
-		pltYavg[2] = polyfit(pltYavg[0], 4);//plt
-		plt->plot(pltXavg, pltYavg);
+		}//load successful
+		else
+		{
+			continue;//no need to replot
+		}//load unsuccessful
+		if (!(iterPic % 5))
+		{
+			pltYavg[1] = polyfit(pltYavg[0], 2);//plt
+			pltYavg[2] = polyfit(pltYavg[0], 4);//plt
+			plt->plot(pltXavg, pltYavg);
+		}	
 	}//picture pairs cycle end
-
-	cout << "> processing results ... " << endl;
 
 	for (int iterPic = 0; iterPic < itersY; iterPic++)//compute averages
 	{
-		if (twoCorrels)
-		{
-			omegasAverageX1[iterPic] /= (itersX*itersSucc);
-			omegasAverageX2[iterPic] /= (itersX*itersSucc);
-		}
-		else
-		{
-			omegasAverageX[iterPic] /= (itersX*itersSucc);
-		}
-
+		omegasAverageX[iterPic] /= (itersX*itersSucc);
 		omegasAverageY[iterPic] /= (itersX*itersSucc);
 		thetasAverage[iterPic] /= (itersX*itersSucc);
 		omegasPredicted[iterPic] /= (itersX*itersSucc);
 		thetasAverage[iterPic] *= (360. / 2. / PI);//deg
 	}
-
 	MainResults->FlowX = omegasMainX;
 	MainResults->FlowY = omegasMainY;
 	MainResults->FlowPic = picture;
