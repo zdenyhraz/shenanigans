@@ -121,14 +121,14 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		CrossPowerPlanes[0] /= (normalizationdenominator + set.epsilon);
 		CrossPowerPlanes[1] /= (normalizationdenominator + set.epsilon);
 	}
-	if (logger) logger->Log("cross-power spectrum calculated", INFO);
+	if (logger) logger->Log("Cross-power spectrum calculated", INFO);
 	Mat CrossPower;
 	merge(CrossPowerPlanes, 2, CrossPower);
 	if (set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
 	if (set.applyBandpass)
 	{
 		CrossPower = bandpass(CrossPower, set.bandpass);
-		if (logger) logger->Log("cross-power spectrum bandpassed", INFO);
+		if (logger) logger->Log("Cross-power spectrum bandpassed", INFO);
 	}
 	if (1)//CORRECT - complex magnitude - input can be real or complex whatever
 	{
@@ -154,7 +154,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 	}
 	L3 = quadrantswap(L3);
 	//L3 = L3.mul(quadrantMask(L3.rows, L3.cols));//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< this is jsut s-wind (HARDCODED)
-	if (logger) logger->Log("inverse fourier of cross-power spectrum calculated", INFO);
+	if (logger) logger->Log("Inverse fourier of cross-power spectrum calculated", INFO);
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 	Point2i L3peak, L3bot;
 	double maxR, minR;
@@ -179,7 +179,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 	{
 		logger->Log("Phase correlation max: " + to_string(maxR) + " at location: " + to_string(L3peak), INFO);
 		logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels", INFO);
-		logger->Log("phase correlation calculated with pixel accuracy", SUBEVENT);
+		logger->Log("Phase correlation calculated with pixel accuracy", SUBEVENT);
 	}
 	output = imageshift_PIXEL;
 
@@ -190,7 +190,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		if (!(L2size % 2)) L2size++;//odd!+
 		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > sourceimg1.cols) || ((L3peak.y + L2size / 2 + 1) > sourceimg1.rows))
 		{
-			if (logger) logger->Log("degenerate peak, results might be inaccurate!", FATAL);
+			if (logger) logger->Log("Degenerate peak, results might be inaccurate!", FATAL);
 		}
 		else
 		{
@@ -238,7 +238,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 					L2Upeak.y += round(L1peak.y - L1mid.y);
 					if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
 					{
-						if (logger) logger->Log("breaking out of IPC iterations, centroid diverges", FATAL);
+						if (logger) logger->Log("Breaking out of IPC iterations, centroid diverges", FATAL);
 						break;
 					}
 					if (logger) logger->Log("L1peak findCentroid double delta: " + to_string(findCentroidDouble(L1).x - L1mid.x) + " , " + to_string(findCentroidDouble(L1).y - L1mid.y), INFO);
@@ -246,7 +246,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 					if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
 					{
 						L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-						if (logger) logger->Log("Iterative PC accuracy reached", SUBEVENT);
+						if (logger) logger->Log("Iterative phase correlation accuracy reached", SUBEVENT);
 						if (logger) logger->Log("L2Upeak: " + to_string(L2Upeak), INFO);
 						if (set.IPCshow)
 						{
@@ -268,7 +268,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 
 			if (logger)
 			{
-				logger->Log("iterative phase correlation calculated with subpixel accuracy", SUBEVENT);
+				logger->Log("Iterative phase correlation calculated with subpixel accuracy", SUBEVENT);
 				logger->Log("L3 size: " + to_string(L3.cols) + ", L2 size: " + to_string(L2.cols) + ", L2U size: " + to_string(L2U.cols) + ", L1 size: " + to_string(L1.cols), INFO);
 				logger->Log("Upsample pixel accuracy theoretical maximum: " + to_string(1.0 / (double)set.UC), INFO);
 				logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels ", INFO);

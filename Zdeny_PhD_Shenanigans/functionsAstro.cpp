@@ -137,7 +137,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, const IPCsettings& set2, FITStime& FITS_time, DiffrotResults* MainResults, bool twoCorrels, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (plt) plt->setAxisNames("latitude [deg]", "omega [rad/s]", std::vector<std::string>{"predicted", "measured"});
+	if (plt) plt->setAxisNames("latitude [deg]", "omega [rad/s]", std::vector<std::string>{"measured - raw", "measured - fit(2)", "measured - fit(4)", "predicted"});
 	//2D stuff
 	Mat omegasMainX = Mat::zeros(itersY, itersX*itersPic, CV_64F);
 	Mat omegasMainY = Mat::zeros(itersY, itersX*itersPic, CV_64F);
@@ -152,8 +152,8 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 	//1D stuff for realtime average plotting
 	std::vector<double> pltXaccum(itersY, 0);
 	std::vector<double> pltXavg(itersY, 0);
-	std::vector<std::vector<double>> pltYaccum = zerovect2(2, itersY);
-	std::vector<std::vector<double>> pltYavg = zerovect2(2, itersY);
+	std::vector<std::vector<double>> pltYaccum = zerovect2(4, itersY);
+	std::vector<std::vector<double>> pltYavg = zerovect2(4, itersY);
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
@@ -282,8 +282,8 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 						omega_x = phi_x / deltasec;
 						omegasAverageX[iterY] += omega_x;
 						pltXaccum[iterY] += theta;//plt
-						pltYaccum[0][iterY] += predicted_omega;//plt
-						pltYaccum[1][iterY] += omega_x;//plt
+						pltYaccum[0][iterY] += omega_x;//plt
+						pltYaccum[3][iterY] += predicted_omega;//plt
 					}
 
 					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
@@ -294,7 +294,7 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 
 					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;//plt
 					pltYavg[0][iterY] = pltYaccum[0][iterY] / itersSucc;//plt
-					pltYavg[1][iterY] = pltYaccum[1][iterY] / itersSucc;//plt
+					pltYavg[3][iterY] = pltYaccum[3][iterY] / itersSucc;//plt
 
 					omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
 					omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
@@ -302,6 +302,8 @@ void calculateDiffrotProfile(const IPCsettings& set, const IPCsettings& set1, co
 				}//Y for cycle end
 			}//X for cycle end
 		}//load succesfull
+		pltYavg[1] = polyfit(pltYavg[0], 2);//plt
+		pltYavg[2] = polyfit(pltYavg[0], 4);//plt
 		plt->plot(pltXavg, pltYavg);
 	}//picture pairs cycle end
 

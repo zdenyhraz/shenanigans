@@ -13,7 +13,7 @@ using namespace cv;
 
 std::tuple<double, double> minMaxMat(const Mat& sourceimg);
 
-std::vector<double> polyfit(std::vector<double> data, int degree);
+std::vector<double> polyfit(const std::vector<double>& data, int degree);
 
 Mat crosshair(const Mat& sourceimgIn, cv::Point point);
 
