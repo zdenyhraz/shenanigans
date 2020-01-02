@@ -81,7 +81,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 {
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
 	listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
-	listing << "filename,size,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
+	listing << "filename,size,maxShift,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
 	Mat pic = loadImage(pathInput);
 	std::string windowname = "objective function source";
 	showimg(pic, windowname);
@@ -96,7 +96,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 		Evo.upperBounds = vector<double>{ 10,200,19,1 };
 		auto Result = Evo.optimize(f, logger, plt);
-		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 	}
 	destroyWindow(windowname);
 }
@@ -151,6 +151,8 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 	std::vector<double> pltXavg(itersY, 0);
 	std::vector<std::vector<double>> pltYaccum = zerovect2(4, itersY);
 	std::vector<std::vector<double>> pltYavg = zerovect2(4, itersY);
+
+	std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
@@ -225,6 +227,7 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 			double theta0 = (params1.theta0 + params2.theta0) / 2;
 			int vertikalniskok = verticalFov / itersY;//px vertical jump
 			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
+			listingdebug << iterPic << ". theta0," << theta0 << endl;
 
 			for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
 			{
@@ -283,13 +286,10 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		{
 			continue;//no need to replot
 		}//load unsuccessful
-		if (!(iterPic % 5) || iterPic < 10)
-		{
-			logger->Log("Updating differential rotation plot...", SUBEVENT);
-			pltYavg[1] = polyfit(pltYavg[0], 2);//plt
-			pltYavg[2] = polyfit(pltYavg[0], 4);//plt
-			plt->plot(pltXavg, pltYavg);
-		}	
+		logger->Log("Updating differential rotation plot...", SUBEVENT);
+		pltYavg[1] = polyfit(pltYavg[0], 2);//plt
+		pltYavg[2] = polyfit(pltYavg[0], 4);//plt
+		plt->plot(pltXavg, pltYavg);
 	}//picture pairs cycle end
 
 	for (int iterPic = 0; iterPic < itersY; iterPic++)//compute averages

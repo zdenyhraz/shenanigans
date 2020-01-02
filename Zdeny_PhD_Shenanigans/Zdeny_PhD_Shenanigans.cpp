@@ -64,7 +64,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D plt(ui.widget);
 		plt.plot(x, y);
 	}
-	if (0)//plot in optimization
+	if (1)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
@@ -77,7 +77,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto result = Evo.optimize(f, globals->Logger, &plt);
 		plt.save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
-	if (1)//ipc bandpass & window 
+	if (0)//ipc bandpass & window 
 	{
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(1000, 1000);
@@ -85,7 +85,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if (0)
+	if (0)//2pic IPC
 	{
 		std::string path1 = "D:\\MainOutput\\Debug\\test1.PNG";
 		std::string path2 = "D:\\MainOutput\\Debug\\test2.PNG";
@@ -97,6 +97,9 @@ void Zdeny_PhD_Shenanigans::debug()
 		set.setSize(img1.rows, img1.cols);
 
 		auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
+	}
+	if (0)
+	{
 	}
 	globals->Logger->Log("Debug finished.", EVENT);
 }
