@@ -22,8 +22,9 @@ struct DiffrotResults
 	Mat FlowY;
 	std::vector<double> FlowXfit;
 
-	void showResults(double quantileBot, double quantileTop, int medianSize, double sigma)
+	void showsaveResults(double quantileBot, double quantileTop, int medianSize, double sigma, std::string dirpath)
 	{
+		dirpath += "pics//";
 		//first compute the X/Y abs/rel median pics
 		Mat medFlowX = FlowX.clone();
 		Mat medFlowY = FlowY.clone();
@@ -41,18 +42,22 @@ struct DiffrotResults
 		//now show various stuff
 		if (1)//source
 		{
-			showimg(FlowPic, "Flow Source", false, 0, 1);
+			showimg(FlowPic, "Flow Source");
+			saveimg(dirpath + "FlowPic.png", FlowPic, true, Size2i(2500, 1000));
 		}
 		if (1)//flow
 		{
 			showimg(medFlowX, "Flow X", true, quantileBot, quantileTop);
 			showimg(medFlowY, "Flow Y", true, quantileBot, quantileTop);
+			saveimg(dirpath + "FlowX.png", applyColorMapZdeny(medFlowX, quantileBot, quantileTop, true), true, Size2i(2500, 1000));
+			saveimg(dirpath + "FlowY.png", applyColorMapZdeny(medFlowY, quantileBot, quantileTop, true), true, Size2i(2500, 1000));
 		}
 		if (1)//relative flow
 		{
 			showimg(medFlowXrelative, "Flow relative", true, quantileBot, quantileTop);
+			saveimg(dirpath + "FlowRel.png", applyColorMapZdeny(medFlowXrelative, quantileBot, quantileTop, true), true, Size2i(2500, 1000));
 		}
-		if (1)//ghetto sum
+		if (0)//ghetto sum
 		{
 			Mat FlowPicBGR = FlowPic.clone();
 			FlowPicBGR.convertTo(FlowPicBGR, CV_32F);
@@ -79,6 +84,8 @@ struct DiffrotResults
 		{
 			Mat mergedBIN = combineTwoPics(medFlowXrelative, FlowPic, BINARYBLUERED, sigma);
 			showimg(mergedBIN, "Flow Merged Binary relative", false, quantileBot, quantileTop);
+			saveimg(dirpath + "FlowBin.png", mergedBIN, true, Size2i(2500, 1000));
+
 		}
 		if (1)//phase and magnitude
 		{
@@ -87,6 +94,8 @@ struct DiffrotResults
 			phase(medFlowXrelative, medFlowY, phas);
 			showimg(magn, "Flow Magnitude relative", true, quantileBot, quantileTop);
 			showimg(phas, "Flow Phase relative", true, quantileBot, quantileTop);
+			saveimg(dirpath + "FlowM.png", applyColorMapZdeny(magn, quantileBot, quantileTop, true), true, Size2i(2500, 1000));
+			saveimg(dirpath + "FlowP.png", applyColorMapZdeny(phas, quantileBot, quantileTop, true), true, Size2i(2500, 1000));
 		}
 	}
 };
