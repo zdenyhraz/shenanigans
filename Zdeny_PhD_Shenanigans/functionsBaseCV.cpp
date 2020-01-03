@@ -346,7 +346,7 @@ void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear, Size2i exp
 	sourceimg.convertTo(sourceimg, CV_8U);
 
 	double RowColRatio = (double)sourceimg.rows / (double)sourceimg.cols;
-	int namedWindowRows = 1200;
+	int namedWindowRows = 1700;
 	int namedWindowCols = (double)namedWindowRows / RowColRatio;
 
 	if (exportSize == Size2i(0, 0))

@@ -46,7 +46,7 @@ inline std::tuple<int, int, int> colorMapJET(int x, int caxisMin=0, int caxisMax
 	return std::make_tuple(B, G, R);
 }
 
-inline std::tuple<int, int, int> colorMapBINARY(double x, double caxisMin=-1, double caxisMax=1, double sigma=1)
+inline std::tuple<int, int, int> colorMapBINARY(double x, double caxisMin=-1, double caxisMax=1, double sigma = 1)
 {
 	double B, G, R;
 
