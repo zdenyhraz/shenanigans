@@ -138,35 +138,40 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - curr", "measured - med", "measured - avg", "measured - fit", "predicted"});
 	//2D stuff
-	Mat omegasMainX = Mat::zeros(itersY, itersX*itersPic, CV_64F);
-	Mat omegasMainY = Mat::zeros(itersY, itersX*itersPic, CV_64F);
-	Mat picture = Mat::zeros(itersY, itersX*itersPic, CV_64F);
-	//1D stuff
-	std::vector<double> omegasAverageX(itersY, 0);
-	std::vector<double> omegasAverageY(itersY, 0);
-	std::vector<double> thetasAverage(itersY, 0);
-	std::vector<double> omegasPredicted(itersY, 0);
-	//1D stuff for realtime average plotting
-	std::vector<double> pltXaccum(itersY, 0);
-	std::vector<double> pltXavg(itersY, 0);
-	std::vector<double> pltYaccumM(itersY, 0);
-	std::vector<double> pltYaccumP(itersY, 0);
-	std::vector<std::vector<double>> pltYs = zerovect2(5, itersY);
-	std::vector<std::vector<double>> pltYmedians = zerovect2(itersY, 0);
-	for (int i = 0; i < pltYmedians.size(); i++)
-	{
-		pltYmedians[i].reserve(1500);
-	}
+	std::vector<std::vector<double>> omegasX(itersY);
+	std::vector<std::vector<double>> omegasY(itersY);
+	std::vector<std::vector<double>> omegasP(itersY);
+	std::vector<std::vector<double>> thetas(itersY);
 
+	for (int iterY = 0; iterY < itersY; iterY++)
+	{
+		omegasX[iterY].reserve(itersPic*itersX);
+		omegasY[iterY].reserve(itersPic*itersX);
+		omegasP[iterY].reserve(itersPic*itersX);
+		thetas[iterY].reserve(itersPic*itersX);
+	}
+		
+	//1D stuff
+	std::vector<double> omegasXavg(itersY);
+	std::vector<double> omegasYavg(itersY);
+	std::vector<double> omegasPavg(itersY);
+	std::vector<double> thetasavg(itersY);
+	std::vector<double> omegasXmed(itersY);
+	std::vector<double> omegasXfit(itersY);
+
+	std::vector<double> omegasXcurr(itersY);
+	std::vector<double> omegasYcurr(itersY);
+	std::vector<double> omegasPcurr(itersY);
+	std::vector<double> thetascurr(itersY);
+	
 	std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
-	listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeedavgavg,rotspeedavgcurr,kenker" << endl;
+	listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeed_avgAvg,rotspeed_currAvg,kenker" << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
 	bool succload;
 	Mat pic1, pic2;
 	fitsParams params1, params2;
-	int itersSucc = 0;
 
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
@@ -225,9 +230,7 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		succload = params1.succload && params2.succload;
 		if (succload)//load succesfull
 		{
-			itersSucc++;
-
-			if (iterPic == 0)
+			if (0 && iterPic == 0)
 			{
 				showimg(pic1, "diffrot pic 1");
 				showimg(pic2, "diffrot pic 2");
@@ -274,24 +277,14 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 					omega_x = phi_x / deltasec;
 					omega_y = phi_y / deltasec;
 
-					omegasAverageX[iterY] += omega_x;
-					omegasAverageY[iterY] += omega_y;
-					thetasAverage[iterY] += theta;
-					omegasPredicted[iterY] += predicted_omega;
+					omegasXcurr[iterY] = omega_x;
+					omegasYcurr[iterY] = omega_y;
+					omegasPcurr[iterY] = predicted_omega;
+					thetascurr[iterY] = theta * 360 / 2 / PI;
 
-					pltXaccum[iterY] += theta * 360 / 2 / PI;
-					pltYaccumM[iterY] += omega_x;
-					pltYmedians[iterY].push_back(omega_x);
-					pltYaccumP[iterY] += predicted_omega;
-					pltXavg[iterY] = pltXaccum[iterY] / itersSucc;
-					pltYs[0][iterY] = omega_x;
-					pltYs[1][iterY] = median(pltYmedians[iterY]);
-					pltYs[2][iterY] = pltYaccumM[iterY] / itersSucc;
-					pltYs[4][iterY] = pltYaccumP[iterY] / itersSucc;
-
-					omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
-					omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
-					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
+					//omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
+					//omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
+					//picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 		}//load successful
@@ -299,28 +292,40 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		{
 			continue;//no need to replot
 		}
-		pltYs[3] = polyfit(pltYs[2], 4);//plt
-		plt->plot(pltXavg, pltYs);
-		double kenker = abs(mean(pltYs[0]) - mean(pltYs[2])) / mean(pltYs[2]);
-		if ((abs(mean(pltYs[0]) - mean(pltYs[2])) / mean(pltYs[2])) > 0.3)//%avg difference
+
+		double currAvg = mean(omegasXcurr);
+		double avgAvg = mean(omegasXavg);
+		double kenker = abs(currAvg - avgAvg) / avgAvg;
+		if (!iterPic || kenker < 0.3)//good data
 		{
-			//kenker = true;
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//push back good data
+				omegasX[iterY].push_back(omegasXcurr[iterY]);
+				omegasY[iterY].push_back(omegasYcurr[iterY]);
+				omegasP[iterY].push_back(omegasPcurr[iterY]);
+				thetas[iterY].push_back(thetascurr[iterY]);
+
+				//calculate good averages
+				omegasXavg[iterY] = mean(omegasX[iterY]);
+				omegasYavg[iterY] = mean(omegasY[iterY]);
+				omegasPavg[iterY] = mean(omegasP[iterY]);
+				thetasavg[iterY] = mean(thetas[iterY]);
+				omegasXmed[iterY] = median(omegasX[iterY]);
+			}	
+		}
+		else//bad data
+		{
 			logger->Log("This one was kenker", FATAL);
 		}
-		listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << mean(pltYs[2]) << "," << mean(pltYs[0]) << "," << kenker << endl;
+
+		std::vector<double> pltX = thetasavg;
+		std::vector<std::vector<double>> pltY{ omegasXcurr, omegasXmed, omegasXavg, polyfit(omegasXavg, 4), omegasPavg };
+		plt->plot(pltX, pltY);
+
+		listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
 
-	for (int iterPic = 0; iterPic < itersY; iterPic++)//compute averages
-	{
-		omegasAverageX[iterPic] /= (itersX*itersSucc);
-		omegasAverageY[iterPic] /= (itersX*itersSucc);
-		thetasAverage[iterPic] /= (itersX*itersSucc);
-		omegasPredicted[iterPic] /= (itersX*itersSucc);
-		thetasAverage[iterPic] *= (360. / 2. / PI);
-	}
-	MainResults->FlowX = omegasMainX;
-	MainResults->FlowY = omegasMainY;
-	MainResults->FlowPic = picture;
 	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 }
 
