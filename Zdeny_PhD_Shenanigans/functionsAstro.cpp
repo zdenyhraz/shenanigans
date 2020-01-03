@@ -178,7 +178,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
-		logger->Log("Calculating picture pair id " + to_string(iterPic) + "(" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
+		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
 		std::string pathdbg1, pathdbg2;
 		//pic1
 		FITS_time.advanceTime((bool)iterPic*timeDelta*(strajdPic - deltaPic));
@@ -303,10 +303,13 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		}
 
 		double currAvgX = mean(omegasXcurr);
+		double currAvgY = mean(omegasYcurr);
 		double avgAvgX = mean(omegasXavg);
-		double kenkerX = abs(currAvgX - avgAvgX) / avgAvgX;
+		double avgAvgY = mean(omegasYavg);
+		double kenkerX = abs(currAvgX - avgAvgX);
+		double kenkerY = abs(currAvgY - avgAvgY);
 
-		if (!iterPic || kenkerX < 0.3)//good data
+		if (!iterPic || (kenkerX < 1e-6 && kenkerY < 1e-6))//good data
 		{
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
@@ -348,6 +351,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 
 	results.FlowX = omegasXmat;
 	results.FlowY = omegasYmat;
+	results.FlowXfit = omegasXfit;
 	results.FlowPic = picture;
 	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 	return results;

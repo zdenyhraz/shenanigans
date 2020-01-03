@@ -56,5 +56,6 @@ void WindowDiffrot::optimizeDiffrot()
 
 void WindowDiffrot::showResults()
 {
-	//diffrotResults->showResults();
+	diffrotResults->showResults(ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble());
+	globals->Logger->Log("Differential rotation results shown", EVENT);
 }

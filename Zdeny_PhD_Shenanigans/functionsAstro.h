@@ -20,11 +20,11 @@ struct DiffrotResults
 	Mat FlowPic;
 	Mat FlowX;
 	Mat FlowY;
+	std::vector<double> FlowXfit;
 
-	void showResults(double quantileBot, double quantileTop, int medianSize, double mergeAlpha, double degree)
+	void showResults(double quantileBot, double quantileTop, int medianSize, double sigma)
 	{
-		Size2i exportSize = Size2i(0, 0);
-		//heatmaps (median blurred + quantiled)
+		//first compute the X/Y abs/rel median pics
 		Mat medFlowX = FlowX.clone();
 		Mat medFlowY = FlowY.clone();
 		medFlowX.convertTo(medFlowX, CV_32F);
@@ -36,24 +36,21 @@ struct DiffrotResults
 		}
 		medFlowX.convertTo(medFlowX, CV_64F);
 		medFlowY.convertTo(medFlowY, CV_64F);
-		std::vector<double> profileAverage = diffrotProfileAverage(medFlowX, medFlowX.cols / 20);
-		std::vector<double> profileAverageSmooth = polyfit(profileAverage, 4);
-		Mat profileAverageSmoothM = matFromVector(profileAverageSmooth, medFlowX.cols);
-		showimg(profileAverageSmoothM, "Flow AvgSmooth (Med+Quan)", true, quantileBot, quantileTop, exportSize);
-		Mat medFlowXrelative = medFlowX - profileAverageSmoothM;
+		Mat medFlowXrelative = medFlowX - matFromVector(FlowXfit, medFlowX.cols);
+
+		//now show various stuff
 		if (1)//source
 		{
-			showimg(FlowPic, "Flow Source", false, 0, 1, exportSize);
+			showimg(FlowPic, "Flow Source", false, 0, 1);
 		}
 		if (1)//flow
 		{
-			showimg(medFlowX, "Flow X", true, quantileBot, quantileTop, exportSize);
-			showimg(medFlowY, "Flow Y", true, quantileBot, quantileTop, exportSize);
+			showimg(medFlowX, "Flow X", true, quantileBot, quantileTop);
+			showimg(medFlowY, "Flow Y", true, quantileBot, quantileTop);
 		}
 		if (1)//relative flow
 		{
-			Mat medFlowXrelative = medFlowX - profileAverageSmoothM;
-			showimg(medFlowXrelative, "Flow relative", true, quantileBot, quantileTop, exportSize);
+			showimg(medFlowXrelative, "Flow relative", true, quantileBot, quantileTop);
 		}
 		if (1)//ghetto sum
 		{
@@ -65,31 +62,31 @@ struct DiffrotResults
 			Mat medFlowX_BGR = applyColorMapZdeny(medFlowX, quantileBot, quantileTop);
 			medFlowX_BGR.convertTo(medFlowX_BGR, CV_64F);
 			normalize(medFlowX_BGR, medFlowX_BGR, 0, 1, CV_MINMAX);
-			Mat mergedGHE = (1. - mergeAlpha)*FlowPicBGR + mergeAlpha * medFlowX_BGR;
-			showimg(mergedGHE, "Flow MergedGHE", false, quantileBot, quantileTop, exportSize);
+			Mat mergedGHE = (1. - sigma)*FlowPicBGR + sigma * medFlowX_BGR;
+			showimg(mergedGHE, "Flow Merged Ghetto", false, quantileBot, quantileTop);
 		}
-		if (1)//HUE sum
+		if (0)//HUE sum
 		{
 			Mat mergedHUE = combineTwoPics(applyColorMapZdeny(medFlowX, quantileBot, quantileTop, false), FlowPic, HUEBRIGHT);
-			showimg(mergedHUE, "Flow MergedHUE", false, quantileBot, quantileTop, exportSize);
+			showimg(mergedHUE, "Flow Merged Hue", false, quantileBot, quantileTop);
 		}
-		if (1)//HUE sum relative
+		if (0)//HUE sum relative
 		{
-			Mat mergedHUE = combineTwoPics(applyColorMapZdeny(medFlowXrelative, quantileBot, quantileTop, false), FlowPic, HUEBRIGHT);
-			showimg(mergedHUE, "Flow MergedHUE relative", false, quantileBot, quantileTop, exportSize);
+			Mat mergedHUE = combineTwoPics(medFlowXrelative, FlowPic, HUEBRIGHT);
+			showimg(mergedHUE, "Flow Merged Hue relative", false, quantileBot, quantileTop);
 		}
 		if (1)//BINARY sum (relative)
 		{
-			Mat mergedBIN = combineTwoPics(medFlowXrelative, FlowPic, BINARYBLUERED, degree);
-			showimg(mergedBIN, "Flow MergedRelativeBIN", false, quantileBot, quantileTop, exportSize);
+			Mat mergedBIN = combineTwoPics(medFlowXrelative, FlowPic, BINARYBLUERED, sigma);
+			showimg(mergedBIN, "Flow Merged Binary relative", false, quantileBot, quantileTop);
 		}
 		if (1)//phase and magnitude
 		{
 			Mat magn, phas;
 			magnitude(medFlowXrelative, medFlowY, magn);
 			phase(medFlowXrelative, medFlowY, phas);
-			showimg(magn, "Flow Magn relative", false, quantileBot, quantileTop, exportSize);
-			showimg(phas, "Flow phase relative", false, quantileBot, quantileTop, exportSize);
+			showimg(magn, "Flow Magnitude relative", true, quantileBot, quantileTop);
+			showimg(phas, "Flow Phase relative", true, quantileBot, quantileTop);
 		}
 	}
 };
