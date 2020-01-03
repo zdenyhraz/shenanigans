@@ -296,7 +296,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
 				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXavg[iterY];
+				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
 				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
 			}
 			continue;//no need to replot
@@ -325,6 +325,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasPavg[iterY] = mean(omegasP[iterY]);
 				thetasavg[iterY] = mean(thetas[iterY]);
 				omegasXmed[iterY] = median(omegasX[iterY]);
+				omegasXfit = polyfit(omegasXavg, 4);
 			}	
 		}
 		else//bad data
@@ -332,19 +333,18 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
 				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXavg[iterY];
+				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
 				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
 			}
-			logger->Log("This one was kenker", FATAL);
+			logger->Log("That one was kenker, thrown to trash", FATAL);
 		}
 
-		omegasXfit = polyfit(omegasXavg, 4);
 		std::vector<double> pltX = thetasavg;
 		std::vector<std::vector<double>> pltY{ omegasXmed, omegasXavg, omegasXfit, omegasPavg };
 		plt->plot(pltX, pltY);
-		showimg(omegasXmat, "omegasXmat", true);
-		showimg(omegasYmat, "omegasYmat", true);
-		showimg(omegasXmat - matFromVector(omegasXfit, omegasXmat.cols), "omegasXmatRel", true);
+		showimg(omegasXmat, "omegasXmat", true, 0.001, 0.999);
+		showimg(omegasYmat, "omegasYmat", true, 0.001, 0.999);
+		showimg(omegasXmat - matFromVector(omegasXfit, omegasXmat.cols), "omegasXmatRel", true, 0.001, 0.999);
 		showimg(picture, "source");
 		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
