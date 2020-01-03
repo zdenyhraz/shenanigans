@@ -158,8 +158,8 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		pltYmedians[i].reserve(1500);
 	}
 
-	//std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
-	//listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeedmid" << endl;
+	std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
+	listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeedavgavg,rotspeedavgcurr,kenker" << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
@@ -301,7 +301,13 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		}
 		pltYs[3] = polyfit(pltYs[2], 4);//plt
 		plt->plot(pltXavg, pltYs);
-		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << pltYs[3][pltYs[3].size() / 2] << endl;
+		double kenker = abs(mean(pltYs[0]) - mean(pltYs[2])) / mean(pltYs[2]);
+		if ((abs(mean(pltYs[0]) - mean(pltYs[2])) / mean(pltYs[2])) > 0.3)//%avg difference
+		{
+			//kenker = true;
+			logger->Log("This one was kenker", FATAL);
+		}
+		listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << mean(pltYs[2]) << "," << mean(pltYs[0]) << "," << kenker << endl;
 	}//picture pairs cycle end
 
 	for (int iterPic = 0; iterPic < itersY; iterPic++)//compute averages
