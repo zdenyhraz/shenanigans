@@ -342,9 +342,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		std::vector<double> pltX = thetasavg;
 		std::vector<std::vector<double>> pltY{ omegasXavg, omegasXfit, omegasPavg };
 		plt->plot(pltX, pltY);
-		showimg(omegasXmat, "omegasXmat", true, 0.001, 0.999);
-		showimg(omegasYmat, "omegasYmat", true, 0.001, 0.999);
-		showimg(omegasXmat - matFromVector(omegasXfit, omegasXmat.cols), "omegasXmatRel", true, 0.001, 0.999);
+		showimg(omegasXmat, "omegasXmat", true, 0.01, 0.99);
+		showimg(omegasYmat, "omegasYmat", true, 0.01, 0.99);
 		showimg(picture, "source");
 		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
