@@ -352,6 +352,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	results.FlowX = omegasXmat;
 	results.FlowY = omegasYmat;
 	results.FlowXfit = omegasXfit;
+	results.FlowXpred = omegasPavg;
 	results.FlowPic = picture;
 	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 	return results;
