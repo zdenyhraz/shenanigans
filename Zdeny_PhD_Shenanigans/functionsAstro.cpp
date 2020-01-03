@@ -136,7 +136,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, DiffrotResults* MainResults, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - curr", "measured - med", "measured - avg", "measured - fit", "predicted"});
+	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - med", "measured - avg", "measured - fit", "predicted"});
 	//2D stuff
 	std::vector<std::vector<double>> omegasX(itersY);
 	std::vector<std::vector<double>> omegasY(itersY);
@@ -157,15 +157,14 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 	std::vector<double> omegasPavg(itersY);
 	std::vector<double> thetasavg(itersY);
 	std::vector<double> omegasXmed(itersY);
-	std::vector<double> omegasXfit(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
 	std::vector<double> omegasYcurr(itersY);
 	std::vector<double> omegasPcurr(itersY);
 	std::vector<double> thetascurr(itersY);
 	
-	std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
-	listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeed_avgAvg,rotspeed_currAvg,kenker" << endl;
+	//std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
+	//listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeed_avgAvg,rotspeed_currAvg,kenker" << endl;
 
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
@@ -320,10 +319,9 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		}
 
 		std::vector<double> pltX = thetasavg;
-		std::vector<std::vector<double>> pltY{ omegasXcurr, omegasXmed, omegasXavg, polyfit(omegasXavg, 4), omegasPavg };
+		std::vector<std::vector<double>> pltY{ omegasXmed, omegasXavg, polyfit(omegasXavg, 4), omegasPavg };
 		plt->plot(pltX, pltY);
-
-		listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
+		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
 
 	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
