@@ -20,10 +20,10 @@ struct DiffrotResults
 	Mat FlowPic;
 	Mat FlowX;
 	Mat FlowY;
-	Size2i exportSize = Size2i(0, 0);
 
 	void showResults(double quantileBot, double quantileTop, int medianSize, double mergeAlpha, double degree)
 	{
+		Size2i exportSize = Size2i(0, 0);
 		//heatmaps (median blurred + quantiled)
 		Mat medFlowX = FlowX.clone();
 		Mat medFlowY = FlowY.clone();
@@ -102,7 +102,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs, Logger* logger);
 
-void calculateDiffrotProfile(const IPCsettings& IPC_settings, FITStime& FITS_time, DiffrotResults* MainResults, int iters, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plot);
+DiffrotResults calculateDiffrotProfile(const IPCsettings& IPC_settings, FITStime& FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plot);
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
 

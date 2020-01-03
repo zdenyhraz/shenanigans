@@ -133,16 +133,20 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, DiffrotResults* MainResults, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
+	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - med", "measured - avg", "measured - fit", "predicted"});
+
 	//2D stuff
+	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	Mat omegasYmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	Mat picture = Mat::zeros(itersY, itersPic*itersX, CV_64F);
 	std::vector<std::vector<double>> omegasX(itersY);
 	std::vector<std::vector<double>> omegasY(itersY);
 	std::vector<std::vector<double>> omegasP(itersY);
 	std::vector<std::vector<double>> thetas(itersY);
-
 	for (int iterY = 0; iterY < itersY; iterY++)
 	{
 		omegasX[iterY].reserve(itersPic*itersX);
@@ -157,6 +161,7 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 	std::vector<double> omegasPavg(itersY);
 	std::vector<double> thetasavg(itersY);
 	std::vector<double> omegasXmed(itersY);
+	std::vector<double> omegasXfit(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
 	std::vector<double> omegasYcurr(itersY);
@@ -165,7 +170,6 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 	
 	//std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
 	//listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeed_avgAvg,rotspeed_currAvg,kenker" << endl;
-
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
 	bool succload;
@@ -247,7 +251,7 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 				for (int iterY = 0; iterY < itersY; iterY++)//Y cyklus
 				{
 					Mat crop1, crop2;
-					Point2d shift(0, 0), shift1, shift2;
+					Point2d shift, shift1, shift2;
 					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
 					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
 					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
@@ -281,21 +285,28 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 					omegasPcurr[iterY] = predicted_omega;
 					thetascurr[iterY] = theta * 360 / 2 / PI;
 
-					//omegasMainX.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
-					//omegasMainY.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
-					//picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
+					omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
+					omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
+					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 		}//load successful
 		else//load unsuccessful
 		{
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//fix bad data with average values
+				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXavg[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
+			}
 			continue;//no need to replot
 		}
 
-		double currAvg = mean(omegasXcurr);
-		double avgAvg = mean(omegasXavg);
-		double kenker = abs(currAvg - avgAvg) / avgAvg;
-		if (!iterPic || kenker < 0.3)//good data
+		double currAvgX = mean(omegasXcurr);
+		double avgAvgX = mean(omegasXavg);
+		double kenkerX = abs(currAvgX - avgAvgX) / avgAvgX;
+
+		if (!iterPic || kenkerX < 0.3)//good data
 		{
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
@@ -315,16 +326,31 @@ void calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, Diffro
 		}
 		else//bad data
 		{
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//fix bad data with average values
+				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXavg[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
+			}
 			logger->Log("This one was kenker", FATAL);
 		}
 
+		omegasXfit = polyfit(omegasXavg, 4);
 		std::vector<double> pltX = thetasavg;
-		std::vector<std::vector<double>> pltY{ omegasXmed, omegasXavg, polyfit(omegasXavg, 4), omegasPavg };
+		std::vector<std::vector<double>> pltY{ omegasXmed, omegasXavg, omegasXfit, omegasPavg };
 		plt->plot(pltX, pltY);
+		showimg(omegasXmat, "omegasXmat", true);
+		showimg(omegasYmat, "omegasYmat", true);
+		showimg(omegasXmat - matFromVector(omegasXfit, omegasXmat.cols), "omegasXmatRel", true);
+		showimg(picture, "source");
 		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
 
+	results.FlowX = omegasXmat;
+	results.FlowY = omegasYmat;
+	results.FlowPic = picture;
 	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
+	return results;
 }
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY)
