@@ -317,20 +317,6 @@ Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB, double quantile
 	}
 }
 
-Mat matFromVector(std::vector<double> vec, int cols)
-{
-	int rows = vec.size();
-	Mat result = Mat::zeros(rows, cols, CV_64F);
-	for (int r = 0; r < rows; r++)
-	{
-		for (int c = 0; c < cols; c++)
-		{
-			result.at<double>(r, c) = vec[r];
-		}
-	}
-	return result;
-}
-
 void showimg(const Mat& sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize)
 {
 	Mat sourceimg = sourceimgIn.clone();

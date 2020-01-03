@@ -157,8 +157,6 @@ Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle 
 
 Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = true);
 
-Mat matFromVector(std::vector<double> vec, int cols);
-
 void showimg(const Mat& sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i(0, 0));
 
 void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i(0, 0));
@@ -232,4 +230,18 @@ inline Mat quadrantMask(int rows, int cols)
 		}
 	}
 	return qmask;
+}
+
+inline Mat matFromVector(std::vector<double>& vec, int cols)
+{
+	int rows = vec.size();
+	Mat result = Mat::zeros(rows, cols, CV_64F);
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			result.at<double>(r, c) = vec[r];
+		}
+	}
+	return result;
 }

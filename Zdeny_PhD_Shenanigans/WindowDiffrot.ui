@@ -50,7 +50,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="text">
-          <string>1499</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
