@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "functionsBaseSTL.h"
 
- enum LOGLEVEL { SPECIAL, FATAL, EVENT, SUBEVENT, WARN, INFO, DEBUG };
- const std::vector<std::string> LOGLEVEL_STR{ "SPECIAL", "FATAL", "main", "sub", "warning", "info", "debug" };
- const std::vector<std::string> LOGLEVEL_STRS{ "", "       ", "", "       ", "       ", "       ", "       " };
+ enum LOGLEVEL { SPECIAL, EVENT, FATAL, SUBEVENT, WARN, INFO, DEBUG };
+ const std::vector<std::string> LOGLEVEL_STR{ "special", "main", "error", "sub", "warning", "info", "debug" };
+ const std::vector<std::string> LOGLEVEL_STRS{ "", "", "       ", "       ", "       ", "       ", "       " };
 
 struct Logger
 {

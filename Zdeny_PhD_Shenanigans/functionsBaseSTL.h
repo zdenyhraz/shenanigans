@@ -302,11 +302,6 @@ inline double gaussian1D(double x, double amp, double mu, double sigma)
 	return amp*exp(-0.5*pow((x - mu) / sigma, 2));
 }
 
-inline void mkdir(std::string path)
-{
-	std::experimental::filesystem::create_directory(path);
-}
-
 constexpr int factorial(int n)
 {
 	return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
