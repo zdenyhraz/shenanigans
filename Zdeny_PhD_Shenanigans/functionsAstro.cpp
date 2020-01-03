@@ -137,7 +137,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
+	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
