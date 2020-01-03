@@ -137,7 +137,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - med", "measured - avg", "measured - fit", "predicted"});
+	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal rotation speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
@@ -160,7 +160,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	std::vector<double> omegasYavg(itersY);
 	std::vector<double> omegasPavg(itersY);
 	std::vector<double> thetasavg(itersY);
-	std::vector<double> omegasXmed(itersY);
+	//std::vector<double> omegasXmed(itersY);
 	std::vector<double> omegasXfit(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
@@ -324,7 +324,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasYavg[iterY] = mean(omegasY[iterY]);
 				omegasPavg[iterY] = mean(omegasP[iterY]);
 				thetasavg[iterY] = mean(thetas[iterY]);
-				omegasXmed[iterY] = median(omegasX[iterY]);
+				//omegasXmed[iterY] = median(omegasX[iterY]);
 				omegasXfit = polyfit(omegasXavg, 4);
 			}	
 		}
@@ -340,7 +340,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		}
 
 		std::vector<double> pltX = thetasavg;
-		std::vector<std::vector<double>> pltY{ omegasXmed, omegasXavg, omegasXfit, omegasPavg };
+		std::vector<std::vector<double>> pltY{ omegasXavg, omegasXfit, omegasPavg };
 		plt->plot(pltX, pltY);
 		showimg(omegasXmat, "omegasXmat", true, 0.001, 0.999);
 		showimg(omegasYmat, "omegasYmat", true, 0.001, 0.999);
