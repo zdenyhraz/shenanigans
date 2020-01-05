@@ -310,7 +310,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		double kenkerX = abs(currAvgX - avgAvgX);
 		double kenkerY = abs(currAvgY - avgAvgY);
 
-		if (!iterPic || (kenkerX < 1e-6 && kenkerY < 1e-6))//good data
+		if (!iterPic || (kenkerX < 1e-6 && kenkerY < 5e-7))//good data
 		{
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
