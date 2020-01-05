@@ -15,8 +15,9 @@ void WindowDiffrot::calculateDiffrot()
 {
 	globals->Logger->Log("Calculating diffrot profile...", EVENT);
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-	Plot1D plt(globals->widget);
-	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), ui.lineEdit_9->text().toStdString(), globals->Logger, &plt);
+	Plot1D pltX(globals->widget1);
+	Plot1D pltY(globals->widget2);
+	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), ui.lineEdit_9->text().toStdString(), globals->Logger, &pltX, &pltY);
 }
 
 void WindowDiffrot::showIPC()
@@ -47,7 +48,7 @@ void WindowDiffrot::optimizeDiffrot()
 		globals->Logger->Log("Optimizing IPC parameters for diffrot profile measurement " + to_string(size) + "x" + to_string(size) + "...", EVENT);
 		IPCsettings set = *globals->IPCsettings;
 		set.setSize(size, size);
-		Plot1D* plt = new Plot1D(globals->widget);
+		Plot1D* plt = new Plot1D(globals->widget1);
 		optimizeIPCParameters(set, fitsTime.path(), path, 5, 0.01, 3, globals->Logger, plt);
 		delete plt;
 	}

@@ -20,7 +20,7 @@ void WindowIPCoptimize::optimize()
 		Evo.upperBounds = zerovect(2, +100);
 		Evo.optimize([&](std::vector<double> arg) {return sin(sqr(arg[0]) - sqr(arg[1] - 3) + 6); }, globals->Logger);
 	}
-	Plot1D plt(globals->widget);
+	Plot1D plt(globals->widget1);
 	optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger, &plt);
 	globals->Logger->Log("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), EVENT);
 }
