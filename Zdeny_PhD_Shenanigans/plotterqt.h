@@ -8,7 +8,7 @@ static const QFont fontTicks("Newyork", 9);
 static const QFont fontLabels("Newyork", 12);
 static const std::vector<QPen> plotPens{ QPen(Qt::gray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin), QPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin), QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin) };
 static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-static const QPen plotPen2(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+static const QPen plotPen2(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
 struct Plot1D : AbstractPlot1D
 {
@@ -38,8 +38,8 @@ struct Plot1D : AbstractPlot1D
 		widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignRight);
 		widget->graph(0)->setName(ylabel1);
 		widget->graph(1)->setName(ylabel2);
-		widget->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
-		widget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+		//widget->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+		//widget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 	}
 
 	inline void setupMultipleGraph(std::vector<std::string> ylabels)

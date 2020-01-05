@@ -133,7 +133,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltasec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
@@ -181,7 +181,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
 		std::string pathdbg1, pathdbg2;
 		//pic1
-		FITS_time.advanceTime((bool)iterPic*timeDelta*(strajdPic - deltaPic));
+		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
 		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
 		pic1 = loadfits(FITS_time.path(), params1);
 		if (!params1.succload)
@@ -206,7 +206,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		pathdbg1 = FITS_time.path();
 
 		//pic2
-		FITS_time.advanceTime(deltasec);
+		FITS_time.advanceTime(deltaPic*deltaSec);
 		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
 		pic2 = loadfits(FITS_time.path(), params2);
 		if (!params2.succload)
@@ -242,7 +242,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			//average fits values for pics 1 and 2
 			double R = (params1.R + params2.R) / 2;
 			double theta0 = (params1.theta0 + params2.theta0) / 2;
-			int vertikalniskok = verticalFov / itersY;//px vertical jump
+			int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
 			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
 
 			for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
@@ -255,7 +255,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
 					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
 					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
-					predicted_phi = predicted_omega * (double)deltasec;//predicted shift in radians
+					predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
 
 					//reduce shift noise by computing multiple shifts near central meridian and then working with their median
 					std::vector<Point2d> shifts(itersMedian);
@@ -264,9 +264,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX - itersX / 2 + iterX - itersMedian / 2 + iterMedian, params1.fitsMidY + vertikalniskok * (- itersY / 2 + iterY) + vertikalniShift, set.getcols(), set.getrows());
+						crop1 = roicrop(pic1, params1.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params1.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX - itersX / 2 + iterX - itersMedian / 2 + iterMedian, params2.fitsMidY + vertikalniskok * (- itersY / 2 + iterY) + vertikalniShift, set.getcols(), set.getrows());
+						crop2 = roicrop(pic2, params2.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params2.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
 						shifts[iterMedian] = phasecorrel(crop1, crop2, set);	
 					}
@@ -277,8 +277,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					phi_x = asin(shift.x / (R*cos(theta)));
 					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
 
-					omega_x = phi_x / deltasec;
-					omega_y = phi_y / deltasec;
+					omega_x = phi_x / deltaPic / deltaSec;
+					omega_y = phi_y / deltaPic / deltaSec;
 
 					omegasXcurr[iterY] = omega_x;
 					omegasYcurr[iterY] = omega_y;

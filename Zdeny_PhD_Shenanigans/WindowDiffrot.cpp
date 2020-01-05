@@ -28,7 +28,7 @@ void WindowDiffrot::showIPC()
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", INFO);
 	Mat pic1 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
-	fitsTime.advanceTime(ui.lineEdit_5->text().toDouble()*timeDelta);
+	fitsTime.advanceTime(ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble());
 	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", INFO);
 	Mat pic2 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 
