@@ -14,7 +14,8 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
 	globals->IPCsettings = new IPCsettings(100, 100, 5, 20);
-	globals->widget = ui.widget;
+	globals->widget1 = ui.widget;
+	globals->widget2 = ui.widget_2;
 	globals->plotter2D = new Plotter2D();
 
 	#ifdef LOGGER_QT

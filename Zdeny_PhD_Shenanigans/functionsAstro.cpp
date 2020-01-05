@@ -133,11 +133,12 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, string pathMasterOut, Logger* logger, AbstractPlot1D* plt)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, string pathMasterOut, Logger* logger, AbstractPlot1D* pltX, AbstractPlot1D* pltY)
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (plt) plt->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
+	if (pltX) pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
+	if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
@@ -160,8 +161,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	std::vector<double> omegasYavg(itersY);
 	std::vector<double> omegasPavg(itersY);
 	std::vector<double> thetasavg(itersY);
-	//std::vector<double> omegasXmed(itersY);
 	std::vector<double> omegasXfit(itersY);
+	std::vector<double> omegasYfit(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
 	std::vector<double> omegasYcurr(itersY);
@@ -275,7 +276,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					shift = median(shifts);
 
 					phi_x = asin(shift.x / (R*cos(theta)));
-					phi_y = (theta - theta0) - atan((R*sin(theta - theta0) - shift.y) / (R*cos(theta - theta0)));
+					phi_y = theta - asin(sin(theta) - shift.y / R);
 
 					omega_x = phi_x / deltaPic / deltaSec;
 					omega_y = phi_y / deltaPic / deltaSec;
@@ -297,7 +298,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			{
 				//fix bad data with average values
 				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
 			}
 			continue;//no need to replot
 		}
@@ -324,8 +325,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasYavg[iterY] = mean(omegasY[iterY]);
 				omegasPavg[iterY] = mean(omegasP[iterY]);
 				thetasavg[iterY] = mean(thetas[iterY]);
-				//omegasXmed[iterY] = median(omegasX[iterY]);
 				omegasXfit = polyfit(omegasXavg, 4);
+				omegasYfit = polyfit(omegasYavg, 4);
 			}	
 		}
 		else//bad data
@@ -334,14 +335,18 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			{
 				//fix bad data with average values
 				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYavg[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
 			}
 			logger->Log("That one was kenker, thrown to trash", FATAL);
 		}
 
-		std::vector<double> pltX = thetasavg;
-		std::vector<std::vector<double>> pltY{ omegasXavg, omegasXfit, omegasPavg };
-		plt->plot(pltX, pltY);
+		std::vector<double> pltx = thetasavg;
+		std::vector<std::vector<double>> plty1{ omegasXavg, omegasXfit, omegasPavg };
+		std::vector<std::vector<double>> plty2{ omegasYavg, omegasYfit };
+
+		pltX->plot(pltx, plty1);
+		pltY->plot(pltx, plty2);
+
 		showimg(omegasXmat, "omegasXmat", true, 0.01, 0.99);
 		showimg(omegasYmat, "omegasYmat", true, 0.01, 0.99);
 		showimg(picture, "source");
@@ -353,7 +358,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	results.FlowXfit = omegasXfit;
 	results.FlowXpred = omegasPavg;
 	results.FlowPic = picture;
-	if (logger) logger->Log("IPC MainFlow calculation finished", SUBEVENT);
+	logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 	return results;
 }
 

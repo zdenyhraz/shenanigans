@@ -9,6 +9,7 @@ struct Globals
 {
 	IPCsettings* IPCsettings;
 	Logger* Logger;
-	QCustomPlot* widget;
+	QCustomPlot* widget1;
+	QCustomPlot* widget2;
 	Plotter2D* plotter2D;
 };
