@@ -9,7 +9,6 @@ using namespace cv;
 //.fits parameters
 constexpr int lineBYTEcnt = 80;
 constexpr int linesMultiplier = 36;
-constexpr int timeDelta = 45;
 enum class fitsType : char { HMI, AIA, SECCHI };
 
 struct fitsParams
