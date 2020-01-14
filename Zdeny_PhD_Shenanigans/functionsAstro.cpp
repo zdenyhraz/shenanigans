@@ -137,8 +137,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (pltX) pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit", "predicted"});
-	if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "measured - fit"});
+	if (pltX) pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"});
+	if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
@@ -148,6 +148,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	std::vector<std::vector<double>> omegasY(itersY);
 	std::vector<std::vector<double>> omegasP(itersY);
 	std::vector<std::vector<double>> thetas(itersY);
+	std::vector<std::vector<double>> omegasXfits;
+	std::vector<std::vector<double>> omegasYfits;
+
 	for (int iterY = 0; iterY < itersY; iterY++)
 	{
 		omegasX[iterY].reserve(itersPic*itersX);
@@ -328,21 +331,25 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasXfit = polyfit(omegasXavg, 4);
 				omegasYfit = polyfit(omegasYavg, 4);
 			}	
+			omegasXfits.push_back(polyfit(omegasXcurr, 10));
+			omegasYfits.push_back(polyfit(omegasYcurr, 10));
 		}
 		else//bad data
 		{
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
 				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
+				omegasXmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
 			}
+			omegasXfits.push_back(polyfit(omegasXavg, 10));
+			omegasYfits.push_back(polyfit(omegasYavg, 10));
 			logger->Log("That one was kenker, thrown to trash", FATAL);
 		}
 
 		std::vector<double> pltx = thetasavg;
-		std::vector<std::vector<double>> plty1{ omegasXavg, omegasXfit, omegasPavg };
-		std::vector<std::vector<double>> plty2{ omegasYavg, omegasYfit };
+		std::vector<std::vector<double>> plty1{ omegasXfits[omegasXfits.size() - 1], omegasXavg, omegasXfit, omegasPavg };
+		std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
 
 		pltX->plot(pltx, plty1);
 		pltY->plot(pltx, plty2);
@@ -356,8 +363,11 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	results.FlowX = omegasXmat;
 	results.FlowY = omegasYmat;
 	results.FlowXfit = omegasXfit;
+	results.FlowYfit = omegasXfit;
 	results.FlowXpred = omegasPavg;
 	results.FlowPic = picture;
+	results.FlowXfits = omegasXfits;
+	results.FlowYfits = omegasYfits;
 	logger->Log("IPC MainFlow calculation finished", SUBEVENT);
 	return results;
 }
