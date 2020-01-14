@@ -245,3 +245,33 @@ inline Mat matFromVector(std::vector<double>& vec, int cols)
 	}
 	return result;
 }
+
+inline Mat matFromVectorR(std::vector<std::vector<double>>& vec)
+{
+	int rows = vec.size();
+	int cols = vec[0].size();
+	Mat result = Mat::zeros(rows, cols, CV_64F);
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			result.at<double>(r, c) = vec[r][c];
+		}
+	}
+	return result;
+}
+
+inline Mat matFromVectorC(std::vector<std::vector<double>>& vec)
+{
+	int cols = vec.size();
+	int rows = vec[0].size();
+	Mat result = Mat::zeros(rows, cols, CV_64F);
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			result.at<double>(r, c) = vec[c][r];
+		}
+	}
+	return result;
+}
