@@ -331,8 +331,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasXfit = polyfit(omegasXavg, 4);
 				omegasYfit = polyfit(omegasYavg, 4);
 			}	
-			omegasXfits.push_back(polyfit(omegasXcurr, 10));
-			omegasYfits.push_back(polyfit(omegasYcurr, 10));
+			omegasXfits.push_back(polyfit(omegasXcurr, 4));
+			omegasYfits.push_back(polyfit(omegasYcurr, 4));
 		}
 		else//bad data
 		{
@@ -342,8 +342,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasXmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
 				omegasYmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
 			}
-			omegasXfits.push_back(polyfit(omegasXavg, 10));
-			omegasYfits.push_back(polyfit(omegasYavg, 10));
+			omegasXfits.push_back(polyfit(omegasXavg, 4));
+			omegasYfits.push_back(polyfit(omegasYavg, 4));
 			logger->Log("That one was kenker, thrown to trash", FATAL);
 		}
 
