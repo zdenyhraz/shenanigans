@@ -45,6 +45,7 @@ struct DiffrotResults
 		Mat medFlowXrelativeFF = medFlowX - matFromVectorC(FlowXfits);
 		Mat medFlowXrelativeP = medFlowX - matFromVector(FlowXpred, medFlowX.cols);
 		showimg(matFromVector(FlowXfit, medFlowX.cols), "FlowX Fit", true);
+		showimg(matFromVectorC(FlowXfits), "FlowX FFit", true);
 		showimg(matFromVector(FlowXpred, medFlowX.cols), "FlowX Pred", true);
 
 		//now show various stuff
