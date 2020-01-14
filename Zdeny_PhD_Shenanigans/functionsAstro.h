@@ -21,7 +21,10 @@ struct DiffrotResults
 	Mat FlowX;
 	Mat FlowY;
 	std::vector<double> FlowXfit;
+	std::vector<double> FlowYfit;
 	std::vector<double> FlowXpred;
+	std::vector<std::vector<double>> FlowXfits;
+	std::vector<std::vector<double>> FlowYfits;
 
 	void showsaveResults(double quantileBot, double quantileTop, int medianSize, double sigma, std::string dirpath)
 	{
