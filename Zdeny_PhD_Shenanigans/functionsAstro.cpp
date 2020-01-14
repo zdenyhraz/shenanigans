@@ -303,6 +303,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
 				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
 			}
+			omegasXfits.push_back(polyfit(omegasXavg, 4));
+			omegasYfits.push_back(polyfit(omegasYavg, 4));
 			continue;//no need to replot
 		}
 

@@ -42,6 +42,7 @@ struct DiffrotResults
 		medFlowX.convertTo(medFlowX, CV_64F);
 		medFlowY.convertTo(medFlowY, CV_64F);
 		Mat medFlowXrelativeF = medFlowX - matFromVector(FlowXfit, medFlowX.cols);
+		Mat medFlowXrelativeFF = medFlowX - matFromVectorC(FlowXfits);
 		Mat medFlowXrelativeP = medFlowX - matFromVector(FlowXpred, medFlowX.cols);
 		showimg(matFromVector(FlowXfit, medFlowX.cols), "FlowX Fit", true);
 		showimg(matFromVector(FlowXpred, medFlowX.cols), "FlowX Pred", true);
@@ -62,8 +63,10 @@ struct DiffrotResults
 		if (1)//relative flow
 		{
 			showimg(medFlowXrelativeF, "FlowX relative Fit", true, quantileBot, quantileTop);
+			showimg(medFlowXrelativeFF, "FlowX relative FFit", true, quantileBot, quantileTop);
 			showimg(medFlowXrelativeP, "FlowX relative Pred", true, quantileBot, quantileTop);
 			saveimg(dirpath + "FlowXRelFit.png", applyColorMapZdeny(medFlowXrelativeF, quantileBot, quantileTop, true), true);
+			saveimg(dirpath + "FlowXRelFFit.png", applyColorMapZdeny(medFlowXrelativeFF, quantileBot, quantileTop, true), true);
 			saveimg(dirpath + "FlowXRelPred.png", applyColorMapZdeny(medFlowXrelativeP, quantileBot, quantileTop, true), true);
 		}
 		if (0)//ghetto sum
@@ -92,10 +95,13 @@ struct DiffrotResults
 		if (1)//BINARY sum relative
 		{
 			Mat mergedBINF = combineTwoPics(medFlowXrelativeF, FlowPic, BINARYBLUERED, sigma);
+			Mat mergedBINFF = combineTwoPics(medFlowXrelativeFF, FlowPic, BINARYBLUERED, sigma);
 			Mat mergedBINP = combineTwoPics(medFlowXrelativeP, FlowPic, BINARYBLUERED, sigma);
 			showimg(mergedBINF, "FlowX Merged Binary relative Fit", false, quantileBot, quantileTop);
+			showimg(mergedBINFF, "FlowX Merged Binary relative FFit", false, quantileBot, quantileTop);
 			showimg(mergedBINP, "FlowX Merged Binary relative Pred", false, quantileBot, quantileTop);
 			saveimg(dirpath + "FlowXBinFit.png", mergedBINF, true);
+			saveimg(dirpath + "FlowXBinFFit.png", mergedBINFF, true);
 			saveimg(dirpath + "FlowXBinPred.png", mergedBINP, true);
 		}
 		if (1)//phase and magnitude
