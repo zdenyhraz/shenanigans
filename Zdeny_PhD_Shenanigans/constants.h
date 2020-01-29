@@ -3,7 +3,7 @@
 #include "functionsBaseSTL.h"
 #include "logger.h"
 
-//#define ATTACH_CONSOLE//attach a console for logging (windows)
+#define ATTACH_CONSOLE//attach a console for logging (windows)
 #define LOGGER_QT//Qt text browser colorful logging
 #define PLOTTER_QT//Qt QCustomPlot plotting
 #define OPTIMIZE_WITH_CV//additional optimization OpenCV graphical functionality

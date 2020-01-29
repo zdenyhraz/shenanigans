@@ -1,37 +1,23 @@
 #include "stdafx.h"
 #include "inverseMapping.h"
 
-std::vector<double> inverseMappingZH(std::vector<std::vector<double>>& trialInputs, std::vector<std::vector<double>>& trialOutputs, std::vector<double>& desiredOutput, int degree, std::ofstream* listing)
+std::vector<double> inverseMappingZH(const std::vector<std::vector<double>>& trialInputs, const std::vector<std::vector<double>>& trialOutputs, const std::vector<double>& desiredOutput, int degree)
 {
 	//assuming input dimension is the same as output dimension for existence and uniqueness
 	int N = trialInputs[0].size();
 	int trials = trialInputs.size();
-	DecompTypes decomp = DECOMP_LU;
-	double dummyC = 1;
-	double dummyP = 1;
 
-	if (1)//degenerate safety check
-	{
-		double outputConst = 0;
-		if (trials < (degree*N + 1))//underdetermined system
-		{
-			return zerovect(N, outputConst);
-			if (listing) *listing << ">> IM: degenerate - underdetermined system" << endl;
-		}
-		if (trialInputs.size() != trialOutputs.size())//system makes no sense
-		{
-			return zerovect(N, outputConst);
-			if (listing) *listing << ">> IM: degenerate - system makes no sense" << endl;
-		}
-		if (trialInputs[0].size() != trialOutputs[0].size())//zero or infinite solutions
-		{
-			return zerovect(N, outputConst);
-			if (listing) *listing << ">> IM: degenerate - I/O dimensions mismatch" << endl;
-		}
-	}
-	if (listing) *listing << ">> IM: dimension " << N << "; degre " << degree << "; trials " << trials << " - ok" << endl << endl;
-
-	//fill input/output trial matrices
+	//degenerate safety checks
+	if (trials < (degree*N + 1)) //underdetermined system
+		return zerovect(N, 0);
+		
+	if (trialInputs.size() != trialOutputs.size()) //system makes no sense
+		return zerovect(N, 0);
+		
+	if (trialInputs[0].size() != trialOutputs[0].size()) //zero or infinite solutions
+		return zerovect(N, 0);
+	
+	//fill input trial matrix
 	Mat trialInputsM = Mat::zeros(trials, degree*N + 1, CV_64F);
 	for (int r = 0; r < trials; r++)
 	{
@@ -40,10 +26,12 @@ std::vector<double> inverseMappingZH(std::vector<std::vector<double>>& trialInpu
 			for (int c = deg * N; c < (deg + 1) * N; c++)
 			{
 				trialInputsM.at<double>(r, c) = pow(trialInputs[r][c % N], deg + 1);
-			}
+			}	
 		}
-		trialInputsM.at<double>(r, trialInputsM.cols - 1) = dummyC; //constant term, last
+		trialInputsM.at<double>(r, trialInputsM.cols - 1) = 1; //constant term, last
 	}
+
+	//fill output trial matrix
 	Mat trialOutputsM = Mat::zeros(trials, degree*N + 1, CV_64F);
 	for (int r = 0; r < trials; r++)
 	{
@@ -51,45 +39,33 @@ std::vector<double> inverseMappingZH(std::vector<std::vector<double>>& trialInpu
 		{
 			for (int c = deg * N; c < (deg + 1) * N; c++)
 			{
-				if (deg == 0) trialOutputsM.at<double>(r, c) = trialOutputs[r][c % N];
-				else trialOutputsM.at<double>(r, c) = dummyP;
+				if (deg == 0)
+					trialOutputsM.at<double>(r, c) = trialOutputs[r][c % N];
+				else
+					trialOutputsM.at<double>(r, c) = 1;
 			}
 		}
-		trialOutputsM.at<double>(r, trialOutputsM.cols - 1) = dummyC; //constant term, last
+		trialOutputsM.at<double>(r, trialOutputsM.cols - 1) = 1; //constant term, last
 	}
 
-	if (listing) *listing << "> trialInputsM:" << endl << trialInputsM << endl << endl;
-	if (listing) *listing << "> trialOutputsM:" << endl << trialOutputsM << endl << endl;
-	if (listing) *listing << "> trialInputsMforInversion: (determinant=" << determinant(trialInputsM.t() * trialInputsM) << ")" << endl << (trialInputsM.t() * trialInputsM) << endl << endl;
-
-	Mat transferMatrix = (trialInputsM.t() * trialInputsM).inv(decomp) * trialInputsM.t() * trialOutputsM;//calculate transfer matrix
-	if (listing) *listing << "> transferMatrix: (determinant=" << determinant(transferMatrix) << ")" << endl << transferMatrix << endl << endl;
-
+	Mat transferMatrix = (trialInputsM.t() * trialInputsM).inv(DECOMP_LU) * trialInputsM.t() * trialOutputsM; //calculate transfer matrix
 	Mat desiredOutputM = Mat::zeros(1, degree*N + 1, CV_64F);
 	for (int deg = 0; deg < degree; deg++)
 	{
 		for (int c = deg * N; c < (deg + 1) * N; c++)
 		{
-			if (deg == 0) desiredOutputM.at<double>(0, c) = desiredOutput[c % N];
-			else desiredOutputM.at<double>(0, c) = dummyP;
+			if (deg == 0) 
+				desiredOutputM.at<double>(0, c) = desiredOutput[c % N];
+			else 
+				desiredOutputM.at<double>(0, c) = 1;
 		}
 	}
-	desiredOutputM.at<double>(0, desiredOutputM.cols - 1) = dummyC; //constant term, last
+	desiredOutputM.at<double>(0, desiredOutputM.cols - 1) = 1; //constant term, last
 
-	Mat desiredInputM = desiredOutputM * transferMatrix.inv(decomp);//calculate desired input matrix
-
-	if (listing) *listing << "> transferMatrixInversionIdentity1:" << endl << transferMatrix * transferMatrix.inv(decomp) << endl << endl;
-	if (listing) *listing << "> transferMatrixInversionIdentity2:" << endl << transferMatrix.inv(decomp) * transferMatrix << endl << endl;
-
+	Mat desiredInputM = desiredOutputM * transferMatrix.inv(DECOMP_LU); //calculate desired input matrix
 	std::vector<double> desiredInput(N, 0);
 	for (int c = 0; c < N; c++)
-	{
 		desiredInput[c] = desiredInputM.at<double>(0, c);
-	}
-	if (listing) *listing << "> desiredOutputM:" << endl << desiredOutputM << endl << endl;
-	if (listing) *listing << "> desiredInputM:" << endl << desiredInputM << endl << endl;
-	if (listing) *listing << "> desiredInput:" << endl << desiredInput << endl;
-	if (listing) *listing << "==============================================================================================================================================================" << endl << endl << endl;
 	return desiredInput;
 }
 

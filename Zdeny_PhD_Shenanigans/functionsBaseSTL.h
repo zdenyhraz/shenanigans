@@ -79,6 +79,24 @@ inline ostream& operator<<(ostream& out, std::vector<T>& vec)
 	return out;
 }
 
+template <typename T>
+inline ostream& operator<<(ostream& out, std::vector<std::vector<T>>& vec)
+{
+	out << endl;
+	for (int r = 0; r < vec.size(); r++)
+	{
+		out << "[";
+		for (int c = 0; c < vec[0].size(); c++)
+		{
+			out << vec[r][c];
+			if (c < vec[r].size() - 1) out << ", ";
+		}
+		out << "]";
+		out << endl;
+	}
+	return out;
+}
+
 inline ostream& operator<<(ostream& out, std::vector<std::string>& vec)
 {
 	for (int i = 0; i < vec.size(); i++)
