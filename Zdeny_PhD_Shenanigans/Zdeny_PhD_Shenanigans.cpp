@@ -65,7 +65,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D plt(ui.widget);
 		plt.plot(x, y);
 	}
-	if (1)//plot in optimization
+	if (0)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
@@ -99,9 +99,39 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
 	}
-	if (0)
+	if (1)//inverse mapping
 	{
+		#include "inverseMapping.h"
+		int trials = 50;
+		int N = 4;
+
+		std::vector<std::vector<double>> trialInputs;
+		std::vector<std::vector<double>> trialOutputs;
+		std::vector<double> desiredOutput;
+
+		for (int trial = 0; trial < trials; trial++)
+		{
+			std::vector<double> trialInput;
+			for (int x = 0; x < N; x++)
+				trialInput.push_back((double)rand() / RAND_MAX);
+			trialInputs.push_back(trialInput);
+			trialOutputs.push_back(inverseMappingTestTransfer(trialInput));
+		}
+
+		for (int x = 0; x < N; x++)
+			desiredOutput.push_back(x + 1);//123456789
+
+		std::vector<double> soughtInput = inverseMappingZH(trialInputs, trialOutputs, desiredOutput);
+		std::vector<double> realOutput = inverseMappingTestTransfer(soughtInput);
+
+		cout << "trialInputs: " << trialInputs << endl;
+		cout << "trialOutputs: " << trialOutputs << endl;
+		cout << endl;
+		cout << "soughtInput: " << soughtInput << endl;
+		cout << "desiredOutput: " << desiredOutput << endl;
+		cout << "realOutput: " << realOutput << endl;
 	}
+
 	globals->Logger->Log("Debug finished.", EVENT);
 }
 
