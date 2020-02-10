@@ -102,7 +102,7 @@ void Zdeny_PhD_Shenanigans::debug()
 	if (1)//inverse mapping
 	{
 		#include "inverseMapping.h"
-		int trials = 50;
+		int trials = 30;
 		int N = 4;
 
 		std::vector<std::vector<double>> trialInputs;

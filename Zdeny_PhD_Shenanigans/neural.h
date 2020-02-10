@@ -58,10 +58,14 @@ inline Mat activate(const Mat& z, ActivationFunction& activationFunction)
 {
 	switch (activationFunction)
 	{
-	case SIGMOID: return sigmoid(z); break;
-	case RELU: return relu(z); break;
-	case RELUL: return reluLeaky(z); break;
-	case IDENTITY: return (z); break;
+	case SIGMOID: 
+		return sigmoid(z);
+	case RELU: 
+		return relu(z);
+	case RELUL: 
+		return reluLeaky(z);
+	case IDENTITY: 
+		return (z);
 	}
 }
 
@@ -69,10 +73,14 @@ inline Mat activatePrime(const Mat& z, ActivationFunction& activationFunction)
 {
 	switch (activationFunction)
 	{
-	case SIGMOID: return sigmoidPrime(z); break;
-	case RELU: return reluPrime(z); break;
-	case RELUL: return reluLeakyPrime(z); break;
-	case IDENTITY: return (z * 0. + 1); break;
+	case SIGMOID: 
+		return sigmoidPrime(z);
+	case RELU: 
+		return reluPrime(z);
+	case RELUL: 
+		return reluLeakyPrime(z);
+	case IDENTITY: 
+		return (z * 0. + 1);
 	}
 }
 
@@ -112,8 +120,10 @@ inline Mat cost(const Mat& a, const Mat& y, CostFunction& costFunction)
 {
 	switch (costFunction)
 	{
-	case MSE: return mse(a, y); break;
-	case XENT: return crossentropy(a, y); break;
+	case MSE: 
+		return mse(a, y);
+	case XENT: 
+		return crossentropy(a, y);
 	}
 }
 
@@ -121,8 +131,10 @@ inline Mat costPrime(const Mat& a, const Mat& y, CostFunction& costFunction)
 {
 	switch (costFunction)
 	{
-	case MSE: return msePrime(a, y); break;
-	case XENT: return crossentropyPrime(a, y); break;
+	case MSE: 
+		return msePrime(a, y);
+	case XENT: 
+		return crossentropyPrime(a, y);
 	}
 }
 
@@ -237,7 +249,7 @@ public: void train()
 		std::vector<Mat> bPrime = copyVectorMat(b);//bias gradient
 		costFunVal = 0;
 
-#pragma omp parallel for
+		#pragma omp parallel for
 		for (int indexData = 0; indexData < dataSize; indexData++)//loop over all data
 		{
 			auto z = copyVectorMat(b), a = copyVectorMat(b);
@@ -255,7 +267,7 @@ public: void train()
 				bPrime_[L] = d_[L].clone();
 				wPrime_[L] = L > 0 ? d_[L] * a[L - 1].t() : d_[L] * trainingInputs_[indexData].t();
 			}
-#pragma omp critical//update gradient
+			#pragma omp critical//update gradient
 			{
 				d += d_;
 				wPrime += wPrime_;
