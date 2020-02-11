@@ -67,7 +67,8 @@ void WindowDiffrot::superOptimizeDiffrot()
 	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D* plt1 = new Plot1D(globals->widget1);
 	Plot1D* plt2 = new Plot1D(globals->widget2);
-	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, fitsTimeMaster, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
+	int pics = 1;
+	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, fitsTimeMaster, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
 	auto result = Evo.optimize(f, globals->Logger, plt1);
 	globals->Logger->Log("Optimal Size: " + to_string(result[0]), INFO);
 	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), INFO);

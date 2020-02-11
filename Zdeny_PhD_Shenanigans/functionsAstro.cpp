@@ -438,34 +438,22 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 	//------------------------------------------------------------------------
 
 	//2D stuff
-	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
-	Mat omegasYmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
-	Mat picture = Mat::zeros(itersY, itersPic*itersX, CV_64F);
 	std::vector<std::vector<double>> omegasX(itersY);
-	std::vector<std::vector<double>> omegasY(itersY);
 	std::vector<std::vector<double>> omegasP(itersY);
 	std::vector<std::vector<double>> thetas(itersY);
-	std::vector<std::vector<double>> omegasXfits;
-	std::vector<std::vector<double>> omegasYfits;
 
 	for (int iterY = 0; iterY < itersY; iterY++)
 	{
 		omegasX[iterY].reserve(itersPic*itersX);
-		omegasY[iterY].reserve(itersPic*itersX);
 		omegasP[iterY].reserve(itersPic*itersX);
 		thetas[iterY].reserve(itersPic*itersX);
 	}
 
 	//1D stuff
-	std::vector<double> omegasXavg(itersY);
-	std::vector<double> omegasYavg(itersY);
 	std::vector<double> omegasPavg(itersY);
 	std::vector<double> thetasavg(itersY);
-	std::vector<double> omegasXfit(itersY);
-	std::vector<double> omegasYfit(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
-	std::vector<double> omegasYcurr(itersY);
 	std::vector<double> omegasPcurr(itersY);
 	std::vector<double> thetascurr(itersY);
 
@@ -572,80 +560,40 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 					omega_y = phi_y / deltaPic / deltaSec;
 
 					omegasXcurr[iterY] = omega_x;
-					omegasYcurr[iterY] = omega_y;
 					omegasPcurr[iterY] = predicted_omega;
 					thetascurr[iterY] = theta * 360 / 2 / PI;
 
-					omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
-					omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
-					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 		}//load successful
 		else//load unsuccessful
 		{
-			for (int iterY = 0; iterY < itersY; iterY++)
-			{
-				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
-			}
-			omegasXfits.push_back(polyfit(omegasXavg, 4));
-			omegasYfits.push_back(polyfit(omegasYavg, 4));
 			continue;//no need to replot
 		}
 
-		double currAvgX = mean(omegasXcurr);
-		double currAvgY = mean(omegasYcurr);
-		double avgAvgX = mean(omegasXavg);
-		double avgAvgY = mean(omegasYavg);
-		double kenkerX = abs(currAvgX - avgAvgX);
-		double kenkerY = abs(currAvgY - avgAvgY);
-
-		if (!iterPic || (kenkerX < 1e-6 && kenkerY < 5e-7))//good data
+		for (int iterY = 0; iterY < itersY; iterY++)
 		{
-			for (int iterY = 0; iterY < itersY; iterY++)
-			{
-				//push back good data
-				omegasX[iterY].push_back(omegasXcurr[iterY]);
-				omegasY[iterY].push_back(omegasYcurr[iterY]);
-				omegasP[iterY].push_back(omegasPcurr[iterY]);
-				thetas[iterY].push_back(thetascurr[iterY]);
+			//push back good data
+			omegasX[iterY].push_back(omegasXcurr[iterY]);
+			omegasP[iterY].push_back(omegasPcurr[iterY]);
+			thetas[iterY].push_back(thetascurr[iterY]);
 
-				//calculate good averages
-				omegasXavg[iterY] = mean(omegasX[iterY]);
-				omegasYavg[iterY] = mean(omegasY[iterY]);
-				omegasPavg[iterY] = mean(omegasP[iterY]);
-				thetasavg[iterY] = mean(thetas[iterY]);
-				omegasXfit = polyfit(omegasXavg, 4);
-				omegasYfit = polyfit(omegasYavg, 4);
-			}
-			omegasXfits.push_back(polyfit(omegasXcurr, 4));
-			omegasYfits.push_back(polyfit(omegasYcurr, 4));
-		}
-		else//bad data
-		{
-			for (int iterY = 0; iterY < itersY; iterY++)
-			{
-				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
-			}
-			omegasXfits.push_back(polyfit(omegasXavg, 4));
-			omegasYfits.push_back(polyfit(omegasYavg, 4));
+			//calculate good averages
+			omegasPavg[iterY] = mean(omegasP[iterY]);
+			thetasavg[iterY] = mean(thetas[iterY]);
 		}
 
 		for (int y = 0; y < itersY; y++)
 			retVal += abs(omegasX[y][omegasX[y].size() - 1] - omegasPavg[y]);
-		
 	}//picture pairs cycle end
 
 	//#pragma omp critical
 	{
-		if (pltX && retVal/itersY < 1e-7)
+		if (pltX && retVal/itersY < 3e-7)
 		{
+			Timerr a("plot");
 			pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
-			pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasXavg, omegasPavg});
+			//pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
 		}
 	}
 	//------------------------------------------------------------------------
