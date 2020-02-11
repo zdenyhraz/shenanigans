@@ -9,6 +9,7 @@ WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(pa
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(showResults()));
 	connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(showIPC()));
 	connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(optimizeDiffrot()));
+	connect(ui.pushButton_5, SIGNAL(clicked()), this, SLOT(superOptimizeDiffrot()));
 }
 
 void WindowDiffrot::calculateDiffrot()
@@ -53,6 +54,11 @@ void WindowDiffrot::optimizeDiffrot()
 		delete plt;
 	}
 	globals->Logger->Log("IPC parameters optimization for diffrot profile measurement finished", SUBEVENT);
+}
+
+void WindowDiffrot::superOptimizeDiffrot()
+{
+
 }
 
 void WindowDiffrot::showResults()
