@@ -349,7 +349,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			logger->Log("That one was kenker, thrown to trash", FATAL);
 		}
 
-		std::vector<double> pltx = thetasavg;
+		std::vector<double>& pltx = thetasavg;
 		std::vector<std::vector<double>> plty1{ omegasXfits[omegasXfits.size() - 1], omegasXavg, omegasXfit, omegasPavg };
 		std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
 
@@ -432,7 +432,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
+double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	double retVal = 0;
 	//------------------------------------------------------------------------
@@ -640,17 +640,24 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 		
 	}//picture pairs cycle end
 
-
+	//#pragma omp critical
+	{
+		if (pltX && retVal/itersY < 1e-7)
+		{
+			pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
+			pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasXavg, omegasPavg});
+		}
+	}
 	//------------------------------------------------------------------------
-	cout << "retVal=" << retVal << endl;
-	return retVal;
+	cout << "retVal=" << retVal / itersY << endl;
+	return retVal / itersY;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
 	FITStime FITS_time = FITS_timeMaster;
-	return DiffrotMerritFunction(set, FITS_time, itersPic, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec);
+	return DiffrotMerritFunction(set, FITS_time, itersPic, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
 }
