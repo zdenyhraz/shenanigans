@@ -142,6 +142,6 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateConstantSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
 
-double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX = nullptr);
+double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<Mat, Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX = nullptr);
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX = nullptr);
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<Mat, Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX = nullptr);

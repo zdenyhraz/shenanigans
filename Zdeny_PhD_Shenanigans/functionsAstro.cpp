@@ -172,8 +172,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	std::vector<double> omegasPcurr(itersY);
 	std::vector<double> thetascurr(itersY);
 	
-	//std::ofstream listingdebug("D:\\MainOutput\\diffrot\\diffrotDEBUG.csv", std::ios::out | std::ios::trunc);//dbg
-	//listingdebug << "#,path1,path2,theta01,theta02,R1,R2,midX1,midX2,midY1,midY2,rotspeed_avgAvg,rotspeed_currAvg,kenker" << endl;
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
 	bool succload;
@@ -183,7 +181,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
 		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
-		std::string pathdbg1, pathdbg2;
 		//pic1
 		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
 		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
@@ -207,7 +204,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
-		pathdbg1 = FITS_time.path();
 
 		//pic2
 		FITS_time.advanceTime(deltaPic*deltaSec);
@@ -232,7 +228,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
-		pathdbg2 = FITS_time.path();
 
 		succload = params1.succload && params2.succload;
 		if (succload)//load succesfull
@@ -359,7 +354,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		showimg(omegasXmat, "omegasXmat", true, 0.01, 0.99);
 		showimg(omegasYmat, "omegasYmat", true, 0.01, 0.99);
 		showimg(picture, "source");
-		//listingdebug << iterPic << "," << pathdbg1 << "," << pathdbg2 << "," << params1.theta0 << "," << params2.theta0 << "," << params1.R << "," << params2.R << "," << params1.fitsMidX << "," << params2.fitsMidX << "," << params1.fitsMidY << "," << params2.fitsMidY << "," << avgAvg << "," << currAvg << "," << kenker << endl;
 	}//picture pairs cycle end
 
 	results.FlowX = omegasXmat;
@@ -432,7 +426,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<Mat,Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	double retVal = 0;
 	//------------------------------------------------------------------------
@@ -444,9 +438,9 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 
 	for (int iterY = 0; iterY < itersY; iterY++)
 	{
-		omegasX[iterY].reserve(itersPic*itersX);
-		omegasP[iterY].reserve(itersPic*itersX);
-		thetas[iterY].reserve(itersPic*itersX);
+		omegasX[iterY].reserve(pics.size()*itersX);
+		omegasP[iterY].reserve(pics.size()*itersX);
+		thetas[iterY].reserve(pics.size()*itersX);
 	}
 
 	//1D stuff
@@ -457,120 +451,56 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 	std::vector<double> omegasPcurr(itersY);
 	std::vector<double> thetascurr(itersY);
 
-	int plusminusbufer = 6;//even!
-	bool succload;
-	Mat pic1, pic2;
-	fitsParams params1, params2;
-
-	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
+	for (int iterPic = 0; iterPic < pics.size(); iterPic++)//main cycle - going through pairs of pics
 	{
-		std::string pathdbg1, pathdbg2;
-		//pic1
-		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
-		pic1 = loadfits(FITS_time.path(), params1);
-		if (!params1.succload)
-		{
-			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
-			{
-				if (pm % 2 == 0)
-					FITS_time.advanceTime(pm);
-				else
-					FITS_time.advanceTime(-pm);
-				pic1 = loadfits(FITS_time.path(), params1);
-				if (params1.succload)
-					break;
-			}
-		}
-		if (!params1.succload)
-		{
-			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
-		}
-		pathdbg1 = FITS_time.path();
+		//average fits values for pics 1 and 2
+		double R = (params[iterPic].first.R + params[iterPic].second.R) / 2;
+		double theta0 = (params[iterPic].first.theta0 + params[iterPic].second.theta0) / 2;
+		int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
+		int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
 
-		//pic2
-		FITS_time.advanceTime(deltaPic*deltaSec);
-		pic2 = loadfits(FITS_time.path(), params2);
-		if (!params2.succload)
+		for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
 		{
-			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
+			#pragma omp parallel for
+			for (int iterY = 0; iterY < itersY; iterY++)//Y cyklus
 			{
-				if (pm % 2 == 0)
-					FITS_time.advanceTime(pm);
-				else
-					FITS_time.advanceTime(-pm);
-				pic2 = loadfits(FITS_time.path(), params2);
-				if (params2.succload)
-					break;
-			}
-		}
-		if (!params2.succload)
-		{
-			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
-		}
-		pathdbg2 = FITS_time.path();
+				Mat crop1, crop2;
+				Point2d shift, shift1, shift2;
+				double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
+				theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
+				predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
+				predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
 
-		succload = params1.succload && params2.succload;
-		if (succload)//load succesfull
-		{
-			if (0 && iterPic == 0)
-			{
-				showimg(pic1, "diffrot pic 1");
-				showimg(pic2, "diffrot pic 2");
-			}
-
-			//average fits values for pics 1 and 2
-			double R = (params1.R + params2.R) / 2;
-			double theta0 = (params1.theta0 + params2.theta0) / 2;
-			int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
-			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
-
-			for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
-			{
-				#pragma omp parallel for
-				for (int iterY = 0; iterY < itersY; iterY++)//Y cyklus
+				//reduce shift noise by computing multiple shifts near central meridian and then working with their median
+				std::vector<Point2d> shifts(itersMedian);
+				std::vector<Point2d> shifts1(itersMedian);
+				std::vector<Point2d> shifts2(itersMedian);
+				for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
 				{
-					Mat crop1, crop2;
-					Point2d shift, shift1, shift2;
-					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
-					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
-					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
-					predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
+					//crop1
+					crop1 = roicrop(pics[iterPic].first, params[iterPic].first.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params[iterPic].first.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+					//crop2
+					crop2 = roicrop(pics[iterPic].second, params[iterPic].second.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params[iterPic].second.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
-					//reduce shift noise by computing multiple shifts near central meridian and then working with their median
-					std::vector<Point2d> shifts(itersMedian);
-					std::vector<Point2d> shifts1(itersMedian);
-					std::vector<Point2d> shifts2(itersMedian);
-					for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
-					{
-						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params1.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
-						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params2.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+					shifts[iterMedian] = phasecorrel(crop1, crop2, set);
+				}
 
-						shifts[iterMedian] = phasecorrel(crop1, crop2, set);
-					}
+				//calculate omega from shift
+				shift = median(shifts);
 
-					//calculate omega from shift
-					shift = median(shifts);
+				phi_x = asin(shift.x / (R*cos(theta)));
+				phi_y = theta - asin(sin(theta) - shift.y / R);
 
-					phi_x = asin(shift.x / (R*cos(theta)));
-					phi_y = theta - asin(sin(theta) - shift.y / R);
+				omega_x = phi_x / deltaPic / deltaSec;
+				omega_y = phi_y / deltaPic / deltaSec;
 
-					omega_x = phi_x / deltaPic / deltaSec;
-					omega_y = phi_y / deltaPic / deltaSec;
+				omegasXcurr[iterY] = omega_x;
+				omegasPcurr[iterY] = predicted_omega;
+				thetascurr[iterY] = theta * 360 / 2 / PI;
 
-					omegasXcurr[iterY] = omega_x;
-					omegasPcurr[iterY] = predicted_omega;
-					thetascurr[iterY] = theta * 360 / 2 / PI;
-
-				}//Y for cycle end
-			}//X for cycle end
-		}//load successful
-		else//load unsuccessful
-		{
-			continue;//no need to replot
-		}
-
+			}//Y for cycle end
+		}//X for cycle end
+		
 		for (int iterY = 0; iterY < itersY; iterY++)
 		{
 			//push back good data
@@ -587,25 +517,21 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 			retVal += abs(omegasX[y][omegasX[y].size() - 1] - omegasPavg[y]);
 	}//picture pairs cycle end
 
-	//#pragma omp critical
+	if (pltX && retVal/itersY < 3e-7)
 	{
-		if (pltX && retVal/itersY < 3e-7)
-		{
-			Timerr a("plot");
-			pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
-			//pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
-		}
+		//pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
+		//pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
 	}
+	
 	//------------------------------------------------------------------------
-	cout << "retVal=" << retVal / itersY << endl;
+	cout << "retVal = " << retVal / itersY << "               (" << std::vector<double>{(double)set.getcols(), set.getL(), set.getH(), set.L2size, (double)set.applyWindow} << ")" << endl;
 	return retVal / itersY;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<Mat, Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
-	FITStime FITS_time = FITS_timeMaster;
-	return DiffrotMerritFunction(set, FITS_time, itersPic, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
+	return DiffrotMerritFunction(set, pics, params, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
 }
