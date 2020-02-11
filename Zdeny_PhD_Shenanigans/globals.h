@@ -1,5 +1,5 @@
 #pragma once
-#include "constants.h"
+#include "macros.h"
 #include "IPC.h"
 #include "loggercsl.h"
 #include "loggerqt.h"
