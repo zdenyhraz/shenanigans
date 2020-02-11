@@ -62,13 +62,23 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Evo.NP = 30;
 	Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 	Evo.lowerBounds = std::vector<double>{ 5,0,0,3,-1 };
-	Evo.upperBounds = std::vector<double>{ 300,10,500,21,1 };
+	Evo.upperBounds = std::vector<double>{ 99,10,500,21,1 };
 	globals->Logger->Log("Super optimizing diffrot profile...", EVENT);
-	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D* plt1 = new Plot1D(globals->widget1);
 	Plot1D* plt2 = new Plot1D(globals->widget2);
-	int pics = 1;
-	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, fitsTimeMaster, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
+
+	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	fitsTimeMaster.advanceTime(0);
+	Mat pic1, pic2;
+	fitsParams params1, params2;
+	pic1 = loadfits(fitsTimeMaster.path(), params1);
+	fitsTimeMaster.advanceTime(45);
+	pic2 = loadfits(fitsTimeMaster.path(), params2);
+
+	std::vector<std::pair<Mat, Mat>> pics{ std::pair<Mat, Mat>(pic1, pic2) };
+	std::vector<std::pair<fitsParams, fitsParams>> params{ std::pair<fitsParams, fitsParams>(params1, params2) };
+
+	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, params, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
 	auto result = Evo.optimize(f, globals->Logger, plt1);
 	globals->Logger->Log("Optimal Size: " + to_string(result[0]), INFO);
 	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), INFO);
