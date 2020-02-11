@@ -18,7 +18,7 @@ void WindowDiffrot::calculateDiffrot()
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D pltX(globals->widget1);
 	Plot1D pltY(globals->widget2);
-	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), ui.lineEdit_9->text().toStdString(), globals->Logger, &pltX, &pltY);
+	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), globals->Logger, &pltX, &pltY);
 }
 
 void WindowDiffrot::showIPC()
@@ -58,7 +58,19 @@ void WindowDiffrot::optimizeDiffrot()
 
 void WindowDiffrot::superOptimizeDiffrot()
 {
-
+	Evolution Evo(5);
+	Evo.lowerBounds = std::vector<double>{ 0,0,0,3,-1 };
+	Evo.upperBounds = std::vector<double>{ 300,10,500,21,1 };
+	globals->Logger->Log("Super optimizing diffrot profile...", EVENT);
+	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble()); };
+	auto result = Evo.optimize(f);
+	globals->Logger->Log("Optimal Size: " + to_string(result[0]), INFO);
+	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), INFO);
+	globals->Logger->Log("Optimal Hmult: " + to_string(result[2]), INFO);
+	globals->Logger->Log("Optimal L2size: " + to_string(result[3]), INFO);
+	globals->Logger->Log("Optimal Window: " + to_string(result[4]), INFO);
+	globals->Logger->Log("Super optimizing finished", SUBEVENT);
 }
 
 void WindowDiffrot::showResults()

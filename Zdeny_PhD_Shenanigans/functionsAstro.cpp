@@ -133,7 +133,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, string pathMasterOut, Logger* logger, AbstractPlot1D* pltX, AbstractPlot1D* pltY)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, AbstractPlot1D* pltX, AbstractPlot1D* pltY)
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
@@ -430,4 +430,225 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	}
 
 	return std::make_tuple(shiftsX, shiftsY, indices);
+}
+
+double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
+{
+	double retVal = 0;
+	//------------------------------------------------------------------------
+
+	//2D stuff
+	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	Mat omegasYmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	Mat picture = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	std::vector<std::vector<double>> omegasX(itersY);
+	std::vector<std::vector<double>> omegasY(itersY);
+	std::vector<std::vector<double>> omegasP(itersY);
+	std::vector<std::vector<double>> thetas(itersY);
+	std::vector<std::vector<double>> omegasXfits;
+	std::vector<std::vector<double>> omegasYfits;
+
+	for (int iterY = 0; iterY < itersY; iterY++)
+	{
+		omegasX[iterY].reserve(itersPic*itersX);
+		omegasY[iterY].reserve(itersPic*itersX);
+		omegasP[iterY].reserve(itersPic*itersX);
+		thetas[iterY].reserve(itersPic*itersX);
+	}
+
+	//1D stuff
+	std::vector<double> omegasXavg(itersY);
+	std::vector<double> omegasYavg(itersY);
+	std::vector<double> omegasPavg(itersY);
+	std::vector<double> thetasavg(itersY);
+	std::vector<double> omegasXfit(itersY);
+	std::vector<double> omegasYfit(itersY);
+
+	std::vector<double> omegasXcurr(itersY);
+	std::vector<double> omegasYcurr(itersY);
+	std::vector<double> omegasPcurr(itersY);
+	std::vector<double> thetascurr(itersY);
+
+	int plusminusbufer = 6;//even!
+	bool succload;
+	Mat pic1, pic2;
+	fitsParams params1, params2;
+
+	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
+	{
+		std::string pathdbg1, pathdbg2;
+		//pic1
+		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
+		pic1 = loadfits(FITS_time.path(), params1);
+		if (!params1.succload)
+		{
+			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
+			{
+				if (pm % 2 == 0)
+					FITS_time.advanceTime(pm);
+				else
+					FITS_time.advanceTime(-pm);
+				pic1 = loadfits(FITS_time.path(), params1);
+				if (params1.succload)
+					break;
+			}
+		}
+		if (!params1.succload)
+		{
+			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
+		}
+		pathdbg1 = FITS_time.path();
+
+		//pic2
+		FITS_time.advanceTime(deltaPic*deltaSec);
+		pic2 = loadfits(FITS_time.path(), params2);
+		if (!params2.succload)
+		{
+			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
+			{
+				if (pm % 2 == 0)
+					FITS_time.advanceTime(pm);
+				else
+					FITS_time.advanceTime(-pm);
+				pic2 = loadfits(FITS_time.path(), params2);
+				if (params2.succload)
+					break;
+			}
+		}
+		if (!params2.succload)
+		{
+			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
+		}
+		pathdbg2 = FITS_time.path();
+
+		succload = params1.succload && params2.succload;
+		if (succload)//load succesfull
+		{
+			if (0 && iterPic == 0)
+			{
+				showimg(pic1, "diffrot pic 1");
+				showimg(pic2, "diffrot pic 2");
+			}
+
+			//average fits values for pics 1 and 2
+			double R = (params1.R + params2.R) / 2;
+			double theta0 = (params1.theta0 + params2.theta0) / 2;
+			int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
+			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
+
+			for (int iterX = 0; iterX < itersX; iterX++)//X cyklus
+			{
+				#pragma omp parallel for
+				for (int iterY = 0; iterY < itersY; iterY++)//Y cyklus
+				{
+					Mat crop1, crop2;
+					Point2d shift, shift1, shift2;
+					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
+					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
+					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
+					predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
+
+					//reduce shift noise by computing multiple shifts near central meridian and then working with their median
+					std::vector<Point2d> shifts(itersMedian);
+					std::vector<Point2d> shifts1(itersMedian);
+					std::vector<Point2d> shifts2(itersMedian);
+					for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
+					{
+						//crop1
+						crop1 = roicrop(pic1, params1.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params1.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+						//crop2
+						crop2 = roicrop(pic2, params2.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params2.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+
+						shifts[iterMedian] = phasecorrel(crop1, crop2, set);
+					}
+
+					//calculate omega from shift
+					shift = median(shifts);
+
+					phi_x = asin(shift.x / (R*cos(theta)));
+					phi_y = theta - asin(sin(theta) - shift.y / R);
+
+					omega_x = phi_x / deltaPic / deltaSec;
+					omega_y = phi_y / deltaPic / deltaSec;
+
+					omegasXcurr[iterY] = omega_x;
+					omegasYcurr[iterY] = omega_y;
+					omegasPcurr[iterY] = predicted_omega;
+					thetascurr[iterY] = theta * 360 / 2 / PI;
+
+					omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
+					omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
+					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
+				}//Y for cycle end
+			}//X for cycle end
+		}//load successful
+		else//load unsuccessful
+		{
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//fix bad data with average values
+				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
+			}
+			omegasXfits.push_back(polyfit(omegasXavg, 4));
+			omegasYfits.push_back(polyfit(omegasYavg, 4));
+			continue;//no need to replot
+		}
+
+		double currAvgX = mean(omegasXcurr);
+		double currAvgY = mean(omegasYcurr);
+		double avgAvgX = mean(omegasXavg);
+		double avgAvgY = mean(omegasYavg);
+		double kenkerX = abs(currAvgX - avgAvgX);
+		double kenkerY = abs(currAvgY - avgAvgY);
+
+		if (!iterPic || (kenkerX < 1e-6 && kenkerY < 5e-7))//good data
+		{
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//push back good data
+				omegasX[iterY].push_back(omegasXcurr[iterY]);
+				omegasY[iterY].push_back(omegasYcurr[iterY]);
+				omegasP[iterY].push_back(omegasPcurr[iterY]);
+				thetas[iterY].push_back(thetascurr[iterY]);
+
+				//calculate good averages
+				omegasXavg[iterY] = mean(omegasX[iterY]);
+				omegasYavg[iterY] = mean(omegasY[iterY]);
+				omegasPavg[iterY] = mean(omegasP[iterY]);
+				thetasavg[iterY] = mean(thetas[iterY]);
+				omegasXfit = polyfit(omegasXavg, 4);
+				omegasYfit = polyfit(omegasYavg, 4);
+			}
+			omegasXfits.push_back(polyfit(omegasXcurr, 4));
+			omegasYfits.push_back(polyfit(omegasYcurr, 4));
+		}
+		else//bad data
+		{
+			for (int iterY = 0; iterY < itersY; iterY++)
+			{
+				//fix bad data with average values
+				omegasXmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
+				omegasYmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
+			}
+			omegasXfits.push_back(polyfit(omegasXavg, 4));
+			omegasYfits.push_back(polyfit(omegasYavg, 4));
+		}
+
+		for (int y = 0; y < itersY; y++)
+			retVal += abs(omegasXfits[omegasXfits.size() - 1][y] - omegasPavg[y]);
+		
+	}//picture pairs cycle end
+
+
+	//------------------------------------------------------------------------
+	return retVal;
+}
+
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
+{
+	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
+	set.L2size = arg[3];
+	set.applyWindow = arg[4] > 0 ? true : false;
+	return DiffrotMerritFunction(set, FITS_time, itersPic, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec);
 }
