@@ -139,7 +139,7 @@
     <ClCompile Include="Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="constants.h" />
+    <ClInclude Include="macros.h" />
     <ClInclude Include="loggercsl.h" />
     <ClInclude Include="filtering.h" />
     <ClInclude Include="FITS.h" />
