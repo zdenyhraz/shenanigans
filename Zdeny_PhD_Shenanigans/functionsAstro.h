@@ -144,4 +144,4 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 
 double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec);
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec);
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec);

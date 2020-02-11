@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>307</width>
-    <height>297</height>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -342,13 +342,13 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
       <y>136</y>
-      <width>91</width>
-      <height>111</height>
+      <width>121</width>
+      <height>121</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_7">
