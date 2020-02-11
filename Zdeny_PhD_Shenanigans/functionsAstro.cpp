@@ -636,19 +636,21 @@ double DiffrotMerritFunction(const IPCsettings& set, FITStime& FITS_time, int it
 		}
 
 		for (int y = 0; y < itersY; y++)
-			retVal += abs(omegasXfits[omegasXfits.size() - 1][y] - omegasPavg[y]);
+			retVal += abs(omegasX[y][omegasX[y].size() - 1] - omegasPavg[y]);
 		
 	}//picture pairs cycle end
 
 
 	//------------------------------------------------------------------------
+	cout << "retVal=" << retVal << endl;
 	return retVal;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, FITStime& FITS_timeMaster, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
+	FITStime FITS_time = FITS_timeMaster;
 	return DiffrotMerritFunction(set, FITS_time, itersPic, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec);
 }
