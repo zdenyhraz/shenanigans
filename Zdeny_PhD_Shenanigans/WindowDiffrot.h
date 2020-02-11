@@ -20,4 +20,5 @@ private slots:
 	void showResults();
 	void showIPC();
 	void optimizeDiffrot();
+	void superOptimizeDiffrot();
 };
