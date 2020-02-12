@@ -59,10 +59,10 @@ void WindowDiffrot::optimizeDiffrot()
 void WindowDiffrot::superOptimizeDiffrot()
 {
 	Evolution Evo(5);
-	Evo.NP = 30;
-	Evo.mutStrat = Evolution::MutationStrategy::RAND1;
+	Evo.NP = 50;
+	Evo.mutStrat = Evolution::MutationStrategy::BEST1;
 	Evo.lowerBounds = std::vector<double>{ 5,0,0,3,-1 };
-	Evo.upperBounds = std::vector<double>{ 99,10,500,21,1 };
+	Evo.upperBounds = std::vector<double>{ 101,10,500,21,1 };
 	globals->Logger->Log("Super optimizing diffrot profile...", EVENT);
 	Plot1D* plt1 = new Plot1D(globals->widget1);
 	Plot1D* plt2 = new Plot1D(globals->widget2);
@@ -70,19 +70,21 @@ void WindowDiffrot::superOptimizeDiffrot()
 	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 
 	std::vector<std::pair<FitsImage, FitsImage>> pics;
-	pics.reserve(3);
+	pics.reserve(20);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		FitsImage a(fitsTimeMaster.path());
 		fitsTimeMaster.advanceTime(45);
+
 		FitsImage b(fitsTimeMaster.path());
 		fitsTimeMaster.advanceTime(45*99);
 
-		pics.emplace_back(std::make_pair(a, b));
+		if (a.params().succload && b.params().succload)
+			pics.emplace_back(std::make_pair(a, b));
 
-		showimg(a.image(), "a" + to_string(i));
-		showimg(b.image(), "b" + to_string(i));
+		//showimg(a.image(), "a" + to_string(i));
+		//showimg(b.image(), "b" + to_string(i));
 	}
 
 	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
