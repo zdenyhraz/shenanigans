@@ -89,12 +89,11 @@ Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<st
 			if (ENDfound && (lajny % linesMultiplier == 0)) break;
 		}
 
-		char* celyobraz_8 = new char[fitsSize2 * 2];
-		streamIN.read(celyobraz_8, fitsSize2 * 2);
-
-		swapbytes(celyobraz_8, fitsSize2 * 2);
-		short* P_shortArray = (short*)(celyobraz_8);
-		ushort* P_ushortArray = (ushort*)(celyobraz_8);
+		std::vector<char> celyobraz_8(fitsSize2 * 2);
+		streamIN.read(celyobraz_8.data(), fitsSize2 * 2);
+		swapbytes(celyobraz_8.data(), fitsSize2 * 2);
+		short* P_shortArray = (short*)(celyobraz_8.data());
+		ushort* P_ushortArray = (ushort*)(celyobraz_8.data());
 
 		if (1)//new korekce
 		{
@@ -117,88 +116,17 @@ Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<st
 		}
 
 		//opencv integration 
-		Mat fits_PICTURE_Mat = Mat(fitsSize, fitsSize, CV_16UC1, celyobraz_8, Mat::AUTO_STEP).clone();//just pass the raw (char) reference to data
+		Mat fits_PICTURE_Mat = Mat(fitsSize, fitsSize, CV_16UC1, celyobraz_8.data(), Mat::AUTO_STEP);
 
-		/*
-		if (0)//zjisti sample stdev z nejakeho rozku
-		{
-			double stddev = 0;
-			double stddevScaled = 0;
-			double mean = 0;
-			double minim = DBL_MAX;
-			double maxim = -DBL_MAX;
-			int maxRows = (double)256 / 4096 * fitsSize;//rozky sou blanknute v AIA - tam mam takovy "darkframe"
-			int maxCols = (double)256 / 4096 * fitsSize;//size 256
-			ushort* darkFrameRegion = new ushort[maxRows*maxCols];
-			int arrayindex = 0;
-			int r, c;
-			for (r = 0; r < maxRows; r++)
-			{
-				for (c = 0; c < maxCols; c++)
-				{
-					mean += P_ushortArray[arrayindex];
-
-					darkFrameRegion[r*maxRows + c] = P_ushortArray[arrayindex];
-
-					if (P_ushortArray[arrayindex] < minim)
-						minim = P_ushortArray[arrayindex];
-					if (P_ushortArray[arrayindex] > maxim)
-						maxim = P_ushortArray[arrayindex];
-
-					arrayindex++;
-				}
-				arrayindex += fitsSize - maxRows;
-			}
-			mean /= maxRows * maxCols;
-			arrayindex = 0;
-			for (int r = 0; r < maxRows; r++)
-			{
-				for (int c = 0; c < maxCols; c++)
-				{
-					int arrayindex = r * maxRows + c;
-					stddev += pow(P_ushortArray[arrayindex] - mean, 2);
-					arrayindex++;
-				}
-				arrayindex += fitsSize - maxRows;
-			}
-			stddev /= maxRows * maxCols;
-			stddev = sqrt(stddev);
-			double maximAll, minimAll;
-			minMaxLoc(fits_PICTURE_Mat, &minimAll, &maximAll, nullptr, nullptr);
-			stddevScaled = stddev * 65535 / (maximAll - minimAll);
-			cout << "<loadfits> pic region min: " << minim - 32768 << endl;
-			cout << "<loadfits> pic region max: " << maxim - 32768 << endl;
-			cout << "<loadfits> pic region mean: " << mean - 32768 << endl;
-			cout << "<loadfits> pic region stddev: " << stddev << endl;
-			cout << "<loadfits> pic region stddevScaled: " << stddevScaled << endl;
-			cout << "<loadfits> pic entire min: " << minimAll - 32768 << endl;
-			cout << "<loadfits> pic entire max: " << maximAll - 32768 << endl;
-			Mat blackPatchForStddev_Mat = Mat(maxRows, maxCols, CV_16UC1, darkFrameRegion, Mat::AUTO_STEP).clone();//just pass the raw (char) reference to data
-			showimg(blackPatchForStddev_Mat, "black patch");
-			delete[] darkFrameRegion;
-		}
-		*/
-
-		switch (type)
-		{
-		case(fitsType::HMI):
-			angle = 90;
-			break;
-		case(fitsType::AIA):
-			angle = -90;
-			break;
-		case(fitsType::SECCHI):
-			angle = 0;
-			break;
-		}
 		normalize(fits_PICTURE_Mat, fits_PICTURE_Mat, 0, 65535, CV_MINMAX);
-		delete[] celyobraz_8;//works
 		Point2f pt(fitsMid, fitsMid);
-		Mat r = getRotationMatrix2D(pt, angle, 1.0);
+		Mat r = getRotationMatrix2D(pt, 90, 1.0);
 		warpAffine(fits_PICTURE_Mat, fits_PICTURE_Mat, r, cv::Size(fitsSize, fitsSize));
 		transpose(fits_PICTURE_Mat, fits_PICTURE_Mat);
 		params.succload = true;
-		return fits_PICTURE_Mat;
+		cout << "loaded." << endl;
+		showimg(fits_PICTURE_Mat, "inside");
+		return fits_PICTURE_Mat.clone();
 	}
 }
 

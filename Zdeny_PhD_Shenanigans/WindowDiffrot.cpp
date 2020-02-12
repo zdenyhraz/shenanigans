@@ -71,7 +71,12 @@ void WindowDiffrot::superOptimizeDiffrot()
 	fitsTimeMaster.advanceTime(0);
 	Mat pic1, pic2;
 	fitsParams params1, params2;
-	pic1 = loadfits(fitsTimeMaster.path(), params1);
+	for (int i = 0; i < 100; i++)
+	{
+		cout << "loading " << i << " ..." << endl;
+		pic1 = loadfits(fitsTimeMaster.path(), params1);
+		showimg(pic1, "outside");
+	}
 	fitsTimeMaster.advanceTime(45);
 	pic2 = loadfits(fitsTimeMaster.path(), params2);
 
