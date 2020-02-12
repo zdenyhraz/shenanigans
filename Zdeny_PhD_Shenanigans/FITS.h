@@ -11,13 +11,150 @@ constexpr int lineBYTEcnt = 80;
 constexpr int linesMultiplier = 36;
 enum class fitsType : char { HMI, AIA, SECCHI };
 
-struct fitsParams
+struct FitsParams
 {
 	double fitsMidX = 0;
 	double fitsMidY = 0;
 	double R = 0;
 	double theta0 = 0;
 	bool succload = 0;
+};
+
+inline void swapbytes(char* input, unsigned length)
+{
+	for (int i = 0; i < length; i += 2)
+	{
+		char temp = std::move(input[i]);
+		input[i] = std::move(input[i + 1]);
+		input[i + 1] = std::move(temp);
+	}
+}
+
+inline std::tuple<Mat, FitsParams> loadfits(std::string path)
+{
+	Timerr("loadfits new");
+	FitsParams params;
+	ifstream streamIN(path, ios::binary | ios::in);
+	if (!streamIN)
+	{
+		cout << "<loadfits> Cannot load file '" << path << "'- file does not exist dude!" << endl;
+		Mat shit;
+		params.succload = false;
+		return std::make_tuple(shit, params);
+	}
+	else
+	{
+		bool ENDfound = false;
+		char lajnaText[lineBYTEcnt];
+		int fitsSize, fitsMid, fitsSize2, angle, lajny = 0;
+		double pixelarcsec;
+
+		while (!streamIN.eof())
+		{
+			streamIN.read(&lajnaText[0], lineBYTEcnt);
+			lajny++;
+			string lajnaString(lajnaText);
+
+			if (lajnaString.find("NAXIS1") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				fitsSize = stoi(stringcislo);
+				fitsMid = fitsSize / 2;
+				fitsSize2 = fitsSize * fitsSize;
+			}
+			else if (lajnaString.find("CRPIX1") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				params.fitsMidX = stod(stringcislo) - 1.;//Nasa index od 1
+			}
+			else if (lajnaString.find("CRPIX2") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				params.fitsMidY = stod(stringcislo) - 1.;//Nasa index od 1
+			}
+			else if (lajnaString.find("CDELT1") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				pixelarcsec = stod(stringcislo);
+			}
+			else if (lajnaString.find("RSUN_OBS") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				params.R = stod(stringcislo);
+				params.R /= pixelarcsec;
+			}
+			else if (lajnaString.find("RSUN") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				params.R = stod(stringcislo);
+			}
+			else if (lajnaString.find("CRLT_OBS") != std::string::npos)
+			{
+				std::size_t pos = lajnaString.find("= ");
+				std::string stringcislo = lajnaString.substr(pos + 2);
+				params.theta0 = stod(stringcislo) / (360. / 2. / PI);
+			}
+			else if (lajnaString.find("END                        ") != std::string::npos)
+			{
+				ENDfound = true;
+			}
+
+			if (ENDfound && (lajny % linesMultiplier == 0)) break;
+		}
+
+		//opencv integration 
+		Mat mat(fitsSize, fitsSize, CV_16UC1);
+
+		streamIN.read((char*)mat.data, fitsSize2 * 2);
+		swapbytes((char*)mat.data, fitsSize2 * 2);
+		short* P_shortArray = (short*)((char*)mat.data);
+		ushort* P_ushortArray = (ushort*)((char*)mat.data);
+
+		//new korekce
+		for (int i = 0; i < fitsSize2; i++)
+		{
+			int px = (int)(P_shortArray[i]);
+			px += 32768;
+			P_ushortArray[i] = px;
+		}
+
+		normalize(mat, mat, 0, 65535, CV_MINMAX);
+		Point2f pt(fitsMid, fitsMid);
+		Mat r = getRotationMatrix2D(pt, 90, 1.0);
+		warpAffine(mat, mat, r, cv::Size(fitsSize, fitsSize));
+		transpose(mat, mat);
+		params.succload = true;
+		return std::make_tuple(mat, params);
+	}
+}
+
+class FitsImage
+{
+public:
+
+	FitsImage(std::string path)
+	{
+		data = loadfits(path);
+	}
+
+	Mat image() const
+	{
+		return std::get<0>(data);
+	}
+
+	FitsParams params() const
+	{
+		return std::get<1>(data);
+	}
+
+private:
+	std::tuple<Mat, FitsParams> data;
 };
 
 struct FITStime
@@ -194,9 +331,7 @@ public:
 	}
 };
 
-void swapbytes(char* input, unsigned length);
-
-Mat loadfits(std::string path, fitsParams& params, fitsType type = fitsType::HMI, std::vector<std::string>* header = nullptr);
+Mat loadfits(std::string path, FitsParams& params);
 
 void generateFitsDownloadUrlsAndCreateFile(int delta, int step, int pics, string urlmain);
 
@@ -209,8 +344,8 @@ inline Mat loadImage(std::string path)
 	Mat result;
 	if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
 	{
-		fitsParams params;
-		result = loadfits(path, params, fitsType::HMI);
+		FitsParams params;
+		result = loadfits(path, params);
 	}
 	else
 	{

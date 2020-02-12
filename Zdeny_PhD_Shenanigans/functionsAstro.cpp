@@ -176,7 +176,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	int plusminusbufer = 6;//even!
 	bool succload;
 	Mat pic1, pic2;
-	fitsParams params1, params2;
+	FitsParams params1, params2;
 
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
@@ -426,7 +426,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<Mat,Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	double retVal = 0;
 	//------------------------------------------------------------------------
@@ -454,8 +454,8 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 	for (int iterPic = 0; iterPic < pics.size(); iterPic++)//main cycle - going through pairs of pics
 	{
 		//average fits values for pics 1 and 2
-		double R = (params[iterPic].first.R + params[iterPic].second.R) / 2;
-		double theta0 = (params[iterPic].first.theta0 + params[iterPic].second.theta0) / 2;
+		double R = (pics[iterPic].first.params().R + pics[iterPic].second.params().R) / 2;
+		double theta0 = (pics[iterPic].first.params().theta0 + pics[iterPic].second.params().theta0) / 2;
 		int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
 		int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
 
@@ -478,9 +478,9 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 				for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
 				{
 					//crop1
-					crop1 = roicrop(pics[iterPic].first, params[iterPic].first.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params[iterPic].first.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+					crop1 = roicrop(pics[iterPic].first.image(), pics[iterPic].first.params().fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, pics[iterPic].first.params().fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 					//crop2
-					crop2 = roicrop(pics[iterPic].second, params[iterPic].second.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params[iterPic].second.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+					crop2 = roicrop(pics[iterPic].second.image(), pics[iterPic].second.params().fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, pics[iterPic].second.params().fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
 					shifts[iterMedian] = phasecorrel(crop1, crop2, set);
 				}
@@ -528,10 +528,10 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 	return retVal / itersY;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<Mat, Mat>>& pics, const std::vector<std::pair<fitsParams, fitsParams>>& params, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
-	return DiffrotMerritFunction(set, pics, params, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
+	return DiffrotMerritFunction(set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
 }

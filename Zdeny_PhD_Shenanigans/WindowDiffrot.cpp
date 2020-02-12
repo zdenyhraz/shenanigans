@@ -24,7 +24,7 @@ void WindowDiffrot::calculateDiffrot()
 void WindowDiffrot::showIPC()
 {
 	globals->Logger->Log("Showimg diffrot profile IPC landscape...", EVENT);
-	fitsParams params1, params2;
+	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
@@ -39,7 +39,7 @@ void WindowDiffrot::showIPC()
 
 void WindowDiffrot::optimizeDiffrot()
 {
-	fitsParams params1, params2;
+	FitsParams params1, params2;
 	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	std::vector<int> sizes{ 16,32,64,128 };
 	std::string path = "D:\\MainOutput\\diffrot\\diffrotIPCopt.csv";
@@ -68,22 +68,24 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Plot1D* plt2 = new Plot1D(globals->widget2);
 
 	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-	fitsTimeMaster.advanceTime(0);
-	Mat pic1, pic2;
-	fitsParams params1, params2;
-	for (int i = 0; i < 100; i++)
+
+	std::vector<std::pair<FitsImage, FitsImage>> pics;
+	pics.reserve(3);
+
+	for (int i = 0; i < 3; i++)
 	{
-		cout << "loading " << i << " ..." << endl;
-		pic1 = loadfits(fitsTimeMaster.path(), params1);
-		showimg(pic1, "outside");
+		FitsImage a(fitsTimeMaster.path());
+		fitsTimeMaster.advanceTime(45);
+		FitsImage b(fitsTimeMaster.path());
+		fitsTimeMaster.advanceTime(45*99);
+
+		pics.emplace_back(std::make_pair(a, b));
+
+		showimg(a.image(), "a" + to_string(i));
+		showimg(b.image(), "b" + to_string(i));
 	}
-	fitsTimeMaster.advanceTime(45);
-	pic2 = loadfits(fitsTimeMaster.path(), params2);
 
-	std::vector<std::pair<Mat, Mat>> pics{ std::pair<Mat, Mat>(pic1, pic2) };
-	std::vector<std::pair<fitsParams, fitsParams>> params{ std::pair<fitsParams, fitsParams>(params1, params2) };
-
-	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, params, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
+	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
 	auto result = Evo.optimize(f, globals->Logger, plt1);
 	globals->Logger->Log("Optimal Size: " + to_string(result[0]), INFO);
 	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), INFO);
