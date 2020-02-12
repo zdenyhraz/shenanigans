@@ -45,67 +45,67 @@ inline std::tuple<Mat, FitsParams> loadfits(std::string path)
 	else
 	{
 		bool ENDfound = false;
-		char lajnaText[lineBYTEcnt];
-		int fitsSize, fitsMid, fitsSize2, angle, lajny = 0;
+		char cline[lineBYTEcnt];
+		int fitsSize, fitsMid, fitsSize2, angle, linecnt = 0;
 		double pixelarcsec;
 
 		while (!streamIN.eof())
 		{
-			streamIN.read(&lajnaText[0], lineBYTEcnt);
-			lajny++;
-			string lajnaString(lajnaText);
+			streamIN.read(&cline[0], lineBYTEcnt);
+			linecnt++;
+			string sline(cline);
 
-			if (lajnaString.find("NAXIS1") != std::string::npos)
+			if (sline.find("NAXIS1") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				fitsSize = stoi(stringcislo);
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				fitsSize = stoi(snum);
 				fitsMid = fitsSize / 2;
 				fitsSize2 = fitsSize * fitsSize;
 			}
-			else if (lajnaString.find("CRPIX1") != std::string::npos)
+			else if (sline.find("CRPIX1") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.fitsMidX = stod(stringcislo) - 1.;//Nasa index od 1
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				params.fitsMidX = stod(snum) - 1.;//Nasa index od 1
 			}
-			else if (lajnaString.find("CRPIX2") != std::string::npos)
+			else if (sline.find("CRPIX2") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.fitsMidY = stod(stringcislo) - 1.;//Nasa index od 1
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				params.fitsMidY = stod(snum) - 1.;//Nasa index od 1
 			}
-			else if (lajnaString.find("CDELT1") != std::string::npos)
+			else if (sline.find("CDELT1") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				pixelarcsec = stod(stringcislo);
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				pixelarcsec = stod(snum);
 			}
-			else if (lajnaString.find("RSUN_OBS") != std::string::npos)
+			else if (sline.find("RSUN_OBS") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.R = stod(stringcislo);
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				params.R = stod(snum);
 				params.R /= pixelarcsec;
 			}
-			else if (lajnaString.find("RSUN") != std::string::npos)
+			else if (sline.find("RSUN") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.R = stod(stringcislo);
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				params.R = stod(snum);
 			}
-			else if (lajnaString.find("CRLT_OBS") != std::string::npos)
+			else if (sline.find("CRLT_OBS") != std::string::npos)
 			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.theta0 = stod(stringcislo) / (360. / 2. / PI);
+				std::size_t pos = sline.find("= ");
+				std::string snum = sline.substr(pos + 2);
+				params.theta0 = stod(snum) / (360. / 2. / PI);
 			}
-			else if (lajnaString.find("END                        ") != std::string::npos)
+			else if (sline.find("END                        ") != std::string::npos)
 			{
 				ENDfound = true;
 			}
 
-			if (ENDfound && (lajny % linesMultiplier == 0)) break;
+			if (ENDfound && (linecnt % linesMultiplier == 0)) break;
 		}
 
 		//opencv integration 
@@ -113,15 +113,15 @@ inline std::tuple<Mat, FitsParams> loadfits(std::string path)
 
 		streamIN.read((char*)mat.data, fitsSize2 * 2);
 		swapbytes((char*)mat.data, fitsSize2 * 2);
-		short* P_shortArray = (short*)((char*)mat.data);
-		ushort* P_ushortArray = (ushort*)((char*)mat.data);
+		short* s16 = (short*)((char*)mat.data);
+		ushort* us16 = (ushort*)((char*)mat.data);
 
 		//new korekce
 		for (int i = 0; i < fitsSize2; i++)
 		{
-			int px = (int)(P_shortArray[i]);
+			int px = (int)(s16[i]);
 			px += 32768;
-			P_ushortArray[i] = px;
+			us16[i] = px;
 		}
 
 		normalize(mat, mat, 0, 65535, CV_MINMAX);
