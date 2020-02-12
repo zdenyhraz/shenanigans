@@ -232,12 +232,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>156</x>
-      <y>20</y>
-      <width>78</width>
+      <x>157</x>
+      <y>28</y>
+      <width>75</width>
       <height>181</height>
      </rect>
     </property>
@@ -293,13 +293,6 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QCheckBox" name="checkBox_6">
-       <property name="text">
-        <string>normalize inputs</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
       <widget class="QCheckBox" name="checkBox_7">
        <property name="text">
         <string>cross correlate</string>

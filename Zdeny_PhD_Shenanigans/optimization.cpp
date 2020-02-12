@@ -422,7 +422,7 @@ using namespace cv;
 
 Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY)
 {
-	Mat resultMat = Mat::zeros(stepsY, stepsX, CV_64F);
+	Mat resultMat = Mat::zeros(stepsY, stepsX, CV_32F);
 	int progress = 0;
 	bool OpenMPparallelism = true;
 
@@ -432,7 +432,7 @@ Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax
 		{
 			double x = xmin + (xmax - xmin) / (stepsX - 1) * c;
 			double y = ymax - (ymax - ymin) / (stepsY - 1) * r;
-			resultMat.at<double>(r, c) = f(vector<double>{x, y});
+			resultMat.at<float>(r, c) = f(vector<double>{x, y});
 		}
 		#pragma omp critical
 		{
@@ -483,7 +483,7 @@ Mat drawPath2D(Mat funcLandscape, vector<vector<vector<double>>> points, double 
 
 std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> lowerBounds, vector<double> upperBounds, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, Mat* landscape)
 {
-	Mat optimizedFuncLandscapeCLR = Mat::zeros(steps[0], steps[1], CV_64F);
+	Mat optimizedFuncLandscapeCLR = Mat::zeros(steps[0], steps[1], CV_32F);
 	cv::Point2i minloc, maxloc;
 	vector<double> minlocArg(2, 0);
 	double stretchFactorX, stretchFactorY;

@@ -54,8 +54,8 @@ Mat gammaCorrect(const Mat& sourceimgIn, double gamma)//returns CV_16UC1/3
 Mat addnoise(const Mat& sourceimgIn)
 {
 	Mat sourceimg = sourceimgIn.clone();
-	sourceimg.convertTo(sourceimg, CV_64F);
-	Mat noised = Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F);
+	sourceimg.convertTo(sourceimg, CV_32F);
+	Mat noised = Mat::zeros(sourceimg.rows, sourceimg.cols, CV_32F);
 	randn(noised, 0, 255 / 50);
 	noised = noised + sourceimg;
 	normalize(noised, noised, 0, 255, CV_MINMAX);

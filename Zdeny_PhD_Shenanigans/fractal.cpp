@@ -17,7 +17,7 @@ Mat computeFractal(Fractalset& fractalset)
 {
 	using namespace std::complex_literals;
 
-	Mat Fractal = Mat::zeros(fractalset.fractalHeight, fractalset.fractalWidth, CV_64F);
+	Mat Fractal = Mat::zeros(fractalset.fractalHeight, fractalset.fractalWidth, CV_32F);
 	complex<double> startZ = 0. + 0.i;
 	cout << "Computing Fractal...";
 	#pragma omp parallel for
@@ -40,7 +40,7 @@ Mat computeFractal(Fractalset& fractalset)
 				if (M > fractalset.magnTresh)
 					break;
 			}
-			Fractal.at<double>(r, c) = (double)finaliter;
+			Fractal.at<float>(r, c) = (double)finaliter;
 		}
 
 	}

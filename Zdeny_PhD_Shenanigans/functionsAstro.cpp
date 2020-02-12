@@ -13,7 +13,7 @@ std::vector<double> diffrotProfileAverage(const Mat& flow, int colS)
 	{
 		for (int c = flow.cols - cols; c < flow.cols; c++)
 		{
-			averageFlow[r] += flow.at<double>(r, c);
+			averageFlow[r] += flow.at<float>(r, c);
 		}
 		averageFlow[r] /= cols;
 	}
@@ -141,9 +141,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
 
 	//2D stuff
-	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
-	Mat omegasYmat = Mat::zeros(itersY, itersPic*itersX, CV_64F);
-	Mat picture = Mat::zeros(itersY, itersPic*itersX, CV_64F);
+	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_32F);
+	Mat omegasYmat = Mat::zeros(itersY, itersPic*itersX, CV_32F);
+	Mat picture = Mat::zeros(itersY, itersPic*itersX, CV_32F);
 	std::vector<std::vector<double>> omegasX(itersY);
 	std::vector<std::vector<double>> omegasY(itersY);
 	std::vector<std::vector<double>> omegasP(itersY);
@@ -284,9 +284,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					omegasPcurr[iterY] = predicted_omega;
 					thetascurr[iterY] = theta * 360 / 2 / PI;
 
-					omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
-					omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
-					picture.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
+					omegasXmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
+					omegasYmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
+					picture.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 		}//load successful
@@ -295,8 +295,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
 				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
+				omegasXmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasXfit[iterY];
+				omegasYmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX) = omegasYfit[iterY];
 			}
 			omegasXfits.push_back(polyfit(omegasXavg, 4));
 			omegasYfits.push_back(polyfit(omegasYavg, 4));
@@ -336,8 +336,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 			for (int iterY = 0; iterY < itersY; iterY++)
 			{
 				//fix bad data with average values
-				omegasXmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
-				omegasYmat.at<double>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
+				omegasXmat.at<float>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasXfit[iterY];
+				omegasYmat.at<float>(iterY, (itersPic - 1 - iterPic)*itersX) = omegasYfit[iterY];
 			}
 			omegasXfits.push_back(polyfit(omegasXavg, 4));
 			omegasYfits.push_back(polyfit(omegasYavg, 4));
