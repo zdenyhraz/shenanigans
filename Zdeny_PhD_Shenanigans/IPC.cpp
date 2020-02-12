@@ -163,8 +163,8 @@ std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCs
 	int cols = qualityRatio * img1.cols;
 	int win = IPC_settings.getcols();
 
-	Mat flowX = Mat::zeros(rows, cols, CV_64F);
-	Mat flowY = Mat::zeros(rows, cols, CV_64F);
+	Mat flowX = Mat::zeros(rows, cols, CV_32F);
+	Mat flowY = Mat::zeros(rows, cols, CV_32F);
 
 	int pad = win / 2 + 1;
 	volatile int progress = 0;
@@ -179,16 +179,16 @@ std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCs
 
 			if (c_ < pad || r_ < pad || c_ > (img1.cols - pad) || r_ > (img1.rows - pad))
 			{
-				flowX.at<double>(r, c) = 0;
-				flowY.at<double>(r, c) = 0;
+				flowX.at<float>(r, c) = 0;
+				flowY.at<float>(r, c) = 0;
 			}
 			else
 			{
 				Mat crop1 = roicrop(img1, c_, r_, win, win);
 				Mat crop2 = roicrop(img2, c_, r_, win, win);
 				auto shift = phasecorrel(crop1, crop2, IPC_settings);
-				flowX.at<double>(r, c) = shift.x;
-				flowY.at<double>(r, c) = shift.y;
+				flowX.at<float>(r, c) = shift.x;
+				flowY.at<float>(r, c) = shift.y;
 			}		
 		}
 

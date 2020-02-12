@@ -13,7 +13,7 @@ inline Mat sigmoid(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
-		result.at<double>(r, 0) = 1. / (1 + exp(-z.at<double>(r, 0)));
+		result.at<float>(r, 0) = 1. / (1 + exp(-z.at<float>(r, 0)));
 	return result;
 }
 
@@ -26,7 +26,7 @@ inline Mat relu(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
-		result.at<double>(r, 0) = z.at<double>(r, 0) > 0 ? z.at<double>(r, 0) : 0;
+		result.at<float>(r, 0) = z.at<float>(r, 0) > 0 ? z.at<float>(r, 0) : 0;
 	return result;
 }
 
@@ -34,7 +34,7 @@ inline Mat reluPrime(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
-		result.at<double>(r, 0) = z.at<double>(r, 0) > 0 ? 1 : 0;
+		result.at<float>(r, 0) = z.at<float>(r, 0) > 0 ? 1 : 0;
 	return result;
 }
 
@@ -42,7 +42,7 @@ inline Mat reluLeaky(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
-		result.at<double>(r, 0) = z.at<double>(r, 0) > 0 ? z.at<double>(r, 0) : 0.01*z.at<double>(r, 0);
+		result.at<float>(r, 0) = z.at<float>(r, 0) > 0 ? z.at<float>(r, 0) : 0.01*z.at<float>(r, 0);
 	return result;
 }
 
@@ -50,7 +50,7 @@ inline Mat reluLeakyPrime(const Mat& z)
 {
 	Mat result = z.clone();
 	for (int r = 0; r < z.rows; r++)
-		result.at<double>(r, 0) = z.at<double>(r, 0) > 0 ? 1 : 0.01;
+		result.at<float>(r, 0) = z.at<float>(r, 0) > 0 ? 1 : 0.01;
 	return result;
 }
 
@@ -268,8 +268,8 @@ private:
 		//initialize weights and biases
 		for (L = 0; L < layerCount; L++)
 		{
-			w[L] = L > 0 ? Mat::zeros(layerSizes[L], layerSizes[L - 1], CV_64FC1) : Mat::zeros(layerSizes[L], inputSize, CV_64FC1);//allocate weight matrices
-			b[L] = Mat::zeros(layerSizes[L], 1, CV_64FC1);
+			w[L] = L > 0 ? Mat::zeros(layerSizes[L], layerSizes[L - 1], CV_32FC1) : Mat::zeros(layerSizes[L], inputSize, CV_32FC1);//allocate weight matrices
+			b[L] = Mat::zeros(layerSizes[L], 1, CV_32FC1);
 		}
 		for (const Mat& w_ : w)
 		{

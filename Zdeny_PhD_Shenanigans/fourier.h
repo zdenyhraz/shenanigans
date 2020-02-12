@@ -8,8 +8,18 @@ using namespace cv;
 inline Mat fourier(const Mat& sourceimgIn)
 {
 	Mat sourceimg = sourceimgIn.clone();
-	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
-	Mat sourceimgcomplex[2] = { sourceimg, Mat::zeros(sourceimg.size(),CV_64F) };
+	sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
+	Mat sourceimgcomplex[2] = { sourceimg, Mat::zeros(sourceimg.size(),CV_32F) };
+	Mat sourceimgcomplexmerged;
+	merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
+	dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
+	return sourceimgcomplexmerged;
+}
+
+inline Mat fourier(Mat&& sourceimg)
+{
+	sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
+	Mat sourceimgcomplex[2] = { sourceimg, Mat::zeros(sourceimg.size(),CV_32F) };
 	Mat sourceimgcomplexmerged;
 	merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
 	dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
@@ -54,21 +64,21 @@ inline Mat quadrantswap(const Mat& sourceimgDFT)
 inline Mat edgemask(int rows, int cols)
 {
 	Mat edgemask;
-	createHanningWindow(edgemask, cv::Size(cols, rows), CV_64F);
+	createHanningWindow(edgemask, cv::Size(cols, rows), CV_32F);
 	return edgemask;
 }
 
 inline Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
 {
-	Mat gaussian = Mat::ones(rows, cols, CV_64F);
-	double centerX = floor((double)cols / 2);
-	double centerY = floor((double)rows / 2);
+	Mat gaussian = Mat::ones(rows, cols, CV_32F);
+	float centerX = floor((float)cols / 2);
+	float centerY = floor((float)rows / 2);
 	int x, y;
 	for (y = 0; y < rows; y++)
 	{
 		for (x = 0; x < cols; x++)
 		{
-			gaussian.at<double>(y, x) = std::exp(-(std::pow(x - centerX, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(y - centerY, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
+			gaussian.at<float>(y, x) = std::exp(-(std::pow(x - centerX, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(y - centerY, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
 		}
 	}
 	normalize(gaussian, gaussian, 0, 1, CV_MINMAX);
@@ -77,7 +87,7 @@ inline Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
 
 inline Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmult)
 {
-	Mat laplacian = Mat::ones(rows, cols, CV_64F);
+	Mat laplacian = Mat::ones(rows, cols, CV_32F);
 	laplacian = 1 - gaussian(rows, cols, stdevYmult, stdevXmult);
 	normalize(laplacian, laplacian, 0, 1, CV_MINMAX);
 	return laplacian;
@@ -92,13 +102,13 @@ inline Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
 
 inline Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 {
-	Mat sinian = Mat::zeros(rows, cols, CV_64F);
+	Mat sinian = Mat::zeros(rows, cols, CV_32F);
 	for (int y = 0; y < rows; y++)
 	{
 		for (int x = 0; x < cols; x++)
 		{
-			//sinian.at<double>(y, x) = std::cos(2 * PI * x * frequencyX)*std::sin(2 * PI * y * frequencyY);//sin or cos just cahnges the phase spectum
-			sinian.at<double>(y, x) = std::sin(2 * PI * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
+			//sinian.at<float>(y, x) = std::cos(2 * PI * x * frequencyX)*std::sin(2 * PI * y * frequencyY);//sin or cos just cahnges the phase spectum
+			sinian.at<float>(y, x) = std::sin(2 * PI * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
 		}
 	}
 	normalize(sinian, sinian, 0, 1, CV_MINMAX);

@@ -27,7 +27,6 @@ public:
 	bool applyBandpass = 1;
 	bool subpixel = 1;
 	bool crossCorrel = 0;
-	bool normInput = 0;
 	bool iterate = 1;
 	bool IPCshow = false;
 	double minimalShift = 0;
@@ -78,22 +77,21 @@ public:
 
 inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger = nullptr, AbstractPlot2D* plt = nullptr)
 {
-	Mat sourceimg1 = sourceimg1In.clone();
-	Mat sourceimg2 = sourceimg2In.clone();
 	Point2d output;
 	Mat L3;
-	sourceimg1.convertTo(sourceimg1, CV_64F);
-	sourceimg2.convertTo(sourceimg2, CV_64F);
-	if (set.normInput)
-	{
-		normalize(sourceimg1, sourceimg1, 0, 1, CV_MINMAX);
-		normalize(sourceimg2, sourceimg2, 0, 1, CV_MINMAX);
-	}
+
+	Mat sourceimg1 = sourceimg1In.clone();
+	Mat sourceimg2 = sourceimg2In.clone();
+	
+	sourceimg1.convertTo(sourceimg1, CV_32F);
+	sourceimg2.convertTo(sourceimg2, CV_32F);
+
 	if (set.applyWindow)
 	{
 		multiply(sourceimg1, set.window, sourceimg1);
 		multiply(sourceimg2, set.window, sourceimg2);
 	}
+
 	if (set.IPCshow)
 	{
 		showimg(sourceimg1, "IPC src1");
@@ -101,16 +99,21 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		showimg(set.bandpass, "IPC bandpass");
 		showimg(set.window, "IPC window");
 	}
-	Mat DFT1 = fourier(sourceimg1);
-	Mat DFT2 = fourier(sourceimg2);
+
+	Mat DFT1 = fourier(std::move(sourceimg1));
+	Mat DFT2 = fourier(std::move(sourceimg2));
+
 	Mat planes1[2];
 	Mat planes2[2];
 	Mat CrossPowerPlanes[2];
+
 	split(DFT1, planes1);
 	split(DFT2, planes2);
+
 	planes1[1] = planes1[1].mul(-1.0);//complex conjugate of second pic
 	CrossPowerPlanes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);//pointwise multiplications real
 	CrossPowerPlanes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);//imag
+
 	if (!set.crossCorrel)
 	{
 		Mat magnre, magnim;
@@ -188,7 +191,7 @@ inline Point2d phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		//first check for degenerate peaklocs
 		int L2size = set.L2size;
 		if (!(L2size % 2)) L2size++;//odd!+
-		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > sourceimg1.cols) || ((L3peak.y + L2size / 2 + 1) > sourceimg1.rows))
+		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > L3.cols) || ((L3peak.y + L2size / 2 + 1) > L3.rows))
 		{
 			if (logger) logger->Log("Degenerate peak, results might be inaccurate!", FATAL);
 		}
@@ -292,8 +295,8 @@ inline void alignPics(const Mat& input1, const Mat& input2, Mat &output, IPCsett
 		Mat img2FT = fourier(input2);
 		img1FT = quadrantswap(img1FT);
 		img2FT = quadrantswap(img2FT);
-		Mat planes1[2] = { Mat::zeros(img1FT.size(),CV_64F), Mat::zeros(img1FT.size(),CV_64F) };
-		Mat planes2[2] = { Mat::zeros(img1FT.size(),CV_64F), Mat::zeros(img1FT.size(),CV_64F) };
+		Mat planes1[2] = { Mat::zeros(img1FT.size(),CV_32F), Mat::zeros(img1FT.size(),CV_32F) };
+		Mat planes2[2] = { Mat::zeros(img1FT.size(),CV_32F), Mat::zeros(img1FT.size(),CV_32F) };
 		split(img1FT, planes1);
 		split(img2FT, planes2);
 		Mat img1FTm, img2FTm;

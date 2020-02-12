@@ -11,7 +11,7 @@ void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwi
 	if (DFTimg.channels() == 2)
 	{
 		Mat DFTimgcentered = quadrantswap(DFTimg);
-		Mat planes[2];// = { Mat::zeros(DFTimg.size(),CV_64F),Mat::zeros(DFTimg.size(),CV_64F) };
+		Mat planes[2];// = { Mat::zeros(DFTimg.size(),CV_32F),Mat::zeros(DFTimg.size(),CV_32F) };
 		split(DFTimgcentered, planes); // planes[0] = Re(DFT(sourceimg), planes[1] = Im(DFT(sourceimg))
 		Mat magnitudeimglog;
 		magnitude(planes[0], planes[1], magnitudeimglog);
@@ -75,18 +75,18 @@ Mat deconvolute(Mat sourceimg, Mat PSFimg)
 {
 	Mat DFT1 = fourier(sourceimg);
 	Mat DFT2 = fourier(PSFimg);
-	Mat planes1[2] = { Mat::zeros(DFT1.size(),CV_64F),Mat::zeros(DFT1.size(),CV_64F) };
-	Mat planes2[2] = { Mat::zeros(DFT2.size(),CV_64F),Mat::zeros(DFT2.size(),CV_64F) };
-	Mat planesDec[2] = { Mat::zeros(DFT2.size(),CV_64F),Mat::zeros(DFT2.size(),CV_64F) };
+	Mat planes1[2] = { Mat::zeros(DFT1.size(),CV_32F),Mat::zeros(DFT1.size(),CV_32F) };
+	Mat planes2[2] = { Mat::zeros(DFT2.size(),CV_32F),Mat::zeros(DFT2.size(),CV_32F) };
+	Mat planesDec[2] = { Mat::zeros(DFT2.size(),CV_32F),Mat::zeros(DFT2.size(),CV_32F) };
 	split(DFT1, planes1);
 	split(DFT2, planes2);
 	Mat a = planes1[0];
 	Mat b = planes1[1];
 	Mat c = planes2[0];
 	Mat d = planes2[1];
-	Mat denom = Mat::zeros(a.size(), CV_64F);
-	Mat csq = Mat::zeros(a.size(), CV_64F);
-	Mat dsq = Mat::zeros(a.size(), CV_64F);
+	Mat denom = Mat::zeros(a.size(), CV_32F);
+	Mat csq = Mat::zeros(a.size(), CV_32F);
+	Mat dsq = Mat::zeros(a.size(), CV_32F);
 	pow(c, 2, csq);
 	pow(d, 2, dsq);
 	denom = csq + dsq;
@@ -111,25 +111,25 @@ Mat deconvoluteWiener(const Mat& sourceimg, const Mat& PSFimg)
 {
 	Mat DFT1 = fourier(sourceimg);
 	Mat DFT2 = fourier(PSFimg);
-	Mat planes1[2] = { Mat::zeros(DFT1.size(),CV_64F),Mat::zeros(DFT1.size(),CV_64F) };
-	Mat planes2[2] = { Mat::zeros(DFT2.size(),CV_64F),Mat::zeros(DFT2.size(),CV_64F) };
-	Mat planesDec[2] = { Mat::zeros(DFT2.size(),CV_64F),Mat::zeros(DFT2.size(),CV_64F) };
+	Mat planes1[2] = { Mat::zeros(DFT1.size(),CV_32F),Mat::zeros(DFT1.size(),CV_32F) };
+	Mat planes2[2] = { Mat::zeros(DFT2.size(),CV_32F),Mat::zeros(DFT2.size(),CV_32F) };
+	Mat planesDec[2] = { Mat::zeros(DFT2.size(),CV_32F),Mat::zeros(DFT2.size(),CV_32F) };
 	split(DFT1, planes1);
 	split(DFT2, planes2);
 	Mat a = planes1[0];
 	Mat b = planes1[1];
 	Mat c = planes2[0];
 	Mat d = planes2[1];
-	Mat denom = Mat::zeros(a.size(), CV_64F);
-	Mat csq = Mat::zeros(a.size(), CV_64F);
-	Mat dsq = Mat::zeros(a.size(), CV_64F);
+	Mat denom = Mat::zeros(a.size(), CV_32F);
+	Mat csq = Mat::zeros(a.size(), CV_32F);
+	Mat dsq = Mat::zeros(a.size(), CV_32F);
 	pow(c, 2, csq);
 	pow(d, 2, dsq);
 	denom = csq + dsq;
 	Mat magnitudedenom;
 	magnitude(c, d, magnitudedenom);
 	pow(magnitudedenom, 2, magnitudedenom);
-	Mat SNR = Mat::zeros(DFT2.size(), CV_64F);
+	Mat SNR = Mat::zeros(DFT2.size(), CV_32F);
 	SNR = Scalar::all(1.) / 1e-13;
 	Mat dampingfactor = (magnitudedenom) / (magnitudedenom + 1 / SNR);
 	Mat scitanec1 = (a.mul(c)).mul(1 / denom);
@@ -172,7 +172,7 @@ Mat frequencyFilter(const Mat& sourceimg, const Mat& mask)
 Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 {
 	Mat sourceimg = sourceimgIn.clone();
-	sourceimg.convertTo(sourceimg, CV_64F, 1. / 65535);
+	sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
 	sourceimg.reserve(sourceimg.rows * 2);//space for imaginary part
 	if (fftw == 1)//fftw slowest version
 	{
@@ -184,18 +184,18 @@ Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 		{
 			for (c = 0; c < sourceimg.cols; c++)
 			{
-				in[r*sourceimg.cols + c][0] = sourceimg.at<double>(r, c);
+				in[r*sourceimg.cols + c][0] = sourceimg.at<float>(r, c);
 				in[r*sourceimg.cols + c][1] = 0;
 			}
 		}
 		fftw_execute(plan);
-		Mat result2[2] = { Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F), Mat::zeros(sourceimg.rows, sourceimg.cols, CV_64F) };
+		Mat result2[2] = { Mat::zeros(sourceimg.rows, sourceimg.cols, CV_32F), Mat::zeros(sourceimg.rows, sourceimg.cols, CV_32F) };
 		for (r = 0; r < sourceimg.rows; r++)
 		{
 			for (c = 0; c < sourceimg.cols; c++)
 			{
-				result2[0].at<double>(r, c) = out[r*sourceimg.cols + c][0];
-				result2[1].at<double>(r, c) = out[r*sourceimg.cols + c][1];
+				result2[0].at<float>(r, c) = out[r*sourceimg.cols + c][0];
+				result2[1].at<float>(r, c) = out[r*sourceimg.cols + c][1];
 			}
 		}
 		Mat result;
@@ -210,8 +210,8 @@ Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 		fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
 		fftw_execute(plan);
 		fftw_destroy_plan(plan);
-		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
 		Mat result2[2] = { resultRe,resultIm };
 		Mat result;
 		merge(result2, 2, result);
@@ -222,8 +222,8 @@ Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 		fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(plan);
 		fftw_destroy_plan(plan);
-		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_64F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+		Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
 		Mat result2[2] = { resultRe,resultIm };
 		Mat result;
 		merge(result2, 2, result);

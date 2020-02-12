@@ -24,7 +24,6 @@ void WindowIPCparameters::refreshIPCparameters()
 	globals->IPCsettings->applyBandpass = ui.checkBox_3->isChecked();
 	globals->IPCsettings->applyWindow = ui.checkBox_4->isChecked();
 	globals->IPCsettings->interpolate = ui.checkBox_5->isChecked();
-	globals->IPCsettings->normInput = ui.checkBox_6->isChecked();
 	globals->IPCsettings->crossCorrel = ui.checkBox_7->isChecked();
 
 	globals->Logger->Log("IPC parameter values updated", INFO);

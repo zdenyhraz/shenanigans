@@ -16,17 +16,17 @@ std::tuple<double, double> minMaxMat(const Mat& sourceimg)
 std::vector<double> polyfit(const std::vector<double>& data, int degree)
 {
 	int dataCount = data.size();
-	Mat X = Mat::zeros(dataCount, degree + 1, CV_64F);//matice planu
-	Mat Y = Mat::zeros(dataCount, 1, CV_64F);//matice prave strany
+	Mat X = Mat::zeros(dataCount, degree + 1, CV_32F);//matice planu
+	Mat Y = Mat::zeros(dataCount, 1, CV_32F);//matice prave strany
 	for (int r = 0; r < X.rows; r++)
 	{
-		Y.at<double>(r, 0) = data[r];
+		Y.at<float>(r, 0) = data[r];
 		for (int c = 0; c < X.cols; c++)
 		{
 			if (!c)
-				X.at<double>(r, c) = 1;
+				X.at<float>(r, c) = 1;
 			else
-				X.at<double>(r, c) = pow(r, c);
+				X.at<float>(r, c) = pow(r, c);
 		}
 	}
 	Mat coeffs = (X.t()*X).inv()*X.t()*Y;//least squares
@@ -34,7 +34,7 @@ std::vector<double> polyfit(const std::vector<double>& data, int degree)
 	std::vector<double> fit(dataCount, 0);
 	for (int r = 0; r < fitM.rows; r++)
 	{
-		fit[r] = fitM.at<double>(r, 0);
+		fit[r] = fitM.at<float>(r, 0);
 	}
 	return fit;
 }
@@ -50,7 +50,7 @@ Mat crosshair(const Mat& sourceimgIn, cv::Point point)
 	cv::Point offset2(outer, 0);
 	cv::Point offset3(0, inner);
 	cv::Point offset4(inner, 0);
-	sourceimg.convertTo(sourceimg, CV_64F);
+	sourceimg.convertTo(sourceimg, CV_32F);
 	normalize(sourceimg, sourceimg, 0, 1, CV_MINMAX);
 
 	circle(sourceimg, point, inner, CrosshairColor, thickness, 0, 0);
@@ -144,18 +144,18 @@ Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)//x,y souradnice 
 
 Mat kirkl(unsigned size)
 {
-	Mat kirkl = Mat::zeros(size, size, CV_64F);
+	Mat kirkl = Mat::zeros(size, size, CV_32F);
 	for (int r = 0; r < size; r++)
 	{
 		for (int c = 0; c < size; c++)
 		{
 			if ((sqr((double)r - floor(size / 2)) + sqr((double)c - floor(size / 2))) < sqr((double)size / 2 + 1))
 			{
-				kirkl.at<double>(r, c) = 1.;
+				kirkl.at<float>(r, c) = 1.;
 			}
 			else
 			{
-				kirkl.at<double>(r, c) = 0.;
+				kirkl.at<float>(r, c) = 0.;
 			}
 		}
 	}
@@ -164,18 +164,18 @@ Mat kirkl(unsigned size)
 
 Mat kirkl(int rows, int cols, unsigned radius)
 {
-	Mat kirkl = Mat::zeros(rows, cols, CV_64F);
+	Mat kirkl = Mat::zeros(rows, cols, CV_32F);
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
 			if ((sqr((double)r - floor(rows / 2)) + sqr((double)c - floor(cols / 2))) < sqr(radius))
 			{
-				kirkl.at<double>(r, c) = 1.;
+				kirkl.at<float>(r, c) = 1.;
 			}
 			else
 			{
-				kirkl.at<double>(r, c) = 0.;
+				kirkl.at<float>(r, c) = 0.;
 			}
 		}
 	}
@@ -199,9 +199,9 @@ Point2d findCentroidDouble(const Mat& sourceimg)
 		//std::cout << " FCrow " << r;
 		for (int c = 0; c < sourceimg.cols; c++)
 		{
-			M00 += 1.0 * sourceimg.at<double>(r, c);
-			M01 += (double)r * sourceimg.at<double>(r, c);
-			M10 += (double)c * sourceimg.at<double>(r, c);
+			M00 += 1.0 * sourceimg.at<float>(r, c);
+			M01 += (double)r * sourceimg.at<float>(r, c);
+			M10 += (double)c * sourceimg.at<float>(r, c);
 		}
 	}
 	Point2d CentroidDouble(2, 0.0);
@@ -215,8 +215,8 @@ Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle 
 	Mat source1 = source1In.clone();
 	Mat source2 = source2In.clone();
 	Mat result = Mat::zeros(source1.rows, source1.cols, CV_8UC3);
-	source1.convertTo(source1, CV_64F);
-	source2.convertTo(source2, CV_64F);
+	source1.convertTo(source1, CV_32F);
+	source2.convertTo(source2, CV_32F);
 	if (style == HUEBRIGHT)
 	{
 		normalize(source1, source1, 0, 1, CV_MINMAX);
@@ -226,9 +226,9 @@ Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle 
 		{
 			for (int c = 0; c < source1.cols; c++)
 			{
-				auto BGRjet = colorMapJET(255.*source1.at<double>(r, c));
+				auto BGRjet = colorMapJET(255.*source1.at<float>(r, c));
 				auto HUE = BGR_to_HUE(BGRjet);
-				auto BGR = HUE_to_BGR(HUE, 255.*source2.at<double>(r, c), BGRjet);
+				auto BGR = HUE_to_BGR(HUE, 255.*source2.at<float>(r, c), BGRjet);
 
 				result.at<Vec3b>(r, c)[0] = std::get<0>(BGR);
 				result.at<Vec3b>(r, c)[1] = std::get<1>(BGR);
@@ -244,10 +244,10 @@ Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle 
 		{
 			for (int c = 0; c < source1.cols; c++)
 			{
-				auto BGR = colorMapBINARY(source1.at<double>(r, c), std::get<0>(minMax), std::get<1>(minMax), sigma);
-				result.at<Vec3b>(r, c)[0] = source2.at<double>(r, c)*std::get<0>(BGR);
-				result.at<Vec3b>(r, c)[1] = source2.at<double>(r, c)*std::get<1>(BGR);
-				result.at<Vec3b>(r, c)[2] = source2.at<double>(r, c)*std::get<2>(BGR);
+				auto BGR = colorMapBINARY(source1.at<float>(r, c), std::get<0>(minMax), std::get<1>(minMax), sigma);
+				result.at<Vec3b>(r, c)[0] = source2.at<float>(r, c)*std::get<0>(BGR);
+				result.at<Vec3b>(r, c)[1] = source2.at<float>(r, c)*std::get<1>(BGR);
+				result.at<Vec3b>(r, c)[2] = source2.at<float>(r, c)*std::get<2>(BGR);
 			}
 		}
 	}
@@ -370,12 +370,12 @@ void saveMatToCsv(const std::string& path, const Mat& matIn)
 {
 	std::ofstream listing(path, std::ios::out | std::ios::trunc);
 	Mat mat = matIn.clone();
-	mat.convertTo(mat, CV_64F);
+	mat.convertTo(mat, CV_32F);
 	for (int r = 0; r < mat.rows; r++)
 	{
 		for (int c = 0; c < mat.cols; c++)
 		{
-			listing << mat.at<double>(r, c) << ",";
+			listing << mat.at<float>(r, c) << ",";
 		}
 		listing << endl;
 	}

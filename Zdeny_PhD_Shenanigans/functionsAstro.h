@@ -39,8 +39,8 @@ struct DiffrotResults
 			medianBlur(medFlowX, medFlowX, med);
 			medianBlur(medFlowY, medFlowY, med);
 		}
-		medFlowX.convertTo(medFlowX, CV_64F);
-		medFlowY.convertTo(medFlowY, CV_64F);
+		medFlowX.convertTo(medFlowX, CV_32F);
+		medFlowY.convertTo(medFlowY, CV_32F);
 		Mat medFlowXrelativeF = medFlowX - matFromVector(FlowXfit, medFlowX.cols);
 		Mat medFlowXrelativeFF = medFlowX - matFromVectorC(FlowXfits);
 		Mat medFlowXrelativeP = medFlowX - matFromVector(FlowXpred, medFlowX.cols);
@@ -75,10 +75,10 @@ struct DiffrotResults
 			Mat FlowPicBGR = FlowPic.clone();
 			FlowPicBGR.convertTo(FlowPicBGR, CV_32F);
 			cvtColor(FlowPicBGR, FlowPicBGR, CV_GRAY2BGR);
-			FlowPicBGR.convertTo(FlowPicBGR, CV_64F);
+			FlowPicBGR.convertTo(FlowPicBGR, CV_32F);
 			normalize(FlowPicBGR, FlowPicBGR, 0, 1, CV_MINMAX);
 			Mat medFlowX_BGR = applyColorMapZdeny(medFlowX, quantileBot, quantileTop);
-			medFlowX_BGR.convertTo(medFlowX_BGR, CV_64F);
+			medFlowX_BGR.convertTo(medFlowX_BGR, CV_32F);
 			normalize(medFlowX_BGR, medFlowX_BGR, 0, 1, CV_MINMAX);
 			Mat mergedGHE = (1. - sigma)*FlowPicBGR + sigma * medFlowX_BGR;
 			showimg(mergedGHE, "FlowX Merged Ghetto", false, quantileBot, quantileTop);

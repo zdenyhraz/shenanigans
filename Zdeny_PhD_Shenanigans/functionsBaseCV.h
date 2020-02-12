@@ -187,7 +187,7 @@ inline std::vector<double> mat1ToVect(const Mat& mat)
 {
 	std::vector<double> result(mat.rows, 0);
 	for (int r = 0; r < mat.rows; r++)
-		result[r] = mat.at<double>(r, 0);
+		result[r] = mat.at<float>(r, 0);
 	return result;
 }
 
@@ -196,7 +196,7 @@ inline std::vector<std::vector<double>> matToVect2(const Mat& mat)
 	std::vector<std::vector<double>> result = zerovect2(mat.rows, mat.cols);
 	for (int r = 0; r < mat.rows; r++)
 		for (int c = 0; c < mat.cols; c++)
-			result[r][c] = mat.at<double>(r, c);
+			result[r][c] = mat.at<float>(r, c);
 	return result;
 }
 
@@ -208,7 +208,7 @@ inline void exportToMATLAB(const Mat& Zdata, double xmin, double xmax, double ym
 	listing << xmin << "," << xmax << "," << ymin << "," << ymax << endl;
 	for (int r = 0; r < Zdata.rows; r++)
 		for (int c = 0; c < Zdata.cols; c++)
-			listing << Zdata.at<double>(r, c) << endl;
+			listing << Zdata.at<float>(r, c) << endl;
 }
 
 inline std::string to_string(const Point2d& point)
@@ -218,14 +218,14 @@ inline std::string to_string(const Point2d& point)
 
 inline Mat quadrantMask(int rows, int cols)
 {
-	Mat qmask = Mat::zeros(rows, cols, CV_64F);
+	Mat qmask = Mat::zeros(rows, cols, CV_32F);
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
 			if (r > (rows / 2) && c < (cols / 2))//3rd quadrant
 			{
-				qmask.at<double>(r, c) = 1;
+				qmask.at<float>(r, c) = 1;
 			}
 		}
 	}
@@ -235,12 +235,12 @@ inline Mat quadrantMask(int rows, int cols)
 inline Mat matFromVector(std::vector<double>& vec, int cols)
 {
 	int rows = vec.size();
-	Mat result = Mat::zeros(rows, cols, CV_64F);
+	Mat result = Mat::zeros(rows, cols, CV_32F);
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
-			result.at<double>(r, c) = vec[r];
+			result.at<float>(r, c) = vec[r];
 		}
 	}
 	return result;
@@ -250,12 +250,12 @@ inline Mat matFromVectorR(std::vector<std::vector<double>>& vec)
 {
 	int rows = vec.size();
 	int cols = vec[0].size();
-	Mat result = Mat::zeros(rows, cols, CV_64F);
+	Mat result = Mat::zeros(rows, cols, CV_32F);
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
-			result.at<double>(r, c) = vec[r][c];
+			result.at<float>(r, c) = vec[r][c];
 		}
 	}
 	return result;
@@ -265,12 +265,12 @@ inline Mat matFromVectorC(std::vector<std::vector<double>>& vec)
 {
 	int cols = vec.size();
 	int rows = vec[0].size();
-	Mat result = Mat::zeros(rows, cols, CV_64F);
+	Mat result = Mat::zeros(rows, cols, CV_32F);
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
-			result.at<double>(r, c) = vec[c][r];
+			result.at<float>(r, c) = vec[c][r];
 		}
 	}
 	return result;

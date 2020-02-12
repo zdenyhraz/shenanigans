@@ -18,21 +18,21 @@ std::vector<double> inverseMappingZH(const std::vector<std::vector<double>>& tri
 		return zerovect(N, 0);
 	
 	//fill input trial matrix
-	Mat trialInputsM = Mat::zeros(trials, degree*N + 1, CV_64F);
+	Mat trialInputsM = Mat::zeros(trials, degree*N + 1, CV_32F);
 	for (int r = 0; r < trials; r++)
 	{
 		for (int deg = 0; deg < degree; deg++)
 		{
 			for (int c = deg * N; c < (deg + 1) * N; c++)
 			{
-				trialInputsM.at<double>(r, c) = pow(trialInputs[r][c % N], deg + 1);
+				trialInputsM.at<float>(r, c) = pow(trialInputs[r][c % N], deg + 1);
 			}	
 		}
-		trialInputsM.at<double>(r, trialInputsM.cols - 1) = 1; //constant term, last
+		trialInputsM.at<float>(r, trialInputsM.cols - 1) = 1; //constant term, last
 	}
 
 	//fill output trial matrix
-	Mat trialOutputsM = Mat::zeros(trials, degree*N + 1, CV_64F);
+	Mat trialOutputsM = Mat::zeros(trials, degree*N + 1, CV_32F);
 	for (int r = 0; r < trials; r++)
 	{
 		for (int deg = 0; deg < degree; deg++)
@@ -40,32 +40,32 @@ std::vector<double> inverseMappingZH(const std::vector<std::vector<double>>& tri
 			for (int c = deg * N; c < (deg + 1) * N; c++)
 			{
 				if (deg == 0)
-					trialOutputsM.at<double>(r, c) = trialOutputs[r][c % N];
+					trialOutputsM.at<float>(r, c) = trialOutputs[r][c % N];
 				else
-					trialOutputsM.at<double>(r, c) = 1;
+					trialOutputsM.at<float>(r, c) = 1;
 			}
 		}
-		trialOutputsM.at<double>(r, trialOutputsM.cols - 1) = 1; //constant term, last
+		trialOutputsM.at<float>(r, trialOutputsM.cols - 1) = 1; //constant term, last
 	}
 
 	Mat transferMatrix = (trialInputsM.t() * trialInputsM).inv(DECOMP_LU) * trialInputsM.t() * trialOutputsM; //calculate transfer matrix
-	Mat desiredOutputM = Mat::zeros(1, degree*N + 1, CV_64F);
+	Mat desiredOutputM = Mat::zeros(1, degree*N + 1, CV_32F);
 	for (int deg = 0; deg < degree; deg++)
 	{
 		for (int c = deg * N; c < (deg + 1) * N; c++)
 		{
 			if (deg == 0) 
-				desiredOutputM.at<double>(0, c) = desiredOutput[c % N];
+				desiredOutputM.at<float>(0, c) = desiredOutput[c % N];
 			else 
-				desiredOutputM.at<double>(0, c) = 1;
+				desiredOutputM.at<float>(0, c) = 1;
 		}
 	}
-	desiredOutputM.at<double>(0, desiredOutputM.cols - 1) = 1; //constant term, last
+	desiredOutputM.at<float>(0, desiredOutputM.cols - 1) = 1; //constant term, last
 
 	Mat desiredInputM = desiredOutputM * transferMatrix.inv(DECOMP_LU); //calculate desired input matrix
 	std::vector<double> desiredInput(N, 0);
 	for (int c = 0; c < N; c++)
-		desiredInput[c] = desiredInputM.at<double>(0, c);
+		desiredInput[c] = desiredInputM.at<float>(0, c);
 	return desiredInput;
 }
 
