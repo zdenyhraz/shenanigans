@@ -1,19 +1,9 @@
 #include "stdafx.h"
 #include "FITS.h"
 
-void swapbytes(char* input, unsigned length)
+Mat loadfits(std::string path, FitsParams& params)
 {
-	//#pragma omp parallel for
-	for (int i = 0; i < length; i += 2)
-	{
-		char temp = input[i];
-		input[i] = input[i + 1];
-		input[i + 1] = temp;
-	}
-}
-
-Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<std::string>* header)
-{
+	Timerr("loadfits old");
 	ifstream streamIN(path, ios::binary | ios::in);
 	if (!streamIN)
 	{
@@ -34,7 +24,6 @@ Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<st
 			streamIN.read(&lajnaText[0], lineBYTEcnt);
 			lajny++;
 			string lajnaString(lajnaText);
-			if (header) header->push_back(lajnaString);
 
 			if (lajnaString.find("NAXIS1") != std::string::npos)
 			{
@@ -116,17 +105,14 @@ Mat loadfits(std::string path, fitsParams& params, fitsType type, std::vector<st
 		}
 
 		//opencv integration 
-		Mat fits_PICTURE_Mat = Mat(fitsSize, fitsSize, CV_16UC1, celyobraz_8.data(), Mat::AUTO_STEP);
-
-		normalize(fits_PICTURE_Mat, fits_PICTURE_Mat, 0, 65535, CV_MINMAX);
+		Mat mat = Mat(fitsSize, fitsSize, CV_16UC1, celyobraz_8.data(), Mat::AUTO_STEP).clone();
+		normalize(mat, mat, 0, 65535, CV_MINMAX);
 		Point2f pt(fitsMid, fitsMid);
 		Mat r = getRotationMatrix2D(pt, 90, 1.0);
-		warpAffine(fits_PICTURE_Mat, fits_PICTURE_Mat, r, cv::Size(fitsSize, fitsSize));
-		transpose(fits_PICTURE_Mat, fits_PICTURE_Mat);
+		warpAffine(mat, mat, r, cv::Size(fitsSize, fitsSize));
+		transpose(mat, mat);
 		params.succload = true;
-		cout << "loaded." << endl;
-		showimg(fits_PICTURE_Mat, "inside");
-		return fits_PICTURE_Mat.clone();
+		return mat;
 	}
 }
 
@@ -202,10 +188,8 @@ void loadImageDebug(Mat& activeimg, double gamaa, bool colorr, double quanBot, d
 	if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
 	{
 		std::cout << "loading a fits file.." << std::endl;
-		fitsParams params;
-		std::vector<std::string> header;
-		activeimg = gammaCorrect(loadfits(path, params, fitsType::HMI, &header), gamaa);
-		std::cout << endl << "fits header:" << endl << endl << header << endl << endl;
+		FitsParams params;
+		activeimg = gammaCorrect(loadfits(path, params), gamaa);
 		std::cout << "fitsMidX: " << params.fitsMidX << std::endl;
 		std::cout << "fitsMidY: " << params.fitsMidY << std::endl;
 		std::cout << "R: " << params.R << std::endl;

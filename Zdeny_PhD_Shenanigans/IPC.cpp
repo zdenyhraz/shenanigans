@@ -40,7 +40,7 @@ Mat AlignStereovision(const Mat& img1In, const Mat& img2In)
 void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_settings)
 {
 	/*
-	fitsParams params;
+	FitsParams params;
 	Mat img1 = loadfits("D:\\MainOutput\\304A.fits", params, fitsType::AIA);
 	Mat img2 = loadfits("D:\\MainOutput\\171A.fits", params, fitsType::AIA);
 	*/
@@ -110,7 +110,7 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
 	int progress = 0;
 
 	//load the test picture
-	fitsParams params;
+	FitsParams params;
 	Mat src1 = loadfits("D:\\MainOutput\\HMI.fits", params);
 	//Mat src1 = imread("D:\\MainOutput\\png\\HMI_proc.png", IMREAD_ANYDEPTH);
 	Mat edgemaska = edgemask(IPC_settings1.getcols(), IPC_settings1.getcols());

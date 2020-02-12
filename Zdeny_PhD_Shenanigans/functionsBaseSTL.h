@@ -23,7 +23,7 @@ struct Timerr//benchmarking struct
 {
 	std::chrono::time_point<std::chrono::high_resolution_clock> startTimepoint;
 	std::string name;
-	inline Timerr(std::string name) : name(name)
+	Timerr(std::string name) : name(name)
 	{
 		startTimepoint = std::chrono::high_resolution_clock::now();
 	}
@@ -33,9 +33,24 @@ struct Timerr//benchmarking struct
 		std::chrono::time_point<std::chrono::high_resolution_clock> endTimepoint = std::chrono::high_resolution_clock::now();
 		auto start = std::chrono::time_point_cast<std::chrono::microseconds>(startTimepoint).time_since_epoch().count();
 		auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
-		auto duration = end - start;
-		double ms = duration * 1e-3;
-		cout << "<timer - " << name << "> (" << ms << " ms)" << endl;
+		cout << "<<" << name << ">> took " << double(end - start) << " mics" << endl;
+	}
+};
+
+struct Timerrr//benchmarking struct
+{
+	double startTimepoint;
+	std::string name;
+	clock_t t;
+	Timerrr(std::string name) : name(name)
+	{
+		t = clock();
+	}
+
+	~Timerrr()
+	{
+		t = clock() - t;
+		cout << "<<" << name << ">> took " << std::setprecision(20) << t << " ms" << endl;
 	}
 };
 
