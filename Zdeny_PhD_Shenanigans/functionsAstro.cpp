@@ -524,7 +524,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 	}
 	
 	//------------------------------------------------------------------------
-	cout << "retVal = " << retVal / itersY << "               (" << std::vector<double>{(double)set.getcols(), set.getL(), set.getH(), set.L2size, (double)set.applyWindow} << ")" << endl;
+	cout << "retVal = " << retVal / itersY << "          (" << std::vector<double>{(double)set.getcols(), set.getL(), set.getH(), set.L2size, (double)set.applyWindow} << ")" << endl;
 	return retVal / itersY;
 }
 
