@@ -32,7 +32,6 @@ inline void swapbytes(char* input, unsigned length)
 
 inline std::tuple<Mat, FitsParams> loadfits(std::string path)
 {
-	Timerr("loadfits new");
 	FitsParams params;
 	ifstream streamIN(path, ios::binary | ios::in);
 	if (!streamIN)
@@ -113,8 +112,8 @@ inline std::tuple<Mat, FitsParams> loadfits(std::string path)
 
 		streamIN.read((char*)mat.data, fitsSize2 * 2);
 		swapbytes((char*)mat.data, fitsSize2 * 2);
-		short* s16 = (short*)((char*)mat.data);
-		ushort* us16 = (ushort*)((char*)mat.data);
+		short* s16 = (short*)mat.data;
+		ushort* us16 = (ushort*)mat.data;
 
 		//new korekce
 		for (int i = 0; i < fitsSize2; i++)

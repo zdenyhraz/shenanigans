@@ -3,7 +3,6 @@
 
 Mat loadfits(std::string path, FitsParams& params)
 {
-	Timerr("loadfits old");
 	ifstream streamIN(path, ios::binary | ios::in);
 	if (!streamIN)
 	{

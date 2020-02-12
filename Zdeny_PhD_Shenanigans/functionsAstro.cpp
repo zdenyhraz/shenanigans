@@ -533,5 +533,5 @@ double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
-	return DiffrotMerritFunction(set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX);
+	return DiffrotMerritFunction(set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX) / pics.size();
 }
