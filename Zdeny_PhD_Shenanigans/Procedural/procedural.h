@@ -15,14 +15,12 @@ inline Mat procedural(int rows, int cols)
 	{
 		float cx = 0.02*(float)rand() / RAND_MAX;
 		float cy = 0.02*(float)rand() / RAND_MAX;
-		float ratio = abs(cx) / abs(cy);
+		float ratio = cx / cy;
 
-		if (ratio > 5 || ratio < 1. / 5)
+		if (ratio > 5 || ratio < (1. / 5))
 			continue;
-
-		//mat += pow(N - i, 1)*sinian(rows, cols, i + 1, i + 1, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX).mul(gaussian(rows, cols, 0.002*(float)rand() / RAND_MAX, 0.002*(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
-		//mat += sinian(rows, cols, i + 1, i + 1, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX).mul(gaussian(rows, cols, 0.002*(float)rand() / RAND_MAX, 0.002*(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
-		mat += (float)rand() / RAND_MAX * gaussian(rows, cols, cx, cy, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+		
+		mat += ((float)rand() / RAND_MAX * gaussian(rows, cols, cx, cy, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
 	}
 	normalize(mat, mat, 0, 1, CV_MINMAX);
 	return mat;
