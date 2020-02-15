@@ -138,10 +138,23 @@ void Zdeny_PhD_Shenanigans::debug()
 		showimg(std::get<0>(noises), "smooth noise 3 color");
 		showimg(std::get<1>(noises), "smooth noise many color");
 	}
+	if (0)
+	{
+		Mat sin1 = sinian(1000, 1000, 5, 5, 0.3, -0.2);
+		Mat sin2 = sinian(1000, 1000, 25, 25, -0.4, 0.6);
+		Mat sin3 = sinian(1000, 1000, 35, 35, 0.7, -0.1);
+		Mat mat = 0.5*sin1 + 0.3*sin2 + 0.2*sin3;
+		showimg(mat, "sinian", true);
+	}
+	if (0)
+	{
+		Mat mat = gaussian(1000, 1000, 0.1, 0.1, 0.5, 0.5);
+		showimg(mat, "gaussian", true);
+	}
 	if (1)
 	{
-		Mat mat = sinian(1000, 1000);
-		showimg(mat, "sinian", true);
+		Mat mat = procedural(1000, 1000);
+		showimg(mat, "procedural", true);
 	}
 
 	globals->Logger->Log("Debug finished.", EVENT);
