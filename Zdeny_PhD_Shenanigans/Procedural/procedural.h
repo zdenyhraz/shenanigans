@@ -28,7 +28,7 @@ inline Mat procedural(int rows, int cols)
 	return mat;
 }
 
-Mat colorlandscape(const Mat& heightmap)
+inline Mat colorlandscape(const Mat& heightmap)
 {
 	Mat mat(heightmap.rows, heightmap.cols, CV_32FC3);
 
