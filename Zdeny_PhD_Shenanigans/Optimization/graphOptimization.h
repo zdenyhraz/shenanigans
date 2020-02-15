@@ -92,6 +92,7 @@ struct Graph
 				return optimalPath;
 			}
 		}
+		return vector<unsigned>{0};
 	}
 };
 

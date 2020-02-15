@@ -50,7 +50,7 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
+   <header>Plot/qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

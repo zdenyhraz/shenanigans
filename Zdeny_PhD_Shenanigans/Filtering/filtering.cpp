@@ -81,7 +81,7 @@ void showhistogram(const Mat& sourceimgIn, int channels, int minimum, int maximu
 	int histSize = 256;
 
 	/// Set the ranges ( for B,G,R) )
-	float range[] = { minimum, maximum };
+	float range[] = { (float)minimum, (float)maximum };
 	const float* histRange = { range };
 
 	bool uniform = true; bool accumulate = false;

@@ -21,6 +21,7 @@ unsigned getTupleIndexWithIndex(std::vector<std::tuple<unsigned, double, unsigne
 			return i;
 		}
 	}
+	return -1;
 }
 
 void findOptimalGraphPathDebug()
