@@ -139,6 +139,7 @@
     <ClCompile Include="Gui\Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Log\loggercsl.h" />
     <ClInclude Include="Filtering\filtering.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Plot\plotter.h" />
     <ClInclude Include="Plot\plotterqt.h" />
     <ClInclude Include="Log\loggerqt.h" />
+    <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\smoothnoise.h" />
     <ClInclude Include="stdafx.h" />
     <QtMoc Include="Gui\WindowDiffrot.h" />

@@ -67,7 +67,7 @@ Mat loadfits(std::string path, FitsParams& params)
 			{
 				std::size_t pos = lajnaString.find("= ");
 				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.theta0 = stod(stringcislo) / (360. / 2. / PI);
+				params.theta0 = stod(stringcislo) / (360. / 2. / Constants::Pi);
 			}
 			else if (lajnaString.find("END                        ") != std::string::npos)
 			{

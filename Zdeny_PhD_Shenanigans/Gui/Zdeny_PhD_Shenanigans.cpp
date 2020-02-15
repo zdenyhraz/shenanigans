@@ -61,7 +61,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		for (int i = 0; i < n; i++)
 		{
 			x[i] = (double)i/(n-1);
-			y[i] = sin(2 * PI*x[i]);
+			y[i] = sin(2 * Constants::Pi*x[i]);
 		}
 
 		Plot1D plt(ui.widget);
@@ -132,11 +132,16 @@ void Zdeny_PhD_Shenanigans::debug()
 		cout << "desiredOutput: " << desiredOutput << endl;
 		cout << "realOutput: " << realOutput << endl;
 	}
-	if (1)
+	if (0)
 	{
 		auto noises = SmoothNoise(500, 500);
 		showimg(std::get<0>(noises), "smooth noise 3 color");
 		showimg(std::get<1>(noises), "smooth noise many color");
+	}
+	if (1)
+	{
+		Mat mat = sinian(1000, 1000);
+		showimg(mat, "sinian", true);
 	}
 
 	globals->Logger->Log("Debug finished.", EVENT);

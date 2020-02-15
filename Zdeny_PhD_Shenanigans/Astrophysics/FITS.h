@@ -97,7 +97,7 @@ inline std::tuple<Mat, FitsParams> loadfits(std::string path)
 			{
 				std::size_t pos = sline.find("= ");
 				std::string snum = sline.substr(pos + 2);
-				params.theta0 = stod(snum) / (360. / 2. / PI);
+				params.theta0 = stod(snum) / (360. / 2. / Constants::Pi);
 			}
 			else if (sline.find("END                        ") != std::string::npos)
 			{

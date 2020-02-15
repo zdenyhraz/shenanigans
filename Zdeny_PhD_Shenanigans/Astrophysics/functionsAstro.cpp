@@ -253,7 +253,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					Point2d shift, shift1, shift2;
 					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
 					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
-					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
+					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);//predicted omega in radians per second
 					predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
 
 					//reduce shift noise by computing multiple shifts near central meridian and then working with their median
@@ -282,7 +282,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					omegasXcurr[iterY] = omega_x;
 					omegasYcurr[iterY] = omega_y;
 					omegasPcurr[iterY] = predicted_omega;
-					thetascurr[iterY] = theta * 360 / 2 / PI;
+					thetascurr[iterY] = theta * 360 / 2 / Constants::Pi;
 
 					omegasXmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
 					omegasYmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
@@ -468,7 +468,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 				Point2d shift, shift1, shift2;
 				double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
 				theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
-				predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / PI);//predicted omega in radians per second
+				predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);//predicted omega in radians per second
 				predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
 
 				//reduce shift noise by computing multiple shifts near central meridian and then working with their median
@@ -496,7 +496,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 
 				omegasXcurr[iterY] = omega_x;
 				omegasPcurr[iterY] = predicted_omega;
-				thetascurr[iterY] = theta * 360 / 2 / PI;
+				thetascurr[iterY] = theta * 360 / 2 / Constants::Pi;
 
 			}//Y for cycle end
 		}//X for cycle end
