@@ -159,9 +159,6 @@
     <ClInclude Include="Core\macros.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Procedural\smoothnoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Log\logger.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
@@ -178,6 +175,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Procedural\procedural.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

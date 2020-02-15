@@ -162,7 +162,7 @@
     <ClInclude Include="Plot\plotterqt.h" />
     <ClInclude Include="Log\loggerqt.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
-    <ClInclude Include="Procedural\smoothnoise.h" />
+    <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="stdafx.h" />
     <QtMoc Include="Gui\WindowDiffrot.h" />
     <QtMoc Include="Gui\WindowIPC2PicAlign.h" />

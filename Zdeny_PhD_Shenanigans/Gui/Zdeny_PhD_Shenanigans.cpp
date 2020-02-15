@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "InverseMap/inverseMapping.h"
 #include "Procedural/baseFunctions2d.h"
-#include "Procedural/smoothnoise.h"
+#include "Procedural/procedural.h"
 
 #include "Zdeny_PhD_Shenanigans.h"
 
