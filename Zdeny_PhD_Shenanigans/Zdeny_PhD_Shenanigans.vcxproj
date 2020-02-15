@@ -108,20 +108,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="filtering.cpp" />
-    <ClCompile Include="FITS.cpp" />
-    <ClCompile Include="fourier.cpp" />
-    <ClCompile Include="fractal.cpp" />
-    <ClCompile Include="functionsAstro.cpp" />
-    <ClCompile Include="functionsBaseCV.cpp" />
-    <ClCompile Include="functionsBaseSTL.cpp" />
-    <ClCompile Include="graphOptimization.cpp" />
-    <ClCompile Include="inverseMapping.cpp" />
-    <ClCompile Include="IPC.cpp" />
+    <ClCompile Include="Filtering\filtering.cpp" />
+    <ClCompile Include="Astrophysics\FITS.cpp" />
+    <ClCompile Include="Fourier\fourier.cpp" />
+    <ClCompile Include="Fractal\fractal.cpp" />
+    <ClCompile Include="Astrophysics\functionsAstro.cpp" />
+    <ClCompile Include="Core\functionsBaseCV.cpp" />
+    <ClCompile Include="Core\functionsBaseSTL.cpp" />
+    <ClCompile Include="Optimization\graphOptimization.cpp" />
+    <ClCompile Include="InverseMapping\inverseMapping.cpp" />
+    <ClCompile Include="IPC\IPC.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="neural.cpp" />
-    <ClCompile Include="optimization.cpp" />
-    <ClCompile Include="qcustomplot.cpp">
+    <ClCompile Include="Neural\neural.cpp" />
+    <ClCompile Include="Optimization\optimization.cpp" />
+    <ClCompile Include="Plot\qcustomplot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -130,63 +130,64 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WindowDiffrot.cpp" />
-    <ClCompile Include="WindowIPC2PicAlign.cpp" />
-    <ClCompile Include="WindowIPCoptimize.cpp" />
-    <ClCompile Include="WindowIPCparameters.cpp" />
-    <ClCompile Include="WindowPlot.cpp" />
-    <ClCompile Include="WindowTemplate.cpp" />
-    <ClCompile Include="Zdeny_PhD_Shenanigans.cpp" />
+    <ClCompile Include="QtGui\WindowDiffrot.cpp" />
+    <ClCompile Include="QtGui\WindowIPC2PicAlign.cpp" />
+    <ClCompile Include="QtGui\WindowIPCoptimize.cpp" />
+    <ClCompile Include="QtGui\WindowIPCparameters.cpp" />
+    <ClCompile Include="QtGui\WindowPlot.cpp" />
+    <ClCompile Include="QtGui\WindowTemplate.cpp" />
+    <ClCompile Include="QtGui\Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="macros.h" />
-    <ClInclude Include="loggercsl.h" />
-    <ClInclude Include="filtering.h" />
-    <ClInclude Include="FITS.h" />
-    <ClInclude Include="fourier.h" />
-    <ClInclude Include="fractal.h" />
-    <ClInclude Include="functionsAstro.h" />
-    <ClInclude Include="functionsBaseCV.h" />
-    <ClInclude Include="functionsBaseSTL.h" />
-    <ClInclude Include="globals.h" />
-    <ClInclude Include="graphOptimization.h" />
-    <ClInclude Include="inverseMapping.h" />
-    <ClInclude Include="IPC.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="neural.h" />
-    <ClInclude Include="optimization.h" />
-    <QtMoc Include="WindowPlot.h" />
-    <QtMoc Include="qcustomplot.h" />
-    <ClInclude Include="plotter.h" />
-    <ClInclude Include="plotterqt.h" />
-    <ClInclude Include="loggerqt.h" />
+    <ClInclude Include="Core\macros.h" />
+    <ClInclude Include="Log\loggercsl.h" />
+    <ClInclude Include="Filtering\filtering.h" />
+    <ClInclude Include="Astrophysics\FITS.h" />
+    <ClInclude Include="Fourier\fourier.h" />
+    <ClInclude Include="Fractal\fractal.h" />
+    <ClInclude Include="Astrophysics\functionsAstro.h" />
+    <ClInclude Include="Core\functionsBaseCV.h" />
+    <ClInclude Include="Core\functionsBaseSTL.h" />
+    <ClInclude Include="Core\globals.h" />
+    <ClInclude Include="Optimization\graphOptimization.h" />
+    <ClInclude Include="InverseMapping\inverseMapping.h" />
+    <ClInclude Include="IPC\IPC.h" />
+    <ClInclude Include="Log\logger.h" />
+    <ClInclude Include="Neural\neural.h" />
+    <ClInclude Include="Optimization\optimization.h" />
+    <QtMoc Include="QtGui\WindowPlot.h" />
+    <QtMoc Include="Plot\qcustomplot.h" />
+    <ClInclude Include="Plot\plotter.h" />
+    <ClInclude Include="Plot\plotterqt.h" />
+    <ClInclude Include="Log\loggerqt.h" />
+    <ClInclude Include="Procedural\smoothnoise.h" />
     <ClInclude Include="stdafx.h" />
-    <QtMoc Include="WindowDiffrot.h" />
-    <QtMoc Include="WindowIPC2PicAlign.h" />
-    <QtMoc Include="WindowTemplate.h" />
-    <QtMoc Include="WindowIPCoptimize.h" />
-    <QtMoc Include="WindowIPCparameters.h" />
-    <QtMoc Include="Zdeny_PhD_Shenanigans.h" />
+    <QtMoc Include="QtGui\WindowDiffrot.h" />
+    <QtMoc Include="QtGui\WindowIPC2PicAlign.h" />
+    <QtMoc Include="QtGui\WindowTemplate.h" />
+    <QtMoc Include="QtGui\WindowIPCoptimize.h" />
+    <QtMoc Include="QtGui\WindowIPCparameters.h" />
+    <QtMoc Include="QtGui\Zdeny_PhD_Shenanigans.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="WindowDiffrot.ui" />
-    <QtUic Include="WindowIPC2PicAlign.ui" />
-    <QtUic Include="WindowIPCoptimize.ui" />
-    <QtUic Include="WindowIPCparameters.ui" />
-    <QtUic Include="WindowPlot.ui" />
-    <QtUic Include="WindowTemplate.ui" />
-    <QtUic Include="Zdeny_PhD_Shenanigans.ui" />
+    <QtUic Include="QtGui\WindowDiffrot.ui" />
+    <QtUic Include="QtGui\WindowIPC2PicAlign.ui" />
+    <QtUic Include="QtGui\WindowIPCoptimize.ui" />
+    <QtUic Include="QtGui\WindowIPCparameters.ui" />
+    <QtUic Include="QtGui\WindowPlot.ui" />
+    <QtUic Include="QtGui\WindowTemplate.ui" />
+    <QtUic Include="QtGui\Zdeny_PhD_Shenanigans.ui" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Zdeny_PhD_Shenanigans.qrc" />
+    <QtRcc Include="Resources\Zdeny_PhD_Shenanigans.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Zdeny_PhD_Shenanigans.rc" />
+    <ResourceCompile Include="Resources\Zdeny_PhD_Shenanigans.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="logo.png" />
-    <Image Include="test.png" />
-    <Image Include="Zdeny_PhD_Shenanigans.ico" />
+    <Image Include="Resources\logo.png" />
+    <Image Include="Resources\test.png" />
+    <Image Include="Resources\Zdeny_PhD_Shenanigans.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

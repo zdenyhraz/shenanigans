@@ -43,197 +43,200 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Zdeny_PhD_Shenanigans.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowIPCparameters.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowIPCoptimize.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowTemplate.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files\Global sources</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files\Global sources</Filter>
     </ClCompile>
-    <ClCompile Include="filtering.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="FITS.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="fourier.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="fractal.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="functionsAstro.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="functionsBaseCV.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="functionsBaseSTL.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="inverseMapping.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="IPC.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="neural.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="optimization.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="graphOptimization.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowIPC2PicAlign.cpp">
+    <ClCompile Include="QtGui\WindowDiffrot.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="WindowDiffrot.cpp">
+    <ClCompile Include="QtGui\WindowIPC2PicAlign.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="qcustomplot.cpp">
+    <ClCompile Include="QtGui\WindowIPCoptimize.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="QtGui\WindowIPCparameters.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="QtGui\WindowPlot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowPlot.cpp">
+    <ClCompile Include="QtGui\WindowTemplate.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="QtGui\Zdeny_PhD_Shenanigans.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot\qcustomplot.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Optimization\graphOptimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Optimization\optimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Fourier\fourier.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Astrophysics\FITS.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Astrophysics\functionsAstro.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="IPC\IPC.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Neural\neural.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Fractal\fractal.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="InverseMapping\inverseMapping.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\functionsBaseSTL.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\functionsBaseCV.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Filtering\filtering.cpp">
+      <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="globals.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="filtering.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="FITS.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="fourier.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="fractal.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="functionsAstro.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="functionsBaseCV.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="functionsBaseSTL.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="IPC.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="neural.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="optimization.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="inverseMapping.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="graphOptimization.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="logger.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="plotter.h">
+    <ClInclude Include="Plot\plotterqt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="loggerqt.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="plotterqt.h">
+    <ClInclude Include="Plot\plotter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="loggercsl.h">
+    <ClInclude Include="Optimization\graphOptimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimization\optimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Fourier\fourier.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Astrophysics\FITS.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Astrophysics\functionsAstro.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC\IPC.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Neural\neural.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Fractal\fractal.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="InverseMapping\inverseMapping.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\functionsBaseSTL.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\functionsBaseCV.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Filtering\filtering.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\globals.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="macros.h">
+    <ClInclude Include="Core\macros.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Procedural\smoothnoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\logger.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\loggercsl.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\loggerqt.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="Zdeny_PhD_Shenanigans.h">
+    <QtMoc Include="QtGui\WindowDiffrot.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="WindowIPCparameters.h">
+    <QtMoc Include="QtGui\WindowIPC2PicAlign.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="WindowIPCoptimize.h">
+    <QtMoc Include="QtGui\WindowIPCoptimize.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="WindowTemplate.h">
+    <QtMoc Include="QtGui\WindowIPCparameters.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="WindowIPC2PicAlign.h">
-      <Filter>WindowHeaders</Filter>
-    </QtMoc>
-    <QtMoc Include="WindowDiffrot.h">
-      <Filter>WindowHeaders</Filter>
-    </QtMoc>
-    <QtMoc Include="qcustomplot.h">
+    <QtMoc Include="QtGui\WindowPlot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="WindowPlot.h">
+    <QtMoc Include="QtGui\WindowTemplate.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="QtGui\Zdeny_PhD_Shenanigans.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="Plot\qcustomplot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="Zdeny_PhD_Shenanigans.ui">
+    <QtUic Include="QtGui\WindowDiffrot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowIPCparameters.ui">
+    <QtUic Include="QtGui\WindowIPC2PicAlign.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowIPCoptimize.ui">
+    <QtUic Include="QtGui\WindowIPCoptimize.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowTemplate.ui">
+    <QtUic Include="QtGui\WindowIPCparameters.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowIPC2PicAlign.ui">
+    <QtUic Include="QtGui\WindowPlot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowDiffrot.ui">
+    <QtUic Include="QtGui\WindowTemplate.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WindowPlot.ui">
+    <QtUic Include="QtGui\Zdeny_PhD_Shenanigans.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Zdeny_PhD_Shenanigans.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
+    <Image Include="Resources\Zdeny_PhD_Shenanigans.ico" />
+    <Image Include="Resources\logo.png" />
+    <Image Include="Resources\test.png" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Zdeny_PhD_Shenanigans.rc">
+    <ResourceCompile Include="Resources\Zdeny_PhD_Shenanigans.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="logo.png" />
-    <Image Include="test.png" />
-    <Image Include="Zdeny_PhD_Shenanigans.ico" />
+    <QtRcc Include="Resources\Zdeny_PhD_Shenanigans.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
   </ItemGroup>
 </Project>
