@@ -30,17 +30,13 @@ inline Mat procedural(int rows, int cols)
 
 inline Mat colorlandscape(const Mat& heightmap)
 {
-	Mat mat(heightmap.rows, heightmap.cols, CV_32FC3);
+	Mat mat = Mat::zeros(heightmap.rows, heightmap.cols, CV_32FC3);
 
 	for (int r = 0; r < heightmap.rows; r++)
 	{
 		for (int c = 0; c < heightmap.cols; c++)
 		{
 			auto& x = heightmap.at<float>(r, c);
-
-			mat.at<Vec3f>(r, c)[0] = 0;
-			mat.at<Vec3f>(r, c)[1] = 0;
-			mat.at<Vec3f>(r, c)[2] = 0;
 
 			if (x < 0.13)
 			{
