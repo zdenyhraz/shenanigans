@@ -15,8 +15,6 @@
 
 using namespace std;
 
-constexpr double PI = 3.1415926535897932384626433;
-constexpr double E = 2.7182818284590452353602874;
 const std::string delimiter = ",";
 
 struct Timerr//benchmarking struct
@@ -327,7 +325,7 @@ inline std::string currentTime()
 
 inline double speedTest(double x)
 {
-	return pow(asin(x*x) + floor(x)*(x - 123.4) + PI * cos(atan(1. / x)), 0.123456);
+	return pow(asin(x*x) + floor(x)*(x - 123.4) + 3.14 * cos(atan(1. / x)), 0.123456);
 }
 
 inline double gaussian1D(double x, double amp, double mu, double sigma)

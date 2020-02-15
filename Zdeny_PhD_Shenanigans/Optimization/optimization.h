@@ -90,7 +90,7 @@ namespace optimizationTestFunctions
 	{
 		double x = arg[0];
 		double y = arg[1];
-		return -20 * exp(-0.2*sqrt(0.5*(x*x + y * y))) - exp(0.5*(cos(2 * PI*x) + cos(2 * PI*y))) + exp(1.) + 20;
+		return -20 * exp(-0.2*sqrt(0.5*(x*x + y * y))) - exp(0.5*(cos(2 * Constants::Pi*x) + cos(2 * Constants::Pi*y))) + exp(1.) + 20;
 	}
 
 	inline double Himmelblau(vector<double> arg)

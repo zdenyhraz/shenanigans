@@ -107,8 +107,8 @@ inline Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 	{
 		for (int x = 0; x < cols; x++)
 		{
-			//sinian.at<float>(y, x) = std::cos(2 * PI * x * frequencyX)*std::sin(2 * PI * y * frequencyY);//sin or cos just cahnges the phase spectum
-			sinian.at<float>(y, x) = std::sin(2 * PI * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
+			//sinian.at<float>(y, x) = std::cos(2 * Constants::Pi * x * frequencyX)*std::sin(2 * Constants::Pi * y * frequencyY);//sin or cos just cahnges the phase spectum
+			sinian.at<float>(y, x) = std::sin(2 * Constants::Pi * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
 		}
 	}
 	normalize(sinian, sinian, 0, 1, CV_MINMAX);
