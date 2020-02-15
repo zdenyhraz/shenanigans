@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "InverseMapping/inverseMapping.h"
+#include "InverseMap/inverseMapping.h"
 #include "Procedural/smoothnoise.h"
 
 #include "Zdeny_PhD_Shenanigans.h"

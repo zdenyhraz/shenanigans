@@ -116,7 +116,7 @@
     <ClCompile Include="Core\functionsBaseCV.cpp" />
     <ClCompile Include="Core\functionsBaseSTL.cpp" />
     <ClCompile Include="Optimization\graphOptimization.cpp" />
-    <ClCompile Include="InverseMapping\inverseMapping.cpp" />
+    <ClCompile Include="InverseMap\inverseMapping.cpp" />
     <ClCompile Include="IPC\IPC.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
@@ -150,7 +150,7 @@
     <ClInclude Include="Core\functionsBaseSTL.h" />
     <ClInclude Include="Core\globals.h" />
     <ClInclude Include="Optimization\graphOptimization.h" />
-    <ClInclude Include="InverseMapping\inverseMapping.h" />
+    <ClInclude Include="InverseMap\inverseMapping.h" />
     <ClInclude Include="IPC\IPC.h" />
     <ClInclude Include="Log\logger.h" />
     <ClInclude Include="Neural\neural.h" />
