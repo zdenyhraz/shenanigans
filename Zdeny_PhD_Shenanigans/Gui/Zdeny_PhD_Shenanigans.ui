@@ -234,8 +234,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>43</y>
+      <x>8</x>
+      <y>42</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -315,13 +315,16 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>196</x>
-      <y>3</y>
-      <width>96</width>
-      <height>83</height>
+      <x>193</x>
+      <y>2</y>
+      <width>90</width>
+      <height>65</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <property name="verticalSpacing">
+      <number>0</number>
+     </property>
      <item row="0" column="0">
       <widget class="QPushButton" name="pushButtonClearLogs">
        <property name="text">
@@ -362,7 +365,7 @@
      <x>0</x>
      <y>0</y>
      <width>1707</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
