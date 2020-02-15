@@ -30,9 +30,9 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 //custom
-#include "macros.h"
+#include "Core/macros.h"
 //QCustomPlot
-#include "qcustomplot.h"
+#include "Plot/qcustomplot.h"
 
 
 
