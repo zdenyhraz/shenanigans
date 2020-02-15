@@ -8,19 +8,19 @@ using namespace Procedural;
 
 inline Mat procedural(int rows, int cols)
 {
-	int N = 200;
+	int N = 500;
 	Mat mat = Mat::zeros(rows, cols, CV_32F);
 
 	for (int i = 0; i < N; i++)
 	{
-		float cx = 0.02*(float)rand() / RAND_MAX;
-		float cy = 0.02*(float)rand() / RAND_MAX;
-		float ratio = cx / cy;
+		float cx = 0.02*randunit();
+		float cy = 0.02*randunit();
+		float ratio = cx / cy ;
 
 		if (ratio > 5 || ratio < (1. / 5))
 			continue;
 		
-		mat += ((float)rand() / RAND_MAX * gaussian(rows, cols, cx, cy, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
+		mat += (randunit() * gaussian(rows, cols, cx, cy, randunit(), randunit()));
 	}
 	normalize(mat, mat, 0, 1, CV_MINMAX);
 	return mat;
@@ -36,14 +36,14 @@ inline Mat colorlandscape(const Mat& heightmap)
 		{
 			auto& x = heightmap.at<float>(r, c);
 
-			if (x < 0.13)
+			if (x < 0.23)
 			{
 				//deep water
 				mat.at<Vec3f>(r, c)[0] = 255. / 255;
 				mat.at<Vec3f>(r, c)[1] = 0. / 255;
 				mat.at<Vec3f>(r, c)[2] = 0. / 255;
 			}
-			else if (x < 0.3)
+			else if (x < 0.35)
 			{
 				//shallow water
 				mat.at<Vec3f>(r, c)[0] = 255. / 255;
@@ -57,12 +57,26 @@ inline Mat colorlandscape(const Mat& heightmap)
 				mat.at<Vec3f>(r, c)[1] = 226. / 255;
 				mat.at<Vec3f>(r, c)[2] = 254. / 255;
 			}
-			else if (x < 0.65)
+			else if (x < 0.55)
 			{
 				//grass lands
+				mat.at<Vec3f>(r, c)[0] = 50. / 255;
+				mat.at<Vec3f>(r, c)[1] = 205. / 255;
+				mat.at<Vec3f>(r, c)[2] = 50. / 255;
+			}
+			else if (x < 0.65)
+			{
+				//forest
 				mat.at<Vec3f>(r, c)[0] = 0. / 255;
 				mat.at<Vec3f>(r, c)[1] = 128. / 255;
 				mat.at<Vec3f>(r, c)[2] = 0. / 255;
+			}
+			else if (x < 0.73)
+			{
+				//dirt
+				mat.at<Vec3f>(r, c)[0] = 19. / 255;
+				mat.at<Vec3f>(r, c)[1] = 69. / 255;
+				mat.at<Vec3f>(r, c)[2] = 139. / 255;
 			}
 			else if (x < 0.87)
 			{
