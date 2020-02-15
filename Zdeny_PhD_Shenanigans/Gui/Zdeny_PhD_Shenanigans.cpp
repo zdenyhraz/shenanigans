@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "InverseMap/inverseMapping.h"
+#include "Procedural/baseFunctions2d.h"
 #include "Procedural/smoothnoise.h"
 
 #include "Zdeny_PhD_Shenanigans.h"
@@ -134,12 +135,7 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if (0)
 	{
-		auto noises = SmoothNoise(500, 500);
-		showimg(std::get<0>(noises), "smooth noise 3 color");
-		showimg(std::get<1>(noises), "smooth noise many color");
-	}
-	if (0)
-	{
+		using namespace Procedural;
 		Mat sin1 = sinian(1000, 1000, 5, 5, 0.3, -0.2);
 		Mat sin2 = sinian(1000, 1000, 25, 25, -0.4, 0.6);
 		Mat sin3 = sinian(1000, 1000, 35, 35, 0.7, -0.1);
@@ -148,13 +144,16 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if (0)
 	{
-		Mat mat = gaussian(1000, 1000, 0.1, 0.1, 0.5, 0.5);
+		using namespace Procedural;
+		Mat mat = gaussian(1000, 1000, 0.1, 0.1, 0.8, 0.8);
 		showimg(mat, "gaussian", true);
 	}
 	if (1)
 	{
+		using namespace Procedural;
 		Mat mat = procedural(1000, 1000);
-		showimg(mat, "procedural", true);
+		showimg(colorlandscape(mat), "procedural nature");
+		showimg(mat, "procedural mature", true);
 	}
 
 	globals->Logger->Log("Debug finished.", EVENT);
