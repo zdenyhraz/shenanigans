@@ -317,8 +317,8 @@
      <rect>
       <x>196</x>
       <y>3</y>
-      <width>91</width>
-      <height>61</height>
+      <width>96</width>
+      <height>83</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -362,7 +362,7 @@
      <x>0</x>
      <y>0</y>
      <width>1707</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -544,12 +544,12 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
+   <header>Plot/qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="Zdeny_PhD_Shenanigans.qrc"/>
+  <include location="../Resources/Zdeny_PhD_Shenanigans.qrc"/>
  </resources>
  <connections/>
 </ui>

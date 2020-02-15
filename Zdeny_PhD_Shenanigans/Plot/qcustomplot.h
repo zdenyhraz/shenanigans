@@ -69,12 +69,12 @@
 #include <limits>
 #include <algorithm>
 #ifdef QCP_OPENGL_FBO
-#  include <QtGui/QOpenGLContext>
-#  include <QtGui/QOpenGLFramebufferObject>
+#  include <Gui/QOpenGLContext>
+#  include <Gui/QOpenGLFramebufferObject>
 #  ifdef QCP_OPENGL_OFFSCREENSURFACE
-#    include <QtGui/QOffscreenSurface>
+#    include <Gui/QOffscreenSurface>
 #  else
-#    include <QtGui/QWindow>
+#    include <Gui/QWindow>
 #  endif
 #endif
 #ifdef QCP_OPENGL_PBUFFER
@@ -82,9 +82,9 @@
 #endif
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #  include <qnumeric.h>
-#  include <QtGui/QWidget>
-#  include <QtGui/QPrinter>
-#  include <QtGui/QPrintEngine>
+#  include <Gui/QWidget>
+#  include <Gui/QPrinter>
+#  include <Gui/QPrintEngine>
 #else
 #  include <QtNumeric>
 #  include <QtWidgets/QWidget>
