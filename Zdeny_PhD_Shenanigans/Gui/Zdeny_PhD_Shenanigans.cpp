@@ -9,7 +9,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	ui.setupUi(this);
 
 	//show the logo
-	QPixmap pm("logo.png"); // <- path to image file
+	QPixmap pm("Resources/logo.png"); // <- path to image file
 	ui.label_2->setPixmap(pm);
 	ui.label_2->setScaledContents(true);
 
