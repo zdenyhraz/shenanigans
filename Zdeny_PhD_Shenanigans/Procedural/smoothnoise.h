@@ -4,72 +4,88 @@
 
 using namespace std;
 using namespace cv;
+using namespace Procedural;
 
-std::pair<Mat, Mat> SmoothNoise(int rows, int cols)
+inline Mat procedural(int rows, int cols)
 {
-	Mat noise1(rows, cols, CV_32FC3);
-	Mat noise2(rows, cols, CV_32FC3);
+	int N = 200;
+	Mat mat = Mat::zeros(rows, cols, CV_32F);
 
-	for (int r = 0; r < rows; r++)
+	for (int i = 0; i < N; i++)
 	{
-		for (int c = 0; c < cols; c++)
+		float cx = 0.02*(float)rand() / RAND_MAX;
+		float cy = 0.02*(float)rand() / RAND_MAX;
+		float ratio = abs(cx) / abs(cy);
+
+		if (ratio > 5 || ratio < 1. / 5)
+			continue;
+
+		//mat += pow(N - i, 1)*sinian(rows, cols, i + 1, i + 1, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX).mul(gaussian(rows, cols, 0.002*(float)rand() / RAND_MAX, 0.002*(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
+		//mat += sinian(rows, cols, i + 1, i + 1, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX).mul(gaussian(rows, cols, 0.002*(float)rand() / RAND_MAX, 0.002*(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
+		mat += (float)rand() / RAND_MAX * gaussian(rows, cols, cx, cy, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+	}
+	normalize(mat, mat, 0, 1, CV_MINMAX);
+	return mat;
+}
+
+Mat colorlandscape(const Mat& heightmap)
+{
+	Mat mat(heightmap.rows, heightmap.cols, CV_32FC3);
+
+	for (int r = 0; r < heightmap.rows; r++)
+	{
+		for (int c = 0; c < heightmap.cols; c++)
 		{
-			// B G R
-			noise1.at<Vec3f>(r, c)[0] = 0;
-			noise1.at<Vec3f>(r, c)[1] = 0;
-			noise1.at<Vec3f>(r, c)[2] = 0;
+			auto& x = heightmap.at<float>(r, c);
 
-			//float x = (double)rand() / RAND_MAX;
-			//float x = (double)r*c/(rows*cols);
-			//float x = (double)(r + c) / (rows + cols);
-			float x = exp((-pow(r - rows / 2, 2) - pow(c - cols / 2, 2)) / 10 / (rows + cols));
-
+			mat.at<Vec3f>(r, c)[0] = 0;
+			mat.at<Vec3f>(r, c)[1] = 0;
+			mat.at<Vec3f>(r, c)[2] = 0;
 
 			if (x < 0.13)
 			{
-				noise1.at<Vec3f>(r, c)[0] = 255. / 255;
-				noise1.at<Vec3f>(r, c)[1] = 0. / 255;
-				noise1.at<Vec3f>(r, c)[2] = 0. / 255;
+				//deep water
+				mat.at<Vec3f>(r, c)[0] = 255. / 255;
+				mat.at<Vec3f>(r, c)[1] = 0. / 255;
+				mat.at<Vec3f>(r, c)[2] = 0. / 255;
 			}
 			else if (x < 0.3)
 			{
-				noise1.at<Vec3f>(r, c)[0] = 255. / 255;
-				noise1.at<Vec3f>(r, c)[1] = 191. / 255;
-				noise1.at<Vec3f>(r, c)[2] = 0. / 255;
+				//shallow water
+				mat.at<Vec3f>(r, c)[0] = 255. / 255;
+				mat.at<Vec3f>(r, c)[1] = 191. / 255;
+				mat.at<Vec3f>(r, c)[2] = 0. / 255;
 			}
 			else if (x < 0.43)
 			{
-				noise1.at<Vec3f>(r, c)[0] = 62. / 255;
-				noise1.at<Vec3f>(r, c)[1] = 226. / 255;
-				noise1.at<Vec3f>(r, c)[2] = 254. / 255;
+				//sandy beaches
+				mat.at<Vec3f>(r, c)[0] = 62. / 255;
+				mat.at<Vec3f>(r, c)[1] = 226. / 255;
+				mat.at<Vec3f>(r, c)[2] = 254. / 255;
 			}
 			else if (x < 0.65)
 			{
-				noise1.at<Vec3f>(r, c)[0] = 0./255;
-				noise1.at<Vec3f>(r, c)[1] = 128./255;
-				noise1.at<Vec3f>(r, c)[2] = 0./255;
+				//grass lands
+				mat.at<Vec3f>(r, c)[0] = 0. / 255;
+				mat.at<Vec3f>(r, c)[1] = 128. / 255;
+				mat.at<Vec3f>(r, c)[2] = 0. / 255;
 			}
 			else if (x < 0.87)
 			{
-				noise1.at<Vec3f>(r, c)[0] = 0.5;
-				noise1.at<Vec3f>(r, c)[1] = 0.5;
-				noise1.at<Vec3f>(r, c)[2] = 0.5;
+				//rocky hills
+				mat.at<Vec3f>(r, c)[0] = 0.5;
+				mat.at<Vec3f>(r, c)[1] = 0.5;
+				mat.at<Vec3f>(r, c)[2] = 0.5;
 			}
 			else
 			{
-				noise1.at<Vec3f>(r, c)[0] = 0.88;
-				noise1.at<Vec3f>(r, c)[1] = 0.88;
-				noise1.at<Vec3f>(r, c)[2] = 0.88;
+				//snow
+				mat.at<Vec3f>(r, c)[0] = 0.88;
+				mat.at<Vec3f>(r, c)[1] = 0.88;
+				mat.at<Vec3f>(r, c)[2] = 0.88;
 			}
-			
-			// B G R
-			float f = exp((-pow(r - rows / 2, 2) / 1000 - pow(c - cols / 2, 2) / 200));
-			noise2.at<Vec3f>(r, c)[0] = f;
-			noise2.at<Vec3f>(r, c)[1] = f;
-			noise2.at<Vec3f>(r, c)[2] = f;
-			
 		}
 	}
-	return std::make_pair(noise1, noise2);
+	return mat;
 }
 
