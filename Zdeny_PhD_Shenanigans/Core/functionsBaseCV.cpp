@@ -189,25 +189,22 @@ Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter)
 	return crop.mul(kirklik);
 }
 
-Point2d findCentroidDouble(const Mat& sourceimg)
+Point2f findCentroidDouble(const Mat& sourceimg)
 {
-	double M00 = 0.0;
-	double M01 = 0.0;
-	double M10 = 0.0;
+	float M00 = 0.0;
+	float M01 = 0.0;
+	float M10 = 0.0;
 	for (int r = 0; r < sourceimg.rows; r++)
 	{
 		//std::cout << " FCrow " << r;
 		for (int c = 0; c < sourceimg.cols; c++)
 		{
 			M00 += 1.0 * sourceimg.at<float>(r, c);
-			M01 += (double)r * sourceimg.at<float>(r, c);
-			M10 += (double)c * sourceimg.at<float>(r, c);
+			M01 += (float)r * sourceimg.at<float>(r, c);
+			M10 += (float)c * sourceimg.at<float>(r, c);
 		}
 	}
-	Point2d CentroidDouble(2, 0.0);
-	CentroidDouble.x = M10 / M00;//double output
-	CentroidDouble.y = M01 / M00;
-	return CentroidDouble;
+	return Point2f(M10 / M00, M01 / M00);
 }
 
 Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle style, double sigma)

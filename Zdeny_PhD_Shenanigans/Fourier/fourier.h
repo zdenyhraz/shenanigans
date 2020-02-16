@@ -18,7 +18,6 @@ inline Mat fourier(const Mat& sourceimgIn)
 
 inline Mat fourier(Mat&& sourceimg)
 {
-	sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
 	Mat sourceimgcomplex[2] = { sourceimg, Mat::zeros(sourceimg.size(),CV_32F) };
 	Mat sourceimgcomplexmerged;
 	merge(sourceimgcomplex, 2, sourceimgcomplexmerged);

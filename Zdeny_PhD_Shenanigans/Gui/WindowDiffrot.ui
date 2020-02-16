@@ -376,7 +376,7 @@
      <item row="3" column="0">
       <widget class="QPushButton" name="pushButton_5">
        <property name="text">
-        <string>Suoer optimize diffrot</string>
+        <string>Optimize fit predicted</string>
        </property>
       </widget>
      </item>

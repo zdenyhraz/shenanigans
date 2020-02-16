@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "InverseMap/inverseMapping.h"
-#include "Procedural/baseFunctions2d.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
 
@@ -158,7 +156,6 @@ void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign()
 
 void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 {
-	windowIPCparameters->show();
 	windowDiffrot->show();
 }
 

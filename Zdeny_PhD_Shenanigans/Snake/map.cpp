@@ -19,9 +19,9 @@ Mat Map::Draw(Snake Bob)
 
 	for (int i = 0; i < body.size(); i++)
 	{
-		if (i == (body.size() - 1))//head
+		if (i == (body.size() - 1))//snake head
 			m_map.at<Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = Vec3f(0, 1, 0);
-		else//body
+		else//snake body
 			m_map.at<Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = Vec3f(randunit(), randunit(), randunit());
 	}
 
