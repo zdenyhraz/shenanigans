@@ -32,7 +32,7 @@ bool Snake::CheckValidMove()
 	return valid;
 }
 
-void Snake::Tick(Coordinate food)
+void Snake::Tick()
 {
 	if (m_gameover)
 		return;
@@ -59,8 +59,10 @@ void Snake::Tick(Coordinate food)
 	}
 
 	//if not food then poop front
-	if (m_body.back() != food)
+	if (m_body.back() != m_map.GetFood())
 		m_body.erase(m_body.begin());
+	else
+		m_map.SetFood();
 
 	if (!CheckValidMove())
 		m_gameover = true;

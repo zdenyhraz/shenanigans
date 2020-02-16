@@ -12,12 +12,14 @@ public:
 	unsigned width;
 	unsigned height;
 
-	Mat DrawBody(Snake Bob);
+	Mat Draw(Snake Bob);
+
+	Snake::Coordinate GetFood();
+
+	void SetFood();
 
 private:
 	Mat m_map;
-
+	Snake::Coordinate m_food;
 	void Clear();
-
-	std::pair<unsigned, unsigned> food;
 };

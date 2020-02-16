@@ -12,6 +12,7 @@ public:
 
 	struct Coordinate
 	{
+		Coordinate() {}
 		Coordinate(int x_, int y_) :x(x_), y(y_) {}
 
 		int x = 0;
@@ -36,7 +37,7 @@ public:
 		RIGHT
 	};
 
-	void Tick(Coordinate food);
+	void Tick();
 
 	std::vector<Coordinate> GetBody();
 

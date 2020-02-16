@@ -158,15 +158,16 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if (1)
 	{
-		int size = 100;
+		srand(time(0));
+		int size = 50;
 		Map map(size, size);
 		Snake snake(map);
 
 		while (!snake.GetGameOver())
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			snake.Tick(Snake::Coordinate(rand() % size, rand() % size));
-			showimg(map.DrawBody(snake), "snake");
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			snake.Tick();
+			showimg(map.Draw(snake), "snake");
 		}
 	}
 
