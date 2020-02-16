@@ -164,14 +164,16 @@ void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 
 void Zdeny_PhD_Shenanigans::generateLand()
 {
+	globals->Logger->Log("Generating some land...", EVENT);
 	Mat mat = procedural(1000, 1000);
 	showimg(colorlandscape(mat), "procedural nature");
 	showimg(mat, "procedural mature", true);
-	globals->Logger->Log("Finished generating some land. Do you like it?", EVENT);
+	globals->Logger->Log("Finished generating some land. Do you like it?", SUBEVENT);
 }
 
 void Zdeny_PhD_Shenanigans::playSnake()
 {
+	globals->Logger->Log("Started playing snake. (It is ok, everyone needs some rest.. :))", EVENT);
 	SnakeGame();
-	globals->Logger->Log("Finished playing snake. Did you enjoy it?", EVENT);
+	globals->Logger->Log("Finished playing snake. Did you enjoy it? *wink*", SUBEVENT);
 }
