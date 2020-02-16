@@ -109,6 +109,12 @@
     <ClCompile Include="InverseMap\inverseMapping.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
+    <ClCompile Include="Snake\snake.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Snake\map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -178,6 +184,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Procedural\procedural.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Snake\snake.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Snake\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
