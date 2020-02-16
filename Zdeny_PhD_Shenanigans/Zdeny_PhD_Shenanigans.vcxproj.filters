@@ -192,6 +192,9 @@
     <ClInclude Include="Snake\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Snake\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Plot\qcustomplot.h">

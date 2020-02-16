@@ -32,6 +32,8 @@
 //custom
 #include "Core/constants.h"
 #include "Core/macros.h"
+#include "Core/functionsBaseSTL.h"
+#include "Core/functionsBaseCV.h"
 //QCustomPlot
 #include "Plot/qcustomplot.h"
 
