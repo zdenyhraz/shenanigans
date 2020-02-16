@@ -39,6 +39,8 @@ public:
 
 	void Tick();
 
+	void Turn(Direction direction);
+
 	std::vector<Coordinate> GetBody();
 
 	bool GetGameOver();
@@ -50,7 +52,5 @@ private:
 	Map& m_map;
 
 	bool CheckValidMove();
-
-	void Turn(Direction direction);
 
 };
