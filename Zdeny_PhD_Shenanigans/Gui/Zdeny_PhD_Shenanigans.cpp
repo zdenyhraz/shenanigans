@@ -46,6 +46,9 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
 	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
+	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
+	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
+
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -103,63 +106,6 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
 	}
-	if (0)//inverse mapping
-	{
-		int trials = 30;
-		int N = 4;
-
-		std::vector<std::vector<double>> trialInputs;
-		std::vector<std::vector<double>> trialOutputs;
-		std::vector<double> desiredOutput;
-
-		for (int trial = 0; trial < trials; trial++)
-		{
-			std::vector<double> trialInput;
-			for (int x = 0; x < N; x++)
-				trialInput.push_back((double)rand() / RAND_MAX);
-			trialInputs.push_back(trialInput);
-			trialOutputs.push_back(inverseMappingTestTransfer(trialInput));
-		}
-
-		for (int x = 0; x < N; x++)
-			desiredOutput.push_back(x + 1);//123456789
-
-		std::vector<double> soughtInput = inverseMappingZH(trialInputs, trialOutputs, desiredOutput);
-		std::vector<double> realOutput = inverseMappingTestTransfer(soughtInput);
-
-		cout << "trialInputs: " << trialInputs << endl;
-		cout << "trialOutputs: " << trialOutputs << endl;
-		cout << endl;
-		cout << "soughtInput: " << soughtInput << endl;
-		cout << "desiredOutput: " << desiredOutput << endl;
-		cout << "realOutput: " << realOutput << endl;
-	}
-	if (0)
-	{
-		using namespace Procedural;
-		Mat sin1 = sinian(1000, 1000, 5, 5, 0.3, -0.2);
-		Mat sin2 = sinian(1000, 1000, 25, 25, -0.4, 0.6);
-		Mat sin3 = sinian(1000, 1000, 35, 35, 0.7, -0.1);
-		Mat mat = 0.5*sin1 + 0.3*sin2 + 0.2*sin3;
-		showimg(mat, "sinian", true);
-	}
-	if (0)
-	{
-		using namespace Procedural;
-		Mat mat = gaussian(1000, 1000, 0.1, 0.1, 0.8, 0.8);
-		showimg(mat, "gaussian", true);
-	}
-	if (0)
-	{
-		using namespace Procedural;
-		Mat mat = procedural(1000, 1000);
-		showimg(colorlandscape(mat), "procedural nature");
-		showimg(mat, "procedural mature", true);
-	}
-	if (1)
-	{
-		SnakeGame();
-	}
 
 	globals->Logger->Log("Debug finished.", EVENT);
 }
@@ -214,4 +160,18 @@ void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 {
 	windowIPCparameters->show();
 	windowDiffrot->show();
+}
+
+void Zdeny_PhD_Shenanigans::generateLand()
+{
+	Mat mat = procedural(1000, 1000);
+	showimg(colorlandscape(mat), "procedural nature");
+	showimg(mat, "procedural mature", true);
+	globals->Logger->Log("Finished generating some land. Do you like it?", EVENT);
+}
+
+void Zdeny_PhD_Shenanigans::playSnake()
+{
+	SnakeGame();
+	globals->Logger->Log("Finished playing snake. Did you enjoy it?", EVENT);
 }
