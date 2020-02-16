@@ -86,34 +86,28 @@ inline Mat activatePrime(const Mat& z, ActivationFunction& activationFunction)
 
 inline Mat mse(const Mat& a, const Mat& y)
 {
-	Mat result = a.clone();
+	Mat result;
 	pow(a - y, 2, result);
 	return result * 0.5;
 }
 
 inline Mat msePrime(const Mat& a, const Mat& y)
 {
-	Mat result = a.clone();
-	result = (a - y);
-	return result;
+	return a - y;
 }
 
 inline Mat crossentropy(const Mat& a, const Mat& y)
 {
-	Mat result = a.clone();
 	Mat loga = a.clone();
 	Mat log1a = a.clone();
 	log(a, loga);
 	log(1. - a, log1a);
-	result = -(y.mul(loga) + (1 - y).mul(log1a));
-	return result;
+	return -(y.mul(loga) + (1 - y).mul(log1a));
 }
 
 inline Mat crossentropyPrime(const Mat& a, const Mat& y)
 {
-	Mat result = a.clone();
-	result = (1. - y) / (1 - a) - y / a;
-	return result;
+	return (1. - y) / (1 - a) - y / a;
 }
 
 inline Mat cost(const Mat& a, const Mat& y, CostFunction& costFunction)
@@ -200,8 +194,7 @@ public:
 				std::vector<Mat> wPrime_ = copyVectorMat(w);//weight gradient for 1 data
 				std::vector<Mat> bPrime_ = copyVectorMat(b);//bias gradient for 1 data
 
-				int L;
-				for (L = layerCount - 1; L >= 0; L--)//backpropagate
+				for (int L = layerCount - 1; L >= 0; L--)//backpropagate
 				{
 					ActivationFunction actFun = L == layerCount - 1 ? activationFunctionLast : activationFunction;
 					d_[L] = L < (layerCount - 1) ? (w[L + 1].t()*d_[L + 1]).mul(activatePrime(z[L], actFun)) : costPrime(a[L], trainingOutputs_[indexData], costFunction).mul(activatePrime(z[L], actFun));
