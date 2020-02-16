@@ -24,10 +24,15 @@ bool Snake::CheckValidMove()
 	auto& head = m_body.back();
 	bool valid = true;
 
+	//check boundaries
 	valid = valid && head.x < m_map.width;
 	valid = valid && head.x >= 0;
 	valid = valid && head.y < m_map.height;
 	valid = valid && head.y >= 0;
+
+	//check self eat
+	if (std::find(m_body.begin(), m_body.end() - 1, head) != (m_body.end() - 1))
+		valid = false;
 
 	return valid;
 }
@@ -92,3 +97,4 @@ bool Snake::GetGameOver()
 {
 	return m_gameover;
 }
+
