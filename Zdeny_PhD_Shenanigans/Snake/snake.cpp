@@ -71,7 +71,6 @@ void Snake::Tick()
 
 	if (!CheckValidMove())
 		m_gameover = true;
-
 }
 
 void Snake::Turn(Direction direction)

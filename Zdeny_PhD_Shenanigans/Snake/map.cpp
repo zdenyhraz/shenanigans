@@ -22,7 +22,7 @@ Mat Map::Draw(Snake Bob)
 		if (i == (body.size() - 1))//head
 			m_map.at<Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = Vec3f(0, 1, 0);
 		else//body
-			m_map.at<Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = Vec3f(1, 1, 1);
+			m_map.at<Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = Vec3f(randunit(), randunit(), randunit());
 	}
 
 	m_map.at<Vec3f>(m_map.rows - 1 - m_food.y, m_food.x) = Vec3f(0, 0, 1);

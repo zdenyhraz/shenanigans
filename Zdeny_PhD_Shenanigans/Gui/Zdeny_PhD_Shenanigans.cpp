@@ -2,7 +2,7 @@
 #include "InverseMap/inverseMapping.h"
 #include "Procedural/baseFunctions2d.h"
 #include "Procedural/procedural.h"
-#include "Snake/map.h"
+#include "Snake/game.h"
 
 #include "Zdeny_PhD_Shenanigans.h"
 
@@ -158,38 +158,7 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if (1)
 	{
-		srand(time(0));
-		int size = 50;
-		Map map(size, size);
-		Snake snake(map);
-
-		while (!snake.GetGameOver())
-		{
-			int c = cvWaitKey(100);
-			cout << "c=" << c << endl;
-
-			switch (c)
-			{
-			case 2555904: // right arrow
-				snake.Turn(Snake::RIGHT);
-				break;
-
-			case 2424832: // left arrow
-				snake.Turn(Snake::LEFT);
-				break;
-
-			case 2490368: // up arrow
-				snake.Turn(Snake::UP);
-				break;
-
-			case 2621440: // down arrow
-				snake.Turn(Snake::DOWN);
-				break;
-			}
-
-			snake.Tick();
-			showimg(map.Draw(snake), "snake");
-		}
+		SnakeGame();
 	}
 
 	globals->Logger->Log("Debug finished.", EVENT);
