@@ -29,7 +29,7 @@ Mat kirkl(int rows, int cols, unsigned radius);
 
 Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter);
 
-Point2d findCentroidDouble(const Mat& sourceimg);
+Point2f findCentroidDouble(const Mat& sourceimg);
 
 inline std::tuple<int, int, int> colorMapJET(int x, int caxisMin=0, int caxisMax=255)
 {

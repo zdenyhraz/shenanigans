@@ -267,7 +267,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 						//crop2
 						crop2 = roicrop(pic2, params2.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params2.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
-						shifts[iterMedian] = phasecorrel(crop1, crop2, set);	
+						shifts[iterMedian] = phasecorrel(std::move(crop1), std::move(crop2), set);	
 					}
 
 					//calculate omega from shift
@@ -482,7 +482,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 					//crop2
 					crop2 = roicrop(pics[iterPic].second.image(), pics[iterPic].second.params().fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, pics[iterPic].second.params().fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
-					shifts[iterMedian] = phasecorrel(crop1, crop2, set);
+					shifts[iterMedian] = phasecorrel(std::move(crop1), std::move(crop2), set);
 				}
 
 				//calculate omega from shift
