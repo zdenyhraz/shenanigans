@@ -164,7 +164,7 @@ void Zdeny_PhD_Shenanigans::generateLand()
 	globals->Logger->Log("Generating some land...", EVENT);
 	Mat mat = procedural(1000, 1000);
 	showimg(colorlandscape(mat), "procedural nature");
-	showimg(mat, "procedural mature", true);
+	//showimg(mat, "procedural mature", true);
 	globals->Logger->Log("Finished generating some land. Do you like it?", SUBEVENT);
 }
 
