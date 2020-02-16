@@ -3,13 +3,16 @@
 #include "map.h"
 
 using namespace cv;
+static const char* windowname = "snake";
 
 void SnakeGame()
 {
+	bool stop = false;
+
 	while (1)
 	{
 		srand(time(0));
-		int size = 70;
+		int size = 50;
 		Map map(size, size);
 		Snake snake(map);
 
@@ -21,6 +24,10 @@ void SnakeGame()
 
 			switch (c)
 			{
+			case 27: //escape
+				stop = true;
+				break;
+
 			case 2555904: // right arrow
 				snake.Turn(Snake::RIGHT);
 				break;
@@ -38,13 +45,23 @@ void SnakeGame()
 				break;
 			}
 
+			if (stop)
+				break;
+
 			snake.Tick();
 
 			if (snake.GetGameOver())
 				break;
 
-			showimg(map.Draw(snake), "snake");
+			showimg(map.Draw(snake), windowname);
 		}
+
+		if (stop)
+		{
+			cvDestroyWindow(windowname);
+			break;
+		}
+
 		QMessageBox msgBox;
 		msgBox.setText("Bob the snake is dead :(((((\n\n        R.I.P.");
 		msgBox.exec();

@@ -34,4 +34,6 @@ private slots:
 	void closeCV();
 	void debug();
 	void showWindowDiffrot();
+	void playSnake();
+	void generateLand();
 };

@@ -430,6 +430,18 @@
     </property>
     <addaction name="actiondiffrot"/>
    </widget>
+   <widget class="QMenu" name="menuSnake">
+    <property name="title">
+     <string>Snake</string>
+    </property>
+    <addaction name="actionPlay"/>
+   </widget>
+   <widget class="QMenu" name="menuProcedural">
+    <property name="title">
+     <string>Procedural</string>
+    </property>
+    <addaction name="actionGenerate_land"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage_Filtering"/>
    <addaction name="menuImage_Registration"/>
@@ -437,6 +449,8 @@
    <addaction name="menuOptimization"/>
    <addaction name="menuNeural"/>
    <addaction name="menuFractal"/>
+   <addaction name="menuProcedural"/>
+   <addaction name="menuSnake"/>
    <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
@@ -539,6 +553,16 @@
   <action name="actionFeature_matching">
    <property name="text">
     <string>feature matching</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="actionGenerate_land">
+   <property name="text">
+    <string>Generate land</string>
    </property>
   </action>
  </widget>
