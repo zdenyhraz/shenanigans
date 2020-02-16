@@ -1,15 +1,14 @@
 #pragma once
+#include "stdafx.h"
 #include "snake.h"
 #include "map.h"
 
 using namespace cv;
 
-
-Snake::Snake(Map& map)
+Snake::Snake(Map& map) : m_map(map)
 {
 	//game just started
 	m_gameover = false;
-	m_body.reserve(3 * max(map.width, map.height));
 	
 	//3 units long snake
 	m_body.push_back(Coordinate(map.width / 2, map.height / 2 - 1));
@@ -20,33 +19,48 @@ Snake::Snake(Map& map)
 	m_direction = UP;
 }
 
-void Snake::Grow()
-{
-}
-
 bool Snake::CheckValidMove()
 {
+	auto& head = m_body.back();
+	bool valid = true;
+
+	valid = valid && head.x < m_map.width;
+	valid = valid && head.x >= 0;
+	valid = valid && head.y < m_map.height;
+	valid = valid && head.y >= 0;
+
+	return valid;
 }
 
-void Snake::Tick()
+void Snake::Tick(Coordinate food)
 {
 	if (m_gameover)
 		return;
 
+	auto& head = m_body.back();
+
 	switch (m_direction)
 	{
 	case UP:
+		m_body.push_back(Coordinate(head.x, head.y + 1));
 		break;
 
 	case DOWN:
+		m_body.push_back(Coordinate(head.x, head.y - 1));
 		break;
 
 	case LEFT:
+		m_body.push_back(Coordinate(head.x - 1, head.y));
 		break;
 
 	case RIGHT:
+		m_body.push_back(Coordinate(head.x + 1, head.y));
 		break;
 	}
+
+	//if not food then poop front
+	if (m_body.back() != food)
+		m_body.erase(m_body.begin());
 
 	if (!CheckValidMove())
 		m_gameover = true;
@@ -65,4 +79,14 @@ void Snake::Turn(Direction direction)
 		return;
 
 	m_direction = direction;
+}
+
+std::vector<Snake::Coordinate> Snake::GetBody()
+{
+	return m_body;
+}
+
+bool Snake::GetGameOver()
+{
+	return m_gameover;
 }

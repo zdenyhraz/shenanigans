@@ -2,6 +2,7 @@
 #include "InverseMap/inverseMapping.h"
 #include "Procedural/baseFunctions2d.h"
 #include "Procedural/procedural.h"
+#include "Snake/map.h"
 
 #include "Zdeny_PhD_Shenanigans.h"
 
@@ -148,12 +149,25 @@ void Zdeny_PhD_Shenanigans::debug()
 		Mat mat = gaussian(1000, 1000, 0.1, 0.1, 0.8, 0.8);
 		showimg(mat, "gaussian", true);
 	}
-	if (1)
+	if (0)
 	{
 		using namespace Procedural;
 		Mat mat = procedural(1000, 1000);
 		showimg(colorlandscape(mat), "procedural nature");
 		showimg(mat, "procedural mature", true);
+	}
+	if (1)
+	{
+		int size = 100;
+		Map map(size, size);
+		Snake snake(map);
+
+		while (!snake.GetGameOver())
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			snake.Tick(Snake::Coordinate(rand() % size, rand() % size));
+			showimg(map.DrawBody(snake), "snake");
+		}
 	}
 
 	globals->Logger->Log("Debug finished.", EVENT);
