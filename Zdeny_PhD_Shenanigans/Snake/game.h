@@ -18,7 +18,6 @@ void SnakeGame()
 
 		while (1)
 		{
-			//std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			int c = cvWaitKey(100);
 			cout << "c=" << c << endl;
 
@@ -63,7 +62,7 @@ void SnakeGame()
 		}
 
 		QMessageBox msgBox;
-		msgBox.setText("Bob the snake is dead :(((((\n\n        R.I.P.");
+		msgBox.setText("Bob the snake is dead :((    	\n\n      </3                 R.I.P. Bob");
 		msgBox.exec();
 	}
 }
