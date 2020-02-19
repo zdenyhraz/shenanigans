@@ -77,7 +77,7 @@ double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster
 	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShift, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, Logger* logger, AbstractPlot1D* plt)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, Logger* logger, IPlot1D* plt)
 {
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
 	listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
@@ -133,7 +133,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, AbstractPlot1D* pltX, AbstractPlot1D* pltY)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, IPlot1D* pltX, IPlot1D* pltY)
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
@@ -428,7 +428,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* pltX)
 {
 	double retVal = 0;
 	//------------------------------------------------------------------------
@@ -530,7 +530,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 	return retVal / itersY;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, AbstractPlot1D* pltX)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* pltX)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
