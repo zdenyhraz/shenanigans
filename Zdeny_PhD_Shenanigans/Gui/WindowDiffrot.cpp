@@ -15,7 +15,7 @@ WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(pa
 void WindowDiffrot::calculateDiffrot()
 {
 	globals->Logger->Log("Calculating diffrot profile...", EVENT);
-	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D pltX(globals->widget1);
 	Plot1D pltY(globals->widget2);
 	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), globals->Logger, &pltX, &pltY);
@@ -27,7 +27,7 @@ void WindowDiffrot::showIPC()
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
-	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", INFO);
 	Mat pic1 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 	fitsTime.advanceTime(ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble());
@@ -40,7 +40,7 @@ void WindowDiffrot::showIPC()
 void WindowDiffrot::optimizeDiffrot()
 {
 	FitsParams params1, params2;
-	FITStime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	std::vector<int> sizes{ 16,32,64,128 };
 	std::string path = "D:\\MainOutput\\diffrot\\diffrotIPCopt.csv";
 	std::ofstream listing(path, std::ios::out | std::ios::trunc);//just delete
@@ -67,7 +67,7 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Plot1D* plt1 = new Plot1D(globals->widget1);
 	Plot1D* plt2 = new Plot1D(globals->widget2);
 
-	FITStime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+	FitsTime fitsTimeMaster(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 
 	std::vector<std::pair<FitsImage, FitsImage>> pics;
 	pics.reserve(20);

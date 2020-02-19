@@ -15,7 +15,7 @@ struct DiffrotSettings
 	int dSec;
 };
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FITStime& time, DiffrotSettings drset, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time, DiffrotSettings drset, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
 {
 	int dy = drset.vFov / (drset.ys - 1);
 
@@ -51,14 +51,15 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FITStime& time
 			omegasXfit = theta1Dfit(omegasX, thetas);
 			omegasXavgfit = theta2Dfit(omegasX2D, thetas2D);
 
-			drplot();
+			drplot1(plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicX);
+			drplot2(plt2, thetas, shiftsX);
 		}
 	}
 
 	return fillDiffrotResults();
 }
 
-void loadFitsFuzzy(FitsImage& pic, FITStime& time)
+void loadFitsFuzzy(FitsImage& pic, FitsTime& time)
 {
 	pic.reload(time.path());
 
@@ -134,6 +135,12 @@ std::vector<double> theta2Dfit(const std::vector<std::vector<double>>& omegasX2D
 	return polyfit(thetasAll, omegasAll, 4);
 }
 
-void drplot()
+void drplot1(IPlot1D* plt1, const std::vector<double>& thetas, const std::vector<double>& omegasX, const std::vector<double>& omegasXfit, const std::vector<double>& omegasXavgfit, const std::vector<double>& predicX)
 {
+	plt1->plot(thetas, std::vector<std::vector<double>>{omegasX, omegasXfit, omegasXavgfit, predicX});
+}
+
+void drplot2(IPlot1D* plt2, const std::vector<double>& thetas, const std::vector<double>& shiftsX)
+{
+	plt2->plot(thetas, std::vector<std::vector<double>>{shiftsX});
 }

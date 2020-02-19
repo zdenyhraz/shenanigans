@@ -136,7 +136,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 
 void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs, Logger* logger);
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& IPC_settings, FITStime& FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, Logger* logger, IPlot1D* pltX, IPlot1D* pltY);
+DiffrotResults calculateDiffrotProfile(const IPCsettings& IPC_settings, FitsTime& FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, Logger* logger, IPlot1D* pltX, IPlot1D* pltY);
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
 
