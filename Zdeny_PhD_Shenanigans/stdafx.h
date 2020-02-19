@@ -8,6 +8,7 @@
 #include <QWidget>
 //STL
 #include <iostream>
+#include <conio.h>
 #include <fstream>
 #include <stdint.h>
 #include <string>
