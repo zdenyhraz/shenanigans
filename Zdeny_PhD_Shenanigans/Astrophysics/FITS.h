@@ -160,7 +160,7 @@ private:
 	}
 };
 
-struct FITStime
+struct FitsTime
 {
 private:
 	int startyear;
@@ -246,7 +246,7 @@ public:
 		second = startsecond;
 	}
 
-	FITStime(std::string dirpathh, int yearr, int monthh, int dayy, int hourr, int minutee, int secondd)
+	FitsTime(std::string dirpathh, int yearr, int monthh, int dayy, int hourr, int minutee, int secondd)
 	{
 		dirpath = dirpathh;
 		startyear = yearr;
