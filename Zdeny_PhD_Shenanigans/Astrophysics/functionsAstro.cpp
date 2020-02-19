@@ -133,13 +133,13 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, IPlot1D* pltX, IPlot1D* pltY)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
 {
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
-	if (pltX) pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"});
-	//if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
-	if (pltY) pltY->setAxisNames("solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string>{"delta px"});
+	if (plt1) plt1->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"});
+	//if (plt2) plt2->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
+	if (plt2) plt2->setAxisNames("solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string>{"delta px"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_32F);
@@ -182,19 +182,19 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	{
 		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
 		//pic1
-		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
-		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
-		FitsImage pic1(FITS_time.path());
+		time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
+		logger->Log("Loading file '" + time.path() + "'...", INFO);
+		FitsImage pic1(time.path());
 		if (!pic1.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
 				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
 				if (pm % 2 == 0)
-					FITS_time.advanceTime(pm);
+					time.advanceTime(pm);
 				else
-					FITS_time.advanceTime(-pm);
-				pic1.reload(FITS_time.path());
+					time.advanceTime(-pm);
+				pic1.reload(time.path());
 				if (pic1.params().succload)
 					break;
 			}
@@ -202,23 +202,23 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		if (!pic1.params().succload)
 		{
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
-			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
+			time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
 		//pic2
-		FITS_time.advanceTime(deltaPic*deltaSec);
-		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
-		FitsImage pic2(FITS_time.path());
+		time.advanceTime(deltaPic*deltaSec);
+		logger->Log("Loading file '" + time.path() + "'...", INFO);
+		FitsImage pic2(time.path());
 		if (!pic2.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
 				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
 				if (pm % 2 == 0)
-					FITS_time.advanceTime(pm);
+					time.advanceTime(pm);
 				else
-					FITS_time.advanceTime(-pm);
-				pic2.reload(FITS_time.path());
+					time.advanceTime(-pm);
+				pic2.reload(time.path());
 				if (pic2.params().succload)
 					break;
 			}
@@ -226,7 +226,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		if (!pic2.params().succload)
 		{
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
-			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
+			time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
 		succload = pic1.params().succload && pic2.params().succload;
@@ -350,8 +350,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		//std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
 		std::vector<std::vector<double>> plty2{ pxshiftsX };
 
-		if (pltX) pltX->plot(pltx, plty1);
-		if (pltY) pltY->plot(pltx, plty2);
+		if (plt1) plt1->plot(pltx, plty1);
+		if (plt2) plt2->plot(pltx, plty2);
 
 		showimg(omegasXmat, "omegasXmat", true, 0.01, 0.99);
 		showimg(omegasYmat, "omegasYmat", true, 0.01, 0.99);
@@ -428,7 +428,7 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
 	return std::make_tuple(shiftsX, shiftsY, indices);
 }
 
-double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* pltX)
+double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* plt1)
 {
 	double retVal = 0;
 	//------------------------------------------------------------------------
@@ -519,10 +519,10 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 			retVal += abs(omegasX[y][omegasX[y].size() - 1] - omegasPavg[y]);
 	}//picture pairs cycle end
 
-	if (pltX && retVal/itersY < 3e-7)
+	if (plt1 && retVal/itersY < 3e-7)
 	{
-		//pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
-		//pltX->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
+		//plt1->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
+		//plt1->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
 	}
 	
 	//------------------------------------------------------------------------
@@ -530,10 +530,10 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 	return retVal / itersY;
 }
 
-double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* pltX)
+double DiffrotMerritFunctionWrapper(std::vector<double>& arg, const std::vector<std::pair<FitsImage, FitsImage>>& pics, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* plt1)
 {
 	IPCsettings set(arg[0], arg[0], arg[1], arg[2]);
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
-	return DiffrotMerritFunction(set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, pltX) / pics.size();
+	return DiffrotMerritFunction(set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, plt1) / pics.size();
 }

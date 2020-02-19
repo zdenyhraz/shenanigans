@@ -33,6 +33,7 @@ inline void swapbytes(char* input, unsigned length)
 class FitsImage
 {
 public:
+	FitsImage() {}
 
 	FitsImage(std::string path)
 	{

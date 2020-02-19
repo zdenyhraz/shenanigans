@@ -108,6 +108,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Astrophysics\diffrot.cpp" />
     <ClCompile Include="Filtering\filtering.cpp" />
     <ClCompile Include="Astrophysics\FITS.cpp" />
     <ClCompile Include="Fourier\fourier.cpp" />
