@@ -10,6 +10,8 @@ static const std::vector<QPen> plotPens{ QPen(Qt::black, 2, Qt::SolidLine, Qt::R
 static const QPen plotPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 static const QPen plotPen2(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
+
+
 struct Plot1D : AbstractPlot1D
 {
 	QCustomPlot* widget;

@@ -17,7 +17,7 @@ struct FitsParams
 	double fitsMidY = 0;
 	double R = 0;
 	double theta0 = 0;
-	bool succload = 0;
+	bool succload = false;
 };
 
 inline void swapbytes(char* input, unsigned length)
@@ -30,114 +30,16 @@ inline void swapbytes(char* input, unsigned length)
 	}
 }
 
-inline std::tuple<Mat, FitsParams> loadfits(std::string path)
-{
-	FitsParams params;
-	ifstream streamIN(path, ios::binary | ios::in);
-	if (!streamIN)
-	{
-		cout << "<loadfits> Cannot load file '" << path << "'- file does not exist dude!" << endl;
-		Mat shit;
-		params.succload = false;
-		return std::make_tuple(shit, params);
-	}
-	else
-	{
-		bool ENDfound = false;
-		char cline[lineBYTEcnt];
-		int fitsSize, fitsMid, fitsSize2, angle, linecnt = 0;
-		double pixelarcsec;
-
-		while (!streamIN.eof())
-		{
-			streamIN.read(&cline[0], lineBYTEcnt);
-			linecnt++;
-			string sline(cline);
-
-			if (sline.find("NAXIS1") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				fitsSize = stoi(snum);
-				fitsMid = fitsSize / 2;
-				fitsSize2 = fitsSize * fitsSize;
-			}
-			else if (sline.find("CRPIX1") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				params.fitsMidX = stod(snum) - 1.;//Nasa index od 1
-			}
-			else if (sline.find("CRPIX2") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				params.fitsMidY = stod(snum) - 1.;//Nasa index od 1
-			}
-			else if (sline.find("CDELT1") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				pixelarcsec = stod(snum);
-			}
-			else if (sline.find("RSUN_OBS") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				params.R = stod(snum);
-				params.R /= pixelarcsec;
-			}
-			else if (sline.find("RSUN") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				params.R = stod(snum);
-			}
-			else if (sline.find("CRLT_OBS") != std::string::npos)
-			{
-				std::size_t pos = sline.find("= ");
-				std::string snum = sline.substr(pos + 2);
-				params.theta0 = stod(snum) / (360. / 2. / Constants::Pi);
-			}
-			else if (sline.find("END                        ") != std::string::npos)
-			{
-				ENDfound = true;
-			}
-
-			if (ENDfound && (linecnt % linesMultiplier == 0)) break;
-		}
-
-		//opencv integration 
-		Mat mat(fitsSize, fitsSize, CV_16UC1);
-
-		streamIN.read((char*)mat.data, fitsSize2 * 2);
-		swapbytes((char*)mat.data, fitsSize2 * 2);
-		short* s16 = (short*)mat.data;
-		ushort* us16 = (ushort*)mat.data;
-
-		//new korekce
-		for (int i = 0; i < fitsSize2; i++)
-		{
-			int px = (int)(s16[i]);
-			px += 32768;
-			us16[i] = px;
-		}
-
-		normalize(mat, mat, 0, 65535, CV_MINMAX);
-		Point2f pt(fitsMid, fitsMid);
-		Mat r = getRotationMatrix2D(pt, 90, 1.0);
-		warpAffine(mat, mat, r, cv::Size(fitsSize, fitsSize));
-		transpose(mat, mat);
-		params.succload = true;
-		return std::make_tuple(mat, params);
-	}
-}
-
 class FitsImage
 {
 public:
 
 	FitsImage(std::string path)
+	{
+		data = loadfits(path);
+	}
+
+	void reload(std::string path)
 	{
 		data = loadfits(path);
 	}
@@ -154,6 +56,107 @@ public:
 
 private:
 	std::tuple<Mat, FitsParams> data;
+
+	inline std::tuple<Mat, FitsParams> loadfits(std::string path)
+	{
+		ifstream streamIN(path, ios::binary | ios::in);
+		if (!streamIN)
+		{
+			cout << "<loadfits> Cannot load file '" << path << "'- file does not exist dude!" << endl;
+			return std::make_tuple(Mat(), FitsParams());
+		}
+		else
+		{
+			FitsParams params;
+			bool ENDfound = false;
+			char cline[lineBYTEcnt];
+			int fitsSize, fitsMid, fitsSize2, angle, linecnt = 0;
+			double pixelarcsec;
+
+			while (!streamIN.eof())
+			{
+				streamIN.read(&cline[0], lineBYTEcnt);
+				linecnt++;
+				string sline(cline);
+
+				if (sline.find("NAXIS1") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					fitsSize = stoi(snum);
+					fitsMid = fitsSize / 2;
+					fitsSize2 = fitsSize * fitsSize;
+				}
+				else if (sline.find("CRPIX1") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					params.fitsMidX = stod(snum) - 1.;//Nasa index od 1
+				}
+				else if (sline.find("CRPIX2") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					params.fitsMidY = stod(snum) - 1.;//Nasa index od 1
+				}
+				else if (sline.find("CDELT1") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					pixelarcsec = stod(snum);
+				}
+				else if (sline.find("RSUN_OBS") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					params.R = stod(snum);
+					params.R /= pixelarcsec;
+				}
+				else if (sline.find("RSUN") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					params.R = stod(snum);
+				}
+				else if (sline.find("CRLT_OBS") != std::string::npos)
+				{
+					std::size_t pos = sline.find("= ");
+					std::string snum = sline.substr(pos + 2);
+					params.theta0 = stod(snum) / (360. / 2. / Constants::Pi);
+				}
+				else if (sline.find("END                        ") != std::string::npos)
+				{
+					ENDfound = true;
+				}
+
+				if (ENDfound && (linecnt % linesMultiplier == 0)) break;
+			}
+
+			//opencv integration 
+			Mat mat(fitsSize, fitsSize, CV_16UC1);
+
+			streamIN.read((char*)mat.data, fitsSize2 * 2);
+			swapbytes((char*)mat.data, fitsSize2 * 2);
+			short* s16 = (short*)mat.data;
+			ushort* us16 = (ushort*)mat.data;
+
+			//new korekce
+			for (int i = 0; i < fitsSize2; i++)
+			{
+				int px = (int)(s16[i]);
+				px += 32768;
+				us16[i] = px;
+			}
+
+			normalize(mat, mat, 0, 65535, CV_MINMAX);
+			Point2f pt(fitsMid, fitsMid);
+			Mat r = getRotationMatrix2D(pt, 90, 1.0);
+			warpAffine(mat, mat, r, cv::Size(fitsSize, fitsSize));
+			transpose(mat, mat);
+			params.succload = true;
+			return std::make_tuple(mat, params);
+		}
+	}
 };
 
 struct FITStime
@@ -343,8 +346,7 @@ inline Mat loadImage(std::string path)
 	Mat result;
 	if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
 	{
-		FitsParams params;
-		result = loadfits(path, params);
+		result = FitsImage(path).image();
 	}
 	else
 	{
