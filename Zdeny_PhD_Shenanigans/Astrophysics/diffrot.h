@@ -3,35 +3,39 @@
 #include "functionsAstro.h"
 
 static constexpr int plusminusbufer = 6;//even!
+static constexpr int sy = 0;//sunspot shift
 
 struct DiffrotSettings
 {
 	int pics;
 	int ys;
-	int strajdPic;
-	int deltaPic;
-	int verticalFov;
-	int deltaSec;
+	int sPic;
+	int dPic;
+	int vFov;
+	int dSec;
 };
 
 DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FITStime& time, DiffrotSettings drset, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
 {
-	int dy = drset.verticalFov / (drset.ys - 1);
-	int sy = 0;
+	int dy = drset.vFov / (drset.ys - 1);
 
-	std::vector<std::vector<double>> omegasX;
-	std::vector<double> shiftsXcurr(drset.ys);
-	std::vector<double> omegasXcurr(drset.ys);
-	std::vector<double> thetascurr(drset.ys);
+	std::vector<std::vector<double>> thetas2D;
+	std::vector<std::vector<double>> omegasX2D;
+	std::vector<double> shiftsX(drset.ys);
+	std::vector<double> thetas(drset.ys);
+	std::vector<double> omegasX(drset.ys);
 
+	std::vector<double> omegasXfit(drset.ys);
+	std::vector<double> omegasXavgfit(drset.ys);
+	std::vector<double> predicX(drset.ys);
 
 	FitsImage pic1, pic2;
 
 	for (int pic = 0; pic < drset.pics; pic++)
 	{
-		time.advanceTime((bool)pic*drset.deltaSec*(drset.strajdPic - drset.deltaPic));
+		time.advanceTime((bool)pic*drset.dSec*(drset.sPic - drset.dPic));
 		loadFitsFuzzy(pic1, time);
-		time.advanceTime(drset.deltaPic*drset.deltaSec);
+		time.advanceTime(drset.dPic*drset.dSec);
 		loadFitsFuzzy(pic2, time);
 
 		if (pic1.params().succload && pic2.params().succload)
@@ -39,16 +43,18 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FITStime& time
 			double R = (pic1.params().R + pic2.params().R) / 2;
 			double theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2;
 
-			calculateOmegas(pic1, pic2, shiftsXcurr, thetascurr, omegasXcurr, ipcset, drset, R, theta0, dy, sy);
+			calculateOmegas(pic1, pic2, shiftsX, thetas, omegasX, predicX, ipcset, drset, R, theta0, dy, sy);
 
-			omegasX.emplace_back(omegasXcurr);
+			omegasX2D.emplace_back(omegasX);
+			thetas2D.emplace_back(thetas);
 
+			omegasXfit = theta1Dfit(omegasX, thetas);
+			omegasXavgfit = theta2Dfit(omegasX2D, thetas2D);
+
+			drplot();
 		}
-
-		drplot();
 	}
 
-	theta2Dfit();
 	return fillDiffrotResults();
 }
 
@@ -78,22 +84,23 @@ void loadFitsFuzzy(FitsImage& pic, FITStime& time)
 	}
 }
 
-void calculateOmegas(FitsImage& pic1, FitsImage& pic2, std::vector<double>& shiftsXcurr, std::vector<double>& thetascurr, std::vector<double>& omegasXcurr, const IPCsettings& ipcset, DiffrotSettings& drset, double R, double theta0, double dy, double sy)
+void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& thetas, std::vector<double>& omegasX, std::vector<double>& predicX, const IPCsettings& ipcset, const DiffrotSettings& drset, double R, double theta0, double dy, double sy)
 {
 	#pragma omp parallel for
 	for (int y = 0; y < drset.ys; y++)
 	{
 		Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
 		Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
-		shiftsXcurr[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset).x;
+		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset).x;
 	}
 
-	//filter outliers
+	//filter outliers here
 
 	for (int y = 0; y < drset.ys; y++)
 	{
-		thetascurr[y] = asin(((double)dy*(drset.ys / 2 - y) - sy) / R) + theta0;
-		omegasXcurr[y] = asin(shiftsXcurr[y] / (R*cos(thetascurr[y]))) / drset.deltaPic / drset.deltaSec;
+		thetas[y] = asin(((double)dy*(drset.ys / 2 - y) - sy) / R) + theta0;
+		omegasX[y] = asin(shiftsX[y] / (R*cos(thetas[y]))) / drset.dPic / drset.dSec;
+		predicX[y] = (14.713 - 2.396*pow(sin(thetas[y]), 2) - 1.787*pow(sin(thetas[y]), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);
 	}
 }
 
@@ -102,14 +109,29 @@ DiffrotResults fillDiffrotResults()
 	return DiffrotResults();
 }
 
-void theta1Dfit()
+std::vector<double> theta1Dfit(const std::vector<double>& omegas, const std::vector<double>& thetas)
 {
-
+	return polyfit(thetas, omegas, 4);
 }
 
-void theta2Dfit()
+std::vector<double> theta2Dfit(const std::vector<std::vector<double>>& omegasX2D, const std::vector<std::vector<double>>& thetas2D)
 {
+	int I = omegasX2D.size();
+	int J = omegasX2D[0].size();
 
+	std::vector<double> omegasAll(I*J);
+	std::vector<double> thetasAll(I*J);
+
+	for (int i = 0; i < I; i++)
+	{
+		for (int j = 0; j < J; j++)
+		{
+			omegasAll[i*J + j] = omegasX2D[i][j];
+			thetasAll[i*J + j] = thetas2D[i][j];
+		}
+	}
+
+	return polyfit(thetasAll, omegasAll, 4);
 }
 
 void drplot()
