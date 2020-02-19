@@ -141,6 +141,7 @@
     <ClCompile Include="Gui\Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Astrophysics\diffrot.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Log\loggercsl.h" />
