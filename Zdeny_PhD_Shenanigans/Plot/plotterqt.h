@@ -12,7 +12,7 @@ static const QPen plotPen2(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJ
 
 
 
-struct Plot1D : AbstractPlot1D
+struct Plot1D : IPlot1D
 {
 	QCustomPlot* widget;
 
@@ -130,7 +130,7 @@ struct Plot1D : AbstractPlot1D
 	}
 };
 
-struct Plotter2D : AbstractPlot2D
+struct Plotter2D : IPlot2D
 {
 	std::vector<WindowPlot*> windowPlots;
 

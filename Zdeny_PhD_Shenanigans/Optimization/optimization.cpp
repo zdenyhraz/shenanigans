@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "optimization.h"
 
-std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger, AbstractPlot1D* plt)
+std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger, IPlot1D* plt)
 {
 	if (logger) logger->Log("Optimization started (evolution)", EVENT);
 
@@ -249,7 +249,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	return bestEntity;
 }//optimize function end
 
-std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger, AbstractPlot1D* plt)
+std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger, IPlot1D* plt)
 {
 	//if (logger) logger->Log    ">> Optimization started (pattern search)"  ;
 

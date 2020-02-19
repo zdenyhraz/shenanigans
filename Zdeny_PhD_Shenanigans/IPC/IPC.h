@@ -75,7 +75,7 @@ public:
 	}
 };
 
-inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger = nullptr, AbstractPlot2D* plt = nullptr)
+inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr)
 {
 	Point2f output;
 	Mat L3;
@@ -283,7 +283,7 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 	return output;
 }
 
-inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, Logger* logger = nullptr, AbstractPlot2D* plt = nullptr)
+inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr)
 {
 	Point2f output;
 	Mat L3;
