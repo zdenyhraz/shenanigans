@@ -138,7 +138,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	DiffrotResults results;
 	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
 	if (pltX) pltX->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"});
-	if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
+	//if (pltY) pltY->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
+	if (pltY) pltY->setAxisNames("solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string>{"delta px"});
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros(itersY, itersPic*itersX, CV_32F);
@@ -166,6 +167,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	std::vector<double> thetasavg(itersY);
 	std::vector<double> omegasXfit(itersY);
 	std::vector<double> omegasYfit(itersY);
+	std::vector<double> pxshiftsX(itersY);
 
 	std::vector<double> omegasXcurr(itersY);
 	std::vector<double> omegasYcurr(itersY);
@@ -270,6 +272,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 
 					//calculate omega from shift
 					shift = median(shifts);
+					pxshiftsX[iterY] = shift.x;
 
 					phi_x = asin(shift.x / (R*cos(theta)));
 					phi_y = theta - asin(sin(theta) - shift.y / R);
@@ -344,10 +347,11 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 
 		std::vector<double>& pltx = thetasavg;
 		std::vector<std::vector<double>> plty1{ omegasXfits[omegasXfits.size() - 1], omegasXavg, omegasXfit, omegasPavg };
-		std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
+		//std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
+		std::vector<std::vector<double>> plty2{ pxshiftsX };
 
-		pltX->plot(pltx, plty1);
-		pltY->plot(pltx, plty2);
+		if (pltX) pltX->plot(pltx, plty1);
+		if (pltY) pltY->plot(pltx, plty2);
 
 		showimg(omegasXmat, "omegasXmat", true, 0.01, 0.99);
 		showimg(omegasYmat, "omegasYmat", true, 0.01, 0.99);
