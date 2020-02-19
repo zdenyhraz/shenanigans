@@ -175,8 +175,6 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 	//omp_set_num_threads(6);
 	int plusminusbufer = 6;//even!
 	bool succload;
-	Mat pic1, pic2;
-	FitsParams params1, params2;
 
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
@@ -184,8 +182,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		//pic1
 		FITS_time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
 		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
-		pic1 = loadfits(FITS_time.path(), params1);
-		if (!params1.succload)
+		FitsImage pic1(FITS_time.path());
+		if (!pic1.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
@@ -194,12 +192,12 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					FITS_time.advanceTime(pm);
 				else
 					FITS_time.advanceTime(-pm);
-				pic1 = loadfits(FITS_time.path(), params1);
-				if (params1.succload)
+				pic1.reload(FITS_time.path());
+				if (pic1.params().succload)
 					break;
 			}
 		}
-		if (!params1.succload)
+		if (!pic1.params().succload)
 		{
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
@@ -208,8 +206,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 		//pic2
 		FITS_time.advanceTime(deltaPic*deltaSec);
 		logger->Log("Loading file '" + FITS_time.path() + "'...", INFO);
-		pic2 = loadfits(FITS_time.path(), params2);
-		if (!params2.succload)
+		FitsImage pic2(FITS_time.path());
+		if (!pic2.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
@@ -218,29 +216,29 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					FITS_time.advanceTime(pm);
 				else
 					FITS_time.advanceTime(-pm);
-				pic2 = loadfits(FITS_time.path(), params2);
-				if (params2.succload)
+				pic2.reload(FITS_time.path());
+				if (pic2.params().succload)
 					break;
 			}
 		}
-		if (!params2.succload)
+		if (!pic2.params().succload)
 		{
 			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
 			FITS_time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
-		succload = params1.succload && params2.succload;
+		succload = pic1.params().succload && pic2.params().succload;
 		if (succload)//load succesfull
 		{
 			if (0 && iterPic == 0)
 			{
-				showimg(pic1, "diffrot pic 1");
-				showimg(pic2, "diffrot pic 2");
+				showimg(pic1.image(), "diffrot pic 1");
+				showimg(pic2.image(), "diffrot pic 2");
 			}
 
 			//average fits values for pics 1 and 2
-			double R = (params1.R + params2.R) / 2;
-			double theta0 = (params1.theta0 + params2.theta0) / 2;
+			double R = (pic1.params().R + pic2.params().R) / 2;
+			double theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2;
 			int vertikalniskok = verticalFov / (itersY - 1);//px vertical jump
 			int vertikalniShift = 0;// 600;//abych videl sunspot hezky - 600
 
@@ -251,7 +249,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 				{
 					Mat crop1, crop2;
 					Point2d shift, shift1, shift2;
-					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
+					double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, omega_x = 0, phi_y = 0, omega_y = 0;
 					theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
 					predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);//predicted omega in radians per second
 					predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians
@@ -263,9 +261,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 					for (int iterMedian = 0; iterMedian < itersMedian; iterMedian++)
 					{
 						//crop1
-						crop1 = roicrop(pic1, params1.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params1.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+						crop1 = roicrop(pic1.image(), pic1.params().fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, pic1.params().fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 						//crop2
-						crop2 = roicrop(pic2, params2.fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, params2.fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
+						crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + iterX - itersX / 2 + iterMedian - itersMedian / 2, pic2.params().fitsMidY + vertikalniskok * (iterY - itersY / 2) + vertikalniShift, set.getcols(), set.getrows());
 
 						shifts[iterMedian] = phasecorrel(std::move(crop1), std::move(crop2), set);	
 					}
@@ -286,7 +284,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FITStime& FITS_ti
 
 					omegasXmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_x;
 					omegasYmat.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = omega_y;
-					picture.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.at<ushort>(params1.fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, params1.fitsMidX - floor((double)itersX / 2.) + iterX);
+					picture.at<float>(iterY, (itersPic - 1)*itersX - iterPic * itersX - iterX) = pic1.image().at<ushort>(pic1.params().fitsMidY + vertikalniskok * (iterY - floor((double)itersY / 2.)) + vertikalniShift, pic1.params().fitsMidX - floor((double)itersX / 2.) + iterX);
 				}//Y for cycle end
 			}//X for cycle end
 		}//load successful
@@ -466,7 +464,7 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 			{
 				Mat crop1, crop2;
 				Point2d shift, shift1, shift2;
-				double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, phi_x1 = 0, phi_x2 = 0, omega_x = 0, omega_x1 = 0, omega_x2 = 0, phi_y = 0, omega_y = 0, beta = 0;
+				double predicted_omega = 0, predicted_phi = 0, theta = 0, phi_x = 0, omega_x = 0, phi_y = 0, omega_y = 0;
 				theta = asin(((double)vertikalniskok*(itersY / 2 - iterY) - vertikalniShift) / R) + theta0;//latitude
 				predicted_omega = (14.713 - 2.396*pow(sin(theta), 2) - 1.787*pow(sin(theta), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);//predicted omega in radians per second
 				predicted_phi = predicted_omega * deltaPic * deltaSec;//predicted shift in radians

@@ -91,10 +91,10 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if (0)//2pic IPC
+	if (1)//2pic IPC
 	{
-		std::string path1 = "D:\\MainOutput\\Debug\\test1.PNG";
-		std::string path2 = "D:\\MainOutput\\Debug\\test2.PNG";
+		std::string path1 = "D:\\SDOpics\\2011_03_12__15_25_15__CONT.fits";
+		std::string path2 = "D:\\SDOpics\\2011_03_12__15_26_00__CONT.fits";
 		Mat img1 = loadImage(path1);
 		Mat img2 = loadImage(path2);
 
@@ -171,6 +171,6 @@ void Zdeny_PhD_Shenanigans::generateLand()
 void Zdeny_PhD_Shenanigans::playSnake()
 {
 	globals->Logger->Log("Started playing snake. (It is ok, everyone needs some rest.. :))", EVENT);
-	SnakeGame2();
+	SnakeGame();
 	globals->Logger->Log("Finished playing snake. Did you enjoy it? *wink*", SUBEVENT);
 }
