@@ -171,6 +171,6 @@ void Zdeny_PhD_Shenanigans::generateLand()
 void Zdeny_PhD_Shenanigans::playSnake()
 {
 	globals->Logger->Log("Started playing snake. (It is ok, everyone needs some rest.. :))", EVENT);
-	SnakeGame();
+	SnakeGame2();
 	globals->Logger->Log("Finished playing snake. Did you enjoy it? *wink*", SUBEVENT);
 }
