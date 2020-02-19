@@ -39,6 +39,32 @@ std::vector<double> polyfit(const std::vector<double>& data, int degree)
 	return fit;
 }
 
+std::vector<double> polyfit(const std::vector<double>& xdata, const std::vector<double>& ydata, int degree)
+{
+	int dataCount = ydata.size();
+	Mat X = Mat::zeros(dataCount, degree + 1, CV_32F);//matice planu
+	Mat Y = Mat::zeros(dataCount, 1, CV_32F);//matice prave strany
+	for (int r = 0; r < X.rows; r++)
+	{
+		Y.at<float>(r, 0) = ydata[r];
+		for (int c = 0; c < X.cols; c++)
+		{
+			if (!c)
+				X.at<float>(r, c) = 1;
+			else
+				X.at<float>(r, c) = pow(xdata[r], c);
+		}
+	}
+	Mat coeffs = (X.t()*X).inv()*X.t()*Y;//least squares
+	Mat fitM = X * coeffs;
+	std::vector<double> fit(dataCount, 0);
+	for (int r = 0; r < fitM.rows; r++)
+	{
+		fit[r] = fitM.at<float>(r, 0);
+	}
+	return fit;
+}
+
 Mat crosshair(const Mat& sourceimgIn, cv::Point point)
 {
 	Mat sourceimg = sourceimgIn.clone();

@@ -15,6 +15,8 @@ std::tuple<double, double> minMaxMat(const Mat& sourceimg);
 
 std::vector<double> polyfit(const std::vector<double>& data, int degree);
 
+std::vector<double> polyfit(const std::vector<double>& xdata, const std::vector<double>& ydata, int degree);
+
 Mat crosshair(const Mat& sourceimgIn, cv::Point point);
 
 Mat xko(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType);
