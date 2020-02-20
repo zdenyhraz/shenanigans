@@ -18,6 +18,8 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time
 	std::vector<double> omegasXfit(drset.ys);
 	std::vector<double> omegasXavgfit(drset.ys);
 	std::vector<double> predicX(drset.ys);
+	std::vector<double> iotam(drset.ys);
+	std::iota(iotam.begin(), iotam.end(), 0);
 
 	FitsImage pic1, pic2;
 
@@ -42,7 +44,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time
 			omegasXavgfit = theta2Dfit(omegasX2D, thetas2D);
 
 			drplot1(plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicX);
-			drplot2(plt2, thetas, shiftsX);
+			drplot2(plt2, iotam, shiftsX);
 		}
 	}
 
@@ -77,12 +79,14 @@ void loadFitsFuzzy(FitsImage& pic, FitsTime& time)
 
 void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& thetas, std::vector<double>& omegasX, std::vector<double>& predicX, const IPCsettings& ipcset, const DiffrotSettings& drset, double R, double theta0, double dy)
 {
+	int yshow = 400;
+
 	#pragma omp parallel for
 	for (int y = 0; y < drset.ys; y++)
 	{
 		Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
 		Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
-		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset, nullptr, nullptr, y == drset.ys / 2).x;
+		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset, nullptr, nullptr, y == yshow).x;
 	}
 
 	//filter outliers here
@@ -91,7 +95,7 @@ void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<d
 	for (int y = 0; y < drset.ys; y++)
 	{
 		thetas[y] = asin(((double)dy*(drset.ys / 2 - y) - sy) / R) + theta0;
-		omegasX[y] = asin(shiftsX[y] / (R*cos(thetas[y]))) / drset.dPic / drset.dSec;
+		omegasX[y] = asin(shiftsX[y] / (R*cos(thetas[y]))) / (double)(drset.dPic * drset.dSec);
 		predicX[y] = (14.713 - 2.396*pow(sin(thetas[y]), 2) - 1.787*pow(sin(thetas[y]), 4)) / (24. * 60. * 60.) / (360. / 2. / Constants::Pi);
 	}
 }
@@ -131,9 +135,9 @@ void drplot1(IPlot1D* plt1, const std::vector<double>& thetas, const std::vector
 	plt1->plot(thetas, std::vector<std::vector<double>>{omegasX, omegasXfit, omegasXavgfit, predicX});
 }
 
-void drplot2(IPlot1D* plt2, const std::vector<double>& thetas, const std::vector<double>& shiftsX)
+void drplot2(IPlot1D* plt2, const std::vector<double>& iotam, const std::vector<double>& shiftsX)
 {
-	plt2->plot(thetas, std::vector<std::vector<double>>{shiftsX});
+	plt2->plot(iotam, std::vector<std::vector<double>>{shiftsX});
 }
 
 void filterShiftsMA(std::vector<double>& shiftsX)
