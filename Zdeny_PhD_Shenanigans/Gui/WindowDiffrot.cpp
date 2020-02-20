@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "WindowDiffrot.h"
+#include "Astrophysics/diffrot.h"
 
 WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
@@ -18,7 +19,17 @@ void WindowDiffrot::calculateDiffrot()
 	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D pltX(globals->widget1);
 	Plot1D pltY(globals->widget2);
-	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), globals->Logger, &pltX, &pltY);
+	//*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), globals->Logger, &pltX, &pltY);
+
+	DiffrotSettings drset;
+	drset.pics = ui.lineEdit_7->text().toDouble();
+	drset.ys = ui.lineEdit_2->text().toDouble();
+	drset.sPic = ui.lineEdit_6->text().toDouble();
+	drset.dPic = ui.lineEdit_5->text().toDouble();
+	drset.vFov = ui.lineEdit_4->text().toDouble();
+	drset.dSec = ui.lineEdit_8->text().toDouble();
+
+	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, drset, globals->Logger, &pltX, &pltY);
 }
 
 void WindowDiffrot::showIPC()
