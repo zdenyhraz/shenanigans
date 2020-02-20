@@ -13,6 +13,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time
 	std::vector<double> shiftsX(drset.ys);
 	std::vector<double> thetas(drset.ys);
 	std::vector<double> omegasX(drset.ys);
+	//std::vector<double> omegasXavg(drset.ys);
 
 	std::vector<double> omegasXfit(drset.ys);
 	std::vector<double> omegasXavgfit(drset.ys);
@@ -32,7 +33,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time
 			double R = (pic1.params().R + pic2.params().R) / 2;
 			double theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2;
 
-			calculateOmegas(pic1, pic2, shiftsX, thetas, omegasX, predicX, ipcset, drset, R, theta0, dy, sy);
+			calculateOmegas(pic1, pic2, shiftsX, thetas, omegasX, predicX, ipcset, drset, R, theta0, dy);
 
 			omegasX2D.emplace_back(omegasX);
 			thetas2D.emplace_back(thetas);
@@ -74,7 +75,7 @@ void loadFitsFuzzy(FitsImage& pic, FitsTime& time)
 	}
 }
 
-void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& thetas, std::vector<double>& omegasX, std::vector<double>& predicX, const IPCsettings& ipcset, const DiffrotSettings& drset, double R, double theta0, double dy, double sy)
+void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& thetas, std::vector<double>& omegasX, std::vector<double>& predicX, const IPCsettings& ipcset, const DiffrotSettings& drset, double R, double theta0, double dy)
 {
 	#pragma omp parallel for
 	for (int y = 0; y < drset.ys; y++)
@@ -85,6 +86,7 @@ void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<d
 	}
 
 	//filter outliers here
+	filterShiftsMA(shiftsX);
 
 	for (int y = 0; y < drset.ys; y++)
 	{
@@ -132,4 +134,27 @@ void drplot1(IPlot1D* plt1, const std::vector<double>& thetas, const std::vector
 void drplot2(IPlot1D* plt2, const std::vector<double>& thetas, const std::vector<double>& shiftsX)
 {
 	plt2->plot(thetas, std::vector<std::vector<double>>{shiftsX});
+}
+
+void filterShiftsMA(std::vector<double>& shiftsX)
+{
+	auto shiftsXma = shiftsX;
+	for (int i = 0; i < shiftsX.size(); i++)
+	{
+		double mav = 0;
+		int mavc = 0;
+		for (int m = 0; m < ma; m++)
+		{
+			int idx = i - ma / 2 + m;
+
+			if (idx < 0 || idx == shiftsX.size())
+				break;
+
+			mav += shiftsX[idx];
+			mavc++;
+		}
+		mav /= (double)mavc;
+		shiftsXma[i] = mav;
+	}
+	shiftsX = shiftsXma;
 }

@@ -39,10 +39,10 @@ void WindowDiffrot::showIPC()
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;
 	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", INFO);
+	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", DEBUG);
 	Mat pic1 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 	fitsTime.advanceTime(ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble());
-	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", INFO);
+	globals->Logger->Log("Loading file '" + fitsTime.path() + "'...", DEBUG);
 	Mat pic2 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 
 	auto shifts = phasecorrel(pic1, pic2, set, globals->Logger);
@@ -100,11 +100,11 @@ void WindowDiffrot::superOptimizeDiffrot()
 
 	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
 	auto result = Evo.optimize(f, globals->Logger, plt1);
-	globals->Logger->Log("Optimal Size: " + to_string(result[0]), INFO);
-	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), INFO);
-	globals->Logger->Log("Optimal Hmult: " + to_string(result[2]), INFO);
-	globals->Logger->Log("Optimal L2size: " + to_string(result[3]), INFO);
-	globals->Logger->Log("Optimal Window: " + to_string(result[4]), INFO);
+	globals->Logger->Log("Optimal Size: " + to_string(result[0]), DEBUG);
+	globals->Logger->Log("Optimal Lmult: " + to_string(result[1]), DEBUG);
+	globals->Logger->Log("Optimal Hmult: " + to_string(result[2]), DEBUG);
+	globals->Logger->Log("Optimal L2size: " + to_string(result[3]), DEBUG);
+	globals->Logger->Log("Optimal Window: " + to_string(result[4]), DEBUG);
 	globals->Logger->Log("Super optimizing finished", SUBEVENT);
 }
 

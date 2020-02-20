@@ -183,13 +183,13 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
 		//pic1
 		time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
-		logger->Log("Loading file '" + time.path() + "'...", INFO);
+		logger->Log("Loading file '" + time.path() + "'...", DEBUG);
 		FitsImage pic1(time.path());
 		if (!pic1.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
+				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", FATAL);
 				if (pm % 2 == 0)
 					time.advanceTime(pm);
 				else
@@ -207,13 +207,13 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 
 		//pic2
 		time.advanceTime(deltaPic*deltaSec);
-		logger->Log("Loading file '" + time.path() + "'...", INFO);
+		logger->Log("Loading file '" + time.path() + "'...", DEBUG);
 		FitsImage pic2(time.path());
 		if (!pic2.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", WARN);
+				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", FATAL);
 				if (pm % 2 == 0)
 					time.advanceTime(pm);
 				else
