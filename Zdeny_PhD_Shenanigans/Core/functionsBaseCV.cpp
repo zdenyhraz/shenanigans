@@ -217,20 +217,25 @@ Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter)
 
 Point2f findCentroidDouble(const Mat& sourceimg)
 {
-	float M00 = 0.0;
-	float M01 = 0.0;
-	float M10 = 0.0;
+	double M00 = 0.0;
+	double M01 = 0.0;
+	double M10 = 0.0;
 	for (int r = 0; r < sourceimg.rows; r++)
 	{
-		//std::cout << " FCrow " << r;
 		for (int c = 0; c < sourceimg.cols; c++)
 		{
-			M00 += 1.0 * sourceimg.at<float>(r, c);
-			M01 += (float)r * sourceimg.at<float>(r, c);
-			M10 += (float)c * sourceimg.at<float>(r, c);
+			M00 += sourceimg.at<float>(r, c);
+			M01 += (double)r * sourceimg.at<float>(r, c);
+			M10 += (double)c * sourceimg.at<float>(r, c);
 		}
 	}
-	return Point2f(M10 / M00, M01 / M00);
+
+	Point2f ret(M10 / M00, M01 / M00);
+
+	if (ret.x < 0 || ret.y < 0 || ret.x > sourceimg.cols || ret.y > sourceimg.rows)
+		return Point2f(sourceimg.cols / 2, sourceimg.rows / 2);
+	else
+		return ret;
 }
 
 Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle style, double sigma)

@@ -66,6 +66,8 @@ void WindowIPC2PicAlign::alignXY()
 	IPCsettings set = *globals->IPCsettings;//copy
 	set.IPCshow = true;//show
 
+	showimg(img1, "img1");
+	showimg(img2, "img2");
 	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
 }
 

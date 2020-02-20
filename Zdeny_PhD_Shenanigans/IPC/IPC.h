@@ -10,6 +10,8 @@
 using namespace std;
 using namespace cv;
 
+static constexpr auto maxPCit = 10;
+
 class IPCsettings
 {
 private:
@@ -230,7 +232,6 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 				L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 				L1mid = Point2f(L1.cols / 2, L1.rows / 2);
 				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
-				int maxPCit = 50;
 				for (int i = 0; i < maxPCit; i++)
 				{
 					if (logger) logger->Log("======= iteration " + to_string(i) + " =======", SUBEVENT);
@@ -407,7 +408,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 			Point2f L2mid(L2.cols / 2, L2.rows / 2);
 			Mat L2U;
 			if (set.interpolate)
-				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_LINEAR);
+				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_CUBIC);
 			else
 				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST);
 			Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
@@ -435,7 +436,6 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 				L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 				L1mid = Point2f(L1.cols / 2, L1.rows / 2);
 				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
-				int maxPCit = 50;
 				for (int i = 0; i < maxPCit; i++)
 				{
 					if (logger) logger->Log("======= iteration " + to_string(i) + " =======", SUBEVENT);
