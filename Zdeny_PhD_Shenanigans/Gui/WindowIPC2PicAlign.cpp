@@ -22,8 +22,8 @@ void WindowIPC2PicAlign::align()
 	Mat img2 = loadImage(path2);
 
 	int size = globals->IPCsettings->getcols();
-	img1 = roicrop(img1, 0.375*img1.cols, 0.7*img1.rows, size, size);
-	img2 = roicrop(img2, 0.375*img2.cols, 0.7*img2.rows, size, size);
+	img1 = roicrop(img1, 0.5*img1.cols, 0.5*img1.rows, size, size);
+	img2 = roicrop(img2, 0.5*img2.cols, 0.5*img2.rows, size, size);
 
 	IPCsettings set = *globals->IPCsettings;
 	set.IPCshow = true;

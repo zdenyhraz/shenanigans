@@ -68,7 +68,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>3</x>
@@ -91,7 +91,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>D:\\MainOutput\\S-wind\\01_calib.PNG</string>
+        <string>D:\\SDOpics\\2020_01_01__00_00_22__CONT.fits</string>
        </property>
       </widget>
      </item>
@@ -108,7 +108,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>D:\\MainOutput\\S-wind\\010_calib.PNG</string>
+        <string>D:\\SDOpics\\2020_01_01__00_01_07__CONT.fits</string>
        </property>
       </widget>
      </item>
@@ -142,7 +142,7 @@
      <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_4">
        <property name="text">
-        <string>0.38</string>
+        <string>0.5</string>
        </property>
       </widget>
      </item>
@@ -159,7 +159,7 @@
      <item row="4" column="1">
       <widget class="QLineEdit" name="lineEdit_5">
        <property name="text">
-        <string>0.73</string>
+        <string>0.5</string>
        </property>
       </widget>
      </item>

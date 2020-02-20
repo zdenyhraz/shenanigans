@@ -40,6 +40,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
 	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
 	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
+	connect(ui.actionFits_downloader, SIGNAL(triggered()), this, SLOT(fitsDownloader()));
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -161,4 +162,11 @@ void Zdeny_PhD_Shenanigans::playSnake()
 	globals->Logger->Log("Started playing snake. (It is ok, everyone needs some rest.. :))", EVENT);
 	SnakeGame();
 	globals->Logger->Log("Finished playing snake. Did you enjoy it? *wink*", SUBEVENT);
+}
+
+void Zdeny_PhD_Shenanigans::fitsDownloader()
+{
+	//http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122 - 2020 1.1. 00:00
+	generateFitsDownloadUrlSingles(1, 20, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122");
+	globals->Logger->Log("Fits download urls created", EVENT);
 }

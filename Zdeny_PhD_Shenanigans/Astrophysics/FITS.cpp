@@ -55,13 +55,6 @@ Mat loadfits(std::string path, FitsParams& params)
 				std::size_t pos = lajnaString.find("= ");
 				std::string stringcislo = lajnaString.substr(pos + 2);
 				params.R = stod(stringcislo);
-				params.R /= pixelarcsec;
-			}
-			else if (lajnaString.find("RSUN") != std::string::npos)
-			{
-				std::size_t pos = lajnaString.find("= ");
-				std::string stringcislo = lajnaString.substr(pos + 2);
-				params.R = stod(stringcislo);
 			}
 			else if (lajnaString.find("CRLT_OBS") != std::string::npos)
 			{
@@ -76,7 +69,7 @@ Mat loadfits(std::string path, FitsParams& params)
 
 			if (ENDfound && (lajny % linesMultiplier == 0)) break;
 		}
-
+		params.R /= pixelarcsec;
 		std::vector<char> celyobraz_8(fitsSize2 * 2);
 		streamIN.read(celyobraz_8.data(), fitsSize2 * 2);
 		swapbytes(celyobraz_8.data(), fitsSize2 * 2);
@@ -115,9 +108,9 @@ Mat loadfits(std::string path, FitsParams& params)
 	}
 }
 
-void generateFitsDownloadUrlsAndCreateFile(int delta, int step, int pics, string urlmain)
+void generateFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain)
 {
-	std::ofstream urls("D:\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
+	std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::app);
 	std::size_t posR = urlmain.find("record=");
 	std::size_t posN = posR + 7;
 	std::string stringcislo = urlmain.substr(posN, 8);//8mistne cislo
@@ -131,7 +124,24 @@ void generateFitsDownloadUrlsAndCreateFile(int delta, int step, int pics, string
 		urls << url1 << endl;
 		if (delta > 0)
 			urls << url2 << endl;
-		number += (step - 1);//step -1 (step od prvni fotky ne od druhe)
+
+		number += step - delta;//step -delta (step od prvni fotky ne od druhe)
+	}
+}
+
+void generateFitsDownloadUrlSingles(int delta, int pics, string urlmain)
+{
+	std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::app);
+	std::size_t posR = urlmain.find("record=");
+	std::size_t posN = posR + 7;
+	std::string stringcislo = urlmain.substr(posN, 8);//8mistne cislo
+	int number = stod(stringcislo);
+	urlmain = urlmain.substr(0, posN);
+	for (int i = 0; i < pics; i++)
+	{
+		string url = urlmain + to_string(number) + "-" + to_string(number);
+		urls << url << endl;
+		number += delta;
 	}
 }
 
