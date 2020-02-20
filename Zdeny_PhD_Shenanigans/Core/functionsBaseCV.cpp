@@ -344,7 +344,7 @@ void showimg(const Mat& sourceimgIn, std::string windowname, bool color, double 
 {
 	Mat sourceimg = sourceimgIn.clone();
 	double RowColRatio = (double)sourceimg.rows / (double)sourceimg.cols;
-	int namedWindowRows = 1200;
+	int namedWindowRows = 600;
 	int namedWindowCols = (double)namedWindowRows / RowColRatio;
 	namedWindow(windowname, WINDOW_NORMAL);
 	if (showSize == Size2i(0, 0))

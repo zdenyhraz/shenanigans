@@ -29,6 +29,8 @@ void WindowDiffrot::calculateDiffrot()
 	drset.vFov = ui.lineEdit_4->text().toDouble();
 	drset.dSec = ui.lineEdit_8->text().toDouble();
 
+	//globals->IPCsettings->IPCshow = true;
+
 	*diffrotResults = calculateDiffrotProfile(*globals->IPCsettings, fitsTime, drset, globals->Logger, &pltX, &pltY);
 }
 

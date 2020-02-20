@@ -82,11 +82,11 @@ void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<d
 	{
 		Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
 		Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
-		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset).x;
+		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset, nullptr, nullptr, y == drset.ys / 2).x;
 	}
 
 	//filter outliers here
-	filterShiftsMA(shiftsX);
+	//filterShiftsMA(shiftsX);
 
 	for (int y = 0; y < drset.ys; y++)
 	{

@@ -283,7 +283,7 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 	return output;
 }
 
-inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr)
+inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr, bool forceshow = false)
 {
 	Point2f output;
 	Mat L3;
@@ -297,12 +297,11 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		multiply(sourceimg2, set.window, sourceimg2);
 	}
 
-	if (set.IPCshow)
+	if (set.IPCshow || forceshow)
 	{
 		showimg(sourceimg1, "IPC src1");
 		showimg(sourceimg2, "IPC src2");
-		showimg(set.bandpass, "IPC bandpass");
-		showimg(set.window, "IPC window");
+		//showimg(set.bandpass, "IPC bandpass");
 	}
 
 	Mat DFT1 = fourier(std::move(sourceimg1));
@@ -332,7 +331,6 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 	if (logger) logger->Log("Cross-power spectrum calculated", DEBUG);
 	Mat CrossPower;
 	merge(CrossPowerPlanes, 2, CrossPower);
-	if (set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
 	if (set.applyBandpass)
 	{
 		CrossPower = bandpass(CrossPower, set.bandpass);
@@ -354,7 +352,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		magnitude(L3planes[0], L3planes[1], L3);
 		Mat L3phase;
 		phase(L3planes[0], L3planes[1], L3phase);
-		if (set.IPCshow) { Mat L3pv; resize(L3phase, L3pv, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(L3pv, "L3phase", true); }
+		if (set.IPCshow || forceshow) { Mat L3pv; resize(L3phase, L3pv, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(L3pv, "L3phase", true); }
 	}
 	else//real only (assume pure real input)
 	{
@@ -369,11 +367,12 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 	minMaxLoc(L3, &minR, &maxR, &L3bot, &L3peak);
 	Point2f L3mid(L3.cols / 2, L3.rows / 2);
 	Point2f imageshift_PIXEL(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
-	if (set.IPCshow)
+	if (set.IPCshow || forceshow)
 	{
 		Mat L3v;
 		resize(L3, L3v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST);
 		showimg(crosshair(L3v, Point2f(round((float)(L3peak.x) * 2000. / (float)L3.cols), round((float)(L3peak.y) * 2000. / (float)L3.rows))), "L3", true, 0, 1);
+		/*
 		Mat L3vl; resize(L3, L3vl, cv::Size(2000, 2000), 0, 0, INTER_NEAREST);
 		for (int j = 0; j < 10; j++)
 		{
@@ -382,6 +381,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 			normalize(L3vl, L3vl, 0, 1, CV_MINMAX);
 		}
 		showimg(crosshair(L3vl, Point2f(round((float)(L3peak.x) * 2000. / (float)L3.cols), round((float)(L3peak.y) * 2000. / (float)L3.rows))), "L3 log", true, 0, 1);
+		*/
 	}
 	if (logger)
 	{
@@ -412,7 +412,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 				resize(L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST);
 			Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
 			if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
-			if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
+			if (set.IPCshow || forceshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
 			Point2f L2Upeak(L2U.cols / 2, L2U.rows / 2);
 			if (logger)
 			{
