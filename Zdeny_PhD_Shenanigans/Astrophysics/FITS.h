@@ -111,13 +111,6 @@ private:
 					std::size_t pos = sline.find("= ");
 					std::string snum = sline.substr(pos + 2);
 					params.R = stod(snum);
-					params.R /= pixelarcsec;
-				}
-				else if (sline.find("RSUN") != std::string::npos)
-				{
-					std::size_t pos = sline.find("= ");
-					std::string snum = sline.substr(pos + 2);
-					params.R = stod(snum);
 				}
 				else if (sline.find("CRLT_OBS") != std::string::npos)
 				{
@@ -132,6 +125,8 @@ private:
 
 				if (ENDfound && (linecnt % linesMultiplier == 0)) break;
 			}
+
+			params.R /= pixelarcsec;
 
 			//opencv integration 
 			Mat mat(fitsSize, fitsSize, CV_16UC1);
@@ -336,7 +331,9 @@ public:
 
 Mat loadfits(std::string path, FitsParams& params);
 
-void generateFitsDownloadUrlsAndCreateFile(int delta, int step, int pics, string urlmain);
+void generateFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain);
+
+void generateFitsDownloadUrlSingles(int delta, int pics, string urlmain);
 
 void checkFitsDownloadsAndCreateFile(int delta, int step, int pics, string urlmain, string pathMasterIn);
 

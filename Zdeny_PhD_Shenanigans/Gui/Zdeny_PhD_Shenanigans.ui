@@ -208,13 +208,13 @@
      <string>Tools</string>
     </property>
     <addaction name="actionDebug"/>
-    <addaction name="actionFITS_download_url_creator_2"/>
    </widget>
    <widget class="QMenu" name="menuAstrophysics">
     <property name="title">
      <string>Astrophysics</string>
     </property>
     <addaction name="actiondiffrot"/>
+    <addaction name="actionFits_downloader"/>
    </widget>
    <widget class="QMenu" name="menuSnake">
     <property name="title">
@@ -349,6 +349,11 @@
   <action name="actionGenerate_land">
    <property name="text">
     <string>Generate land</string>
+   </property>
+  </action>
+  <action name="actionFits_downloader">
+   <property name="text">
+    <string>Fits downloader</string>
    </property>
   </action>
  </widget>

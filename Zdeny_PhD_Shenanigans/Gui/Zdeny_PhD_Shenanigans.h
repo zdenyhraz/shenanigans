@@ -35,4 +35,5 @@ private slots:
 	void showWindowDiffrot();
 	void playSnake();
 	void generateLand();
+	void fitsDownloader();
 };
