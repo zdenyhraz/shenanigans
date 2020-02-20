@@ -47,11 +47,11 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			for (int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++)//check distance to all other entities
 			{
 				double avgDist = averageVectorDistance(population[indexEntity], population[indexEntity2], boundsRange);//calculate how distinct the entity is to another entity
-				if (logger) logger->Log("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist), INFO);
+				if (logger) logger->Log("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist), DEBUG);
 				if (avgDist < initialMinAvgDist)//check if entity is distinct
 				{
 					distinctEntity = false;
-					if (logger) logger->Log("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment", INFO);
+					if (logger) logger->Log("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment", DEBUG);
 					break;//needs to be distinct from all entities
 				}
 			}
@@ -184,7 +184,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 				fitness_curr = bestFitness;
 				if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2))
 				{
-					logger->Log("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), INFO);
+					logger->Log("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), DEBUG);
 					logger->Log("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", DEBUG);
 					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) logger->Log("Big improvement!", SUBEVENT);
 					logger->Log("", DEBUG);

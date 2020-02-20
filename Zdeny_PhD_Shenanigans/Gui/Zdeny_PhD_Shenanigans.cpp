@@ -19,14 +19,9 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	globals->widget1 = ui.widget;
 	globals->widget2 = ui.widget_2;
 	globals->plotter2D = new Plotter2D();
-
-	#ifdef LOGGER_QT
-	globals->Logger = new QtLogger(g_loglevel, ui.textBrowser);
-	#else
 	globals->Logger = new CslLogger(g_loglevel);
-	#endif
 
-	globals->Logger->Log("Welcome back, my friend.", SPECIAL);//log a welcome message
+	globals->Logger->Log("Welcome back, my friend.", SUCCESS);//log a welcome message
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);
@@ -37,7 +32,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
 	connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
 	connect(ui.pushButtonAddLogs, SIGNAL(clicked()), this, SLOT(loggerToTextBrowser()));
-	connect(ui.pushButtonClearLogs, SIGNAL(clicked()), this, SLOT(clearTextBrowser()));
 	connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(closeCV()));
 	connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
 	connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
@@ -46,7 +40,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
 	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
 	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
-
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -118,7 +111,7 @@ void Zdeny_PhD_Shenanigans::about()
 void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
-	globals->Logger->Log("All image windows closed", INFO);
+	globals->Logger->Log("All image windows closed", DEBUG);
 }
 
 void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
@@ -128,14 +121,9 @@ void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
 		globals->Logger->Log("boziiinku, co ted budeme delat?", FATAL);
 		globals->Logger->Log("jejda, nebude v tom nahodou nejaky probljhbemek?", EVENT);
 		globals->Logger->Log("trololooo niga xdxd 5", SUBEVENT);
-		globals->Logger->Log("objednal jsem ti ten novy monitor, jak jsi chtel", INFO);
+		globals->Logger->Log("objednal jsem ti ten novy monitor, jak jsi chtel", DEBUG);
 		globals->Logger->Log("tak tenhle zapeklity problemek budeme muset", DEBUG);
 	}
-}
-
-void Zdeny_PhD_Shenanigans::clearTextBrowser()
-{
-	ui.textBrowser->clear();
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters()

@@ -26,7 +26,7 @@ void WindowIPCparameters::refreshIPCparameters()
 	globals->IPCsettings->interpolate = ui.checkBox_5->isChecked();
 	globals->IPCsettings->crossCorrel = ui.checkBox_7->isChecked();
 
-	globals->Logger->Log("IPC parameter values updated", INFO);
+	globals->Logger->Log("IPC parameter values updated", DEBUG);
 }
 
 void WindowIPCparameters::refreshIPCparametersAndExit()

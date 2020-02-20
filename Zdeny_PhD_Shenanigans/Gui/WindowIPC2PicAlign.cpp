@@ -118,10 +118,10 @@ void WindowIPC2PicAlign::linearFlow()
 	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
-	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);
-	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
-	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
-	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
+	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), DEBUG);
+	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), DEBUG);
+	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), DEBUG);
+	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), DEBUG);
 	globals->Logger->Log("Linear solar wind speed calculated", SUBEVENT);
 }
 
@@ -136,9 +136,9 @@ void WindowIPC2PicAlign::constantFlow()
 	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
-	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), INFO);
-	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), INFO);
-	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), INFO);
-	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), INFO);
+	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), DEBUG);
+	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), DEBUG);
+	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), DEBUG);
+	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), DEBUG);
 	globals->Logger->Log("Constant solar wind speed calculated", SUBEVENT);
 }
