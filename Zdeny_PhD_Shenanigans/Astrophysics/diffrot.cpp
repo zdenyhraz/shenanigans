@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "diffrot.h"
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time, DiffrotSettings drset, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time, DiffrotSettings drset, IPlot1D* plt1, IPlot1D* plt2)
 {
 	int dy = drset.vFov / (drset.ys - 1);
 
@@ -86,7 +86,7 @@ void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<d
 	{
 		Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
 		Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * (y - drset.ys / 2) + sy, ipcset.getcols(), ipcset.getrows());
-		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset, nullptr, nullptr, y == yshow).x;
+		shiftsX[y] = phasecorrel(std::move(crop1), std::move(crop2), ipcset, nullptr, y == yshow).x;
 	}
 
 	//filter outliers here
@@ -107,7 +107,7 @@ DiffrotResults fillDiffrotResults()
 
 std::vector<double> theta1Dfit(const std::vector<double>& omegas, const std::vector<double>& thetas)
 {
-	return polyfit(thetas, omegas, 4);
+	return polyfit(thetas, omegas, 2);
 }
 
 std::vector<double> theta2Dfit(const std::vector<std::vector<double>>& omegasX2D, const std::vector<std::vector<double>>& thetas2D)
@@ -127,7 +127,7 @@ std::vector<double> theta2Dfit(const std::vector<std::vector<double>>& omegasX2D
 		}
 	}
 
-	return polyfit(thetasAll, omegasAll, 4);
+	return polyfit(thetasAll, omegasAll, 2);
 }
 
 void drplot1(IPlot1D* plt1, const std::vector<double>& thetas, const std::vector<double>& omegasX, const std::vector<double>& omegasXfit, const std::vector<double>& omegasXavgfit, const std::vector<double>& predicX)

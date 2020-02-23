@@ -1,15 +1,22 @@
 #pragma once
-#include "macros.h"
+#include "stdafx.h"
 #include "IPC/IPC.h"
-#include "Log/loggercsl.h"
-#include "Log/loggerqt.h"
 #include "Plot/plotterqt.h"
+#include "Log/logger.h"
 
 struct Globals
 {
-	IPCsettings* IPCsettings;
-	Logger* Logger;
+	IPCsettings* IPCset;
 	QCustomPlot* widget1;
 	QCustomPlot* widget2;
 	Plotter2D* plotter2D;
+	Logger* logger;
+
+	Globals()
+	{
+		IPCset = new IPCsettings(100, 100, 5, 20);
+		plotter2D = new Plotter2D();
+		logger = new Logger();
+	}
+	
 };

@@ -15,13 +15,9 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
-	globals->IPCsettings = new IPCsettings(100, 100, 5, 20);
 	globals->widget1 = ui.widget;
 	globals->widget2 = ui.widget_2;
-	globals->plotter2D = new Plotter2D();
-	globals->Logger = new CslLogger(g_loglevel);
-
-	globals->Logger->Log("Welcome back, my friend.", SUCCESS);//log a welcome message
+	LOG_DEBUG("Welcome back, my friend.");//log a welcome message
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);
@@ -74,32 +70,32 @@ void Zdeny_PhD_Shenanigans::debug()
 			std::this_thread::sleep_for(std::chrono::milliseconds(10)); 
 			return abs(args[0] - args[1]); 
 		};
-		auto result = Evo.optimize(f, globals->Logger, &plt);
+		auto result = Evo.optimize(f, &plt);
 		plt.save("D:\\MainOutput\\Debug\\plot1D.png");
 	}
 	if (0)//ipc bandpass & window 
 	{
-		IPCsettings set = *globals->IPCsettings;
+		IPCsettings set = *globals->IPCset;
 		set.setSize(1000, 1000);
 		set.setBandpassParameters(5, 1);
 		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if (1)//2pic IPC
+	if (0)//2pic IPC
 	{
 		std::string path1 = "D:\\SDOpics\\2011_03_12__15_25_15__CONT.fits";
 		std::string path2 = "D:\\SDOpics\\2011_03_12__15_26_00__CONT.fits";
 		Mat img1 = loadImage(path1);
 		Mat img2 = loadImage(path2);
 
-		IPCsettings set = *globals->IPCsettings;
+		IPCsettings set = *globals->IPCset;
 		set.IPCshow = true;
 		set.setSize(img1.rows, img1.cols);
 
-		auto shifts = phasecorrel(img1, img2, set, globals->Logger, globals->plotter2D);
+		auto shifts = phasecorrel(img1, img2, set,  globals->plotter2D);
 	}
 
-	globals->Logger->Log("Debug finished.", EVENT);
+	LOG_DEBUG("Debug finished.");
 }
 
 void Zdeny_PhD_Shenanigans::about()
@@ -112,18 +108,18 @@ void Zdeny_PhD_Shenanigans::about()
 void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
-	globals->Logger->Log("All image windows closed", DEBUG);
+	LOG_DEBUG("All image windows closed");
 }
 
 void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
 {
 	for (int i = 0; i < 100; i++)
 	{
-		globals->Logger->Log("boziiinku, co ted budeme delat?", FATAL);
-		globals->Logger->Log("jejda, nebude v tom nahodou nejaky probljhbemek?", EVENT);
-		globals->Logger->Log("trololooo niga xdxd 5", SUBEVENT);
-		globals->Logger->Log("objednal jsem ti ten novy monitor, jak jsi chtel", DEBUG);
-		globals->Logger->Log("tak tenhle zapeklity problemek budeme muset", DEBUG);
+		LOG_DEBUG("boziiinku, co ted budeme delat?");
+		LOG_DEBUG("jejda, nebude v tom nahodou nejaky probljhbemek?");
+		LOG_DEBUG("trololooo niga xdxd 5");
+		LOG_DEBUG("objednal jsem ti ten novy monitor, jak jsi chtel");
+		LOG_DEBUG("tak tenhle zapeklity problemek budeme muset");
 	}
 }
 
@@ -150,23 +146,23 @@ void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 
 void Zdeny_PhD_Shenanigans::generateLand()
 {
-	globals->Logger->Log("Generating some land...", EVENT);
+	LOG_DEBUG("Generating some land...");
 	Mat mat = procedural(1000, 1000);
 	showimg(colorlandscape(mat), "procedural nature");
 	//showimg(mat, "procedural mature", true);
-	globals->Logger->Log("Finished generating some land. Do you like it?", SUBEVENT);
+	LOG_DEBUG("Finished generating some land. Do you like it?");
 }
 
 void Zdeny_PhD_Shenanigans::playSnake()
 {
-	globals->Logger->Log("Started playing snake. (It is ok, everyone needs some rest.. :))", EVENT);
+	LOG_DEBUG("Started playing snake. (It is ok, everyone needs some rest.. :))");
 	SnakeGame();
-	globals->Logger->Log("Finished playing snake. Did you enjoy it? *wink*", SUBEVENT);
+	LOG_DEBUG("Finished playing snake. Did you enjoy it? *wink*");
 }
 
 void Zdeny_PhD_Shenanigans::fitsDownloader()
 {
 	//http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122 - 2020 1.1. 00:00
-	generateFitsDownloadUrlSingles(1, 20, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122");
-	globals->Logger->Log("Fits download urls created", EVENT);
+	generateFitsDownloadUrlSingles(1, 2000, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122");
+	LOG_DEBUG("Fits download urls created");
 }

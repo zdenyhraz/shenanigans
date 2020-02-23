@@ -16,7 +16,7 @@ struct DiffrotSettings
 	int dSec;
 };
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time, DiffrotSettings drset, Logger* logger, IPlot1D* plt1, IPlot1D* plt2);
+DiffrotResults calculateDiffrotProfile(const IPCsettings& ipcset, FitsTime& time, DiffrotSettings drset, IPlot1D* plt1, IPlot1D* plt2);
 
 void loadFitsFuzzy(FitsImage& pic, FitsTime& time);
 

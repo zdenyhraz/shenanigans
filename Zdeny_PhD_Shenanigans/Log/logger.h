@@ -1,15 +1,27 @@
 #pragma once
 #include "stdafx.h"
-#include "Core/functionsBaseSTL.h"
 
-enum LOGLEVEL { SUCCESS, FATAL, EVENT, SUBEVENT, DEBUG };
-const std::vector<std::string> LOGLEVEL_STR{ "success", "error","main", "sub", "debug" };
-
-struct Logger
+class Logger
 {
-	LOGLEVEL m_loglevel;
+public:
+	Logger()
+	{
+		logger = spdlog::stdout_color_mt("console");
+		spdlog::set_pattern("%^[%T][%l] %v%$");
+		spdlog::set_level(spdlog::level::debug);
+	}
 
-	Logger(LOGLEVEL loglevel) : m_loglevel(loglevel) {};
+	inline static std::shared_ptr<spdlog::logger>& GetLogger()
+	{
+		return logger;
+	}
 
-	inline virtual void Log(const std::string& msg, LOGLEVEL loglevel = DEBUG) = 0;
+private:
+	static std::shared_ptr<spdlog::logger> logger;
 };
+
+#define LOG_DEBUG(...) Logger::GetLogger()->debug(__VA_ARGS__)
+#define LOG_INFO(...) Logger::GetLogger()->info(__VA_ARGS__)
+#define LOG_WARN(...) Logger::GetLogger()->warn(__VA_ARGS__)
+#define LOG_ERROR(...) Logger::GetLogger()->error(__VA_ARGS__)
+#define LOG_FATAL(...) Logger::GetLogger()->critical(__VA_ARGS__)

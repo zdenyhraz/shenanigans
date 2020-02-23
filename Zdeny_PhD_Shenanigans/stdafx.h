@@ -25,19 +25,22 @@
 #include <complex>
 #include <tuple>
 #include <thread>
+#include <memory>
 //OpenCV
 #include "opencv2/opencv.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
+//QCustomPlot
+#include "Plot/qcustomplot.h"
+//spdlog
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 //custom
 #include "Core/constants.h"
 #include "Core/macros.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
-//QCustomPlot
-#include "Plot/qcustomplot.h"
-
-
 

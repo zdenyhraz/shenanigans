@@ -77,7 +77,7 @@ double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster
 	return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShift, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, Logger* logger, IPlot1D* plt)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, IPlot1D* plt)
 {
 	std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
 	listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
@@ -95,13 +95,13 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
 		Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 		Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 		Evo.upperBounds = vector<double>{ 10,200,19,1 };
-		auto Result = Evo.optimize(f, logger, plt);
+		auto Result = Evo.optimize(f, plt);
 		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 	}
 	destroyWindow(windowname);
 }
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs, Logger* logger)
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs)
 {
 	std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
 	if (1)//OPT 4par
@@ -125,7 +125,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 					Evo.optimalFitness = 0;
 					Evo.lowerBounds = vector<double>{ 0,0,3,-1 };
 					Evo.upperBounds = vector<double>{ 20,200,19,1 };
-					auto Result = Evo.optimize(f, logger);
+					auto Result = Evo.optimize(f);
 					listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
 				}
 			}
@@ -133,10 +133,10 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
 	}
 }
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, Logger* logger, IPlot1D* plt1, IPlot1D* plt2)
+DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov, int deltaSec, IPlot1D* plt1, IPlot1D* plt2)
 {
 	DiffrotResults results;
-	if (logger) logger->Log("Starting IPC MainFlow calculation", SUBEVENT);
+	LOG_DEBUG("Starting IPC MainFlow calculation");
 	if (plt1) plt1->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"});
 	//if (plt2) plt2->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
 	if (plt2) plt2->setAxisNames("solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string>{"delta px"});
@@ -180,16 +180,16 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 
 	for (int iterPic = 0; iterPic < itersPic; iterPic++)//main cycle - going through pairs of pics
 	{
-		logger->Log("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")", SUBEVENT);
+		LOG_DEBUG("Calculating picture pair id " + to_string(iterPic) + " (" + to_string(iterPic + 1) + " / " + itersPic + ")");
 		//pic1
 		time.advanceTime((bool)iterPic*deltaSec*(strajdPic - deltaPic));
-		logger->Log("Loading file '" + time.path() + "'...", DEBUG);
+		LOG_DEBUG("Loading file '" + time.path() + "'...");
 		FitsImage pic1(time.path());
 		if (!pic1.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", FATAL);
+				LOG_DEBUG("Load failed, trying plusminus " + to_string(pm) + ": ");
 				if (pm % 2 == 0)
 					time.advanceTime(pm);
 				else
@@ -201,19 +201,19 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 		}
 		if (!pic1.params().succload)
 		{
-			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
+			LOG_DEBUG("Picture not loaded succesfully - stopping current block execution ");
 			time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
 		//pic2
 		time.advanceTime(deltaPic*deltaSec);
-		logger->Log("Loading file '" + time.path() + "'...", DEBUG);
+		LOG_DEBUG("Loading file '" + time.path() + "'...");
 		FitsImage pic2(time.path());
 		if (!pic2.params().succload)
 		{
 			for (int pm = 1; pm < plusminusbufer; pm++)//try plus minus some seconds
 			{
-				logger->Log("Load failed, trying plusminus " + to_string(pm) + ": ", FATAL);
+				LOG_DEBUG("Load failed, trying plusminus " + to_string(pm) + ": ");
 				if (pm % 2 == 0)
 					time.advanceTime(pm);
 				else
@@ -225,7 +225,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 		}
 		if (!pic2.params().succload)
 		{
-			logger->Log("Picture not loaded succesfully - stopping current block execution ", FATAL);
+			LOG_DEBUG("Picture not loaded succesfully - stopping current block execution ");
 			time.advanceTime(plusminusbufer / 2);//fix unsuccesful plusminus
 		}
 
@@ -342,7 +342,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 			}
 			omegasXfits.push_back(polyfit(omegasXavg, 4));
 			omegasYfits.push_back(polyfit(omegasYavg, 4));
-			logger->Log("That one was kenker, thrown to trash", FATAL);
+			LOG_DEBUG("That one was kenker, thrown to trash");
 		}
 
 		std::vector<double>& pltx = thetasavg;
@@ -366,7 +366,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings& set, FitsTime& time, i
 	results.FlowPic = picture;
 	results.FlowXfits = omegasXfits;
 	results.FlowYfits = omegasYfits;
-	logger->Log("IPC MainFlow calculation finished", SUBEVENT);
+	LOG_DEBUG("IPC MainFlow calculation finished");
 	return results;
 }
 
@@ -518,12 +518,6 @@ double DiffrotMerritFunction(const IPCsettings& set, const std::vector<std::pair
 		for (int y = 0; y < itersY; y++)
 			retVal += abs(omegasX[y][omegasX[y].size() - 1] - omegasPavg[y]);
 	}//picture pairs cycle end
-
-	if (plt1 && retVal/itersY < 3e-7)
-	{
-		//plt1->setAxisNames("solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string>{"measured - avg", "predicted"});
-		//plt1->plot(thetasavg, std::vector<std::vector<double>>{omegasX, omegasPavg});
-	}
 	
 	//------------------------------------------------------------------------
 	cout << "retVal = " << retVal / itersY << "          (" << std::vector<double>{(double)set.getcols(), set.getL(), set.getH(), set.L2size, (double)set.applyWindow} << ")" << endl;

@@ -21,11 +21,11 @@ void WindowIPC2PicAlign::align()
 	Mat img1 = loadImage(path1);
 	Mat img2 = loadImage(path2);
 
-	int size = globals->IPCsettings->getcols();
+	int size = globals->IPCset->getcols();
 	img1 = roicrop(img1, 0.5*img1.cols, 0.5*img1.rows, size, size);
 	img2 = roicrop(img2, 0.5*img2.cols, 0.5*img2.rows, size, size);
 
-	IPCsettings set = *globals->IPCsettings;
+	IPCsettings set = *globals->IPCset;
 	set.IPCshow = true;
 
 	if (0)//artificial misalign
@@ -52,23 +52,23 @@ void WindowIPC2PicAlign::align()
 
 void WindowIPC2PicAlign::alignXY()
 {
-	globals->Logger->Log("Starting IPC image align process(XY)...", EVENT);
+	LOG_DEBUG("Starting IPC image align process(XY)...");
 	std::string path1 = ui.lineEdit->text().toStdString();
 	std::string path2 = ui.lineEdit_2->text().toStdString();
 	Mat img1 = loadImage(path1);
 	Mat img2 = loadImage(path2);
 
-	int sizeX = globals->IPCsettings->getcols();
-	int sizeY = globals->IPCsettings->getrows();
+	int sizeX = globals->IPCset->getcols();
+	int sizeY = globals->IPCset->getrows();
 	img1 = roicrop(img1, ui.lineEdit_4->text().toDouble()*img1.cols, ui.lineEdit_5->text().toDouble()*img1.rows, sizeX, sizeY);
 	img2 = roicrop(img2, ui.lineEdit_4->text().toDouble()*img2.cols, ui.lineEdit_5->text().toDouble()*img2.rows, sizeX, sizeY);
 
-	IPCsettings set = *globals->IPCsettings;//copy
+	IPCsettings set = *globals->IPCset;//copy
 	set.IPCshow = true;//show
 
 	showimg(img1, "img1");
 	showimg(img2, "img2");
-	auto shifts = phasecorrel(img1, img2, set, globals->Logger);
+	auto shifts = phasecorrel(img1, img2, set);
 }
 
 void WindowIPC2PicAlign::flowMap()
@@ -86,7 +86,7 @@ void WindowIPC2PicAlign::flowMap()
 	Mat flowAD = abs(img1 - img2);
 	showimg(flowAD, "flowAD", true, 0, 1);
 
-	auto flowMap = calculateFlowMap(img1, img2, *globals->IPCsettings, 1);
+	auto flowMap = calculateFlowMap(img1, img2, *globals->IPCset, 1);
 	Mat flowX = std::get<0>(flowMap);
 	Mat flowY = std::get<1>(flowMap);
 
@@ -111,8 +111,8 @@ void WindowIPC2PicAlign::features()
 
 void WindowIPC2PicAlign::linearFlow()
 {
-	globals->Logger->Log("Starting linear solar wind speed calculation...", EVENT);
-	auto xyi = calculateLinearSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
+	LOG_DEBUG("Starting linear solar wind speed calculation...");
+	auto xyi = calculateLinearSwindFlow(*globals->IPCset, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
@@ -120,17 +120,17 @@ void WindowIPC2PicAlign::linearFlow()
 	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
-	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), DEBUG);
-	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), DEBUG);
-	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), DEBUG);
-	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), DEBUG);
-	globals->Logger->Log("Linear solar wind speed calculated", SUBEVENT);
+	LOG_DEBUG("xshifts min = " + to_string(vectorMin(xshifts)));
+	LOG_DEBUG("xshifts max = " + to_string(vectorMax(xshifts)));
+	LOG_DEBUG("yshifts min = " + to_string(vectorMin(yshifts)));
+	LOG_DEBUG("yshifts max = " + to_string(vectorMax(yshifts)));
+	LOG_DEBUG("Linear solar wind speed calculated");
 }
 
 void WindowIPC2PicAlign::constantFlow()
 {
-	globals->Logger->Log("Starting constant solar wind speed calculation...", EVENT);
-	auto xyi = calculateConstantSwindFlow(*globals->IPCsettings, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
+	LOG_DEBUG("Starting constant solar wind speed calculation...");
+	auto xyi = calculateConstantSwindFlow(*globals->IPCset, ui.lineEdit_3->text().toStdString(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toDouble());
 	auto xshifts = std::get<0>(xyi);
 	auto yshifts = std::get<1>(xyi);
 	auto indices = std::get<2>(xyi);
@@ -138,9 +138,9 @@ void WindowIPC2PicAlign::constantFlow()
 	plt.setAxisNames("picture index", "pixel shift X", "pixel shift Y");
 	plt.plot(indices, xshifts, yshifts);
 
-	globals->Logger->Log("xshifts min = " + to_string(vectorMin(xshifts)), DEBUG);
-	globals->Logger->Log("xshifts max = " + to_string(vectorMax(xshifts)), DEBUG);
-	globals->Logger->Log("yshifts min = " + to_string(vectorMin(yshifts)), DEBUG);
-	globals->Logger->Log("yshifts max = " + to_string(vectorMax(yshifts)), DEBUG);
-	globals->Logger->Log("Constant solar wind speed calculated", SUBEVENT);
+	LOG_DEBUG("xshifts min = " + to_string(vectorMin(xshifts)));
+	LOG_DEBUG("xshifts max = " + to_string(vectorMax(xshifts)));
+	LOG_DEBUG("yshifts min = " + to_string(vectorMin(yshifts)));
+	LOG_DEBUG("yshifts max = " + to_string(vectorMax(yshifts)));
+	LOG_DEBUG("Constant solar wind speed calculated");
 }
