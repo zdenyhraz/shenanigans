@@ -171,12 +171,6 @@
     <ClInclude Include="Log\logger.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Log\loggercsl.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Log\loggerqt.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
     <ClInclude Include="InverseMap\inverseMapping.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>

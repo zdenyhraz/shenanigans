@@ -132,11 +132,11 @@ double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, doubl
 
 double IPCparOptFun(std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShift, double accuracy);
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, Logger* logger, IPlot1D* plt);
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, IPlot1D* plt);
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs, Logger* logger);
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs);
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings& IPC_settings, FitsTime& FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, Logger* logger, IPlot1D* pltX, IPlot1D* pltY);
+DiffrotResults calculateDiffrotProfile(const IPCsettings& IPC_settings, FitsTime& FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic, int verticalFov, int deltasec, IPlot1D* pltX, IPlot1D* pltY);
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow(const IPCsettings& set, std::string path, double SwindCropFocusX, double SwindCropFocusY);
 

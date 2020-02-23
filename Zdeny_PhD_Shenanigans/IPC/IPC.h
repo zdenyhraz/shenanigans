@@ -1,11 +1,12 @@
 #pragma once
+#include "stdafx.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Fourier/fourier.h"
 #include "Astrophysics/FITS.h"
 #include "Filtering/filtering.h"
-#include "Log/logger.h"
 #include "Plot/plotter.h"
+#include "Log/logger.h"
 
 using namespace std;
 using namespace cv;
@@ -77,7 +78,7 @@ public:
 	}
 };
 
-inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr)
+inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, const IPCsettings& set, IPlot2D* plt = nullptr)
 {
 	Point2f output;
 	Mat L3;
@@ -126,14 +127,14 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		CrossPowerPlanes[0] /= (normalizationdenominator + set.epsilon);
 		CrossPowerPlanes[1] /= (normalizationdenominator + set.epsilon);
 	}
-	if (logger) logger->Log("Cross-power spectrum calculated", DEBUG);
+	LOG_DEBUG("Cross-power spectrum calculated");
 	Mat CrossPower;
 	merge(CrossPowerPlanes, 2, CrossPower);
 	if (set.IPCshow) { showfourier(CrossPower, false, true, "crosspowerFFTmagn", "crosspowerFFTphase"); }
 	if (set.applyBandpass)
 	{
 		CrossPower = bandpass(CrossPower, set.bandpass);
-		if (logger) logger->Log("Cross-power spectrum bandpassed", DEBUG);
+		LOG_DEBUG("Cross-power spectrum bandpassed");
 	}
 	if (0)//CORRECT - complex magnitude - input can be real or complex whatever
 	{
@@ -145,8 +146,8 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		{
 			auto minmaxReal = minMaxMat(L3planes[0]);
 			auto minmaxImag = minMaxMat(L3planes[1]);
-			if (logger) logger->Log("L3 real min/max: " + to_string(std::get<0>(minmaxReal)) + " / " + to_string(std::get<1>(minmaxReal)), DEBUG);
-			if (logger) logger->Log("L3 imag min/max: " + to_string(std::get<0>(minmaxImag)) + " / " + to_string(std::get<1>(minmaxImag)), DEBUG);
+			LOG_DEBUG("L3 real min/max: " + to_string(std::get<0>(minmaxReal)) + " / " + to_string(std::get<1>(minmaxReal)));
+			LOG_DEBUG("L3 imag min/max: " + to_string(std::get<0>(minmaxImag)) + " / " + to_string(std::get<1>(minmaxImag)));
 		}
 		magnitude(L3planes[0], L3planes[1], L3);
 		Mat L3phase;
@@ -159,7 +160,7 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 	}
 	L3 = quadrantswap(L3);
 	//L3 = L3.mul(quadrantMask(L3.rows, L3.cols));//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< this is jsut s-wind (HARDCODED)
-	if (logger) logger->Log("Inverse fourier of cross-power spectrum calculated", DEBUG);
+	LOG_DEBUG("Inverse fourier of cross-power spectrum calculated");
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 	Point2i L3peak, L3bot;
 	double maxR, minR;
@@ -180,12 +181,10 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		}
 		showimg(crosshair(L3vl, Point2f(round((float)(L3peak.x) * 2000. / (float)L3.cols), round((float)(L3peak.y) * 2000. / (float)L3.rows))), "L3 log", true, 0, 1);
 	}
-	if (logger)
-	{
-		logger->Log("Phase correlation max: " + to_string(maxR) + " at location: " + to_string(L3peak), DEBUG);
-		logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels", DEBUG);
-		logger->Log("Phase correlation calculated with pixel accuracy", SUBEVENT);
-	}
+	LOG_DEBUG("Phase correlation max: " + to_string(maxR) + " at location: " + to_string(L3peak));
+	LOG_DEBUG("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels");
+	LOG_DEBUG("Phase correlation calculated with pixel accuracy");
+	
 	output = imageshift_PIXEL;
 
 	if (set.subpixel)
@@ -195,7 +194,7 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 		if (!(L2size % 2)) L2size++;//odd!+
 		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > L3.cols) || ((L3peak.y + L2size / 2 + 1) > L3.rows))
 		{
-			if (logger) logger->Log("Degenerate peak, results might be inaccurate!", FATAL);
+			LOG_DEBUG("Degenerate peak, results might be inaccurate!");
 		}
 		else
 		{
@@ -211,11 +210,10 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 			if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
 			if (set.IPCshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
 			Point2f L2Upeak(L2U.cols / 2, L2U.rows / 2);
-			if (logger)
-			{
-				logger->Log("L2Upeak location before iterations: " + to_string(L2Upeak), DEBUG);
-				logger->Log("L2Upeak location before iterations findCentroid double: " + to_string(findCentroidDouble(L2U)), DEBUG);
-			}
+			
+			LOG_DEBUG("L2Upeak location before iterations: " + to_string(L2Upeak));
+			LOG_DEBUG("L2Upeak location before iterations findCentroid double: " + to_string(findCentroidDouble(L2U)));
+			
 			int L1size = std::round((float)L2U.cols*set.L1ratio);
 			if (!(L1size % 2)) L1size++;//odd!+
 			Mat L1;
@@ -234,24 +232,24 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
 				for (int i = 0; i < maxPCit; i++)
 				{
-					if (logger) logger->Log("======= iteration " + to_string(i) + " =======", SUBEVENT);
+					LOG_DEBUG("======= iteration " + to_string(i) + " =======");
 					L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 					Point2f L1peak = findCentroidDouble(L1);
-					if (logger) logger->Log("L1peak: " + to_string(L1peak), DEBUG);
+					LOG_DEBUG("L1peak: " + to_string(L1peak));
 					L2Upeak.x += round(L1peak.x - L1mid.x);
 					L2Upeak.y += round(L1peak.y - L1mid.y);
 					if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
 					{
-						if (logger) logger->Log("Breaking out of IPC iterations, centroid diverges", FATAL);
+						LOG_DEBUG("Breaking out of IPC iterations, centroid diverges");
 						break;
 					}
-					if (logger) logger->Log("L1peak findCentroid double delta: " + to_string(findCentroidDouble(L1).x - L1mid.x) + " , " + to_string(findCentroidDouble(L1).y - L1mid.y), DEBUG);
-					if (logger) logger->Log("Resulting L2Upeak in this iteration: " + to_string(L2Upeak), DEBUG);
+					LOG_DEBUG("L1peak findCentroid double delta: " + to_string(findCentroidDouble(L1).x - L1mid.x) + " , " + to_string(findCentroidDouble(L1).y - L1mid.y));
+					LOG_DEBUG("Resulting L2Upeak in this iteration: " + to_string(L2Upeak));
 					if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
 					{
 						L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-						if (logger) logger->Log("Iterative phase correlation accuracy reached", SUBEVENT);
-						if (logger) logger->Log("L2Upeak: " + to_string(L2Upeak), DEBUG);
+						LOG_DEBUG("Iterative phase correlation accuracy reached");
+						LOG_DEBUG("L2Upeak: " + to_string(L2Upeak));
 						if (set.IPCshow)
 						{
 							Mat L1v;
@@ -263,28 +261,25 @@ inline Point2f phasecorrel(const Mat& sourceimg1In, const Mat& sourceimg2In, con
 					}
 					if (i == (maxPCit - 1))
 					{
-						if (logger) logger->Log("IPC out of iterations - diverges", FATAL);
+						LOG_DEBUG("IPC out of iterations - diverges");
 					}
 				}
 				imageshift_SUBPIXEL.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)set.UC*((float)L2Upeak.x - (float)L2Umid.x + findCentroidDouble(L1).x - (float)L1mid.x);//image shift in L3 - final
 				imageshift_SUBPIXEL.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)set.UC*((float)L2Upeak.y - (float)L2Umid.y + findCentroidDouble(L1).y - (float)L1mid.y);//image shift in L3 - final
 			}
-
-			if (logger)
-			{
-				logger->Log("Iterative phase correlation calculated with subpixel accuracy", SUBEVENT);
-				logger->Log("L3 size: " + to_string(L3.cols) + ", L2 size: " + to_string(L2.cols) + ", L2U size: " + to_string(L2U.cols) + ", L1 size: " + to_string(L1.cols), DEBUG);
-				logger->Log("Upsample pixel accuracy theoretical maximum: " + to_string(1.0 / (float)set.UC), DEBUG);
-				logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels ", DEBUG);
-				logger->Log("Calculated shift with SUBpixel accuracy1: " + to_string(imageshift_SUBPIXEL) + " pixels ", SUBEVENT);
-			}
+			LOG_DEBUG("Iterative phase correlation calculated with subpixel accuracy");
+			LOG_DEBUG("L3 size: " + to_string(L3.cols) + ", L2 size: " + to_string(L2.cols) + ", L2U size: " + to_string(L2U.cols) + ", L1 size: " + to_string(L1.cols));
+			LOG_DEBUG("Upsample pixel accuracy theoretical maximum: " + to_string(1.0 / (float)set.UC));
+			LOG_DEBUG("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels ");
+			LOG_DEBUG("Calculated shift with SUBpixel accuracy1: " + to_string(imageshift_SUBPIXEL) + " pixels ");
+			
 			output = imageshift_SUBPIXEL;
 		}
 	}
 	return output;
 }
 
-inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, Logger* logger = nullptr, IPlot2D* plt = nullptr, bool forceshow = false)
+inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, IPlot2D* plt = nullptr, bool forceshow = false)
 {
 	Point2f output;
 	Mat L3;
@@ -329,13 +324,13 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		CrossPowerPlanes[0] /= (normalizationdenominator + set.epsilon);
 		CrossPowerPlanes[1] /= (normalizationdenominator + set.epsilon);
 	}
-	if (logger) logger->Log("Cross-power spectrum calculated", DEBUG);
+	LOG_DEBUG("Cross-power spectrum calculated");
 	Mat CrossPower;
 	merge(CrossPowerPlanes, 2, CrossPower);
 	if (set.applyBandpass)
 	{
 		CrossPower = bandpass(CrossPower, set.bandpass);
-		if (logger) logger->Log("Cross-power spectrum bandpassed", DEBUG);
+		LOG_DEBUG("Cross-power spectrum bandpassed");
 	}
 	if (0)//CORRECT - complex magnitude - input can be real or complex whatever
 	{
@@ -347,8 +342,8 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		{
 			auto minmaxReal = minMaxMat(L3planes[0]);
 			auto minmaxImag = minMaxMat(L3planes[1]);
-			if (logger) logger->Log("L3 real min/max: " + to_string(std::get<0>(minmaxReal)) + " / " + to_string(std::get<1>(minmaxReal)), DEBUG);
-			if (logger) logger->Log("L3 imag min/max: " + to_string(std::get<0>(minmaxImag)) + " / " + to_string(std::get<1>(minmaxImag)), DEBUG);
+			LOG_DEBUG("L3 real min/max: " + to_string(std::get<0>(minmaxReal)) + " / " + to_string(std::get<1>(minmaxReal)));
+			LOG_DEBUG("L3 imag min/max: " + to_string(std::get<0>(minmaxImag)) + " / " + to_string(std::get<1>(minmaxImag)));
 		}
 		magnitude(L3planes[0], L3planes[1], L3);
 		Mat L3phase;
@@ -361,7 +356,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 	}
 	L3 = quadrantswap(L3);
 	//L3 = L3.mul(quadrantMask(L3.rows, L3.cols));//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< this is jsut s-wind (HARDCODED)
-	if (logger) logger->Log("Inverse fourier of cross-power spectrum calculated", DEBUG);
+	LOG_DEBUG("Inverse fourier of cross-power spectrum calculated");
 	if (set.minimalShift) L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 	Point2i L3peak, L3bot;
 	double maxR, minR;
@@ -384,12 +379,9 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		showimg(crosshair(L3vl, Point2f(round((float)(L3peak.x) * 2000. / (float)L3.cols), round((float)(L3peak.y) * 2000. / (float)L3.rows))), "L3 log", true, 0, 1);
 		*/
 	}
-	if (logger)
-	{
-		logger->Log("Phase correlation max: " + to_string(maxR) + " at location: " + to_string(L3peak), DEBUG);
-		logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels", DEBUG);
-		logger->Log("Phase correlation calculated with pixel accuracy", SUBEVENT);
-	}
+	LOG_DEBUG("Phase correlation max: " + to_string(maxR) + " at location: " + to_string(L3peak));
+	LOG_DEBUG("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels");
+	LOG_DEBUG("Phase correlation calculated with pixel accuracy");
 	output = imageshift_PIXEL;
 
 	if (set.subpixel)
@@ -399,7 +391,7 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 		if (!(L2size % 2)) L2size++;//odd!+
 		if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2 + 1) > L3.cols) || ((L3peak.y + L2size / 2 + 1) > L3.rows))
 		{
-			if (logger) logger->Log("Degenerate peak, results might be inaccurate!", FATAL);
+			LOG_DEBUG("Degenerate peak, results might be inaccurate!");
 		}
 		else
 		{
@@ -415,11 +407,8 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 			if (set.IPCshow) { Mat L2v; resize(L2, L2v, cv::Size(2000, 2000), 0, 0, INTER_NEAREST); showimg(crosshair(L2v, L2mid * 2000 / L2.cols), "L2", true); }
 			if (set.IPCshow || forceshow) { Mat L2Uv; resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L2Uv, L2Umid * 2000 / L2U.cols), "L2U", true, 0, 1); }
 			Point2f L2Upeak(L2U.cols / 2, L2U.rows / 2);
-			if (logger)
-			{
-				logger->Log("L2Upeak location before iterations: " + to_string(L2Upeak), DEBUG);
-				logger->Log("L2Upeak location before iterations findCentroid double: " + to_string(findCentroidDouble(L2U)), DEBUG);
-			}
+			LOG_DEBUG("L2Upeak location before iterations: " + to_string(L2Upeak));
+			LOG_DEBUG("L2Upeak location before iterations findCentroid double: " + to_string(findCentroidDouble(L2U)));
 			int L1size = std::round((float)L2U.cols*set.L1ratio);
 			if (!(L1size % 2)) L1size++;//odd!+
 			Mat L1;
@@ -438,24 +427,24 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 				if (set.IPCshow) { Mat L1v; resize(L1, L1v, cv::Size(2000, 2000), 0, 0, INTER_LINEAR); showimg(crosshair(L1v, L1mid * 2000 / L1.cols), "L1 be4", true); }
 				for (int i = 0; i < maxPCit; i++)
 				{
-					if (logger) logger->Log("======= iteration " + to_string(i) + " =======", SUBEVENT);
+					LOG_DEBUG("======= iteration " + to_string(i) + " =======");
 					L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 					Point2f L1peak = findCentroidDouble(L1);
-					if (logger) logger->Log("L1peak: " + to_string(L1peak), DEBUG);
+					LOG_DEBUG("L1peak: " + to_string(L1peak));
 					L2Upeak.x += round(L1peak.x - L1mid.x);
 					L2Upeak.y += round(L1peak.y - L1mid.y);
 					if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
 					{
-						if (logger) logger->Log("Breaking out of IPC iterations, centroid diverges", FATAL);
+						LOG_DEBUG("Breaking out of IPC iterations, centroid diverges");
 						break;
 					}
-					if (logger) logger->Log("L1peak findCentroid double delta: " + to_string(findCentroidDouble(L1).x - L1mid.x) + " , " + to_string(findCentroidDouble(L1).y - L1mid.y), DEBUG);
-					if (logger) logger->Log("Resulting L2Upeak in this iteration: " + to_string(L2Upeak), DEBUG);
+					LOG_DEBUG("L1peak findCentroid double delta: " + to_string(findCentroidDouble(L1).x - L1mid.x) + " , " + to_string(findCentroidDouble(L1).y - L1mid.y));
+					LOG_DEBUG("Resulting L2Upeak in this iteration: " + to_string(L2Upeak));
 					if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
 					{
 						L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-						if (logger) logger->Log("Iterative phase correlation accuracy reached", SUBEVENT);
-						if (logger) logger->Log("L2Upeak: " + to_string(L2Upeak), DEBUG);
+						LOG_DEBUG("Iterative phase correlation accuracy reached");
+						LOG_DEBUG("L2Upeak: " + to_string(L2Upeak));
 						if (set.IPCshow)
 						{
 							Mat L1v;
@@ -467,21 +456,20 @@ inline Point2f phasecorrel(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings
 					}
 					if (i == (maxPCit - 1))
 					{
-						if (logger) logger->Log("IPC out of iterations - diverges", FATAL);
+						LOG_DEBUG("IPC out of iterations - diverges");
 					}
 				}
 				imageshift_SUBPIXEL.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)set.UC*((float)L2Upeak.x - (float)L2Umid.x + findCentroidDouble(L1).x - (float)L1mid.x);//image shift in L3 - final
 				imageshift_SUBPIXEL.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)set.UC*((float)L2Upeak.y - (float)L2Umid.y + findCentroidDouble(L1).y - (float)L1mid.y);//image shift in L3 - final
 			}
 
-			if (logger)
-			{
-				logger->Log("Iterative phase correlation calculated with subpixel accuracy", SUBEVENT);
-				logger->Log("L3 size: " + to_string(L3.cols) + ", L2 size: " + to_string(L2.cols) + ", L2U size: " + to_string(L2U.cols) + ", L1 size: " + to_string(L1.cols), DEBUG);
-				logger->Log("Upsample pixel accuracy theoretical maximum: " + to_string(1.0 / (float)set.UC), DEBUG);
-				logger->Log("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels ", DEBUG);
-				logger->Log("Calculated shift with SUBpixel accuracy1: " + to_string(imageshift_SUBPIXEL) + " pixels ", SUBEVENT);
-			}
+			
+			LOG_DEBUG("Iterative phase correlation calculated with subpixel accuracy");
+			LOG_DEBUG("L3 size: " + to_string(L3.cols) + ", L2 size: " + to_string(L2.cols) + ", L2U size: " + to_string(L2U.cols) + ", L1 size: " + to_string(L1.cols));
+			LOG_DEBUG("Upsample pixel accuracy theoretical maximum: " + to_string(1.0 / (float)set.UC));
+			LOG_DEBUG("Calculated shift with pixel accuracy: " + to_string(imageshift_PIXEL) + " pixels ");
+			LOG_DEBUG("Calculated shift with SUBpixel accuracy1: " + to_string(imageshift_SUBPIXEL) + " pixels ");
+			
 			output = imageshift_SUBPIXEL;
 		}
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/functionsBaseSTL.h"
-#include "Log/logger.h"
 #include "Plot/plotter.h"
+#include "Log/logger.h"
 
 #ifdef OPTIMIZE_WITH_CV
 #include "Core/functionsBaseCV.h"
@@ -24,7 +24,7 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
 	OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1)), upperBounds(zerovect(N, 1)) {};//construct some default bounds
 
-	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, IPlot1D* plot = nullptr) = 0;
+	virtual std::vector<double> optimize(std::function<double(std::vector<double>)> f, IPlot1D* plot = nullptr) = 0;
 };
 
 struct Evolution : OptimizationAlgorithm
@@ -44,7 +44,7 @@ struct Evolution : OptimizationAlgorithm
 	double historyImprovTresholdPercent = 1;
 	Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm*N) {};
 
-	std::vector<double> optimize(std::function<double(std::vector<double>)> f, Logger* logger = nullptr, IPlot1D* plot = nullptr) override;
+	std::vector<double> optimize(std::function<double(std::vector<double>)> f, IPlot1D* plot = nullptr) override;
 };
 
 struct PatternSearch : OptimizationAlgorithm
@@ -57,7 +57,7 @@ struct PatternSearch : OptimizationAlgorithm
 
 	PatternSearch(int N) : OptimizationAlgorithm(N) {};
 
-	vector<double> optimize(std::function<double(vector<double>)> f, Logger* logger = nullptr, IPlot1D* plot = nullptr) override;
+	vector<double> optimize(std::function<double(vector<double>)> f, IPlot1D* plot = nullptr) override;
 };
 
 struct Simplex : OptimizationAlgorithm

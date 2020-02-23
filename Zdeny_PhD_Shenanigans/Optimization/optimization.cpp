@@ -6,9 +6,9 @@
 #include "stdafx.h"
 #include "optimization.h"
 
-std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, Logger* logger, IPlot1D* plt)
+std::vector<double> Evolution::optimize(std::function<double(std::vector<double>)> f, IPlot1D* plt)
 {
-	if (logger) logger->Log("Optimization started (evolution)", EVENT);
+	LOG_DEBUG("Optimization started (evolution)");
 
 	vector<vector<double>> visitedPointsMainThisRun;
 	vector<vector<double>> visitedPointsThisRun;
@@ -29,7 +29,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	success = false;
 
 	//initialize random starting population matrix within bounds
-	if (logger) logger->Log("Initializing population within bounds ... ", SUBEVENT);
+	LOG_DEBUG("Initializing population within bounds ... ");
 	double initialMinAvgDist = 0.5;
 	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
 	{
@@ -47,11 +47,11 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 			for (int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++)//check distance to all other entities
 			{
 				double avgDist = averageVectorDistance(population[indexEntity], population[indexEntity2], boundsRange);//calculate how distinct the entity is to another entity
-				if (logger) logger->Log("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist), DEBUG);
+				LOG_DEBUG("entity" + to_string(indexEntity) + " trial " + to_string(distinctEntityTrials) + " avgDist to entity" + to_string(indexEntity2) + ": " + to_string(avgDist) + ", minimum dist: " + to_string(initialMinAvgDist));
 				if (avgDist < initialMinAvgDist)//check if entity is distinct
 				{
 					distinctEntity = false;
-					if (logger) logger->Log("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment", DEBUG);
+					LOG_DEBUG("entity" + to_string(indexEntity) + " is not distinct to entity " + to_string(indexEntity2) + ", bruh moment");
 					break;//needs to be distinct from all entities
 				}
 			}
@@ -63,7 +63,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		}
 	}
 
-	if (logger) logger->Log("Initial population created\n", SUBEVENT);
+	LOG_DEBUG("Initial population created\n");
 	//calculate initial fitness vector
 	#pragma omp parallel for
 	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -182,12 +182,12 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 				bestFitness = fitness[indexEntity];
 				fitness_prev = fitness_curr;
 				fitness_curr = bestFitness;
-				if (logger && ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2))
+				if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 2)
 				{
-					logger->Log("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness), DEBUG);
-					logger->Log("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%", DEBUG);
-					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) logger->Log("Big improvement!", SUBEVENT);
-					logger->Log("", DEBUG);
+					LOG_DEBUG("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness));
+					LOG_DEBUG("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%");
+					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) LOG_DEBUG("Big improvement!");
+					LOG_DEBUG("");
 				}
 			}
 		}
@@ -218,28 +218,28 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		//termination criterions
 		if (bestFitness < optimalFitness)//fitness goal reached
 		{
-			if (logger) logger->Log("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			LOG_DEBUG("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
 			success = true;
 			break;
 		}
 		if (generation == maxGen)//maximum generation reached
 		{
-			if (logger) logger->Log("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			LOG_DEBUG("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;
 		}
 		if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
 		{
-			if (logger) logger->Log("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			LOG_DEBUG("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;
 		}
 		if (historyConstant)//no entity improved last (historySize) generations
 		{
-			if (logger) logger->Log("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n", SUBEVENT);
+			LOG_DEBUG("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;
@@ -249,9 +249,9 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 	return bestEntity;
 }//optimize function end
 
-std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, Logger* logger, IPlot1D* plt)
+std::vector<double> PatternSearch::optimize(std::function<double(std::vector<double>)> f, IPlot1D* plt)
 {
-	//if (logger) logger->Log    ">> Optimization started (pattern search)"  ;
+	//LOG_DEBUG    ">> Optimization started (pattern search)"  ;
 
 	vector<double> boundsRange = upperBounds - lowerBounds;
 	double initialStep = vectorMax(boundsRange) / 4;
@@ -322,7 +322,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 						mainPoint = pattern[dim][pm];
 						mainPointFitness = patternFitness[dim][pm];
 						smallerStep = false;
-						//if (logger) logger->Log  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
+						//LOG_DEBUG  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
 						if (maxExploitCnt > 0)
 						{
 							double testPointFitness = mainPointFitness;
@@ -338,7 +338,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 								{
 									mainPoint = testPoint;
 									mainPointFitness = testPointFitness;
-									//if (logger) logger->Log  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
+									//LOG_DEBUG  "> run "  run  " - exploitation "  exploitCnt  " just improved the fitness: "  testPointFitness  ;
 								}
 							}
 						}
@@ -355,7 +355,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			{
 				#pragma omp critical
 				{
-					//if (logger) logger->Log  "> minStep value reached, terminating - generation "  generation  "."  ;
+					//LOG_DEBUG  "> minStep value reached, terminating - generation "  generation  "."  ;
 					success = false;
 					terminationReason = "minStep value reached, final fitness: " + to_string(mainPointFitness);
 				}
@@ -365,7 +365,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			{
 				#pragma omp critical
 				{
-					//if (logger) logger->Log  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
+					//LOG_DEBUG  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
 					success = true;
 					terminationReason = "optimalFitness value reached, final fitness: " + to_string(mainPointFitness);
 				}
@@ -375,7 +375,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			{
 				#pragma omp critical
 				{
-					//if (logger) logger->Log  "> maxGen value reached, terminating - generation "  generation  "."  ;
+					//LOG_DEBUG  "> maxGen value reached, terminating - generation "  generation  "."  ;
 					success = false;
 					terminationReason = "maxGen value reached, final fitness: " + to_string(mainPointFitness);
 				}
@@ -385,7 +385,7 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			{
 				#pragma omp critical
 				{
-					//if (logger) logger->Log  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
+					//LOG_DEBUG  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
 					terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
 					success = false;
 					flag = true;//dont do other runs, out of funEvals
@@ -400,17 +400,16 @@ std::vector<double> PatternSearch::optimize(std::function<double(std::vector<dou
 			multistartCnt++;
 			funEvals += funEvalsThisRun;
 			if (logPoints) visitedPoints.push_back(visitedPointsThisRun);
-			//if (logger) logger->Log  "> run "  run  ": ";
+			//LOG_DEBUG  "> run "  run  ": ";
 			if (mainPointFitness < topPointFitness)
 			{
 				topPoint = mainPoint;
 				topPointFitness = mainPointFitness;
-				//if (logger) showEntity(topPoint, topPointFitness, "current multistart best", true, true);
 				if (topPointFitness < optimalFitness) flag = true;//dont do other runs, fitness goal reached
 			}
 			else
 			{
-				//if (logger) logger->Log  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
+				//LOG_DEBUG  "- run has ended with no improvement, fitness: "  mainPointFitness  ;
 			}
 		}
 	}//multistart end

@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "qcustomplot.h"
 #include "plotter.h"
-#include "WindowPlot.h"
+#include "Gui/WindowPlot.h"
 
 static const QFont fontTicks("Newyork", 9);
 static const QFont fontLabels("Newyork", 12);

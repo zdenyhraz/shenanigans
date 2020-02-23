@@ -11,22 +11,22 @@ WindowIPCparameters::WindowIPCparameters(QWidget* parent, Globals* globals) : QM
 
 void WindowIPCparameters::refreshIPCparameters()
 {
-	globals->IPCsettings->setSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
-	globals->IPCsettings->L2size = ui.lineEdit_2->text().toInt();
-	globals->IPCsettings->L1ratio = ui.lineEdit_3->text().toDouble();
-	globals->IPCsettings->UC = ui.lineEdit_4->text().toInt();
-	globals->IPCsettings->setBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
-	globals->IPCsettings->epsilon = ui.lineEdit_7->text().toDouble();
-	globals->IPCsettings->minimalShift = ui.lineEdit_8->text().toDouble();
+	globals->IPCset->setSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
+	globals->IPCset->L2size = ui.lineEdit_2->text().toInt();
+	globals->IPCset->L1ratio = ui.lineEdit_3->text().toDouble();
+	globals->IPCset->UC = ui.lineEdit_4->text().toInt();
+	globals->IPCset->setBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
+	globals->IPCset->epsilon = ui.lineEdit_7->text().toDouble();
+	globals->IPCset->minimalShift = ui.lineEdit_8->text().toDouble();
 
-	globals->IPCsettings->subpixel = ui.checkBox->isChecked();
-	globals->IPCsettings->iterate = ui.checkBox_2->isChecked();
-	globals->IPCsettings->applyBandpass = ui.checkBox_3->isChecked();
-	globals->IPCsettings->applyWindow = ui.checkBox_4->isChecked();
-	globals->IPCsettings->interpolate = ui.checkBox_5->isChecked();
-	globals->IPCsettings->crossCorrel = ui.checkBox_7->isChecked();
+	globals->IPCset->subpixel = ui.checkBox->isChecked();
+	globals->IPCset->iterate = ui.checkBox_2->isChecked();
+	globals->IPCset->applyBandpass = ui.checkBox_3->isChecked();
+	globals->IPCset->applyWindow = ui.checkBox_4->isChecked();
+	globals->IPCset->interpolate = ui.checkBox_5->isChecked();
+	globals->IPCset->crossCorrel = ui.checkBox_7->isChecked();
 
-	globals->Logger->Log("IPC parameter values updated", DEBUG);
+	LOG_DEBUG("IPC parameter values updated");
 }
 
 void WindowIPCparameters::refreshIPCparametersAndExit()

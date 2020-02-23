@@ -73,7 +73,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>C:\opencv\build\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\spdlog\include;C:\opencv\build\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -96,7 +96,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>C:\opencv\build\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\spdlog\include;C:\opencv\build\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -145,7 +145,6 @@
     <ClInclude Include="Astrophysics\diffrot.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
-    <ClInclude Include="Log\loggercsl.h" />
     <ClInclude Include="Filtering\filtering.h" />
     <ClInclude Include="Astrophysics\FITS.h" />
     <ClInclude Include="Fourier\fourier.h" />
@@ -164,7 +163,6 @@
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\plotter.h" />
     <ClInclude Include="Plot\plotterqt.h" />
-    <ClInclude Include="Log\loggerqt.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="Snake\game.h" />

@@ -18,14 +18,14 @@ void WindowIPCoptimize::optimize()
 		Evo.NP = 32;
 		Evo.lowerBounds = zerovect(2, -100);
 		Evo.upperBounds = zerovect(2, +100);
-		Evo.optimize([&](std::vector<double> arg) {return sin(sqr(arg[0]) - sqr(arg[1] - 3) + 6); }, globals->Logger);
+		Evo.optimize([&](std::vector<double> arg) {return sin(sqr(arg[0]) - sqr(arg[1] - 3) + 6); });
 	}
 	Plot1D plt(globals->widget1);
-	optimizeIPCParameters(*globals->IPCsettings, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger, &plt);
-	globals->Logger->Log("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString(), EVENT);
+	optimizeIPCParameters(*globals->IPCset, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(),  &plt);
+	LOG_DEBUG("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString());
 }
 
 void WindowIPCoptimize::optimizeAll()
 {
-	optimizeIPCParametersForAllWavelengths(*globals->IPCsettings, ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt(), globals->Logger);
+	optimizeIPCParametersForAllWavelengths(*globals->IPCset, ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt());
 }
