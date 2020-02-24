@@ -24,12 +24,12 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	//make signal to slot connections
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
 	connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
-	connect(ui.pushButtonAddLogs, SIGNAL(clicked()), this, SLOT(loggerToTextBrowser()));
 	connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(closeCV()));
 	connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
 	connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
 	connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
+	connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
 	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
 	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
 	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
@@ -108,18 +108,6 @@ void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
 	LOG_DEBUG("All image windows closed");
-}
-
-void Zdeny_PhD_Shenanigans::loggerToTextBrowser()
-{
-	for (int i = 0; i < 100; i++)
-	{
-		LOG_DEBUG("boziiinku, co ted budeme delat?");
-		LOG_DEBUG("jejda, nebude v tom nahodou nejaky probljhbemek?");
-		LOG_DEBUG("trololooo niga xdxd 5");
-		LOG_DEBUG("objednal jsem ti ten novy monitor, jak jsi chtel");
-		LOG_DEBUG("tak tenhle zapeklity problemek budeme muset");
-	}
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters()

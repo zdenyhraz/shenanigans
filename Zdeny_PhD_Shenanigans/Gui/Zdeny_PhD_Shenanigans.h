@@ -29,7 +29,6 @@ private:
 private slots:
 	void exit();
 	void about();
-	void loggerToTextBrowser();
 	void showWindowIPCparameters();
 	void showWindowIPCoptimize();
 	void showWindowIPC2PicAlign();
