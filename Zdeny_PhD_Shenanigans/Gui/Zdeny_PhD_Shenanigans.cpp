@@ -14,7 +14,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	globals = new Globals();
 	globals->widget1 = ui.widget;
 	globals->widget2 = ui.widget_2;
-	LOG_DEBUG("Welcome back, my friend.");//log a welcome message
+
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters(this, globals);
 	windowIPCoptimize = new WindowIPCoptimize(this, globals);
@@ -34,6 +34,8 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
 	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
 	connect(ui.actionFits_downloader, SIGNAL(triggered()), this, SLOT(fitsDownloader()));
+
+	LOG_SUCC("Welcome back, my friend.");//log a welcome message
 }
 
 void Zdeny_PhD_Shenanigans::exit()
