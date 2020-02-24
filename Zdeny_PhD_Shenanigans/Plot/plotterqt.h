@@ -46,7 +46,8 @@ struct Plot1D : IPlot1D
 	{
 		for (int i = 0; i < ylabels.size(); i++)
 		{
-			if (i) widget->addGraph();
+			if (i) 
+				widget->addGraph();
 			widget->graph(i)->setPen(plotPens[i]);
 			widget->graph(i)->setName(QString::fromStdString(ylabels[i]));
 			//widget->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
@@ -66,14 +67,16 @@ struct Plot1D : IPlot1D
 		widget->xAxis->setLabel(QString::fromStdString(xlabel));
 		widget->yAxis->setLabel(QString::fromStdString(ylabel1));
 		widget->yAxis2->setLabel(QString::fromStdString(ylabel2));
-		if (widget->graphCount() < 2) setupSecondGraph(QString::fromStdString(ylabel1), QString::fromStdString(ylabel2));
+		if (widget->graphCount() < 2) 
+			setupSecondGraph(QString::fromStdString(ylabel1), QString::fromStdString(ylabel2));
 	}
 
 	inline void setAxisNames(std::string xlabel, std::string ylabel, std::vector<std::string> ylabels) override
 	{
 		widget->xAxis->setLabel(QString::fromStdString(xlabel));
 		widget->yAxis->setLabel(QString::fromStdString(ylabel));
-		if (widget->graphCount() < ylabels.size()) setupMultipleGraph(ylabels);
+		if (widget->graphCount() < ylabels.size()) 
+			setupMultipleGraph(ylabels);
 	}
 
 	inline void plot(const std::vector<double>& x, const std::vector<double>& y) override
@@ -119,7 +122,8 @@ struct Plot1D : IPlot1D
 	inline void clear(bool second) override
 	{
 		widget->graph(0)->data()->clear();
-		if (second) widget->graph(1)->data()->clear();
+		if (second) 
+			widget->graph(1)->data()->clear();
 	}
 
 	inline void save(std::string path) override

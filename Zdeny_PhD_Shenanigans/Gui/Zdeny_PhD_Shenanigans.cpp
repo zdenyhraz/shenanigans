@@ -59,7 +59,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D plt(ui.widget);
 		plt.plot(x, y);
 	}
-	if (0)//plot in optimization
+	if (1)//plot in optimization
 	{
 		Evolution Evo(2);
 		Evo.NP = 10;
