@@ -4,12 +4,12 @@
 WindowIPCparameters::WindowIPCparameters(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
 	ui.setupUi(this);
-	this->refreshIPCparameters();
+	this->refreshIPCparameters(true);
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(refreshIPCparametersAndExit()));
 	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(refreshIPCparameters()));
 }
 
-void WindowIPCparameters::refreshIPCparameters()
+void WindowIPCparameters::refreshIPCparameters(bool init)
 {
 	globals->IPCset->setSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
 	globals->IPCset->L2size = ui.lineEdit_2->text().toInt();
@@ -26,7 +26,8 @@ void WindowIPCparameters::refreshIPCparameters()
 	globals->IPCset->interpolate = ui.checkBox_5->isChecked();
 	globals->IPCset->crossCorrel = ui.checkBox_7->isChecked();
 
-	LOG_DEBUG("IPC parameter values updated");
+	if (!init)
+		LOG_DEBUG("IPC parameter values updated");
 }
 
 void WindowIPCparameters::refreshIPCparametersAndExit()
