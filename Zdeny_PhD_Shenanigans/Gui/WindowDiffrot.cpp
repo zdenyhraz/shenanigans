@@ -32,6 +32,7 @@ void WindowDiffrot::calculateDiffrot()
 	//globals->IPCset->IPCshow = true;
 
 	*diffrotResults = calculateDiffrotProfile(*globals->IPCset, fitsTime, drset,  &pltX, &pltY);
+	LOG_SUCC("Diffrot profile calculated.");
 }
 
 void WindowDiffrot::showIPC()
