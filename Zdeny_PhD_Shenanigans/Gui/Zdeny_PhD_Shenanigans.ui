@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1199</width>
-    <height>388</height>
+    <width>802</width>
+    <height>263</height>
    </rect>
   </property>
   <property name="cursor">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>8</x>
-      <y>42</y>
+      <y>0</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -78,10 +78,10 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>5</x>
-      <y>70</y>
-      <width>280</width>
-      <height>280</height>
+      <x>6</x>
+      <y>40</y>
+      <width>185</width>
+      <height>185</height>
      </rect>
     </property>
     <property name="text">
@@ -91,58 +91,48 @@
    <widget class="QCustomPlot" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>289</x>
+      <x>196</x>
       <y>0</y>
-      <width>451</width>
-      <height>351</height>
+      <width>301</width>
+      <height>225</height>
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QCustomPlot" name="widget_2" native="true">
     <property name="geometry">
      <rect>
-      <x>193</x>
-      <y>2</y>
-      <width>90</width>
-      <height>65</height>
+      <x>498</x>
+      <y>0</y>
+      <width>301</width>
+      <height>225</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="verticalSpacing">
-      <number>0</number>
-     </property>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="pushButtonClearLogs">
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>20</y>
+      <width>186</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButtonDebug">
        <property name="text">
         <string>Debug</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="pushButtonAddLogs">
-       <property name="text">
-        <string>Log</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
+     <item>
       <widget class="QPushButton" name="pushButtonClose">
        <property name="text">
-        <string>Close All Windows</string>
+        <string>Close All</string>
        </property>
       </widget>
      </item>
     </layout>
-   </widget>
-   <widget class="QCustomPlot" name="widget_2" native="true">
-    <property name="geometry">
-     <rect>
-      <x>741</x>
-      <y>0</y>
-      <width>451</width>
-      <height>351</height>
-     </rect>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -150,7 +140,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1199</width>
+     <width>802</width>
      <height>18</height>
     </rect>
    </property>
