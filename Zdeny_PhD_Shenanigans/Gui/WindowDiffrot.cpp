@@ -15,7 +15,7 @@ WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(pa
 
 void WindowDiffrot::calculateDiffrot()
 {
-	LOG_DEBUG("Calculating diffrot profile...");
+	LOG_EVENT("Calculating diffrot profile...");
 	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 	Plot1D pltX(globals->widget1);
 	Plot1D pltY(globals->widget2);
@@ -36,15 +36,15 @@ void WindowDiffrot::calculateDiffrot()
 
 void WindowDiffrot::showIPC()
 {
-	LOG_DEBUG("Showimg diffrot profile IPC landscape...");
+	LOG_EVENT("Showimg diffrot profile IPC landscape...");
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCset;
 	set.IPCshow = true;
 	FitsTime fitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-	LOG_DEBUG("Loading file '" + fitsTime.path() + "'...");
+	LOG_EVENT("Loading file '" + fitsTime.path() + "'...");
 	Mat pic1 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 	fitsTime.advanceTime(ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble());
-	LOG_DEBUG("Loading file '" + fitsTime.path() + "'...");
+	LOG_EVENT("Loading file '" + fitsTime.path() + "'...");
 	Mat pic2 = roicrop(loadfits(fitsTime.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 
 	auto shifts = phasecorrel(pic1, pic2, set);
@@ -59,14 +59,14 @@ void WindowDiffrot::optimizeDiffrot()
 	std::ofstream listing(path, std::ios::out | std::ios::trunc);//just delete
 	for (auto& size : sizes)
 	{
-		LOG_DEBUG("Optimizing IPC parameters for diffrot profile measurement " + to_string(size) + "x" + to_string(size) + "...");
+		LOG_EVENT("Optimizing IPC parameters for diffrot profile measurement " + to_string(size) + "x" + to_string(size) + "...");
 		IPCsettings set = *globals->IPCset;
 		set.setSize(size, size);
 		Plot1D* plt = new Plot1D(globals->widget1);
 		optimizeIPCParameters(set, fitsTime.path(), path, 5, 0.01, 3,  plt);
 		delete plt;
 	}
-	LOG_DEBUG("IPC parameters optimization for diffrot profile measurement finished");
+	LOG_EVENT("IPC parameters optimization for diffrot profile measurement finished");
 }
 
 void WindowDiffrot::superOptimizeDiffrot()
@@ -76,7 +76,7 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Evo.mutStrat = Evolution::MutationStrategy::BEST1;
 	Evo.lowerBounds = std::vector<double>{ 5,0,0,3,-1 };
 	Evo.upperBounds = std::vector<double>{ 101,10,500,21,1 };
-	LOG_DEBUG("Super optimizing diffrot profile...");
+	LOG_EVENT("Super optimizing diffrot profile...");
 	Plot1D* plt1 = new Plot1D(globals->widget1);
 	Plot1D* plt2 = new Plot1D(globals->widget2);
 
@@ -101,20 +101,20 @@ void WindowDiffrot::superOptimizeDiffrot()
 
 	auto f = [&](std::vector<double> arg) {return DiffrotMerritFunctionWrapper(arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2); };
 	std::vector<double> test{ 53,3.5,123.3,11,0.7 };
-	LOG_DEBUG("Opt fn consistency test1=" + to_string(f(test)));
-	LOG_DEBUG("Opt fn consistency test1=" + to_string(f(test)));
-	LOG_DEBUG("Opt fn consistency test1=" + to_string(f(test)));
+	LOG_EVENT("Opt fn consistency test1=" + to_string(f(test)));
+	LOG_EVENT("Opt fn consistency test1=" + to_string(f(test)));
+	LOG_EVENT("Opt fn consistency test1=" + to_string(f(test)));
 	auto result = Evo.optimize(f,  plt1);
-	LOG_DEBUG("Optimal Size: " + to_string(result[0]));
-	LOG_DEBUG("Optimal Lmult: " + to_string(result[1]));
-	LOG_DEBUG("Optimal Hmult: " + to_string(result[2]));
-	LOG_DEBUG("Optimal L2size: " + to_string(result[3]));
-	LOG_DEBUG("Optimal Window: " + to_string(result[4]));
-	LOG_DEBUG("Super optimizing finished");
+	LOG_EVENT("Optimal Size: " + to_string(result[0]));
+	LOG_EVENT("Optimal Lmult: " + to_string(result[1]));
+	LOG_EVENT("Optimal Hmult: " + to_string(result[2]));
+	LOG_EVENT("Optimal L2size: " + to_string(result[3]));
+	LOG_EVENT("Optimal Window: " + to_string(result[4]));
+	LOG_EVENT("Super optimizing finished");
 }
 
 void WindowDiffrot::showResults()
 {
 	diffrotResults->showsaveResults(ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_9->text().toStdString());
-	LOG_DEBUG("Differential rotation results shown");
+	LOG_EVENT("Differential rotation results shown");
 }
