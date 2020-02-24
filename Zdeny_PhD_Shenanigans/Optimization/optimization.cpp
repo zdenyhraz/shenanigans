@@ -63,7 +63,7 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		}
 	}
 
-	LOG_DEBUG("Initial population created\n");
+	LOG_SUCC("Initial population created\n");
 	//calculate initial fitness vector
 	#pragma omp parallel for
 	for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -186,13 +186,14 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 				{
 					LOG_DEBUG("Gen " + to_string(generation) + " best entity: " + to_string(bestFitness));
 					LOG_DEBUG("CBI = " + to_string((fitness_prev - fitness_curr) / fitness_prev * 100) + "%, AHI = " + to_string(averageImprovement * 100) + "%");
-					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) LOG_DEBUG("Big improvement!");
-					LOG_DEBUG("");
+					if ((fitness_prev - fitness_curr) / fitness_prev * 100 > 25) 
+						LOG_SUCC("Big improvement!\n");
 				}
 			}
 		}
 
-		if (plt) plt->plot(generation, bestFitness, log(bestFitness));
+		if (plt) 
+			plt->plot(generation, bestFitness, log(bestFitness));
 		
 		//fill history ques for all entities - termination criterion
 		historyConstant = true;//assume history is constant
@@ -218,28 +219,28 @@ std::vector<double> Evolution::optimize(std::function<double(std::vector<double>
 		//termination criterions
 		if (bestFitness < optimalFitness)//fitness goal reached
 		{
-			LOG_DEBUG("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
+			LOG_SUCC("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
 			success = true;
 			break;
 		}
 		if (generation == maxGen)//maximum generation reached
 		{
-			LOG_DEBUG("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
+			LOG_SUCC("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;
 		}
 		if (funEvals >= maxFunEvals)//maximum function evaluations exhausted
 		{
-			LOG_DEBUG("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
+			LOG_SUCC("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;
 		}
 		if (historyConstant)//no entity improved last (historySize) generations
 		{
-			LOG_DEBUG("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
+			LOG_SUCC("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
 			terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
 			success = false;
 			break;

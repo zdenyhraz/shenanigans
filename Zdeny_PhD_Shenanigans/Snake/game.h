@@ -20,7 +20,7 @@ static void SnakeGame()
 		while (1)
 		{
 			c = cvWaitKey(50);
-			cout << "c=" << c << endl;
+			LOG_DEBUG("input={}", c);
 
 			switch (c)
 			{
