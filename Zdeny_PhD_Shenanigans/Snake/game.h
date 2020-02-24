@@ -5,7 +5,7 @@
 using namespace cv;
 static const char* windowname = "snake";
 
-void SnakeGame()
+static void SnakeGame()
 {
 	srand(time(0));
 	bool stop = false;

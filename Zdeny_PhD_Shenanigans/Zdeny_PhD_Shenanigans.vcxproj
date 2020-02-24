@@ -116,6 +116,7 @@
     <ClCompile Include="Astrophysics\functionsAstro.cpp" />
     <ClCompile Include="Core\functionsBaseCV.cpp" />
     <ClCompile Include="Core\functionsBaseSTL.cpp" />
+    <ClCompile Include="Log\logger.cpp" />
     <ClCompile Include="Optimization\graphOptimization.cpp" />
     <ClCompile Include="InverseMap\inverseMapping.cpp" />
     <ClCompile Include="IPC\IPC.cpp" />

@@ -1,7 +1,4 @@
 #include "stdafx.h"
-#include "Procedural/procedural.h"
-#include "Snake/game.h"
-
 #include "Zdeny_PhD_Shenanigans.h"
 
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
