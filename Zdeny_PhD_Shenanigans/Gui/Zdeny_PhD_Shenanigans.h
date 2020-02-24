@@ -5,6 +5,9 @@
 #include "WindowIPC2PicAlign.h"
 #include "WindowDiffrot.h"
 #include "Plot/plotterqt.h"
+#include "Log/logger.h"
+#include "Procedural/procedural.h"
+#include "Snake/game.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {

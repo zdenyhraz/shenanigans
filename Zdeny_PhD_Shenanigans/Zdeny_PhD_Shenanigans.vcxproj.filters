@@ -118,6 +118,9 @@
     <ClCompile Include="Astrophysics\diffrot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Log\logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

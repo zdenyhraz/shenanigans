@@ -4,13 +4,13 @@
 #include "Plot/plotterqt.h"
 #include "Log/logger.h"
 
-struct Globals
+class Globals
 {
+public:
 	IPCsettings* IPCset;
 	QCustomPlot* widget1;
 	QCustomPlot* widget2;
 	Plotter2D* plotter2D;
-	Logger* logger;
 
 	Globals()
 	{
@@ -18,5 +18,7 @@ struct Globals
 		plotter2D = new Plotter2D();
 		logger = new Logger();
 	}
-	
+private:
+	Logger* logger;
+
 };
