@@ -291,62 +291,7 @@ inline Point2f phasecorrel( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsetting
 	return ipcinsides( std::move( sourceimg1 ), std::move( sourceimg2 ), set, plt, forceshow );
 }
 
-inline void alignPics( const Mat &input1, const Mat &input2, Mat &output, IPCsettings set )
-{
-	Mat estR, estT;
-	Point2f center( ( float )input1.cols / 2, ( float )input1.rows / 2 );
-	output = input2.clone();
-
-	if ( 1 ) //calculate rotation and scale
-	{
-		Mat img1FT = fourier( input1 );
-		Mat img2FT = fourier( input2 );
-		img1FT = quadrantswap( img1FT );
-		img2FT = quadrantswap( img2FT );
-		Mat planes1[2] = { Mat::zeros( img1FT.size(), CV_32F ), Mat::zeros( img1FT.size(), CV_32F ) };
-		Mat planes2[2] = { Mat::zeros( img1FT.size(), CV_32F ), Mat::zeros( img1FT.size(), CV_32F ) };
-		split( img1FT, planes1 );
-		split( img2FT, planes2 );
-		Mat img1FTm, img2FTm;
-		magnitude( planes1[0], planes1[1], img1FTm );
-		magnitude( planes2[0], planes2[1], img2FTm );
-		bool logar = true;
-		if ( logar )
-		{
-			img1FTm += Scalar::all( 1. );
-			img2FTm += Scalar::all( 1. );
-			log( img1FTm, img1FTm );
-			log( img2FTm, img2FTm );
-		}
-		normalize( img1FTm, img1FTm, 0, 1, CV_MINMAX );
-		normalize( img2FTm, img2FTm, 0, 1, CV_MINMAX );
-		Mat img1LP, img2LP;
-		double maxRadius = 1.*min( center.y, center.x );
-		int flags = INTER_LINEAR + WARP_FILL_OUTLIERS;
-		warpPolar( img1FTm, img1LP, cv::Size( input1.cols, input1.rows ), center, maxRadius, flags + WARP_POLAR_LOG ); // semilog Polar
-		warpPolar( img2FTm, img2LP, cv::Size( input1.cols, input1.rows ), center, maxRadius, flags + WARP_POLAR_LOG ); // semilog Polar
-		auto LPshifts = phasecorrel( img1LP, img2LP, set );
-		cout << "LPshifts: " << LPshifts << endl;
-		double anglePredicted = -LPshifts.y / input1.rows * 360;
-		double scalePredicted = exp( LPshifts.x * log( maxRadius ) / input1.cols );
-		cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
-		cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
-		estR = getRotationMatrix2D( center, -anglePredicted, scalePredicted );
-		warpAffine( output, output, estR, cv::Size( input1.cols, input1.rows ) );
-	}
-
-	if ( 1 ) //calculate shift
-	{
-		auto shifts = phasecorrel( input1, output, set );
-		cout << "shifts: " << shifts << endl;
-		double shiftXPredicted = shifts.x;
-		double shiftYPredicted = shifts.y;
-		cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
-		cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
-		estT = ( Mat_<float>( 2, 3 ) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted );
-		warpAffine( output, output, estT, cv::Size( input1.cols, input1.rows ) );
-	}
-}
+void alignPics( const Mat &input1, const Mat &input2, Mat &output, IPCsettings set );
 
 Mat AlignStereovision( const Mat &img1In, const Mat &img2In );
 
