@@ -146,9 +146,6 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 			if ( set.IPCshow ) LOG_DEBUG( "L3 imag min/max: " + to_string( std::get<0>( minmaxImag ) ) + " / " + to_string( std::get<1>( minmaxImag ) ) );
 		}
 		magnitude( L3planes[0], L3planes[1], L3 );
-		Mat L3phase;
-		phase( L3planes[0], L3planes[1], L3phase );
-		if ( set.IPCshow || forceshow ) { Mat L3pv; resize( L3phase, L3pv, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST ); showimg( L3pv, "L3phase", true ); }
 	}
 	else//real only (assume pure real input)
 	{
