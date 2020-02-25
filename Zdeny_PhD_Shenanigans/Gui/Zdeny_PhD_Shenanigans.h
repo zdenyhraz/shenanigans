@@ -4,7 +4,8 @@
 #include "WindowIPCoptimize.h"
 #include "WindowIPC2PicAlign.h"
 #include "WindowDiffrot.h"
-#include "Plot/plotterqt.h"
+#include "Plot/plotterqt1D.h"
+#include "Plot/plotterqt2D.h"
 #include "Log/logger.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
@@ -14,17 +15,17 @@ class Zdeny_PhD_Shenanigans : public QMainWindow
 	Q_OBJECT
 
 public:
-	Zdeny_PhD_Shenanigans(QWidget *parent = Q_NULLPTR);
+	Zdeny_PhD_Shenanigans( QWidget *parent = Q_NULLPTR );
 
 private:
 	Ui::Zdeny_PhD_ShenanigansClass ui;
-	Globals* globals;
+	Globals *globals;
 
 	//windows
-	WindowIPCparameters* windowIPCparameters;
-	WindowIPCoptimize* windowIPCoptimize;
-	WindowIPC2PicAlign* windowIPC2PicAlign;
-	WindowDiffrot* windowDiffrot;
+	WindowIPCparameters *windowIPCparameters;
+	WindowIPCoptimize *windowIPCoptimize;
+	WindowIPC2PicAlign *windowIPC2PicAlign;
+	WindowDiffrot *windowDiffrot;
 
 private slots:
 	void exit();
