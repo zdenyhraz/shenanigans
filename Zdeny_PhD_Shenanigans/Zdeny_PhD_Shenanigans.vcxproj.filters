@@ -126,9 +126,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Plot\plotterqt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Plot\plotter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -196,6 +193,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Astrophysics\diffrot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\plotterqt1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\plotterqt2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\plotterqt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

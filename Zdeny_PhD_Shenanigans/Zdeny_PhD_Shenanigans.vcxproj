@@ -164,6 +164,8 @@
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\plotter.h" />
     <ClInclude Include="Plot\plotterqt.h" />
+    <ClInclude Include="Plot\plotterqt1D.h" />
+    <ClInclude Include="Plot\plotterqt2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="Snake\game.h" />
