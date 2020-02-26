@@ -5,7 +5,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 
-	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2"} );
+	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2", "predicX3", "predicX4", "predicX5"} );
 	plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string> {"shiftsX"} );
 
 	std::vector<std::vector<double>> thetas2D;
@@ -98,6 +98,11 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec );
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 );
+
+		predicXs[2][y] = predictDiffrotProfile( thetas[y], 14.47, -2.66, 0 );
+		predicXs[3][y] = predictDiffrotProfile( thetas[y], 14.5, -2.87, 0 );
+		predicXs[4][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
+
 		// etc...
 	}
 }
@@ -135,7 +140,7 @@ std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXfit, const std::vector<double> &omegasXavgfit,
               const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1]} );
+	plt1->plot( thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1], predicXs[2], predicXs[3], predicXs[4]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX )

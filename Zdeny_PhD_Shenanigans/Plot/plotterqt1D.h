@@ -43,8 +43,14 @@ struct Plot1D : IPlot1D
 		{
 			if ( i )
 				widget->addGraph();
-			widget->graph( i )->setPen( plotPens[i] );
+
+			if ( i < plotPens.size() )
+				widget->graph( i )->setPen( plotPens[i] );
+			else
+				widget->graph( i )->setPen( QPen( Qt::darkRed, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+
 			widget->graph( i )->setName( QString::fromStdString( ylabels[i] ) );
+
 			//widget->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 		}
 		widget->axisRect()->insetLayout()->setInsetAlignment( 0, Qt::AlignBottom | Qt::AlignRight );

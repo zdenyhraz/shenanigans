@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>263</height>
+    <width>1264</width>
+    <height>451</height>
    </rect>
   </property>
   <property name="cursor">
@@ -93,18 +93,18 @@
      <rect>
       <x>196</x>
       <y>0</y>
-      <width>301</width>
-      <height>225</height>
+      <width>531</width>
+      <height>411</height>
      </rect>
     </property>
    </widget>
    <widget class="QCustomPlot" name="widget_2" native="true">
     <property name="geometry">
      <rect>
-      <x>498</x>
+      <x>728</x>
       <y>0</y>
-      <width>301</width>
-      <height>225</height>
+      <width>531</width>
+      <height>411</height>
      </rect>
     </property>
    </widget>
@@ -152,7 +152,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>802</width>
+     <width>1264</width>
      <height>18</height>
     </rect>
    </property>
