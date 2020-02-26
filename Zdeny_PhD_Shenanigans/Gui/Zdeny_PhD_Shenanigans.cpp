@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
 
-Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
+Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( parent )
 {
-	ui.setupUi(this);
+	ui.setupUi( this );
 
 	//show the logo
-	QPixmap pm("Resources/logo.png"); // <- path to image file
-	ui.label_2->setPixmap(pm);
-	ui.label_2->setScaledContents(true);
+	QPixmap pm( "Resources/logo.png" ); // <- path to image file
+	ui.label_2->setPixmap( pm );
+	ui.label_2->setScaledContents( true );
 
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
@@ -16,26 +16,26 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 	globals->widget2 = ui.widget_2;
 
 	//create all windows
-	windowIPCparameters = new WindowIPCparameters(this, globals);
-	windowIPCoptimize = new WindowIPCoptimize(this, globals);
-	windowIPC2PicAlign = new WindowIPC2PicAlign(this, globals);
-	windowDiffrot = new WindowDiffrot(this, globals);
+	windowIPCparameters = new WindowIPCparameters( this, globals );
+	windowIPCoptimize = new WindowIPCoptimize( this, globals );
+	windowIPC2PicAlign = new WindowIPC2PicAlign( this, globals );
+	windowDiffrot = new WindowDiffrot( this, globals );
 
 	//make signal to slot connections
-	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
-	connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
-	connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(closeCV()));
-	connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
-	connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
-	connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
-	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
-	connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
-	connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
-	connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
-	connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
-	connect(ui.actionFits_downloader, SIGNAL(triggered()), this, SLOT(fitsDownloader()));
+	connect( ui.actionExit, SIGNAL( triggered() ), this, SLOT( exit() ) );
+	connect( ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL( triggered() ), this, SLOT( about() ) );
+	connect( ui.pushButtonClose, SIGNAL( clicked() ), this, SLOT( closeCV() ) );
+	connect( ui.actionIPC_parameters, SIGNAL( triggered() ), this, SLOT( showWindowIPCparameters() ) );
+	connect( ui.actionIPC_optimize, SIGNAL( triggered() ), this, SLOT( showWindowIPCoptimize() ) );
+	connect( ui.actionIPC_2pic_align, SIGNAL( triggered() ), this, SLOT( showWindowIPC2PicAlign() ) );
+	connect( ui.actionDebug, SIGNAL( triggered() ), this, SLOT( debug() ) );
+	connect( ui.pushButtonDebug, SIGNAL( clicked() ), this, SLOT( debug() ) );
+	connect( ui.actiondiffrot, SIGNAL( triggered() ), this, SLOT( showWindowDiffrot() ) );
+	connect( ui.actionPlay, SIGNAL( triggered() ), this, SLOT( playSnake() ) );
+	connect( ui.actionGenerate_land, SIGNAL( triggered() ), this, SLOT( generateLand() ) );
+	connect( ui.actionFits_downloader, SIGNAL( triggered() ), this, SLOT( fitsDownloader() ) );
 
-	LOG_SUCC("Welcome back, my friend.");//log a welcome message
+	LOG_SUCC( "Welcome back, my friend." ); //log a welcome message
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -45,69 +45,69 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
-	if (0)//1D plot
+	if ( 0 ) //1D plot
 	{
 		int n = 10001;
-		auto x = zerovect(n);
-		auto y = zerovect(n);
-		for (int i = 0; i < n; i++)
+		auto x = zerovect( n );
+		auto y = zerovect( n );
+		for ( int i = 0; i < n; i++ )
 		{
-			x[i] = (double)i/(n-1);
-			y[i] = sin(2 * Constants::Pi*x[i]);
+			x[i] = ( double )i / ( n - 1 );
+			y[i] = sin( 2 * Constants::Pi * x[i] );
 		}
 
-		Plot1D plt(ui.widget);
-		plt.plot(x, y);
+		Plot1D plt( ui.widget );
+		plt.plot( x, y );
 	}
-	if (1)//plot in optimization
+	if ( 1 ) //plot in optimization
 	{
-		Evolution Evo(2);
+		Evolution Evo( 2 );
 		Evo.NP = 10;
-		Plot1D plt(ui.widget);
-		auto f = [&](std::vector<double> args) 
+		Plot1D plt( ui.widget );
+		auto f = [&]( std::vector<double> args )
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(10)); 
-			return abs(args[0] - args[1]); 
+			std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+			return abs( args[0] - args[1] );
 		};
-		auto result = Evo.optimize(f, &plt);
-		plt.save("D:\\MainOutput\\Debug\\plot1D.png");
+		auto result = Evo.optimize( f, &plt );
+		plt.save( "D:\\MainOutput\\Debug\\plot1D.png" );
 	}
-	if (0)//ipc bandpass & window 
+	if ( 0 ) //ipc bandpass & window
 	{
 		IPCsettings set = *globals->IPCset;
-		set.setSize(1000, 1000);
-		set.setBandpassParameters(5, 1);
-		globals->plotter2D->plot(matToVect2(set.bandpass), "x", "y", "z", 0, 1, 0, 1);
+		set.setSize( 1000, 1000 );
+		set.setBandpassParameters( 5, 1 );
+		globals->plotter2D->plot( matToVect2( set.bandpass ), "x", "y", "z", 0, 1, 0, 1 );
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if (0)//2pic IPC
+	if ( 0 ) //2pic IPC
 	{
 		std::string path1 = "D:\\SDOpics\\2011_03_12__15_25_15__CONT.fits";
 		std::string path2 = "D:\\SDOpics\\2011_03_12__15_26_00__CONT.fits";
-		Mat img1 = loadImage(path1);
-		Mat img2 = loadImage(path2);
+		Mat img1 = loadImage( path1 );
+		Mat img2 = loadImage( path2 );
 
 		IPCsettings set = *globals->IPCset;
 		set.IPCshow = true;
-		set.setSize(img1.rows, img1.cols);
+		set.setSize( img1.rows, img1.cols );
 
-		auto shifts = phasecorrel(img1, img2, set,  globals->plotter2D);
+		auto shifts = phasecorrel( img1, img2, set,  globals->plotter2D );
 	}
 
-	LOG_EVENT("Debug finished.");
+	LOG_EVENT( "Debug finished." );
 }
 
 void Zdeny_PhD_Shenanigans::about()
 {
 	QMessageBox msgBox;
-	msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n2018-2020");
+	msgBox.setText( "All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n2018-2020" );
 	msgBox.exec();
 }
 
 void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
-	LOG_EVENT("All image windows closed");
+	LOG_EVENT( "All image windows closed" );
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters()
@@ -133,23 +133,23 @@ void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 
 void Zdeny_PhD_Shenanigans::generateLand()
 {
-	LOG_EVENT("Generating some land...");
-	Mat mat = procedural(1000, 1000);
-	showimg(colorlandscape(mat), "procedural nature");
+	LOG_EVENT( "Generating some land..." );
+	Mat mat = procedural( 1000, 1000 );
+	showimg( colorlandscape( mat ), "procedural nature" );
 	//showimg(mat, "procedural mature", true);
-	LOG_EVENT("Finished generating some land. Do you like it?");
+	LOG_EVENT( "Finished generating some land. Do you like it?" );
 }
 
 void Zdeny_PhD_Shenanigans::playSnake()
 {
-	LOG_EVENT("Started playing snake. (It is ok, everyone needs some rest.. :))");
+	LOG_EVENT( "Started playing snake. (It is ok, everyone needs some rest.. :))" );
 	SnakeGame();
-	LOG_EVENT("Finished playing snake. Did you enjoy it? *wink*");
+	LOG_EVENT( "Finished playing snake. Did you enjoy it? *wink*" );
 }
 
 void Zdeny_PhD_Shenanigans::fitsDownloader()
 {
 	//http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122 - 2020 1.1. 00:00
-	generateFitsDownloadUrlSingles(1, 2000, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122");
-	LOG_EVENT("Fits download urls created");
+	generateFitsDownloadUrlSingles( 1, 2000, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122" );
+	LOG_EVENT( "Fits download urls created" );
 }
