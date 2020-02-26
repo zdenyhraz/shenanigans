@@ -98,11 +98,9 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec );
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 );
-
 		predicXs[2][y] = predictDiffrotProfile( thetas[y], 14.47, -2.66, 0 );
 		predicXs[3][y] = predictDiffrotProfile( thetas[y], 14.5, -2.87, 0 );
 		predicXs[4][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
-
 		// etc...
 	}
 }
