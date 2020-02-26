@@ -133,23 +133,21 @@ private:
 			streamIN.read( ( char * )mat.data, fitsSize2 * 2 );
 			swapbytes( ( char * )mat.data, fitsSize2 * 2 );
 
-			//new korekce
+			//korekce - necessarry?
 			if ( 0 )
 			{
-				short *s16 = ( short * )mat.data;
-				ushort *us16 = ( ushort * )mat.data;
+				short *s = ( short * )mat.data;
+				ushort *us = ( ushort * )mat.data;
 				for ( int i = 0; i < fitsSize2; i++ )
 				{
-					int px = ( int )( s16[i] );
+					int px = ( int )( s[i] );
 					px += 32768;
-					us16[i] = px;
+					us[i] = px;
 				}
 			}
 
 			normalize( mat, mat, 0, 65535, CV_MINMAX );
-			Point2f pt( fitsMid, fitsMid );
-			Mat r = getRotationMatrix2D( pt, 90, 1.0 );
-			warpAffine( mat, mat, r, cv::Size( fitsSize, fitsSize ) );
+			warpAffine( mat, mat, getRotationMatrix2D( Point2f( fitsMid, fitsMid ), 90, 1.0 ), cv::Size( fitsSize, fitsSize ) );
 			transpose( mat, mat );
 			params.succload = true;
 			return std::make_tuple( mat, params );

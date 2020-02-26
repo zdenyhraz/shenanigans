@@ -223,7 +223,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 					resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
 					showimg( crosshair( L1v, L1mid * 2000 / L1.cols ), "L1 be4", true );
 				}
-				for ( int i = 0; i < maxPCit; i++ )
+				for ( int i = 1; i <= maxPCit; i++ )
 				{
 					if ( set.IPCshow ) LOG_DEBUG( "======= iteration " + to_string( i ) + " =======" );
 					L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
@@ -253,7 +253,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 						}
 						break;
 					}
-					if ( i == ( maxPCit - 1 ) )
+					if ( i == maxPCit )
 					{
 						LOG_ERROR( "IPC out of iterations - centroid oscilated" );
 					}
