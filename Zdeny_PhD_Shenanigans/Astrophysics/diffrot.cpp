@@ -5,19 +5,18 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 
-	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX"} );
+	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2"} );
 	plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string> {"shiftsX"} );
 
 	std::vector<std::vector<double>> thetas2D;
 	std::vector<std::vector<double>> omegasX2D;
+	std::vector<std::vector<double>> predicXs = zerovect2( 5, drset.ys );
 	std::vector<double> shiftsX( drset.ys );
 	std::vector<double> thetas( drset.ys );
 	std::vector<double> omegasX( drset.ys );
-	//std::vector<double> omegasXavg(drset.ys);
-
 	std::vector<double> omegasXfit( drset.ys );
 	std::vector<double> omegasXavgfit( drset.ys );
-	std::vector<double> predicX( drset.ys );
+
 	std::vector<double> iotam( drset.ys );
 	std::iota( iotam.begin(), iotam.end(), 0 );
 
@@ -35,7 +34,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			double R = ( pic1.params().R + pic2.params().R ) / 2;
 			double theta0 = ( pic1.params().theta0 + pic2.params().theta0 ) / 2;
 
-			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, predicX, ipcset, drset, R, theta0, dy );
+			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, predicXs, ipcset, drset, R, theta0, dy );
 
 			omegasX2D.emplace_back( omegasX );
 			thetas2D.emplace_back( thetas );
@@ -43,7 +42,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXfit = theta1Dfit( omegasX, thetas );
 			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
 
-			drplot1( plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicX );
+			drplot1( plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicXs );
 			drplot2( plt2, iotam, shiftsX );
 		}
 	}
@@ -78,7 +77,7 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 }
 
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX,
-                      std::vector<double> &predicX, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
+                      std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
 {
 	int yshow = 400;
 
@@ -97,9 +96,9 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	{
 		thetas[y] = asin( ( ( double )dy * ( drset.ys / 2 - y ) - sy ) / R ) + theta0;
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec );
-		predicX[y] = ( 14.713 - 2.396 * pow( sin( thetas[y] ), 2 ) - 1.787 * pow( sin( thetas[y] ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi );
-		predicX[y] = ( 14.296 - 1.847 * pow( sin( thetas[y] ), 2 ) - 2.615 * pow( sin( thetas[y] ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi );
-
+		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
+		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 );
+		// etc...
 	}
 }
 
@@ -134,9 +133,9 @@ std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2
 }
 
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXfit, const std::vector<double> &omegasXavgfit,
-              const std::vector<double> &predicX )
+              const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicX} );
+	plt1->plot( thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX )
@@ -167,11 +166,7 @@ void filterShiftsMA( std::vector<double> &shiftsX )
 	shiftsX = shiftsXma;
 }
 
-std::vector<double> predictions( double theta )
+double predictDiffrotProfile( double theta, double A, double B, double C )
 {
-	std::vector<double> pred;
-	pred.reserve( 10 );
-
-	pred.push_back( ( 14.713 - 2.396 * pow( sin( theta ), 2 ) - 1.787 * pow( sin( theta ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi ) ); // wiki
-	pred.push_back( ( 14.296 - 1.847 * pow( sin( theta ), 2 ) - 2.615 * pow( sin( theta ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi ) ); // smth
+	return ( A + B * pow( sin( theta ), 2 ) + C * pow( sin( theta ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi );
 }

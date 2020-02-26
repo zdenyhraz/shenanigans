@@ -36,4 +36,4 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &thetas, const std::vecto
 
 void filterShiftsMA( std::vector<double> &shiftsX );
 
-std::vector<double> predictions( double theta );
+double predictDiffrotProfile( double theta, double A, double B, double C );
