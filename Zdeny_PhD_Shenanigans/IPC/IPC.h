@@ -58,24 +58,34 @@ public:
 		window = edgemask( rows, cols );
 	}
 
-	int getrows() const
+	const int &getrows() const
 	{
 		return rows;
 	}
 
-	int getcols() const
+	const int &getcols() const
 	{
 		return cols;
 	}
 
-	double getL() const
+	const double &getL() const
 	{
 		return stdevLmultiplier;
 	}
 
-	double getH() const
+	const double &getH() const
 	{
 		return stdevHmultiplier;
+	}
+
+	const Mat &getWindow() const
+	{
+		return window;
+	}
+
+	const Mat &getBandpass() const
+	{
+		return bandpass;
 	}
 };
 
