@@ -45,8 +45,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
 
 			drplot1( plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicXs );
-			//drplot2( plt2, iotam, shiftsX );
-			drplot3( plt2, iotam, thetas );
+			drplot2( plt2, iotam, shiftsX );
+			//drplot3( plt2, iotam, thetas );
 		}
 	}
 
@@ -90,7 +90,6 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		Mat crop1 = roicrop( pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
 		Mat crop2 = roicrop( pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
 		shiftsX[y] = phasecorrel( std::move( crop1 ), std::move( crop2 ), ipcset, nullptr, y == yshow ).x;
-		//shiftsX[y] = phaseCorrelate( std::move( crop1 ), std::move( crop2 ), ipcset.getWindow() ).x;
 	}
 
 	//filter outliers here
@@ -99,6 +98,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	for ( int y = 0; y < drset.ys; y++ )
 	{
 		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - sy ) / R ) + theta0;
+		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec );
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 );
@@ -152,7 +152,7 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector
 
 void drplot3( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &thetas )
 {
-	plt2->plot( iotam, std::vector<std::vector<double>> {thetas} );
+	plt2->plot( iotam, std::vector<std::vector<double>> {( 360 / Constants::TwoPi ) * thetas} );
 }
 
 void filterShiftsMA( std::vector<double> &shiftsX )
