@@ -80,6 +80,15 @@ struct Plot1D : IPlot1D
 			setupMultipleGraph( ylabels );
 	}
 
+	inline void plot( const std::vector<double> &y ) override
+	{
+		std::vector<double> iotam( y.size() );
+		std::iota( iotam.begin(), iotam.end(), 0 );
+		widget->graph( 0 )->setData( QVector<double>::fromStdVector( iotam ), QVector<double>::fromStdVector( y ) );
+		widget->rescaleAxes();
+		widget->replot();
+	}
+
 	inline void plot( const std::vector<double> &x, const std::vector<double> &y ) override
 	{
 		widget->graph( 0 )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y ) );
