@@ -139,7 +139,7 @@ inline double mean( std::vector<T> &vec )
 	return mean / vec.size();
 }
 
-inline double mean2( std::vector<std::vector<double>> &vec )
+inline double mean2( const std::vector<std::vector<double>> &vec )
 {
 	double mean = 0;
 	for ( auto &row : vec )

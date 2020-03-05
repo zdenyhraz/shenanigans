@@ -265,7 +265,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 					}
 					if ( i == maxPCit )
 					{
-						LOG_ERROR( "IPC out of iterations - centroid oscilated" );
+						//LOG_ERROR( "IPC out of iterations - centroid oscilated" );
 					}
 				}
 

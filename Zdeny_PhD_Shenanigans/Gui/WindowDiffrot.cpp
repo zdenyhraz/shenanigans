@@ -105,7 +105,7 @@ void WindowDiffrot::superOptimizeDiffrot()
 		//showimg( b.image(), "b" + to_string( i ) );
 	}
 
-	auto f = [&]( std::vector<double> arg ) {return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
+	auto f = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
 	std::vector<double> test{ 53, 3.5, 123.3, 11, 0.7 };
 	LOG_DEBUG( "Opt fn consistency test1=" + to_string( f( test ) ) );
 	LOG_DEBUG( "Opt fn consistency test1=" + to_string( f( test ) ) );
