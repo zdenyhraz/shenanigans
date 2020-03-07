@@ -534,7 +534,7 @@ double DiffrotMerritFunction( const IPCsettings &set, const std::vector<std::pai
 	//------------------------------------------------------------------------
 	LOG_DEBUG( "retVal = {}", retVal );
 	cout << std::vector<double> {( double )set.getcols(), set.getL(), set.getH(), set.L2size, ( double )set.applyWindow} << "\n";
-	return retVal / itersY;
+	return retVal / itersY / pics.size();
 }
 
 double DiffrotMerritFunctionWrapper( std::vector<double> &arg, const std::vector<std::pair<FitsImage, FitsImage>> &pics, int itersX, int itersY, int itersMedian, int strajdPic,
@@ -543,5 +543,14 @@ double DiffrotMerritFunctionWrapper( std::vector<double> &arg, const std::vector
 	IPCsettings set( arg[0], arg[0], arg[1], arg[2] );
 	set.L2size = arg[3];
 	set.applyWindow = arg[4] > 0 ? true : false;
-	return DiffrotMerritFunction( set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, plt1 ) / pics.size();
+	return DiffrotMerritFunction( set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, plt1 );
+}
+
+double DiffrotMerritFunctionWrapper2( std::vector<double> &arg, const std::vector<std::pair<FitsImage, FitsImage>> &pics, int itersX, int itersY, int itersMedian, int strajdPic,
+                                      int deltaPic, int verticalFov, int deltaSec, IPlot1D *plt1 )
+{
+	IPCsettings set( 200, 200, arg[0], arg[1] );
+	set.L2size = arg[2];
+	set.applyWindow = arg[3] > 0 ? true : false;
+	return DiffrotMerritFunction( set, pics, itersX, itersY, itersMedian, strajdPic, deltaPic, verticalFov, deltaSec, plt1 );
 }
