@@ -14,13 +14,13 @@ Mat loadfits(std::string path, FitsParams& params)
 	else
 	{
 		bool ENDfound = false;
-		char lajnaText[lineBYTEcnt];
+		char lajnaText[lineBytes];
 		int fitsSize, fitsMid, fitsSize2, angle, lajny = 0;
 		double pixelarcsec;
 
 		while (!streamIN.eof())
 		{
-			streamIN.read(&lajnaText[0], lineBYTEcnt);
+			streamIN.read(&lajnaText[0], lineBytes);
 			lajny++;
 			string lajnaString(lajnaText);
 

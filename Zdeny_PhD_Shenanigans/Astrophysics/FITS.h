@@ -2,12 +2,13 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Filtering/filtering.h"
+#include "Log/logger.h"
 
 using namespace std;
 using namespace cv;
 
 //.fits parameters
-constexpr int lineBYTEcnt = 80;
+constexpr int lineBytes = 80;
 constexpr int linesMultiplier = 36;
 enum class fitsType : char { HMI, AIA, SECCHI };
 
@@ -63,20 +64,22 @@ private:
 		ifstream streamIN( path, ios::binary | ios::in );
 		if ( !streamIN )
 		{
-			cout << "<loadfits> Cannot load file '" << path << "'- file does not exist dude!" << endl;
+			LOG_DEBUG( "<loadfits> Cannot load file '{}'- file does not exist dude!", path );
 			return std::make_tuple( Mat(), FitsParams() );
 		}
 		else
 		{
+			LOG_DEBUG( "<loadfits> Loading file '{}'...", path );
 			FitsParams params;
 			bool ENDfound = false;
-			char cline[lineBYTEcnt];
-			int fitsSize, fitsMid, fitsSize2, angle, linecnt = 0;
+			char cline[lineBytes];
+			int fitsSize, fitsMid, fitsSize2;
+			int linecnt = 0;
 			double pixelarcsec;
 
 			while ( !streamIN.eof() )
 			{
-				streamIN.read( &cline[0], lineBYTEcnt );
+				streamIN.read( &cline[0], lineBytes );
 				linecnt++;
 				string sline( cline );
 
@@ -134,7 +137,7 @@ private:
 			swapbytes( ( char * )mat.data, fitsSize2 * 2 );
 
 			//korekce - necessarry?
-			if ( 0 )
+			if ( 1 )
 			{
 				short *s = ( short * )mat.data;
 				ushort *us = ( ushort * )mat.data;

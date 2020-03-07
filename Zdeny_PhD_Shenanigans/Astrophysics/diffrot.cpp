@@ -57,7 +57,11 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 {
 	pic.reload( time.path() );
 
-	if ( !pic.params().succload )
+	if ( pic.params().succload )
+	{
+		return;
+	}
+	else
 	{
 		for ( int pm = 1; pm < plusminusbufer; pm++ )
 		{
@@ -69,14 +73,11 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 			pic.reload( time.path() );
 
 			if ( pic.params().succload )
-				break;
+				return;
 		}
 	}
 
-	if ( !pic.params().succload )
-	{
-		time.advanceTime( plusminusbufer / 2 );
-	}
+	time.advanceTime( plusminusbufer / 2 );
 }
 
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX,
