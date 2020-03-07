@@ -532,7 +532,7 @@ double DiffrotMerritFunction( const IPCsettings &set, const std::vector<std::pai
 	}//picture pairs cycle end
 
 	//------------------------------------------------------------------------
-	LOG_DEBUG( "retVal = {}", retVal );
+	LOG_DEBUG( "MfunVal = {}", retVal );
 	cout << std::vector<double> {( double )set.getcols(), set.getL(), set.getH(), set.L2size, ( double )set.applyWindow} << "\n";
 	return retVal / itersY / pics.size();
 }
