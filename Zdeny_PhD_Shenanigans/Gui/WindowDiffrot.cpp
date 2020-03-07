@@ -83,10 +83,10 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Evo.upperBounds = std::vector<double> { 256, 10, 500, 15, 1 };
 	*/
 
-	// Lm, Hm, L2, W
-	Evolution Evo( 4 );
-	Evo.lowerBounds = std::vector<double> {  0, 0, 5, -1 };
-	Evo.upperBounds = std::vector<double> { 10, 500, 15, 1 };
+	// Lm, Hm
+	Evolution Evo( 2 );
+	Evo.lowerBounds = std::vector<double> {  0, 0 };
+	Evo.upperBounds = std::vector<double> { 10, 500 };
 
 	Evo.NP = 50;
 	Evo.mutStrat = Evolution::MutationStrategy::BEST1;
@@ -114,20 +114,9 @@ void WindowDiffrot::superOptimizeDiffrot()
 	//auto f = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
 	auto f2 = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper2( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
 
-	/*
-	auto result = Evo.optimize( f,  plt1 );
-	LOG_SUCC( "Optimal Size: " + to_string( result[0] ) );
-	LOG_SUCC( "Optimal Lmult: " + to_string( result[1] ) );
-	LOG_SUCC( "Optimal Hmult: " + to_string( result[2] ) );
-	LOG_SUCC( "Optimal L2size: " + to_string( result[3] ) );
-	LOG_SUCC( "Optimal Window: " + to_string( result[4] ) );
-	*/
-
 	auto result = Evo.optimize( f2, plt1 );
 	LOG_SUCC( "Optimal Lmult: " + to_string( result[0] ) );
 	LOG_SUCC( "Optimal Hmult: " + to_string( result[1] ) );
-	LOG_SUCC( "Optimal L2size: " + to_string( result[2] ) );
-	LOG_SUCC( "Optimal Window: " + to_string( result[3] ) );
 	LOG_EVENT( "Super optimizing finished for dt={}`", dt );
 }
 
