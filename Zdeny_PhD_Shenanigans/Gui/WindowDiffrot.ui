@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>307</width>
-    <height>301</height>
+    <height>318</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,7 +58,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>130</y>
+      <y>148</y>
       <width>90</width>
       <height>121</height>
      </rect>
@@ -388,6 +388,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>130</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>filter shifts MA</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
