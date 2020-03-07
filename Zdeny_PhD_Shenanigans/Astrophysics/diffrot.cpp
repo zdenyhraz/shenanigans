@@ -55,7 +55,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX,
                       std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
 {
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for ( int y = 0; y < drset.ys; y++ )
 	{
 		Mat crop1 = roicrop( pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
@@ -75,11 +75,6 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
 		// etc...
 	}
-}
-
-DiffrotResults fillDiffrotResults()
-{
-	return DiffrotResults();
 }
 
 std::vector<double> theta1Dfit( const std::vector<double> &omegas, const std::vector<double> &thetas )
@@ -110,7 +105,7 @@ std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXfit, const std::vector<double> &omegasXavgfit,
               const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1]} );
+	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
@@ -171,4 +166,9 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 	}
 
 	time.advanceTime( plusminusbufer / 2 );
+}
+
+DiffrotResults fillDiffrotResults()
+{
+	return DiffrotResults();
 }
