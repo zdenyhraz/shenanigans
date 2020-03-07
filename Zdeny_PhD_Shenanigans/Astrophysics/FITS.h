@@ -152,7 +152,6 @@ private:
 			normalize( mat, mat, 0, 65535, CV_MINMAX );
 			warpAffine( mat, mat, getRotationMatrix2D( Point2f( fitsMid, fitsMid ), 90, 1.0 ), cv::Size( fitsSize, fitsSize ) );
 			transpose( mat, mat );
-			params.succload = true;
 			if ( 0 )
 			{
 				Mat xd = mat.clone();
@@ -160,6 +159,7 @@ private:
 				circle( xd, Point( fitsMid, fitsMid ), params.R, Scalar( 0, 0, 65535 ), 5 );
 				showimg( xd, "xd" );
 			}
+			params.succload = true;
 			return std::make_tuple( mat, params );
 		}
 	}

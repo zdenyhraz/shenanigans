@@ -32,9 +32,7 @@ std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXfit, const std::vector<double> &omegasXavgfit,
               const std::vector<std::vector<double>> &predicXs );
 
-void drplot2( IPlot1D *plt2, const std::vector<double> &thetas, const std::vector<double> &shiftsX );
-
-void drplot3( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &thetas );
+void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas );
 
 void filterShiftsMA( std::vector<double> &shiftsX );
 
