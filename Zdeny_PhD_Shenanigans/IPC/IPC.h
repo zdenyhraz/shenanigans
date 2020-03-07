@@ -35,6 +35,7 @@ public:
 	double minimalShift = 0;
 	Mat bandpass;
 	Mat window;
+	string auxdir = "D:\\MainOutput\\diffrot\\auxdir\\";
 
 	IPCsettings( int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier ) : rows( Rows ), cols( Cols ), stdevLmultiplier( StdevLmultiplier ),
 		stdevHmultiplier( StdevHmultiplier )
@@ -105,6 +106,12 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 		showimg( sourceimg1, "IPC src1" );
 		showimg( sourceimg2, "IPC src2" );
 		//showimg(set.bandpass, "IPC bandpass");
+	}
+
+	if ( 0 )
+	{
+		saveimg( set.auxdir + "image1_" + rand() + ".png", sourceimg1 );
+		saveimg( set.auxdir + "image2_" + rand() + ".png", sourceimg2 );
 	}
 
 	Point2f output;
