@@ -5,7 +5,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 
-	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2", "predicX3", "predicX4", "predicX5"} );
+	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2", "predicX3", "predicX4", "predicX5"} );
 	plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string> {"shiftsX"} );
 
 	std::vector<std::vector<double>> thetas2D;
@@ -100,7 +100,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	{
 		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - sy ) / R ) + theta0;
 		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
-		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec );
+		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 );
 		predicXs[2][y] = predictDiffrotProfile( thetas[y], 14.47, -2.66, 0 );
@@ -153,7 +153,7 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector
 
 void drplot3( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &thetas )
 {
-	plt2->plot( iotam, std::vector<std::vector<double>> {( 360 / Constants::TwoPi ) * thetas} );
+	plt2->plot( iotam, std::vector<std::vector<double>> {( 360. / Constants::TwoPi ) * thetas} );
 }
 
 void filterShiftsMA( std::vector<double> &shiftsX )
@@ -181,5 +181,5 @@ void filterShiftsMA( std::vector<double> &shiftsX )
 
 double predictDiffrotProfile( double theta, double A, double B, double C )
 {
-	return ( A + B * pow( sin( theta ), 2 ) + C * pow( sin( theta ), 4 ) ) / ( 24. * 60. * 60. ) / ( 360. / 2. / Constants::Pi );
+	return ( A + B * pow( sin( theta ), 2 ) + C * pow( sin( theta ), 4 ) );
 }
