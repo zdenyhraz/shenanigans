@@ -4,6 +4,7 @@
 
 static constexpr int plusminusbufer = 4;//even!
 static constexpr int sy = 0;//sunspot shift
+static constexpr int yshow = 400;//ipc show y index
 constexpr int ma = 5;//moving average window
 
 struct DiffrotSettings
