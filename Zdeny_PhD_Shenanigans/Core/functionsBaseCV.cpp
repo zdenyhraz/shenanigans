@@ -6,325 +6,325 @@
 #include "stdafx.h"
 #include "Core/functionsBaseCV.h"
 
-std::tuple<double, double> minMaxMat(const Mat& sourceimg)
+std::tuple<double, double> minMaxMat( const Mat &sourceimg )
 {
 	double minR, maxR;
-	minMaxLoc(sourceimg, &minR, &maxR, nullptr, nullptr);
-	return make_tuple(minR, maxR);
+	minMaxLoc( sourceimg, &minR, &maxR, nullptr, nullptr );
+	return make_tuple( minR, maxR );
 }
 
-std::vector<double> polyfit(const std::vector<double>& data, int degree)
+std::vector<double> polyfit( const std::vector<double> &data, int degree )
 {
 	int dataCount = data.size();
-	Mat X = Mat::zeros(dataCount, degree + 1, CV_32F);//matice planu
-	Mat Y = Mat::zeros(dataCount, 1, CV_32F);//matice prave strany
-	for (int r = 0; r < X.rows; r++)
+	Mat X = Mat::zeros( dataCount, degree + 1, CV_32F ); //matice planu
+	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
+	for ( int r = 0; r < X.rows; r++ )
 	{
-		Y.at<float>(r, 0) = data[r];
-		for (int c = 0; c < X.cols; c++)
+		Y.at<float>( r, 0 ) = data[r];
+		for ( int c = 0; c < X.cols; c++ )
 		{
-			if (!c)
-				X.at<float>(r, c) = 1;
+			if ( !c )
+				X.at<float>( r, c ) = 1;
 			else
-				X.at<float>(r, c) = pow(r, c);
+				X.at<float>( r, c ) = pow( r, c );
 		}
 	}
-	Mat coeffs = (X.t()*X).inv()*X.t()*Y;//least squares
+	Mat coeffs = ( X.t() * X ).inv() * X.t() * Y; //least squares
 	Mat fitM = X * coeffs;
-	std::vector<double> fit(dataCount, 0);
-	for (int r = 0; r < fitM.rows; r++)
+	std::vector<double> fit( dataCount, 0 );
+	for ( int r = 0; r < fitM.rows; r++ )
 	{
-		fit[r] = fitM.at<float>(r, 0);
+		fit[r] = fitM.at<float>( r, 0 );
 	}
 	return fit;
 }
 
-std::vector<double> polyfit(const std::vector<double>& xdata, const std::vector<double>& ydata, int degree)
+std::vector<double> polyfit( const std::vector<double> &xdata, const std::vector<double> &ydata, int degree )
 {
 	int dataCount = ydata.size();
-	Mat X = Mat::zeros(dataCount, degree + 1, CV_32F);//matice planu
-	Mat Y = Mat::zeros(dataCount, 1, CV_32F);//matice prave strany
-	for (int r = 0; r < X.rows; r++)
+	Mat X = Mat::zeros( dataCount, degree + 1, CV_32F ); //matice planu
+	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
+	for ( int r = 0; r < X.rows; r++ )
 	{
-		Y.at<float>(r, 0) = ydata[r];
-		for (int c = 0; c < X.cols; c++)
+		Y.at<float>( r, 0 ) = ydata[r];
+		for ( int c = 0; c < X.cols; c++ )
 		{
-			if (!c)
-				X.at<float>(r, c) = 1;
+			if ( !c )
+				X.at<float>( r, c ) = 1;
 			else
-				X.at<float>(r, c) = pow(xdata[r], c);
+				X.at<float>( r, c ) = pow( xdata[r], c );
 		}
 	}
-	Mat coeffs = (X.t()*X).inv()*X.t()*Y;//least squares
+	Mat coeffs = ( X.t() * X ).inv() * X.t() * Y; //least squares
 	Mat fitM = X * coeffs;
-	std::vector<double> fit(dataCount, 0);
-	for (int r = 0; r < fitM.rows; r++)
+	std::vector<double> fit( dataCount, 0 );
+	for ( int r = 0; r < fitM.rows; r++ )
 	{
-		fit[r] = fitM.at<float>(r, 0);
+		fit[r] = fitM.at<float>( r, 0 );
 	}
 	return fit;
 }
 
-Mat crosshair(const Mat& sourceimgIn, cv::Point point)
+Mat crosshair( const Mat &sourceimgIn, cv::Point point )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	Scalar CrosshairColor = Scalar(0.3);
-	int thickness = max(sourceimg.cols / 250, 1);
+	Scalar CrosshairColor = Scalar( 0.3 );
+	int thickness = max( sourceimg.cols / 250, 1 );
 	int inner = sourceimg.cols / 40;
 	int outer = sourceimg.cols / 15;
-	cv::Point offset1(0, outer);
-	cv::Point offset2(outer, 0);
-	cv::Point offset3(0, inner);
-	cv::Point offset4(inner, 0);
-	sourceimg.convertTo(sourceimg, CV_32F);
-	normalize(sourceimg, sourceimg, 0, 1, CV_MINMAX);
+	cv::Point offset1( 0, outer );
+	cv::Point offset2( outer, 0 );
+	cv::Point offset3( 0, inner );
+	cv::Point offset4( inner, 0 );
+	sourceimg.convertTo( sourceimg, CV_32F );
+	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
 
-	circle(sourceimg, point, inner, CrosshairColor, thickness, 0, 0);
-	line(sourceimg, point + offset3, point + offset1, CrosshairColor, thickness);
-	line(sourceimg, point + offset4, point + offset2, CrosshairColor, thickness);
-	line(sourceimg, point - offset3, point - offset1, CrosshairColor, thickness);
-	line(sourceimg, point - offset4, point - offset2, CrosshairColor, thickness);
+	circle( sourceimg, point, inner, CrosshairColor, thickness, 0, 0 );
+	line( sourceimg, point + offset3, point + offset1, CrosshairColor, thickness );
+	line( sourceimg, point + offset4, point + offset2, CrosshairColor, thickness );
+	line( sourceimg, point - offset3, point - offset1, CrosshairColor, thickness );
+	line( sourceimg, point - offset4, point - offset2, CrosshairColor, thickness );
 	return sourceimg;
 }
 
-Mat xko(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
+Mat xko( const Mat &sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType )
 {
 	Mat sourceimg = sourceimgIn.clone();
 	int inner = 0;
 	int outer = 4;
-	cv::Point offset1(-outer, -outer);
-	cv::Point offset2(outer, -outer);
-	cv::Point offset3(outer, outer);
-	cv::Point offset4(-outer, outer);
-	Mat sourceimgCLR = Mat::zeros(sourceimg.size(), CV_16UC3);
-	if (inputType == "CLR")
+	cv::Point offset1( -outer, -outer );
+	cv::Point offset2( outer, -outer );
+	cv::Point offset3( outer, outer );
+	cv::Point offset4( -outer, outer );
+	Mat sourceimgCLR = Mat::zeros( sourceimg.size(), CV_16UC3 );
+	if ( inputType == "CLR" )
 	{
-		normalize(sourceimg, sourceimg, 0, 65535, CV_MINMAX);
-		sourceimg.convertTo(sourceimg, CV_16UC3);
-		sourceimg.copyTo(sourceimgCLR);
+		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		sourceimg.convertTo( sourceimg, CV_16UC3 );
+		sourceimg.copyTo( sourceimgCLR );
 	}
-	if (inputType == "GRS")
+	if ( inputType == "GRS" )
 	{
-		normalize(sourceimg, sourceimg, 0, 65535, CV_MINMAX);
-		sourceimg.convertTo(sourceimg, CV_16UC1);
-		for (int r = 0; r < sourceimg.rows; r++)
+		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		sourceimg.convertTo( sourceimg, CV_16UC1 );
+		for ( int r = 0; r < sourceimg.rows; r++ )
 		{
-			for (int c = 0; c < sourceimg.cols; c++)
+			for ( int c = 0; c < sourceimg.cols; c++ )
 			{
-				sourceimgCLR.at<Vec3w>(r, c)[0] = sourceimg.at<ushort>(r, c);
-				sourceimgCLR.at<Vec3w>(r, c)[1] = sourceimg.at<ushort>(r, c);
-				sourceimgCLR.at<Vec3w>(r, c)[2] = sourceimg.at<ushort>(r, c);
+				sourceimgCLR.at<Vec3w>( r, c )[0] = sourceimg.at<ushort>( r, c );
+				sourceimgCLR.at<Vec3w>( r, c )[1] = sourceimg.at<ushort>( r, c );
+				sourceimgCLR.at<Vec3w>( r, c )[2] = sourceimg.at<ushort>( r, c );
 			}
 		}
 	}
 	double THICCness = 1;
 	//circle(sourceimgCLR, point, inner, CrosshairColor, 2);
-	circle(sourceimgCLR, point, 5, CrosshairColor, THICCness, 0, 0);
-	line(sourceimgCLR, point + offset3, point + offset1, CrosshairColor, THICCness);
-	line(sourceimgCLR, point + offset4, point + offset2, CrosshairColor, THICCness);
-	line(sourceimgCLR, point - offset3, point - offset1, CrosshairColor, THICCness);
-	line(sourceimgCLR, point - offset4, point - offset2, CrosshairColor, THICCness);
+	circle( sourceimgCLR, point, 5, CrosshairColor, THICCness, 0, 0 );
+	line( sourceimgCLR, point + offset3, point + offset1, CrosshairColor, THICCness );
+	line( sourceimgCLR, point + offset4, point + offset2, CrosshairColor, THICCness );
+	line( sourceimgCLR, point - offset3, point - offset1, CrosshairColor, THICCness );
+	line( sourceimgCLR, point - offset4, point - offset2, CrosshairColor, THICCness );
 	return sourceimgCLR;
 }
 
-Mat pointik(const Mat& sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType)
+Mat pointik( const Mat &sourceimgIn, cv::Point point, Scalar CrosshairColor, std::string inputType )
 {
 	Mat sourceimg = sourceimgIn.clone();
 	int inner = 1;
 	int outer = 0;
-	cv::Point offset1(-outer, -outer);
-	cv::Point offset2(outer, -outer);
-	cv::Point offset3(outer, outer);
-	cv::Point offset4(-outer, outer);
-	Mat sourceimgCLR = Mat::zeros(sourceimg.size(), CV_16UC3);
-	if (inputType == "CLR")
+	cv::Point offset1( -outer, -outer );
+	cv::Point offset2( outer, -outer );
+	cv::Point offset3( outer, outer );
+	cv::Point offset4( -outer, outer );
+	Mat sourceimgCLR = Mat::zeros( sourceimg.size(), CV_16UC3 );
+	if ( inputType == "CLR" )
 	{
-		normalize(sourceimg, sourceimg, 0, 65535, CV_MINMAX);
-		sourceimg.convertTo(sourceimg, CV_16UC1);
-		sourceimg.copyTo(sourceimgCLR);
+		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		sourceimg.convertTo( sourceimg, CV_16UC1 );
+		sourceimg.copyTo( sourceimgCLR );
 	}
-	if (inputType == "GRS")
+	if ( inputType == "GRS" )
 	{
-		normalize(sourceimg, sourceimg, 0, 65535, CV_MINMAX);
-		sourceimg.convertTo(sourceimg, CV_16UC1);
-		for (int r = 0; r < sourceimg.rows; r++)
+		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		sourceimg.convertTo( sourceimg, CV_16UC1 );
+		for ( int r = 0; r < sourceimg.rows; r++ )
 		{
-			for (int c = 0; c < sourceimg.cols; c++)
+			for ( int c = 0; c < sourceimg.cols; c++ )
 			{
-				sourceimgCLR.at<Vec3w>(r, c)[0] = sourceimg.at<ushort>(r, c);
-				sourceimgCLR.at<Vec3w>(r, c)[1] = sourceimg.at<ushort>(r, c);
-				sourceimgCLR.at<Vec3w>(r, c)[2] = sourceimg.at<ushort>(r, c);
+				sourceimgCLR.at<Vec3w>( r, c )[0] = sourceimg.at<ushort>( r, c );
+				sourceimgCLR.at<Vec3w>( r, c )[1] = sourceimg.at<ushort>( r, c );
+				sourceimgCLR.at<Vec3w>( r, c )[2] = sourceimg.at<ushort>( r, c );
 			}
 		}
 	}
-	circle(sourceimgCLR, point, inner, CrosshairColor, 2);
+	circle( sourceimgCLR, point, inner, CrosshairColor, 2 );
 	return sourceimgCLR;
 }
 
-Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)//x,y souradnice stredu, cols, rows
+Mat roicrop( const Mat &sourceimgIn, int x, int y, int w, int h ) //x,y souradnice stredu, cols, rows
 {
-	Rect roi = Rect(x - std::floor((double)w / 2.), y - std::floor((double)h / 2.), w, h);
-	Mat crop = sourceimgIn(roi);
+	Rect roi = Rect( x - std::floor( ( double )w / 2. ), y - std::floor( ( double )h / 2. ), w, h );
+	Mat crop = sourceimgIn( roi );
 	return crop.clone();
 }
 
-Mat kirkl(unsigned size)
+Mat kirkl( unsigned size )
 {
-	Mat kirkl = Mat::zeros(size, size, CV_32F);
-	for (int r = 0; r < size; r++)
+	Mat kirkl = Mat::zeros( size, size, CV_32F );
+	for ( int r = 0; r < size; r++ )
 	{
-		for (int c = 0; c < size; c++)
+		for ( int c = 0; c < size; c++ )
 		{
-			if ((sqr((double)r - floor(size / 2)) + sqr((double)c - floor(size / 2))) < sqr((double)size / 2 + 1))
+			if ( ( sqr( ( double )r - floor( size / 2 ) ) + sqr( ( double )c - floor( size / 2 ) ) ) < sqr( ( double )size / 2 + 1 ) )
 			{
-				kirkl.at<float>(r, c) = 1.;
+				kirkl.at<float>( r, c ) = 1.;
 			}
 			else
 			{
-				kirkl.at<float>(r, c) = 0.;
+				kirkl.at<float>( r, c ) = 0.;
 			}
 		}
 	}
 	return kirkl;
 }
 
-Mat kirkl(int rows, int cols, unsigned radius)
+Mat kirkl( int rows, int cols, unsigned radius )
 {
-	Mat kirkl = Mat::zeros(rows, cols, CV_32F);
-	for (int r = 0; r < rows; r++)
+	Mat kirkl = Mat::zeros( rows, cols, CV_32F );
+	for ( int r = 0; r < rows; r++ )
 	{
-		for (int c = 0; c < cols; c++)
+		for ( int c = 0; c < cols; c++ )
 		{
-			if ((sqr((double)r - floor(rows / 2)) + sqr((double)c - floor(cols / 2))) < sqr(radius))
+			if ( ( sqr( ( double )r - floor( rows / 2 ) ) + sqr( ( double )c - floor( cols / 2 ) ) ) < sqr( radius ) )
 			{
-				kirkl.at<float>(r, c) = 1.;
+				kirkl.at<float>( r, c ) = 1.;
 			}
 			else
 			{
-				kirkl.at<float>(r, c) = 0.;
+				kirkl.at<float>( r, c ) = 0.;
 			}
 		}
 	}
 	return kirkl;
 }
 
-Mat kirklcrop(const Mat& sourceimgIn, int x, int y, int diameter)
+Mat kirklcrop( const Mat &sourceimgIn, int x, int y, int diameter )
 {
-	Mat crop = roicrop(sourceimgIn, x, y, diameter, diameter);
-	Mat kirklik = kirkl(diameter);
-	return crop.mul(kirklik);
+	Mat crop = roicrop( sourceimgIn, x, y, diameter, diameter );
+	Mat kirklik = kirkl( diameter );
+	return crop.mul( kirklik );
 }
 
-Point2f findCentroidDouble(const Mat& sourceimg)
+Point2f findCentroidDouble( const Mat &sourceimg )
 {
 	double M00 = 0.0;
 	double M01 = 0.0;
 	double M10 = 0.0;
-	for (int r = 0; r < sourceimg.rows; r++)
+	for ( int r = 0; r < sourceimg.rows; r++ )
 	{
-		for (int c = 0; c < sourceimg.cols; c++)
+		for ( int c = 0; c < sourceimg.cols; c++ )
 		{
-			M00 += sourceimg.at<float>(r, c);
-			M01 += (double)r * sourceimg.at<float>(r, c);
-			M10 += (double)c * sourceimg.at<float>(r, c);
+			M00 += sourceimg.at<float>( r, c );
+			M01 += ( double )r * sourceimg.at<float>( r, c );
+			M10 += ( double )c * sourceimg.at<float>( r, c );
 		}
 	}
 
-	Point2f ret(M10 / M00, M01 / M00);
+	Point2f ret( M10 / M00, M01 / M00 );
 
-	if (ret.x < 0 || ret.y < 0 || ret.x > sourceimg.cols || ret.y > sourceimg.rows)
-		return Point2f(sourceimg.cols / 2, sourceimg.rows / 2);
+	if ( ret.x < 0 || ret.y < 0 || ret.x > sourceimg.cols || ret.y > sourceimg.rows )
+		return Point2f( sourceimg.cols / 2, sourceimg.rows / 2 );
 	else
 		return ret;
 }
 
-Mat combineTwoPics(const Mat& source1In, const Mat& source2In, CombinePicsStyle style, double sigma)
+Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle style, double sigma )
 {
 	Mat source1 = source1In.clone();
 	Mat source2 = source2In.clone();
-	Mat result = Mat::zeros(source1.rows, source1.cols, CV_8UC3);
-	source1.convertTo(source1, CV_32F);
-	source2.convertTo(source2, CV_32F);
-	if (style == HUEBRIGHT)
+	Mat result = Mat::zeros( source1.rows, source1.cols, CV_8UC3 );
+	source1.convertTo( source1, CV_32F );
+	source2.convertTo( source2, CV_32F );
+	if ( style == HUEBRIGHT )
 	{
-		normalize(source1, source1, 0, 1, CV_MINMAX);
-		normalize(source2, source2, 0, 1, CV_MINMAX);
-		pow(source2, 2, source2);
-		for (int r = 0; r < source1.rows; r++)
+		normalize( source1, source1, 0, 1, CV_MINMAX );
+		normalize( source2, source2, 0, 1, CV_MINMAX );
+		pow( source2, 2, source2 );
+		for ( int r = 0; r < source1.rows; r++ )
 		{
-			for (int c = 0; c < source1.cols; c++)
+			for ( int c = 0; c < source1.cols; c++ )
 			{
-				auto BGRjet = colorMapJET(255.*source1.at<float>(r, c));
-				auto HUE = BGR_to_HUE(BGRjet);
-				auto BGR = HUE_to_BGR(HUE, 255.*source2.at<float>(r, c), BGRjet);
+				auto BGRjet = colorMapJET( 255.*source1.at<float>( r, c ) );
+				auto HUE = BGR_to_HUE( BGRjet );
+				auto BGR = HUE_to_BGR( HUE, 255.*source2.at<float>( r, c ), BGRjet );
 
-				result.at<Vec3b>(r, c)[0] = std::get<0>(BGR);
-				result.at<Vec3b>(r, c)[1] = std::get<1>(BGR);
-				result.at<Vec3b>(r, c)[2] = std::get<2>(BGR);
+				result.at<Vec3b>( r, c )[0] = std::get<0>( BGR );
+				result.at<Vec3b>( r, c )[1] = std::get<1>( BGR );
+				result.at<Vec3b>( r, c )[2] = std::get<2>( BGR );
 			}
 		}
 	}
-	if (style == BINARYBLUERED)
+	if ( style == BINARYBLUERED )
 	{
-		normalize(source2, source2, 0, 1, CV_MINMAX);
-		auto minMax = minMaxMat(source1);
-		for (int r = 0; r < source1.rows; r++)
+		normalize( source2, source2, 0, 1, CV_MINMAX );
+		auto minMax = minMaxMat( source1 );
+		for ( int r = 0; r < source1.rows; r++ )
 		{
-			for (int c = 0; c < source1.cols; c++)
+			for ( int c = 0; c < source1.cols; c++ )
 			{
-				auto BGR = colorMapBINARY(source1.at<float>(r, c), std::get<0>(minMax), std::get<1>(minMax), sigma);
-				result.at<Vec3b>(r, c)[0] = source2.at<float>(r, c)*std::get<0>(BGR);
-				result.at<Vec3b>(r, c)[1] = source2.at<float>(r, c)*std::get<1>(BGR);
-				result.at<Vec3b>(r, c)[2] = source2.at<float>(r, c)*std::get<2>(BGR);
+				auto BGR = colorMapBINARY( source1.at<float>( r, c ), std::get<0>( minMax ), std::get<1>( minMax ), sigma );
+				result.at<Vec3b>( r, c )[0] = source2.at<float>( r, c ) * std::get<0>( BGR );
+				result.at<Vec3b>( r, c )[1] = source2.at<float>( r, c ) * std::get<1>( BGR );
+				result.at<Vec3b>( r, c )[2] = source2.at<float>( r, c ) * std::get<2>( BGR );
 			}
 		}
 	}
 	return result;
 }
 
-Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB, double quantileT, bool color)
+Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
 {
 	Mat sourceimg = sourceimgIn.clone();
 	//input is grayscale, output is colored
 	int caxisMin = 0, caxisMax = 255;
 
-	normalize(sourceimg, sourceimg, 0, 255, CV_MINMAX);
-	sourceimg.convertTo(sourceimg, CV_8U);
+	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	sourceimg.convertTo( sourceimg, CV_8U );
 
-	if ((quantileB > 0) || (quantileT < 1))
+	if ( ( quantileB > 0 ) || ( quantileT < 1 ) )
 	{
-		vector<int> picvalues(sourceimg.rows*sourceimg.cols, 0);
-		for (int r = 0; r < sourceimg.rows; r++)
+		vector<int> picvalues( sourceimg.rows * sourceimg.cols, 0 );
+		for ( int r = 0; r < sourceimg.rows; r++ )
 		{
-			for (int c = 0; c < sourceimg.cols; c++)
+			for ( int c = 0; c < sourceimg.cols; c++ )
 			{
-				picvalues[r*sourceimg.cols + c] = sourceimg.at<uchar>(r, c);
+				picvalues[r * sourceimg.cols + c] = sourceimg.at<uchar>( r, c );
 			}
 		}
 
 		//sort the vector
-		sort(picvalues.begin(), picvalues.end());
+		sort( picvalues.begin(), picvalues.end() );
 
 		//calculate the alpha and 1-alpha quantiles
-		int alpha1Quantile = picvalues[round(quantileB*(picvalues.size() - 1))];
-		int alpha2Quantile = picvalues[round(quantileT*(picvalues.size() - 1))];
+		int alpha1Quantile = picvalues[round( quantileB * ( picvalues.size() - 1 ) )];
+		int alpha2Quantile = picvalues[round( quantileT * ( picvalues.size() - 1 ) )];
 		caxisMin = alpha1Quantile;
 		caxisMax = alpha2Quantile;
 	}
 
-	if (color)
+	if ( color )
 	{
-		Mat sourceimgOutCLR(sourceimg.rows, sourceimg.cols, CV_8UC3);
-		for (int r = 0; r < sourceimgOutCLR.rows; r++)
+		Mat sourceimgOutCLR( sourceimg.rows, sourceimg.cols, CV_8UC3 );
+		for ( int r = 0; r < sourceimgOutCLR.rows; r++ )
 		{
-			for (int c = 0; c < sourceimgOutCLR.cols; c++)
+			for ( int c = 0; c < sourceimgOutCLR.cols; c++ )
 			{
-				double x = sourceimg.at<uchar>(r, c);
+				double x = sourceimg.at<uchar>( r, c );
 
-				std::tuple<int, int, int> BGR = colorMapJET(x, caxisMin, caxisMax);
-				sourceimgOutCLR.at<Vec3b>(r, c)[0] = round(std::get<0>(BGR));
-				sourceimgOutCLR.at<Vec3b>(r, c)[1] = round(std::get<1>(BGR));
-				sourceimgOutCLR.at<Vec3b>(r, c)[2] = round(std::get<2>(BGR));
+				std::tuple<int, int, int> BGR = colorMapJET( x, caxisMin, caxisMax );
+				sourceimgOutCLR.at<Vec3b>( r, c )[0] = round( std::get<0>( BGR ) );
+				sourceimgOutCLR.at<Vec3b>( r, c )[1] = round( std::get<1>( BGR ) );
+				sourceimgOutCLR.at<Vec3b>( r, c )[2] = round( std::get<2>( BGR ) );
 			}
 		}
 		return sourceimgOutCLR;
@@ -332,112 +332,113 @@ Mat applyColorMapZdeny(const Mat& sourceimgIn, double quantileB, double quantile
 	}
 	else
 	{
-		Mat sourceimgOutGS(sourceimg.rows, sourceimg.cols, CV_8UC1);
-		for (int r = 0; r < sourceimgOutGS.rows; r++)
+		Mat sourceimgOutGS( sourceimg.rows, sourceimg.cols, CV_8UC1 );
+		for ( int r = 0; r < sourceimgOutGS.rows; r++ )
 		{
-			for (int c = 0; c < sourceimgOutGS.cols; c++)
+			for ( int c = 0; c < sourceimgOutGS.cols; c++ )
 			{
-				double x = sourceimg.at<uchar>(r, c);
-				sourceimgOutGS.at<char>(r, c) = clamp(x, caxisMin, caxisMax);
+				double x = sourceimg.at<uchar>( r, c );
+				sourceimgOutGS.at<char>( r, c ) = clamp( x, caxisMin, caxisMax );
 			}
 		}
 		return sourceimgOutGS;
 	}
 }
 
-void showimg(const Mat& sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize)
+void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	double RowColRatio = (double)sourceimg.rows / (double)sourceimg.cols;
+	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
 	int namedWindowRows = 600;
-	int namedWindowCols = (double)namedWindowRows / RowColRatio;
-	namedWindow(windowname, WINDOW_NORMAL);
-	if (showSize == Size2i(0, 0))
-	{
-		resizeWindow(windowname, namedWindowCols, namedWindowRows);
-	}
+	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
+	namedWindow( windowname, WINDOW_NORMAL );
+
+	if ( showSize == Size2i( 0, 0 ) )
+		resizeWindow( windowname, namedWindowCols, namedWindowRows );
 	else
-	{
-		resizeWindow(windowname, showSize);
-	}
-	normalize(sourceimg, sourceimg, 0, 255, CV_MINMAX);
-	sourceimg.convertTo(sourceimg, CV_8U);
-	if (sourceimg.channels() == 1) sourceimg = applyColorMapZdeny(sourceimg, quantileB, quantileT, color);
-	imshow(windowname, sourceimg);
-	waitKey(1);
+		resizeWindow( windowname, showSize );
+
+	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	sourceimg.convertTo( sourceimg, CV_8U );
+
+	if ( sourceimg.channels() == 1 )
+		sourceimg = applyColorMapZdeny( sourceimg, quantileB, quantileT, color );
+
+	imshow( windowname, sourceimg );
+	waitKey( 1 );
 }
 
-void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear, Size2i exportSize)
+void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear, Size2i exportSize )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	normalize(sourceimg, sourceimg, 0, 255, CV_MINMAX);
-	sourceimg.convertTo(sourceimg, CV_8U);
+	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	sourceimg.convertTo( sourceimg, CV_8U );
 
-	double RowColRatio = (double)sourceimg.rows / (double)sourceimg.cols;
+	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
 	int namedWindowRows = 1700;
-	int namedWindowCols = (double)namedWindowRows / RowColRatio;
+	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
 
-	if (exportSize == Size2i(0, 0))
+	if ( exportSize == Size2i( 0, 0 ) )
 	{
-		if (bilinear)
-			resize(sourceimg, sourceimg, Size2i(namedWindowCols, namedWindowRows), 0, 0, INTER_LINEAR);
+		if ( bilinear )
+			resize( sourceimg, sourceimg, Size2i( namedWindowCols, namedWindowRows ), 0, 0, INTER_LINEAR );
 		else
-			resize(sourceimg, sourceimg, Size2i(namedWindowCols, namedWindowRows), 0, 0, INTER_NEAREST);
+			resize( sourceimg, sourceimg, Size2i( namedWindowCols, namedWindowRows ), 0, 0, INTER_NEAREST );
 	}
 	else
 	{
-		if (bilinear)
-			resize(sourceimg, sourceimg, exportSize, 0, 0, INTER_LINEAR);
+		if ( bilinear )
+			resize( sourceimg, sourceimg, exportSize, 0, 0, INTER_LINEAR );
 		else
-			resize(sourceimg, sourceimg, exportSize, 0, 0, INTER_NEAREST);
+			resize( sourceimg, sourceimg, exportSize, 0, 0, INTER_NEAREST );
 	}
-	imwrite(path, sourceimg);
+	imwrite( path, sourceimg );
 }
 
-void saveMatToCsv(const std::string& path, const Mat& matIn)
+void saveMatToCsv( const std::string &path, const Mat &matIn )
 {
-	std::ofstream listing(path, std::ios::out | std::ios::trunc);
+	std::ofstream listing( path, std::ios::out | std::ios::trunc );
 	Mat mat = matIn.clone();
-	mat.convertTo(mat, CV_32F);
-	for (int r = 0; r < mat.rows; r++)
+	mat.convertTo( mat, CV_32F );
+	for ( int r = 0; r < mat.rows; r++ )
 	{
-		for (int c = 0; c < mat.cols; c++)
+		for ( int c = 0; c < mat.cols; c++ )
 		{
-			listing << mat.at<float>(r, c) << ",";
+			listing << mat.at<float>( r, c ) << ",";
 		}
 		listing << endl;
 	}
 }
 
-void colorMapDebug(double sigmaa)
+void colorMapDebug( double sigmaa )
 {
 	int rows = 500;
 	int cols = 1500;
-	Mat colormap = Mat::zeros(rows, cols, CV_8UC3);
+	Mat colormap = Mat::zeros( rows, cols, CV_8UC3 );
 	ColorMapStyle colormapStyle = CM_BINARY;
-	for (int r = 0; r < rows; r++)
+	for ( int r = 0; r < rows; r++ )
 	{
-		for (int c = 0; c < cols; c++)
+		for ( int c = 0; c < cols; c++ )
 		{
 			std::tuple<int, int, int>BGR;
 
-			if (colormapStyle == CM_JET)
+			if ( colormapStyle == CM_JET )
 			{
-				double x = 255.*c / (cols - 1.);
-				BGR = colorMapJET(x);
+				double x = 255.*c / ( cols - 1. );
+				BGR = colorMapJET( x );
 			}
-			if (colormapStyle == CM_BINARY)
+			if ( colormapStyle == CM_BINARY )
 			{
-				double x = 2.*((double)c / (cols - 1.)) - 1.;
-				BGR = colorMapBINARY(x, -1, 1, sigmaa);
+				double x = 2.*( ( double )c / ( cols - 1. ) ) - 1.;
+				BGR = colorMapBINARY( x, -1, 1, sigmaa );
 			}
 
-			colormap.at<Vec3b>(r, c)[0] = std::get<0>(BGR);
-			colormap.at<Vec3b>(r, c)[1] = std::get<1>(BGR);
-			colormap.at<Vec3b>(r, c)[2] = std::get<2>(BGR);
+			colormap.at<Vec3b>( r, c )[0] = std::get<0>( BGR );
+			colormap.at<Vec3b>( r, c )[1] = std::get<1>( BGR );
+			colormap.at<Vec3b>( r, c )[2] = std::get<2>( BGR );
 		}
 	}
-	showimg(colormap, "colormap");
+	showimg( colormap, "colormap" );
 }
 
 
