@@ -15,6 +15,7 @@ struct DiffrotSettings
 	int dPic;
 	int vFov;
 	int dSec;
+	bool filter;
 };
 
 DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset, IPlot1D *plt1, IPlot1D *plt2 );

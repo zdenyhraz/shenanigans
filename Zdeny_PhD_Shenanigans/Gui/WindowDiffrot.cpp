@@ -30,7 +30,7 @@ void WindowDiffrot::calculateDiffrot()
 	drset.dPic = ui.lineEdit_5->text().toDouble();
 	drset.vFov = ui.lineEdit_4->text().toDouble();
 	drset.dSec = ui.lineEdit_8->text().toDouble();
-
+	drset.filter = ui.checkBox->isChecked();
 	//globals->IPCset->IPCshow = true;
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset,  &pltX, &pltY );

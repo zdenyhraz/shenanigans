@@ -63,8 +63,8 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		shiftsX[y] = phasecorrel( std::move( crop1 ), std::move( crop2 ), ipcset, nullptr, y == yshow ).x;
 	}
 
-	//filter outliers here
-	//filterShiftsMA(shiftsX);
+	if ( drset.filter )
+		filterShiftsMA( shiftsX );
 
 	for ( int y = 0; y < drset.ys; y++ )
 	{
