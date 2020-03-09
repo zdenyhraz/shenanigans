@@ -348,6 +348,7 @@ Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantil
 void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
 {
 	Mat sourceimg = sourceimgIn.clone();
+
 	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
 	int namedWindowRows = 600;
 	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
@@ -370,7 +371,27 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 
 void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) )
 {
+	//Mat sourceimg = sourceimgIn.clone();
+	//hconcat
 
+	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
+	int namedWindowRows = 600;
+	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
+	namedWindow( windowname, WINDOW_NORMAL );
+
+	if ( showSize == Size2i( 0, 0 ) )
+		resizeWindow( windowname, namedWindowCols, namedWindowRows );
+	else
+		resizeWindow( windowname, showSize );
+
+	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	sourceimg.convertTo( sourceimg, CV_8U );
+
+	if ( sourceimg.channels() == 1 )
+		sourceimg = applyColorMapZdeny( sourceimg, quantileB, quantileT, color );
+
+	imshow( windowname, sourceimg );
+	waitKey( 1 );
 }
 
 void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear, Size2i exportSize )
