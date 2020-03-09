@@ -11,12 +11,12 @@ class Logger
 public:
 	Logger()
 	{
-		spdlogger = spdlog::stdout_color_mt("console");
-		spdlog::set_pattern("%^[%T] %v %$");
-		spdlog::set_level(spdlog::level::debug);
+		spdlogger = spdlog::stdout_color_mt( "console" );
+		spdlog::set_pattern( "%^[%T]%$ %v " );
+		spdlog::set_level( spdlog::level::debug );
 	}
-	
-	inline static std::shared_ptr<spdlog::logger>& GetLogger() { return spdlogger; }
+
+	inline static std::shared_ptr<spdlog::logger> &GetLogger() { return spdlogger; }
 
 private:
 	static std::shared_ptr<spdlog::logger> spdlogger;
