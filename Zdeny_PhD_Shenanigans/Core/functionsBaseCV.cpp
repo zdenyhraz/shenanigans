@@ -368,6 +368,11 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 	waitKey( 1 );
 }
 
+void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) )
+{
+
+}
+
 void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear, Size2i exportSize )
 {
 	Mat sourceimg = sourceimgIn.clone();
