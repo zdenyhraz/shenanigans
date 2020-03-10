@@ -47,7 +47,7 @@ struct Plot1D : IPlot1D
 			if ( i < plotPens.size() )
 				widget->graph( i )->setPen( plotPens[i] );
 			else
-				widget->graph( i )->setPen( QPen( Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+				widget->graph( i )->setPen( QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
 
 			widget->graph( i )->setName( QString::fromStdString( ylabels[i] ) );
 

@@ -59,7 +59,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D plt( ui.widget );
 		plt.plot( x, y );
 	}
-	if ( 1 ) //plot in optimization
+	if ( 0 ) //plot in optimization
 	{
 		Evolution Evo( 2 );
 		Evo.NP = 10;
@@ -92,6 +92,10 @@ void Zdeny_PhD_Shenanigans::debug()
 		set.setSize( img1.rows, img1.cols );
 
 		auto shifts = phasecorrel( img1, img2, set,  globals->plotter2D );
+	}
+	if ( 1 )
+	{
+		// hconcat tests
 	}
 
 	LOG_EVENT( "Debug finished." );
