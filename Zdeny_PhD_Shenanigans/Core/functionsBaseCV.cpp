@@ -371,10 +371,17 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 
 void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
 {
-	std::vector<Mat> sourceimgs( sourceimgIns.size() );
-	for ( int i = 0; i < sourceimgIns.size(); i++ )
+	std::vector<Mat> sourceimgs;
+	for ( auto &srcimg : sourceimgIns )
 	{
-		sourceimgs[i] = sourceimgIns[i].clone();
+		if ( !srcimg.empty() )
+		{
+			auto img = srcimg.clone();
+			resize( img, img, Size( 500, 500 ) );
+			normalize( img, img, 0, 255, CV_MINMAX );
+			img.convertTo( img, CV_8UC3 );
+			sourceimgs.emplace_back( img );
+		}
 	}
 
 	Mat concatenated;

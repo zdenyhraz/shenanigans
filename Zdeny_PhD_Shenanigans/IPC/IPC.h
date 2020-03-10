@@ -107,7 +107,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 	{
 		showMats.push_back( sourceimg1 );
 		showMats.push_back( sourceimg2 );
-		showMats.push_back( set.bandpass );
+		//showMats.push_back( set.bandpass );
 	}
 
 	if ( 0 )
@@ -255,12 +255,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 				L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
 				L1mid = Point2f( L1.cols / 2, L1.rows / 2 );
 				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
-				if ( set.broadcast )
-				{
-					Mat L1v;
-					resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
-					showMats.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
-				}
+
 				for ( int i = 1; i <= maxPCit; i++ )
 				{
 					if ( set.broadcast )
@@ -314,19 +309,19 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 				                        ( float )L1mid.y ); //image shift in L3 - final
 			}
 
-			if ( set.broadcast ) LOG_SUCC( "Iterative phase correlation calculated with subpixel accuracy" );
-			if ( set.broadcast ) LOG_DEBUG( "L3 size: " + to_string( L3.cols ) + ", L2 size: " + to_string( L2.cols ) + ", L2U size: " + to_string( L2U.cols ) + ", L1 size: " + to_string(
-				                                    L1.cols ) );
-			if ( set.broadcast ) LOG_DEBUG( "Upsample pixel accuracy theoretical maximum: " + to_string( 1.0 / ( float )set.UC ) );
-			if ( set.broadcast ) LOG_DEBUG( "Calculated shift with pixel accuracy: " + to_string( imageshift_PIXEL ) + " pixels " );
-			if ( set.broadcast ) LOG_SUCC( "Calculated shift with SUBpixel accuracy1: " + to_string( imageshift_SUBPIXEL ) + " pixels " );
-
+			if ( set.broadcast )
+			{
+				LOG_DEBUG( "L3 size: " + to_string( L3.cols ) + ", L2 size: " + to_string( L2.cols ) + ", L2U size: " + to_string( L2U.cols ) + ", L1 size: " + to_string( L1.cols ) );
+				LOG_DEBUG( "Upsample pixel accuracy theoretical maximum: " + to_string( 1.0 / ( float )set.UC ) );
+				LOG_DEBUG( "Calculated shift with pixel accuracy: " + to_string( imageshift_PIXEL ) + " pixels " );
+				LOG_SUCC( "Calculated shift with subpixel accuracy1: " + to_string( imageshift_SUBPIXEL ) + " pixels " );
+			}
 			output = imageshift_SUBPIXEL;
 		}
 	}
 
 	if ( set.broadcast )
-		showimg( showMats, "IPC pipeline", true );
+		showimg( showMats, "IPC pipeline", false );
 
 	return output;
 }
