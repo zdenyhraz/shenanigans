@@ -87,23 +87,12 @@ void Zdeny_PhD_Shenanigans::debug()
 		Mat img1 = loadImage( path1 );
 		Mat img2 = loadImage( path2 );
 
-		showimg( std::vector<Mat> {img1, img2}, "ipc input" );
-
 		IPCsettings set = *globals->IPCset;
 		set.broadcast = true;
 		set.setSize( img1.rows, img1.cols );
 
 		//auto shifts = phasecorrel( img1, img2, set, globals->plotter2D );
 		auto shifts = phasecorrel( img1, img2, set );
-	}
-	if ( 0 )// showimg multiple Mats test
-	{
-		Mat img1 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
-		Mat img2 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
-		Mat img3 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
-		Mat img4 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
-
-		showimg( std::vector<Mat> {img1, img2, img3, img4}, "hconcat maybe" );
 	}
 
 	LOG_EVENT( "Debug finished." );
