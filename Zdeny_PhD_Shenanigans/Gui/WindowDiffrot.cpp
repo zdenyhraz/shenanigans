@@ -31,7 +31,7 @@ void WindowDiffrot::calculateDiffrot()
 	drset.vFov = ui.lineEdit_4->text().toDouble();
 	drset.dSec = ui.lineEdit_8->text().toDouble();
 	drset.filter = ui.checkBox->isChecked();
-	//globals->IPCset->IPCshow = true;
+	//globals->IPCset->broadcast = true;
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset,  &pltX, &pltY );
 	LOG_SUCC( "Diffrot profile calculated." );
@@ -42,7 +42,7 @@ void WindowDiffrot::showIPC()
 	LOG_EVENT( "Showimg diffrot profile IPC landscape..." );
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCset;
-	set.IPCshow = true;
+	set.broadcast = true;
 	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(),
 	                   ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	LOG_EVENT( "Loading file '" + fitsTime.path() + "'..." );
