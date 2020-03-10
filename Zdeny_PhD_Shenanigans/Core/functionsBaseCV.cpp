@@ -371,10 +371,16 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 
 void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
 {
-	//Mat sourceimg = sourceimgIn.clone();
-	//hconcat
+	std::vector<Mat> sourceimgs( sourceimgIns.size() );
+	for ( int i = 0; i < sourceimgIns.size(); i++ )
+	{
+		sourceimgs[i] = sourceimgIns[i].clone();
+	}
 
+	Mat concatenated;
+	hconcat( sourceimgs, concatenated );
 
+	showimg( concatenated, windowname, color, quantileB, quantileT, showSize );
 }
 
 void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear, Size2i exportSize )

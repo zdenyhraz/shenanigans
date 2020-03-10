@@ -93,9 +93,14 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel( img1, img2, set,  globals->plotter2D );
 	}
-	if ( 1 )
+	if ( 1 )// showimg multiple Mats test
 	{
-		// hconcat tests
+		Mat img1 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
+		Mat img2 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
+		Mat img3 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
+		Mat img4 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
+
+		showimg( std::vector<Mat> {img1, img2, img3, img4}, "hconcat maybe" );
 	}
 
 	LOG_EVENT( "Debug finished." );
