@@ -88,17 +88,17 @@ void Zdeny_PhD_Shenanigans::debug()
 		Mat img2 = loadImage( path2 );
 
 		IPCsettings set = *globals->IPCset;
-		set.IPCshow = true;
+		set.broadcast = true;
 		set.setSize( img1.rows, img1.cols );
 
 		auto shifts = phasecorrel( img1, img2, set,  globals->plotter2D );
 	}
 	if ( 1 )// showimg multiple Mats test
 	{
-		Mat img1 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
-		Mat img2 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
-		Mat img3 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
-		Mat img4 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\50216587.png" );
+		Mat img1 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
+		Mat img2 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
+		Mat img3 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
+		Mat img4 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
 
 		showimg( std::vector<Mat> {img1, img2, img3, img4}, "hconcat maybe" );
 	}
