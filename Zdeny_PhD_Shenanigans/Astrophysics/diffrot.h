@@ -5,7 +5,8 @@
 static constexpr int plusminusbufer = 4;//even!
 static constexpr int sy = 0;//sunspot shift
 static constexpr int yshow = 400;//ipc show y index
-constexpr int ma = 5;//moving average window
+constexpr int movavgWindow = 5;//moving average window
+constexpr int medianWindow = 5;//median window
 
 struct DiffrotSettings
 {
@@ -36,6 +37,8 @@ void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vecto
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas );
 
-void filterShiftsMA( std::vector<double> &shiftsX );
+void filterShiftsMOVAVG( std::vector<double> &shiftsX );
+
+void filterShiftsMEDIAN( std::vector<double> &shiftsX );
 
 double predictDiffrotProfile( double theta, double A, double B, double C );
