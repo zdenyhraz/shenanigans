@@ -64,7 +64,10 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 
 	if ( drset.filter )
-		filterShiftsMA( shiftsX );
+	{
+		filterShiftsMEDIAN( shiftsX );
+		filterShiftsMOVAVG( shiftsX );
+	}
 
 	for ( int y = 0; y < drset.ys; y++ )
 	{
@@ -113,25 +116,43 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector
 	plt2->plot( iotam, shiftsX, ( 360. / Constants::TwoPi ) * thetas );
 }
 
-void filterShiftsMA( std::vector<double> &shiftsX )
+void filterShiftsMOVAVG( std::vector<double> &shiftsX )
 {
 	auto shiftsXma = shiftsX;
+	double movavg;
+
 	for ( int i = 0; i < shiftsX.size(); i++ )
 	{
-		double mav = 0;
-		int mavc = 0;
-		for ( int m = 0; m < ma; m++ )
+		movavg = 0;
+		for ( int m = 0; m < movavgWindow; m++ )
 		{
-			int idx = i - ma / 2 + m;
+			int idx = i - movavgWindow / 2 + m;
 
 			if ( idx < 0 || idx == shiftsX.size() )
 				break;
 
-			mav += shiftsX[idx];
-			mavc++;
+			movavg += shiftsX[idx];
 		}
-		mav /= ( double )mavc;
-		shiftsXma[i] = mav;
+		movavg /= ( double )movavgWindow;
+		shiftsXma[i] = movavg;
+	}
+	shiftsX = shiftsXma;
+}
+
+void filterShiftsMEDIAN( std::vector<double> &shiftsX )
+{
+	auto shiftsXma = shiftsX;
+	std::vector<double> med( medianWindow );
+
+	for ( int i = 0; i < shiftsX.size(); i++ )
+	{
+		for ( int m = 0; m < movavgWindow; m++ )
+		{
+			int idx = i - movavgWindow / 2 + m;
+			med[m] = shiftsX[idx];
+		}
+
+		shiftsXma[i] = median( med );
 	}
 	shiftsX = shiftsXma;
 }
