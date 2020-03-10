@@ -5,7 +5,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 
-	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasX", "omegasXfit", "omegasXavgfit", "predicX1", "predicX2"} );
+	plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasX", "omegasXavgfit", "predicX1", "predicX2"} );
 	plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", "theta[deg]" );
 
 	std::vector<std::vector<double>> thetas2D;
@@ -44,7 +44,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXfit = theta1Dfit( omegasX, thetas );
 			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
 
-			drplot1( plt1, thetas, omegasX, omegasXfit, omegasXavgfit, predicXs );
+			drplot1( plt1, thetas, omegasX, omegasXavgfit, predicXs );
 			drplot2( plt2, iotam, shiftsX, thetas );
 		}
 	}
@@ -102,10 +102,10 @@ std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2
 	return polyfit( thetasAll, omegasAll, 2 );
 }
 
-void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXfit, const std::vector<double> &omegasXavgfit,
+void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavgfit,
               const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXfit, omegasXavgfit, predicXs[0], predicXs[1]} );
+	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
