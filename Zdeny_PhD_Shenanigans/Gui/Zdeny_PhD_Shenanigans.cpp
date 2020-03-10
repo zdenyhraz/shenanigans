@@ -80,20 +80,23 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->plotter2D->plot( matToVect2( set.bandpass ), "x", "y", "z", 0, 1, 0, 1 );
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if ( 0 ) //2pic IPC
+	if ( 1 ) //2pic IPC
 	{
-		std::string path1 = "D:\\SDOpics\\2011_03_12__15_25_15__CONT.fits";
-		std::string path2 = "D:\\SDOpics\\2011_03_12__15_26_00__CONT.fits";
+		std::string path1 = "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg";
+		std::string path2 = "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg";
 		Mat img1 = loadImage( path1 );
 		Mat img2 = loadImage( path2 );
+
+		showimg( std::vector<Mat> {img1, img2}, "ipc input" );
 
 		IPCsettings set = *globals->IPCset;
 		set.broadcast = true;
 		set.setSize( img1.rows, img1.cols );
 
-		auto shifts = phasecorrel( img1, img2, set,  globals->plotter2D );
+		//auto shifts = phasecorrel( img1, img2, set, globals->plotter2D );
+		auto shifts = phasecorrel( img1, img2, set );
 	}
-	if ( 1 )// showimg multiple Mats test
+	if ( 0 )// showimg multiple Mats test
 	{
 		Mat img1 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
 		Mat img2 = loadImage( "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg" );
