@@ -25,6 +25,13 @@ public:
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
 		}
+
+		// relative flow X jet
+
+		// relative flow X binary
+
+		// relative magnitude & absolute phase
+
 	}
 
 	void SetData( Mat &image, Mat &flowX )

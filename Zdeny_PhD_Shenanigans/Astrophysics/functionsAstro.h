@@ -69,19 +69,7 @@ struct DiffrotResults2
 			saveimg( dirpath + "FlowXRelFFit.png", applyColorMapZdeny( medFlowXrelativeFF, quantileBot, quantileTop, true ), true );
 			saveimg( dirpath + "FlowXRelPred.png", applyColorMapZdeny( medFlowXrelativeP, quantileBot, quantileTop, true ), true );
 		}
-		if ( 0 ) //ghetto sum
-		{
-			Mat FlowPicBGR = FlowPic.clone();
-			FlowPicBGR.convertTo( FlowPicBGR, CV_32F );
-			cvtColor( FlowPicBGR, FlowPicBGR, CV_GRAY2BGR );
-			FlowPicBGR.convertTo( FlowPicBGR, CV_32F );
-			normalize( FlowPicBGR, FlowPicBGR, 0, 1, CV_MINMAX );
-			Mat medFlowX_BGR = applyColorMapZdeny( medFlowX, quantileBot, quantileTop );
-			medFlowX_BGR.convertTo( medFlowX_BGR, CV_32F );
-			normalize( medFlowX_BGR, medFlowX_BGR, 0, 1, CV_MINMAX );
-			Mat mergedGHE = ( 1. - sigma ) * FlowPicBGR + sigma * medFlowX_BGR;
-			showimg( mergedGHE, "FlowX Merged Ghetto", false, quantileBot, quantileTop );
-		}
+
 		if ( 0 ) //HUE sum
 		{
 			Mat mergedHUE = combineTwoPics( applyColorMapZdeny( medFlowX, quantileBot, quantileTop, false ), FlowPic, HUEBRIGHT );
