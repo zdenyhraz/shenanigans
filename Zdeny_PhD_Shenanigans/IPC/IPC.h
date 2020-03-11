@@ -95,7 +95,8 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 	sourceimg1.convertTo( sourceimg1, CV_32F, 1. / 65535 );
 	sourceimg2.convertTo( sourceimg2, CV_32F, 1. / 65535 );
 
-	std::vector<Mat> showMats;
+	std::vector<Mat> showMatsGRS; // grayscale
+	std::vector<Mat> showMatsCLR; // color
 
 	if ( set.applyWindow )
 	{
@@ -105,9 +106,9 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 
 	if ( set.broadcast || forceshow )
 	{
-		showMats.push_back( sourceimg1 );
-		showMats.push_back( sourceimg2 );
-		//showMats.push_back( set.bandpass );
+		showMatsGRS.push_back( sourceimg1 );
+		showMatsGRS.push_back( sourceimg2 );
+		//showMatsCLR.push_back( set.bandpass );
 	}
 
 	if ( 0 )
@@ -175,6 +176,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 	}
 
 	L3 = quadrantswap( L3 );
+
 	if ( set.minimalShift )
 		L3 = L3.mul( 1 - kirkl( L3.rows, L3.cols, set.minimalShift ) );
 
@@ -187,7 +189,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 	{
 		Mat L3v;
 		resize( L3, L3v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
-		showMats.push_back( crosshair( L3v, Point2f( round( ( float )( L3peak.x ) * 2000. / ( float )L3.cols ), round( ( float )( L3peak.y ) * 2000. / ( float )L3.rows ) ) ) );
+		showMatsCLR.push_back( crosshair( L3v, Point2f( round( ( float )( L3peak.x ) * 2000. / ( float )L3.cols ), round( ( float )( L3peak.y ) * 2000. / ( float )L3.rows ) ) ) );
 	}
 	if ( set.broadcast )
 	{
@@ -220,13 +222,13 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 			{
 				Mat L2v;
 				resize( L2, L2v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
-				showMats.push_back( crosshair( L2v, L2mid * 2000 / L2.cols ) );
+				showMatsCLR.push_back( crosshair( L2v, L2mid * 2000 / L2.cols ) );
 			}
 			if ( set.broadcast || forceshow )
 			{
 				Mat L2Uv;
 				resize( L2U, L2Uv, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
-				showMats.push_back( crosshair( L2Uv, L2Umid * 2000 / L2U.cols ) );
+				showMatsCLR.push_back( crosshair( L2Uv, L2Umid * 2000 / L2U.cols ) );
 			}
 			Point2f L2Upeak( L2U.cols / 2, L2U.rows / 2 );
 			if ( set.broadcast )
@@ -247,7 +249,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 				{
 					Mat L1v;
 					resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
-					showMats.push_back( crosshair( L1v, findCentroidDouble( L1 ) * 2000 / L1.cols ) );
+					showMatsCLR.push_back( crosshair( L1v, findCentroidDouble( L1 ) * 2000 / L1.cols ) );
 				}
 			}
 			else
@@ -290,7 +292,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 						{
 							Mat L1v;
 							resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
-							showMats.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
+							showMatsCLR.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
 
 							if ( plt )
 								plt->plot( matToVect2( L1v ) );
@@ -321,7 +323,10 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 	}
 
 	if ( set.broadcast )
-		showimg( showMats, "IPC pipeline", false );
+	{
+		showimg( showMatsGRS, "IPC source", false );
+		showimg( showMatsCLR, "IPC pipeline", true );
+	}
 
 	return output;
 }
