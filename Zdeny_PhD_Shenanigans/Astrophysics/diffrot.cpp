@@ -47,7 +47,9 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 		}
 	}
 
-	return fillDiffrotResults();
+	DiffrotResults dr;
+	dr.SetData( matFromVector( omegasX2D ), matFromVector( omegasX2D, true ) );
+	return dr;
 }
 
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
@@ -171,11 +173,6 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 	}
 
 	time.advanceTime( plusminusbufer / 2 );
-}
-
-DiffrotResults fillDiffrotResults()
-{
-	return DiffrotResults();
 }
 
 std::vector<double> theta1Dfit( const std::vector<double> &omegas, const std::vector<double> &thetas )
