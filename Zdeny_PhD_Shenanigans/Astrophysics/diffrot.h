@@ -5,8 +5,6 @@
 static constexpr int plusminusbufer = 4;//even!
 static constexpr int sy = 0;//sunspot shift
 static constexpr int yshow = 400;//ipc show y index
-constexpr int medianWindow = 5;//median window
-constexpr int movavgWindow = 5;//moving average window
 
 struct DiffrotSettings
 {
@@ -16,7 +14,10 @@ struct DiffrotSettings
 	int dPic;
 	int vFov;
 	int dSec;
-	bool filter;
+	bool medianFilter;
+	bool movavgFilter;
+	int medianFilterSize;
+	int movavgFilterSize;
 };
 
 DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset, IPlot1D *plt1, IPlot1D *plt2 );
@@ -35,8 +36,8 @@ void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vecto
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas );
 
-void filterShiftsMEDIAN( std::vector<double> &shiftsX );
+void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size );
 
-void filterShiftsMOVAVG( std::vector<double> &shiftsX );
+void filterShiftsMOVAVG( std::vector<double> &shiftsX, int size );
 
 double predictDiffrotProfile( double theta, double A, double B, double C );

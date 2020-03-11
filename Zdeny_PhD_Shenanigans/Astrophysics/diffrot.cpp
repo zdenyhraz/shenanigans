@@ -60,11 +60,11 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		shiftsX[y] = phasecorrel( std::move( crop1 ), std::move( crop2 ), ipcset, nullptr, y == yshow ).x;
 	}
 
-	if ( drset.filter )
-	{
-		filterShiftsMEDIAN( shiftsX );
-		filterShiftsMOVAVG( shiftsX );
-	}
+	if ( drset.medianFilter )
+		filterShiftsMEDIAN( shiftsX, drset.medianFilterSize );
+
+	if ( drset.movavgFilter )
+		filterShiftsMOVAVG( shiftsX, drset.movavgFilterSize );
 
 	for ( int y = 0; y < drset.ys; y++ )
 	{
@@ -87,18 +87,18 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector
 	plt2->plot( iotam, shiftsX, ( 360. / Constants::TwoPi ) * thetas );
 }
 
-void filterShiftsMEDIAN( std::vector<double> &shiftsX )
+void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size )
 {
 	auto shiftsXma = shiftsX;
 	std::vector<double> med;
-	med.reserve( medianWindow );
+	med.reserve( size );
 
 	for ( int i = 0; i < shiftsX.size(); i++ )
 	{
 		med.clear();
-		for ( int m = 0; m < medianWindow; m++ )
+		for ( int m = 0; m < size; m++ )
 		{
-			int idx = i - medianWindow / 2 + m;
+			int idx = i - size / 2 + m;
 
 			if ( idx < 0 )
 				continue;
@@ -113,7 +113,7 @@ void filterShiftsMEDIAN( std::vector<double> &shiftsX )
 	shiftsX = shiftsXma;
 }
 
-void filterShiftsMOVAVG( std::vector<double> &shiftsX )
+void filterShiftsMOVAVG( std::vector<double> &shiftsX, int size )
 {
 	auto shiftsXma = shiftsX;
 	double movavg;
@@ -123,9 +123,9 @@ void filterShiftsMOVAVG( std::vector<double> &shiftsX )
 	{
 		movavg = 0;
 		movavgcnt = 0;
-		for ( int m = 0; m < movavgWindow; m++ )
+		for ( int m = 0; m < size; m++ )
 		{
-			int idx = i - movavgWindow / 2 + m;
+			int idx = i - size / 2 + m;
 
 			if ( idx < 0 )
 				continue;

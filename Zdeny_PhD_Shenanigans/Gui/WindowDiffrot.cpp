@@ -17,8 +17,7 @@ WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow(
 void WindowDiffrot::calculateDiffrot()
 {
 	LOG_EVENT( "Calculating diffrot profile..." );
-	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(),
-	                   ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	Plot1D pltX( globals->widget1 );
 	Plot1D pltY( globals->widget2 );
 	//*diffrotResults = calculateDiffrotProfile(*globals->IPCset, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(),  &pltX, &pltY);
@@ -30,8 +29,10 @@ void WindowDiffrot::calculateDiffrot()
 	drset.dPic = ui.lineEdit_5->text().toDouble();
 	drset.vFov = ui.lineEdit_4->text().toDouble();
 	drset.dSec = ui.lineEdit_8->text().toDouble();
-	drset.filter = ui.checkBox->isChecked();
-	//globals->IPCset->broadcast = true;
+	drset.medianFilter = ui.checkBox->isChecked();
+	drset.movavgFilter = ui.checkBox_2->isChecked();
+	drset.medianFilterSize = ui.lineEdit_21->text().toDouble();
+	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset,  &pltX, &pltY );
 	LOG_SUCC( "Diffrot profile calculated." );

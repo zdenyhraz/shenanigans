@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>307</width>
-    <height>318</height>
+    <width>328</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>8</x>
       <y>87</y>
-      <width>291</width>
+      <width>301</width>
       <height>41</height>
      </rect>
     </property>
@@ -57,8 +57,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>148</y>
+      <x>177</x>
+      <y>132</y>
       <width>90</width>
       <height>121</height>
      </rect>
@@ -68,34 +68,6 @@
       <widget class="QLabel" name="label_13">
        <property name="text">
         <string>start hour</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_10">
-       <property name="text">
-        <string>2020</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_12">
-       <property name="text">
-        <string>01</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_15">
-       <property name="text">
-        <string>start second</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>start month</string>
        </property>
       </widget>
      </item>
@@ -113,17 +85,17 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>start year</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_13">
        <property name="text">
         <string>00</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_14">
+       <property name="text">
+        <string>start minute</string>
        </property>
       </widget>
      </item>
@@ -134,10 +106,38 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_14">
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEdit_12">
        <property name="text">
-        <string>start minute</string>
+        <string>01</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>start year</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit_10">
+       <property name="text">
+        <string>2020</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>start month</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>start second</string>
        </property>
       </widget>
      </item>
@@ -155,7 +155,7 @@
      <rect>
       <x>9</x>
       <y>6</y>
-      <width>291</width>
+      <width>301</width>
       <height>76</height>
      </rect>
     </property>
@@ -345,8 +345,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>136</y>
+      <x>28</x>
+      <y>130</y>
       <width>121</width>
       <height>121</height>
      </rect>
@@ -389,18 +389,67 @@
      </item>
     </layout>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>130</y>
-      <width>81</width>
-      <height>16</height>
+      <x>72</x>
+      <y>257</y>
+      <width>171</width>
+      <height>38</height>
      </rect>
     </property>
-    <property name="text">
-     <string>filter shifts MA</string>
-    </property>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="0">
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>median filter</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_2">
+         <property name="text">
+          <string>movavg filter</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1">
+      <layout class="QFormLayout" name="formLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string>median size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_21">
+         <property name="text">
+          <string>5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
+          <string>movavg size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_22">
+         <property name="text">
+          <string>5</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -408,7 +457,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>307</width>
+     <width>328</width>
      <height>18</height>
     </rect>
    </property>
