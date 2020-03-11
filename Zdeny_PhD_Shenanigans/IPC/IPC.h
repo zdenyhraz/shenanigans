@@ -218,7 +218,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 			else
 				resize( L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST );
 			Point2f L2Umid( L2U.cols / 2, L2U.rows / 2 );
-			if ( set.broadcast )
+			if ( set.broadcast || forceshow )
 			{
 				Mat L2v;
 				resize( L2, L2v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
@@ -245,7 +245,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 				L1 = roicrop( L3, L3peak.x, L3peak.y, 5, 5 );
 				L1mid = Point2f( L1.cols / 2, L1.rows / 2 );
 				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
-				if ( set.broadcast )
+				if ( set.broadcast || forceshow )
 				{
 					Mat L1v;
 					resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
@@ -293,9 +293,6 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 							Mat L1v;
 							resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
 							showMatsCLR.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
-
-							if ( plt )
-								plt->plot( matToVect2( L1v ) );
 						}
 						break;
 					}
