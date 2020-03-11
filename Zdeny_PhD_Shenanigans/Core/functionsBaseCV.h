@@ -252,32 +252,67 @@ inline Mat matFromVector( std::vector<double> &vec, int cols )
 	return result;
 }
 
-inline Mat matFromVectorR( std::vector<std::vector<double>> &vec )
+inline Mat matFromVector( const std::vector<std::vector<double>> &vec, bool colorder = false )
 {
-	int rows = vec.size();
-	int cols = vec[0].size();
-	Mat result = Mat::zeros( rows, cols, CV_32F );
-	for ( int r = 0; r < rows; r++ )
+	if ( colorder )
 	{
-		for ( int c = 0; c < cols; c++ )
+		int cols = vec.size();
+		int rows = vec[0].size();
+		Mat result = Mat::zeros( rows, cols, CV_32F );
+		for ( int r = 0; r < rows; r++ )
 		{
-			result.at<float>( r, c ) = vec[r][c];
+			for ( int c = 0; c < cols; c++ )
+			{
+				result.at<float>( r, c ) = vec[c][r];
+			}
 		}
+		return result;
 	}
-	return result;
+	else
+	{
+		int rows = vec.size();
+		int cols = vec[0].size();
+		Mat result = Mat::zeros( rows, cols, CV_32F );
+		for ( int r = 0; r < rows; r++ )
+		{
+			for ( int c = 0; c < cols; c++ )
+			{
+				result.at<float>( r, c ) = vec[r][c];
+			}
+		}
+		return result;
+	}
 }
 
-inline Mat matFromVectorC( std::vector<std::vector<double>> &vec )
+inline std::vector<double> meanHorizontal( const std::vector<std::vector<double>> &vec )
 {
-	int cols = vec.size();
-	int rows = vec[0].size();
-	Mat result = Mat::zeros( rows, cols, CV_32F );
-	for ( int r = 0; r < rows; r++ )
+	std::vector<double> meansH( vec.size(), 0 );
+	Mat mat = matFromVector( vec );
+
+	for ( int r = 0; r < mat.rows; r++ )
 	{
-		for ( int c = 0; c < cols; c++ )
+		for ( int c = 0; c < mat.cols; c++ )
 		{
-			result.at<float>( r, c ) = vec[c][r];
+			meansH[r] += mat.at<float>( r, c );
 		}
+		meansH[r] /= mat.cols;
 	}
-	return result;
+	return meansH;
 }
+
+inline std::vector<double> meanVertical( const std::vector<std::vector<double>> &vec )
+{
+	std::vector<double> meansV( vec.size(), 0 );
+	Mat mat = matFromVector( vec );
+
+	for ( int c = 0; c < mat.cols; c++ )
+	{
+		for ( int r = 0; r < mat.rows; r++ )
+		{
+			meansV[c] += mat.at<float>( r, c );
+		}
+		meansV[c] /= mat.rows;
+	}
+	return meansV;
+}
+
