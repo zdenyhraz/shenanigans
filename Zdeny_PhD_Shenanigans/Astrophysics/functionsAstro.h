@@ -42,10 +42,10 @@ struct DiffrotResults
 		medFlowX.convertTo( medFlowX, CV_32F );
 		medFlowY.convertTo( medFlowY, CV_32F );
 		Mat medFlowXrelativeF = medFlowX - matFromVector( FlowXfit, medFlowX.cols );
-		Mat medFlowXrelativeFF = medFlowX - matFromVectorC( FlowXfits );
+		Mat medFlowXrelativeFF = medFlowX - matFromVector( FlowXfits, true );
 		Mat medFlowXrelativeP = medFlowX - matFromVector( FlowXpred, medFlowX.cols );
 		showimg( matFromVector( FlowXfit, medFlowX.cols ), "FlowX Fit", true );
-		showimg( matFromVectorC( FlowXfits ), "FlowX FFit", true );
+		showimg( matFromVector( FlowXfits, true ), "FlowX FFit", true );
 		showimg( matFromVector( FlowXpred, medFlowX.cols ), "FlowX Pred", true );
 
 		//now show various stuff
