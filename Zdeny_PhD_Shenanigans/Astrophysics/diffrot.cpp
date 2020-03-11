@@ -24,9 +24,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	for ( int pic = 0; pic < drset.pics; pic++ )
 	{
-		if ( pic )
-			time.advanceTime( ( drset.sPic - drset.dPic ) * drset.dSec );
-
+		time.advanceTime( ( bool )pic * ( drset.sPic - drset.dPic ) * drset.dSec );
 		loadFitsFuzzy( pic1, time );
 		time.advanceTime( drset.dPic * drset.dSec );
 		loadFitsFuzzy( pic2, time );

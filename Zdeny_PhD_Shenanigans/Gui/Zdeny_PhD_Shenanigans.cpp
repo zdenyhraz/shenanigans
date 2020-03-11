@@ -82,8 +82,8 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if ( 1 ) //2pic IPC
 	{
-		std::string path1 = "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg";
-		std::string path2 = "C:\\Users\\zdenek.hrazdira\\Documents\\stuff\\wp\\sandro-katalina-k1bO_VTiZSs-unsplash.jpg";
+		std::string path1 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
+		std::string path2 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
 		Mat img1 = loadImage( path1 );
 		Mat img2 = loadImage( path2 );
 
@@ -91,7 +91,6 @@ void Zdeny_PhD_Shenanigans::debug()
 		set.broadcast = true;
 		set.setSize( img1.rows, img1.cols );
 
-		//auto shifts = phasecorrel( img1, img2, set, globals->plotter2D );
 		auto shifts = phasecorrel( img1, img2, set );
 	}
 
