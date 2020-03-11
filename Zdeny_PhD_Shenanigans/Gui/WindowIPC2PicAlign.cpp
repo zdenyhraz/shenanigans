@@ -3,6 +3,7 @@
 #include "Astrophysics/functionsAstro.h"
 #include "Plot/plotterqt1D.h"
 #include "Plot/plotterqt2D.h"
+#include "IPC/ipcAux.h"
 
 WindowIPC2PicAlign::WindowIPC2PicAlign( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {

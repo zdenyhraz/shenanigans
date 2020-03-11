@@ -116,6 +116,7 @@
     <ClCompile Include="Astrophysics\functionsAstro.cpp" />
     <ClCompile Include="Core\functionsBaseCV.cpp" />
     <ClCompile Include="Core\functionsBaseSTL.cpp" />
+    <ClCompile Include="IPC\ipcAux.cpp" />
     <ClCompile Include="Log\logger.cpp" />
     <ClCompile Include="Optimization\graphOptimization.cpp" />
     <ClCompile Include="InverseMap\inverseMapping.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Core\functionsBaseCV.h" />
     <ClInclude Include="Core\functionsBaseSTL.h" />
     <ClInclude Include="Core\globals.h" />
+    <ClInclude Include="IPC\ipcAux.h" />
     <ClInclude Include="Optimization\graphOptimization.h" />
     <ClInclude Include="InverseMap\inverseMapping.h" />
     <ClInclude Include="IPC\IPC.h" />

@@ -30,7 +30,6 @@ public:
 	bool applyBandpass = 1;
 	bool subpixel = 1;
 	bool crossCorrel = 0;
-	bool iterate = 1;
 	bool broadcast = false;
 	double minimalShift = 0;
 	Mat bandpass;
@@ -240,73 +239,60 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 			if ( !( L1size % 2 ) ) L1size++; //odd!+
 			Mat L1;
 			Point2f L1mid;
-			if ( !set.iterate )
+
+			L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
+			L1mid = Point2f( L1.cols / 2, L1.rows / 2 );
+			imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
+
+			for ( int i = 1; i <= maxPCit; i++ )
 			{
-				L1 = roicrop( L3, L3peak.x, L3peak.y, 5, 5 );
-				L1mid = Point2f( L1.cols / 2, L1.rows / 2 );
-				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
-				if ( set.broadcast || forceshow )
-				{
-					Mat L1v;
-					resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
-					showMatsCLR.push_back( crosshair( L1v, findCentroidDouble( L1 ) * 2000 / L1.cols ) );
-				}
-			}
-			else
-			{
+				if ( set.broadcast )
+					LOG_DEBUG( "======= iteration {} =======", i );
+
 				L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
-				L1mid = Point2f( L1.cols / 2, L1.rows / 2 );
-				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
+				Point2f L1peak = findCentroidDouble( L1 );
 
-				for ( int i = 1; i <= maxPCit; i++ )
+				if ( set.broadcast )
+					LOG_DEBUG( "L1peak: {}", to_string( L1peak ) );
+
+				L2Upeak.x += round( L1peak.x - L1mid.x );
+				L2Upeak.y += round( L1peak.y - L1mid.y );
+				if ( ( L2Upeak.x > ( L2U.cols - L1mid.x - 1 ) ) || ( L2Upeak.y > ( L2U.rows - L1mid.y - 1 ) ) || ( L2Upeak.x < ( L1mid.x + 1 ) ) || ( L2Upeak.y < ( L1mid.y + 1 ) ) )
 				{
-					if ( set.broadcast )
-						LOG_DEBUG( "======= iteration {} =======", i );
-
-					L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
-					Point2f L1peak = findCentroidDouble( L1 );
-
-					if ( set.broadcast )
-						LOG_DEBUG( "L1peak: {}", to_string( L1peak ) );
-
-					L2Upeak.x += round( L1peak.x - L1mid.x );
-					L2Upeak.y += round( L1peak.y - L1mid.y );
-					if ( ( L2Upeak.x > ( L2U.cols - L1mid.x - 1 ) ) || ( L2Upeak.y > ( L2U.rows - L1mid.y - 1 ) ) || ( L2Upeak.x < ( L1mid.x + 1 ) ) || ( L2Upeak.y < ( L1mid.y + 1 ) ) )
-					{
-						LOG_ERROR( "IPC out of bounds - centroid diverged" );
-						break;
-					}
-					if ( set.broadcast )
-					{
-						LOG_DEBUG( "L1peak findCentroid double delta: {}/{}", to_string( findCentroidDouble( L1 ).x - L1mid.x ), to_string( findCentroidDouble( L1 ).y - L1mid.y ) );
-						LOG_DEBUG( "Resulting L2Upeak in this iteration: {}", to_string( L2Upeak ) );
-					}
-					if ( ( abs( L1peak.x - L1mid.x ) < 0.5 ) && ( abs( L1peak.y - L1mid.y ) < 0.5 ) )
-					{
-						L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
-						if ( set.broadcast )
-						{
-							LOG_DEBUG( "Iterative phase correlation accuracy reached, L2Upeak: " + to_string( L2Upeak ) );
-						}
-						if ( set.broadcast || forceshow )
-						{
-							Mat L1v;
-							resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
-							showMatsCLR.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
-						}
-						break;
-					}
-					if ( i == maxPCit )
-					{
-						//LOG_ERROR( "IPC out of iterations - centroid oscilated" );
-					}
+					LOG_ERROR( "IPC out of bounds - centroid diverged" );
+					break;
 				}
-
-				imageshift_SUBPIXEL.x = ( float )L3peak.x - ( float )L3mid.x + 1.0 / ( float )set.UC * ( ( float )L2Upeak.x - ( float )L2Umid.x + findCentroidDouble( L1 ).x -
-				                        ( float )L1mid.x ); //image shift in L3 - final
-				imageshift_SUBPIXEL.y = ( float )L3peak.y - ( float )L3mid.y + 1.0 / ( float )set.UC * ( ( float )L2Upeak.y - ( float )L2Umid.y + findCentroidDouble( L1 ).y -
-				                        ( float )L1mid.y ); //image shift in L3 - final
+				if ( set.broadcast )
+				{
+					LOG_DEBUG( "L1peak findCentroid double delta: {}/{}", to_string( findCentroidDouble( L1 ).x - L1mid.x ), to_string( findCentroidDouble( L1 ).y - L1mid.y ) );
+					LOG_DEBUG( "Resulting L2Upeak in this iteration: {}", to_string( L2Upeak ) );
+				}
+				if ( ( abs( L1peak.x - L1mid.x ) < 0.5 ) && ( abs( L1peak.y - L1mid.y ) < 0.5 ) )
+				{
+					L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
+					if ( set.broadcast )
+					{
+						LOG_DEBUG( "Iterative phase correlation accuracy reached, L2Upeak: " + to_string( L2Upeak ) );
+					}
+					if ( set.broadcast || forceshow )
+					{
+						Mat L1v;
+						resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
+						showMatsCLR.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
+					}
+					break;
+				}
+				if ( i == maxPCit )
+				{
+					//LOG_ERROR( "IPC out of iterations - centroid oscilated" );
+				}
 			}
+
+			imageshift_SUBPIXEL.x = ( float )L3peak.x - ( float )L3mid.x + 1.0 / ( float )set.UC * ( ( float )L2Upeak.x - ( float )L2Umid.x + findCentroidDouble( L1 ).x -
+			                        ( float )L1mid.x ); //image shift in L3 - final
+			imageshift_SUBPIXEL.y = ( float )L3peak.y - ( float )L3mid.y + 1.0 / ( float )set.UC * ( ( float )L2Upeak.y - ( float )L2Umid.y + findCentroidDouble( L1 ).y -
+			                        ( float )L1mid.y ); //image shift in L3 - final
+
 
 			if ( set.broadcast )
 			{
@@ -341,12 +327,3 @@ inline Point2f phasecorrel( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsetting
 	return ipcinsides( std::move( sourceimg1 ), std::move( sourceimg2 ), set, plt, forceshow );
 }
 
-void alignPics( const Mat &input1, const Mat &input2, Mat &output, IPCsettings set );
-
-Mat AlignStereovision( const Mat &img1In, const Mat &img2In );
-
-void alignPicsDebug( const Mat &img1In, const Mat &img2In, IPCsettings &IPC_settings );
-
-void registrationDuelDebug( IPCsettings &IPC_settings1, IPCsettings &IPC_settings2 );
-
-std::tuple<Mat, Mat> calculateFlowMap( const Mat &img1In, const Mat &img2In, IPCsettings &IPC_settings, double qualityRatio );
