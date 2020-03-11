@@ -372,7 +372,7 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
 {
 	// 1st image determines the main hconcat height
-	double mainHeight = sourceimgIns[0].rows;
+	int mainHeight = sourceimgIns[0].rows;
 	std::vector<Mat> sourceimgs;
 	sourceimgs.reserve( sourceimgIns.size() );
 	for ( auto &srcimg : sourceimgIns )
@@ -380,7 +380,7 @@ void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool
 		if ( !srcimg.empty() )
 		{
 			auto img = srcimg.clone();
-			resize( img, img, Size( mainHeight / img.rows * img.cols, mainHeight ) );
+			resize( img, img, Size( ( double )mainHeight / img.rows * img.cols, mainHeight ) );
 			normalize( img, img, 0, 255, CV_MINMAX );
 			img.convertTo( img, CV_8U );
 			sourceimgs.emplace_back( img );
