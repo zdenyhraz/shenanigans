@@ -319,7 +319,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 		}
 	}
 
-	if ( set.broadcast )
+	if ( set.broadcast || forceshow )
 	{
 		showimg( showMatsGRS, "IPC source", false );
 		showimg( showMatsCLR, "IPC pipeline", true );

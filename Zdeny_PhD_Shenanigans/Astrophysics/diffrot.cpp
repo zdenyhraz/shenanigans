@@ -50,8 +50,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	return fillDiffrotResults();
 }
 
-void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX,
-                      std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
+void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
 {
 	#pragma omp parallel for
 	for ( int y = 0; y < drset.ys; y++ )
@@ -78,8 +77,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 }
 
-void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D,
-              const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
+void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
 {
 	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, meanVertical( omegasX2D ), omegasXavgfit, predicXs[0], predicXs[1]} );
 }
