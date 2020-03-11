@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "functionsAstro.h"
+#include "diffrotResults.h"
 
 static constexpr int plusminusbufer = 4;//even!
 static constexpr int sy = 0;//sunspot shift

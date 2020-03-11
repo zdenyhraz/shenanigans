@@ -15,7 +15,7 @@ static const int SwindPicCnt = 10;
 
 std::vector<double> diffrotProfileAverage( const Mat &flow, int colS = 0 );
 
-struct DiffrotResults
+struct DiffrotResults2
 {
 	Mat FlowPic;
 	Mat FlowX;
@@ -136,8 +136,8 @@ void optimizeIPCParameters( const IPCsettings &settingsMaster, std::string pathI
 
 void optimizeIPCParametersForAllWavelengths( const IPCsettings &settingsMaster, double maxShift, double accuracy, unsigned runs );
 
-DiffrotResults calculateDiffrotProfile( const IPCsettings &IPC_settings, FitsTime &FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic,
-                                        int verticalFov, int deltasec, IPlot1D *pltX, IPlot1D *pltY );
+DiffrotResults2 calculateDiffrotProfile( const IPCsettings &IPC_settings, FitsTime &FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic,
+        int verticalFov, int deltasec, IPlot1D *pltX, IPlot1D *pltY );
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow( const IPCsettings &set, std::string path, double SwindCropFocusX,
         double SwindCropFocusY );

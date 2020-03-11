@@ -109,6 +109,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Astrophysics\diffrot.cpp" />
+    <ClCompile Include="Astrophysics\diffrotResults.cpp" />
     <ClCompile Include="Filtering\filtering.cpp" />
     <ClCompile Include="Astrophysics\FITS.cpp" />
     <ClCompile Include="Fourier\fourier.cpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Astrophysics\diffrot.h" />
+    <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Filtering\filtering.h" />

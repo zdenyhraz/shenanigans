@@ -124,6 +124,9 @@
     <ClCompile Include="IPC\ipcAux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Astrophysics\diffrotResults.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -208,6 +211,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IPC\ipcAux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Astrophysics\diffrotResults.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
