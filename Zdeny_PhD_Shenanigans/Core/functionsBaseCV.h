@@ -302,7 +302,7 @@ inline std::vector<double> meanHorizontal( const std::vector<std::vector<double>
 
 inline std::vector<double> meanVertical( const std::vector<std::vector<double>> &vec )
 {
-	std::vector<double> meansV( vec.size(), 0 );
+	std::vector<double> meansV( vec[0].size(), 0 );
 	Mat mat = matFromVector( vec );
 
 	for ( int c = 0; c < mat.cols; c++ )

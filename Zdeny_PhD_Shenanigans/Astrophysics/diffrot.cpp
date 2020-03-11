@@ -81,7 +81,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D,
               const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, meanHorizontal( omegasX2D ), omegasXavgfit, predicXs[0], predicXs[1]} );
+	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, meanVertical( omegasX2D ), omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
