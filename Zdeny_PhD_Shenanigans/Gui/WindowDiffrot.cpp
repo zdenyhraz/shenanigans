@@ -123,7 +123,5 @@ void WindowDiffrot::superOptimizeDiffrot()
 
 void WindowDiffrot::showResults()
 {
-	diffrotResults->showsaveResults( ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(),
-	                                 ui.lineEdit_9->text().toStdString() );
 	LOG_EVENT( "Differential rotation results shown" );
 }

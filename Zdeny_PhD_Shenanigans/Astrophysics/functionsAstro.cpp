@@ -134,10 +134,10 @@ void optimizeIPCParametersForAllWavelengths( const IPCsettings &settingsMaster, 
 	}
 }
 
-DiffrotResults calculateDiffrotProfile( const IPCsettings &set, FitsTime &time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov,
+DiffrotResults2 calculateDiffrotProfile( const IPCsettings &set, FitsTime &time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov,
                                         int deltaSec, IPlot1D *plt1, IPlot1D *plt2 )
 {
-	DiffrotResults results;
+	DiffrotResults2 results;
 	LOG_DEBUG( "Starting IPC MainFlow calculation" );
 	if ( plt1 ) plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"} );
 	//if (plt2) plt2->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
