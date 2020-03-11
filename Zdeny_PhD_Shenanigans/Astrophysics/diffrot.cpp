@@ -87,43 +87,56 @@ void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector
 	plt2->plot( iotam, shiftsX, ( 360. / Constants::TwoPi ) * thetas );
 }
 
-void filterShiftsMOVAVG( std::vector<double> &shiftsX )
+void filterShiftsMEDIAN( std::vector<double> &shiftsX )
 {
 	auto shiftsXma = shiftsX;
-	double movavg;
+	std::vector<double> med;
+	med.reserve( medianWindow );
 
 	for ( int i = 0; i < shiftsX.size(); i++ )
 	{
-		movavg = 0;
-		for ( int m = 0; m < movavgWindow; m++ )
+		med.clear();
+		for ( int m = 0; m < medianWindow; m++ )
 		{
-			int idx = i - movavgWindow / 2 + m;
+			int idx = i - medianWindow / 2 + m;
 
-			if ( idx < 0 || idx == shiftsX.size() )
+			if ( idx < 0 )
+				continue;
+			if ( idx == shiftsX.size() )
 				break;
 
-			movavg += shiftsX[idx];
+			med.emplace_back( shiftsX[idx] );
 		}
-		movavg /= ( double )movavgWindow;
-		shiftsXma[i] = movavg;
+
+		shiftsXma[i] = median( med );
 	}
 	shiftsX = shiftsXma;
 }
 
-void filterShiftsMEDIAN( std::vector<double> &shiftsX )
+void filterShiftsMOVAVG( std::vector<double> &shiftsX )
 {
 	auto shiftsXma = shiftsX;
-	std::vector<double> med( medianWindow );
+	double movavg;
+	int movavgcnt;
 
 	for ( int i = 0; i < shiftsX.size(); i++ )
 	{
+		movavg = 0;
+		movavgcnt = 0;
 		for ( int m = 0; m < movavgWindow; m++ )
 		{
 			int idx = i - movavgWindow / 2 + m;
-			med[m] = shiftsX[idx];
-		}
 
-		shiftsXma[i] = median( med );
+			if ( idx < 0 )
+				continue;
+			if ( idx == shiftsX.size() )
+				break;
+
+			movavg += shiftsX[idx];
+			movavgcnt += 1;
+		}
+		movavg /= ( double )movavgcnt;
+		shiftsXma[i] = movavg;
 	}
 	shiftsX = shiftsXma;
 }
