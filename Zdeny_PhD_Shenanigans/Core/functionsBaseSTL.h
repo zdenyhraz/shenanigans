@@ -131,7 +131,7 @@ inline T sqr( T x )
 }
 
 template <typename T>
-inline double mean( std::vector<T> &vec )
+inline double mean( const std::vector<T> &vec )
 {
 	double mean = 0;
 	for ( auto &x : vec )
@@ -139,7 +139,38 @@ inline double mean( std::vector<T> &vec )
 	return mean / vec.size();
 }
 
-inline double mean2( const std::vector<std::vector<double>> &vec )
+template <typename T>
+inline std::vector<T> meanHorizontal( const std::vector<std::vector<T>> &vec )
+{
+	std::vector<T> meansH( vec.size() );
+	for ( int row = 0; row < vec.size; row++ )
+	{
+		for ( auto &x : vec[row] )
+			meansH[row] += x;
+
+		meansH[row] /= row.size();
+	}
+	return meansH;
+}
+
+template <typename T>
+inline std::vector<T> meanVertical( const std::vector<std::vector<T>> &vec )
+{
+	std::vector<T> meansV( vec[0].size() );
+	for ( auto &row : vec )
+	{
+		for ( int col = 0; col < row.size(); col++ )
+			meansV[col] += x;
+	}
+	for ( int col = 0; col < row.size(); col++ )
+	{
+		meansV[col] /= vec.size();
+	}
+	return meansV;
+}
+
+template <typename T>
+inline double mean2( const std::vector<std::vector<T>> &vec )
 {
 	double mean = 0;
 	for ( auto &row : vec )
