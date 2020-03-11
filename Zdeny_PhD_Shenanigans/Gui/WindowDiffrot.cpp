@@ -35,7 +35,13 @@ void WindowDiffrot::calculateDiffrot()
 	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset,  &pltX, &pltY );
-	LOG_SUCC( "Diffrot profile calculated." );
+	LOG_SUCC( "Differential rotation profile calculated." );
+}
+
+void WindowDiffrot::showResults()
+{
+	diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
+	LOG_EVENT( "Differential rotation results shown" );
 }
 
 void WindowDiffrot::showIPC()
@@ -121,7 +127,3 @@ void WindowDiffrot::superOptimizeDiffrot()
 	LOG_EVENT( "Super optimizing finished for dt={}`", dt );
 }
 
-void WindowDiffrot::showResults()
-{
-	LOG_EVENT( "Differential rotation results shown" );
-}

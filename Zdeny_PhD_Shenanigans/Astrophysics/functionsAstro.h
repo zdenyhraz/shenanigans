@@ -39,8 +39,7 @@ struct DiffrotResults2
 			medianBlur( medFlowX, medFlowX, med );
 			medianBlur( medFlowY, medFlowY, med );
 		}
-		medFlowX.convertTo( medFlowX, CV_32F );
-		medFlowY.convertTo( medFlowY, CV_32F );
+
 		Mat medFlowXrelativeF = medFlowX - matFromVector( FlowXfit, medFlowX.cols );
 		Mat medFlowXrelativeFF = medFlowX - matFromVector( FlowXfits, true );
 		Mat medFlowXrelativeP = medFlowX - matFromVector( FlowXpred, medFlowX.cols );
