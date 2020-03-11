@@ -374,6 +374,7 @@ void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool
 	// 1st image determines the main hconcat height
 	double mainHeight = sourceimgIns[0].rows;
 	std::vector<Mat> sourceimgs;
+	sourceimgs.reserve( sourceimgIns.size() );
 	for ( auto &srcimg : sourceimgIns )
 	{
 		if ( !srcimg.empty() )
