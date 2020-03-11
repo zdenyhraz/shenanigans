@@ -6,8 +6,6 @@ class DiffrotResults
 public:
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
-
-
 		if ( medianSize )
 		{
 			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
@@ -29,12 +27,12 @@ public:
 		}
 	}
 
-	void SetData( Mat image, Mat flowX )
+	void SetData( Mat &image, Mat &flowX )
 	{
-		SourceImage = image;
-		SourceFlowX = flowX;
+		flip( image, SourceImage, 1 );
+		flip( flowX, SourceFlowX, 1 );
 
-		FlowX = flowX;
+		FlowX = SourceFlowX;
 		FlowX.convertTo( FlowX, CV_32F );
 	}
 
