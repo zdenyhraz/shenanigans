@@ -10,15 +10,21 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	std::vector<std::vector<double>> thetas2D;
 	std::vector<std::vector<double>> omegasX2D;
+	std::vector<std::vector<double>> image2D;
 	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys );
 	std::vector<double> shiftsX( drset.ys );
 	std::vector<double> thetas( drset.ys );
 	std::vector<double> omegasX( drset.ys );
+	std::vector<double> image( drset.ys );
 	std::vector<double> omegasXfit( drset.ys );
 	std::vector<double> omegasXavgfit( drset.ys );
 
 	std::vector<double> iotam( drset.ys );
 	std::iota( iotam.begin(), iotam.end(), 0 );
+
+	thetas2D.reserve( drset.pics );
+	omegasX2D.reserve( drset.pics );
+	image2D.reserve( drset.pics );
 
 	FitsImage pic1, pic2;
 
@@ -34,10 +40,11 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			double R = ( pic1.params().R + pic2.params().R ) / 2.;
 			double theta0 = ( pic1.params().theta0 + pic2.params().theta0 ) / 2.;
 
-			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, predicXs, ipcset, drset, R, theta0, dy );
+			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, image, predicXs, ipcset, drset, R, theta0, dy );
 
-			omegasX2D.emplace_back( omegasX );
 			thetas2D.emplace_back( thetas );
+			omegasX2D.emplace_back( omegasX );
+			image2D.emplace_back( image );
 
 			omegasXfit = theta1Dfit( omegasX, thetas );
 			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
@@ -48,17 +55,18 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	}
 
 	DiffrotResults dr;
-	dr.SetData( matFromVector( omegasX2D ), matFromVector( omegasX2D, true ) );
+	dr.SetData( matFromVector( image2D, true ), matFromVector( omegasX2D, true ) );
 	return dr;
 }
 
-void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
+void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
 {
 	#pragma omp parallel for
 	for ( int y = 0; y < drset.ys; y++ )
 	{
 		Mat crop1 = roicrop( pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
 		Mat crop2 = roicrop( pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
+		image[y] = pic1.image().at<ushort>( pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy );
 		shiftsX[y] = phasecorrel( std::move( crop1 ), std::move( crop2 ), ipcset, nullptr, y == yshow ).x;
 	}
 
