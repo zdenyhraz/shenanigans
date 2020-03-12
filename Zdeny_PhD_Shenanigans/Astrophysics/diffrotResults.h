@@ -6,6 +6,9 @@ class DiffrotResults
 public:
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
+		// reset
+		FlowX = SourceFlowX.clone();
+
 		if ( medianSize )
 		{
 			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
