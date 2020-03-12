@@ -68,16 +68,16 @@ std::vector<double> polyfit( const std::vector<double> &xdata, const std::vector
 Mat crosshair( const Mat &sourceimgIn, cv::Point point )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	Scalar CrosshairColor = Scalar( 0.3 );
-	int thickness = max( sourceimg.cols / 250, 1 );
-	int inner = sourceimg.cols / 40;
-	int outer = sourceimg.cols / 15;
+	Scalar CrosshairColor = Scalar( 0 );
+	int thickness = max( sourceimg.cols / 150, 1 );
+	int inner = sourceimg.cols / 50;
+	int outer = sourceimg.cols / 18;
 	cv::Point offset1( 0, outer );
 	cv::Point offset2( outer, 0 );
 	cv::Point offset3( 0, inner );
 	cv::Point offset4( inner, 0 );
-	sourceimg.convertTo( sourceimg, CV_32F );
-	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
+	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	sourceimg.convertTo( sourceimg, CV_8U );
 
 	circle( sourceimg, point, inner, CrosshairColor, thickness, 0, 0 );
 	line( sourceimg, point + offset3, point + offset1, CrosshairColor, thickness );
@@ -285,6 +285,7 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
 {
 	Mat sourceimg = sourceimgIn.clone();
+
 	//input is grayscale, output is colored
 	int caxisMin = 0, caxisMax = 255;
 
@@ -319,7 +320,7 @@ Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantil
 		{
 			for ( int c = 0; c < sourceimgOutCLR.cols; c++ )
 			{
-				double x = sourceimg.at<uchar>( r, c );
+				uchar x = sourceimg.at<uchar>( r, c );
 
 				std::tuple<int, int, int> BGR = colorMapJET( x, caxisMin, caxisMax );
 				sourceimgOutCLR.at<Vec3b>( r, c )[0] = round( std::get<0>( BGR ) );
@@ -328,7 +329,6 @@ Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantil
 			}
 		}
 		return sourceimgOutCLR;
-
 	}
 	else
 	{

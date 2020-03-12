@@ -157,24 +157,29 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 		dft( CrossPower, L3complex, DFT_INVERSE + DFT_SCALE );
 		Mat L3planes[2];
 		split( L3complex, L3planes );
-		if ( 1 )
+
+		if ( set.broadcast )
 		{
 			auto minmaxReal = minMaxMat( L3planes[0] );
 			auto minmaxImag = minMaxMat( L3planes[1] );
-			if ( set.broadcast )
-			{
-				LOG_DEBUG( "L3 real min/max: " + to_string( std::get<0>( minmaxReal ) ) + " / " + to_string( std::get<1>( minmaxReal ) ) );
-				LOG_DEBUG( "L3 imag min/max: " + to_string( std::get<0>( minmaxImag ) ) + " / " + to_string( std::get<1>( minmaxImag ) ) );
-			}
+			LOG_DEBUG( "L3 real min/max: " + to_string( std::get<0>( minmaxReal ) ) + " / " + to_string( std::get<1>( minmaxReal ) ) );
+			LOG_DEBUG( "L3 imag min/max: " + to_string( std::get<0>( minmaxImag ) ) + " / " + to_string( std::get<1>( minmaxImag ) ) );
 		}
+
 		magnitude( L3planes[0], L3planes[1], L3 );
 	}
 	else//real only (assume pure real input)
 	{
 		dft( CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT );
+		if ( set.broadcast )
+		{
+			auto minmax = minMaxMat( L3 );
+			LOG_DEBUG( "L3 real min/max: {}/{}", std::get<0>( minmax ), std::get<1>( minmax ) );
+		}
 	}
 
 	L3 = quadrantswap( L3 );
+	normalize( L3, L3, 0, 1, CV_MINMAX );
 
 	if ( set.minimalShift )
 		L3 = L3.mul( 1 - kirkl( L3.rows, L3.cols, set.minimalShift ) );
@@ -216,7 +221,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 				Mat L2U;
 
 				if ( set.interpolate )
-					resize( L2, L2U, L2.size()*set.UC, 0, 0, INTER_CUBIC );
+					resize( L2, L2U, L2.size()*set.UC, 0, 0, INTER_LINEAR );
 				else
 					resize( L2, L2U, L2.size()*set.UC, 0, 0, INTER_NEAREST );
 
