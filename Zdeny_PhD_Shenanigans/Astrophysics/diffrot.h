@@ -5,7 +5,7 @@
 
 static constexpr int plusminusbufer = 4;//even!
 static constexpr int sy = 0;//sunspot shift
-static constexpr int yshow = 1400;//ipc show y index
+static constexpr int yshow = 400;//ipc show y index
 
 struct DiffrotSettings
 {

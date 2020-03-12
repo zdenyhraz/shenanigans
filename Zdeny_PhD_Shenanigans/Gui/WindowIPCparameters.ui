@@ -232,16 +232,26 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>157</x>
-      <y>28</y>
-      <width>75</width>
-      <height>181</height>
+      <x>150</x>
+      <y>0</y>
+      <width>79</width>
+      <height>141</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout_2">
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>subpixel</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QCheckBox" name="checkBox_3">
        <property name="text">
@@ -279,13 +289,10 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="checkBox">
+     <item row="5" column="0">
+      <widget class="QCheckBox" name="checkBox_8">
        <property name="text">
-        <string>subpixel</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>logar</string>
        </property>
       </widget>
      </item>

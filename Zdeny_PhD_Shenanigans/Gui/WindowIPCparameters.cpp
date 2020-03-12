@@ -24,6 +24,7 @@ void WindowIPCparameters::refreshIPCparameters( bool init )
 	globals->IPCset->applyWindow = ui.checkBox_4->isChecked();
 	globals->IPCset->interpolate = ui.checkBox_5->isChecked();
 	globals->IPCset->crossCorrel = ui.checkBox_7->isChecked();
+	globals->IPCset->logar = ui.checkBox_8->isChecked();
 
 	if ( !init )
 		LOG_DEBUG( "IPC parameter values updated" );

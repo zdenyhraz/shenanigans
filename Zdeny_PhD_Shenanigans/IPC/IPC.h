@@ -12,6 +12,7 @@ using namespace std;
 using namespace cv;
 
 static constexpr int maxPCit = 10;
+static constexpr double loglimit = 5;
 
 class IPCsettings
 {
@@ -32,6 +33,7 @@ public:
 	bool crossCorrel = 0;
 	bool broadcast = false;
 	double minimalShift = 0;
+	bool logar = false;
 	Mat bandpass;
 	Mat window;
 	string auxdir = "D:\\MainOutput\\diffrot\\auxdir\\";
@@ -160,10 +162,10 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 
 		if ( set.broadcast )
 		{
-			auto minmaxReal = minMaxMat( L3planes[0] );
-			auto minmaxImag = minMaxMat( L3planes[1] );
-			LOG_DEBUG( "L3 real min/max: " + to_string( std::get<0>( minmaxReal ) ) + " / " + to_string( std::get<1>( minmaxReal ) ) );
-			LOG_DEBUG( "L3 imag min/max: " + to_string( std::get<0>( minmaxImag ) ) + " / " + to_string( std::get<1>( minmaxImag ) ) );
+			auto minmaxR = minMaxMat( L3planes[0] );
+			auto minmaxI = minMaxMat( L3planes[1] );
+			LOG_DEBUG( "L3 real min/max: {}/{}", std::get<0>( minmaxR ), std::get<1>( minmaxR ) );
+			LOG_DEBUG( "L3 imag min/max: {}/{}", std::get<0>( minmaxI ), std::get<1>( minmaxI ) );
 		}
 
 		magnitude( L3planes[0], L3planes[1], L3 );
@@ -176,6 +178,12 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 			auto minmax = minMaxMat( L3 );
 			LOG_DEBUG( "L3 real min/max: {}/{}", std::get<0>( minmax ), std::get<1>( minmax ) );
 		}
+	}
+
+	if ( set.logar )
+	{
+		normalize( L3, L3, 1, loglimit, CV_MINMAX );
+		log( L3, L3 );
 	}
 
 	L3 = quadrantswap( L3 );
