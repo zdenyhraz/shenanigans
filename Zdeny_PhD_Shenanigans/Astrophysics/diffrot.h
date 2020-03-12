@@ -29,7 +29,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 
 std::vector<double> thetaFit( const std::vector<double> &omegas, const std::vector<double> &thetas );
 
-void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs );
+void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs );
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas );
 
