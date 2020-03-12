@@ -87,6 +87,11 @@ void Zdeny_PhD_Shenanigans::debug()
 		Mat img1 = loadImage( path1 );
 		Mat img2 = loadImage( path2 );
 
+		double shiftX = 10.3;
+		double shiftY = -7.2;
+		Mat T = ( Mat_<float>( 2, 3 ) << 1., 0., shiftX, 0., 1., shiftY );
+		warpAffine( img2, img2, T, cv::Size( img2.cols, img2.rows ) );
+
 		IPCsettings set = *globals->IPCset;
 		set.broadcast = true;
 		set.setSize( img1.rows, img1.cols );

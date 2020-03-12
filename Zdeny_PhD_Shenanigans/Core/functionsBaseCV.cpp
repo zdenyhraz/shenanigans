@@ -217,20 +217,20 @@ Mat kirklcrop( const Mat &sourceimgIn, int x, int y, int diameter )
 
 Point2f findCentroidDouble( const Mat &sourceimg )
 {
-	double M00 = 0.0;
-	double M01 = 0.0;
-	double M10 = 0.0;
+	double M = 0.0;
+	double My = 0.0;
+	double Mx = 0.0;
 	for ( int r = 0; r < sourceimg.rows; r++ )
 	{
 		for ( int c = 0; c < sourceimg.cols; c++ )
 		{
-			M00 += sourceimg.at<float>( r, c );
-			M01 += ( double )r * sourceimg.at<float>( r, c );
-			M10 += ( double )c * sourceimg.at<float>( r, c );
+			M += sourceimg.at<float>( r, c );
+			My += ( double )r * sourceimg.at<float>( r, c );
+			Mx += ( double )c * sourceimg.at<float>( r, c );
 		}
 	}
 
-	Point2f ret( M10 / M00, M01 / M00 );
+	Point2f ret( Mx / M, My / M );
 
 	if ( ret.x < 0 || ret.y < 0 || ret.x > sourceimg.cols || ret.y > sourceimg.rows )
 		return Point2f( sourceimg.cols / 2, sourceimg.rows / 2 );
