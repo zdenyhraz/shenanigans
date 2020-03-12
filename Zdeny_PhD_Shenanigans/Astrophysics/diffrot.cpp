@@ -45,12 +45,12 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, image, predicXs, ipcset, drset, R, theta0, dy );
 
-			if ( pic > 5 )
+			if ( pic >= 10 )
 			{
 				double diff = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
-				if ( abs( diff ) > 2. )
+				if ( abs( diff ) > 1. )
 				{
-					LOG_ERROR( "Calculating diffrot profile... {}%, outlier profile detected, diff = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diff );
+					LOG_ERROR( "Calculating diffrot profile... {}%, abnormal profile detected, diff = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diff );
 					continue;
 				}
 				else
@@ -60,7 +60,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			}
 			else
 			{
-				LOG_SUCC( "Calculating diffrot profile... {}%, initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
+				LOG_SUCC( "Calculating diffrot profile... {}%, estimating initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
 			}
 
 			thetas2D.emplace_back( thetas );
