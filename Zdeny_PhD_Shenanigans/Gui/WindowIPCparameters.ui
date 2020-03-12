@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>240</width>
+    <width>243</width>
     <height>295</height>
    </rect>
   </property>
@@ -232,13 +232,39 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>174</y>
+      <width>76</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox_7">
+       <property name="text">
+        <string>cross correlate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="checkBox_8">
+       <property name="text">
+        <string>logar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>0</y>
+      <x>160</x>
+      <y>12</y>
       <width>79</width>
-      <height>141</height>
+      <height>70</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -253,26 +279,6 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QCheckBox" name="checkBox_3">
-       <property name="text">
-        <string>apply bandpass</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="checkBox_4">
-       <property name="text">
-        <string>apply window</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
       <widget class="QCheckBox" name="checkBox_5">
        <property name="text">
         <string>interpolate</string>
@@ -282,17 +288,23 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QCheckBox" name="checkBox_7">
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="checkBox_3">
        <property name="text">
-        <string>cross correlate</string>
+        <string>apply bandpass</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
-      <widget class="QCheckBox" name="checkBox_8">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="checkBox_4">
        <property name="text">
-        <string>logar</string>
+        <string>apply window</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -304,7 +316,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>240</width>
+     <width>243</width>
      <height>18</height>
     </rect>
    </property>
