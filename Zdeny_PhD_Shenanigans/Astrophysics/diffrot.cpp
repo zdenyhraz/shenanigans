@@ -32,7 +32,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	for ( int pic = 0; pic < drset.pics; pic++ )
 	{
-		LOG_EVENT( "Calculating differential rotation profile... {}%", ( double )( pic + 1 ) / drset.pics * 100 );
+		LOG_INFO( "Calculating differential rotation profile... {}%", ( double )( pic + 1 ) / drset.pics * 100 );
 
 		time.advanceTime( ( bool )pic * ( drset.sPic - drset.dPic ) * drset.dSec );
 		loadFitsFuzzy( pic1, time );
@@ -45,6 +45,20 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			double theta0 = ( pic1.params().theta0 + pic2.params().theta0 ) / 2.;
 
 			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, image, predicXs, ipcset, drset, R, theta0, dy );
+
+			if ( pic > 5 )
+			{
+				double diff = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
+				if ( abs( diff ) > 2. )
+				{
+					LOG_ERROR( "Outlier profile detected, diff={}, skipping", diff );
+					continue;
+				}
+				else
+				{
+					LOG_DEBUG( "Normal profile detected, diff={}, adding", diff );
+				}
+			}
 
 			thetas2D.emplace_back( thetas );
 			omegasX2D.emplace_back( omegasX );

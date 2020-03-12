@@ -23,7 +23,7 @@ public:
 			showimg( SourceImage, "diffrot source" );
 		}
 
-		// flow X
+		// flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
