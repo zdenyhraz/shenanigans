@@ -11,7 +11,7 @@
 using namespace std;
 using namespace cv;
 
-static constexpr auto maxPCit = 10;
+static constexpr int maxPCit = 10;
 
 class IPCsettings
 {
@@ -317,7 +317,7 @@ inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings
 
 	if ( set.broadcast || forceshow )
 	{
-		showimg( showMatsGRS, "IPC source", false );
+		showimg( showMatsGRS, "IPC input", false );
 		showimg( showMatsCLR, "IPC pipeline", true );
 	}
 
