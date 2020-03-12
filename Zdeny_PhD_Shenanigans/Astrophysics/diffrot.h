@@ -27,9 +27,7 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time );
 
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy );
 
-std::vector<double> theta1Dfit( const std::vector<double> &omegas, const std::vector<double> &thetas );
-
-std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2D, const std::vector<std::vector<double>> &thetas2D );
+std::vector<double> thetaFit( const std::vector<double> &omegas, const std::vector<double> &thetas );
 
 void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs );
 

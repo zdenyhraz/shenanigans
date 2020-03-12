@@ -51,12 +51,12 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				double diff = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
 				if ( abs( diff ) > 2. )
 				{
-					LOG_ERROR( "Outlier profile detected, diff={}, skipping", diff );
+					LOG_ERROR( "Outlier profile detected, diff = {}, skipping", diff );
 					continue;
 				}
 				else
 				{
-					LOG_DEBUG( "Normal profile detected, diff={}, adding", diff );
+					LOG_DEBUG( "Normal profile detected, diff = {}, adding", diff );
 				}
 			}
 
@@ -65,8 +65,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			predicX2D.emplace_back( predicXs[0] );
 			image2D.emplace_back( image );
 
-			omegasXfit = theta1Dfit( omegasX, thetas );
-			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
+			omegasXfit = thetaFit( omegasX, thetas );
+			omegasXavgfit = thetaFit( meanVertical( omegasX2D ), thetas );
 
 			drplot1( plt1, thetas, omegasX, omegasX2D, omegasXavgfit, predicXs );
 			drplot2( plt2, iotam, shiftsX, thetas );
@@ -202,27 +202,7 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 	time.advanceTime( plusminusbufer / 2 );
 }
 
-std::vector<double> theta1Dfit( const std::vector<double> &omegas, const std::vector<double> &thetas )
+std::vector<double> thetaFit( const std::vector<double> &omegas, const std::vector<double> &thetas )
 {
 	return polyfit( thetas, omegas, 2 );
-}
-
-std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2D, const std::vector<std::vector<double>> &thetas2D )
-{
-	int I = omegasX2D.size();
-	int J = omegasX2D[0].size();
-
-	std::vector<double> omegasAll( I * J );
-	std::vector<double> thetasAll( I * J );
-
-	for ( int i = 0; i < I; i++ )
-	{
-		for ( int j = 0; j < J; j++ )
-		{
-			omegasAll[i * J + j] = omegasX2D[i][j];
-			thetasAll[i * J + j] = thetas2D[i][j];
-		}
-	}
-
-	return polyfit( thetasAll, omegasAll, 2 );
 }
