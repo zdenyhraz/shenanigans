@@ -9,7 +9,7 @@ using namespace std;
 using namespace cv;
 
 enum ColorMapStyle { CM_JET, CM_BINARY };
-enum CombinePicsStyle { HUEBRIGHT, BINARYBLUERED };
+enum CombinePicsStyle { huebright, binary };
 
 std::tuple<double, double> minMaxMat( const Mat &sourceimg );
 

@@ -245,7 +245,7 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 	Mat result = Mat::zeros( source1.rows, source1.cols, CV_8UC3 );
 	source1.convertTo( source1, CV_32F );
 	source2.convertTo( source2, CV_32F );
-	if ( style == HUEBRIGHT )
+	if ( style == huebright )
 	{
 		normalize( source1, source1, 0, 1, CV_MINMAX );
 		normalize( source2, source2, 0, 1, CV_MINMAX );
@@ -264,7 +264,7 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 			}
 		}
 	}
-	if ( style == BINARYBLUERED )
+	if ( style == binary )
 	{
 		normalize( source2, source2, 0, 1, CV_MINMAX );
 		auto minMax = minMaxMat( source1 );

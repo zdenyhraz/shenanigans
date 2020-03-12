@@ -27,17 +27,35 @@ public:
 		}
 
 		// relative flow X jet
+		if ( 1 )
+		{
+			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
+		}
+
+		// relative flow X huebright
+		if ( 1 )
+		{
+			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, huebright, sigma ), "diffrot relative flow X huebright", false, quanBot, quanTop );
+		}
 
 		// relative flow X binary
+		if ( 1 )
+		{
+			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, binary, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
+		}
 
 		// relative magnitude & absolute phase
-
+		if ( 1 )
+		{
+			// needs Y information
+		}
 	}
 
-	void SetData( Mat &image, Mat &flowX )
+	void SetData( Mat &image, Mat &flowX, Mat &predicX )
 	{
 		flip( image, SourceImage, 1 );
 		flip( flowX, SourceFlowX, 1 );
+		flip( predicX, SourcePredicX, 1 );
 
 		FlowX = SourceFlowX;
 		FlowX.convertTo( FlowX, CV_32F );
@@ -46,5 +64,7 @@ public:
 private:
 	Mat SourceImage;
 	Mat SourceFlowX;
+	Mat SourcePredicX;
+
 	Mat FlowX;
 };

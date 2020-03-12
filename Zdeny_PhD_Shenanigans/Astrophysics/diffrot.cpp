@@ -10,6 +10,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	std::vector<std::vector<double>> thetas2D;
 	std::vector<std::vector<double>> omegasX2D;
+	std::vector<std::vector<double>> predicX2D;
 	std::vector<std::vector<double>> image2D;
 	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys );
 	std::vector<double> shiftsX( drset.ys );
@@ -24,6 +25,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	thetas2D.reserve( drset.pics );
 	omegasX2D.reserve( drset.pics );
+	predicX2D.reserve( drset.pics );
 	image2D.reserve( drset.pics );
 
 	FitsImage pic1, pic2;
@@ -44,6 +46,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			thetas2D.emplace_back( thetas );
 			omegasX2D.emplace_back( omegasX );
+			predicX2D.emplace_back( predicXs[0] );
 			image2D.emplace_back( image );
 
 			omegasXfit = theta1Dfit( omegasX, thetas );
@@ -55,7 +58,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	}
 
 	DiffrotResults dr;
-	dr.SetData( matFromVector( image2D, true ), matFromVector( omegasX2D, true ) );
+	dr.SetData( matFromVector( image2D, true ), matFromVector( omegasX2D, true ), matFromVector( predicX2D, true ) );
 	return dr;
 }
 

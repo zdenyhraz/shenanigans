@@ -72,19 +72,19 @@ struct DiffrotResults2
 
 		if ( 0 ) //HUE sum
 		{
-			Mat mergedHUE = combineTwoPics( applyColorMapZdeny( medFlowX, quantileBot, quantileTop, false ), FlowPic, HUEBRIGHT );
+			Mat mergedHUE = combineTwoPics( applyColorMapZdeny( medFlowX, quantileBot, quantileTop, false ), FlowPic, huebright );
 			showimg( mergedHUE, "FlowX Merged Hue", false, quantileBot, quantileTop );
 		}
 		if ( 0 ) //HUE sum relative
 		{
-			Mat mergedHUE = combineTwoPics( medFlowXrelativeP, FlowPic, HUEBRIGHT );
+			Mat mergedHUE = combineTwoPics( medFlowXrelativeP, FlowPic, huebright );
 			showimg( mergedHUE, "FlowX Merged Hue relative Pred", false, quantileBot, quantileTop );
 		}
 		if ( 1 ) //BINARY sum relative
 		{
-			Mat mergedBINF = combineTwoPics( medFlowXrelativeF, FlowPic, BINARYBLUERED, sigma );
-			Mat mergedBINFF = combineTwoPics( medFlowXrelativeFF, FlowPic, BINARYBLUERED, sigma );
-			Mat mergedBINP = combineTwoPics( medFlowXrelativeP, FlowPic, BINARYBLUERED, sigma );
+			Mat mergedBINF = combineTwoPics( medFlowXrelativeF, FlowPic, binary, sigma );
+			Mat mergedBINFF = combineTwoPics( medFlowXrelativeFF, FlowPic, binary, sigma );
+			Mat mergedBINP = combineTwoPics( medFlowXrelativeP, FlowPic, binary, sigma );
 			showimg( mergedBINF, "FlowX Merged Binary relative Fit", false, quantileBot, quantileTop );
 			showimg( mergedBINFF, "FlowX Merged Binary relative FFit", false, quantileBot, quantileTop );
 			showimg( mergedBINP, "FlowX Merged Binary relative Pred", false, quantileBot, quantileTop );
