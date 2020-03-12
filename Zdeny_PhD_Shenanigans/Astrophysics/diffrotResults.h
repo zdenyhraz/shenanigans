@@ -35,12 +35,6 @@ public:
 			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
 		}
 
-		// relative flow X huebright
-		if ( 1 )
-		{
-			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, huebright, sigma ), "diffrot relative flow X huebright", false, quanBot, quanTop );
-		}
-
 		// relative flow X binary
 		if ( 1 )
 		{
