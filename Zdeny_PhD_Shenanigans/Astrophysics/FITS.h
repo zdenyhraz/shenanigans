@@ -69,7 +69,7 @@ private:
 		}
 		else
 		{
-			LOG_DEBUG( "<loadfits> Loading file '{}'...", path );
+			//LOG_DEBUG( "<loadfits> Loading file '{}'...", path );
 			FitsParams params;
 			bool ENDfound = false;
 			char cline[lineBytes];

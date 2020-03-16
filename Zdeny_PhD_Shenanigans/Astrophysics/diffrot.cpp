@@ -17,7 +17,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	std::vector<double> thetas( drset.ys );
 	std::vector<double> omegasX( drset.ys );
 	std::vector<double> image( drset.ys );
-	std::vector<double> omegasXfit( drset.ys );
+
+	std::vector<double> omegasXavg( drset.ys );
 	std::vector<double> omegasXavgfit( drset.ys );
 
 	std::vector<double> iotam( drset.ys );
@@ -44,15 +45,33 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			calculateOmegas( pic1, pic2, shiftsX, thetas, omegasX, image, predicXs, ipcset, drset, R, theta0, dy );
 
+			if ( pic >= 10 )
+			{
+				double diff = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
+				if ( abs( diff ) > 1. )
+				{
+					LOG_ERROR( "Calculating diffrot profile... {}%, abnormal profile detected, diff = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diff );
+					continue;
+				}
+				else
+				{
+					LOG_SUCC( "Calculating diffrot profile... {}%, normal profile detected, diff = {}, adding", ( double )( pic + 1 ) / drset.pics * 100, diff );
+				}
+			}
+			else
+			{
+				LOG_SUCC( "Calculating diffrot profile... {}%, estimating initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
+			}
+
 			thetas2D.emplace_back( thetas );
 			omegasX2D.emplace_back( omegasX );
 			predicX2D.emplace_back( predicXs[0] );
 			image2D.emplace_back( image );
 
-			omegasXfit = theta1Dfit( omegasX, thetas );
-			omegasXavgfit = theta2Dfit( omegasX2D, thetas2D );
+			omegasXavg = meanVertical( omegasX2D );
+			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
-			drplot1( plt1, thetas, omegasX, omegasX2D, omegasXavgfit, predicXs );
+			drplot1( plt1, thetas, omegasX, omegasXavg, omegasXavgfit, predicXs );
 			drplot2( plt2, iotam, shiftsX, thetas );
 		}
 	}
@@ -90,9 +109,9 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 }
 
-void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<std::vector<double>> &omegasX2D, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
+void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
 {
-	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, meanVertical( omegasX2D ), omegasXavgfit, predicXs[0], predicXs[1]} );
+	plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
 void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
@@ -186,27 +205,7 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 	time.advanceTime( plusminusbufer / 2 );
 }
 
-std::vector<double> theta1Dfit( const std::vector<double> &omegas, const std::vector<double> &thetas )
+std::vector<double> thetaFit( const std::vector<double> &omegas, const std::vector<double> &thetas )
 {
 	return polyfit( thetas, omegas, 2 );
-}
-
-std::vector<double> theta2Dfit( const std::vector<std::vector<double>> &omegasX2D, const std::vector<std::vector<double>> &thetas2D )
-{
-	int I = omegasX2D.size();
-	int J = omegasX2D[0].size();
-
-	std::vector<double> omegasAll( I * J );
-	std::vector<double> thetasAll( I * J );
-
-	for ( int i = 0; i < I; i++ )
-	{
-		for ( int j = 0; j < J; j++ )
-		{
-			omegasAll[i * J + j] = omegasX2D[i][j];
-			thetasAll[i * J + j] = thetas2D[i][j];
-		}
-	}
-
-	return polyfit( thetasAll, omegasAll, 2 );
 }

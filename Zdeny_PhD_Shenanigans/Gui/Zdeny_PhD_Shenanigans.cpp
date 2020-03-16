@@ -104,7 +104,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
 	}
 
-	LOG_EVENT( "Debug finished." );
+	LOG_INFO( "Debug finished." );
 }
 
 void Zdeny_PhD_Shenanigans::about()
@@ -117,7 +117,7 @@ void Zdeny_PhD_Shenanigans::about()
 void Zdeny_PhD_Shenanigans::closeCV()
 {
 	destroyAllWindows();
-	LOG_EVENT( "All image windows closed" );
+	LOG_INFO( "All image windows closed" );
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters()
@@ -143,23 +143,23 @@ void Zdeny_PhD_Shenanigans::showWindowDiffrot()
 
 void Zdeny_PhD_Shenanigans::generateLand()
 {
-	LOG_EVENT( "Generating some land..." );
+	LOG_INFO( "Generating some land..." );
 	Mat mat = procedural( 1000, 1000 );
 	showimg( colorlandscape( mat ), "procedural nature" );
 	//showimg(mat, "procedural mature", true);
-	LOG_EVENT( "Finished generating some land. Do you like it?" );
+	LOG_INFO( "Finished generating some land. Do you like it?" );
 }
 
 void Zdeny_PhD_Shenanigans::playSnake()
 {
-	LOG_EVENT( "Started playing snake. (It is ok, everyone needs some rest.. :))" );
+	LOG_INFO( "Started playing snake. (It is ok, everyone needs some rest.. :))" );
 	SnakeGame();
-	LOG_EVENT( "Finished playing snake. Did you enjoy it? *wink*" );
+	LOG_INFO( "Finished playing snake. Did you enjoy it? *wink*" );
 }
 
 void Zdeny_PhD_Shenanigans::fitsDownloader()
 {
 	//http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122 - 2020 1.1. 00:00
 	generateFitsDownloadUrlSingles( 1, 2000, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122" );
-	LOG_EVENT( "Fits download urls created" );
+	LOG_INFO( "Fits download urls created" );
 }
