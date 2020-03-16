@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>240</width>
+    <width>243</width>
     <height>295</height>
    </rect>
   </property>
@@ -63,7 +63,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>32</string>
+        <string>64</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -83,7 +83,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_9">
        <property name="text">
-        <string>32</string>
+        <string>64</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -103,7 +103,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>11</string>
+        <string>9</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -235,34 +235,50 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>157</x>
-      <y>28</y>
-      <width>75</width>
-      <height>181</height>
+      <x>160</x>
+      <y>174</y>
+      <width>76</width>
+      <height>34</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="checkBox_3">
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox_7">
        <property name="text">
-        <string>apply bandpass</string>
+        <string>cross correlate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="checkBox_8">
+       <property name="text">
+        <string>logar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>12</y>
+      <width>79</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>subpixel</string>
        </property>
        <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="checkBox_4">
-       <property name="text">
-        <string>apply window</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
+     <item row="1" column="0">
       <widget class="QCheckBox" name="checkBox_5">
        <property name="text">
         <string>interpolate</string>
@@ -272,20 +288,20 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QCheckBox" name="checkBox_7">
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="checkBox_3">
        <property name="text">
-        <string>cross correlate</string>
+        <string>apply bandpass</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="checkBox">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="checkBox_4">
        <property name="text">
-        <string>subpixel</string>
+        <string>apply window</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -297,7 +313,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>240</width>
+     <width>243</width>
      <height>18</height>
     </rect>
    </property>

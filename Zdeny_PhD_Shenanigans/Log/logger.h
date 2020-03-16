@@ -2,7 +2,7 @@
 
 #define LOG_DEBUG(...) Logger::GetLogger()->debug(__VA_ARGS__)
 #define LOG_SUCC(...) Logger::GetLogger()->info(__VA_ARGS__)
-#define LOG_EVENT(...) Logger::GetLogger()->warn(__VA_ARGS__)
+#define LOG_INFO(...) Logger::GetLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...) Logger::GetLogger()->error(__VA_ARGS__)
 #define LOG_FATAL(...) Logger::GetLogger()->critical(__VA_ARGS__)
 

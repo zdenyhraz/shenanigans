@@ -6,6 +6,9 @@ class DiffrotResults
 public:
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
+		// reset
+		FlowX = SourceFlowX.clone();
+
 		if ( medianSize )
 		{
 			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
@@ -20,7 +23,7 @@ public:
 			showimg( SourceImage, "diffrot source" );
 		}
 
-		// flow X
+		// flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
@@ -30,12 +33,6 @@ public:
 		if ( 1 )
 		{
 			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
-		}
-
-		// relative flow X huebright
-		if ( 1 )
-		{
-			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, huebright, sigma ), "diffrot relative flow X huebright", false, quanBot, quanTop );
 		}
 
 		// relative flow X binary

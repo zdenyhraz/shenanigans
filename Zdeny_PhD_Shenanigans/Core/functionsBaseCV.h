@@ -35,17 +35,20 @@ Point2f findCentroidDouble( const Mat &sourceimg );
 
 inline std::tuple<int, int, int> colorMapJET( int x, int caxisMin = 0, int caxisMax = 255 )
 {
+	if ( !x )
+	{
+		return std::make_tuple( 0., 0., 0. );
+	}
+
 	double B, G, R;
 	double sh = 0.125 * ( caxisMax - caxisMin );
 	double start = caxisMin;
 	double mid = caxisMin + 0.5 * ( caxisMax - caxisMin );
 	double end = caxisMax;
 
-	B = ( x > ( start + sh ) ) ? clamp( -255 / 2 / sh * x + 255 / 2 / sh * ( mid + sh ), 0, 255 ) : ( x < start ? 255 / 2 : clamp( 255 / 2 / sh * x + 255 / 2 - 255 / 2 / sh * start, 0,
-	        255 ) );
+	B = ( x > ( start + sh ) ) ? clamp( -255 / 2 / sh * x + 255 / 2 / sh * ( mid + sh ), 0, 255 ) : ( x < start ? 255 / 2 : clamp( 255 / 2 / sh * x + 255 / 2 - 255 / 2 / sh * start, 0, 255 ) );
 	G = ( x < mid ) ? clamp( 255 / 2 / sh * x - 255 / 2 / sh * ( start + sh ), 0, 255 ) : clamp( -255 / 2 / sh * x + 255 / 2 / sh * ( end - sh ), 0, 255 );
-	R = ( x < ( end - sh ) ) ? clamp( 255 / 2 / sh * x - 255 / 2 / sh * ( mid - sh ), 0, 255 ) : ( x > end ? 255 / 2 : clamp( -255 / 2 / sh * x + 255 / 2 + 255 / 2 / sh * end, 0,
-	        255 ) );
+	R = ( x < ( end - sh ) ) ? clamp( 255 / 2 / sh * x - 255 / 2 / sh * ( mid - sh ), 0, 255 ) : ( x > end ? 255 / 2 : clamp( -255 / 2 / sh * x + 255 / 2 + 255 / 2 / sh * end, 0, 255 ) );
 
 	return std::make_tuple( B, G, R );
 }
