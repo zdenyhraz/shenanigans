@@ -6,6 +6,7 @@
 #include <QtWidgets/QApplication>
 #include <QPixmap>
 #include <QWidget>
+#include <QCloseEvent>
 //STL
 #include <iostream>
 #include <stdio.h>

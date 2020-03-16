@@ -175,3 +175,16 @@ void Zdeny_PhD_Shenanigans::fitsDownloader()
 	generateFitsDownloadUrlSingles( 1, 2000, "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122" );
 	LOG_INFO( "Fits download urls created" );
 }
+
+void Zdeny_PhD_Shenanigans::closeEvent( QCloseEvent *event )
+{
+	QMessageBox::StandardButton resBtn = QMessageBox::question( this, "hehe XD", tr( "Are you sure u wanna exit?\n" ), QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes );
+	if ( resBtn != QMessageBox::Yes )
+	{
+		event->ignore();
+	}
+	else
+	{
+		event->accept();
+	}
+}
