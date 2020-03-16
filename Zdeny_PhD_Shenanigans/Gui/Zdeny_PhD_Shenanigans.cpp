@@ -100,8 +100,20 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if ( 1 )
 	{
-		Plot2D plt( );
+		Plot2D plt;
+		int Ny = 1000;
+		int Nx = 1000;
+		auto Z = zerovect2( Ny, Nx );
 
+		for ( int y = 0; y < Ny; y++ )
+		{
+			for ( int x = 0; x < Nx; x++ )
+			{
+				Z[y][x] = ( x - y ) * ( x - y );
+			}
+		}
+
+		plt.plot( Z );
 	}
 
 	LOG_INFO( "Debug finished." );

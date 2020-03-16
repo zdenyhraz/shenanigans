@@ -20,18 +20,15 @@ struct Plot2D : IPlot2D
 		//windowPlots->erase(windowPlots->begin() + index);//remove from vector of WindowPlot*
 	}
 
-	inline void plot( const std::vector<std::vector<double>> &z, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax ) override
+	inline void plot( const std::vector<std::vector<double>> &z, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1 ) override
 	{
-		QString qxlabel = QString::fromStdString( xlabel );
-		QString qylabel = QString::fromStdString( ylabel );
-		QString qzlabel = QString::fromStdString( zlabel );
 		windowPlots.push_back( new WindowPlot() );
 		int index = windowPlots.size() - 1;
 		windowPlots[index]->show();
 		windowPlots[index]->ui.widget->addGraph();//create graph
 		windowPlots[index]->ui.widget->axisRect()->setupFullAxesBox( true ); //configure axis rect
-		windowPlots[index]->ui.widget->xAxis->setLabel( qxlabel ); //give the axes some labels
-		windowPlots[index]->ui.widget->yAxis->setLabel( qylabel ); //give the axes some labels
+		windowPlots[index]->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) ); //give the axes some labels
+		windowPlots[index]->ui.widget->yAxis->setLabel( QString::fromStdString( ylabel ) ); //give the axes some labels
 		QCPColorMap *colorMap = new QCPColorMap( windowPlots[index]->ui.widget->xAxis, windowPlots[index]->ui.widget->yAxis ); //set up the QCPColorMap
 		colorMap->data()->setSize( z[0].size(), z.size() ); //we want the color map to have nx * ny data points
 		colorMap->data()->setRange( QCPRange( xmin, xmax ), QCPRange( ymin, ymax ) ); //and span the coordinate range in both key (x) and value (y) dimensions
@@ -40,7 +37,7 @@ struct Plot2D : IPlot2D
 		windowPlots[index]->ui.widget->plotLayout()->addElement( 0, 1, colorScale ); //add it to the right of the main axis rect
 		colorScale->setType( QCPAxis::atRight ); //scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
 		colorMap->setColorScale( colorScale ); //associate the color map with the color scale
-		colorScale->axis()->setLabel( qzlabel ); //add the z value name
+		colorScale->axis()->setLabel( QString::fromStdString( zlabel ) ); //add the z value name
 		colorMap->setGradient( QCPColorGradient::gpJet ); //set the color gradient of the color map to one of the presets
 		QCPMarginGroup *marginGroup = new QCPMarginGroup( windowPlots[index]->ui.widget ); //make sure the axis rect and color scale synchronize their bottom and top margins (so they line up)
 		windowPlots[index]->ui.widget->axisRect()->setMarginGroup( QCP::msBottom | QCP::msTop, marginGroup ); //align plot
