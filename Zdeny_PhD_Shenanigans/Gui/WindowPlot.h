@@ -11,6 +11,7 @@ public:
 	Ui::WindowPlot ui;
 
 private:
+	void closeEvent( QCloseEvent *event );
 
 private slots:
 

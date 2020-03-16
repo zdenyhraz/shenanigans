@@ -5,6 +5,10 @@
 #include "Gui/WindowPlot.h"
 #include "plotterqt.h"
 
+// TODO:
+// plot with just Z and "name" parameter - similar to showimg() - if "name" already exists, then just update it
+// free up resources when window is closed - callback? delete from vec n shit
+
 struct Plot2D : IPlot2D
 {
 	std::vector<WindowPlot *> windowPlots;
@@ -16,8 +20,7 @@ struct Plot2D : IPlot2D
 
 	inline ~Plot2D()
 	{
-		//delete windowPlots[index];//destroy WindowPlot
-		//windowPlots->erase(windowPlots->begin() + index);//remove from vector of WindowPlot*
+
 	}
 
 	inline void plot( const std::vector<std::vector<double>> &z, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1 ) override

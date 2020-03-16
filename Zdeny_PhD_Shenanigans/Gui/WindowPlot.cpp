@@ -3,9 +3,14 @@
 
 WindowPlot::WindowPlot() : QMainWindow()
 {
-	ui.setupUi(this);
+	ui.setupUi( this );
 }
 
 WindowPlot::~WindowPlot()
 {
+}
+
+void WindowPlot::closeEvent( QCloseEvent *event )
+{
+
 }

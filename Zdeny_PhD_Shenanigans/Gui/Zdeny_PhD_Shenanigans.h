@@ -39,4 +39,5 @@ private slots:
 	void playSnake();
 	void generateLand();
 	void fitsDownloader();
+	void closeEvent( QCloseEvent *event );
 };
