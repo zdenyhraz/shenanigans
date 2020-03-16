@@ -9,9 +9,9 @@ public:
 	WindowPlot( std::function<void( WindowPlot * )> &OnClose );
 	~WindowPlot();
 	Ui::WindowPlot ui;
-	std::shared_ptr<QCPColorMap> colorMap;
-	std::shared_ptr<QCPColorScale> colorScale;
-	std::shared_ptr<QCPMarginGroup> marginGroup;
+	QCPColorMap *colorMap;
+	QCPColorScale *colorScale;
+	QCPMarginGroup *marginGroup;
 
 private:
 	std::function<void( WindowPlot * )> &OnClose;
