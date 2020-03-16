@@ -77,8 +77,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		IPCsettings set = *globals->IPCset;
 		set.setSize( 1000, 1000 );
 		set.setBandpassParameters( 5, 1 );
-		globals->plot2D->plot( matToVect2( set.bandpass ), "x", "y", "z", 0, 1, 0, 1 );
-		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
+		Plot2D::plot( set.bandpass, "x", "y", "z", 0, 1, 0, 1 );
 	}
 	if ( 0 ) //2pic IPC
 	{
@@ -112,7 +111,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			}
 		}
 
-		globals->plot2D->plot( Z );
+		Plot2D::plot( Z, "xx", "yy", "nice graph xdd" );
 	}
 
 	LOG_INFO( "Debug finished." );
