@@ -111,7 +111,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			}
 		}
 
-		Plot2D::plot( Z, "xx", "yy", "nice graph xdd" );
+		Plot2D::plot( Z, "x", "y", "nice graph xdd" );
 	}
 
 	LOG_INFO( "Debug finished." );

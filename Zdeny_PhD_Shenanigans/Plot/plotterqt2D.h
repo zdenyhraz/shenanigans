@@ -64,5 +64,4 @@ inline static void plot( const Mat &z, std::string xlabel = "x", std::string yla
 	return plot( matToVect2( z ), xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax, savepath );
 }
 
-
 };

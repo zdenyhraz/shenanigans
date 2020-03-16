@@ -9,6 +9,11 @@ public:
 	WindowPlot( std::function<void( WindowPlot * )> &OnClose );
 	~WindowPlot();
 	Ui::WindowPlot ui;
+
+	//Plot1D
+
+
+	//Plot2D
 	QCPColorMap *colorMap;
 	QCPColorScale *colorScale;
 	QCPMarginGroup *marginGroup;
