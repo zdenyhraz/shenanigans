@@ -25,7 +25,8 @@ struct IPlot1D
 
 struct IPlot2D
 {
-	inline virtual void plot( const std::vector<std::vector<double>> &z, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1,
-	                          double ymin = 0, double ymax = 1 ) = 0;
+	inline virtual void plot( const std::vector<std::vector<double>> &z, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1 ) = 0;
+
+	inline virtual void clear() = 0;
 	inline virtual void save( std::string path, int index ) = 0;
 };

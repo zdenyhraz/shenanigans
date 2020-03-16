@@ -10,12 +10,12 @@ public:
 	IPCsettings *IPCset;
 	QCustomPlot *widget1;
 	QCustomPlot *widget2;
-	Plotter2D *plotter2D;
+	Plot2D *plotter2D;
 
 	Globals()
 	{
 		IPCset = new IPCsettings( 100, 100, 5, 20 );
-		plotter2D = new Plotter2D();
+		plotter2D = new Plot2D();
 		logger = new Logger();
 	}
 private:
