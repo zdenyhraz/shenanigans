@@ -80,7 +80,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		globals->plotter2D->plot( matToVect2( set.bandpass ), "x", "y", "z", 0, 1, 0, 1 );
 		//globals->plotter2D->save("D:\\MainOutput\\Debug\\plot2D.png", 1);
 	}
-	if ( 1 ) //2pic IPC
+	if ( 0 ) //2pic IPC
 	{
 		std::string path1 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
 		std::string path2 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
@@ -97,6 +97,11 @@ void Zdeny_PhD_Shenanigans::debug()
 		set.setSize( img1.rows, img1.cols );
 
 		auto shifts = phasecorrel( img1, img2, set );
+	}
+	if ( 1 )
+	{
+		Plot2D plt( );
+
 	}
 
 	LOG_EVENT( "Debug finished." );
