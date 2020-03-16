@@ -12,5 +12,5 @@ WindowPlot::~WindowPlot()
 
 void WindowPlot::closeEvent( QCloseEvent *event )
 {
-
+	//delete this;
 }
