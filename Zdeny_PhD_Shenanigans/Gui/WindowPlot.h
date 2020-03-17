@@ -8,14 +8,9 @@ class WindowPlot : public QMainWindow
 public:
 	WindowPlot( std::string name, std::function<void( std::string )> &OnClose );
 	~WindowPlot();
-	Ui::WindowPlot ui;
-
 	void Clear();
 
-	//Plot1Di
-
-
-	//Plot2D
+	Ui::WindowPlot ui;
 	QCPColorMap *colorMap;
 	QCPColorScale *colorScale;
 	QCPMarginGroup *marginGroup;

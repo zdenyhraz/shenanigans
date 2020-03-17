@@ -17,7 +17,7 @@ struct Plot1Di : IPlot1D
 		widget->yAxis->setTickLabelFont( fontTicks );
 		widget->xAxis->setLabelFont( fontLabels );
 		widget->yAxis->setLabelFont( fontLabels );
-		widget->graph( 0 )->setPen( plotPen );
+		widget->graph( 0 )->setPen( plotPens1D[0] );
 		widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom );
 	};
 
@@ -28,7 +28,7 @@ struct Plot1Di : IPlot1D
 		widget->yAxis2->setLabel( ylabel2 );
 		widget->yAxis2->setTickLabelFont( fontTicks );
 		widget->yAxis2->setLabelFont( fontLabels );
-		widget->graph( 1 )->setPen( plotPen2 );
+		widget->graph( 1 )->setPen( plotPens1D[1] );
 		widget->legend->setVisible( true );
 		widget->axisRect()->insetLayout()->setInsetAlignment( 0, Qt::AlignBottom | Qt::AlignRight );
 		widget->graph( 0 )->setName( ylabel1 );
@@ -44,8 +44,8 @@ struct Plot1Di : IPlot1D
 			if ( i )
 				widget->addGraph();
 
-			if ( i < plotPens.size() )
-				widget->graph( i )->setPen( plotPens[i] );
+			if ( i < plotPens1D.size() )
+				widget->graph( i )->setPen( plotPens1D[i] );
 			else
 				widget->graph( i )->setPen( QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
 
@@ -57,13 +57,13 @@ struct Plot1Di : IPlot1D
 		widget->legend->setVisible( true );
 	}
 
-	inline void setAxisNames( std::string xlabel, std::string ylabel ) override
+	inline void setAxisNames( std::string xlabel, std::string ylabel )
 	{
 		widget->xAxis->setLabel( QString::fromStdString( xlabel ) );
 		widget->yAxis->setLabel( QString::fromStdString( ylabel ) );
 	}
 
-	inline void setAxisNames( std::string xlabel, std::string ylabel1, std::string ylabel2 ) override
+	inline void setAxisNames( std::string xlabel, std::string ylabel1, std::string ylabel2 )
 	{
 		widget->xAxis->setLabel( QString::fromStdString( xlabel ) );
 		widget->yAxis->setLabel( QString::fromStdString( ylabel1 ) );
@@ -72,7 +72,7 @@ struct Plot1Di : IPlot1D
 			setupSecondGraph( QString::fromStdString( ylabel1 ), QString::fromStdString( ylabel2 ) );
 	}
 
-	inline void setAxisNames( std::string xlabel, std::string ylabel, std::vector<std::string> ylabels ) override
+	inline void setAxisNames( std::string xlabel, std::string ylabel, std::vector<std::string> ylabels )
 	{
 		widget->xAxis->setLabel( QString::fromStdString( xlabel ) );
 		widget->yAxis->setLabel( QString::fromStdString( ylabel ) );
@@ -80,7 +80,7 @@ struct Plot1Di : IPlot1D
 			setupMultipleGraph( ylabels );
 	}
 
-	inline void plot( const std::vector<double> &y ) override
+	inline void plot( const std::vector<double> &y )
 	{
 		std::vector<double> iotam( y.size() );
 		std::iota( iotam.begin(), iotam.end(), 0 );
@@ -89,14 +89,14 @@ struct Plot1Di : IPlot1D
 		widget->replot();
 	}
 
-	inline void plot( const std::vector<double> &x, const std::vector<double> &y ) override
+	inline void plot( const std::vector<double> &x, const std::vector<double> &y )
 	{
 		widget->graph( 0 )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y ) );
 		widget->rescaleAxes();
 		widget->replot();
 	}
 
-	inline void plot( const std::vector<double> &x, const std::vector<double> &y1, const std::vector<double> &y2 ) override
+	inline void plot( const std::vector<double> &x, const std::vector<double> &y1, const std::vector<double> &y2 )
 	{
 		widget->graph( 0 )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y1 ) );
 		widget->graph( 1 )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y2 ) );
@@ -104,7 +104,7 @@ struct Plot1Di : IPlot1D
 		widget->replot();
 	}
 
-	inline void plot( const std::vector<double> &x, const std::vector<std::vector<double>> &ys ) override
+	inline void plot( const std::vector<double> &x, const std::vector<std::vector<double>> &ys )
 	{
 		for ( int i = 0; i < ys.size(); i++ )
 		{
@@ -114,14 +114,14 @@ struct Plot1Di : IPlot1D
 		widget->replot();
 	}
 
-	inline void plot( const double x, const double y ) override
+	inline void plot( const double x, const double y )
 	{
 		widget->graph( 0 )->addData( x, y );
 		widget->rescaleAxes();
 		widget->replot();
 	}
 
-	inline void plot( const double x, const double y1, const double y2 ) override
+	inline void plot( const double x, const double y1, const double y2 )
 	{
 		widget->graph( 0 )->addData( x, y1 );
 		widget->graph( 1 )->addData( x, y2 );
@@ -129,14 +129,14 @@ struct Plot1Di : IPlot1D
 		widget->replot();
 	}
 
-	inline void clear( bool second ) override
+	inline void clear( bool second )
 	{
 		widget->graph( 0 )->data()->clear();
 		if ( second )
 			widget->graph( 1 )->data()->clear();
 	}
 
-	inline void save( std::string path ) override
+	inline void save( std::string path )
 	{
 		widget->savePng( QString::fromStdString( path ), 0, 0, 3, -1 );
 	}

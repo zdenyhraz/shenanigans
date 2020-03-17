@@ -18,7 +18,7 @@ std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 	}
 };
 
-void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, double xmin, double xmax, std::string savepath )
+void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::string savepath )
 {
 	WindowPlot *windowPlot;
 
@@ -55,13 +55,15 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 		{
 			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis );
 			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y1s[i] ) );
+			windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y1names[i] ) );
 		}
 		else
 		{
 			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis2 );
 			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y2s[i - y1cnt] ) );
+			windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y2names[i - y1cnt] ) );
 		}
-		windowPlot->ui.widget->graph( i )->setPen( plotPens[i] );
+		windowPlot->ui.widget->graph( i )->setPen( plotPens1D[i] );
 	}
 
 	windowPlot->ui.widget->rescaleAxes();
