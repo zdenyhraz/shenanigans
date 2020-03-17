@@ -119,12 +119,12 @@ double absoluteSubpixelRegistrationError( IPCsettings &set, const Mat &src, doub
 
 double IPCparOptFun( std::vector<double> &args, const IPCsettings &settingsMaster, const Mat &source, double noisestddev, double maxShift, double accuracy );
 
-void optimizeIPCParameters( const IPCsettings &settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs, IPlot1D *plt );
+void optimizeIPCParameters( const IPCsettings &settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs );
 
 void optimizeIPCParametersForAllWavelengths( const IPCsettings &settingsMaster, double maxShift, double accuracy, unsigned runs );
 
 DiffrotResults2 calculateDiffrotProfile( const IPCsettings &IPC_settings, FitsTime &FITS_time, int itersPic, int itersX, int itersY, int medianiters, int strajdPic, int deltaPic,
-        int verticalFov, int deltasec, IPlot1D *pltX, IPlot1D *pltY );
+        int verticalFov, int deltasec );
 
 std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calculateLinearSwindFlow( const IPCsettings &set, std::string path, double SwindCropFocusX,
         double SwindCropFocusY );
@@ -133,11 +133,11 @@ std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> calcul
         double SwindCropFocusY );
 
 double DiffrotMerritFunction( const IPCsettings &set, const std::vector<std::pair<FitsImage, FitsImage>> &pics, int itersX, int itersY, int itersMedian, int strajdPic,
-                              int deltaPic, int verticalFov, int deltaSec, IPlot1D *pltX = nullptr );
+                              int deltaPic, int verticalFov, int deltaSec );
 
 double DiffrotMerritFunctionWrapper( std::vector<double> &arg, const std::vector<std::pair<FitsImage, FitsImage>> &pics, int itersX, int itersY, int itersMedian, int strajdPic,
-                                     int deltaPic, int verticalFov, int deltaSec, IPlot1D *pltX = nullptr );
+                                     int deltaPic, int verticalFov, int deltaSec );
 
 double DiffrotMerritFunctionWrapper2( std::vector<double> &arg, const std::vector<std::pair<FitsImage, FitsImage>> &pics, int itersX, int itersY, int itersMedian, int strajdPic,
-                                      int deltaPic, int verticalFov, int deltaSec, IPlot1D *pltX = nullptr );
+                                      int deltaPic, int verticalFov, int deltaSec );
 
