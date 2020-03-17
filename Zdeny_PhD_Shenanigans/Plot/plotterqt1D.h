@@ -3,7 +3,7 @@
 #include "qcustomplot.h"
 #include "plotter.h"
 #include "Gui/WindowPlot.h"
-#include "plotterqt.h"
+#include "Plot.h"
 
 struct Plot1D : IPlot1D
 {
