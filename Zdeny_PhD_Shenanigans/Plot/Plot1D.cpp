@@ -18,7 +18,7 @@ std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 	}
 };
 
-void Plot1D::plot( const std::vector<double> &y, std::string name, std::string xlabel, std::string ylabel, double xmin, double xmax, std::string savepath )
+void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, double xmin, double xmax, std::string savepath )
 {
 	WindowPlot *windowPlot;
 
@@ -36,19 +36,34 @@ void Plot1D::plot( const std::vector<double> &y, std::string name, std::string x
 	}
 	plots[name] = windowPlot;
 
-	windowPlot->ui.widget->addGraph();
 	windowPlot->ui.widget->xAxis->setTickLabelFont( fontTicks );
 	windowPlot->ui.widget->yAxis->setTickLabelFont( fontTicks );
+	windowPlot->ui.widget->yAxis2->setTickLabelFont( fontTicks );
 	windowPlot->ui.widget->xAxis->setLabelFont( fontLabels );
 	windowPlot->ui.widget->yAxis->setLabelFont( fontLabels );
-	windowPlot->ui.widget->graph( 0 )->setPen( plotPen );
+	windowPlot->ui.widget->yAxis2->setLabelFont( fontLabels );
 	windowPlot->ui.widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom );
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) );
-	windowPlot->ui.widget->yAxis->setLabel( QString::fromStdString( ylabel ) );
+	windowPlot->ui.widget->yAxis->setLabel( QString::fromStdString( y1label ) );
+	windowPlot->ui.widget->yAxis2->setLabel( QString::fromStdString( y2label ) );
+	int y1cnt = y1s.size();
+	int y2cnt = y2s.size();
+	int ycnt = y1cnt + y2cnt;
+	for ( int i = 0 ; i < ycnt; i++ )
+	{
+		if ( i < y1cnt )
+		{
+			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis );
+			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y1s[i] ) );
+		}
+		else
+		{
+			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis2 );
+			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y2s[i - y1cnt] ) );
+		}
+		windowPlot->ui.widget->graph( i )->setPen( plotPens[i] );
+	}
 
-	std::vector<double> iotam( y.size() );
-	std::iota( iotam.begin(), iotam.end(), 0 );
-	windowPlot->ui.widget->graph( 0 )->setData( QVector<double>::fromStdVector( iotam ), QVector<double>::fromStdVector( y ) );
 	windowPlot->ui.widget->rescaleAxes();
 	windowPlot->ui.widget->replot();
 	windowPlot->show();
