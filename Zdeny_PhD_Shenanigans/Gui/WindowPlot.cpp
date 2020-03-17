@@ -12,13 +12,9 @@ WindowPlot::~WindowPlot()
 
 void WindowPlot::Clear()
 {
+	ui.widget->clearItems();
 	ui.widget->clearGraphs();
 	ui.widget->clearPlottables();
-	ui.widget->clearItems();
-
-	delete colorMap;
-	delete colorScale;
-	delete marginGroup;
 }
 
 void WindowPlot::closeEvent( QCloseEvent *event )
