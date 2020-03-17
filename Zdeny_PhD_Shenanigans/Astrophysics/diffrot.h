@@ -29,8 +29,6 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 
 std::vector<double> thetaFit( const std::vector<double> &omegas, const std::vector<double> &thetas );
 
-void drplot( const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs, const std::vector<double> &shiftsX );
-
 void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size );
 
 void filterShiftsMOVAVG( std::vector<double> &shiftsX, int size );

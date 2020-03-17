@@ -66,7 +66,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavg = meanVertical( omegasX2D );
 			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
-			drplot( thetas, omegasX, omegasXavg, omegasXavgfit, predicXs, shiftsX );
+			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shifts"} );
+			Plot2D::plot( matFromVector( omegasX2D, true ), "diffrot2D", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, 1, 0, 1 );
 		}
 	}
 
@@ -101,11 +102,6 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
 		// etc...
 	}
-}
-
-void drplot( const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs, const std::vector<double> &shiftsX )
-{
-	Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shifts"} );
 }
 
 void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size )

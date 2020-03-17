@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>622</width>
-    <height>286</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="cursor">
@@ -20,9 +20,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>4</x>
-      <y>218</y>
-      <width>249</width>
+      <x>17</x>
+      <y>211</y>
+      <width>181</width>
       <height>31</height>
      </rect>
     </property>
@@ -78,8 +78,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>33</x>
-      <y>32</y>
+      <x>14</x>
+      <y>29</y>
       <width>185</width>
       <height>185</height>
      </rect>
@@ -93,7 +93,7 @@
      <rect>
       <x>6</x>
       <y>2</y>
-      <width>238</width>
+      <width>202</width>
       <height>25</height>
      </rect>
     </property>
@@ -133,7 +133,7 @@
      <x>0</x>
      <y>0</y>
      <width>622</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
