@@ -10,13 +10,6 @@ WindowPlot::~WindowPlot()
 {
 }
 
-void WindowPlot::Clear()
-{
-	ui.widget->clearItems();
-	ui.widget->clearGraphs();
-	ui.widget->clearPlottables();
-}
-
 void WindowPlot::closeEvent( QCloseEvent *event )
 {
 	OnClose( name );

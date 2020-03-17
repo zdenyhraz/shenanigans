@@ -10,6 +10,8 @@ public:
 
 	static void CloseAll();
 
+	static void SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names );
+
 	static void plot( const std::vector<double> &y, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string savepath = "" )
 	{
 		std::vector<double> x( y.size() );

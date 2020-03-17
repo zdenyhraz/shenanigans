@@ -45,20 +45,6 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
-	if ( 0 ) //1D plot
-	{
-		int n = 10001;
-		auto x = zerovect( n );
-		auto y = zerovect( n );
-		for ( int i = 0; i < n; i++ )
-		{
-			x[i] = ( double )i / ( n - 1 );
-			y[i] = sin( 2 * Constants::Pi * x[i] );
-		}
-
-		Plot1Di plt( ui.widget );
-		plt.plot( x, y );
-	}
 	if ( 0 ) //plot in optimization
 	{
 		Evolution Evo( 2 );
@@ -97,29 +83,13 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel( img1, img2, set );
 	}
-	if ( 0 ) //Plot2D test
+	if ( 1 ) //Plot1D + Plot2D test
 	{
-		int Ny = 1000;
-		int Nx = 1000;
-		auto Z = zerovect2( Ny, Nx );
-
-		for ( int y = 0; y < Ny; y++ )
-		{
-			for ( int x = 0; x < Nx; x++ )
-			{
-				Z[y][x] = rand();
-			}
-		}
-
-		Plot2D::plot( Z, "niceplot", "x", "y", "z" );
-	}
-	if ( 1 ) //Plot1D test
-	{
+		// 1D
 		int N = 1000;
 		auto X = zerovect( N );
 		auto Y1s = zerovect2( 3, N );
 		auto Y2s = zerovect2( 2, N );
-
 		double s1 = randunit();
 		double s2 = randunit();
 		double s3 = randunit();
@@ -136,8 +106,21 @@ void Zdeny_PhD_Shenanigans::debug()
 			Y2s[1][x] = s2 * 0.5 * cos( Constants::TwoPi * ( double )x / N );
 		}
 
-		//Plot1D::plot( X, Y1s, Y2s, "very nice plot", "x", "y1", "y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
-		Plot1D::plot( X, Y1s, Y2s, "very nice plot" );
+		// 2D
+		int Ny = 1000;
+		int Nx = 1000;
+		auto Z = zerovect2( Ny, Nx );
+
+		for ( int y = 0; y < Ny; y++ )
+		{
+			for ( int x = 0; x < Nx; x++ )
+			{
+				Z[y][x] = rand();
+			}
+		}
+
+		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
+		Plot2D::plot( Z, "niceplot", "X", "Y", "Z" );
 	}
 
 	LOG_INFO( "Debug finished." );
