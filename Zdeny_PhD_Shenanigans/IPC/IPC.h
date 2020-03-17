@@ -5,7 +5,7 @@
 #include "Fourier/fourier.h"
 #include "Astrophysics/FITS.h"
 #include "Filtering/filtering.h"
-#include "Plot/plotter.h"
+#include "Plot/IPlot1D.h"
 #include "Log/logger.h"
 
 using namespace std;

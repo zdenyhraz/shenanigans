@@ -2,7 +2,7 @@
 #include "WindowIPCoptimize.h"
 #include "WindowIPCparameters.h"
 #include "Astrophysics/functionsAstro.h"
-#include "Plot/plotterqt1D.h"
+#include "Plot/Plot1D.h"
 
 WindowIPCoptimize::WindowIPCoptimize( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {
