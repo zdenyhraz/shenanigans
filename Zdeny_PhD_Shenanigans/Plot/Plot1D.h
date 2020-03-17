@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "qcustomplot.h"
-#include "plotter.h"
+#include "IPlot1D.h"
 #include "Gui/WindowPlot.h"
 #include "Plot.h"
 

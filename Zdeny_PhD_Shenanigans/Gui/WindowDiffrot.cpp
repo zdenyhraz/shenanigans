@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
-#include "Plot/plotterqt1D.h"
+#include "Plot/Plot1D.h"
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {
