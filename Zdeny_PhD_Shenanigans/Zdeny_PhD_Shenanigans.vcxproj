@@ -125,7 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
-    <ClCompile Include="Plot\Plotter2D.cpp" />
+    <ClCompile Include="Plot\Plot2D.cpp" />
     <ClCompile Include="Plot\qcustomplot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</PrecompiledHeaderFile>
@@ -170,7 +170,7 @@
     <ClInclude Include="Plot\plotter.h" />
     <ClInclude Include="Plot\plotterqt.h" />
     <ClInclude Include="Plot\plotterqt1D.h" />
-    <ClInclude Include="Plot\plotterqt2D.h" />
+    <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="Snake\game.h" />

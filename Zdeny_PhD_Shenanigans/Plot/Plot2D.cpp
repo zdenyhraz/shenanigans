@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "plotterqt2D.h"
+#include "Plot2D.h"
 
 std::map<std::string, WindowPlot *> Plot2D::plots;
 
@@ -18,12 +18,7 @@ std::function<void( std::string )> Plot2D::OnClose = []( std::string name )
 	}
 };
 
-void Plot2D::plot( const Mat &z, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1, std::string savepath = "" )
-{
-	return plot( matToVect2( z ), name, xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax, savepath );
-}
-
-void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string zlabel = "z", double xmin = 0, double xmax = 1, double ymin = 0, double ymax = 1, std::string savepath = "" )
+void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, std::string savepath )
 {
 	WindowPlot *windowPlot;
 
@@ -85,3 +80,4 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 
 	plots[name] = windowPlot;
 }
+
