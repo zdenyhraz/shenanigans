@@ -29,25 +29,45 @@ void Plot1D::CloseAll()
 
 void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::string savepath )
 {
-	WindowPlot *windowPlot;
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
 	int ycnt = y1cnt + y2cnt;
 
+	WindowPlot *windowPlot;
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
 		LOG_DEBUG( "Updating 1Dplot '{}'", name );
 		windowPlot = idx->second;
-		windowPlot->Clear();
+		for ( int i = 0; i < windowPlot->ui.widget->graphCount(); i++ )
+			windowPlot->ui.widget->graph( i )->data().clear();
 	}
 	else
 	{
 		LOG_DEBUG( "Creating 1Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
+		plots[name] = windowPlot;
+		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
 	}
-	plots[name] = windowPlot;
 
+	for ( int i = 0; i < ycnt; i++ )
+	{
+		if ( i < y1cnt )
+			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y1s[i] ) );
+		else
+			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y2s[i - y1cnt] ) );
+	}
+
+	windowPlot->ui.widget->rescaleAxes();
+	windowPlot->ui.widget->replot();
+	windowPlot->show();
+
+	if ( savepath != "" )
+		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
+}
+
+void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
+{
 	windowPlot->ui.widget->xAxis->setTickLabelFont( fontTicks );
 	windowPlot->ui.widget->yAxis->setTickLabelFont( fontTicks );
 	windowPlot->ui.widget->yAxis2->setTickLabelFont( fontTicks );
@@ -60,13 +80,11 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 	windowPlot->ui.widget->yAxis2->setLabel( QString::fromStdString( y2label ) );
 	windowPlot->ui.widget->legend->setVisible( true );
 	windowPlot->ui.widget->axisRect()->insetLayout()->setInsetAlignment( 0, Qt::AlignBottom | Qt::AlignRight );
-
-	for ( int i = 0 ; i < ycnt; i++ )
+	for ( int i = 0; i < ycnt; i++ )
 	{
 		if ( i < y1cnt )
 		{
 			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis );
-			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y1s[i] ) );
 			if ( y1names.size() > i )
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y1names[i] ) );
 			else
@@ -75,7 +93,6 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 		else
 		{
 			windowPlot->ui.widget->addGraph( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis2 );
-			windowPlot->ui.widget->graph( i )->setData( QVector<double>::fromStdVector( x ), QVector<double>::fromStdVector( y2s[i - y1cnt] ) );
 			if ( y2names.size() > i - y1cnt )
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y2names[i - y1cnt] ) );
 			else
@@ -90,14 +107,4 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 
 	if ( y2cnt > 0 )
 		windowPlot->ui.widget->yAxis2->setVisible( true );
-
-	windowPlot->ui.widget->rescaleAxes();
-	windowPlot->ui.widget->replot();
-	windowPlot->show();
-
-	if ( savepath != "" )
-	{
-		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
-	}
 }
-

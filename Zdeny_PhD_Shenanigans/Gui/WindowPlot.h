@@ -8,7 +8,6 @@ class WindowPlot : public QMainWindow
 public:
 	WindowPlot( std::string name, std::function<void( std::string )> &OnClose );
 	~WindowPlot();
-	void Clear();
 
 	Ui::WindowPlot ui;
 	QCPColorMap *colorMap;
