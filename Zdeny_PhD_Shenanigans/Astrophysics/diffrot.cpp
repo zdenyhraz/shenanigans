@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "diffrot.h"
+#include "Plot/Plot1D.h"
+#include "Plot/Plot2D.h"
 
 DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset )
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
-
-	//plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"} );
-	//plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", "theta[deg]" );
-
 	std::vector<std::vector<double>> thetas2D;
 	std::vector<std::vector<double>> omegasX2D;
 	std::vector<std::vector<double>> predicX2D;
@@ -20,9 +18,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	std::vector<double> omegasXavg( drset.ys );
 	std::vector<double> omegasXavgfit( drset.ys );
-
-	std::vector<double> iotam( drset.ys );
-	std::iota( iotam.begin(), iotam.end(), 0 );
 
 	thetas2D.reserve( drset.pics );
 	omegasX2D.reserve( drset.pics );
@@ -71,8 +66,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavg = meanVertical( omegasX2D );
 			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
-			drplot1( thetas, omegasX, omegasXavg, omegasXavgfit, predicXs );
-			drplot2( iotam, shiftsX, thetas );
+			drplot( thetas, omegasX, omegasXavg, omegasXavgfit, predicXs, shiftsX );
 		}
 	}
 
@@ -109,14 +103,9 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 }
 
-void drplot1( const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
+void drplot( const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs, const std::vector<double> &shiftsX )
 {
-	//plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]} );
-}
-
-void drplot2( const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
-{
-	//plt2->plot( iotam, shiftsX, ( 360. / Constants::TwoPi ) * thetas );
+	Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shifts"} );
 }
 
 void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size )
