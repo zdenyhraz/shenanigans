@@ -54,9 +54,9 @@ struct Timerrr//benchmarking struct
 
 enum class Norm : char { L1, L2 };
 
-inline float randunit()
+inline double randunit()
 {
-	return ( float )rand() / RAND_MAX;
+	return ( double )rand() / RAND_MAX;
 }
 
 inline std::vector<double> zerovect( int N, double value = 0 )

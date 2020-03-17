@@ -60,6 +60,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	windowPlot->ui.widget->yAxis->setLabelFont( fontLabels );
 	windowPlot->ui.widget->yAxis->setRangeReversed( true );
 	windowPlot->colorScale->axis()->setLabelFont( fontLabels );
+
 	for ( int xIndex = 0; xIndex < z[0].size(); ++xIndex )
 	{
 		for ( int yIndex = 0; yIndex < z.size(); ++yIndex )
@@ -67,6 +68,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[yIndex][xIndex] );
 		}
 	}
+
 	windowPlot->colorMap->rescaleDataRange();//rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
 	windowPlot->ui.widget->rescaleAxes();
 	windowPlot->colorScale->rescaleDataRange( 0 );

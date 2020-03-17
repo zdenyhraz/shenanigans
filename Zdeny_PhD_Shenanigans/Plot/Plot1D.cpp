@@ -21,6 +21,9 @@ std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::string savepath )
 {
 	WindowPlot *windowPlot;
+	int y1cnt = y1s.size();
+	int y2cnt = y2s.size();
+	int ycnt = y1cnt + y2cnt;
 
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
@@ -48,9 +51,6 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 	windowPlot->ui.widget->yAxis2->setLabel( QString::fromStdString( y2label ) );
 	windowPlot->ui.widget->legend->setVisible( true );
 	windowPlot->ui.widget->axisRect()->insetLayout()->setInsetAlignment( 0, Qt::AlignBottom | Qt::AlignRight );
-	int y1cnt = y1s.size();
-	int y2cnt = y2s.size();
-	int ycnt = y1cnt + y2cnt;
 
 	for ( int i = 0 ; i < ycnt; i++ )
 	{
@@ -76,9 +76,8 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 		if ( plotPens1D.size() > i )
 			windowPlot->ui.widget->graph( i )->setPen( plotPens1D[i] );
 		else
-			windowPlot->ui.widget->graph( i )->setPen( plotPens1D[0] );
+			windowPlot->ui.widget->graph( i )->setPen( plotPens1D[1] );
 	}
-
 
 	if ( y2cnt > 0 )
 		windowPlot->ui.widget->yAxis2->setVisible( true );
