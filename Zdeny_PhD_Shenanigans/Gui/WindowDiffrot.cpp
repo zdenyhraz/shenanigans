@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
-#include "Plot/Plot1D.h"
+#include "Plot/Plot1DImpl.h"
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {
@@ -18,8 +18,8 @@ void WindowDiffrot::calculateDiffrot()
 {
 	LOG_INFO( "Calculating diffrot profile..." );
 	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
-	Plot1D pltX( globals->widget1 );
-	Plot1D pltY( globals->widget2 );
+	Plot1Di pltX( globals->widget1 );
+	Plot1Di pltY( globals->widget2 );
 	//*diffrotResults = calculateDiffrotProfile(*globals->IPCset, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(),  &pltX, &pltY);
 
 	DiffrotSettings drset;
@@ -64,8 +64,7 @@ void WindowDiffrot::showIPC()
 void WindowDiffrot::optimizeDiffrot()
 {
 	FitsParams params1, params2;
-	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(),
-	                   ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	std::vector<int> sizes{ 16, 32, 64, 128 };
 	std::string path = "D:\\MainOutput\\diffrot\\diffrotIPCopt.csv";
 	std::ofstream listing( path, std::ios::out | std::ios::trunc ); //just delete
@@ -74,7 +73,7 @@ void WindowDiffrot::optimizeDiffrot()
 		LOG_INFO( "Optimizing IPC parameters for diffrot profile measurement " + to_string( size ) + "x" + to_string( size ) + "..." );
 		IPCsettings set = *globals->IPCset;
 		set.setSize( size, size );
-		Plot1D *plt = new Plot1D( globals->widget1 );
+		Plot1Di *plt = new Plot1Di( globals->widget1 );
 		optimizeIPCParameters( set, fitsTime.path(), path, 5, 0.01, 3,  plt );
 		delete plt;
 	}
@@ -99,8 +98,8 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Evo.mutStrat = Evolution::MutationStrategy::BEST1;
 
 	LOG_INFO( "Super optimizing diffrot profile..." );
-	Plot1D *plt1 = new Plot1D( globals->widget1 );
-	Plot1D *plt2 = new Plot1D( globals->widget2 );
+	Plot1Di *plt1 = new Plot1Di( globals->widget1 );
+	Plot1Di *plt2 = new Plot1Di( globals->widget2 );
 
 	FitsTime fitsTimeMaster( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(),
 	                         ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );

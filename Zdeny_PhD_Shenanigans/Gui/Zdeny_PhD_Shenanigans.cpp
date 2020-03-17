@@ -56,14 +56,14 @@ void Zdeny_PhD_Shenanigans::debug()
 			y[i] = sin( 2 * Constants::Pi * x[i] );
 		}
 
-		Plot1D plt( ui.widget );
+		Plot1Di plt( ui.widget );
 		plt.plot( x, y );
 	}
 	if ( 0 ) //plot in optimization
 	{
 		Evolution Evo( 2 );
 		Evo.NP = 10;
-		Plot1D plt( ui.widget );
+		Plot1Di plt( ui.widget );
 		auto f = [&]( std::vector<double> args )
 		{
 			std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );

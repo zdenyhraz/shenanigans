@@ -125,6 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
+    <ClCompile Include="Plot\Plot1D.cpp" />
     <ClCompile Include="Plot\Plot2D.cpp" />
     <ClCompile Include="Plot\qcustomplot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -170,6 +171,7 @@
     <ClInclude Include="Plot\IPlot1D.h" />
     <ClInclude Include="Plot\Plot.h" />
     <ClInclude Include="Plot\Plot1D.h" />
+    <ClInclude Include="Plot\Plot1DImpl.h" />
     <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
