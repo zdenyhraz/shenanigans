@@ -18,6 +18,15 @@ std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 	}
 };
 
+void Plot1D::CloseAll()
+{
+	for ( auto &plt : plots )
+	{
+		delete plt.second;
+		plots.erase( plt.first );
+	}
+}
+
 void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::string savepath )
 {
 	WindowPlot *windowPlot;
@@ -61,7 +70,7 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 			if ( y1names.size() > i )
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y1names[i] ) );
 			else
-				windowPlot->ui.widget->graph( i )->setName( "y1" );
+				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( "y1_" + to_string( i + 1 ) ) );
 		}
 		else
 		{
@@ -70,7 +79,7 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 			if ( y2names.size() > i - y1cnt )
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( y2names[i - y1cnt] ) );
 			else
-				windowPlot->ui.widget->graph( i )->setName( "y2" );
+				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( "y2_" + to_string( i - y1cnt + 1 ) ) );
 		}
 
 		if ( plotPens1D.size() > i )

@@ -24,7 +24,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 	//make signal to slot connections
 	connect( ui.actionExit, SIGNAL( triggered() ), this, SLOT( exit() ) );
 	connect( ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL( triggered() ), this, SLOT( about() ) );
-	connect( ui.pushButtonClose, SIGNAL( clicked() ), this, SLOT( closeCV() ) );
+	connect( ui.pushButtonClose, SIGNAL( clicked() ), this, SLOT( CloseAll() ) );
 	connect( ui.actionIPC_parameters, SIGNAL( triggered() ), this, SLOT( showWindowIPCparameters() ) );
 	connect( ui.actionIPC_optimize, SIGNAL( triggered() ), this, SLOT( showWindowIPCoptimize() ) );
 	connect( ui.actionIPC_2pic_align, SIGNAL( triggered() ), this, SLOT( showWindowIPC2PicAlign() ) );
@@ -136,7 +136,8 @@ void Zdeny_PhD_Shenanigans::debug()
 			Y2s[1][x] = s2 * 0.5 * cos( Constants::TwoPi * ( double )x / N );
 		}
 
-		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "x", "y1", "y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
+		//Plot1D::plot( X, Y1s, Y2s, "very nice plot", "x", "y1", "y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
+		Plot1D::plot( X, Y1s, Y2s, "very nice plot" );
 	}
 
 	LOG_INFO( "Debug finished." );
@@ -149,10 +150,12 @@ void Zdeny_PhD_Shenanigans::about()
 	msgBox.exec();
 }
 
-void Zdeny_PhD_Shenanigans::closeCV()
+void Zdeny_PhD_Shenanigans::CloseAll()
 {
 	destroyAllWindows();
-	LOG_INFO( "All image windows closed" );
+	Plot1D::CloseAll();
+	Plot2D::CloseAll();
+	LOG_INFO( "All image & plot windows closed" );
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters()
