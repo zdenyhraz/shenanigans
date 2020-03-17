@@ -107,7 +107,6 @@ void Zdeny_PhD_Shenanigans::debug()
 		{
 			for ( int x = 0; x < Nx; x++ )
 			{
-				//Z[y][x] = ( x - y ) * ( x - y );
 				Z[y][x] = rand();
 			}
 		}
@@ -117,14 +116,23 @@ void Zdeny_PhD_Shenanigans::debug()
 	if ( 1 ) //Plot1D test
 	{
 		int N = 1000;
-		auto Y = zerovect( N );
+		auto X = zerovect( N );
+		auto Y1s = zerovect2( 3, N );
+		auto Y2s = zerovect2( 2, N );
 
 		for ( int x = 0; x < N; x++ )
 		{
-			Y[x] = rand();
+			X[x] = x;
+
+			Y1s[0][x] = 100.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y1s[1][x] = 200.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y1s[2][x] = 500.0 * sin( Constants::TwoPi * ( double )x / N );
+
+			Y2s[0][x] = 1.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y2s[1][x] = 0.5 * sin( Constants::TwoPi * ( double )x / N );
 		}
 
-		Plot1D::plot( Y, "niceplot", "x", "y" );
+		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "x", "y1", "y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
 	}
 
 	LOG_INFO( "Debug finished." );
