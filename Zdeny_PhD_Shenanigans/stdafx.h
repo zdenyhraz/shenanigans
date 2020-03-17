@@ -44,4 +44,5 @@
 #include "Core/macros.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
+#include "Log/logger.h"
 

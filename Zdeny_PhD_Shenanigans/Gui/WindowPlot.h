@@ -6,9 +6,11 @@ class WindowPlot : public QMainWindow
 	Q_OBJECT
 
 public:
-	WindowPlot( std::function<void( WindowPlot * )> &OnClose );
+	WindowPlot( std::string name, std::function<void( std::string )> &OnClose );
 	~WindowPlot();
 	Ui::WindowPlot ui;
+
+	void Clear();
 
 	//Plot1D
 
@@ -19,8 +21,9 @@ public:
 	QCPMarginGroup *marginGroup;
 
 private:
-	std::function<void( WindowPlot * )> &OnClose;
+	std::function<void( std::string )> &OnClose;
 	void closeEvent( QCloseEvent *event );
+	std::string name;
 
 private slots:
 

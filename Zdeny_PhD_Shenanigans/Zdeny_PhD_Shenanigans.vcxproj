@@ -125,6 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
+    <ClCompile Include="Plot\Plotter2D.cpp" />
     <ClCompile Include="Plot\qcustomplot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</PrecompiledHeaderFile>
