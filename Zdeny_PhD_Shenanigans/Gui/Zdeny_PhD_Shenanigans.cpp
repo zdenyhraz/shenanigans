@@ -120,16 +120,20 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto Y1s = zerovect2( 3, N );
 		auto Y2s = zerovect2( 2, N );
 
+		double s1 = randunit();
+		double s2 = randunit();
+		double s3 = randunit();
+
 		for ( int x = 0; x < N; x++ )
 		{
 			X[x] = x;
 
-			Y1s[0][x] = 100.0 * sin( Constants::TwoPi * ( double )x / N );
-			Y1s[1][x] = 200.0 * sin( Constants::TwoPi * ( double )x / N );
-			Y1s[2][x] = 500.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y1s[0][x] = s1 * 100.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y1s[1][x] = s2 * 200.0 * sin( Constants::TwoPi * ( double )x / N );
+			Y1s[2][x] = s3 * 500.0 * sin( Constants::TwoPi * ( double )x / N );
 
-			Y2s[0][x] = 1.0 * sin( Constants::TwoPi * ( double )x / N );
-			Y2s[1][x] = 0.5 * sin( Constants::TwoPi * ( double )x / N );
+			Y2s[0][x] = s1 * 1.0 * cos( Constants::TwoPi * ( double )x / N );
+			Y2s[1][x] = s2 * 0.5 * cos( Constants::TwoPi * ( double )x / N );
 		}
 
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "x", "y1", "y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
