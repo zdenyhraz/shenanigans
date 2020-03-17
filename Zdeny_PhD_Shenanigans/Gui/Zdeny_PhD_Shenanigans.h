@@ -5,7 +5,7 @@
 #include "WindowIPC2PicAlign.h"
 #include "WindowDiffrot.h"
 #include "Plot/plotterqt1D.h"
-#include "Plot/plotterqt2D.h"
+#include "Plot/Plot2D.h"
 #include "Log/logger.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
