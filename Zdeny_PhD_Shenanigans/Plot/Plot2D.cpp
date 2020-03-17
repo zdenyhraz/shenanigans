@@ -18,6 +18,15 @@ std::function<void( std::string )> Plot2D::OnClose = []( std::string name )
 	}
 };
 
+void Plot2D::CloseAll()
+{
+	for ( auto &plt : plots )
+	{
+		delete plt.second;
+		plots.erase( plt.first );
+	}
+}
+
 void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, std::string savepath )
 {
 	WindowPlot *windowPlot;

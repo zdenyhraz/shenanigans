@@ -8,6 +8,8 @@ class Plot1D
 {
 public:
 
+	static void CloseAll();
+
 	static void plot( const std::vector<double> &y, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string savepath = "" )
 	{
 		std::vector<double> x( y.size() );

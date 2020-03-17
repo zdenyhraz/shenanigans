@@ -34,7 +34,7 @@ private slots:
 	void showWindowIPCparameters();
 	void showWindowIPCoptimize();
 	void showWindowIPC2PicAlign();
-	void closeCV();
+	void CloseAll();
 	void debug();
 	void showWindowDiffrot();
 	void playSnake();
