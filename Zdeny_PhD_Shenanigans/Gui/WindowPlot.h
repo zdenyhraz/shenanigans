@@ -12,7 +12,7 @@ public:
 
 	void Clear();
 
-	//Plot1D
+	//Plot1Di
 
 
 	//Plot2D

@@ -130,6 +130,9 @@
     <ClCompile Include="Plot\Plot2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Plot\Plot1D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -214,6 +217,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plot\IPlot1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\Plot1DImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plot\Plot1D.h">

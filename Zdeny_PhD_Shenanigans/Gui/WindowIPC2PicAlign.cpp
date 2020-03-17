@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowIPC2PicAlign.h"
 #include "Astrophysics/functionsAstro.h"
-#include "Plot/Plot1D.h"
+#include "Plot/Plot1DImpl.h"
 #include "Plot/Plot2D.h"
 #include "IPC/ipcAux.h"
 
@@ -118,7 +118,7 @@ void WindowIPC2PicAlign::linearFlow()
 	auto xshifts = std::get<0>( xyi );
 	auto yshifts = std::get<1>( xyi );
 	auto indices = std::get<2>( xyi );
-	Plot1D plt( globals->widget1 );
+	Plot1Di plt( globals->widget1 );
 	plt.setAxisNames( "picture index", "pixel shift X", "pixel shift Y" );
 	plt.plot( indices, xshifts, yshifts );
 
@@ -136,7 +136,7 @@ void WindowIPC2PicAlign::constantFlow()
 	auto xshifts = std::get<0>( xyi );
 	auto yshifts = std::get<1>( xyi );
 	auto indices = std::get<2>( xyi );
-	Plot1D plt( globals->widget1 );
+	Plot1Di plt( globals->widget1 );
 	plt.setAxisNames( "picture index", "pixel shift X", "pixel shift Y" );
 	plt.plot( indices, xshifts, yshifts );
 
