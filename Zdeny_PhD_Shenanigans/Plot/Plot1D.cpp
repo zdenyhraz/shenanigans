@@ -33,14 +33,14 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
-		LOG_DEBUG( "Updating 1Dplot '{}'", name );
+		//LOG_DEBUG( "Updating 1Dplot '{}'", name );
 		windowPlot = idx->second;
 		for ( int i = 0; i < windowPlot->ui.widget->graphCount(); i++ )
 			windowPlot->ui.widget->graph( i )->data().clear();
 	}
 	else
 	{
-		LOG_DEBUG( "Creating 1Dplot '{}'", name );
+		//LOG_DEBUG( "Creating 1Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
 		plots[name] = windowPlot;
 		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );

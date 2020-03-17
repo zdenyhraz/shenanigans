@@ -29,18 +29,19 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
-		LOG_DEBUG( "Updating 2Dplot '{}'", name );
+		//LOG_DEBUG( "Updating 2Dplot '{}'", name );
 		windowPlot = idx->second;
 		windowPlot->ui.widget->graph( 0 )->data().clear();
 	}
 	else
 	{
-		LOG_DEBUG( "Creating 2Dplot '{}'", name );
+		//LOG_DEBUG( "Creating 2Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
 		plots[name] = windowPlot;
-		SetupGraph( windowPlot, z[0].size(), z.size(), xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax );
+		SetupGraph( windowPlot, xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax );
 	}
 
+	windowPlot->colorMap->data()->setSize( z[0].size(), z.size() );
 	for ( int xIndex = 0; xIndex < z[0].size(); ++xIndex )
 		for ( int yIndex = 0; yIndex < z.size(); ++yIndex )
 			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[yIndex][xIndex] );
@@ -55,14 +56,13 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
-void Plot2D::SetupGraph( WindowPlot *windowPlot, int sizex, int sizey, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax )
+void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax )
 {
 	windowPlot->ui.widget->addGraph();//create graph
 	windowPlot->ui.widget->axisRect()->setupFullAxesBox( true ); //configure axis rect
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) ); //give the axes some labels
 	windowPlot->ui.widget->yAxis->setLabel( QString::fromStdString( ylabel ) ); //give the axes some labels
 	windowPlot->colorMap = new QCPColorMap( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis ); //set up the QCPColorMap
-	windowPlot->colorMap->data()->setSize( sizex, sizey ); //we want the color map to have nx * ny data points
 	windowPlot->colorMap->data()->setRange( QCPRange( xmin, xmax ), QCPRange( ymin, ymax ) ); //and span the coordinate range in both key (x) and value (y) dimensions
 	windowPlot->ui.widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom ); //allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 	windowPlot->colorScale = new QCPColorScale( windowPlot->ui.widget ); //add a color scale
