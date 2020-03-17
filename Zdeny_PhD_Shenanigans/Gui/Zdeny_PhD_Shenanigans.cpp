@@ -69,7 +69,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
 			return abs( args[0] - args[1] );
 		};
-		auto result = Evo.optimize( f, &plt );
+		auto result = Evo.optimize( f );
 		plt.save( "D:\\MainOutput\\Debug\\plot1D.png" );
 	}
 	if ( 0 ) //ipc bandpass & window

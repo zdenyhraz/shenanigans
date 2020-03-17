@@ -120,7 +120,7 @@ void WindowDiffrot::superOptimizeDiffrot()
 	//auto f = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
 	auto f2 = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper2( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
 
-	auto result = Evo.optimize( f2, plt1 );
+	auto result = Evo.optimize( f2 );
 	LOG_SUCC( "Optimal Lmult: " + to_string( result[0] ) );
 	LOG_SUCC( "Optimal Hmult: " + to_string( result[1] ) );
 	LOG_INFO( "Super optimizing finished for dt={}`", dt );

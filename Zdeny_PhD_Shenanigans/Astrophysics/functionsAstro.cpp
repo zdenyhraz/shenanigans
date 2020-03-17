@@ -95,9 +95,8 @@ void optimizeIPCParameters( const IPCsettings &settingsMaster, std::string pathI
 		Evo.mutStrat = Evolution::MutationStrategy::RAND1;
 		Evo.lowerBounds = vector<double> { 0, 0, 3, -1 };
 		Evo.upperBounds = vector<double> { 10, 200, 19, 1 };
-		auto Result = Evo.optimize( f, plt );
-		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," <<
-		        Result[3] << "," << f( Result ) << "," << currentDateTime() << endl;
+		auto Result = Evo.optimize( f );
+		listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f( Result ) << "," << currentDateTime() << endl;
 	}
 	destroyWindow( windowname );
 }
@@ -135,13 +134,13 @@ void optimizeIPCParametersForAllWavelengths( const IPCsettings &settingsMaster, 
 }
 
 DiffrotResults2 calculateDiffrotProfile( const IPCsettings &set, FitsTime &time, int itersPic, int itersX, int itersY, int itersMedian, int strajdPic, int deltaPic, int verticalFov,
-                                        int deltaSec, IPlot1D *plt1, IPlot1D *plt2 )
+        int deltaSec, IPlot1D *plt1, IPlot1D *plt2 )
 {
 	DiffrotResults2 results;
 	LOG_DEBUG( "Starting IPC MainFlow calculation" );
-	if ( plt1 ) plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"} );
+	//if ( plt1 ) plt1->setAxisNames( "solar latitude [deg]", "horizontal plasma flow speed [rad/s]", std::vector<std::string> {"measured - fit", "measured - avg", "measuredAvg - fit", "predicted"} );
 	//if (plt2) plt2->setAxisNames("solar latitude [deg]", "vertical plasma flow speed [rad/s]", std::vector<std::string>{"measured - fit", "measured - avg", "measuredAvg - fit"});
-	if ( plt2 ) plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string> {"delta px"} );
+	//if ( plt2 ) plt2->setAxisNames( "solar latitude [deg]", "horizontal px shift [px]", std::vector<std::string> {"delta px"} );
 
 	//2D stuff
 	Mat omegasXmat = Mat::zeros( itersY, itersPic * itersX, CV_32F );
@@ -356,8 +355,8 @@ DiffrotResults2 calculateDiffrotProfile( const IPCsettings &set, FitsTime &time,
 		//std::vector<std::vector<double>> plty2{ omegasYfits[omegasXfits.size() - 1], omegasYavg, omegasYfit };
 		std::vector<std::vector<double>> plty2{ pxshiftsX };
 
-		if ( plt1 ) plt1->plot( pltx, plty1 );
-		if ( plt2 ) plt2->plot( pltx, plty2 );
+		//if ( plt1 ) plt1->plot( pltx, plty1 );
+		//if ( plt2 ) plt2->plot( pltx, plty2 );
 
 		showimg( omegasXmat, "omegasXmat", true, 0.01, 0.99 );
 		showimg( omegasYmat, "omegasYmat", true, 0.01, 0.99 );
