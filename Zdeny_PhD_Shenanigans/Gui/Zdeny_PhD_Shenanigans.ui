@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1264</width>
-    <height>451</height>
+    <width>622</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="cursor">
@@ -20,10 +20,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>205</y>
-      <width>181</width>
-      <height>21</height>
+      <x>4</x>
+      <y>218</y>
+      <width>249</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="palette">
@@ -78,8 +78,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>6</x>
-      <y>22</y>
+      <x>33</x>
+      <y>32</y>
       <width>185</width>
       <height>185</height>
      </rect>
@@ -88,33 +88,13 @@
      <string/>
     </property>
    </widget>
-   <widget class="QCustomPlot" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>196</x>
-      <y>0</y>
-      <width>531</width>
-      <height>411</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCustomPlot" name="widget_2" native="true">
-    <property name="geometry">
-     <rect>
-      <x>728</x>
-      <y>0</y>
-      <width>531</width>
-      <height>411</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>5</x>
+      <x>6</x>
       <y>2</y>
-      <width>186</width>
-      <height>19</height>
+      <width>238</width>
+      <height>25</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -152,8 +132,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1264</width>
-     <height>18</height>
+     <width>622</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -360,14 +340,6 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>Plot/qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../Resources/Zdeny_PhD_Shenanigans.qrc"/>
  </resources>

@@ -12,8 +12,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 
 	//allocate all globals - main window is loaded once only
 	globals = new Globals();
-	globals->widget1 = ui.widget;
-	globals->widget2 = ui.widget_2;
 
 	//create all windows
 	windowIPCparameters = new WindowIPCparameters( this, globals );

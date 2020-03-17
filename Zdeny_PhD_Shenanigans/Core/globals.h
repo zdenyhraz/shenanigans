@@ -7,8 +7,6 @@ class Globals
 {
 public:
 	IPCsettings *IPCset;
-	QCustomPlot *widget1;
-	QCustomPlot *widget2;
 
 	Globals()
 	{
