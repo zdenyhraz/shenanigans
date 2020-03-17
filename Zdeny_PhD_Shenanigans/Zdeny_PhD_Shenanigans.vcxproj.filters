@@ -216,12 +216,6 @@
     <ClInclude Include="Plot\Plot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Plot\IPlot1D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Plot\Plot1DImpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Plot\Plot1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>

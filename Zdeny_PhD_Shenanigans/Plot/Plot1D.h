@@ -4,6 +4,10 @@
 #include "Gui/WindowPlot.h"
 #include "Plot.h"
 
+// TODO: add addData support
+// widget->graph( 0 )->addData( x, y1 );
+// widget->graph(1)->addData(x, y2);
+
 class Plot1D
 {
 public:

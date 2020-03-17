@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
-#include "Plot/Plot1DImpl.h"
+
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {
@@ -18,8 +18,6 @@ void WindowDiffrot::calculateDiffrot()
 {
 	LOG_INFO( "Calculating diffrot profile..." );
 	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
-	Plot1Di pltX( globals->widget1 );
-	Plot1Di pltY( globals->widget2 );
 	//*diffrotResults = calculateDiffrotProfile(*globals->IPCset, fitsTime, ui.lineEdit_7->text().toDouble(), ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(),  &pltX, &pltY);
 
 	DiffrotSettings drset;
@@ -34,7 +32,7 @@ void WindowDiffrot::calculateDiffrot()
 	drset.medianFilterSize = ui.lineEdit_21->text().toDouble();
 	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
 
-	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset,  &pltX, &pltY );
+	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );
 }
 
@@ -73,9 +71,7 @@ void WindowDiffrot::optimizeDiffrot()
 		LOG_INFO( "Optimizing IPC parameters for diffrot profile measurement " + to_string( size ) + "x" + to_string( size ) + "..." );
 		IPCsettings set = *globals->IPCset;
 		set.setSize( size, size );
-		Plot1Di *plt = new Plot1Di( globals->widget1 );
-		optimizeIPCParameters( set, fitsTime.path(), path, 5, 0.01, 3,  plt );
-		delete plt;
+		optimizeIPCParameters( set, fitsTime.path(), path, 5, 0.01, 3 );
 	}
 	LOG_INFO( "IPC parameters optimization for diffrot profile measurement finished" );
 }
@@ -98,8 +94,6 @@ void WindowDiffrot::superOptimizeDiffrot()
 	Evo.mutStrat = Evolution::MutationStrategy::BEST1;
 
 	LOG_INFO( "Super optimizing diffrot profile..." );
-	Plot1Di *plt1 = new Plot1Di( globals->widget1 );
-	Plot1Di *plt2 = new Plot1Di( globals->widget2 );
 
 	FitsTime fitsTimeMaster( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(),
 	                         ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
@@ -117,8 +111,8 @@ void WindowDiffrot::superOptimizeDiffrot()
 			pics.emplace_back( std::make_pair( a, b ) );
 	}
 
-	//auto f = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
-	auto f2 = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper2( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble(), plt2 ); };
+	//auto f = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble() ); };
+	auto f2 = [&]( std::vector<double> arg ) { return DiffrotMerritFunctionWrapper2( arg, pics, ui.lineEdit->text().toDouble(), ui.lineEdit_2->text().toDouble(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_6->text().toDouble(), ui.lineEdit_5->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_8->text().toDouble() ); };
 
 	auto result = Evo.optimize( f2 );
 	LOG_SUCC( "Optimal Lmult: " + to_string( result[0] ) );

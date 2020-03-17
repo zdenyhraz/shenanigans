@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "diffrot.h"
 
-DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset, IPlot1D *plt1, IPlot1D *plt2 )
+DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset )
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 
@@ -71,8 +71,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavg = meanVertical( omegasX2D );
 			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
-			drplot1( plt1, thetas, omegasX, omegasXavg, omegasXavgfit, predicXs );
-			drplot2( plt2, iotam, shiftsX, thetas );
+			drplot1( thetas, omegasX, omegasXavg, omegasXavgfit, predicXs );
+			drplot2( iotam, shiftsX, thetas );
 		}
 	}
 
@@ -109,12 +109,12 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 }
 
-void drplot1( IPlot1D *plt1, const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
+void drplot1( const std::vector<double> &thetas, const std::vector<double> &omegasX, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgfit, const std::vector<std::vector<double>> &predicXs )
 {
 	//plt1->plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]} );
 }
 
-void drplot2( IPlot1D *plt2, const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
+void drplot2( const std::vector<double> &iotam, const std::vector<double> &shiftsX, const std::vector<double> &thetas )
 {
 	//plt2->plot( iotam, shiftsX, ( 360. / Constants::TwoPi ) * thetas );
 }

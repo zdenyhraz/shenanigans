@@ -168,10 +168,8 @@
     <ClInclude Include="Optimization\optimization.h" />
     <QtMoc Include="Gui\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />
-    <ClInclude Include="Plot\IPlot1D.h" />
     <ClInclude Include="Plot\Plot.h" />
     <ClInclude Include="Plot\Plot1D.h" />
-    <ClInclude Include="Plot\Plot1DImpl.h" />
     <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
