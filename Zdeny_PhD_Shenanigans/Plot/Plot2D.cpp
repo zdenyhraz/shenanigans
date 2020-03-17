@@ -8,33 +8,32 @@ std::function<void( std::string )> Plot2D::OnClose = []( std::string name )
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
-		LOG_DEBUG( "2Dplot '{}' found in plot registry, deleting plot", name );
+		LOG_DEBUG( "Deleting 2Dplot '{}'", name );
 		delete idx->second;
 		plots.erase( idx );
 	}
 	else
 	{
-		LOG_DEBUG( "2Dplot '{}' not found in plot registry, not deleting plot", name );
+		LOG_ERROR( "2Dplot '{}' not found in plot registry (why tho?), not deleting", name );
 	}
 };
 
 void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, std::string savepath )
 {
 	WindowPlot *windowPlot;
-
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
-		LOG_DEBUG( "2Dplot '{}' found in plot registry, updating plot", name );
+		LOG_DEBUG( "Updating 2Dplot '{}'", name );
 		windowPlot = idx->second;
 		windowPlot->Clear();
 	}
 	else
 	{
-		LOG_DEBUG( "2Dplot '{}' not found in plot registry, registering plot", name );
+		LOG_DEBUG( "Creating 2Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
 	}
-
+	plots[name] = windowPlot;
 	windowPlot->ui.widget->addGraph();//create graph
 	windowPlot->ui.widget->axisRect()->setupFullAxesBox( true ); //configure axis rect
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) ); //give the axes some labels
@@ -78,6 +77,6 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 	}
 
-	plots[name] = windowPlot;
+
 }
 
