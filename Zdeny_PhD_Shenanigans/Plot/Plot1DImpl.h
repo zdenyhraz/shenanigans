@@ -18,7 +18,7 @@ struct Plot1Di : IPlot1D
 		widget->xAxis->setLabelFont( fontLabels );
 		widget->yAxis->setLabelFont( fontLabels );
 		widget->graph( 0 )->setPen( plotPen );
-		widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom ); //allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
+		widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom );
 	};
 
 	inline void setupSecondGraph( QString ylabel1, QString ylabel2 )

@@ -5,6 +5,7 @@
 #include "WindowIPC2PicAlign.h"
 #include "WindowDiffrot.h"
 #include "Plot/Plot1DImpl.h"
+#include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 #include "Log/logger.h"
 #include "Procedural/procedural.h"
