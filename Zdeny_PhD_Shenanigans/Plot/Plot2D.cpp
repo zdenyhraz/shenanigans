@@ -12,10 +12,6 @@ std::function<void( std::string )> Plot2D::OnClose = []( std::string name )
 		delete idx->second;
 		plots.erase( idx );
 	}
-	else
-	{
-		LOG_ERROR( "2Dplot '{}' not found in plot registry (why tho?), not deleting", name );
-	}
 };
 
 void Plot2D::CloseAll()

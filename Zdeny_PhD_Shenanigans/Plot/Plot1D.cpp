@@ -12,10 +12,6 @@ std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 		delete idx->second;
 		plots.erase( idx );
 	}
-	else
-	{
-		LOG_ERROR( "1Dplot '{}' not found in plot registry (why tho?), not deleting", name );
-	}
 };
 
 void Plot1D::CloseAll()
