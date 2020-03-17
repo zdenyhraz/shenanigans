@@ -107,7 +107,8 @@ void Zdeny_PhD_Shenanigans::debug()
 		{
 			for ( int x = 0; x < Nx; x++ )
 			{
-				Z[y][x] = ( x - y ) * ( x - y );
+				//Z[y][x] = ( x - y ) * ( x - y );
+				Z[y][x] = rand();
 			}
 		}
 
