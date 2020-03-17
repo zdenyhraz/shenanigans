@@ -97,7 +97,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel( img1, img2, set );
 	}
-	if ( 1 )
+	if ( 0 ) //Plot2D test
 	{
 		int Ny = 1000;
 		int Nx = 1000;
@@ -112,7 +112,19 @@ void Zdeny_PhD_Shenanigans::debug()
 			}
 		}
 
-		Plot2D::plot( Z, "niceplot", "x", "y", "nice graph xdd" );
+		Plot2D::plot( Z, "niceplot", "x", "y", "z" );
+	}
+	if ( 1 ) //Plot1D test
+	{
+		int N = 1000;
+		auto Y = zerovect( N );
+
+		for ( int x = 0; x < N; x++ )
+		{
+			Y[x] = rand();
+		}
+
+		Plot1D::plot( Y, "niceplot", "x", "y" );
 	}
 
 	LOG_INFO( "Debug finished." );

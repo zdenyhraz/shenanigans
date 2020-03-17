@@ -34,6 +34,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 		windowPlot = new WindowPlot( name, OnClose );
 	}
 	plots[name] = windowPlot;
+
 	windowPlot->ui.widget->addGraph();//create graph
 	windowPlot->ui.widget->axisRect()->setupFullAxesBox( true ); //configure axis rect
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) ); //give the axes some labels
@@ -76,7 +77,5 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	{
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 	}
-
-
 }
 

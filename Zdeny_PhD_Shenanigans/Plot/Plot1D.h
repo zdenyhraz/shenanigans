@@ -8,7 +8,7 @@ class Plot1D
 {
 public:
 
-	static void plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel = "x", std::string ylabel = "y", double xmin = 0, double xmax = 1, std::string savepath = "" );
+	static void plot( const std::vector<double> &y, std::string name, std::string xlabel = "x", std::string ylabel = "y", double xmin = 0, double xmax = 1, std::string savepath = "" );
 
 private:
 	static std::map<std::string, WindowPlot *> plots;
