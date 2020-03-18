@@ -29,7 +29,6 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	{
 		windowPlot = idx->second;
 		windowPlot->ui.widget->graph( 0 )->data().clear();
-		windowPlot->colorMap->data()->clear();
 	}
 	else
 	{
@@ -45,7 +44,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex] );
 
 	windowPlot->ui.widget->rescaleAxes();
-	windowPlot->colorMap->rescaleDataRange();
+	windowPlot->colorMap->rescaleDataRange( true );
 	windowPlot->colorScale->rescaleDataRange( false );
 	windowPlot->ui.widget->replot();
 	windowPlot->show();
