@@ -361,10 +361,12 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
 
 	if ( sourceimg.channels() == 1 )
+	{
 		if ( color )
 			sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT );
 		else
 			sourceimg = applyQuantile( sourceimg, quantileB, quantileT );
+	}
 
 	imshow( windowname, sourceimg );
 	waitKey( 1 );
