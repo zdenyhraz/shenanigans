@@ -146,7 +146,6 @@ void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt,
 	if ( y2cnt > 0 )
 		windowPlot->ui.widget->yAxis2->setVisible( true );
 
-	windowPlot->ui.widget->rescaleAxes();
-	windowPlot->ui.widget->replot();
 	windowPlot->show();
+	QCoreApplication::processEvents();
 }
