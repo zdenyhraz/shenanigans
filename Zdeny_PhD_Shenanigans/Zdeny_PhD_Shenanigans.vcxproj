@@ -125,6 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
+    <ClCompile Include="Plot\Plot.cpp" />
     <ClCompile Include="Plot\Plot1D.cpp" />
     <ClCompile Include="Plot\Plot2D.cpp" />
     <ClCompile Include="Plot\qcustomplot.cpp">

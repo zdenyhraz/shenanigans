@@ -1,32 +1,30 @@
 #include "stdafx.h"
 #include "Plot1D.h"
-
-std::map<std::string, WindowPlot *> Plot1D::plots;
+#include "Plot2D.h"
 
 std::function<void( std::string )> Plot1D::OnClose = []( std::string name )
 {
-	auto idx = plots.find( name );
-	if ( idx != plots.end() )
+	auto idx = Plot::plots.find( name );
+	if ( idx != Plot::plots.end() )
 	{
-		LOG_DEBUG( "Deleting 1Dplot '{}'", name );
 		delete idx->second;
-		plots.erase( idx );
+		Plot::plots.erase( idx );
 	}
 };
 
 void Plot1D::CloseAll()
 {
-	for ( auto &plt : plots )
+	for ( auto &plt : Plot::plots )
 	{
 		delete plt.second;
-		plots.erase( plt.first );
+		Plot::plots.erase( plt.first );
 	}
 }
 
 void Plot1D::Reset( std::string name )
 {
-	auto idx = plots.find( name );
-	if ( idx != plots.end() )
+	auto idx = Plot::plots.find( name );
+	if ( idx != Plot::plots.end() )
 	{
 		LOG_DEBUG( "Reseting 1Dplot '{}'", name );
 		WindowPlot *windowPlot = idx->second;
@@ -90,15 +88,16 @@ void Plot1D::plotinsides( double x, const std::vector<double> &y1s, const std::v
 WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
 {
 	WindowPlot *windowPlot;
-	auto idx = plots.find( name );
-	if ( idx != plots.end() )
+	auto idx = Plot::plots.find( name );
+	if ( idx != Plot::plots.end() )
 	{
 		windowPlot = idx->second;
 	}
 	else
 	{
 		windowPlot = new WindowPlot( name, OnClose );
-		plots[name] = windowPlot;
+		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
+		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
 	}
 	return windowPlot;
@@ -106,12 +105,12 @@ WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2c
 
 void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
 {
-	windowPlot->ui.widget->xAxis->setTickLabelFont( fontTicks );
-	windowPlot->ui.widget->yAxis->setTickLabelFont( fontTicks );
-	windowPlot->ui.widget->yAxis2->setTickLabelFont( fontTicks );
-	windowPlot->ui.widget->xAxis->setLabelFont( fontLabels );
-	windowPlot->ui.widget->yAxis->setLabelFont( fontLabels );
-	windowPlot->ui.widget->yAxis2->setLabelFont( fontLabels );
+	windowPlot->ui.widget->xAxis->setTickLabelFont( Plot::fontTicks );
+	windowPlot->ui.widget->yAxis->setTickLabelFont( Plot::fontTicks );
+	windowPlot->ui.widget->yAxis2->setTickLabelFont( Plot::fontTicks );
+	windowPlot->ui.widget->xAxis->setLabelFont( Plot::fontLabels );
+	windowPlot->ui.widget->yAxis->setLabelFont( Plot::fontLabels );
+	windowPlot->ui.widget->yAxis2->setLabelFont( Plot::fontLabels );
 	windowPlot->ui.widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom );
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) );
 	windowPlot->ui.widget->yAxis->setLabel( QString::fromStdString( y1label ) );
@@ -137,10 +136,10 @@ void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt,
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( "y2_" + to_string( i - y1cnt + 1 ) ) );
 		}
 
-		if ( plotPens1D.size() > i )
-			windowPlot->ui.widget->graph( i )->setPen( plotPens1D[i] );
+		if ( Plot::plotPens.size() > i )
+			windowPlot->ui.widget->graph( i )->setPen( Plot::plotPens[i] );
 		else
-			windowPlot->ui.widget->graph( i )->setPen( plotPens1D[1] );
+			windowPlot->ui.widget->graph( i )->setPen( Plot::plotPens[1] );
 	}
 
 	if ( y2cnt > 0 )

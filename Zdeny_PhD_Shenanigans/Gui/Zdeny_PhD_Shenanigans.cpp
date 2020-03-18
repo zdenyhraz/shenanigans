@@ -191,5 +191,6 @@ void Zdeny_PhD_Shenanigans::closeEvent( QCloseEvent *event )
 	else
 	{
 		event->accept();
+		CloseAll();
 	}
 }

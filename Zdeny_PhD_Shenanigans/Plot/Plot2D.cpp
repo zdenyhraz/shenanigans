@@ -1,43 +1,40 @@
 #include "stdafx.h"
 #include "Plot2D.h"
-
-std::map<std::string, WindowPlot *> Plot2D::plots;
+#include "Plot1D.h"
 
 std::function<void( std::string )> Plot2D::OnClose = []( std::string name )
 {
-	auto idx = plots.find( name );
-	if ( idx != plots.end() )
+	auto idx = Plot::plots.find( name );
+	if ( idx != Plot::plots.end() )
 	{
-		LOG_DEBUG( "Deleting 2Dplot '{}'", name );
 		delete idx->second;
-		plots.erase( idx );
+		Plot::plots.erase( idx );
 	}
 };
 
 void Plot2D::CloseAll()
 {
-	for ( auto &plt : plots )
+	for ( auto &plt : Plot::plots )
 	{
 		delete plt.second;
-		plots.erase( plt.first );
+		Plot::plots.erase( plt.first );
 	}
 }
 
 void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, std::string savepath )
 {
 	WindowPlot *windowPlot;
-	auto idx = plots.find( name );
-	if ( idx != plots.end() )
+	auto idx = Plot::plots.find( name );
+	if ( idx != Plot::plots.end() )
 	{
-		//LOG_DEBUG( "Updating 2Dplot '{}'", name );
 		windowPlot = idx->second;
 		windowPlot->ui.widget->graph( 0 )->data().clear();
 	}
 	else
 	{
-		//LOG_DEBUG( "Creating 2Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
-		plots[name] = windowPlot;
+		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
+		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax );
 	}
 
@@ -75,13 +72,13 @@ void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string
 	windowPlot->ui.widget->axisRect()->setMarginGroup( QCP::msBottom | QCP::msTop, windowPlot->marginGroup ); //align plot
 	windowPlot->colorScale->setMarginGroup( QCP::msBottom | QCP::msTop, windowPlot->marginGroup ); //align colorbar
 	windowPlot->colorMap->setInterpolate( true ); //interpolate bro
-	windowPlot->ui.widget->xAxis->setTickLabelFont( fontTicks );
-	windowPlot->ui.widget->yAxis->setTickLabelFont( fontTicks );
-	windowPlot->colorScale->axis()->setTickLabelFont( fontTicks );
-	windowPlot->ui.widget->xAxis->setLabelFont( fontLabels );
-	windowPlot->ui.widget->yAxis->setLabelFont( fontLabels );
+	windowPlot->ui.widget->xAxis->setTickLabelFont( Plot::fontTicks );
+	windowPlot->ui.widget->yAxis->setTickLabelFont( Plot::fontTicks );
+	windowPlot->colorScale->axis()->setTickLabelFont( Plot::fontTicks );
+	windowPlot->ui.widget->xAxis->setLabelFont( Plot::fontLabels );
+	windowPlot->ui.widget->yAxis->setLabelFont( Plot::fontLabels );
 	windowPlot->ui.widget->yAxis->setRangeReversed( true );
-	windowPlot->colorScale->axis()->setLabelFont( fontLabels );
+	windowPlot->colorScale->axis()->setLabelFont( Plot::fontLabels );
 	windowPlot->show();
 	QCoreApplication::processEvents();
 }
