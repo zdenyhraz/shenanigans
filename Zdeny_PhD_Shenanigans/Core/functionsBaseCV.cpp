@@ -285,60 +285,48 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
 {
 	Mat sourceimg = sourceimgIn.clone();
+	float caxisMin, caxisMax;
+	sourceimg.convertTo( sourceimg, CV_32F );
+	std::tie( caxisMin, caxisMax ) = minMaxMat( sourceimg );
 
-	//input is grayscale, output is colored
-	int caxisMin = 0, caxisMax = 255;
-
-	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
-	sourceimg.convertTo( sourceimg, CV_8U );
-
-	if ( ( quantileB > 0 ) || ( quantileT < 1 ) )
+	if ( quantileB > 0 || quantileT < 1 )
 	{
-		vector<int> picvalues( sourceimg.rows * sourceimg.cols, 0 );
+		std::vector<float> picvalues( sourceimg.rows * sourceimg.cols, 0 );
 		for ( int r = 0; r < sourceimg.rows; r++ )
-		{
 			for ( int c = 0; c < sourceimg.cols; c++ )
-			{
-				picvalues[r * sourceimg.cols + c] = sourceimg.at<uchar>( r, c );
-			}
-		}
+				picvalues[r * sourceimg.cols + c] = sourceimg.at<float>( r, c );
 
-		//sort the vector
 		sort( picvalues.begin(), picvalues.end() );
-
-		//calculate the alpha and 1-alpha quantiles
-		int alpha1Quantile = picvalues[round( quantileB * ( picvalues.size() - 1 ) )];
-		int alpha2Quantile = picvalues[round( quantileT * ( picvalues.size() - 1 ) )];
-		caxisMin = alpha1Quantile;
-		caxisMax = alpha2Quantile;
+		caxisMin = picvalues[quantileB * ( picvalues.size() - 1 )];
+		caxisMax = picvalues[quantileT * ( picvalues.size() - 1 )];
 	}
 
 	if ( color )
 	{
-		Mat sourceimgOutCLR( sourceimg.rows, sourceimg.cols, CV_8UC3 );
+		Mat sourceimgOutCLR( sourceimg.rows, sourceimg.cols, CV_32FC3 );
 		for ( int r = 0; r < sourceimgOutCLR.rows; r++ )
 		{
 			for ( int c = 0; c < sourceimgOutCLR.cols; c++ )
 			{
-				uchar x = sourceimg.at<uchar>( r, c );
-
-				std::tuple<int, int, int> BGR = colorMapJET( x, caxisMin, caxisMax );
-				sourceimgOutCLR.at<Vec3b>( r, c )[0] = round( std::get<0>( BGR ) );
-				sourceimgOutCLR.at<Vec3b>( r, c )[1] = round( std::get<1>( BGR ) );
-				sourceimgOutCLR.at<Vec3b>( r, c )[2] = round( std::get<2>( BGR ) );
+				float x = sourceimg.at<float>( r, c );
+				float B, G, R;
+				std::tie( B, G, R ) = colorMapJET( x, caxisMin, caxisMax );
+				sourceimgOutCLR.at<Vec3f>( r, c )[0] = B;
+				sourceimgOutCLR.at<Vec3f>( r, c )[1] = G;
+				sourceimgOutCLR.at<Vec3f>( r, c )[2] = R;
 			}
 		}
 		return sourceimgOutCLR;
 	}
 	else
 	{
-		Mat sourceimgOutGS( sourceimg.rows, sourceimg.cols, CV_8UC1 );
+		Mat sourceimgOutGS( sourceimg.rows, sourceimg.cols, CV_32FC1 );
 		for ( int r = 0; r < sourceimgOutGS.rows; r++ )
 		{
 			for ( int c = 0; c < sourceimgOutGS.cols; c++ )
 			{
-				double x = sourceimg.at<uchar>( r, c );
-				sourceimgOutGS.at<char>( r, c ) = clamp( x, caxisMin, caxisMax );
+				float x = sourceimg.at<float>( r, c );
+				sourceimgOutGS.at<float>( r, c ) = clamp( x, caxisMin, caxisMax );
 			}
 		}
 		return sourceimgOutGS;
@@ -359,8 +347,8 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 	else
 		resizeWindow( windowname, showSize );
 
-	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
-	sourceimg.convertTo( sourceimg, CV_8U );
+	sourceimg.convertTo( sourceimg, CV_32F );
+	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
 
 	if ( sourceimg.channels() == 1 )
 		sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT, color );
@@ -389,7 +377,6 @@ void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool
 
 	Mat concatenated;
 	hconcat( sourceimgs, concatenated );
-
 	showimg( concatenated, windowname, color, quantileB, quantileT, showSize );
 }
 
