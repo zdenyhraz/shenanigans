@@ -1,5 +1,7 @@
 #pragma once
 #include "stdafx.h"
+#include "Core/functionsBaseCV.h"
+#include "Plot/Plot2D.h"
 
 class DiffrotResults
 {
@@ -21,18 +23,21 @@ public:
 		if ( 1 )
 		{
 			showimg( SourceImage, "diffrot source" );
+			Plot2D::plot( SourceImage, "diffrot source" );
 		}
 
 		// flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
+			Plot2D::plot( applyQuantileColorMap( FlowX, quanBot, quanTop ), "diffrot flow X" );
 		}
 
 		// relative flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
+			Plot2D::plot( applyQuantileColorMap( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X" );
 		}
 
 		// relative flow X binary

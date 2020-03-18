@@ -33,22 +33,23 @@ Mat kirklcrop( const Mat &sourceimgIn, int x, int y, int diameter );
 
 Point2f findCentroidDouble( const Mat &sourceimg );
 
-inline std::tuple<int, int, int> colorMapJET( int x, int caxisMin = 0, int caxisMax = 255 )
+inline std::tuple<float, float, float> colorMapJET( float x, float caxisMin = 0, float caxisMax = 1 )
 {
 	if ( !x )
 	{
 		return std::make_tuple( 0., 0., 0. );
 	}
 
-	double B, G, R;
-	double sh = 0.125 * ( caxisMax - caxisMin );
-	double start = caxisMin;
-	double mid = caxisMin + 0.5 * ( caxisMax - caxisMin );
-	double end = caxisMax;
 
-	B = ( x > ( start + sh ) ) ? clamp( -255 / 2 / sh * x + 255 / 2 / sh * ( mid + sh ), 0, 255 ) : ( x < start ? 255 / 2 : clamp( 255 / 2 / sh * x + 255 / 2 - 255 / 2 / sh * start, 0, 255 ) );
-	G = ( x < mid ) ? clamp( 255 / 2 / sh * x - 255 / 2 / sh * ( start + sh ), 0, 255 ) : clamp( -255 / 2 / sh * x + 255 / 2 / sh * ( end - sh ), 0, 255 );
-	R = ( x < ( end - sh ) ) ? clamp( 255 / 2 / sh * x - 255 / 2 / sh * ( mid - sh ), 0, 255 ) : ( x > end ? 255 / 2 : clamp( -255 / 2 / sh * x + 255 / 2 + 255 / 2 / sh * end, 0, 255 ) );
+	float B, G, R;
+	float sh = 0.125 * ( caxisMax - caxisMin );
+	float start = caxisMin;
+	float mid = caxisMin + 0.5 * ( caxisMax - caxisMin );
+	float end = caxisMax;
+
+	B = ( x > ( start + sh ) ) ? clamp( -1. / 2 / sh * x + 1. / 2 / sh * ( mid + sh ), 0, 1. ) : ( x < start ? 1. / 2 : clamp( 1. / 2 / sh * x + 1. / 2 - 1. / 2 / sh * start, 0, 1. ) );
+	G = ( x < mid ) ? clamp( 1. / 2 / sh * x - 1. / 2 / sh * ( start + sh ), 0, 1. ) : clamp( -1. / 2 / sh * x + 1. / 2 / sh * ( end - sh ), 0, 1. );
+	R = ( x < ( end - sh ) ) ? clamp( 1. / 2 / sh * x - 1. / 2 / sh * ( mid - sh ), 0, 1. ) : ( x > end ? 1. / 2 : clamp( -1. / 2 / sh * x + 1. / 2 + 1. / 2 / sh * end, 0, 1. ) );
 
 	return std::make_tuple( B, G, R );
 }
@@ -162,7 +163,7 @@ inline std::tuple<int, int, int> HUE_to_BGR( std::tuple<double, double, double> 
 
 Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle style, double sigma = 1 );
 
-Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = true );
+Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = false );
 
 void showimg( const Mat &sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) );
 
