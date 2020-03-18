@@ -20,6 +20,12 @@ int main( int argc, char *argv[] )
 	// attach the new console to this application's process
 	AttachConsole( GetCurrentProcessId() );
 
+	HWND console = GetConsoleWindow();
+	int consolewidth = 1500;
+	int consoleheight = 500;
+	MoveWindow( console, 0, 1400 - consoleheight, consolewidth, consoleheight, TRUE );
+
+
 	// reopen the std I/O streams to redirect I/O to the new console
 	freopen( "CON", "w", stdout );
 	freopen( "CON", "w", stderr );
