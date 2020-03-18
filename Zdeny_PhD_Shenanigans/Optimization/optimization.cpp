@@ -10,6 +10,7 @@
 std::vector<double> Evolution::optimize( std::function<double( std::vector<double> )> f )
 {
 	LOG_DEBUG( "Optimization started (evolution)" );
+	Plot1D::Reset( "evolution" );
 
 	vector<vector<double>> visitedPointsMainThisRun;
 	vector<vector<double>> visitedPointsThisRun;
