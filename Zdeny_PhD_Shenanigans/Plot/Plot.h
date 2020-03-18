@@ -10,7 +10,6 @@ public:
 	static QFont fontTicks;
 	static QFont fontLabels;
 	static std::vector<QPen> plotPens;
-
 	static QPoint GetNewPlotPosition( WindowPlot *windowPlot );
 
 private:

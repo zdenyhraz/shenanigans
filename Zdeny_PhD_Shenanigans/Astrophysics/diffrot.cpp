@@ -66,7 +66,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavg = meanVertical( omegasX2D );
 			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
-			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shifts"} );
+			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shiftsX"} );
 			Plot2D::plot( matFromVector( omegasX2D, true ), "diffrot2D", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, 1, 0, 1 );
 		}
 	}

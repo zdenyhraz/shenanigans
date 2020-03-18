@@ -508,12 +508,12 @@ std::vector<double> drawFuncLandscapeAndOptimize2D( std::function<double( vector
 	cout << "Drawing the function landscape... " << endl;
 	Mat optimizedFuncLandscapeRAW = drawFunc2D( f, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1] );
 	if ( landscape ) *landscape = optimizedFuncLandscapeRAW;
-	optimizedFuncLandscapeCLR = applyColorMapZdeny( optimizedFuncLandscapeRAW, quantileB, quantileT );
+	optimizedFuncLandscapeCLR = applyColorMap( optimizedFuncLandscapeRAW, quantileB, quantileT );
 	Mat optimizedFuncLandscapeRAWlog = optimizedFuncLandscapeRAW.clone() + Scalar::all( 1. );
 	log( optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog );
 	normalize( optimizedFuncLandscapeRAW, optimizedFuncLandscapeRAW, 0, 255, CV_MINMAX );
 	normalize( optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog, 0, 255, CV_MINMAX );
-	Mat optimizedFuncLandscapeCLRlog = applyColorMapZdeny( optimizedFuncLandscapeRAWlog, quantileB, quantileT ); //log or not
+	Mat optimizedFuncLandscapeCLRlog = applyColorMap( optimizedFuncLandscapeRAWlog, quantileB, quantileT ); //log or not
 
 	double minim, maxim;
 	minMaxLoc( optimizedFuncLandscapeRAW, &minim, &maxim, &minloc, &maxloc );

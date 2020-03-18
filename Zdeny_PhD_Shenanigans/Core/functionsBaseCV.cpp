@@ -282,7 +282,7 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 	return result;
 }
 
-Mat applyColorMapZdeny( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
+Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
 {
 	Mat sourceimg = sourceimgIn.clone();
 
@@ -363,7 +363,7 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 	sourceimg.convertTo( sourceimg, CV_8U );
 
 	if ( sourceimg.channels() == 1 )
-		sourceimg = applyColorMapZdeny( sourceimg, quantileB, quantileT, color );
+		sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT, color );
 
 	imshow( windowname, sourceimg );
 	waitKey( 1 );

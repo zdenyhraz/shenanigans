@@ -57,22 +57,22 @@ struct DiffrotResults2
 		{
 			showimg( medFlowX, "Flow X", true, quantileBot, quantileTop );
 			showimg( medFlowY, "Flow Y", true, quantileBot, quantileTop );
-			saveimg( dirpath + "FlowX.png", applyColorMapZdeny( medFlowX, quantileBot, quantileTop, true ), true );
-			saveimg( dirpath + "FlowY.png", applyColorMapZdeny( medFlowY, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowX.png", applyQuantileColorMap( medFlowX, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowY.png", applyQuantileColorMap( medFlowY, quantileBot, quantileTop, true ), true );
 		}
 		if ( 1 ) //relative flow
 		{
 			showimg( medFlowXrelativeF, "FlowX relative Fit", true, quantileBot, quantileTop );
 			showimg( medFlowXrelativeFF, "FlowX relative FFit", true, quantileBot, quantileTop );
 			showimg( medFlowXrelativeP, "FlowX relative Pred", true, quantileBot, quantileTop );
-			saveimg( dirpath + "FlowXRelFit.png", applyColorMapZdeny( medFlowXrelativeF, quantileBot, quantileTop, true ), true );
-			saveimg( dirpath + "FlowXRelFFit.png", applyColorMapZdeny( medFlowXrelativeFF, quantileBot, quantileTop, true ), true );
-			saveimg( dirpath + "FlowXRelPred.png", applyColorMapZdeny( medFlowXrelativeP, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXRelFit.png", applyQuantileColorMap( medFlowXrelativeF, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXRelFFit.png", applyQuantileColorMap( medFlowXrelativeFF, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXRelPred.png", applyQuantileColorMap( medFlowXrelativeP, quantileBot, quantileTop, true ), true );
 		}
 
 		if ( 0 ) //HUE sum
 		{
-			Mat mergedHUE = combineTwoPics( applyColorMapZdeny( medFlowX, quantileBot, quantileTop, false ), FlowPic, huebright );
+			Mat mergedHUE = combineTwoPics( applyQuantileColorMap( medFlowX, quantileBot, quantileTop, false ), FlowPic, huebright );
 			showimg( mergedHUE, "FlowX Merged Hue", false, quantileBot, quantileTop );
 		}
 		if ( 0 ) //HUE sum relative
@@ -100,8 +100,8 @@ struct DiffrotResults2
 			phase( medFlowX, medFlowY, phas );
 			showimg( magn, "FlowX Magnitude", true, quantileBot, quantileTop );
 			showimg( phas, "FlowX Phase", true, quantileBot, quantileTop );
-			saveimg( dirpath + "FlowXMagn.png", applyColorMapZdeny( magn, quantileBot, quantileTop, true ), true );
-			saveimg( dirpath + "FlowXPhas.png", applyColorMapZdeny( phas, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXMagn.png", applyQuantileColorMap( magn, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXPhas.png", applyQuantileColorMap( phas, quantileBot, quantileTop, true ), true );
 
 			//relative
 			Mat magnP, phasP;
@@ -109,8 +109,8 @@ struct DiffrotResults2
 			phase( medFlowXrelativeP, medFlowY, phasP );
 			showimg( magnP, "FlowX Magnitude relative Pred", true, quantileBot, quantileTop );
 			showimg( phasP, "FlowX Phase relative Pred", true, quantileBot, quantileTop );
-			saveimg( dirpath + "FlowXRelPredMagn.png", applyColorMapZdeny( magnP, quantileBot, quantileTop, true ), true );
-			saveimg( dirpath + "FlowXRelPredPhas.png", applyColorMapZdeny( phasP, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXRelPredMagn.png", applyQuantileColorMap( magnP, quantileBot, quantileTop, true ), true );
+			saveimg( dirpath + "FlowXRelPredPhas.png", applyQuantileColorMap( phasP, quantileBot, quantileTop, true ), true );
 		}
 	}
 };
