@@ -12,12 +12,12 @@ std::vector<double> Evolution::optimize( std::function<double( std::vector<doubl
 	LOG_DEBUG( "Optimization started (evolution)" );
 	Plot1D::Reset( "evolution" );
 
+	vector<double> boundsRange = upperBounds - lowerBounds;
 	vector<vector<double>> visitedPointsMainThisRun;
 	vector<vector<double>> visitedPointsThisRun;
 	double averageImprovement = 0;
 	funEvals = 0;
 	success = false;
-	vector<double> boundsRange = upperBounds - lowerBounds;
 
 	//establish population matrix, fitness vector and other intrinsics
 	vector<vector<double>> population( NP, zerovect( N ) );
@@ -28,7 +28,6 @@ std::vector<double> Evolution::optimize( std::function<double( std::vector<doubl
 	double bestFitness = std::numeric_limits<double>::max();
 	double fitness_prev = std::numeric_limits<double>::max();
 	double fitness_curr = std::numeric_limits<double>::max();
-	success = false;
 
 	//initialize random starting population matrix within bounds
 	LOG_DEBUG( "Initializing population within bounds ... " );

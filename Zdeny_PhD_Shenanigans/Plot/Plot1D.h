@@ -77,7 +77,6 @@ public:
 	static void plotinsides( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y2", std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring, std::string savepath = emptystring );
 
 private:
-	static std::map<std::string, WindowPlot *> plots;
 
 	static std::function<void( std::string )> OnClose;
 
