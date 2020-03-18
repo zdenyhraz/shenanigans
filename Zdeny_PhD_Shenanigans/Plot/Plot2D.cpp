@@ -82,6 +82,8 @@ void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string
 	windowPlot->ui.widget->yAxis->setLabelFont( fontLabels );
 	windowPlot->ui.widget->yAxis->setRangeReversed( true );
 	windowPlot->colorScale->axis()->setLabelFont( fontLabels );
+	windowPlot->show();
+	QCoreApplication::processEvents();
 }
 
 
