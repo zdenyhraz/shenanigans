@@ -161,7 +161,9 @@ inline std::tuple<int, int, int> HUE_to_BGR( std::tuple<double, double, double> 
 
 Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle style, double sigma = 1 );
 
-Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB = 0, double quantileT = 1, bool color = false );
+Mat applyQuantile( const Mat &sourceimgIn, double quantileB = 0, double quantileT = 1 );
+
+Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB = 0, double quantileT = 1 );
 
 void showimg( const Mat &sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) );
 

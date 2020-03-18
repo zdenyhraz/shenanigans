@@ -282,7 +282,33 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 	return result;
 }
 
-Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
+Mat applyQuantile( const Mat &sourceimgIn, double quantileB, double quantileT )
+{
+	Mat sourceimg = sourceimgIn.clone();
+	sourceimg.convertTo( sourceimg, CV_32FC1 );
+	float caxisMin, caxisMax;
+	std::tie( caxisMin, caxisMax ) = minMaxMat( sourceimg );
+
+	if ( quantileB > 0 || quantileT < 1 )
+	{
+		std::vector<float> picvalues( sourceimg.rows * sourceimg.cols, 0 );
+		for ( int r = 0; r < sourceimg.rows; r++ )
+			for ( int c = 0; c < sourceimg.cols; c++ )
+				picvalues[r * sourceimg.cols + c] = sourceimg.at<float>( r, c );
+
+		sort( picvalues.begin(), picvalues.end() );
+		caxisMin = picvalues[quantileB * ( picvalues.size() - 1 )];
+		caxisMax = picvalues[quantileT * ( picvalues.size() - 1 )];
+	}
+
+	for ( int r = 0; r < sourceimg.rows; r++ )
+		for ( int c = 0; c < sourceimg.cols; c++ )
+			sourceimg.at<float>( r, c ) = clamp( sourceimg.at<float>( r, c ), caxisMin, caxisMax );
+
+	return sourceimg;
+}
+
+Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quantileT )
 {
 	Mat sourceimg = sourceimgIn.clone();
 	sourceimg.convertTo( sourceimg, CV_32F );
@@ -301,36 +327,20 @@ Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quan
 		caxisMax = picvalues[quantileT * ( picvalues.size() - 1 )];
 	}
 
-	if ( color )
+	Mat sourceimgOutCLR( sourceimg.rows, sourceimg.cols, CV_32FC3 );
+	for ( int r = 0; r < sourceimgOutCLR.rows; r++ )
 	{
-		Mat sourceimgOutCLR( sourceimg.rows, sourceimg.cols, CV_32FC3 );
-		for ( int r = 0; r < sourceimgOutCLR.rows; r++ )
+		for ( int c = 0; c < sourceimgOutCLR.cols; c++ )
 		{
-			for ( int c = 0; c < sourceimgOutCLR.cols; c++ )
-			{
-				float x = sourceimg.at<float>( r, c );
-				float B, G, R;
-				std::tie( B, G, R ) = colorMapJET( x, caxisMin, caxisMax );
-				sourceimgOutCLR.at<Vec3f>( r, c )[0] = B;
-				sourceimgOutCLR.at<Vec3f>( r, c )[1] = G;
-				sourceimgOutCLR.at<Vec3f>( r, c )[2] = R;
-			}
+			float x = sourceimg.at<float>( r, c );
+			float B, G, R;
+			std::tie( B, G, R ) = colorMapJET( x, caxisMin, caxisMax );
+			sourceimgOutCLR.at<Vec3f>( r, c )[0] = B;
+			sourceimgOutCLR.at<Vec3f>( r, c )[1] = G;
+			sourceimgOutCLR.at<Vec3f>( r, c )[2] = R;
 		}
-		return sourceimgOutCLR;
 	}
-	else
-	{
-		Mat sourceimgOutGS( sourceimg.rows, sourceimg.cols, CV_32FC1 );
-		for ( int r = 0; r < sourceimgOutGS.rows; r++ )
-		{
-			for ( int c = 0; c < sourceimgOutGS.cols; c++ )
-			{
-				float x = sourceimg.at<float>( r, c );
-				sourceimgOutGS.at<float>( r, c ) = clamp( x, caxisMin, caxisMax );
-			}
-		}
-		return sourceimgOutGS;
-	}
+	return sourceimgOutCLR;
 }
 
 void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double quantileB, double quantileT, Size2i showSize )
@@ -351,7 +361,10 @@ void showimg( const Mat &sourceimgIn, std::string windowname, bool color, double
 	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
 
 	if ( sourceimg.channels() == 1 )
-		sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT, color );
+		if ( color )
+			sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT );
+		else
+			sourceimg = applyQuantile( sourceimg, quantileB, quantileT );
 
 	imshow( windowname, sourceimg );
 	waitKey( 1 );
