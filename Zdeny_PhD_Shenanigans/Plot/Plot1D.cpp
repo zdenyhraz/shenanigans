@@ -49,7 +49,26 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 
 void Plot1D::plotinsides( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
 {
+	int y1cnt = y1s.size();
+	int y2cnt = y2s.size();
+	int ycnt = y1cnt + y2cnt;
 
+	WindowPlot *windowPlot = RefreshGraph( name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
+
+	for ( int i = 0; i < ycnt; i++ )
+	{
+		if ( i < y1cnt )
+			windowPlot->ui.widget->graph( i )->addData( x, y1s[i]  );
+		else
+			windowPlot->ui.widget->graph( i )->addData( x, y2s[i - y1cnt] );
+	}
+
+	windowPlot->ui.widget->rescaleAxes();
+	windowPlot->ui.widget->replot();
+	windowPlot->show();
+
+	if ( savepath != "" )
+		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
 WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
@@ -58,14 +77,12 @@ WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2c
 	auto idx = plots.find( name );
 	if ( idx != plots.end() )
 	{
-		//LOG_DEBUG( "Updating 1Dplot '{}'", name );
 		windowPlot = idx->second;
 		for ( int i = 0; i < windowPlot->ui.widget->graphCount(); i++ )
 			windowPlot->ui.widget->graph( i )->data().clear();
 	}
 	else
 	{
-		//LOG_DEBUG( "Creating 1Dplot '{}'", name );
 		windowPlot = new WindowPlot( name, OnClose );
 		plots[name] = windowPlot;
 		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );

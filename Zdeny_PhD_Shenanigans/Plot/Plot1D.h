@@ -24,7 +24,7 @@ public:
 	// x - y1/y2 add data
 	static void plot( double x, double y1, double y2, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y2", std::string savepath = emptystring )
 	{
-		return plotinsides( x, std::vector<double> {y1}, std::vector<double> {y2}, name, xlabel, y1label, y2label, emptyvectstring, emptyvectstring, savepath );
+		return plotinsides( x, std::vector<double> {y1}, std::vector<double> {y2}, name, xlabel, y1label, y2label, std::vector<std::string> {y1label}, std::vector<std::string> {y2label}, savepath );
 	}
 
 	// x - ys add data
@@ -56,7 +56,7 @@ public:
 	// x - y1/y2 replot data
 	static void plot( const std::vector<double> &x, const std::vector<double> &y1, const std::vector<double> &y2, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y1", std::string savepath = emptystring )
 	{
-		return plotinsides( x, std::vector<std::vector<double>> {y1}, std::vector<std::vector<double>> {y2}, name, xlabel, y1label, y2label, emptyvectstring, emptyvectstring, savepath );
+		return plotinsides( x, std::vector<std::vector<double>> {y1}, std::vector<std::vector<double>> {y2}, name, xlabel, y1label, y2label, std::vector<std::string> {y1label}, std::vector<std::string> {y2label}, savepath );
 	}
 
 	// x - ys replot data
