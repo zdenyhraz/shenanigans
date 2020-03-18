@@ -23,7 +23,7 @@ void Plot1D::CloseAll()
 	}
 }
 
-void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::string savepath )
+void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
 {
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
