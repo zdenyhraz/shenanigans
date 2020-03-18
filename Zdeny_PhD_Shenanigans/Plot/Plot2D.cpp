@@ -29,6 +29,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	{
 		windowPlot = idx->second;
 		windowPlot->ui.widget->graph( 0 )->data().clear();
+		windowPlot->colorMap->data()->clear();
 	}
 	else
 	{
@@ -41,11 +42,11 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	windowPlot->colorMap->data()->setSize( z[0].size(), z.size() );
 	for ( int xIndex = 0; xIndex < z[0].size(); ++xIndex )
 		for ( int yIndex = 0; yIndex < z.size(); ++yIndex )
-			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[yIndex][xIndex] );
+			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex] );
 
-	windowPlot->colorMap->rescaleDataRange();
 	windowPlot->ui.widget->rescaleAxes();
-	windowPlot->colorScale->rescaleDataRange( 0 );
+	windowPlot->colorMap->rescaleDataRange();
+	windowPlot->colorScale->rescaleDataRange( false );
 	windowPlot->ui.widget->replot();
 	windowPlot->show();
 
@@ -77,7 +78,7 @@ void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string
 	windowPlot->colorScale->axis()->setTickLabelFont( Plot::fontTicks );
 	windowPlot->ui.widget->xAxis->setLabelFont( Plot::fontLabels );
 	windowPlot->ui.widget->yAxis->setLabelFont( Plot::fontLabels );
-	windowPlot->ui.widget->yAxis->setRangeReversed( true );
+	windowPlot->ui.widget->yAxis->setRangeReversed( false );
 	windowPlot->colorScale->axis()->setLabelFont( Plot::fontLabels );
 	windowPlot->show();
 	QCoreApplication::processEvents();

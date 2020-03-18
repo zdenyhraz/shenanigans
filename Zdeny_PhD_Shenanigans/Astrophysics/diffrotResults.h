@@ -23,7 +23,6 @@ public:
 		if ( 1 )
 		{
 			showimg( SourceImage, "diffrot source" );
-			Plot2D::plot( SourceImage, "diffrot source" );
 		}
 
 		// flow X jet
