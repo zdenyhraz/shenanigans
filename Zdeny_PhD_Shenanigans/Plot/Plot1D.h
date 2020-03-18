@@ -4,9 +4,6 @@
 #include "Gui/WindowPlot.h"
 #include "Plot.h"
 
-// TODO: add data add dataData support
-// widget->graph( 0 )->add dataData( x, y1 );
-// widget->graph(1)->add dataData(x, y2);
 using namespace Constants;
 
 class Plot1D
