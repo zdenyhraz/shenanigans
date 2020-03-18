@@ -12,6 +12,8 @@ public:
 
 	static void CloseAll();
 
+	static void Reset( std::string name );
+
 	// x - y add data
 	static void plot( double x, double y, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string savepath = emptystring )
 	{

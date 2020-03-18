@@ -23,6 +23,22 @@ void Plot1D::CloseAll()
 	}
 }
 
+void Plot1D::Reset( std::string name )
+{
+	auto idx = plots.find( name );
+	if ( idx != plots.end() )
+	{
+		LOG_DEBUG( "Reseting 1Dplot '{}'", name );
+		WindowPlot *windowPlot = idx->second;
+		for ( int i = 0; i < windowPlot->ui.widget->graphCount(); i++ )
+			windowPlot->ui.widget->graph( i )->data().data()->clear();
+
+		windowPlot->ui.widget->rescaleAxes();
+		windowPlot->ui.widget->replot();
+		windowPlot->show();
+	}
+}
+
 void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
 {
 	int y1cnt = y1s.size();
@@ -78,8 +94,6 @@ WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2c
 	if ( idx != plots.end() )
 	{
 		windowPlot = idx->second;
-		for ( int i = 0; i < windowPlot->ui.widget->graphCount(); i++ )
-			windowPlot->ui.widget->graph( i )->data().clear();
 	}
 	else
 	{
@@ -131,4 +145,8 @@ void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt,
 
 	if ( y2cnt > 0 )
 		windowPlot->ui.widget->yAxis2->setVisible( true );
+
+	windowPlot->ui.widget->rescaleAxes();
+	windowPlot->ui.widget->replot();
+	windowPlot->show();
 }
