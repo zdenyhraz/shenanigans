@@ -15,8 +15,6 @@ public:
 
 	static void CloseAll();
 
-	static void SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names );
-
 	// x - y add data
 	static void plot( double x, double y, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::string savepath = emptystring )
 	{
@@ -83,4 +81,9 @@ private:
 	static std::map<std::string, WindowPlot *> plots;
 
 	static std::function<void( std::string )> OnClose;
+
+	static void SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names );
+
+	static WindowPlot *RefreshGraph( std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names );
+
 };
