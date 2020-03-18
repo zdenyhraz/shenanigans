@@ -29,14 +29,14 @@ public:
 		if ( 1 )
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
-			Plot2D::plot( applyQuantileColorMap( FlowX, quanBot, quanTop ), "diffrot flow X" );
+			Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X" );
 		}
 
 		// relative flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
-			Plot2D::plot( applyQuantileColorMap( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X" );
+			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X" );
 		}
 
 		// relative flow X binary
