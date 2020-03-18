@@ -285,8 +285,8 @@ Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePicsStyle
 Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB, double quantileT, bool color )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	float caxisMin, caxisMax;
 	sourceimg.convertTo( sourceimg, CV_32F );
+	float caxisMin, caxisMax;
 	std::tie( caxisMin, caxisMax ) = minMaxMat( sourceimg );
 
 	if ( quantileB > 0 || quantileT < 1 )

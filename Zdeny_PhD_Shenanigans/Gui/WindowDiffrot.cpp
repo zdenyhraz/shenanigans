@@ -38,7 +38,6 @@ void WindowDiffrot::calculateDiffrot()
 void WindowDiffrot::showResults()
 {
 	diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
-	LOG_INFO( "Differential rotation results shown" );
 }
 
 void WindowDiffrot::showIPC()
