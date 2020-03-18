@@ -43,7 +43,7 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
-	if ( 0 ) //plot in optimization
+	if ( 1 ) //plot in optimization
 	{
 		Evolution Evo( 2 );
 		Evo.NP = 10;
@@ -79,7 +79,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel( img1, img2, set );
 	}
-	if ( 1 ) //Plot1D + Plot2D test
+	if ( 0 ) //Plot1D + Plot2D test
 	{
 		// 1D
 		int N = 1000;
