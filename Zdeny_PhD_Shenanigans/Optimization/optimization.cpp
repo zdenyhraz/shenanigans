@@ -5,6 +5,7 @@
 
 #include "stdafx.h"
 #include "optimization.h"
+#include "Plot/Plot1D.h"
 
 std::vector<double> Evolution::optimize( std::function<double( std::vector<double> )> f )
 {
@@ -210,7 +211,7 @@ std::vector<double> Evolution::optimize( std::function<double( std::vector<doubl
 			}
 		}
 
-		//if ( plt ) plt->plot( generation, bestFitness, log( bestFitness ) );
+		Plot1D::plot( generation, bestFitness, log( bestFitness ), "evolution", "generation", "fitness", "log fitness" );
 
 		//fill history ques for all entities - termination criterion
 		historyConstant = true;//assume history is constant

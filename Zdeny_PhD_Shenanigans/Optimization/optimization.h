@@ -1,10 +1,7 @@
 #pragma once
 #include "Core/functionsBaseSTL.h"
+#include "Core/functionsBaseCV.h"
 #include "Log/logger.h"
-
-#ifdef OPTIMIZE_WITH_CV
-	#include "Core/functionsBaseCV.h"
-#endif
 
 using namespace std;
 
