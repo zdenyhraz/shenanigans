@@ -85,24 +85,6 @@
     <ClCompile Include="Filtering\filtering.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\WindowDiffrot.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WindowIPC2PicAlign.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WindowIPCoptimize.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WindowIPCparameters.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WindowPlot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WindowTemplate.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="InverseMap\inverseMapping.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -134,6 +116,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowDiffrot.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowIPC2PicAlign.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowIPCoptimize.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowIPCparameters.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowPlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\WindowTemplate.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
   </ItemGroup>
@@ -227,48 +227,48 @@
     <QtMoc Include="Plot\qcustomplot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowDiffrot.h">
+    <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowIPC2PicAlign.h">
+    <QtMoc Include="Gui\Windows\WindowDiffrot.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowIPCoptimize.h">
+    <QtMoc Include="Gui\Windows\WindowIPC2PicAlign.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowIPCparameters.h">
+    <QtMoc Include="Gui\Windows\WindowIPCoptimize.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowPlot.h">
+    <QtMoc Include="Gui\Windows\WindowIPCparameters.h">
+      <Filter>WindowHeaders</Filter>
+    </QtMoc>
+    <QtMoc Include="Gui\Windows\WindowPlot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\WindowTemplate.h">
-      <Filter>WindowHeaders</Filter>
-    </QtMoc>
-    <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h">
+    <QtMoc Include="Gui\Windows\WindowTemplate.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="Gui\WindowDiffrot.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\WindowIPC2PicAlign.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\WindowIPCoptimize.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\WindowIPCparameters.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\WindowPlot.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\WindowTemplate.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowDiffrot.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowIPC2PicAlign.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowIPCoptimize.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowIPCparameters.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowPlot.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\WindowTemplate.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
