@@ -139,12 +139,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Gui\WindowDiffrot.cpp" />
-    <ClCompile Include="Gui\WindowIPC2PicAlign.cpp" />
-    <ClCompile Include="Gui\WindowIPCoptimize.cpp" />
-    <ClCompile Include="Gui\WindowIPCparameters.cpp" />
-    <ClCompile Include="Gui\WindowPlot.cpp" />
-    <ClCompile Include="Gui\WindowTemplate.cpp" />
+    <ClCompile Include="Gui\Windows\WindowDiffrot.cpp" />
+    <ClCompile Include="Gui\Windows\WindowIPC2PicAlign.cpp" />
+    <ClCompile Include="Gui\Windows\WindowIPCoptimize.cpp" />
+    <ClCompile Include="Gui\Windows\WindowIPCparameters.cpp" />
+    <ClCompile Include="Gui\Windows\WindowPlot.cpp" />
+    <ClCompile Include="Gui\Windows\WindowTemplate.cpp" />
     <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,7 +167,7 @@
     <ClInclude Include="Log\logger.h" />
     <ClInclude Include="Neural\neural.h" />
     <ClInclude Include="Optimization\optimization.h" />
-    <QtMoc Include="Gui\WindowPlot.h" />
+    <QtMoc Include="Gui\Windows\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\Plot.h" />
     <ClInclude Include="Plot\Plot1D.h" />
@@ -178,20 +178,20 @@
     <ClInclude Include="Snake\map.h" />
     <ClInclude Include="Snake\snake.h" />
     <ClInclude Include="stdafx.h" />
-    <QtMoc Include="Gui\WindowDiffrot.h" />
-    <QtMoc Include="Gui\WindowIPC2PicAlign.h" />
-    <QtMoc Include="Gui\WindowTemplate.h" />
-    <QtMoc Include="Gui\WindowIPCoptimize.h" />
-    <QtMoc Include="Gui\WindowIPCparameters.h" />
+    <QtMoc Include="Gui\Windows\WindowDiffrot.h" />
+    <QtMoc Include="Gui\Windows\WindowIPC2PicAlign.h" />
+    <QtMoc Include="Gui\Windows\WindowTemplate.h" />
+    <QtMoc Include="Gui\Windows\WindowIPCoptimize.h" />
+    <QtMoc Include="Gui\Windows\WindowIPCparameters.h" />
     <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="Gui\WindowDiffrot.ui" />
-    <QtUic Include="Gui\WindowIPC2PicAlign.ui" />
-    <QtUic Include="Gui\WindowIPCoptimize.ui" />
-    <QtUic Include="Gui\WindowIPCparameters.ui" />
-    <QtUic Include="Gui\WindowPlot.ui" />
-    <QtUic Include="Gui\WindowTemplate.ui" />
+    <QtUic Include="Gui\Windows\WindowDiffrot.ui" />
+    <QtUic Include="Gui\Windows\WindowIPC2PicAlign.ui" />
+    <QtUic Include="Gui\Windows\WindowIPCoptimize.ui" />
+    <QtUic Include="Gui\Windows\WindowIPCparameters.ui" />
+    <QtUic Include="Gui\Windows\WindowPlot.ui" />
+    <QtUic Include="Gui\Windows\WindowTemplate.ui" />
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui" />
   </ItemGroup>
   <ItemGroup>

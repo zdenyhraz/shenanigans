@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "qcustomplot.h"
-#include "Gui/WindowPlot.h"
+#include "Gui/Windows/WindowPlot.h"
 #include "Plot.h"
 
 using namespace Constants;
