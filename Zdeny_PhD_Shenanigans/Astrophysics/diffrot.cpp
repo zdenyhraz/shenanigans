@@ -67,12 +67,12 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasXavgfit = thetaFit( omegasXavg, thetas );
 
 			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> {omegasX, omegasXavg, omegasXavgfit, predicXs[0], predicXs[1]}, std::vector<std::vector<double>> {shiftsX}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasX", "omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, std::vector<std::string> {"shiftsX"} );
-			Plot2D::plot( matFromVector( omegasX2D, true ), "diffrot2D", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, 1, 0, 1 );
+			Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2D", "solar latitude [deg]", "solar longitude [pics]", "horizontal plasma flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1 );
 		}
 	}
 
 	DiffrotResults dr;
-	dr.SetData( matFromVector( image2D, true ), matFromVector( omegasX2D, true ), matFromVector( predicX2D, true ) );
+	dr.SetData( image2D, omegasX2D, predicX2D, thetas );
 	return dr;
 }
 

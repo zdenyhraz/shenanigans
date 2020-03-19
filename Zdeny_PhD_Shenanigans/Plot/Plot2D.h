@@ -10,7 +10,7 @@ public:
 
 	static void CloseAll();
 
-	static void SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax );
+	static void SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string ylabel, std::string zlabel );
 
 	static void plot( const Mat &z, std::string name )
 	{
