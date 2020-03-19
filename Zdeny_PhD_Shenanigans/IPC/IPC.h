@@ -90,7 +90,7 @@ public:
 	}
 };
 
-inline Point2f ipcinsides( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &set, bool forceshow = false )
+inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &set, bool forceshow = false )
 {
 	sourceimg1.convertTo( sourceimg1, CV_32F, 1. / 65535 );
 	sourceimg2.convertTo( sourceimg2, CV_32F, 1. / 65535 );
@@ -341,11 +341,11 @@ inline Point2f phasecorrel( const Mat &sourceimg1In, const Mat &sourceimg2In, co
 	Mat sourceimg1 = sourceimg1In.clone();
 	Mat sourceimg2 = sourceimg2In.clone();
 
-	return ipcinsides( std::move( sourceimg1 ), std::move( sourceimg2 ), set, forceshow );
+	return ipccore( std::move( sourceimg1 ), std::move( sourceimg2 ), set, forceshow );
 }
 
 inline Point2f phasecorrel( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &set, bool forceshow = false )
 {
-	return ipcinsides( std::move( sourceimg1 ), std::move( sourceimg2 ), set, forceshow );
+	return ipccore( std::move( sourceimg1 ), std::move( sourceimg2 ), set, forceshow );
 }
 
