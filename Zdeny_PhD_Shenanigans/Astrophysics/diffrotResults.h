@@ -29,14 +29,14 @@ public:
 		if ( 1 )
 		{
 			showimg( FlowX, "diffrot flow X", true, quanBot, quanTop );
-			Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X" );
+			Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back() );
 		}
 
 		// relative flow X jet
 		if ( 1 )
 		{
 			showimg( FlowX - SourcePredicX, "diffrot relative flow X", true, quanBot, quanTop );
-			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X" );
+			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "solar longitude [pics]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back() );
 		}
 
 		// relative flow X binary
@@ -52,20 +52,19 @@ public:
 		}
 	}
 
-	void SetData( Mat &image, Mat &flowX, Mat &predicX )
+	void SetData( std::vector<std::vector<double>> &image, std::vector<std::vector<double>> &flowX, std::vector<std::vector<double>> &predicX, std::vector<double> &thetas )
 	{
-		flip( image, SourceImage, 1 );
-		flip( flowX, SourceFlowX, 1 );
-		flip( predicX, SourcePredicX, 1 );
-
-		FlowX = SourceFlowX;
-		FlowX.convertTo( FlowX, CV_32F );
+		flip( matFromVector( image, true ), SourceImage, 1 );
+		flip( matFromVector( flowX, true ), SourceFlowX, 1 );
+		flip( matFromVector( predicX, true ), SourcePredicX, 1 );
+		SourceThetas = ( 360. / Constants::TwoPi ) * thetas;
 	}
 
 private:
 	Mat SourceImage;
 	Mat SourceFlowX;
 	Mat SourcePredicX;
+	std::vector<double> SourceThetas;
 
 	Mat FlowX;
 };

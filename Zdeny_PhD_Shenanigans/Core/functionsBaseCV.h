@@ -680,9 +680,9 @@ inline Mat matFromVector( std::vector<double> &vec, int cols )
 	return result;
 }
 
-inline Mat matFromVector( const std::vector<std::vector<double>> &vec, bool colorder = false )
+inline Mat matFromVector( const std::vector<std::vector<double>> &vec, bool transpose = false )
 {
-	if ( colorder )
+	if ( transpose )
 	{
 		int cols = vec.size();
 		int rows = vec[0].size();

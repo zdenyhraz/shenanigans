@@ -35,10 +35,11 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 		windowPlot = new WindowPlot( name, OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
-		SetupGraph( windowPlot, xlabel, ylabel, zlabel, xmin, xmax, ymin, ymax );
+		SetupGraph( windowPlot, xlabel, ylabel, zlabel );
 	}
 
 	windowPlot->colorMap->data()->setSize( z[0].size(), z.size() );
+	windowPlot->colorMap->data()->setRange( QCPRange( xmin, xmax ), QCPRange( ymin, ymax ) );
 	for ( int xIndex = 0; xIndex < z[0].size(); ++xIndex )
 		for ( int yIndex = 0; yIndex < z.size(); ++yIndex )
 			windowPlot->colorMap->data()->setCell( xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex] );
@@ -53,14 +54,13 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
-void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax )
+void Plot2D::SetupGraph( WindowPlot *windowPlot, std::string xlabel, std::string ylabel, std::string zlabel )
 {
 	windowPlot->ui.widget->addGraph();//create graph
 	windowPlot->ui.widget->axisRect()->setupFullAxesBox( true ); //configure axis rect
 	windowPlot->ui.widget->xAxis->setLabel( QString::fromStdString( xlabel ) ); //give the axes some labels
 	windowPlot->ui.widget->yAxis->setLabel( QString::fromStdString( ylabel ) ); //give the axes some labels
 	windowPlot->colorMap = new QCPColorMap( windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis ); //set up the QCPColorMap
-	windowPlot->colorMap->data()->setRange( QCPRange( xmin, xmax ), QCPRange( ymin, ymax ) ); //and span the coordinate range in both key (x) and value (y) dimensions
 	windowPlot->ui.widget->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom ); //allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
 	windowPlot->colorScale = new QCPColorScale( windowPlot->ui.widget ); //add a color scale
 	windowPlot->ui.widget->plotLayout()->addElement( 0, 1, windowPlot->colorScale ); //add it to the right of the main axis rect
