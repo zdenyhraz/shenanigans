@@ -145,7 +145,7 @@
     <ClCompile Include="Gui\WindowIPCparameters.cpp" />
     <ClCompile Include="Gui\WindowPlot.cpp" />
     <ClCompile Include="Gui\WindowTemplate.cpp" />
-    <ClCompile Include="Gui\Zdeny_PhD_Shenanigans.cpp" />
+    <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Astrophysics\diffrot.h" />
@@ -183,7 +183,7 @@
     <QtMoc Include="Gui\WindowTemplate.h" />
     <QtMoc Include="Gui\WindowIPCoptimize.h" />
     <QtMoc Include="Gui\WindowIPCparameters.h" />
-    <QtMoc Include="Gui\Zdeny_PhD_Shenanigans.h" />
+    <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Gui\WindowDiffrot.ui" />
@@ -192,7 +192,7 @@
     <QtUic Include="Gui\WindowIPCparameters.ui" />
     <QtUic Include="Gui\WindowPlot.ui" />
     <QtUic Include="Gui\WindowTemplate.ui" />
-    <QtUic Include="Gui\Zdeny_PhD_Shenanigans.ui" />
+    <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Resources\Zdeny_PhD_Shenanigans.qrc" />

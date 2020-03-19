@@ -103,9 +103,6 @@
     <ClCompile Include="Gui\WindowTemplate.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\Zdeny_PhD_Shenanigans.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="InverseMap\inverseMapping.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -135,6 +132,9 @@
     </ClCompile>
     <ClCompile Include="Plot\Plot.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp">
+      <Filter>WindowCpps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,7 +245,7 @@
     <QtMoc Include="Gui\WindowTemplate.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Zdeny_PhD_Shenanigans.h">
+    <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
   </ItemGroup>
@@ -268,7 +268,7 @@
     <QtUic Include="Gui\WindowTemplate.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Zdeny_PhD_Shenanigans.ui">
+    <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

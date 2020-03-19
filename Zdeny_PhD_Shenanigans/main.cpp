@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Gui/Zdeny_PhD_Shenanigans.h"
+#include "Gui/Main/Zdeny_PhD_Shenanigans.h"
 
 #ifdef ATTACH_CONSOLE
 	#include <windows.h>

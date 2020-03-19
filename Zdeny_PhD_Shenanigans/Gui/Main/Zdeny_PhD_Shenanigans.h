@@ -1,9 +1,9 @@
 #pragma once
 #include "ui_Zdeny_PhD_Shenanigans.h"
-#include "WindowIPCparameters.h"
-#include "WindowIPCoptimize.h"
-#include "WindowIPC2PicAlign.h"
-#include "WindowDiffrot.h"
+#include "Gui/WindowIPCparameters.h"
+#include "Gui/WindowIPCoptimize.h"
+#include "Gui/WindowIPC2PicAlign.h"
+#include "Gui/WindowDiffrot.h"
 
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
