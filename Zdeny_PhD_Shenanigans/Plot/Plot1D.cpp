@@ -37,7 +37,7 @@ void Plot1D::Reset( std::string name )
 	}
 }
 
-void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
+void Plot1D::plotcore( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
 {
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
@@ -61,7 +61,7 @@ void Plot1D::plotinsides( const std::vector<double> &x, const std::vector<std::v
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
-void Plot1D::plotinsides( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
+void Plot1D::plotcore( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
 {
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
