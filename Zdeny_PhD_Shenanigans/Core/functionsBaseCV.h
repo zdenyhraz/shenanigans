@@ -479,12 +479,12 @@ inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color 
 	Mat sourceimg = sourceimgIn.clone();
 
 	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
-	int namedWindowRows = 600;
-	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
+	int wRows = 600;
+	int wCols = ( double )wRows / RowColRatio;
 	namedWindow( windowname, WINDOW_NORMAL );
 
 	if ( showSize == Size2i( 0, 0 ) )
-		resizeWindow( windowname, namedWindowCols, namedWindowRows );
+		resizeWindow( windowname, wCols, wRows );
 	else
 		resizeWindow( windowname, showSize );
 
@@ -533,15 +533,15 @@ inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = f
 	sourceimg.convertTo( sourceimg, CV_8U );
 
 	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
-	int namedWindowRows = 1700;
-	int namedWindowCols = ( double )namedWindowRows / RowColRatio;
+	int namedwRows = 1700;
+	int namedwCols = ( double )namedwRows / RowColRatio;
 
 	if ( exportSize == Size2i( 0, 0 ) )
 	{
 		if ( bilinear )
-			resize( sourceimg, sourceimg, Size2i( namedWindowCols, namedWindowRows ), 0, 0, INTER_LINEAR );
+			resize( sourceimg, sourceimg, Size2i( namedwCols, namedwRows ), 0, 0, INTER_LINEAR );
 		else
-			resize( sourceimg, sourceimg, Size2i( namedWindowCols, namedWindowRows ), 0, 0, INTER_NEAREST );
+			resize( sourceimg, sourceimg, Size2i( namedwCols, namedwRows ), 0, 0, INTER_NEAREST );
 	}
 	else
 	{
