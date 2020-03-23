@@ -32,7 +32,7 @@ void Plot2D::plotcore( const std::vector<std::vector<double>> &z, std::string na
 	}
 	else
 	{
-		windowPlot = new WindowPlot( name, colRowRatio * ( double )z[0].size() / z.size(), OnClose );
+		windowPlot = new WindowPlot( name, clamp( colRowRatio * ( double )z[0].size() / z.size(), 1, 3 ), OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, xlabel, ylabel, zlabel );
