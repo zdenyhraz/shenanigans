@@ -35,13 +35,13 @@ public:
 		// flow X jet
 		if ( 1 )
 		{
-			Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back(), colRowRatio, savepath );
+			Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "solar longitude [pics]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "diffrot flow X.png" );
 		}
 
 		// relative flow X jet
 		if ( 1 )
 		{
-			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "solar longitude [pics]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back(), colRowRatio, savepath );
+			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "solar longitude [pics]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 1, FlowX.cols, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "diffrot relative flow X.png" );
 		}
 
 		// relative flow X binary
@@ -85,6 +85,6 @@ private:
 	std::vector<double> SourcePredicX2;
 
 	Mat FlowX;
-	std::string savepath = "";
+	std::string saveDir = "C:\\Users\\Zdeny\\Desktop\\PhD_things\\diffrot\\plotsave\\";
 	static constexpr double colRowRatio = 2;
 };
