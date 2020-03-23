@@ -22,5 +22,5 @@ QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 	if ( w + windowPlot->width() < screenwidth )
 		return QPoint( w, 0 );
 	else
-		return QPoint( w % screenwidth, windowPlot->height() + 20 );
+		return QPoint( w % screenwidth, w / screenwidth * windowPlot->height() + 20 );
 }
