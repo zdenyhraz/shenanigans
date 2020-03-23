@@ -21,7 +21,7 @@ void Plot2D::CloseAll()
 	}
 }
 
-void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, std::string savepath )
+void Plot2D::plotcore( const std::vector<std::vector<double>> &z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax, double colRowRatio, std::string savepath )
 {
 	WindowPlot *windowPlot;
 	auto idx = Plot::plots.find( name );
@@ -32,7 +32,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	}
 	else
 	{
-		windowPlot = new WindowPlot( name, ( double )z.size() / z[0].size(), OnClose );
+		windowPlot = new WindowPlot( name, colRowRatio * ( double )z[0].size() / z.size(), OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, xlabel, ylabel, zlabel );

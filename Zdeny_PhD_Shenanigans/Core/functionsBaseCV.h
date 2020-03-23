@@ -478,9 +478,9 @@ inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color 
 {
 	Mat sourceimg = sourceimgIn.clone();
 
-	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
+	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;
 	int wRows = 600;
-	int wCols = ( double )wRows / RowColRatio;
+	int wCols = ( double )wRows * colRowRatio;
 	namedWindow( windowname, WINDOW_NORMAL );
 
 	if ( showSize == Size2i( 0, 0 ) )
@@ -532,9 +532,9 @@ inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = f
 	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
 	sourceimg.convertTo( sourceimg, CV_8U );
 
-	double RowColRatio = ( double )sourceimg.rows / ( double )sourceimg.cols;
+	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;
 	int namedwRows = 1700;
-	int namedwCols = ( double )namedwRows / RowColRatio;
+	int namedwCols = ( double )namedwRows * colRowRatio;
 
 	if ( exportSize == Size2i( 0, 0 ) )
 	{
