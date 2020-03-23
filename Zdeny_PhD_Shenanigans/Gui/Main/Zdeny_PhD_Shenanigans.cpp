@@ -116,7 +116,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		}
 
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
-		Plot2D::plot( Z, "niceplot", "X", "Y", "Z" );
+		Plot2D::plot( Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2 );
 	}
 
 	LOG_INFO( "Debug finished." );
