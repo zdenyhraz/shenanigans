@@ -32,7 +32,7 @@ void Plot2D::plot( const std::vector<std::vector<double>> &z, std::string name, 
 	}
 	else
 	{
-		windowPlot = new WindowPlot( name, OnClose );
+		windowPlot = new WindowPlot( name, ( double )z.size() / z[0].size(), OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, xlabel, ylabel, zlabel );
