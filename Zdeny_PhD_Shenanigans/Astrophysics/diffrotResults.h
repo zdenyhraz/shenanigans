@@ -23,7 +23,7 @@ public:
 		// diffrot profile
 		if ( 1 )
 		{
-			Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgfit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, saveDir + "diffrot profile X.png" );
+			Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "diffrot profile X.png" );
 		}
 
 		// source img
@@ -64,11 +64,12 @@ public:
 		flip( matFromVector( predicX, true ), SourcePredicX, 1 );
 	}
 
-	void SetData1D( std::vector<double> &thetas, std::vector<double> &omegasXavg, std::vector<double> &omegasXavgfit, std::vector<double> &predicX1, std::vector<double> &predicX2 )
+	void SetData1D( std::vector<double> &thetas, std::vector<double> &omegasXavg, std::vector<double> &omegasXavgpolyfit, std::vector<double> &omegasXavgsin2sin4fit, std::vector<double> &predicX1, std::vector<double> &predicX2 )
 	{
 		SourceThetas = ( 360. / Constants::TwoPi ) * thetas;
 		SourceOmegasXavg = omegasXavg;
-		SourceOmegasXavgfit = omegasXavgfit;
+		SourceOmegasXavgpolyfit = omegasXavgpolyfit;
+		SourceOmegasXavgsin2sin4fit = omegasXavgsin2sin4fit;
 		SourcePredicX1 = predicX1;
 		SourcePredicX2 = predicX2;
 	}
@@ -80,7 +81,8 @@ private:
 
 	std::vector<double> SourceThetas;
 	std::vector<double> SourceOmegasXavg;
-	std::vector<double> SourceOmegasXavgfit;
+	std::vector<double> SourceOmegasXavgpolyfit;
+	std::vector<double> SourceOmegasXavgsin2sin4fit;
 	std::vector<double> SourcePredicX1;
 	std::vector<double> SourcePredicX2;
 
