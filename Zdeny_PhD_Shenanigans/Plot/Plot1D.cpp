@@ -95,7 +95,7 @@ WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2c
 	}
 	else
 	{
-		windowPlot = new WindowPlot( name, 1, OnClose );
+		windowPlot = new WindowPlot( name, 1.2, OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
 		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
