@@ -449,3 +449,56 @@ inline std::string operator+( const int val, const std::string &str )
 	return to_string( val ) + str;
 }
 
+inline void filterMedian( std::vector<double> &vec, int size )
+{
+	std::vector<double> vecMedian = vec;
+	std::vector<double> med;
+	med.reserve( size );
+
+	for ( int i = 0; i < vec.size(); i++ )
+	{
+		med.clear();
+		for ( int m = 0; m < size; m++ )
+		{
+			int idx = i - size / 2 + m;
+
+			if ( idx < 0 )
+				continue;
+			if ( idx == vec.size() )
+				break;
+
+			med.emplace_back( vec[idx] );
+		}
+
+		vecMedian[i] = median( med );
+	}
+	vec = vecMedian;
+}
+
+inline void filterMovavg( std::vector<double> &vec, int size )
+{
+	std::vector<double> vecMovavg = vec;
+	double movavg;
+	int movavgcnt;
+
+	for ( int i = 0; i < vec.size(); i++ )
+	{
+		movavg = 0;
+		movavgcnt = 0;
+		for ( int m = 0; m < size; m++ )
+		{
+			int idx = i - size / 2 + m;
+
+			if ( idx < 0 )
+				continue;
+			if ( idx == vec.size() )
+				break;
+
+			movavg += vec[idx];
+			movavgcnt += 1;
+		}
+		movavg /= ( double )movavgcnt;
+		vecMovavg[i] = movavg;
+	}
+	vec = vecMovavg;
+}
