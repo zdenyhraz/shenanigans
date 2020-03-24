@@ -89,10 +89,10 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 
 	if ( drset.medianFilter )
-		filterShiftsMEDIAN( shiftsX, drset.medianFilterSize );
+		filterMedian( shiftsX, drset.medianFilterSize );
 
 	if ( drset.movavgFilter )
-		filterShiftsMOVAVG( shiftsX, drset.movavgFilterSize );
+		filterMovavg( shiftsX, drset.movavgFilterSize );
 
 	for ( int y = 0; y < drset.ys; y++ )
 	{
@@ -103,60 +103,6 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
 		// etc...
 	}
-}
-
-void filterShiftsMEDIAN( std::vector<double> &shiftsX, int size )
-{
-	auto shiftsXma = shiftsX;
-	std::vector<double> med;
-	med.reserve( size );
-
-	for ( int i = 0; i < shiftsX.size(); i++ )
-	{
-		med.clear();
-		for ( int m = 0; m < size; m++ )
-		{
-			int idx = i - size / 2 + m;
-
-			if ( idx < 0 )
-				continue;
-			if ( idx == shiftsX.size() )
-				break;
-
-			med.emplace_back( shiftsX[idx] );
-		}
-
-		shiftsXma[i] = median( med );
-	}
-	shiftsX = shiftsXma;
-}
-
-void filterShiftsMOVAVG( std::vector<double> &shiftsX, int size )
-{
-	auto shiftsXma = shiftsX;
-	double movavg;
-	int movavgcnt;
-
-	for ( int i = 0; i < shiftsX.size(); i++ )
-	{
-		movavg = 0;
-		movavgcnt = 0;
-		for ( int m = 0; m < size; m++ )
-		{
-			int idx = i - size / 2 + m;
-
-			if ( idx < 0 )
-				continue;
-			if ( idx == shiftsX.size() )
-				break;
-
-			movavg += shiftsX[idx];
-			movavgcnt += 1;
-		}
-		movavg /= ( double )movavgcnt;
-		shiftsXma[i] = movavg;
-	}
-	shiftsX = shiftsXma;
 }
 
 double predictDiffrotProfile( double theta, double A, double B, double C )
