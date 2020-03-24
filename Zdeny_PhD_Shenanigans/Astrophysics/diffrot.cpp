@@ -8,6 +8,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	int dy = drset.vFov / ( drset.ys - 1 );
 	std::vector<std::vector<double>> thetas2D;
 	std::vector<std::vector<double>> omegasX2D;
+	std::vector<std::vector<double>> shiftsX2D;
 	std::vector<std::vector<double>> predicX2D;
 	std::vector<std::vector<double>> image2D;
 	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys );
@@ -17,10 +18,12 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	std::vector<double> image( drset.ys );
 
 	std::vector<double> omegasXavg( drset.ys );
+	std::vector<double> shiftsXavg( drset.ys );
 	std::vector<double> omegasXavgfit( drset.ys );
 
 	thetas2D.reserve( drset.pics );
 	omegasX2D.reserve( drset.pics );
+	shiftsX2D.reserve( drset.pics );
 	predicX2D.reserve( drset.pics );
 	image2D.reserve( drset.pics );
 
@@ -60,13 +63,15 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			thetas2D.emplace_back( thetas );
 			omegasX2D.emplace_back( omegasX );
+			shiftsX2D.emplace_back( shiftsX );
 			predicX2D.emplace_back( predicXs[0] );
 			image2D.emplace_back( image );
 
 			omegasXavg = meanVertical( omegasX2D );
+			shiftsXavg = meanVertical( shiftsX2D );
 			omegasXavgfit = polyfit( thetas, omegasXavg, 2 );
 
-			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsX}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgfit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsX"} );
+			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1D", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgfit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
 			Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2D", "solar latitude [deg]", "solar longitude [pics]", "horizontal plasma flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
 		}
 	}
