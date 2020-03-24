@@ -23,7 +23,7 @@ public:
 		// diffrot profile
 		if ( 1 )
 		{
-			Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgfit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, saveDir + "_diffrot profile X.png" );
+			Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgfit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgfit", "predicX1", "predicX2"}, saveDir + "diffrot profile X.png" );
 		}
 
 		// source img
