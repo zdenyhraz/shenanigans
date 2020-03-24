@@ -18,20 +18,17 @@ inline std::tuple<double, double> minMaxMat( const Mat &sourceimg )
 	return make_tuple( minR, maxR );
 }
 
-inline std::vector<double> polyfit( const std::vector<double> &data, int degree )
+inline std::vector<double> polyfitcore( const std::vector<double> &xdata, const std::vector<double> &ydata, int degree )
 {
-	int dataCount = data.size();
+	int dataCount = ydata.size();
 	Mat X = Mat::zeros( dataCount, degree + 1, CV_32F ); //matice planu
 	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
 	for ( int r = 0; r < X.rows; r++ )
 	{
-		Y.at<float>( r, 0 ) = data[r];
+		Y.at<float>( r, 0 ) = ydata[r];
 		for ( int c = 0; c < X.cols; c++ )
 		{
-			if ( !c )
-				X.at<float>( r, c ) = 1;
-			else
-				X.at<float>( r, c ) = pow( r, c );
+			X.at<float>( r, c ) = pow( xdata[r], c );
 		}
 	}
 	Mat coeffs = ( X.t() * X ).inv() * X.t() * Y; //least squares
@@ -44,21 +41,30 @@ inline std::vector<double> polyfit( const std::vector<double> &data, int degree 
 	return fit;
 }
 
+inline std::vector<double> polyfit( const std::vector<double> &ydata, int degree )
+{
+	std::vector<double> xdata;
+	std::iota( xdata.begin(), xdata.end(), 1 );
+	return polyfitcore( xdata, ydata, degree );
+}
+
 inline std::vector<double> polyfit( const std::vector<double> &xdata, const std::vector<double> &ydata, int degree )
 {
+	return polyfitcore( xdata, ydata, degree );
+}
+
+inline std::vector<double> sin2sin4fit( const std::vector<double> &xdata, const std::vector<double> &ydata )
+{
 	int dataCount = ydata.size();
-	Mat X = Mat::zeros( dataCount, degree + 1, CV_32F ); //matice planu
+	Mat X = Mat::zeros( dataCount, 3, CV_32F ); //matice planu
 	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
 	for ( int r = 0; r < X.rows; r++ )
 	{
 		Y.at<float>( r, 0 ) = ydata[r];
-		for ( int c = 0; c < X.cols; c++ )
-		{
-			if ( !c )
-				X.at<float>( r, c ) = 1;
-			else
-				X.at<float>( r, c ) = pow( xdata[r], c );
-		}
+
+		X.at<float>( r, 0 ) = 1;
+		X.at<float>( r, 1 ) = pow( sin( xdata[r] ), 2 );
+		X.at<float>( r, 2 ) = pow( sin( xdata[r] ), 4 );
 	}
 	Mat coeffs = ( X.t() * X ).inv() * X.t() * Y; //least squares
 	Mat fitM = X * coeffs;
