@@ -246,7 +246,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_6">
          <property name="text">
-          <string>1</string>
+          <string>25</string>
          </property>
         </widget>
        </item>
@@ -359,13 +359,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>Show 2pic IPC</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QPushButton" name="pushButton_4">
        <property name="text">
@@ -373,14 +366,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QPushButton" name="pushButton_5">
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton_3">
        <property name="text">
-        <string>Optimize fit predicted</string>
+        <string>Show 2pic IPC</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="3" column="0">
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
         <string>Show results</string>
