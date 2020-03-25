@@ -4,12 +4,6 @@
 #include "Gui/Windows/WindowIPCoptimize.h"
 #include "Gui/Windows/WindowIPC2PicAlign.h"
 #include "Gui/Windows/WindowDiffrot.h"
-#include "Plot/Plot1D.h"
-#include "Plot/Plot2D.h"
-#include "Log/logger.h"
-#include "Procedural/procedural.h"
-#include "Snake/game.h"
-#include "Optimization/optimization.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {

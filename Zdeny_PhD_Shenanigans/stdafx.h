@@ -18,7 +18,6 @@
 #include <numeric>
 #include <time.h>
 #include <math.h>
-#include <omp.h>
 #include <filesystem>
 #include <queue>
 #include <functional>
@@ -30,7 +29,7 @@
 //OpenMP
 #include <omp.h>
 //OpenCV
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
