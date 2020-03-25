@@ -32,12 +32,6 @@ public:
 			Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "shifts profile X.png" );
 		}
 
-		// source img
-		if ( 1 )
-		{
-			showimg( SourceImage, "diffrot source" );
-		}
-
 		// flow X jet
 		if ( 1 )
 		{
@@ -50,10 +44,16 @@ public:
 			Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [hours]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrot relative flow X.png" );
 		}
 
+		// source img
+		if ( 1 )
+		{
+			showimg( SourceImage, "diffrot source" );
+		}
+
 		// relative flow X binary
 		if ( 1 )
 		{
-			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, binary, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
+			showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, bluered, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
 		}
 
 		// relative magnitude & absolute phase
