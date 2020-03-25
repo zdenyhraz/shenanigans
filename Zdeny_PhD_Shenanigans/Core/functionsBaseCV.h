@@ -9,7 +9,7 @@ using namespace std;
 using namespace cv;
 
 enum ColorMapStyle { CM_JET, CM_BINARY };
-enum CombinePicsStyle { huebright, binary };
+enum CombinePicsStyle { huebright, bluered };
 
 inline std::tuple<double, double> minMaxMat( const Mat &sourceimg )
 {
@@ -401,7 +401,7 @@ inline Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePi
 			}
 		}
 	}
-	if ( style == binary )
+	if ( style == bluered )
 	{
 		normalize( source2, source2, 0, 1, CV_MINMAX );
 		auto minMax = minMaxMat( source1 );
