@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "WindowIPC2PicAlign.h"
-#include "Astrophysics/functionsAstro.h"
-
+#include "Astrophysics/SwindFlow.h"
 #include "Plot/Plot2D.h"
 #include "IPC/ipcAux.h"
 

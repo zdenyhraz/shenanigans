@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Astrophysics\diffrot.h" />
     <ClInclude Include="Astrophysics\diffrotResults.h" />
+    <ClInclude Include="Astrophysics\SwindFlow.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Filtering\filtering.h" />
