@@ -73,12 +73,6 @@
     <ClCompile Include="Fractal\fractal.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
-    <ClCompile Include="Core\functionsBaseSTL.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\functionsBaseCV.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
     <ClCompile Include="Filtering\filtering.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -98,9 +92,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IPC\ipcAux.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Astrophysics\diffrotResults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Plot\Plot2D.cpp">

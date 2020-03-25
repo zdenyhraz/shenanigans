@@ -109,14 +109,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Astrophysics\diffrot.cpp" />
-    <ClCompile Include="Astrophysics\diffrotResults.cpp" />
     <ClCompile Include="Filtering\filtering.cpp" />
     <ClCompile Include="Astrophysics\FITS.cpp" />
     <ClCompile Include="Fourier\fourier.cpp" />
     <ClCompile Include="Fractal\fractal.cpp" />
     <ClCompile Include="Astrophysics\SDOipcOpt.cpp" />
-    <ClCompile Include="Core\functionsBaseCV.cpp" />
-    <ClCompile Include="Core\functionsBaseSTL.cpp" />
     <ClCompile Include="IPC\ipcAux.cpp" />
     <ClCompile Include="Log\logger.cpp" />
     <ClCompile Include="Optimization\graphOptimization.cpp" />
