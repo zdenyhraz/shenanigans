@@ -32,6 +32,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 	connect( ui.actionPlay, SIGNAL( triggered() ), this, SLOT( playSnake() ) );
 	connect( ui.actionGenerate_land, SIGNAL( triggered() ), this, SLOT( generateLand() ) );
 	connect( ui.actionFits_downloader, SIGNAL( triggered() ), this, SLOT( fitsDownloader() ) );
+	connect( ui.actionFits_checker, SIGNAL( triggered() ), this, SLOT( fitsDownloadChecker() ) );
 
 	LOG_SUCC( "Welcome back, my friend." ); //log a welcome message
 }
@@ -180,6 +181,14 @@ void Zdeny_PhD_Shenanigans::fitsDownloader()
 	//generateFitsDownloadUrlSingles( 1, 2000, urlmain );
 	generateFitsDownloadUrlPairs( 1, 25, 2000, urlmain );
 	LOG_INFO( "Fits download urls created" );
+}
+
+void Zdeny_PhD_Shenanigans::fitsDownloadChecker()
+{
+	std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
+	std::string path = "D:\\SDOpics\\Calm2020stride\\";
+	checkFitsDownloadUrlPairs( 1, 25, 2000, urlmain, path );
+	LOG_INFO( "Fits download urls checked" );
 }
 
 void Zdeny_PhD_Shenanigans::closeEvent( QCloseEvent *event )

@@ -345,7 +345,7 @@ void generateFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain
 
 void generateFitsDownloadUrlSingles( int delta, int pics, string urlmain );
 
-void checkFitsDownloadsAndCreateFile( int delta, int step, int pics, string urlmain, string pathMasterIn );
+void checkFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain, string pathMasterIn );
 
 void loadImageDebug( Mat &activeimg, double gamaa, bool colorr, double quanBot, double quanTop );
 
