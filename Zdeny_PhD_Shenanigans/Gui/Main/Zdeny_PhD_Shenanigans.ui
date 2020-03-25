@@ -197,6 +197,7 @@
     </property>
     <addaction name="actiondiffrot"/>
     <addaction name="actionFits_downloader"/>
+    <addaction name="actionFits_checker"/>
    </widget>
    <widget class="QMenu" name="menuSnake">
     <property name="title">
@@ -338,10 +339,13 @@
     <string>Fits downloader</string>
    </property>
   </action>
+  <action name="actionFits_checker">
+   <property name="text">
+    <string>Fits checker</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../Resources/Zdeny_PhD_Shenanigans.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

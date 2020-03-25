@@ -27,6 +27,8 @@
 #include <tuple>
 #include <thread>
 #include <memory>
+//OpenMP
+#include <omp.h>
 //OpenCV
 #include "opencv2/opencv.hpp"
 #include <opencv2/core.hpp>

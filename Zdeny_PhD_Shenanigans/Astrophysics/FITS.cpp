@@ -145,9 +145,9 @@ void generateFitsDownloadUrlSingles( int delta, int pics, string urlmain )
 	}
 }
 
-void checkFitsDownloadsAndCreateFile( int delta, int step, int pics, string urlmain, string pathMasterIn )
+void checkFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain, string pathMasterIn )
 {
-	std::ofstream urls( "D:\\processedurls_missing.txt", std::ios::out | std::ios::trunc );
+	std::ofstream urls( "D:\\MainOutput\\Fits_urls\\processedurls_missing.txt", std::ios::out | std::ios::trunc );
 	string pathmain = "drms_export.cgi@series=hmi__Ic_45s;record=";
 	std::size_t posR = urlmain.find( "record=" );
 	std::size_t posN = posR + 7;
@@ -162,29 +162,26 @@ void checkFitsDownloadsAndCreateFile( int delta, int step, int pics, string urlm
 		string url2 = urlmain + to_string( number ) + "-" + to_string( number );
 		string path2 = pathMasterIn + pathmain + to_string( number ) + "-" + to_string( number );
 
-		ifstream streamIN1( path1, ios::binary | ios::in );
-		if ( !streamIN1 )
+		ifstream stream1( path1, ios::binary | ios::in );
+		if ( !stream1 )
 		{
-			cout << "File " << path1 << " not found! Adding path to text file .." << endl;
+			LOG_ERROR( "File '{}' not found! Adding path to text file ..", path1 );
 			urls << url1 << endl;
 		}
 		else
 		{
-			cout << "File " << path1 << " ok" << endl;
+			LOG_SUCC( "File '{}' ok", path1 );
 		}
 
-		if ( delta > 0 )
+		ifstream stream2( path2, ios::binary | ios::in );
+		if ( !stream2 )
 		{
-			ifstream streamIN2( path2, ios::binary | ios::in );
-			if ( !streamIN2 )
-			{
-				cout << "File " << path2 << " not found! Adding path to text file .." << endl;
-				urls << url2 << endl;
-			}
-			else
-			{
-				cout << "File " << path2 << " ok" << endl;
-			}
+			LOG_ERROR( "File '{}' not found! Adding path to text file ..", path2 );
+			urls << url2 << endl;
+		}
+		else
+		{
+			LOG_SUCC( "File '{}' ok", path2 );
 		}
 
 		number += step - delta;
