@@ -47,4 +47,7 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Log/logger.h"
+#include "Plot/Plot1D.h"
+#include "Plot/Plot2D.h"
+
 

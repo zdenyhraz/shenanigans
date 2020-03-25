@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowIPCoptimize.h"
 #include "WindowIPCparameters.h"
-#include "Astrophysics/functionsAstro.h"
+#include "Astrophysics/SDOipcOpt.h"
 
 
 WindowIPCoptimize::WindowIPCoptimize( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
@@ -21,8 +21,7 @@ void WindowIPCoptimize::optimize()
 		Evo.upperBounds = zerovect( 2, +100 );
 		Evo.optimize( [&]( std::vector<double> arg ) {return sin( sqr( arg[0] ) - sqr( arg[1] - 3 ) + 6 ); } );
 	}
-	optimizeIPCParameters( *globals->IPCset, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(),
-	                       ui.lineEdit_5->text().toInt() );
+	optimizeIPCParameters( *globals->IPCset, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt() );
 	LOG_DEBUG( "IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString() );
 }
 
