@@ -9,6 +9,7 @@
 #include "Log/logger.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
+#include "Optimization/optimization.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {

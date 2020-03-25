@@ -1,9 +1,5 @@
-//various image processing / optimization / fractal functions
-//PhD work of Zdenek Hrazdira
-//made during 2018-2019
-
 #include "stdafx.h"
-#include "functionsAstro.h"
+#include "SDOipcOpt.h"
 
 double absoluteSubpixelRegistrationError( IPCsettings &set, const Mat &src, double noisestddev, double maxShift, double accuracy )
 {

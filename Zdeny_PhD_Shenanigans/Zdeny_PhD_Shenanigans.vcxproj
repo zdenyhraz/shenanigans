@@ -114,7 +114,7 @@
     <ClCompile Include="Astrophysics\FITS.cpp" />
     <ClCompile Include="Fourier\fourier.cpp" />
     <ClCompile Include="Fractal\fractal.cpp" />
-    <ClCompile Include="Astrophysics\functionsAstro.cpp" />
+    <ClCompile Include="Astrophysics\SDOipcOpt.cpp" />
     <ClCompile Include="Core\functionsBaseCV.cpp" />
     <ClCompile Include="Core\functionsBaseSTL.cpp" />
     <ClCompile Include="IPC\ipcAux.cpp" />
@@ -157,7 +157,7 @@
     <ClInclude Include="Astrophysics\FITS.h" />
     <ClInclude Include="Fourier\fourier.h" />
     <ClInclude Include="Fractal\fractal.h" />
-    <ClInclude Include="Astrophysics\functionsAstro.h" />
+    <ClInclude Include="Astrophysics\SDOipcOpt.h" />
     <ClInclude Include="Core\functionsBaseCV.h" />
     <ClInclude Include="Core\functionsBaseSTL.h" />
     <ClInclude Include="Core\globals.h" />
