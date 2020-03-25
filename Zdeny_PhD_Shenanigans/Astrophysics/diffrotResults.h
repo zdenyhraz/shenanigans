@@ -26,6 +26,12 @@ public:
 			Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "diffrot profile X.png" );
 		}
 
+		// shifts profile
+		if ( 1 )
+		{
+			Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "shifts profile X.png" );
+		}
+
 		// source img
 		if ( 1 )
 		{
@@ -57,14 +63,14 @@ public:
 		}
 	}
 
-	void SetData2D( std::vector<std::vector<double>> &image, std::vector<std::vector<double>> &flowX, std::vector<std::vector<double>> &predicX )
+	void SetData2D( const std::vector<std::vector<double>> &image, const std::vector<std::vector<double>> &flowX, const std::vector<std::vector<double>> &predicX )
 	{
 		flip( matFromVector( image, true ), SourceImage, 1 );
 		flip( matFromVector( flowX, true ), SourceFlowX, 1 );
 		flip( matFromVector( predicX, true ), SourcePredicX, 1 );
 	}
 
-	void SetData1D( std::vector<double> &thetas, std::vector<double> &omegasXavg, std::vector<double> &omegasXavgpolyfit, std::vector<double> &omegasXavgsin2sin4fit, std::vector<double> &predicX1, std::vector<double> &predicX2 )
+	void SetData1D( const std::vector<double> &thetas, const std::vector<double> &omegasXavg, const std::vector<double> &omegasXavgpolyfit, const std::vector<double> &omegasXavgsin2sin4fit, const std::vector<double> &predicX1, const std::vector<double> &predicX2, const std::vector<double> &shiftsX )
 	{
 		SourceThetas = ( 360. / Constants::TwoPi ) * thetas;
 		SourceOmegasXavg = omegasXavg;
@@ -72,6 +78,7 @@ public:
 		SourceOmegasXavgsin2sin4fit = omegasXavgsin2sin4fit;
 		SourcePredicX1 = predicX1;
 		SourcePredicX2 = predicX2;
+		SourceShiftsX = shiftsX;
 	}
 
 	void SetParams( int stride )
@@ -91,6 +98,7 @@ private:
 	std::vector<double> SourceOmegasXavgsin2sin4fit;
 	std::vector<double> SourcePredicX1;
 	std::vector<double> SourcePredicX2;
+	std::vector<double> SourceShiftsX;
 
 	Mat FlowX;
 	std::string saveDir = "C:\\Users\\Zdeny\\Desktop\\PhD_things\\diffrot\\plotsave\\";

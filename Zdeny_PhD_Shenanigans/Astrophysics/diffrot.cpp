@@ -79,7 +79,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	}
 
 	DiffrotResults dr;
-	dr.SetData1D( thetas, omegasXavg, omegasXavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1] );
+	dr.SetData1D( thetas, omegasXavg, omegasXavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], shiftsXavg );
 	dr.SetData2D( image2D, omegasX2D, predicX2D );
 	dr.SetParams( drset.sPic );
 	return dr;
