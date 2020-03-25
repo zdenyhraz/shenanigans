@@ -64,9 +64,6 @@
     <ClCompile Include="Astrophysics\FITS.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
-    <ClCompile Include="Astrophysics\functionsAstro.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
     <ClCompile Include="IPC\IPC.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -136,6 +133,9 @@
     <ClCompile Include="Gui\Windows\WindowTemplate.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
+    <ClCompile Include="Astrophysics\SDOipcOpt.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -151,9 +151,6 @@
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
     <ClInclude Include="Astrophysics\FITS.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Astrophysics\functionsAstro.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
     <ClInclude Include="IPC\IPC.h">
@@ -224,6 +221,9 @@
     </ClInclude>
     <ClInclude Include="Astrophysics\SwindFlow.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Astrophysics\SDOipcOpt.h">
+      <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

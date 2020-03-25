@@ -1,7 +1,6 @@
 #pragma once
 #include "ui_WindowDiffrot.h"
 #include "Core/globals.h"
-#include "Astrophysics/functionsAstro.h"
 #include "Astrophysics/diffrotResults.h"
 
 class WindowDiffrot : public QMainWindow

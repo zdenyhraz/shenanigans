@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "functionsAstro.h"
+#include "IPC/IPC.h"
 #include "diffrotResults.h"
 
 static constexpr int plusminusbufer = 4;//even!
