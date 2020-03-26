@@ -21,16 +21,16 @@ public:
 		}
 
 		// diffrot profile
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "diffrot profile X.png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "diffrotprofileXs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile
-		Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "shifts profile X.png" );
+		Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "shiftsprofileXs" + to_string( SourceStride ) + ".png" );
 
 		// flow X jet
-		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [hours]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrot flow X.png" );
+		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [hours]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotflowXs" + to_string( SourceStride ) + ".png" );
 
 		// relative flow X jet
-		Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [hours]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrot relative flow X.png" );
+		Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [hours]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotrelativeflowXs" + to_string( SourceStride ) + ".png" );
 
 		// source img
 		showimg( SourceImage, "diffrot source" );
