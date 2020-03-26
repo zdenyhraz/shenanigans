@@ -27,10 +27,10 @@ public:
 		Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "shiftsprofileXs" + to_string( SourceStride ) + ".png" );
 
 		// flow X jet
-		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [hours]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotflowXs" + to_string( SourceStride ) + ".png" );
+		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [hours]", "solar latitude [deg]", "horizontal plasma flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * ( SourceStride + 1 ) * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotflowXs" + to_string( SourceStride ) + ".png" );
 
 		// relative flow X jet
-		Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [hours]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 0, ( double )( FlowX.cols - 1 ) * SourceStride * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotrelativeflowXs" + to_string( SourceStride ) + ".png" );
+		Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [hours]", "solar latitude [deg]", "relative horizontal plasma flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * ( SourceStride + 1 ) * 45 / 60 / 60, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + to_string( medianSize ) + "_diffrotrelativeflowXs" + to_string( SourceStride ) + ".png" );
 
 		// source img
 		showimg( SourceImage, "diffrot source" );
@@ -60,8 +60,9 @@ public:
 		SourceShiftsX = shiftsX;
 	}
 
-	void SetParams( int stride )
+	void SetParams( int pics, int stride )
 	{
+		SourcePics = pics;
 		SourceStride = stride;
 	}
 
@@ -71,6 +72,7 @@ private:
 	Mat SourceImage;
 	Mat SourceFlowX;
 	Mat SourcePredicX;
+	int SourcePics;
 	int SourceStride;
 	std::vector<double> SourceThetas;
 	std::vector<double> SourceOmegasXavg;
