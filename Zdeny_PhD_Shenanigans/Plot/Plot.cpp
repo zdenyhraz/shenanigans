@@ -8,7 +8,7 @@ QFont Plot::fontTicks( "Newyork", 9 );
 
 QFont Plot::fontLabels( "Newyork", 12 );
 
-std::vector<QPen> Plot::plotPens{ QPen( Qt::blue, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 79, 200, 66 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::lightGray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) };
+std::vector<QPen> Plot::plotPens{ QPen( Qt::blue, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 79, 200, 66 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::lightGray, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) };
 
 QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 {
