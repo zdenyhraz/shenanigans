@@ -29,6 +29,7 @@ void WindowDiffrot::calculateDiffrot()
 	drset.movavgFilter = ui.checkBox_2->isChecked();
 	drset.medianFilterSize = ui.lineEdit_21->text().toDouble();
 	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
+	drset.visual = ui.checkBox_3->isChecked();
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );

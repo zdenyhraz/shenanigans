@@ -19,9 +19,10 @@ struct DiffrotSettings
 	bool movavgFilter;
 	int medianFilterSize;
 	int movavgFilterSize;
+	bool visual;
 };
 
-DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset );
+DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, const DiffrotSettings &drset );
 
 void loadFitsFuzzy( FitsImage &pic, FitsTime &time );
 
