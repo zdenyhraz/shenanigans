@@ -73,25 +73,29 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				// filter outlier X data
 				if ( abs( diffX ) < diffThreshX )
 				{
-					LOG_SUCC( "Calculating diffrot profile X... {}%, normal profile detected, diff X = {}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffX );
 					omegasX2D.emplace_back( omegasX );
 					shiftsX2D.emplace_back( shiftsX );
 				}
 				else
 				{
-					LOG_ERROR( "Calculating diffrot profile X... {}%, abnormal profile detected, diff X = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffX );
+					LOG_ERROR( "Abnormal profile detected, diff X = {}, skipping", diffX );
 				}
 
 				// filter outlier Y data
 				if ( abs( diffY ) < diffThreshY )
 				{
-					LOG_SUCC( "Calculating diffrot profile Y... {}%, normal profile detected, diff Y = {}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffY );
 					omegasY2D.emplace_back( omegasY );
 					shiftsY2D.emplace_back( shiftsY );
 				}
 				else
 				{
-					LOG_ERROR( "Calculating diffrot profile Y... {}%, abnormal profile detected, diff Y = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffY );
+					LOG_ERROR( "Abnormal profile detected, diff Y = {}, skipping", diffY );
+				}
+
+				// log progress
+				if ( abs( diffX ) < diffThreshX && abs( diffY ) < diffThreshY )
+				{
+					LOG_SUCC( "Calculating diffrot profile... {}% done, diff X/Y = {}/{}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffX, diffY );
 				}
 			}
 
@@ -104,9 +108,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				shiftsYavg = meanVertical( shiftsY2D );
 				omegasXavgpolyfit = polyfit( thetas, omegasXavg, 2 );
 				omegasYavgpolyfit = polyfit( thetas, omegasYavg, 3 );
-				omegasXavgsin2sin4fit = sin2sin4fit( thetas, omegasXavg );
 
-				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
+				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
 				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasYavg, omegasYavgpolyfit, omegasY}, std::vector<std::vector<double>> {shiftsYavg}, "diffrot1DY", "solar latitude [deg]", "vertical material flow speed [deg/day]", "vertical px shift [px]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit", "omegasY"}, std::vector<std::string> {"shiftsYavg"} );
 
 				Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2DX", "solar latitude [deg]", "solar longitude [pics]", "horizontal material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
