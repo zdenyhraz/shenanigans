@@ -51,32 +51,46 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy );
 
-			if ( pic >= 10 )
-			{
-				double diffX = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
-				double diffY = mean( omegasY ) - mean( meanVertical( omegasY2D ) );
+			thetas2D.emplace_back( thetas );
+			image2D.emplace_back( image );
 
-				if ( abs( diffX ) > 1. || abs( diffY ) > 1. )
-				{
-					LOG_ERROR( "Calculating diffrot profile... {}%, abnormal profile detected, diff X/Y = {}/{}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffX, diffY );
-					continue;
-				}
-				else
-				{
-					LOG_SUCC( "Calculating diffrot profile... {}%, normal profile detected, diff X/Y = {}/{}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffX, diffY );
-				}
+			if ( pic < 8 )
+			{
+				LOG_SUCC( "Calculating diffrot profile... {}%, estimating initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
+				omegasX2D.emplace_back( omegasX );
+				omegasY2D.emplace_back( omegasY );
+				shiftsX2D.emplace_back( shiftsX );
+				shiftsY2D.emplace_back( shiftsY );
 			}
 			else
 			{
-				LOG_SUCC( "Calculating diffrot profile... {}%, estimating initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
-			}
+				double diffX = mean( omegasX ) - mean( omegasXavg );
+				double diffY = mean( omegasY ) - mean( omegasYavg );
 
-			thetas2D.emplace_back( thetas );
-			omegasX2D.emplace_back( omegasX );
-			omegasY2D.emplace_back( omegasY );
-			shiftsX2D.emplace_back( shiftsX );
-			shiftsY2D.emplace_back( shiftsY );
-			image2D.emplace_back( image );
+				// filter bad X data
+				if ( abs( diffX ) < 1. )
+				{
+					LOG_SUCC( "Calculating diffrot profile X... {}%, normal profile detected, diff X = {}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffX );
+					omegasX2D.emplace_back( omegasX );
+					shiftsX2D.emplace_back( shiftsX );
+				}
+				else
+				{
+					LOG_ERROR( "Calculating diffrot profile X... {}%, abnormal profile detected, diff X = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffX );
+				}
+
+				// filter bad Y data
+				if ( abs( diffY ) < 1. )
+				{
+					LOG_SUCC( "Calculating diffrot profile Y... {}%, normal profile detected, diff Y = {}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffY );
+					omegasY2D.emplace_back( omegasY );
+					shiftsY2D.emplace_back( shiftsY );
+				}
+				else
+				{
+					LOG_ERROR( "Calculating diffrot profile Y... {}%, abnormal profile detected, diff Y = {}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffY );
+				}
+			}
 
 			omegasXavg = meanVertical( omegasX2D );
 			omegasYavg = meanVertical( omegasY2D );
