@@ -12,6 +12,7 @@ public:
 		// reset
 		FlowX = SourceFlowX.clone();
 		FlowY = SourceFlowY.clone();
+		resize( FlowY, FlowY, FlowX.size() );
 
 		if ( medianSize )
 		{
@@ -21,6 +22,15 @@ public:
 				medianBlur( FlowY, FlowY, med );
 			}
 		}
+
+		magnitude( FlowX, FlowY, FlowM );
+		phase( FlowX, FlowY, FlowP, true );
+
+		double startTime = 0;
+		double endTime = ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24;
+
+		double startTheta = SourceThetas.front();
+		double endTheta = SourceThetas.back();
 
 		// diffrot profile X
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
@@ -34,19 +44,23 @@ public:
 		// shifts profile Y
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical shift [px]", std::vector<std::string> {"shiftsYavg", "shiftsYavgpolyfit"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
 
-		// flow jet X
-		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+		// flow X
+		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
-		// flow jet Y
-		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DYm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+		// flow Y
+		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DYm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
-		// relative flow jet X
-		//Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+		// flow magnitude
+		Plot2D::plot( applyQuantile( FlowM, quanBot, quanTop ), "diffrot flow M", "time [days]", "solar latitude [deg]", "horizontal material flow speed magnitude [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DMm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+
+		// flow phase
+		Plot2D::plot( applyQuantile( FlowP, quanBot, quanTop ), "diffrot flow P", "time [days]", "solar latitude [deg]", "horizontal material flow speed angle [deg]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DPm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+
+		// relative flow X
+		//Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
 		// relative flow binary X
 		//showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, bluered, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
-
-		// relative magnitude & absolute phase
 
 	}
 
@@ -99,6 +113,8 @@ private:
 	// internal data
 	Mat FlowX;
 	Mat FlowY;
+	Mat FlowM;
+	Mat FlowP;
 	std::string saveDir = "C:\\Users\\Zdeny\\Desktop\\PhD_things\\diffrot\\plotsave\\";
 	static constexpr double colRowRatio = 2;
 };
