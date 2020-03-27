@@ -3,7 +3,7 @@
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 
-DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, DiffrotSettings drset )
+DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, const DiffrotSettings &drset )
 {
 	int dy = drset.vFov / ( drset.ys - 1 );
 	std::vector<std::vector<double>> thetas2D;
@@ -97,19 +97,31 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			omegasXavg = meanVertical( omegasX2D );
 			omegasYavg = meanVertical( omegasY2D );
-			shiftsXavg = meanVertical( shiftsX2D );
-			shiftsYavg = meanVertical( shiftsY2D );
-			omegasXavgpolyfit = polyfit( thetas, omegasXavg, 2 );
-			omegasYavgpolyfit = polyfit( thetas, omegasYavg, 3 );
-			omegasXavgsin2sin4fit = sin2sin4fit( thetas, omegasXavg );
 
-			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
-			Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasYavg, omegasYavgpolyfit, omegasY}, std::vector<std::vector<double>> {shiftsYavg}, "diffrot1DY", "solar latitude [deg]", "vertical material flow speed [deg/day]", "vertical px shift [px]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit", "omegasY"}, std::vector<std::string> {"shiftsYavg"} );
+			if ( drset.visual )
+			{
+				shiftsXavg = meanVertical( shiftsX2D );
+				shiftsYavg = meanVertical( shiftsY2D );
+				omegasXavgpolyfit = polyfit( thetas, omegasXavg, 2 );
+				omegasYavgpolyfit = polyfit( thetas, omegasYavg, 3 );
+				omegasXavgsin2sin4fit = sin2sin4fit( thetas, omegasXavg );
 
-			Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2DX", "solar latitude [deg]", "solar longitude [pics]", "horizontal material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
-			Plot2D::plot( applyQuantile( matFromVector( omegasY2D ), 0.01, 0.99 ), "diffrot2DY", "solar latitude [deg]", "solar longitude [pics]", "vertical material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
+				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
+				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasYavg, omegasYavgpolyfit, omegasY}, std::vector<std::vector<double>> {shiftsYavg}, "diffrot1DY", "solar latitude [deg]", "vertical material flow speed [deg/day]", "vertical px shift [px]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit", "omegasY"}, std::vector<std::string> {"shiftsYavg"} );
+
+				Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2DX", "solar latitude [deg]", "solar longitude [pics]", "horizontal material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
+				Plot2D::plot( applyQuantile( matFromVector( omegasY2D ), 0.01, 0.99 ), "diffrot2DY", "solar latitude [deg]", "solar longitude [pics]", "vertical material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
+			}
 		}
 	}
+
+	omegasXavg = meanVertical( omegasX2D );
+	omegasYavg = meanVertical( omegasY2D );
+	shiftsXavg = meanVertical( shiftsX2D );
+	shiftsYavg = meanVertical( shiftsY2D );
+	omegasXavgpolyfit = polyfit( thetas, omegasXavg, 2 );
+	omegasYavgpolyfit = polyfit( thetas, omegasYavg, 3 );
+	omegasXavgsin2sin4fit = sin2sin4fit( thetas, omegasXavg );
 
 	DiffrotResults dr;
 	dr.SetData1D( thetas, omegasXavg, omegasYavg, omegasXavgpolyfit, omegasYavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], shiftsXavg, shiftsYavg );

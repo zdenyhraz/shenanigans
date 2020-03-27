@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>328</width>
-    <height>351</height>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -388,7 +388,7 @@
       <x>72</x>
       <y>257</y>
       <width>171</width>
-      <height>38</height>
+      <height>54</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_3">
@@ -405,6 +405,13 @@
         <widget class="QCheckBox" name="checkBox_2">
          <property name="text">
           <string>movavg filter</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="checkBox_3">
+         <property name="text">
+          <string>visual</string>
          </property>
         </widget>
        </item>
