@@ -43,7 +43,7 @@ inline std::vector<double> polyfitcore( const std::vector<double> &xdata, const 
 
 inline std::vector<double> polyfit( const std::vector<double> &ydata, int degree )
 {
-	std::vector<double> xdata;
+	std::vector<double> xdata( ydata.size() );
 	std::iota( xdata.begin(), xdata.end(), 1 );
 	return polyfitcore( xdata, ydata, degree );
 }
