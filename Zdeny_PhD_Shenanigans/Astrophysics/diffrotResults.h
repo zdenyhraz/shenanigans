@@ -33,16 +33,16 @@ public:
 		double endTheta = SourceThetas.back();
 
 		// diffrot profile X
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourceOmegasXavgsin2sin4fit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "omegasXavgsin2sin4fit", "predicX1", "predicX2"}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "predicX1", "predicX2"}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
 
 		// diffrot profile Y
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasYavg, SourceOmegasYavgpolyfit}, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit"}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile X
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsX, polyfit( SourceThetas, SourceShiftsX, 2 )}, "shifts profile X", "solar latitude [deg]", "horizontal shift [px]", std::vector<std::string> {"shiftsXavg", "shiftsXavgpolyfit"}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsX, polyfit( SourceThetas, SourceShiftsX, 2 )}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"shiftsXavg", "shiftsXavgpolyfit"}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile Y
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical shift [px]", std::vector<std::string> {"shiftsYavg", "shiftsYavgpolyfit"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"shiftsYavg", "shiftsYavgpolyfit"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
 
 		// flow X
 		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
@@ -50,11 +50,11 @@ public:
 		// flow Y
 		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DYm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
-		// flow magnitude
-		Plot2D::plot( applyQuantile( FlowM, quanBot, quanTop ), "diffrot flow M", "time [days]", "solar latitude [deg]", "horizontal material flow speed magnitude [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DMm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+		// relative flow magnitude
+		//Plot2D::plot( applyQuantile( FlowM, quanBot, quanTop ), "diffrot flow M", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed magnitude [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DMm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
-		// flow phase
-		Plot2D::plot( applyQuantile( FlowP, quanBot, quanTop ), "diffrot flow P", "time [days]", "solar latitude [deg]", "horizontal material flow speed angle [deg]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DPm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
+		// relative flow phase
+		//Plot2D::plot( applyQuantile( FlowP, quanBot, quanTop ), "diffrot flow P", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed angle [deg]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DPm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
 		// relative flow X
 		//Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
