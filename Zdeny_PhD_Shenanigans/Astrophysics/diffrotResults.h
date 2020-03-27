@@ -18,6 +18,7 @@ public:
 			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
 			{
 				medianBlur( FlowX, FlowX, med );
+				medianBlur( FlowY, FlowY, med );
 			}
 		}
 
@@ -28,10 +29,10 @@ public:
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasYavg, SourceOmegasYavgpolyfit}, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit"}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile X
-		Plot1D::plot( SourceThetas, SourceShiftsX, "shifts profile X", "solar latitude [deg]", "horizontal px shift [px]", saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsX, polyfit( SourceThetas, SourceShiftsX, 2 )}, "shifts profile X", "solar latitude [deg]", "horizontal shift [px]", std::vector<std::string> {"shiftsXavg", "shiftsXavgpolyfit"}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile Y
-		Plot1D::plot( SourceThetas, SourceShiftsY, "shifts profile Y", "solar latitude [deg]", "vertical px shift [px]", saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical shift [px]", std::vector<std::string> {"shiftsYavg", "shiftsYavgpolyfit"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
 
 		// flow jet X
 		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
