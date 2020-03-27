@@ -20,6 +20,8 @@ QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 		{
 			w = plot.second->width();
 			h += plot.second->height() + 25;
+			if ( h  > QApplication::desktop()->height() )
+				h = 0;
 		}
 		else
 		{
@@ -31,6 +33,8 @@ QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 	{
 		w = 0;
 		h += windowPlot->height() + 25;
+		if ( h > QApplication::desktop()->height() )
+			h = 0;
 	}
 
 	return QPoint( w, h );
