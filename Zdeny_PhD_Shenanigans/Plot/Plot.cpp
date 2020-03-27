@@ -13,14 +13,25 @@ std::vector<QPen> Plot::plotPens{ QPen( Qt::blue, 1, Qt::SolidLine, Qt::RoundCap
 QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 {
 	int w = 0;
+	int h = 0;
 	for ( auto &plot : plots )
-		w += plot.second->width();
+	{
+		if ( w + plot.second->width() > QApplication::desktop()->width() )
+		{
+			w = plot.second->width();
+			h += plot.second->height() + 25;
+		}
+		else
+		{
+			w += plot.second->width();
+		}
+	}
 
-	int screenwidth = QApplication::desktop()->width();
-	int screenheight = QApplication::desktop()->height();
+	if ( w + windowPlot->width() > QApplication::desktop()->width() )
+	{
+		w = 0;
+		h += windowPlot->height() + 25;
+	}
 
-	if ( w + windowPlot->width() < screenwidth )
-		return QPoint( w, 0 );
-	else
-		return QPoint( w % screenwidth, w / screenwidth * windowPlot->height() + 20 );
+	return QPoint( w, h );
 }
