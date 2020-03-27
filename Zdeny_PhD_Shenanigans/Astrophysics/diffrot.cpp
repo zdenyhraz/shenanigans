@@ -11,7 +11,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	std::vector<std::vector<double>> omegasY2D;
 	std::vector<std::vector<double>> shiftsX2D;
 	std::vector<std::vector<double>> shiftsY2D;
-	std::vector<std::vector<double>> predicX2D;
 	std::vector<std::vector<double>> image2D;
 	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys );
 	std::vector<double> shiftsX( drset.ys );
@@ -34,7 +33,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	omegasY2D.reserve( drset.pics );
 	shiftsX2D.reserve( drset.pics );
 	shiftsY2D.reserve( drset.pics );
-	predicX2D.reserve( drset.pics );
 	image2D.reserve( drset.pics );
 
 	FitsImage pic1, pic2;
@@ -58,7 +56,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				double diffX = mean( omegasX ) - mean( meanVertical( omegasX2D ) );
 				double diffY = mean( omegasY ) - mean( meanVertical( omegasY2D ) );
 
-				if ( abs( diffX ) > 1. || abs( diffY ) > 0.1 )
+				if ( abs( diffX ) > 1. || abs( diffY ) > 1. )
 				{
 					LOG_ERROR( "Calculating diffrot profile... {}%, abnormal profile detected, diff X/Y = {}/{}, skipping", ( double )( pic + 1 ) / drset.pics * 100, diffX, diffY );
 					continue;
@@ -78,7 +76,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			omegasY2D.emplace_back( omegasY );
 			shiftsX2D.emplace_back( shiftsX );
 			shiftsY2D.emplace_back( shiftsY );
-			predicX2D.emplace_back( predicXs[0] );
 			image2D.emplace_back( image );
 
 			omegasXavg = meanVertical( omegasX2D );
@@ -99,7 +96,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 	DiffrotResults dr;
 	dr.SetData1D( thetas, omegasXavg, omegasYavg, omegasXavgpolyfit, omegasYavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], shiftsXavg, shiftsYavg );
-	dr.SetData2D( image2D, omegasX2D, omegasY2D, predicX2D );
+	dr.SetData2D( image2D, omegasX2D, omegasY2D );
 	dr.SetParams( drset.pics, drset.sPic );
 	return dr;
 }

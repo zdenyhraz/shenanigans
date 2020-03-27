@@ -40,24 +40,20 @@ public:
 		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DYm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
 		// relative flow jet X
-		Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
-
-		// source img
-		showimg( SourceImage, "diffrot source" );
+		//Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", 0, ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24, SourceThetas.front(), SourceThetas.back(), colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
 		// relative flow binary X
-		showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, bluered, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
+		//showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, bluered, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
 
 		// relative magnitude & absolute phase
 
 	}
 
-	void SetData2D( const std::vector<std::vector<double>> &image, const std::vector<std::vector<double>> &flowX, const std::vector<std::vector<double>> &flowY, const std::vector<std::vector<double>> &predicX )
+	void SetData2D( const std::vector<std::vector<double>> &image, const std::vector<std::vector<double>> &flowX, const std::vector<std::vector<double>> &flowY )
 	{
 		flip( matFromVector( image, true ), SourceImage, 1 );
 		flip( matFromVector( flowX, true ), SourceFlowX, 1 );
 		flip( matFromVector( flowY, true ), SourceFlowY, 1 );
-		flip( matFromVector( predicX, true ), SourcePredicX, 1 );
 	}
 
 	void SetData1D( const std::vector<double> &thetas, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &omegasXavgpolyfit, const std::vector<double> &omegasYavgpolyfit, const std::vector<double> &omegasXavgsin2sin4fit, const std::vector<double> &predicX1, const std::vector<double> &predicX2, const std::vector<double> &shiftsX, const std::vector<double> &shiftsY )
@@ -86,7 +82,6 @@ private:
 	Mat SourceImage;
 	Mat SourceFlowX;
 	Mat SourceFlowY;
-	Mat SourcePredicX;
 	int SourcePics;
 	int SourceStride;
 	std::vector<double> SourceThetas;
