@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Plot.h"
-#include "Gui/Windows/WindowPlot.h"
+#include "Gui/Windows/Plot/WindowPlot.h"
 
 std::map<std::string, WindowPlot *> Plot::plots;
 

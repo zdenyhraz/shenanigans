@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "WindowIPCoptimize.h"
-#include "WindowIPCparameters.h"
+#include "Gui/Windows/IPCoptimize/WindowIPCoptimize.h"
+#include "Gui/Windows/IPCparameters/WindowIPCparameters.h"
 #include "Astrophysics/SDOipcOpt.h"
 
 

@@ -1,9 +1,9 @@
 #pragma once
 #include "ui_Zdeny_PhD_Shenanigans.h"
-#include "Gui/Windows/WindowIPCparameters.h"
-#include "Gui/Windows/WindowIPCoptimize.h"
-#include "Gui/Windows/WindowIPC2PicAlign.h"
-#include "Gui/Windows/WindowDiffrot.h"
+#include "Gui/Windows/IPCparameters/WindowIPCparameters.h"
+#include "Gui/Windows/IPCoptimize/WindowIPCoptimize.h"
+#include "Gui/Windows/IPC2PicAlign/WindowIPC2PicAlign.h"
+#include "Gui/Windows/Diffrot/WindowDiffrot.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {
