@@ -106,26 +106,26 @@
     <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowDiffrot.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowIPC2PicAlign.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowIPCoptimize.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowIPCparameters.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowPlot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Windows\WindowTemplate.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="Astrophysics\SDOipcOpt.cpp">
       <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\Diffrot\WindowDiffrot.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\IPCparameters\WindowIPCparameters.cpp">
+      <Filter>WindowCpps</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\Plot\WindowPlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Windows\Template\WindowTemplate.cpp">
+      <Filter>WindowCpps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -224,22 +224,22 @@
     <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowDiffrot.h">
+    <QtMoc Include="Gui\Windows\Diffrot\WindowDiffrot.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowIPC2PicAlign.h">
+    <QtMoc Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowIPCoptimize.h">
+    <QtMoc Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowIPCparameters.h">
+    <QtMoc Include="Gui\Windows\IPCparameters\WindowIPCparameters.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowPlot.h">
+    <QtMoc Include="Gui\Windows\Plot\WindowPlot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\WindowTemplate.h">
+    <QtMoc Include="Gui\Windows\Template\WindowTemplate.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
   </ItemGroup>
@@ -247,22 +247,22 @@
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowDiffrot.ui">
+    <QtUic Include="Gui\Windows\Diffrot\WindowDiffrot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowIPC2PicAlign.ui">
+    <QtUic Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowIPCoptimize.ui">
+    <QtUic Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowIPCparameters.ui">
+    <QtUic Include="Gui\Windows\IPCparameters\WindowIPCparameters.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowPlot.ui">
+    <QtUic Include="Gui\Windows\Plot\WindowPlot.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="Gui\Windows\WindowTemplate.ui">
+    <QtUic Include="Gui\Windows\Template\WindowTemplate.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
