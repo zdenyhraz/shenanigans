@@ -46,6 +46,7 @@ void WindowDiffrot::showIPC()
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCset;
 	set.broadcast = true;
+	set.save = true;
 	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	LOG_INFO( "Loading file '" + fitsTime.path() + "'..." );
 	Mat pic1 = roicrop( loadfits( fitsTime.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );

@@ -31,6 +31,7 @@ public:
 	bool subpixel = 1;
 	bool crossCorrel = 0;
 	bool broadcast = false;
+	bool save = false;
 	double minimalShift = 0;
 	bool logar = false;
 	Mat bandpass;
@@ -111,11 +112,10 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 		//showMatsCLR.push_back( set.bandpass );
 	}
 
-	if ( 0 )
+	if ( set.save )
 	{
-		// debug
-		saveimg( set.auxdir + "image1_" + rand() + ".png", sourceimg1 );
-		saveimg( set.auxdir + "image2_" + rand() + ".png", sourceimg2 );
+		saveimg( set.auxdir + "ipc_image1.png", sourceimg1 );
+		saveimg( set.auxdir + "ipc_image2.png", sourceimg2 );
 	}
 
 	Point2f output;
@@ -201,6 +201,11 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 		Mat L3v;
 		resize( L3, L3v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
 		showMatsCLR.push_back( crosshair( L3v, Point2f( round( ( float )( L3peak.x ) * 2000. / ( float )L3.cols ), round( ( float )( L3peak.y ) * 2000. / ( float )L3.rows ) ) ) );
+		if ( set.save )
+		{
+			auto L3vs = applyQuantileColorMap( L3v );
+			saveimg( set.auxdir + "ipc_L3.png", L3vs );
+		}
 	}
 	if ( set.broadcast )
 	{
@@ -241,6 +246,11 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 					Mat L2Uv;
 					resize( L2U, L2Uv, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
 					showMatsCLR.push_back( crosshair( L2Uv, L2Umid * 2000 / L2U.cols ) );
+					if ( set.save )
+					{
+						auto L2Uvs = applyQuantileColorMap( crosshair( L2Uv, L2Umid * 2000 / L2U.cols ) );
+						saveimg( set.auxdir + "ipc_L2.png", L2Uvs );
+					}
 				}
 				if ( set.broadcast )
 				{
@@ -291,6 +301,11 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 							Mat L1v;
 							resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
 							showMatsCLR.push_back( crosshair( L1v, L1mid * 2000 / L1.cols ) );
+							if ( set.save )
+							{
+								auto L1vs = applyQuantileColorMap( crosshair( L1v, L1mid * 2000 / L1.cols ) );
+								saveimg( set.auxdir + "ipc_L1.png", L1vs );
+							}
 						}
 						converged = true;
 						break;
