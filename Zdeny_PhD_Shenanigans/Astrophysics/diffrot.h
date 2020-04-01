@@ -29,3 +29,5 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time );
 void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy );
 
 double predictDiffrotProfile( double theta, double A, double B, double C );
+
+void logFitCoeffs( const std::vector<double> &xcoeffsPoly, const std::vector<double> &xcoeffsTrig, const std::vector<double> &ycoeffsPoly );

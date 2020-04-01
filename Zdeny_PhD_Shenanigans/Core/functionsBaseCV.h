@@ -76,6 +76,50 @@ inline std::vector<double> sin2sin4fit( const std::vector<double> &xdata, const 
 	return fit;
 }
 
+inline std::vector<double> polyfitCoeffs( const std::vector<double> &xdata, const std::vector<double> &ydata, int degree )
+{
+	int dataCount = ydata.size();
+	Mat X = Mat::zeros( dataCount, degree + 1, CV_32F ); //matice planu
+	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
+	for ( int r = 0; r < X.rows; r++ )
+	{
+		Y.at<float>( r, 0 ) = ydata[r];
+		for ( int c = 0; c < X.cols; c++ )
+		{
+			X.at<float>( r, c ) = pow( xdata[r], c );
+		}
+	}
+	Mat coeffsM = ( X.t() * X ).inv() * X.t() * Y; //least squares
+	std::vector<double> coeffs( coeffsM.rows, 0 );
+	for ( int r = 0; r < coeffsM.rows; r++ )
+	{
+		coeffs[r] = coeffsM.at<float>( r, 0 );
+	}
+	return coeffs;
+}
+
+inline std::vector<double> sin2sin4fitCoeffs( const std::vector<double> &xdata, const std::vector<double> &ydata )
+{
+	int dataCount = ydata.size();
+	Mat X = Mat::zeros( dataCount, 3, CV_32F ); //matice planu
+	Mat Y = Mat::zeros( dataCount, 1, CV_32F ); //matice prave strany
+	for ( int r = 0; r < X.rows; r++ )
+	{
+		Y.at<float>( r, 0 ) = ydata[r];
+
+		X.at<float>( r, 0 ) = 1;
+		X.at<float>( r, 1 ) = pow( sin( xdata[r] ), 2 );
+		X.at<float>( r, 2 ) = pow( sin( xdata[r] ), 4 );
+	}
+	Mat coeffsM = ( X.t() * X ).inv() * X.t() * Y; //least squares
+	std::vector<double> coeffs( coeffsM.rows, 0 );
+	for ( int r = 0; r < coeffsM.rows; r++ )
+	{
+		coeffs[r] = coeffsM.at<float>( r, 0 );
+	}
+	return coeffs;
+}
+
 inline Mat crosshair( const Mat &sourceimgIn, cv::Point point )
 {
 	Mat sourceimg = sourceimgIn.clone();
