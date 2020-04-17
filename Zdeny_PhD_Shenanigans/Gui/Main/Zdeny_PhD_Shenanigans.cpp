@@ -37,7 +37,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 	connect( ui.actionGenerate_land, SIGNAL( triggered() ), this, SLOT( generateLand() ) );
 	connect( ui.actionFits_downloader, SIGNAL( triggered() ), this, SLOT( fitsDownloader() ) );
 	connect( ui.actionFits_checker, SIGNAL( triggered() ), this, SLOT( fitsDownloadChecker() ) );
-	connect( ui.actionFeature_extract, SIGNAL( triggered() ), this, SLOT( featureExtract() ) );
 	connect( ui.actionFeature_match, SIGNAL( triggered() ), this, SLOT( featureMatch() ) );
 
 	LOG_SUCC( "Welcome back, my friend." ); //log a welcome message
@@ -211,12 +210,7 @@ void Zdeny_PhD_Shenanigans::closeEvent( QCloseEvent *event )
 	}
 }
 
-void Zdeny_PhD_Shenanigans::featureExtract()
-{
-
-}
-
 void Zdeny_PhD_Shenanigans::featureMatch()
 {
-
+	windowFeatures->show();
 }

@@ -14,5 +14,5 @@ private:
 	Globals *globals;
 
 private slots:
-
+	void FeatureMatch();
 };

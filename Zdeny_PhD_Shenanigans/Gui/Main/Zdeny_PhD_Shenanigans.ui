@@ -215,7 +215,6 @@
     <property name="title">
      <string>Features</string>
     </property>
-    <addaction name="actionFeature_extract"/>
     <addaction name="actionFeature_match"/>
    </widget>
    <addaction name="menuFile"/>
