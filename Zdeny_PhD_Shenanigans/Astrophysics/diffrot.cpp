@@ -129,7 +129,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	auto xcoeffsPoly = polyfitCoeffs( thetas, omegasXavg, 2 );
 	auto xcoeffsTrig = sin2sin4fitCoeffs( thetas, omegasXavg );
 	auto ycoeffsPoly = polyfitCoeffs( thetas, omegasYavg, 3 );
-
 	logFitCoeffs( xcoeffsPoly, xcoeffsTrig, ycoeffsPoly );
 
 	DiffrotResults dr;

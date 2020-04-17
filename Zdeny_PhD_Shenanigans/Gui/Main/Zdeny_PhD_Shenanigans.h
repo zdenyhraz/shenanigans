@@ -4,6 +4,7 @@
 #include "Gui/Windows/IPCoptimize/WindowIPCoptimize.h"
 #include "Gui/Windows/IPC2PicAlign/WindowIPC2PicAlign.h"
 #include "Gui/Windows/Diffrot/WindowDiffrot.h"
+#include "Gui/Windows/Features/WindowFeatures.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {
@@ -21,6 +22,7 @@ private:
 	WindowIPCoptimize *windowIPCoptimize;
 	WindowIPC2PicAlign *windowIPC2PicAlign;
 	WindowDiffrot *windowDiffrot;
+	WindowFeatures *windowFeatures;
 
 private slots:
 	void exit();
@@ -36,4 +38,6 @@ private slots:
 	void fitsDownloader();
 	void fitsDownloadChecker();
 	void closeEvent( QCloseEvent *event );
+	void featureExtract();
+	void featureMatch();
 };
