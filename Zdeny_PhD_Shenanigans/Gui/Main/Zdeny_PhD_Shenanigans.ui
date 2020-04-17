@@ -211,11 +211,19 @@
     </property>
     <addaction name="actionGenerate_land"/>
    </widget>
+   <widget class="QMenu" name="menuFeatures">
+    <property name="title">
+     <string>Features</string>
+    </property>
+    <addaction name="actionFeature_extract"/>
+    <addaction name="actionFeature_match"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuImage_Filtering"/>
    <addaction name="menuImage_Registration"/>
    <addaction name="menuAstrophysics"/>
    <addaction name="menuOptimization"/>
+   <addaction name="menuFeatures"/>
    <addaction name="menuNeural"/>
    <addaction name="menuFractal"/>
    <addaction name="menuProcedural"/>
@@ -342,6 +350,16 @@
   <action name="actionFits_checker">
    <property name="text">
     <string>Fits checker</string>
+   </property>
+  </action>
+  <action name="actionFeature_extract">
+   <property name="text">
+    <string>Feature extract</string>
+   </property>
+  </action>
+  <action name="actionFeature_match">
+   <property name="text">
+    <string>Feature match</string>
    </property>
   </action>
  </widget>

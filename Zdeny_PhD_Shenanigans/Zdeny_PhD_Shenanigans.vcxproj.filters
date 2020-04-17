@@ -127,6 +127,9 @@
     <ClCompile Include="Gui\Windows\Template\WindowTemplate.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\Windows\Features\WindowFeatures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -242,6 +245,9 @@
     <QtMoc Include="Gui\Windows\Template\WindowTemplate.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
+    <QtMoc Include="Gui\Windows\Features\WindowFeatures.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui">
@@ -263,6 +269,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\Template\WindowTemplate.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\Features\WindowFeatures.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

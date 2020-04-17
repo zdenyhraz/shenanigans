@@ -143,6 +143,7 @@
     <ClCompile Include="Gui\Windows\Plot\WindowPlot.cpp" />
     <ClCompile Include="Gui\Windows\Template\WindowTemplate.cpp" />
     <ClCompile Include="Gui\Main\Zdeny_PhD_Shenanigans.cpp" />
+    <ClCompile Include="Gui\Windows\Features\WindowFeatures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Astrophysics\diffrot.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Log\logger.h" />
     <ClInclude Include="Neural\neural.h" />
     <ClInclude Include="Optimization\optimization.h" />
+    <QtMoc Include="Gui\Windows\Features\WindowFeatures.h" />
     <QtMoc Include="Gui\Windows\Plot\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\Plot.h" />
@@ -191,6 +193,7 @@
     <QtUic Include="Gui\Windows\Plot\WindowPlot.ui" />
     <QtUic Include="Gui\Windows\Template\WindowTemplate.ui" />
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui" />
+    <QtUic Include="Gui\Windows\Features\WindowFeatures.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Resources\Zdeny_PhD_Shenanigans.qrc" />
