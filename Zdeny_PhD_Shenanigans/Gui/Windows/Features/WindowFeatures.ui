@@ -32,7 +32,11 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\cropped1\\crop0.PNG</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -42,7 +46,11 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\cropped1\\crop5.PNG</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

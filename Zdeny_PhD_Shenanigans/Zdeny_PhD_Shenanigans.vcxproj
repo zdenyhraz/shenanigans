@@ -151,6 +151,7 @@
     <ClInclude Include="Astrophysics\SwindFlow.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="Core\macros.h" />
+    <ClInclude Include="Features\FeatureMatch.h" />
     <ClInclude Include="Filtering\filtering.h" />
     <ClInclude Include="Astrophysics\FITS.h" />
     <ClInclude Include="Fourier\fourier.h" />
