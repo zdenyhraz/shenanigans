@@ -38,6 +38,5 @@ private slots:
 	void fitsDownloader();
 	void fitsDownloadChecker();
 	void closeEvent( QCloseEvent *event );
-	void featureExtract();
 	void featureMatch();
 };
