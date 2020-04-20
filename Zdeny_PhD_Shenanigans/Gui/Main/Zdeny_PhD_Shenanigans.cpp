@@ -124,7 +124,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
 		Plot2D::plot( Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2 );
 	}
-	if ( 1 )
+	if ( 1 )// swind crop
 	{
 		std::string path = "D:\\MainOutput\\S-wind\\";
 		int sizeX = 250;
@@ -134,9 +134,9 @@ void Zdeny_PhD_Shenanigans::debug()
 		{
 			auto pic = imread( path + "0" + to_string( i + 1 ) + "_calib.PNG", IMREAD_ANYDEPTH );
 			pic = roicrop( pic, 0.365 * pic.cols, 0.71 * pic.rows, sizeX, sizeY );
-			saveimg( path + "cropped2//crop" + to_string( i ) + ".PNG", pic, false, cv::Size2i( 5 * pic.cols, 5 * pic.rows ) );
+			saveimg( path + "cropped3//crop" + to_string( i ) + ".PNG", pic, false, cv::Size2i( 10 * pic.cols, 10 * pic.rows ) );
+			saveimg( path + "cropped3//crop" + to_string( i ) + "i.PNG", pic, true, cv::Size2i( 10 * pic.cols, 10 * pic.rows ) );
 		}
-
 	}
 
 	LOG_INFO( "Debug finished." );
