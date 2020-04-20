@@ -28,8 +28,8 @@ void alignPics( const Mat &input1, const Mat &input2, Mat &output, IPCsettings s
 			log( img1FTm, img1FTm );
 			log( img2FTm, img2FTm );
 		}
-		normalize( img1FTm, img1FTm, 0, 1, CV_MINMAX );
-		normalize( img2FTm, img2FTm, 0, 1, CV_MINMAX );
+		normalize( img1FTm, img1FTm, 0, 1, NORM_MINMAX );
+		normalize( img2FTm, img2FTm, 0, 1, NORM_MINMAX );
 		Mat img1LP, img2LP;
 		double maxRadius = 1.*min( center.y, center.x );
 		int flags = INTER_LINEAR + WARP_FILL_OUTLIERS;
@@ -62,8 +62,8 @@ Mat AlignStereovision( const Mat &img1In, const Mat &img2In )
 {
 	Mat img1 = img1In.clone();
 	Mat img2 = img2In.clone();
-	normalize( img1, img1, 0, 65535, CV_MINMAX );
-	normalize( img2, img2, 0, 65535, CV_MINMAX );
+	normalize( img1, img1, 0, 65535, NORM_MINMAX );
+	normalize( img2, img2, 0, 65535, NORM_MINMAX );
 	img1.convertTo( img1, CV_16U );
 	img2.convertTo( img2, CV_16U );
 
@@ -89,7 +89,7 @@ Mat AlignStereovision( const Mat &img1In, const Mat &img2In )
 	merge( channels2, img2CLR );
 
 	Mat result = img1CLR + img2CLR;
-	normalize( result, result, 0, 65535, CV_MINMAX );
+	normalize( result, result, 0, 65535, NORM_MINMAX );
 
 	return result;
 }

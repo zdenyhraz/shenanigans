@@ -22,7 +22,7 @@ inline Mat procedural(int rows, int cols)
 		
 		mat += (randunit() * gaussian(rows, cols, cx, cy, randunit(), randunit()));
 	}
-	normalize(mat, mat, 0, 1, CV_MINMAX);
+	normalize(mat, mat, 0, 1, NORM_MINMAX);
 	return mat;
 }
 

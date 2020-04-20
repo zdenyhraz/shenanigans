@@ -35,7 +35,7 @@ inline Mat fourierinv(const Mat& realIn, const Mat& imagIn)
 	Mat DFTcomplexmerged;
 	merge(DFTcomplex, 2, DFTcomplexmerged);
 	dft(DFTcomplexmerged, invDFT, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
-	normalize(invDFT, invDFT, 0, 65535, CV_MINMAX);
+	normalize(invDFT, invDFT, 0, 65535, NORM_MINMAX);
 	invDFT.convertTo(invDFT, CV_16UC1);
 	return invDFT;
 }
@@ -81,7 +81,7 @@ inline Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
 			gaussian.at<float>(y, x) = std::exp(-(std::pow(x - centerX, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(y - centerY, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
 		}
 	}
-	normalize(gaussian, gaussian, 0, 1, CV_MINMAX);
+	normalize(gaussian, gaussian, 0, 1, NORM_MINMAX);
 	return gaussian;
 }
 
@@ -89,14 +89,14 @@ inline Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmult)
 {
 	Mat laplacian = Mat::ones(rows, cols, CV_32F);
 	laplacian = 1 - gaussian(rows, cols, stdevYmult, stdevXmult);
-	normalize(laplacian, laplacian, 0, 1, CV_MINMAX);
+	normalize(laplacian, laplacian, 0, 1, NORM_MINMAX);
 	return laplacian;
 }
 
 inline Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
 {
 	Mat bandpassian = gaussian(rows, cols, stdevLmult, stdevLmult).mul(laplacian(rows, cols, stdevHmult, stdevHmult));
-	normalize(bandpassian, bandpassian, 0, 1, CV_MINMAX);
+	normalize(bandpassian, bandpassian, 0, 1, NORM_MINMAX);
 	return bandpassian;
 }
 
@@ -110,7 +110,7 @@ inline Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
 			sinian.at<float>(y, x) = std::sin(2 * Constants::Pi * (y + x) * frequencyX);//sin or cos just cahnges the phase spectum
 		}
 	}
-	normalize(sinian, sinian, 0, 1, CV_MINMAX);
+	normalize(sinian, sinian, 0, 1, NORM_MINMAX);
 	sinian = sinian.mul(edgemask(rows, cols));
 	return sinian;
 }

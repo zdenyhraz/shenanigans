@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace cv;
+using namespace cv::xfeatures2d;
 
 enum ColorMapStyle { CM_JET, CM_BINARY };
 enum CombinePicsStyle { huebright, bluered };
@@ -131,7 +132,7 @@ inline Mat crosshair( const Mat &sourceimgIn, cv::Point point )
 	cv::Point offset2( outer, 0 );
 	cv::Point offset3( 0, inner );
 	cv::Point offset4( inner, 0 );
-	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	normalize( sourceimg, sourceimg, 0, 255, NORM_MINMAX );
 	sourceimg.convertTo( sourceimg, CV_8U );
 
 	circle( sourceimg, point, inner, CrosshairColor, thickness, 0, 0 );
@@ -154,13 +155,13 @@ inline Mat xko( const Mat &sourceimgIn, cv::Point point, Scalar CrosshairColor, 
 	Mat sourceimgCLR = Mat::zeros( sourceimg.size(), CV_16UC3 );
 	if ( inputType == "CLR" )
 	{
-		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		normalize( sourceimg, sourceimg, 0, 65535, NORM_MINMAX );
 		sourceimg.convertTo( sourceimg, CV_16UC3 );
 		sourceimg.copyTo( sourceimgCLR );
 	}
 	if ( inputType == "GRS" )
 	{
-		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		normalize( sourceimg, sourceimg, 0, 65535, NORM_MINMAX );
 		sourceimg.convertTo( sourceimg, CV_16UC1 );
 		for ( int r = 0; r < sourceimg.rows; r++ )
 		{
@@ -194,13 +195,13 @@ inline Mat pointik( const Mat &sourceimgIn, cv::Point point, Scalar CrosshairCol
 	Mat sourceimgCLR = Mat::zeros( sourceimg.size(), CV_16UC3 );
 	if ( inputType == "CLR" )
 	{
-		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		normalize( sourceimg, sourceimg, 0, 65535, NORM_MINMAX );
 		sourceimg.convertTo( sourceimg, CV_16UC1 );
 		sourceimg.copyTo( sourceimgCLR );
 	}
 	if ( inputType == "GRS" )
 	{
-		normalize( sourceimg, sourceimg, 0, 65535, CV_MINMAX );
+		normalize( sourceimg, sourceimg, 0, 65535, NORM_MINMAX );
 		sourceimg.convertTo( sourceimg, CV_16UC1 );
 		for ( int r = 0; r < sourceimg.rows; r++ )
 		{
@@ -428,8 +429,8 @@ inline Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePi
 	source2.convertTo( source2, CV_32F );
 	if ( style == huebright )
 	{
-		normalize( source1, source1, 0, 1, CV_MINMAX );
-		normalize( source2, source2, 0, 1, CV_MINMAX );
+		normalize( source1, source1, 0, 1, NORM_MINMAX );
+		normalize( source2, source2, 0, 1, NORM_MINMAX );
 		pow( source2, 2, source2 );
 		for ( int r = 0; r < source1.rows; r++ )
 		{
@@ -447,7 +448,7 @@ inline Mat combineTwoPics( const Mat &source1In, const Mat &source2In, CombinePi
 	}
 	if ( style == bluered )
 	{
-		normalize( source2, source2, 0, 1, CV_MINMAX );
+		normalize( source2, source2, 0, 1, NORM_MINMAX );
 		auto minMax = minMaxMat( source1 );
 		for ( int r = 0; r < source1.rows; r++ )
 		{
@@ -539,7 +540,7 @@ inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color 
 		resizeWindow( windowname, showSize );
 
 	sourceimg.convertTo( sourceimg, CV_32F );
-	normalize( sourceimg, sourceimg, 0, 1, CV_MINMAX );
+	normalize( sourceimg, sourceimg, 0, 1, NORM_MINMAX );
 
 	if ( sourceimg.channels() == 1 )
 	{
@@ -565,7 +566,7 @@ inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windownam
 		{
 			auto img = srcimg.clone();
 			resize( img, img, Size( ( double )mainHeight / img.rows * img.cols, mainHeight ) );
-			normalize( img, img, 0, 255, CV_MINMAX );
+			normalize( img, img, 0, 255, NORM_MINMAX );
 			img.convertTo( img, CV_8U );
 			sourceimgs.emplace_back( img );
 		}
@@ -579,7 +580,7 @@ inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windownam
 inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i( 0, 0 ) )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	//normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	//normalize( sourceimg, sourceimg, 0, 255, NORM_MINMAX );
 	//sourceimg.convertTo( sourceimg, CV_8U );
 
 	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;

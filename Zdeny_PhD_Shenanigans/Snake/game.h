@@ -3,67 +3,67 @@
 #include "map.h"
 
 using namespace cv;
-static const char* windowname = "snake";
+static const char *windowname = "snake";
 
 static void SnakeGame()
 {
-	srand(time(0));
+	srand( time( 0 ) );
 	bool stop = false;
 
-	while (1)
+	while ( 1 )
 	{
 		int size = 50;
-		Map map(size, size);
-		Snake snake(map);
+		Map map( size, size );
+		Snake snake( map );
 		int c;
 
-		while (1)
+		while ( 1 )
 		{
-			c = cvWaitKey(50);
-			LOG_DEBUG("input={}", c);
+			c = waitKey( 50 );
+			LOG_DEBUG( "input={}", c );
 
-			switch (c)
+			switch ( c )
 			{
-			case 27: //escape
-				stop = true;
-				break;
+				case 27: //escape
+					stop = true;
+					break;
 
-			case 2555904: // right arrow
-				snake.Turn(Snake::RIGHT);
-				break;
+				case 2555904: // right arrow
+					snake.Turn( Snake::RIGHT );
+					break;
 
-			case 2424832: // left arrow
-				snake.Turn(Snake::LEFT);
-				break;
+				case 2424832: // left arrow
+					snake.Turn( Snake::LEFT );
+					break;
 
-			case 2490368: // up arrow
-				snake.Turn(Snake::UP);
-				break;
+				case 2490368: // up arrow
+					snake.Turn( Snake::UP );
+					break;
 
-			case 2621440: // down arrow
-				snake.Turn(Snake::DOWN);
-				break;
+				case 2621440: // down arrow
+					snake.Turn( Snake::DOWN );
+					break;
 			}
 
-			if (stop)
+			if ( stop )
 				break;
 
 			snake.Tick();
 
-			if (snake.GetGameOver())
+			if ( snake.GetGameOver() )
 				break;
 
-			showimg(map.Draw(snake), windowname);
+			showimg( map.Draw( snake ), windowname );
 		}
 
-		if (stop)
+		if ( stop )
 		{
-			cvDestroyWindow(windowname);
+			destroyWindow( windowname );
 			break;
 		}
 
 		QMessageBox msgBox;
-		msgBox.setText("Bob the snake is dead :((    	\n\n      </3                 R.I.P. Bob");
+		msgBox.setText( "Bob the snake is dead :((    	\n\n      </3                 R.I.P. Bob" );
 		msgBox.exec();
 	}
 }

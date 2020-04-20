@@ -98,7 +98,7 @@ Mat loadfits( std::string path, FitsParams &params )
 
 		//opencv integration
 		Mat mat = Mat( fitsSize, fitsSize, CV_16UC1, celyobraz_8.data(), Mat::AUTO_STEP ).clone();
-		normalize( mat, mat, 0, 65535, CV_MINMAX );
+		normalize( mat, mat, 0, 65535, NORM_MINMAX );
 		Point2f pt( fitsMid, fitsMid );
 		Mat r = getRotationMatrix2D( pt, 90, 1.0 );
 		warpAffine( mat, mat, r, cv::Size( fitsSize, fitsSize ) );
@@ -205,7 +205,7 @@ void loadImageDebug( Mat &activeimg, double gamaa, bool colorr, double quanBot, 
 	{
 		std::cout << "loading a picture.." << std::endl;
 		if ( colorr )
-			activeimg = imread( path, CV_LOAD_IMAGE_COLOR );
+			activeimg = imread( path, IMREAD_COLOR );
 		else
 			activeimg = imread( path, IMREAD_ANYDEPTH ); //IMREAD_ANYDEPTH
 	}
@@ -219,7 +219,7 @@ void loadImageDebug( Mat &activeimg, double gamaa, bool colorr, double quanBot, 
 		imshow( "activeimg_imshow_raw", activeimg );
 	}
 	activeimg.convertTo( activeimg, CV_16U );
-	normalize( activeimg, activeimg, 0, 65535, CV_MINMAX );
+	normalize( activeimg, activeimg, 0, 65535, NORM_MINMAX );
 	showimg( activeimg, "activeimg", false, quanBot, quanTop );
 	std::cout << "image loaded" << std::endl;
 }
