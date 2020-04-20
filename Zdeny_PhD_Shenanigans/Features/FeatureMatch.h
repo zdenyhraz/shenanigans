@@ -68,7 +68,7 @@ inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
 	return ORB::create();
 }
 
-inline void featureMatch( std::string path1, std::string path2, int featurecnt, FeatureType ftype )
+inline void featureMatch( std::string path1, std::string path2, int matchcnt, FeatureType ftype )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
@@ -99,18 +99,19 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 		}
 	}
 
+	//get first n smallest shifts
+	std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) < magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ); } );
+	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( matchcnt, ( int )matches.size() ) );
+
 	//get first n best matches
-	std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
-	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( featurecnt, ( int )matches.size() ) );
+	//std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
+	//matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( featurecnt, ( int )matches.size() ) );
 
 	//calculate feature shifts
 	std::vector<Point2f> shifts( matches.size() );
 	for ( int i = 0; i < matches.size(); i++ )
 	{
-		int idx1 = matches[i].queryIdx;
-		int idx2 = matches[i].trainIdx;
-
-		shifts[i] = keypoints2[idx2].pt - keypoints1[idx1].pt;
+		shifts[i] = GetFeatureMatchShift( matches[i], keypoints1, keypoints2 );
 		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}]", i, shifts[i].x, shifts[i].y );
 	}
 
@@ -120,8 +121,8 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 	//draw keypoints
 	Mat img1_keypoints;
 	Mat img2_keypoints;
-	drawKeypoints( img1, keypoints1, img1_keypoints );
-	drawKeypoints( img2, keypoints2, img2_keypoints );
+	drawKeypoints( img1, keypoints1, img1_keypoints, Scalar( 0, 0, 255 ) );
+	drawKeypoints( img2, keypoints2, img2_keypoints, Scalar( 0, 0, 255 ) );
 	resize( img1_keypoints, img1_keypoints, cv::Size( 0.5 * img1_keypoints.cols, 0.5 * img1_keypoints.rows ) );
 	resize( img2_keypoints, img2_keypoints, cv::Size( 0.5 * img2_keypoints.cols, 0.5 * img2_keypoints.rows ) );
 	imshow( "Image 1 features", img1_keypoints );
@@ -129,7 +130,7 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 
 	//draw matches
 	Mat img_matches;
-	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar::all( -1 ), Scalar::all( -1 ), std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 0 ), Scalar( 0, 0, 255 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
 	resize( img_matches, img_matches, cv::Size( 0.5 * img_matches.cols, 0.5 * img_matches.rows ) );
 	imshow( "Good matches", img_matches );
 }
