@@ -80,14 +80,14 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>feature count</string>
+        <string>match count</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_3">
        <property name="text">
-        <string>50</string>
+        <string>10</string>
        </property>
       </widget>
      </item>

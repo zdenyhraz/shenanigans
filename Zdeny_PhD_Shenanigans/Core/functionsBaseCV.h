@@ -810,3 +810,13 @@ inline Point2d mean( const std::vector<Point2d> &vec )
 		mean += x;
 	return mean * ( 1. / vec.size() );
 }
+
+inline Point2f GetFeatureMatchShift( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+{
+	return kp2[match.trainIdx].pt - kp1[match.queryIdx].pt;
+}
+
+inline double magnitude( const Point2f &pt )
+{
+	return sqrt( sqr( pt.x ) + sqr( pt.y ) );
+}
