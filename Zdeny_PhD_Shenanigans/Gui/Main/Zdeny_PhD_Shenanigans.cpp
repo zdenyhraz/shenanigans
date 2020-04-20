@@ -85,7 +85,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		auto shifts = phasecorrel( img1, img2, set );
 	}
-	if ( 1 ) //Plot1D + Plot2D test
+	if ( 0 ) //Plot1D + Plot2D test
 	{
 		// 1D
 		int N = 1000;
@@ -123,6 +123,20 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
 		Plot2D::plot( Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2 );
+	}
+	if ( 1 )
+	{
+		std::string path = "D:\\MainOutput\\S-wind\\";
+		int sizeX = 250;
+		int sizeY = 100;
+
+		for ( int i = 0; i < 10; i++ )
+		{
+			auto pic = imread( path + "0" + to_string( i + 1 ) + "_calib.PNG", IMREAD_ANYDEPTH );
+			pic = roicrop( pic, 0.365 * pic.cols, 0.71 * pic.rows, sizeX, sizeY );
+			saveimg( path + "cropped2//crop" + to_string( i ) + ".PNG", pic, false, cv::Size2i( 5 * pic.cols, 5 * pic.rows ) );
+		}
+
 	}
 
 	LOG_INFO( "Debug finished." );

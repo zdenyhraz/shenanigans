@@ -12,7 +12,7 @@ inline std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>
 	{
 		pics[iterPic] = imread( path + "0" + to_string( iterPic + 1 ) + "_calib.PNG", IMREAD_ANYDEPTH );
 		pics[iterPic] = roicrop( pics[iterPic], SwindCropFocusX * pics[iterPic].cols, SwindCropFocusY * pics[iterPic].rows, set.getcols(), set.getrows() );
-		//saveimg(path + "cropped//crop" + to_string(iterPic) + ".PNG", pics[iterPic], false, cv::Size2i(5*pics[iterPic].cols, 5*pics[iterPic].rows));
+		//saveimg( path + "cropped2//crop" + to_string( iterPic ) + ".PNG", pics[iterPic], false, cv::Size2i( 5 * pics[iterPic].cols, 5 * pics[iterPic].rows ) );
 	}
 
 	//calculate shifts
