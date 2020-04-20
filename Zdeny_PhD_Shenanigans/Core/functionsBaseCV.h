@@ -579,8 +579,8 @@ inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windownam
 inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i( 0, 0 ) )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
-	sourceimg.convertTo( sourceimg, CV_8U );
+	//normalize( sourceimg, sourceimg, 0, 255, CV_MINMAX );
+	//sourceimg.convertTo( sourceimg, CV_8U );
 
 	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;
 	int namedwRows = 1700;
