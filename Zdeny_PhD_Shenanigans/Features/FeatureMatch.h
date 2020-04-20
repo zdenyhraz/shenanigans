@@ -38,6 +38,29 @@ inline int GetFeatureTypeMatcher( FeatureType ftype )
 	}
 }
 
+inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
+{
+	switch ( ftype )
+	{
+		case FeatureType::BRISK:
+			return BRISK::create();
+		case FeatureType::ORB:
+			return ORB::create();
+		case FeatureType::MSER:
+			return MSER::create();
+		case FeatureType::FAST:
+			return ORB::create();
+		case FeatureType::AGAST:
+			return ORB::create();
+		case FeatureType::GFTT:
+			return ORB::create();
+		case FeatureType::KAZE:
+			return KAZE::create();
+		case FeatureType::AKAZE:
+			return AKAZE::create();
+	}
+}
+
 inline void featureMatch( std::string path1, std::string path2, int featurecnt, FeatureType ftype )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
@@ -47,8 +70,7 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 	showimg( img2, "img2 source" );
 
 	//detect the keypoints, compute the descriptors
-	Ptr<Feature2D> detector;
-	detector = ORB::create();
+	Ptr<Feature2D> detector = GetFeatureDetector( ftype );
 	std::vector<KeyPoint> keypoints1, keypoints2;
 	Mat descriptors1, descriptors2;
 	detector->detectAndCompute( img1, noArray(), keypoints1, descriptors1 );
