@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>367</width>
-    <height>188</height>
+    <width>316</width>
+    <height>160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,10 +57,10 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>60</y>
+      <x>191</x>
+      <y>76</y>
       <width>101</width>
-      <height>17</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -70,8 +70,8 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
+      <x>10</x>
+      <y>50</y>
       <width>94</width>
       <height>17</height>
      </rect>
@@ -93,13 +93,63 @@
      </item>
     </layout>
    </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>108</x>
+      <y>48</y>
+      <width>183</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>BRISK</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ORB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>MSER</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FAST</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>AGAST</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>GFTT</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>KAZE</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>AKAZE</string>
+     </property>
+    </item>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>367</width>
+     <width>316</width>
      <height>18</height>
     </rect>
    </property>

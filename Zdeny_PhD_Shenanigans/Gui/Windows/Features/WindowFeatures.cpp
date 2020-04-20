@@ -14,8 +14,9 @@ void WindowFeatures::FeatureMatch()
 	std::string path1 = ui.lineEdit->text().toStdString();
 	std::string path2 = ui.lineEdit_2->text().toStdString();
 	int featurecount = ui.lineEdit_3->text().toInt();
+	FeatureType ftype = ( FeatureType )ui.comboBox->currentIndex();
 
-	featureMatch( path1, path2, featurecount );
+	featureMatch( path1, path2, featurecount, ftype );
 
 
 	LOG_INFO( "Finished matching features" );
