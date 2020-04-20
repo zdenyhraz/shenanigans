@@ -458,7 +458,7 @@ Mat drawFunc2D( std::function<double( vector<double> )> f, double xmin, double x
 			cout << ( double )progress / resultMat.rows * 100 << "% done." << endl;
 		}
 	} );
-	normalize( resultMat, resultMat, 0, 255, CV_MINMAX );
+	normalize( resultMat, resultMat, 0, 255, NORM_MINMAX );
 	return resultMat;
 }
 
@@ -511,8 +511,8 @@ std::vector<double> drawFuncLandscapeAndOptimize2D( std::function<double( vector
 	optimizedFuncLandscapeCLR = applyColorMap( optimizedFuncLandscapeRAW, quantileB, quantileT );
 	Mat optimizedFuncLandscapeRAWlog = optimizedFuncLandscapeRAW.clone() + Scalar::all( 1. );
 	log( optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog );
-	normalize( optimizedFuncLandscapeRAW, optimizedFuncLandscapeRAW, 0, 255, CV_MINMAX );
-	normalize( optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog, 0, 255, CV_MINMAX );
+	normalize( optimizedFuncLandscapeRAW, optimizedFuncLandscapeRAW, 0, 255, NORM_MINMAX );
+	normalize( optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog, 0, 255, NORM_MINMAX );
 	Mat optimizedFuncLandscapeCLRlog = applyColorMap( optimizedFuncLandscapeRAWlog, quantileB, quantileT ); //log or not
 
 	double minim, maxim;

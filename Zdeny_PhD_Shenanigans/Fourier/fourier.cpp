@@ -19,14 +19,14 @@ void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwi
 		{
 			magnitudeimglog += Scalar::all(1);
 			log(magnitudeimglog, magnitudeimglog);
-			normalize(magnitudeimglog, magnitudeimglog, 0, 1, CV_MINMAX);
+			normalize(magnitudeimglog, magnitudeimglog, 0, 1, NORM_MINMAX);
 		}
 		if (expon)
 		{
 			for (int i = 0; i < 20; i++)
 			{
 				exp(magnitudeimglog, magnitudeimglog);
-				normalize(magnitudeimglog, magnitudeimglog, 0, 1, CV_MINMAX);
+				normalize(magnitudeimglog, magnitudeimglog, 0, 1, NORM_MINMAX);
 			}
 		}
 		showimg(magnitudeimglog, magnwindowname, true);
@@ -42,7 +42,7 @@ void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwi
 			DFTimgcentered = abs(DFTimgcentered);
 			DFTimgcentered += Scalar::all(1);
 			log(DFTimgcentered, DFTimgcentered);
-			normalize(DFTimgcentered, DFTimgcentered, 0, 1, CV_MINMAX);
+			normalize(DFTimgcentered, DFTimgcentered, 0, 1, NORM_MINMAX);
 		}
 		showimg(DFTimgcentered, magnwindowname, true);
 	}
@@ -65,7 +65,7 @@ Mat convolute(Mat sourceimg, Mat PSFimg)
 	planesCon[1] = a.mul(d) + b.mul(c);//imag		
 	Mat convimg = fourierinv(planesCon[0], planesCon[1]);
 	convimg = quadrantswap(convimg);
-	normalize(convimg, convimg, 0, 65535, CV_MINMAX);
+	normalize(convimg, convimg, 0, 65535, NORM_MINMAX);
 	convimg.convertTo(convimg, CV_16UC1);
 	std::cout << "convolution calculated" << std::endl;
 	return convimg;
@@ -101,7 +101,7 @@ Mat deconvolute(Mat sourceimg, Mat PSFimg)
 	planesDec[1] = (scitanec3 + scitanec4);//imag	
 	Mat deconvimg = fourierinv(planesDec[0], planesDec[1]);
 	deconvimg = quadrantswap(deconvimg);
-	normalize(deconvimg, deconvimg, 0, 65535, CV_MINMAX);
+	normalize(deconvimg, deconvimg, 0, 65535, NORM_MINMAX);
 	deconvimg.convertTo(deconvimg, CV_16UC1);
 	std::cout << "Naive deconvolution calculated" << std::endl;
 	return deconvimg;
@@ -140,7 +140,7 @@ Mat deconvoluteWiener(const Mat& sourceimg, const Mat& PSFimg)
 	planesDec[1] = (scitanec3 + scitanec4).mul(dampingfactor);//imag	
 	Mat deconvimg = fourierinv(planesDec[0], planesDec[1]);
 	deconvimg = quadrantswap(deconvimg);
-	normalize(deconvimg, deconvimg, 0, 65535, CV_MINMAX);
+	normalize(deconvimg, deconvimg, 0, 65535, NORM_MINMAX);
 	deconvimg.convertTo(deconvimg, CV_16UC1);
 	std::cout << "Wiener deconvolution calculated" << std::endl;
 	return deconvimg;
@@ -163,7 +163,7 @@ Mat frequencyFilter(const Mat& sourceimg, const Mat& mask)
 	showfourier(invDFTready);
 	Mat newimg;
 	dft(invDFTready, newimg, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
-	normalize(newimg, newimg, 0, 65535, CV_MINMAX);
+	normalize(newimg, newimg, 0, 65535, NORM_MINMAX);
 	newimg.convertTo(newimg, CV_16UC1);
 	return newimg;
 }

@@ -149,7 +149,7 @@ private:
 				}
 			}
 
-			normalize( mat, mat, 0, 65535, CV_MINMAX );
+			normalize( mat, mat, 0, 65535, NORM_MINMAX );
 			warpAffine( mat, mat, getRotationMatrix2D( Point2f( fitsMid, fitsMid ), 90, 1.0 ), cv::Size( fitsSize, fitsSize ) );
 			transpose( mat, mat );
 			if ( 0 )
@@ -360,7 +360,7 @@ inline Mat loadImage( std::string path )
 	{
 		result = imread( path, IMREAD_ANYDEPTH );
 		result.convertTo( result, CV_16U );
-		normalize( result, result, 0, 65535, CV_MINMAX );
+		normalize( result, result, 0, 65535, NORM_MINMAX );
 	}
 	return result;
 }

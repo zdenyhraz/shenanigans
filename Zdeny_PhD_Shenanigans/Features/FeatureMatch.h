@@ -20,22 +20,23 @@ inline int GetFeatureTypeMatcher( FeatureType ftype )
 	switch ( ftype )
 	{
 		case FeatureType::BRISK:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::ORB:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::MSER:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::FAST:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::AGAST:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::GFTT:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::KAZE:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::AKAZE:
-			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 	}
+	return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 }
 
 inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
@@ -59,6 +60,7 @@ inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
 		case FeatureType::AKAZE:
 			return AKAZE::create();
 	}
+	return ORB::create();
 }
 
 inline void featureMatch( std::string path1, std::string path2, int featurecnt, FeatureType ftype )
@@ -77,7 +79,7 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 	detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
 
 	//matching descriptor vectors
-	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( GetFeatureTypeMatcher( ftype ) );
+	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( ftype ) );
 	std::vector<DMatch> matches;
 	matcher->match( descriptors1, descriptors2, matches );
 

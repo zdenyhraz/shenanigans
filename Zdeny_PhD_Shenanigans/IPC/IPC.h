@@ -181,12 +181,12 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 
 	if ( set.logar )
 	{
-		normalize( L3, L3, 1, loglimit, CV_MINMAX );
+		normalize( L3, L3, 1, loglimit, NORM_MINMAX );
 		log( L3, L3 );
 	}
 
 	L3 = quadrantswap( L3 );
-	normalize( L3, L3, 0, 1, CV_MINMAX );
+	normalize( L3, L3, 0, 1, NORM_MINMAX );
 
 	if ( set.minimalShift )
 		L3 = L3.mul( 1 - kirkl( L3.rows, L3.cols, set.minimalShift ) );
