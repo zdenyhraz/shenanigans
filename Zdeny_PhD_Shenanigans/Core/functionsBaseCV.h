@@ -794,3 +794,18 @@ inline std::vector<double> meanVertical( const std::vector<std::vector<double>> 
 	return meansV;
 }
 
+inline Point2f mean( const std::vector<Point2f> &vec )
+{
+	Point2f mean( 0, 0 );
+	for ( auto &x : vec )
+		mean += x;
+	return mean * ( 1. / vec.size() );
+}
+
+inline Point2d mean( const std::vector<Point2d> &vec )
+{
+	Point2d mean( 0, 0 );
+	for ( auto &x : vec )
+		mean += x;
+	return mean * ( 1. / vec.size() );
+}
