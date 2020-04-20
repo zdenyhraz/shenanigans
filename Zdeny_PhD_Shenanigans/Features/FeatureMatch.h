@@ -3,7 +3,42 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 
-inline void featureMatch( std::string path1, std::string path2, int featurecnt )
+enum FeatureType
+{
+	BRISK,
+	ORB,
+	MSER,
+	FAST,
+	AGAST,
+	GFTT,
+	KAZE,
+	AKAZE
+};
+
+inline int GetFeatureTypeMatcher( FeatureType ftype )
+{
+	switch ( ftype )
+	{
+		case FeatureType::BRISK:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::ORB:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::MSER:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::FAST:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::AGAST:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::GFTT:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::KAZE:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+		case FeatureType::AKAZE:
+			return DescriptorMatcher::BRUTEFORCE_HAMMING;
+	}
+}
+
+inline void featureMatch( std::string path1, std::string path2, int featurecnt, FeatureType ftype )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
@@ -12,20 +47,21 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt )
 	showimg( img2, "img2 source" );
 
 	//detect the keypoints, compute the descriptors
-	Ptr<AKAZE> detector = AKAZE::create();
+	Ptr<Feature2D> detector;
+	detector = ORB::create();
 	std::vector<KeyPoint> keypoints1, keypoints2;
 	Mat descriptors1, descriptors2;
 	detector->detectAndCompute( img1, noArray(), keypoints1, descriptors1 );
 	detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
 
 	//matching descriptor vectors
-	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( DescriptorMatcher::BRUTEFORCE_HAMMING );
+	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( GetFeatureTypeMatcher( ftype ) );
 	std::vector<DMatch> matches;
 	matcher->match( descriptors1, descriptors2, matches );
 
 	//get first n best matches
 	std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
-	matches = std::vector<DMatch>( matches.begin(), matches.begin() + featurecnt );
+	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( featurecnt, ( int )matches.size() ) );
 
 	//calculate feature shifts
 	std::vector<Point2f> shifts( matches.size() );
