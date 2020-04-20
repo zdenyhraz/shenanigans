@@ -104,6 +104,11 @@
     </property>
     <item>
      <property name="text">
+      <string>SURF</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>BRISK</string>
      </property>
     </item>

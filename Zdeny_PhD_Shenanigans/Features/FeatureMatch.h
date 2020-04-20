@@ -5,6 +5,7 @@
 
 enum FeatureType
 {
+	SURF,
 	BRISK,
 	ORB,
 	MSER,
@@ -19,6 +20,8 @@ inline int GetFeatureTypeMatcher( FeatureType ftype )
 {
 	switch ( ftype )
 	{
+		case FeatureType::SURF:
+			return DescriptorMatcher::MatcherType::BRUTEFORCE;
 		case FeatureType::BRISK:
 			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 		case FeatureType::ORB:
@@ -43,6 +46,8 @@ inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
 {
 	switch ( ftype )
 	{
+		case FeatureType::SURF:
+			return SURF::create();
 		case FeatureType::BRISK:
 			return BRISK::create();
 		case FeatureType::ORB:
@@ -80,8 +85,19 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 
 	//matching descriptor vectors
 	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( ftype ) );
+	std::vector< std::vector<DMatch>> knn_matches;
+	matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
+
+	//filter matches using the Lowe's ratio test
+	const double ratio_thresh = 0.6;
 	std::vector<DMatch> matches;
-	matcher->match( descriptors1, descriptors2, matches );
+	for ( size_t i = 0; i < knn_matches.size(); i++ )
+	{
+		if ( knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance )
+		{
+			matches.push_back( knn_matches[i][0] );
+		}
+	}
 
 	//get first n best matches
 	std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
@@ -101,9 +117,19 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt, 
 	auto avgshift = mean( shifts );
 	LOG_SUCC( "Calculated average feature shift=[{},{}] - angle={} deg", avgshift.x, avgshift.y, ( int )toDegrees( atan2( avgshift.y, avgshift.x ) ) );
 
+	//draw keypoints
+	Mat img1_keypoints;
+	Mat img2_keypoints;
+	drawKeypoints( img1, keypoints1, img1_keypoints );
+	drawKeypoints( img2, keypoints2, img2_keypoints );
+	resize( img1_keypoints, img1_keypoints, cv::Size( 0.5 * img1_keypoints.cols, 0.5 * img1_keypoints.rows ) );
+	resize( img2_keypoints, img2_keypoints, cv::Size( 0.5 * img2_keypoints.cols, 0.5 * img2_keypoints.rows ) );
+	imshow( "Image 1 features", img1_keypoints );
+	imshow( "Image 2 features", img2_keypoints );
+
 	//draw matches
 	Mat img_matches;
 	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar::all( -1 ), Scalar::all( -1 ), std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 	resize( img_matches, img_matches, cv::Size( 0.5 * img_matches.cols, 0.5 * img_matches.rows ) );
-	imshow( "Good Matches", img_matches );
+	imshow( "Good matches", img_matches );
 }
