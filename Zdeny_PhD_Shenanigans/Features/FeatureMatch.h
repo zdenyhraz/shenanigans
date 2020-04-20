@@ -34,12 +34,12 @@ inline void featureMatch( std::string path1, std::string path2, int featurecnt )
 		int idx1 = matches[i].queryIdx;
 		int idx2 = matches[i].trainIdx;
 
-		shifts[i] = keypoints1[idx1].pt - keypoints2[idx2].pt;
+		shifts[i] = keypoints2[idx2].pt - keypoints1[idx1].pt;
 		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}]", i, shifts[i].x, shifts[i].y );
 	}
 
 	auto avgshift = mean( shifts );
-	LOG_SUCC( "Calculated average feature shift=[{},{}]", avgshift.x, avgshift.y );
+	LOG_SUCC( "Calculated average feature shift=[{},{}] - angle={} deg", avgshift.x, avgshift.y, ( int )toDegrees( atan2( avgshift.y, avgshift.x ) ) );
 
 	//draw matches
 	Mat img_matches;

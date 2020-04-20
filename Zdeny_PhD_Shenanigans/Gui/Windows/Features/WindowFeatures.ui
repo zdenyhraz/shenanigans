@@ -67,12 +67,12 @@
      <string>Match features</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>60</y>
-      <width>91</width>
+      <width>94</width>
       <height>17</height>
      </rect>
     </property>
