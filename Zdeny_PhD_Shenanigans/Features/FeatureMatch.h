@@ -21,7 +21,7 @@ struct FeatureMatchData
 	FeatureType ftype;
 	double thresh;
 	int matchcnt;
-	bool distancesort;
+	double magnitudeweight;
 };
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
@@ -120,25 +120,16 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 		}
 	}
 
-	if ( data.distancesort )
-	{
-		//get first n smallest shifts
-		std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) < magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ); } );
-		matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
-	}
-	else
-	{
-		//get first n best matches
-		std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
-		matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
-	}
+	//get first n smallest shifts & best fits
+	std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return ( data.magnitudeweight * magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) + a.distance ) < ( data.magnitudeweight * magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ) + b.distance ); } );
+	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
 
 	//calculate feature shifts
 	std::vector<Point2f> shifts( matches.size() );
 	for ( int i = 0; i < matches.size(); i++ )
 	{
 		shifts[i] = GetFeatureMatchShift( matches[i], keypoints1, keypoints2 );
-		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}]", i, shifts[i].x, shifts[i].y );
+		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}], wmagn={}, descdist={}", i, shifts[i].x, shifts[i].y, data.magnitudeweight * magnitude( shifts[i] ), matches[i].distance );
 	}
 
 	auto avgshift = mean( shifts );

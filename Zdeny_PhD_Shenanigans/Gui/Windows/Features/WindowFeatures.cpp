@@ -18,7 +18,7 @@ void WindowFeatures::FeatureMatch()
 	data.ftype = ( FeatureType )ui.comboBox->currentIndex();
 	data.thresh = ui.lineEdit_4->text().toDouble();
 	data.matchcnt = ui.lineEdit_3->text().toInt();
-	data.distancesort = ui.checkBox->isChecked();
+	data.magnitudeweight = ui.lineEdit_5->text().toDouble();
 
 	featureMatch( path1, path2, data );
 
