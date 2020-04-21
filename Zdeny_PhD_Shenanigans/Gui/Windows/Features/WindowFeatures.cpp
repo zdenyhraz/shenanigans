@@ -13,10 +13,13 @@ void WindowFeatures::FeatureMatch()
 
 	std::string path1 = ui.lineEdit->text().toStdString();
 	std::string path2 = ui.lineEdit_2->text().toStdString();
-	int matchcount = ui.lineEdit_3->text().toInt();
-	FeatureType ftype = ( FeatureType )ui.comboBox->currentIndex();
 
-	featureMatch( path1, path2, matchcount, ftype );
+	FeatureMatchData data;
+	data.ftype = ( FeatureType )ui.comboBox->currentIndex();
+	data.thresh = ui.lineEdit_4->text().toDouble();
+	data.matchcnt = ui.lineEdit_3->text().toInt();
+	data.distancesort = ui.checkBox->isChecked();
+	featureMatch( path1, path2, data );
 
 
 	LOG_INFO( "Finished matching features" );

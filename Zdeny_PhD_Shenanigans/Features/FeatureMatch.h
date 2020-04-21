@@ -16,7 +16,15 @@ enum FeatureType
 	AKAZE
 };
 
-inline int GetFeatureTypeMatcher( FeatureType ftype )
+struct FeatureMatchData
+{
+	FeatureType ftype;
+	double thresh;
+	int matchcnt;
+	bool distancesort;
+};
+
+inline int GetFeatureTypeMatcher( const FeatureType &ftype )
 {
 	switch ( ftype )
 	{
@@ -42,12 +50,12 @@ inline int GetFeatureTypeMatcher( FeatureType ftype )
 	return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 }
 
-inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
+inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 {
-	switch ( ftype )
+	switch ( data.ftype )
 	{
 		case FeatureType::SURF:
-			return SURF::create();
+			return SURF::create( data.thresh );
 		case FeatureType::BRISK:
 			return BRISK::create();
 		case FeatureType::ORB:
@@ -68,7 +76,9 @@ inline Ptr<Feature2D> GetFeatureDetector( FeatureType ftype )
 	return ORB::create();
 }
 
-inline void featureMatch( std::string path1, std::string path2, int matchcnt, FeatureType ftype )
+
+
+inline void featureMatch( std::string path1, std::string path2, const FeatureMatchData &data )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
@@ -77,14 +87,14 @@ inline void featureMatch( std::string path1, std::string path2, int matchcnt, Fe
 	showimg( img2, "img2 source" );
 
 	//detect the keypoints, compute the descriptors
-	Ptr<Feature2D> detector = GetFeatureDetector( ftype );
+	Ptr<Feature2D> detector = GetFeatureDetector( data );
 	std::vector<KeyPoint> keypoints1, keypoints2;
 	Mat descriptors1, descriptors2;
 	detector->detectAndCompute( img1, noArray(), keypoints1, descriptors1 );
 	detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
 
 	//matching descriptor vectors
-	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( ftype ) );
+	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data.ftype ) );
 	std::vector< std::vector<DMatch>> knn_matches;
 	matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
 
@@ -99,13 +109,18 @@ inline void featureMatch( std::string path1, std::string path2, int matchcnt, Fe
 		}
 	}
 
-	//get first n smallest shifts
-	std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) < magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ); } );
-	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( matchcnt, ( int )matches.size() ) );
-
-	//get first n best matches
-	//std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
-	//matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( featurecnt, ( int )matches.size() ) );
+	if ( data.distancesort )
+	{
+		//get first n smallest shifts
+		std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) < magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ); } );
+		matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
+	}
+	else
+	{
+		//get first n best matches
+		std::sort( matches.begin(), matches.end(), []( DMatch a, DMatch b ) { return a.distance < b.distance; } );
+		matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
+	}
 
 	//calculate feature shifts
 	std::vector<Point2f> shifts( matches.size() );
