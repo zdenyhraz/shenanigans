@@ -24,9 +24,9 @@ struct FeatureMatchData
 	bool distancesort;
 };
 
-inline int GetFeatureTypeMatcher( const FeatureType &ftype )
+inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
 {
-	switch ( ftype )
+	switch ( data.ftype )
 	{
 		case FeatureType::SURF:
 			return DescriptorMatcher::MatcherType::BRUTEFORCE;
@@ -76,8 +76,6 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-
-
 inline void featureMatch( std::string path1, std::string path2, const FeatureMatchData &data )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
@@ -94,12 +92,12 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
 
 	//matching descriptor vectors
-	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data.ftype ) );
+	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data ) );
 	std::vector< std::vector<DMatch>> knn_matches;
 	matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
 
 	//filter matches using the Lowe's ratio test
-	const double ratio_thresh = 0.6;
+	const double ratio_thresh = 0.7;
 	std::vector<DMatch> matches;
 	for ( size_t i = 0; i < knn_matches.size(); i++ )
 	{
@@ -131,7 +129,7 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	}
 
 	auto avgshift = mean( shifts );
-	LOG_SUCC( "Calculated average feature shift=[{},{}] - angle={} deg", avgshift.x, avgshift.y, ( int )toDegrees( atan2( avgshift.y, avgshift.x ) ) );
+	LOG_SUCC( "Calculated average feature shift=[{},{}] - angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
 
 	//draw keypoints
 	Mat img1_keypoints;
