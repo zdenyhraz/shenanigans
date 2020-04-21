@@ -19,8 +19,8 @@ void WindowFeatures::FeatureMatch()
 	data.thresh = ui.lineEdit_4->text().toDouble();
 	data.matchcnt = ui.lineEdit_3->text().toInt();
 	data.distancesort = ui.checkBox->isChecked();
-	featureMatch( path1, path2, data );
 
+	featureMatch( path1, path2, data );
 
 	LOG_INFO( "Finished matching features" );
 }

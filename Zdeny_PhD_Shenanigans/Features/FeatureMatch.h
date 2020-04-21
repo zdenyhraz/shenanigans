@@ -81,8 +81,7 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
 
-	showimg( img1, "img1 source" );
-	showimg( img2, "img2 source" );
+	showimg( std::vector<Mat> {img1, img2}, "imgs source" );
 
 	//detect the keypoints, compute the descriptors
 	Ptr<Feature2D> detector = GetFeatureDetector( data );
@@ -129,21 +128,11 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	}
 
 	auto avgshift = mean( shifts );
-	LOG_SUCC( "Calculated average feature shift=[{},{}] - angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
-
-	//draw keypoints
-	Mat img1_keypoints;
-	Mat img2_keypoints;
-	drawKeypoints( img1, keypoints1, img1_keypoints, Scalar( 0, 0, 255 ) );
-	drawKeypoints( img2, keypoints2, img2_keypoints, Scalar( 0, 0, 255 ) );
-	resize( img1_keypoints, img1_keypoints, cv::Size( 0.5 * img1_keypoints.cols, 0.5 * img1_keypoints.rows ) );
-	resize( img2_keypoints, img2_keypoints, cv::Size( 0.5 * img2_keypoints.cols, 0.5 * img2_keypoints.rows ) );
-	imshow( "Image 1 features", img1_keypoints );
-	imshow( "Image 2 features", img2_keypoints );
+	LOG_SUCC( "Calculated average feature shift=[{},{}] => angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
 
 	//draw matches
 	Mat img_matches;
-	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 0 ), Scalar( 0, 0, 255 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
+	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
 	resize( img_matches, img_matches, cv::Size( 0.5 * img_matches.cols, 0.5 * img_matches.rows ) );
 	imshow( "Good matches", img_matches );
 }
