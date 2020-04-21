@@ -76,6 +76,20 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
+inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+{
+	Mat out;
+	cvtColor( img, out, COLOR_GRAY2BGR );
+	float arrowscale = 10;
+	for ( auto &match : matches )
+	{
+		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
+		arrowedLine( out, pts.first, pts.first + arrowscale * ( pts.second - pts.first ), Scalar( 0, 255, 255 ), 2 );
+	}
+
+	return out;
+}
+
 inline void featureMatch( std::string path1, std::string path2, const FeatureMatchData &data )
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
@@ -128,11 +142,16 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	}
 
 	auto avgshift = mean( shifts );
-	LOG_SUCC( "Calculated average feature shift=[{},{}] => angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
+	LOG_SUCC( "Calculated average feature shift=[{},{}] => average angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
 
 	//draw matches
 	Mat img_matches;
 	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
 	resize( img_matches, img_matches, cv::Size( 0.5 * img_matches.cols, 0.5 * img_matches.rows ) );
 	imshow( "Good matches", img_matches );
+
+	//draw arrows
+	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2 );
+	showimg( img_arrows, "Match arrows" );
 }
+
