@@ -12,11 +12,11 @@ using namespace cv::xfeatures2d;
 enum ColorMapStyle { CM_JET, CM_BINARY };
 enum CombinePicsStyle { huebright, bluered };
 
-inline std::tuple<double, double> minMaxMat( const Mat &sourceimg )
+inline std::pair<double, double> minMaxMat( const Mat &sourceimg )
 {
 	double minR, maxR;
 	minMaxLoc( sourceimg, &minR, &maxR, nullptr, nullptr );
-	return make_tuple( minR, maxR );
+	return make_pair( minR, maxR );
 }
 
 inline std::vector<double> polyfitcore( const std::vector<double> &xdata, const std::vector<double> &ydata, int degree )
@@ -814,6 +814,11 @@ inline Point2d mean( const std::vector<Point2d> &vec )
 inline Point2f GetFeatureMatchShift( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
 {
 	return kp2[match.trainIdx].pt - kp1[match.queryIdx].pt;
+}
+
+inline std::pair<Point2f, Point2f> GetFeatureMatchPoints( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+{
+	return std::make_pair( kp1[match.queryIdx].pt, kp2[match.trainIdx].pt );
 }
 
 inline double magnitude( const Point2f &pt )
