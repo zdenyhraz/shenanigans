@@ -27,6 +27,8 @@ struct FeatureMatchData
 	double thresh;
 	int matchcnt;
 	double magnitudeweight;
+	double quanB;
+	double quanT;
 };
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
@@ -81,21 +83,25 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2, const std::vector<double> &speeds )
+inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2, const std::vector<double> &speeds, const FeatureMatchData &data )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
 	resize( out, out, Size( scale * out.cols, scale * out.rows ) );
 
-	double minspd = vectorMin( speeds );
-	double maxspd = vectorMax( speeds );
+	double minspd = getQuantile( speeds, data.quanB );
+	double maxspd = getQuantile( speeds, data.quanT );
 
 	for ( auto &match : matches )
 	{
+		double spd = magnitude( GetFeatureMatchShift( match, kp1, kp2 ) ) * kmpp / dt;
+
+		if ( spd < minspd || spd > maxspd )
+			continue;
+
 		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
 		Point2f arrStart = scale * pts.first;
 		Point2f arrEnd = scale * pts.first + arrowscale * ( scale * pts.second - scale * pts.first );
-		double spd = magnitude( GetFeatureMatchShift( match, kp1, kp2 ) ) * kmpp / dt;
 		Scalar clr = colorMapJet( spd, minspd, maxspd );
 		arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
 
@@ -159,7 +165,7 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	showimg( img_matches, "Good matches" );
 
 	//draw arrows
-	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2, speeds );
+	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2, speeds, data );
 	showimg( img_arrows, "Match arrows", false, 0, 1, 1200 );
 }
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>182</height>
+    <height>198</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,8 +57,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>206</x>
-      <y>80</y>
+      <x>160</x>
+      <y>100</y>
       <width>98</width>
       <height>21</height>
      </rect>
@@ -70,9 +70,9 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>128</x>
-      <y>53</y>
-      <width>176</width>
+      <x>163</x>
+      <y>51</y>
+      <width>141</width>
       <height>22</height>
      </rect>
     </property>
@@ -122,13 +122,26 @@
      </property>
     </item>
    </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>53</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>feature type</string>
+    </property>
+   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>52</y>
-      <width>107</width>
-      <height>55</height>
+      <x>10</x>
+      <y>50</y>
+      <width>91</width>
+      <height>93</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
@@ -163,7 +176,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>magnitudeweight</string>
+        <string>magnitudew</string>
        </property>
       </widget>
      </item>
@@ -171,6 +184,34 @@
       <widget class="QLineEdit" name="lineEdit_5">
        <property name="text">
         <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>quantileB</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="lineEdit_6">
+       <property name="text">
+        <string>0.7</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>quantileT</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="lineEdit_7">
+       <property name="text">
+        <string>1.0</string>
        </property>
       </widget>
      </item>

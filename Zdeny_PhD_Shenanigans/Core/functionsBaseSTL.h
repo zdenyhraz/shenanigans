@@ -525,3 +525,17 @@ inline std::string to_stringp( double val, int prec )
 	std::string vals = to_string( val );
 	return vals.substr( 0, vals.find( "." ) + prec + 1 );
 }
+
+inline std::vector<double> removeQuantileOutliers( const std::vector<double> &vec, double quanB, double quanT )
+{
+	auto out = vec;
+	std::sort( out.begin(), out.end() );
+	return std::vector<double>( out.begin() + ( int )( quanB * ( out.size() - 1 ) ), out.begin() + ( int )( quanT * ( out.size() - 1 ) ) );
+}
+
+inline double getQuantile( const std::vector<double> &vec, double quan )
+{
+	auto out = vec;
+	std::sort( out.begin(), out.end() );
+	return out[( int )( quan * ( out.size() - 1 ) )];
+}
