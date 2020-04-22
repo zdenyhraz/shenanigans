@@ -19,6 +19,8 @@ void WindowFeatures::FeatureMatch()
 	data.thresh = ui.lineEdit_4->text().toDouble();
 	data.matchcnt = ui.lineEdit_3->text().toInt();
 	data.magnitudeweight = ui.lineEdit_5->text().toDouble();
+	data.quanB = ui.lineEdit_6->text().toDouble();
+	data.quanT = ui.lineEdit_7->text().toDouble();
 
 	featureMatch( path1, path2, data );
 
