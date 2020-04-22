@@ -150,19 +150,6 @@
     </property>
     <addaction name="actionAbout_Zdeny_s_PhD_Shenanigans"/>
    </widget>
-   <widget class="QMenu" name="menuImage_Filtering">
-    <property name="title">
-     <string>Filtering</string>
-    </property>
-    <addaction name="actiongamma_contrast_brightness"/>
-    <addaction name="actionfourier_filtering"/>
-   </widget>
-   <widget class="QMenu" name="menuOptimization">
-    <property name="title">
-     <string>Optimization</string>
-    </property>
-    <addaction name="actiontest_benchmark"/>
-   </widget>
    <widget class="QMenu" name="menuImage_Registration">
     <property name="title">
      <string>IPC</string>
@@ -171,25 +158,6 @@
     <addaction name="actionIPC_2pic_align"/>
     <addaction name="actionIPC_optimize"/>
     <addaction name="actionIPC_duel"/>
-   </widget>
-   <widget class="QMenu" name="menuNeural">
-    <property name="title">
-     <string>Neural</string>
-    </property>
-    <addaction name="actionANN"/>
-    <addaction name="actionCNN"/>
-   </widget>
-   <widget class="QMenu" name="menuFractal">
-    <property name="title">
-     <string>Fractal</string>
-    </property>
-    <addaction name="actionMandelbrot"/>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Tools</string>
-    </property>
-    <addaction name="actionDebug"/>
    </widget>
    <widget class="QMenu" name="menuAstrophysics">
     <property name="title">
@@ -218,16 +186,11 @@
     <addaction name="actionFeature_match"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuImage_Filtering"/>
    <addaction name="menuImage_Registration"/>
    <addaction name="menuAstrophysics"/>
-   <addaction name="menuOptimization"/>
    <addaction name="menuFeatures"/>
-   <addaction name="menuNeural"/>
-   <addaction name="menuFractal"/>
    <addaction name="menuProcedural"/>
    <addaction name="menuSnake"/>
-   <addaction name="menuTools"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
