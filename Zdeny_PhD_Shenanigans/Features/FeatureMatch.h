@@ -3,6 +3,11 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 
+static constexpr double scale = 10;//scale for visualization
+static constexpr double kmpp = 696010. / 378.3;//kilometers per pixel
+static constexpr double dt = 11.88;//dt temporally adjacent pics
+static constexpr double arrowscale = 10;//size of the arrow
+
 enum FeatureType
 {
 	SURF,
@@ -76,17 +81,29 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2, const std::vector<double> &speeds )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
-	float arrowscale = 10;
+	resize( out, out, Size( scale * out.cols, scale * out.rows ) );
+
+	double minspd = vectorMin( speeds );
+	double maxspd = vectorMax( speeds );
+
 	for ( auto &match : matches )
 	{
 		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
-		arrowedLine( out, pts.first, pts.first + arrowscale * ( pts.second - pts.first ), Scalar( 0, 255, 255 ), 2 );
-	}
+		Point2f arrStart = scale * pts.first;
+		Point2f arrEnd = scale * pts.first + arrowscale * ( scale * pts.second - scale * pts.first );
+		double spd = magnitude( GetFeatureMatchShift( match, kp1, kp2 ) ) * kmpp / dt;
+		Scalar clr = colorMapJet( spd, minspd, maxspd );
+		arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
 
+		Point2f textpos = ( arrStart + arrEnd ) / 2;
+		textpos.x += scale * 2;
+		textpos.y += scale * 3;
+		putText( out, to_stringp( spd, 1 ), textpos, 1, scale / 2, clr, scale / 3 );
+	}
 	return out;
 }
 
@@ -94,7 +111,6 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
-
 	showimg( std::vector<Mat> {img1, img2}, "imgs source" );
 
 	//detect the keypoints, compute the descriptors
@@ -126,10 +142,12 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 
 	//calculate feature shifts
 	std::vector<Point2f> shifts( matches.size() );
+	std::vector<double> speeds( matches.size() );
 	for ( int i = 0; i < matches.size(); i++ )
 	{
 		shifts[i] = GetFeatureMatchShift( matches[i], keypoints1, keypoints2 );
-		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}], wmagn={}, descdist={}", i, shifts[i].x, shifts[i].y, data.magnitudeweight * magnitude( shifts[i] ), matches[i].distance );
+		speeds[i] = magnitude( shifts[i] ) * kmpp / dt;
+		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}], magn={}, wmagn={}, descdist={}, spd={} km/s", i, shifts[i].x, shifts[i].y, magnitude( shifts[i] ), data.magnitudeweight * magnitude( shifts[i] ), matches[i].distance, speeds[i] );
 	}
 
 	auto avgshift = mean( shifts );
@@ -138,11 +156,10 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	//draw matches
 	Mat img_matches;
 	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
-	resize( img_matches, img_matches, cv::Size( 0.5 * img_matches.cols, 0.5 * img_matches.rows ) );
-	imshow( "Good matches", img_matches );
+	showimg( img_matches, "Good matches" );
 
 	//draw arrows
-	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2 );
-	showimg( img_arrows, "Match arrows" );
+	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2, speeds );
+	showimg( img_arrows, "Match arrows", false, 0, 1, 1200 );
 }
 

@@ -313,6 +313,22 @@ inline std::tuple<float, float, float> colorMapJET( float x, float caxisMin = 0,
 	return std::make_tuple( B, G, R );
 }
 
+inline Scalar colorMapJet( float x, float caxisMin = 0, float caxisMax = 1 )
+{
+	float val = 255;
+	float B, G, R;
+	float sh = 0.125 * ( caxisMax - caxisMin );
+	float start = caxisMin;
+	float mid = caxisMin + 0.5 * ( caxisMax - caxisMin );
+	float end = caxisMax;
+
+	B = ( x > ( start + sh ) ) ? clamp( -val / 2 / sh * x + val / 2 / sh * ( mid + sh ), 0, val ) : ( x < start ? val / 2 : clamp( val / 2 / sh * x + val / 2 - val / 2 / sh * start, 0, val ) );
+	G = ( x < mid ) ? clamp( val / 2 / sh * x - val / 2 / sh * ( start + sh ), 0, val ) : clamp( -val / 2 / sh * x + val / 2 / sh * ( end - sh ), 0, val );
+	R = ( x < ( end - sh ) ) ? clamp( val / 2 / sh * x - val / 2 / sh * ( mid - sh ), 0, val ) : ( x > end ? val / 2 : clamp( -val / 2 / sh * x + val / 2 + val / 2 / sh * end, 0, val ) );
+
+	return Scalar( B, G, R );
+}
+
 inline std::tuple<int, int, int> colorMapBINARY( double x, double caxisMin = -1, double caxisMax = 1, double sigma = 1 )
 {
 	double B, G, R;
@@ -525,19 +541,14 @@ inline Mat applyQuantileColorMap( const Mat &sourceimgIn, double quantileB = 0, 
 	return sourceimgOutCLR;
 }
 
-inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) )
+inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600 )
 {
 	Mat sourceimg = sourceimgIn.clone();
 
 	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;
-	int wRows = 600;
 	int wCols = ( double )wRows * colRowRatio;
 	namedWindow( windowname, WINDOW_NORMAL );
-
-	if ( showSize == Size2i( 0, 0 ) )
-		resizeWindow( windowname, wCols, wRows );
-	else
-		resizeWindow( windowname, showSize );
+	resizeWindow( windowname, wCols, wRows );
 
 	sourceimg.convertTo( sourceimg, CV_32F );
 	normalize( sourceimg, sourceimg, 0, 1, NORM_MINMAX );
@@ -546,7 +557,7 @@ inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color 
 	{
 		if ( color )
 			sourceimg = applyQuantileColorMap( sourceimg, quantileB, quantileT );
-		else
+		else if ( quantileB != 0 || quantileT != 1 )
 			sourceimg = applyQuantile( sourceimg, quantileB, quantileT );
 	}
 
@@ -554,7 +565,7 @@ inline void showimg( const Mat &sourceimgIn, std::string windowname, bool color 
 	waitKey( 1 );
 }
 
-inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, Size2i showSize = Size2i( 0, 0 ) )
+inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600 )
 {
 	// 1st image determines the main hconcat height
 	int mainHeight = sourceimgIns[0].rows;
@@ -574,32 +585,19 @@ inline void showimg( const std::vector<Mat> &sourceimgIns, std::string windownam
 
 	Mat concatenated;
 	hconcat( sourceimgs, concatenated );
-	showimg( concatenated, windowname, color, quantileB, quantileT, showSize );
+	showimg( concatenated, windowname, color, quantileB, quantileT, wRows );
 }
 
-inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = false, Size2i exportSize = Size2i( 0, 0 ) )
+inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = false, Size size = Size( 0, 0 ) )
 {
 	Mat sourceimg = sourceimgIn.clone();
-	//normalize( sourceimg, sourceimg, 0, 255, NORM_MINMAX );
-	//sourceimg.convertTo( sourceimg, CV_8U );
 
-	double colRowRatio = ( double )sourceimg.cols / ( double )sourceimg.rows;
-	int namedwRows = 1700;
-	int namedwCols = ( double )namedwRows * colRowRatio;
-
-	if ( exportSize == Size2i( 0, 0 ) )
+	if ( size != Size2i( 0, 0 ) )
 	{
 		if ( bilinear )
-			resize( sourceimg, sourceimg, Size2i( namedwCols, namedwRows ), 0, 0, INTER_LINEAR );
+			resize( sourceimg, sourceimg, size, 0, 0, INTER_LINEAR );
 		else
-			resize( sourceimg, sourceimg, Size2i( namedwCols, namedwRows ), 0, 0, INTER_NEAREST );
-	}
-	else
-	{
-		if ( bilinear )
-			resize( sourceimg, sourceimg, exportSize, 0, 0, INTER_LINEAR );
-		else
-			resize( sourceimg, sourceimg, exportSize, 0, 0, INTER_NEAREST );
+			resize( sourceimg, sourceimg, size, 0, 0, INTER_NEAREST );
 	}
 	imwrite( path, sourceimg );
 }
