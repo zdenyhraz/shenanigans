@@ -134,8 +134,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		{
 			auto pic = imread( path + "0" + to_string( i + 1 ) + "_calib.PNG", IMREAD_ANYDEPTH );
 			pic = roicrop( pic, 0.365 * pic.cols, 0.72 * pic.rows, sizeX, sizeY );
-			saveimg( path + "cropped4//crop" + to_string( i ) + ".PNG", pic, false, cv::Size2i( 10 * pic.cols, 10 * pic.rows ) );
-			saveimg( path + "cropped4//crop" + to_string( i ) + "i.PNG", pic, true, cv::Size2i( 10 * pic.cols, 10 * pic.rows ) );
+			saveimg( path + "cropped5//crop" + to_string( i ) + ".PNG", pic );
 		}
 	}
 

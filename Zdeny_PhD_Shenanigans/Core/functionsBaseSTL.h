@@ -519,3 +519,9 @@ inline double toRadians( double deg )
 {
 	return deg / Constants::Rad;
 }
+
+inline std::string to_stringp( double val, int prec )
+{
+	std::string vals = to_string( val );
+	return vals.substr( 0, vals.find( "." ) + prec + 1 );
+}
