@@ -113,15 +113,15 @@ inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &ma
 		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
 		Point2f arrStart = scale * pts.first;
 		Point2f arrEnd = scale * pts.first + arrowscale * ( scale * pts.second - scale * pts.first );
-		//Scalar clr = colorMapJet( spd, minspd, maxspd );
-		Scalar clr = colorMapJet( spd, vectorMin( speeds ), vectorMax( speeds ) );
+		Scalar clr = colorMapJet( spd, minspd, maxspd );
+		//Scalar clr = colorMapJet( spd, vectorMin( speeds ), vectorMax( speeds ) );
 
 		arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
 
 		Point2f textpos = ( arrStart + arrEnd ) / 2;
 		textpos.x += scale * 2;
-		textpos.y += scale * 3;
-		putText( out, to_stringp( spd, 1 ) + "/" + to_stringp( dir, 2 ), textpos, 1, scale / 2, clr, scale / 3 );
+		textpos.y += scale * 7;
+		putText( out, to_stringp( spd, 1 ), textpos, 1, scale / 2, clr, scale / 3 );
 	}
 	return out;
 }
@@ -130,7 +130,7 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 {
 	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
-	showimg( std::vector<Mat> {img1, img2}, "imgs source" );
+	//showimg( std::vector<Mat> {img1, img2}, "imgs source" );
 
 	//detect the keypoints, compute the descriptors
 	Ptr<Feature2D> detector = GetFeatureDetector( data );
@@ -175,7 +175,7 @@ inline void featureMatch( std::string path1, std::string path2, const FeatureMat
 	//draw matches
 	Mat img_matches;
 	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
-	showimg( img_matches, "Good matches" );
+	//showimg( img_matches, "Good matches" );
 
 	//draw arrows
 	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2, speeds, data );
