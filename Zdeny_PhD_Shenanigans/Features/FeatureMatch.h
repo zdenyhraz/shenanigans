@@ -94,21 +94,34 @@ inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &ma
 
 	for ( auto &match : matches )
 	{
-		double spd = magnitude( GetFeatureMatchShift( match, kp1, kp2 ) ) * kmpp / dt;
+		auto shift = GetFeatureMatchShift( match, kp1, kp2 );
+		double spd = magnitude( shift ) * kmpp / dt;
+		double dir = toDegrees( atan2( -shift.y, shift.x ) );
 
-		if ( spd < minspd || spd > maxspd )
+		if ( spd < minspd )
+			continue;
+
+		if ( spd > maxspd )
+			continue;
+
+		if ( dir > 0.8 * 360 )
+			continue;
+
+		if ( dir < 0.5 * 360 )
 			continue;
 
 		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
 		Point2f arrStart = scale * pts.first;
 		Point2f arrEnd = scale * pts.first + arrowscale * ( scale * pts.second - scale * pts.first );
-		Scalar clr = colorMapJet( spd, minspd, maxspd );
+		//Scalar clr = colorMapJet( spd, minspd, maxspd );
+		Scalar clr = colorMapJet( spd, vectorMin( speeds ), vectorMax( speeds ) );
+
 		arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
 
 		Point2f textpos = ( arrStart + arrEnd ) / 2;
 		textpos.x += scale * 2;
 		textpos.y += scale * 3;
-		putText( out, to_stringp( spd, 1 ), textpos, 1, scale / 2, clr, scale / 3 );
+		putText( out, to_stringp( spd, 1 ) + "/" + to_stringp( dir, 2 ), textpos, 1, scale / 2, clr, scale / 3 );
 	}
 	return out;
 }

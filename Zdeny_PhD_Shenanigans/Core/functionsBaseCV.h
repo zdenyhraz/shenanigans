@@ -823,3 +823,8 @@ inline double magnitude( const Point2f &pt )
 {
 	return sqrt( sqr( pt.x ) + sqr( pt.y ) );
 }
+
+inline double angle( const Point2f &pt )
+{
+	return toDegrees( atan2( pt.y, pt.x ) );
+}
