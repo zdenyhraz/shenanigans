@@ -189,8 +189,8 @@
    <addaction name="menuImage_Registration"/>
    <addaction name="menuAstrophysics"/>
    <addaction name="menuFeatures"/>
-   <addaction name="menuProcedural"/>
    <addaction name="menuSnake"/>
+   <addaction name="menuProcedural"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
