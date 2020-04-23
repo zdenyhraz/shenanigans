@@ -11,18 +11,21 @@ void WindowFeatures::FeatureMatch()
 {
 	LOG_INFO( "Matching features..." );
 
-	std::string path1 = ui.lineEdit->text().toStdString();
-	std::string path2 = ui.lineEdit_2->text().toStdString();
+
 
 	FeatureMatchData data;
+	data.path1 = ui.lineEdit->text().toStdString();
+	data.path2 = ui.lineEdit_2->text().toStdString();
+	data.path = ui.lineEdit_3->text().toStdString();
 	data.ftype = ( FeatureType )ui.comboBox->currentIndex();
 	data.thresh = ui.lineEdit_4->text().toDouble();
 	data.matchcnt = ui.lineEdit_3->text().toInt();
 	data.magnitudeweight = ui.lineEdit_5->text().toDouble();
 	data.quanB = ui.lineEdit_6->text().toDouble();
 	data.quanT = ui.lineEdit_7->text().toDouble();
+	data.matchall = ui.checkBox->isChecked();
 
-	featureMatch( path1, path2, data );
+	featureMatch( data );
 
 	LOG_INFO( "Finished matching features" );
 }

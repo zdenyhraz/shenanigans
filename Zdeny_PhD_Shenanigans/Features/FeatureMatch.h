@@ -29,6 +29,10 @@ struct FeatureMatchData
 	double magnitudeweight;
 	double quanB;
 	double quanT;
+	bool matchall;
+	std::string path1;
+	std::string path2;
+	std::string path;
 };
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
@@ -126,10 +130,10 @@ inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &ma
 	return out;
 }
 
-inline void featureMatch( std::string path1, std::string path2, const FeatureMatchData &data )
+inline void featureMatch( const FeatureMatchData &data )
 {
-	Mat img1 = imread( path1, IMREAD_GRAYSCALE );
-	Mat img2 = imread( path2, IMREAD_GRAYSCALE );
+	Mat img1 = imread( data.path1, IMREAD_GRAYSCALE );
+	Mat img2 = imread( data.path2, IMREAD_GRAYSCALE );
 	//showimg( std::vector<Mat> {img1, img2}, "imgs source" );
 
 	//detect the keypoints, compute the descriptors
