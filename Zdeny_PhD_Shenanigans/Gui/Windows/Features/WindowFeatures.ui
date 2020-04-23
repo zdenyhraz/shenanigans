@@ -7,71 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>198</height>
+    <height>223</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WindowFeatures</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>294</width>
-      <height>36</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>image 1 path</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="text">
-        <string>D:\\MainOutput\\S-wind\\cropped5\\crop0.PNG</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>image 2 path</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2">
-       <property name="text">
-        <string>D:\\MainOutput\\S-wind\\cropped5\\crop1.PNG</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>100</y>
-      <width>98</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Match features</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>163</x>
-      <y>51</y>
+      <x>173</x>
+      <y>78</y>
       <width>141</width>
       <height>22</height>
      </rect>
@@ -125,8 +72,8 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>53</y>
+      <x>120</x>
+      <y>80</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -139,7 +86,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>80</y>
       <width>91</width>
       <height>93</height>
      </rect>
@@ -216,6 +163,86 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>124</x>
+      <y>123</y>
+      <width>53</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>match all</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>11</y>
+      <width>311</width>
+      <height>55</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>image 1 path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\cropped5\\crop0.PNG</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>image 2 path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\cropped5\\crop1.PNG</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>images path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEdit_8">
+       <property name="text">
+        <string>D:\\MainOutput\\S-wind\\cropped5\\crop</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>120</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Match features</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
