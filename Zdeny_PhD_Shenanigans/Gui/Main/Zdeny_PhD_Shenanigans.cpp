@@ -124,7 +124,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
 		Plot2D::plot( Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2 );
 	}
-	if ( 1 )// swind crop
+	if ( 0 )// swind crop
 	{
 		std::string path = "D:\\MainOutput\\S-wind\\";
 		int sizeX = 300;
@@ -136,6 +136,25 @@ void Zdeny_PhD_Shenanigans::debug()
 			pic = roicrop( pic, 0.365 * pic.cols, 0.72 * pic.rows, sizeX, sizeY );
 			saveimg( path + "cropped5//crop" + to_string( i ) + ".PNG", pic );
 		}
+	}
+	if ( 1 ) //2d poylfit
+	{
+		int trials = 100;
+		int degree = 5;
+		std::vector<double> xdata( trials );
+		std::vector<double> ydata( trials );
+		std::vector<double> zdata( trials );
+
+		for ( int i = 0; i < trials; i++ )
+		{
+			xdata[i] = randunit();
+			ydata[i] = randunit();
+			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 );
+		}
+
+
+		Mat pic = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, 100, 100 );
+		showimg( pic, "polyfit2d", true );
 	}
 
 	LOG_INFO( "Debug finished." );
