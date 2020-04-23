@@ -23,7 +23,7 @@ void WindowFeatures::FeatureMatch()
 	data.magnitudeweight = ui.lineEdit_5->text().toDouble();
 	data.quanB = ui.lineEdit_6->text().toDouble();
 	data.quanT = ui.lineEdit_7->text().toDouble();
-	data.matchall = ui.checkBox->isChecked();
+	data.degree = ui.lineEdit_9->text().toInt();
 
 	featureMatch( data );
 

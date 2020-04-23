@@ -33,10 +33,10 @@ struct FeatureMatchData
 	double magnitudeweight;
 	double quanB;
 	double quanT;
-	bool matchall;
 	std::string path1;
 	std::string path2;
 	std::string path;
+	int degree;
 };
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
@@ -108,7 +108,6 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &im
 	std::vector<double> velXdata;
 	std::vector<double> velYdata;
 
-
 	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
 		for ( auto &match : matches_all[pic] )
@@ -148,10 +147,9 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &im
 		}
 	}
 
-
-	Mat outM = polyfit( xdata, ydata, velMdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
-	Mat outX = polyfit( xdata, ydata, velXdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
-	Mat outY = polyfit( xdata, ydata, velYdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
+	Mat outM = polyfit( xdata, ydata, velMdata, data.degree, 0, out.cols - 1, 0, out.rows - 1, out.cols / 5, out.rows / 5 );
+	Mat outX = polyfit( xdata, ydata, velXdata, data.degree, 0, out.cols - 1, 0, out.rows - 1, out.cols / 5, out.rows / 5 );
+	Mat outY = polyfit( xdata, ydata, velYdata, data.degree, 0, out.cols - 1, 0, out.rows - 1, out.cols / 5, out.rows / 5 );
 
 	return std::make_tuple( out, outPt, outM, outX, outY );
 }
@@ -227,10 +225,10 @@ inline void featureMatch( const FeatureMatchData &data )
 	//draw arrows
 	auto mats = DrawFeatureMatchArrows( img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data );
 	showimg( std::get<0>( mats ), "Match arrows", false, 0, 1, 1200 );
-	showimg( std::get<1>( mats ), "Match points", false, 0, 1, 1200 );
-	showimg( std::get<2>( mats ), "Match surface M", true, 0, 1, 1200 );
-	showimg( std::get<3>( mats ), "Match surface X", true, 0, 1, 1200 );
-	showimg( std::get<4>( mats ), "Match surface Y", true, 0, 1, 1200 );
+	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
+	showimg( std::get<2>( mats ), "Match surface M", true );
+	showimg( std::get<3>( mats ), "Match surface X", true );
+	showimg( std::get<4>( mats ), "Match surface Y", true );
 
 }
 

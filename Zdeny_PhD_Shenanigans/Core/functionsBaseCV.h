@@ -61,7 +61,7 @@ inline Mat polyfitcore2d( const std::vector<double> &xdata, const std::vector<do
 	Mat Y = Mat::zeros( datacnt, 1, CV_32F ); //matice prave strany
 	for ( int r = 0; r < X.rows; r++ )
 	{
-		Y.at<float>( r, 0 ) = ydata[r];
+		Y.at<float>( r, 0 ) = zdata[r];
 		for ( int c = 0; c < X.cols; c++ )
 		{
 			if ( !c )
