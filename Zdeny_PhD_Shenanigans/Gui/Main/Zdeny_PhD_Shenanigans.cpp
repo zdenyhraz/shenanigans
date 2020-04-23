@@ -124,7 +124,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		Plot1D::plot( X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string> {"y1a", "y1b", "y1c"}, std::vector<std::string> {"y2a", "y2b"} );
 		Plot2D::plot( Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2 );
 	}
-	if ( 0 )// swind crop
+	if ( 0 ) //swind crop
 	{
 		std::string path = "D:\\MainOutput\\S-wind\\";
 		int sizeX = 300;
@@ -139,8 +139,17 @@ void Zdeny_PhD_Shenanigans::debug()
 	}
 	if ( 1 ) //2d poylfit
 	{
-		int trials = 100;
-		int degree = 5;
+		Mat orig = Mat::zeros( 100, 100, CV_32F );
+		for ( int r = 0; r < 100; r++ )
+		{
+			for ( int c = 0; c < 100; c++ )
+			{
+				orig.at<float>( r, c ) = sqr( ( float )c / 99 - 0.75 ) + sqr( ( float )r / 99 - 0.25 ) + 0.1 * sin( 0.1 * ( r + c ) + 1 );
+			}
+		}
+
+		int trials = 1000;
+		int degree = 7;
 		std::vector<double> xdata( trials );
 		std::vector<double> ydata( trials );
 		std::vector<double> zdata( trials );
@@ -152,9 +161,11 @@ void Zdeny_PhD_Shenanigans::debug()
 			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 );
 		}
 
+		Mat fit = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, 100, 100 );
 
-		Mat pic = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, 100, 100 );
-		showimg( pic, "polyfit2d", true );
+		showimg( fit, "polyfit2d", true );
+		showimg( orig, "orig", true );
+
 	}
 
 	LOG_INFO( "Debug finished." );
