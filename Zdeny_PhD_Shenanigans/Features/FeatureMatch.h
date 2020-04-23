@@ -97,8 +97,8 @@ inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector
 	cvtColor( img, out, COLOR_GRAY2BGR );
 	resize( out, out, Size( scale * out.cols, scale * out.rows ) );
 
-	double minspd = getQuantile( speeds_all[0], data.quanB );//HACK!!!!!!
-	double maxspd = getQuantile( speeds_all[0], data.quanT );
+	double minspd = getQuantile( speeds_all, data.quanB );
+	double maxspd = getQuantile( speeds_all, data.quanT );
 
 	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
