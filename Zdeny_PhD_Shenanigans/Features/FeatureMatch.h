@@ -91,7 +91,7 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
+inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
@@ -104,10 +104,9 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Ma
 
 	std::vector<double> xdata;
 	std::vector<double> ydata;
+	std::vector<Point2f> points;
 	std::vector<double> velMdata;
 	std::vector<double> velPdata;
-	std::vector<double> velXdata;
-	std::vector<double> velYdata;
 
 	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
@@ -142,19 +141,26 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Ma
 
 			xdata.push_back( pts.first.x );
 			ydata.push_back( pts.first.y );
+			points.push_back( pts.first );
 			velMdata.push_back( spd );
 			velPdata.push_back( dir );
-			velXdata.push_back( shift.x * kmpp / dt );
-			velYdata.push_back( shift.y * kmpp / dt );
 		}
 	}
 
-	Mat outM = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows  );
-	Mat outP = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows  );
-	Mat outX = polyfit( xdata, ydata, velXdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows  );
-	Mat outY = polyfit( xdata, ydata, velYdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows  );
+	Mat outM, outP;
 
-	return std::make_tuple( out, outPt, outM, outP, outX, outY );
+	if ( 0 )
+	{
+		outM = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+		outP = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+	}
+	else
+	{
+		outM = nnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+		outP = nnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+	}
+
+	return std::make_tuple( out, outPt, outM, outP );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -231,8 +237,5 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
 	showimg( std::get<2>( mats ), "Velocity surface M", true );
 	showimg( std::get<3>( mats ), "Velocity surface P", true );
-	showimg( std::get<4>( mats ), "Velocity surface X", true );
-	showimg( std::get<5>( mats ), "Velocity surface Y", true );
-
 }
 
