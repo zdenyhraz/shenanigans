@@ -144,7 +144,10 @@ void Zdeny_PhD_Shenanigans::debug()
 		{
 			for ( int c = 0; c < 100; c++ )
 			{
-				orig.at<float>( r, c ) = sqr( ( float )c / 99 - 0.75 ) + sqr( ( float )r / 99 - 0.25 ) + 0.1 * sin( 0.1 * ( r + c ) + 1 );
+				double x = ( float )c / 99;
+				double y = ( float )r / 99;
+
+				orig.at<float>( r, c ) = sqr( x - 0.75 ) + sqr( y - 0.25 ) + 0.1 * sin( 0.1 * ( x * 99 + y * 99 ) + 1 );
 			}
 		}
 
@@ -153,17 +156,21 @@ void Zdeny_PhD_Shenanigans::debug()
 		std::vector<double> xdata( trials );
 		std::vector<double> ydata( trials );
 		std::vector<double> zdata( trials );
+		std::vector<Point2f> pts( trials );
 
 		for ( int i = 0; i < trials; i++ )
 		{
 			xdata[i] = randunit();
 			ydata[i] = randunit();
-			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 );
+			pts[i] = Point2f( xdata[i], ydata[i] );
+			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 ) + 0.1 * sin( 0.1 * ( xdata[i] * 99 + ydata[i] * 99 ) + 1 );
 		}
 
-		Mat fit = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, 100, 100 );
+		Mat fitPoly = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, 100, 100 );
+		Mat fitNn = nnfit( pts, zdata, 0, 1, 0, 1, 100, 100 );
 
-		showimg( fit, "polyfit2d", true );
+		showimg( fitPoly, "fitPoly", true );
+		showimg( fitNn, "fitNn", true );
 		showimg( orig, "orig", true );
 
 	}
