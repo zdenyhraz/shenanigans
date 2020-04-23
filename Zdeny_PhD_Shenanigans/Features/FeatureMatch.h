@@ -91,7 +91,7 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
+inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
@@ -147,20 +147,13 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, co
 		}
 	}
 
-	Mat outM, outP;
+	Mat outMpoly = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+	Mat outPpoly = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
 
-	if ( 0 )
-	{
-		outM = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-		outP = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-	}
-	else
-	{
-		outM = nnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-		outP = nnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-	}
+	Mat outMnn = nnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+	Mat outPnn = nnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
 
-	return std::make_tuple( out, outPt, outM, outP );
+	return std::make_tuple( out, outPt, outMpoly, outPpoly, outMnn, outPnn );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -235,7 +228,9 @@ inline void featureMatch( const FeatureMatchData &data )
 	auto mats = DrawFeatureMatchArrows( img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data );
 	showimg( std::get<0>( mats ), "Match arrows", false, 0, 1, 1200 );
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
-	showimg( std::get<2>( mats ), "Velocity surface M", true );
-	showimg( std::get<3>( mats ), "Velocity surface P", true );
+	showimg( std::get<2>( mats ), "Velocity surface Mpoly", true );
+	showimg( std::get<3>( mats ), "Velocity surface Ppoly", true );
+	showimg( std::get<4>( mats ), "Velocity surface Mnn", true );
+	showimg( std::get<5>( mats ), "Velocity surface Pnn", true );
 }
 
