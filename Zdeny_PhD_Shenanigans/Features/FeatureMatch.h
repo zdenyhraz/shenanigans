@@ -3,10 +3,14 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 
+static constexpr int piccnt = 10;//number of pics
 static constexpr double scale = 10;//scale for visualization
 static constexpr double kmpp = 696010. / 378.3;//kilometers per pixel
 static constexpr double dt = 11.88;//dt temporally adjacent pics
-static constexpr double arrowscale = 10;//size of the arrow
+static constexpr double arrow_scale = 2;//size of the arrow
+const constexpr double ratio_thresh = 0.7;//Lowe's ratio test
+static constexpr double text_scale = scale / 4;//text scale
+static constexpr double text_thickness = scale / 4;//text thickness
 
 enum FeatureType
 {
@@ -87,102 +91,121 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<DMatch> &matches, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2, const std::vector<double> &speeds, const FeatureMatchData &data )
+inline Mat DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
 	resize( out, out, Size( scale * out.cols, scale * out.rows ) );
 
-	double minspd = getQuantile( speeds, data.quanB );
-	double maxspd = getQuantile( speeds, data.quanT );
+	double minspd = getQuantile( speeds_all[0], data.quanB );//HACK!!!!!!
+	double maxspd = getQuantile( speeds_all[0], data.quanT );
 
-	for ( auto &match : matches )
+	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
-		auto shift = GetFeatureMatchShift( match, kp1, kp2 );
-		double spd = magnitude( shift ) * kmpp / dt;
-		double dir = toDegrees( atan2( -shift.y, shift.x ) );
+		for ( auto &match : matches_all[pic] )
+		{
+			auto shift = GetFeatureMatchShift( match, kp1_all[pic], kp2_all[pic] );
+			double spd = magnitude( shift ) * kmpp / dt;
+			double dir = toDegrees( atan2( -shift.y, shift.x ) );
 
-		if ( spd < minspd )
-			continue;
+			if ( spd < minspd )
+				continue;
 
-		if ( spd > maxspd )
-			continue;
+			if ( spd > maxspd )
+				continue;
 
-		if ( dir > 0.8 * 360 )
-			continue;
+			if ( dir > 0.8 * 360 )
+				continue;
 
-		if ( dir < 0.5 * 360 )
-			continue;
+			if ( dir < 0.5 * 360 )
+				continue;
 
-		auto pts = GetFeatureMatchPoints( match, kp1, kp2 );
-		Point2f arrStart = scale * pts.first;
-		Point2f arrEnd = scale * pts.first + arrowscale * ( scale * pts.second - scale * pts.first );
-		Scalar clr = colorMapJet( spd, minspd, maxspd );
-		//Scalar clr = colorMapJet( spd, vectorMin( speeds ), vectorMax( speeds ) );
+			auto pts = GetFeatureMatchPoints( match, kp1_all[pic], kp2_all[pic] );
+			Point2f arrStart = scale * pts.first;
+			Point2f arrEnd = scale * pts.first + arrow_scale * ( scale * pts.second - scale * pts.first );
+			Scalar clr = colorMapJet( spd, minspd, maxspd );
+			arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
 
-		arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
-
-		Point2f textpos = ( arrStart + arrEnd ) / 2;
-		textpos.x += scale * 2;
-		textpos.y += scale * 7;
-		putText( out, to_stringp( spd, 1 ), textpos, 1, scale / 2, clr, scale / 3 );
+			Point2f textpos = ( arrStart + arrEnd ) / 2;
+			textpos.x += scale * 2;
+			textpos.y += scale * 4;
+			putText( out, to_stringp( spd, 1 ), textpos, 1, text_scale, clr, text_thickness );
+		}
 	}
+
 	return out;
 }
 
 inline void featureMatch( const FeatureMatchData &data )
 {
-	Mat img1 = imread( data.path1, IMREAD_GRAYSCALE );
-	Mat img2 = imread( data.path2, IMREAD_GRAYSCALE );
-	//showimg( std::vector<Mat> {img1, img2}, "imgs source" );
+	std::vector<std::vector<DMatch>> matches_all( piccnt - 1 );
+	std::vector<std::vector<KeyPoint>> keypoints1_all( piccnt - 1 );
+	std::vector<std::vector<KeyPoint>> keypoints2_all( piccnt - 1 );
+	std::vector<std::vector<double>> speeds_all( piccnt - 1 );
 
-	//detect the keypoints, compute the descriptors
-	Ptr<Feature2D> detector = GetFeatureDetector( data );
-	std::vector<KeyPoint> keypoints1, keypoints2;
-	Mat descriptors1, descriptors2;
-	detector->detectAndCompute( img1, noArray(), keypoints1, descriptors1 );
-	detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
-
-	//matching descriptor vectors
-	Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data ) );
-	std::vector< std::vector<DMatch>> knn_matches;
-	matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
-
-	//filter matches using the Lowe's ratio test
-	const double ratio_thresh = 0.7;
-	std::vector<DMatch> matches;
-	for ( size_t i = 0; i < knn_matches.size(); i++ )
+	#pragma omp parallel for
+	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
-		if ( knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance )
+		std::string path1 = data.path + to_string( pic ) + ".PNG";
+		std::string path2 = data.path + to_string( pic + 1 ) + ".PNG";
+
+		LOG_DEBUG( "Matching imagees {} - {}", path1, path2 );
+
+		Mat img1 = imread( path1, IMREAD_GRAYSCALE );
+		Mat img2 = imread( path2, IMREAD_GRAYSCALE );
+		//showimg( std::vector<Mat> {img1, img2}, "imgs source" );
+
+		//detect the keypoints, compute the descriptors
+		Ptr<Feature2D> detector = GetFeatureDetector( data );
+		std::vector<KeyPoint> keypoints1, keypoints2;
+		Mat descriptors1, descriptors2;
+		detector->detectAndCompute( img1, noArray(), keypoints1, descriptors1 );
+		detector->detectAndCompute( img2, noArray(), keypoints2, descriptors2 );
+		keypoints1_all[pic] = keypoints1;
+		keypoints2_all[pic] = keypoints2 ;
+
+		//matching descriptor vectors
+		Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data ) );
+		std::vector< std::vector<DMatch>> knn_matches;
+		matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
+
+		//filter matches using the Lowe's ratio test
+		std::vector<DMatch> matches;
+		for ( size_t i = 0; i < knn_matches.size(); i++ )
 		{
-			matches.push_back( knn_matches[i][0] );
+			if ( knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance )
+			{
+				matches.push_back( knn_matches[i][0] );
+			}
+		}
+
+		//get first n smallest shifts & best fits
+		std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return ( data.magnitudeweight * magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) + a.distance ) < ( data.magnitudeweight * magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ) + b.distance ); } );
+		matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
+		matches_all[pic] = matches;
+
+		//calculate feature shifts
+		std::vector<Point2f> shifts( matches.size() );
+		std::vector<double> speeds( matches.size() );
+		for ( int i = 0; i < matches.size(); i++ )
+		{
+			shifts[i] = GetFeatureMatchShift( matches[i], keypoints1, keypoints2 );
+			speeds[i] = magnitude( shifts[i] ) * kmpp / dt;
+			LOG_DEBUG( "Calculated feature shift[{}] =[{},{}], magn={}, wmagn={}, descdist={}, spd={} km/s", i, shifts[i].x, shifts[i].y, magnitude( shifts[i] ), data.magnitudeweight * magnitude( shifts[i] ), matches[i].distance, speeds[i] );
+		}
+		speeds_all[pic] = speeds;
+
+		if ( 0 )
+		{
+			//draw matches
+			Mat img_matches;
+			drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
+			showimg( img_matches, "Good matches" );
 		}
 	}
 
-	//get first n smallest shifts & best fits
-	std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return ( data.magnitudeweight * magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) + a.distance ) < ( data.magnitudeweight * magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ) + b.distance ); } );
-	matches = std::vector<DMatch>( matches.begin(), matches.begin() + min( data.matchcnt, ( int )matches.size() ) );
-
-	//calculate feature shifts
-	std::vector<Point2f> shifts( matches.size() );
-	std::vector<double> speeds( matches.size() );
-	for ( int i = 0; i < matches.size(); i++ )
-	{
-		shifts[i] = GetFeatureMatchShift( matches[i], keypoints1, keypoints2 );
-		speeds[i] = magnitude( shifts[i] ) * kmpp / dt;
-		LOG_DEBUG( "Calculated feature shift[{}] =[{},{}], magn={}, wmagn={}, descdist={}, spd={} km/s", i, shifts[i].x, shifts[i].y, magnitude( shifts[i] ), data.magnitudeweight * magnitude( shifts[i] ), matches[i].distance, speeds[i] );
-	}
-
-	auto avgshift = mean( shifts );
-	LOG_SUCC( "Calculated average feature shift=[{},{}] => average angle={} deg", avgshift.x, avgshift.y, toDegrees( atan2( -avgshift.y, avgshift.x ) ) );
-
-	//draw matches
-	Mat img_matches;
-	drawMatches( img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar( 0, 255, 255 ), Scalar( 0, 255, 0 ), std::vector<char>(), DrawMatchesFlags::DEFAULT );
-	//showimg( img_matches, "Good matches" );
-
 	//draw arrows
-	Mat img_arrows = DrawFeatureMatchArrows( img1, matches, keypoints1, keypoints2, speeds, data );
+	Mat img_arrows = DrawFeatureMatchArrows( imread( data.path + "0.PNG", IMREAD_GRAYSCALE ), matches_all, keypoints1_all, keypoints2_all, speeds_all, data );
 	showimg( img_arrows, "Match arrows", false, 0, 1, 1200 );
 }
 

@@ -16,7 +16,7 @@ void WindowFeatures::FeatureMatch()
 	FeatureMatchData data;
 	data.path1 = ui.lineEdit->text().toStdString();
 	data.path2 = ui.lineEdit_2->text().toStdString();
-	data.path = ui.lineEdit_3->text().toStdString();
+	data.path = ui.lineEdit_8->text().toStdString();
 	data.ftype = ( FeatureType )ui.comboBox->currentIndex();
 	data.thresh = ui.lineEdit_4->text().toDouble();
 	data.matchcnt = ui.lineEdit_3->text().toInt();
