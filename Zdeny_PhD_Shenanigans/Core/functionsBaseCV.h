@@ -828,3 +828,11 @@ inline double angle( const Point2f &pt )
 {
 	return toDegrees( atan2( pt.y, pt.x ) );
 }
+
+inline void drawPoint( Mat &out, const Point &pt, const Scalar &clr, int ptsz = 5, int thickness = 1 )
+{
+	Point ofst1( ptsz, ptsz );
+	Point ofst2( ptsz, -ptsz );
+	line( out, pt - ofst1, pt + ofst1, clr, thickness );
+	line( out, pt - ofst2, pt + ofst2, clr, thickness );
+}
