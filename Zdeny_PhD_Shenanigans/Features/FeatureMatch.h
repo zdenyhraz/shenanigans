@@ -91,16 +91,23 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline std::tuple<Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
+inline std::tuple<Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
-	Mat outA;
-	cvtColor( img, outA, COLOR_GRAY2BGR );
-	resize( outA, outA, Size( scale * outA.cols, scale * outA.rows ) );
+	Mat out;
+	cvtColor( img, out, COLOR_GRAY2BGR );
+	resize( out, out, Size( scale * out.cols, scale * out.rows ) );
 
-	Mat outP = Mat::zeros( outA.rows, outA.cols, CV_8UC3 );
+	Mat outPt = Mat::zeros( out.rows, out.cols, CV_8UC3 );
 
 	double minspd = getQuantile( speeds_all, data.quanB );
 	double maxspd = getQuantile( speeds_all, data.quanT );
+
+	std::vector<double> xdata;
+	std::vector<double> ydata;
+	std::vector<double> velMdata;
+	std::vector<double> velXdata;
+	std::vector<double> velYdata;
+
 
 	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
@@ -125,19 +132,28 @@ inline std::tuple<Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::v
 			auto pts = GetFeatureMatchPoints( match, kp1_all[pic], kp2_all[pic] );
 			Point2f arrStart = scale * pts.first;
 			Point2f arrEnd = scale * pts.first + arrow_scale * ( scale * pts.second - scale * pts.first );
-			Scalar clr = colorMapJet( spd, minspd, maxspd );
-			arrowedLine( outA, arrStart, arrEnd, clr, scale / 2 );
-
-			drawPoint( outP, arrStart, clr, scale, scale / 2 );
-
 			Point2f textpos = ( arrStart + arrEnd ) / 2;
+			Scalar clr = colorMapJet( spd, minspd, maxspd );
 			textpos.x += scale * 2;
 			textpos.y += scale * 4;
-			putText( outA, to_stringp( spd, 1 ), textpos, 1, text_scale, clr, text_thickness );
+			arrowedLine( out, arrStart, arrEnd, clr, scale / 2 );
+			drawPoint( outPt, arrStart, clr, scale, scale / 2 );
+			putText( out, to_stringp( spd, 1 ), textpos, 1, text_scale, clr, text_thickness );
+
+			xdata.push_back( arrStart.x );
+			ydata.push_back( arrStart.y );
+			velMdata.push_back( spd );
+			velXdata.push_back( shift.x * kmpp / dt );
+			velYdata.push_back( shift.y * kmpp / dt );
 		}
 	}
 
-	return std::make_tuple( outA, outP );
+
+	Mat outM = polyfit( xdata, ydata, velMdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
+	Mat outX = polyfit( xdata, ydata, velXdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
+	Mat outY = polyfit( xdata, ydata, velYdata, 4, 0, out.cols - 1, 0, out.rows - 1, out.cols, out.rows );
+
+	return std::make_tuple( out, outPt, outM, outX, outY );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -212,6 +228,9 @@ inline void featureMatch( const FeatureMatchData &data )
 	auto mats = DrawFeatureMatchArrows( img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data );
 	showimg( std::get<0>( mats ), "Match arrows", false, 0, 1, 1200 );
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1, 1200 );
+	showimg( std::get<2>( mats ), "Match surface M", true, 0, 1, 1200 );
+	showimg( std::get<3>( mats ), "Match surface X", true, 0, 1, 1200 );
+	showimg( std::get<4>( mats ), "Match surface Y", true, 0, 1, 1200 );
 
 }
 

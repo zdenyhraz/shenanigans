@@ -92,9 +92,9 @@ inline Mat polyfitcore2d( const std::vector<double> &xdata, const std::vector<do
 				else
 				{
 					if ( c1 % 2 )
-						X1.at<float>( r, c1 ) = pow( x, ceil( ( float )c1 / 2 ) );
+						X1.at<float>( 0, c1 ) = pow( x, ceil( ( float )c1 / 2 ) );
 					else
-						X1.at<float>( r, c1 ) = pow( y, ceil( ( float )c1 / 2 ) );
+						X1.at<float>( 0, c1 ) = pow( y, ceil( ( float )c1 / 2 ) );
 				}
 			}
 
