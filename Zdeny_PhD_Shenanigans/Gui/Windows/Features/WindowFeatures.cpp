@@ -11,8 +11,6 @@ void WindowFeatures::FeatureMatch()
 {
 	LOG_INFO( "Matching features..." );
 
-
-
 	FeatureMatchData data;
 	data.path1 = ui.lineEdit->text().toStdString();
 	data.path2 = ui.lineEdit_2->text().toStdString();
