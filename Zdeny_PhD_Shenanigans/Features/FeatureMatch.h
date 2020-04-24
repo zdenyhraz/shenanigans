@@ -174,6 +174,8 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Ma
 inline void featureMatch( const FeatureMatchData &data )
 {
 	Mat img_base = imread( data.path + "0.PNG", IMREAD_GRAYSCALE );
+	Mat img_base_ups;
+	resize( img_base, img_base_ups, Size( scale * img_base.cols, scale * img_base.rows ) );
 	std::vector<std::vector<DMatch>> matches_all( piccnt - 1 );
 	std::vector<std::vector<KeyPoint>> keypoints1_all( piccnt - 1 );
 	std::vector<std::vector<KeyPoint>> keypoints2_all( piccnt - 1 );
@@ -248,6 +250,6 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<4>( mats ), "Velocity surface Mwnn", true );
 	showimg( std::get<5>( mats ), "Velocity surface Pwnn", true );
 
-	showimg( combinePics( img_base, std::get<4>( mats ), CombineType::JET, 0.05, 0.95 ), "Combined" );
+	showimg( combinePics( img_base_ups, std::get<4>( mats ), CombineType::JET, 0.05, 0.95 ), "Combined" );
 }
 

@@ -13,11 +13,13 @@ inline Mat combinePics( const Mat &img1In, const Mat &img2In, CombineType ctype,
 	Mat out = Mat::zeros( img1In.rows, img1In.cols, CV_32FC3 );
 	Mat img1 = img1In.clone();
 	Mat img2 = img2In.clone();
+	resize( img2, img2, Size( img1.cols, img1.rows ) );
 	img1.convertTo( img1, CV_32F );
 	img2.convertTo( img2, CV_32F );
 	normalize( img1, img1, 0, 1, NORM_MINMAX );
 	normalize( img2, img2, 0, 1, NORM_MINMAX );
 	img1 = applyQuantile( img1, quanB, quanT );
+	img2 = applyQuantile( img2, quanB, quanT );
 
 	switch ( ctype )
 	{
