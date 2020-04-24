@@ -150,6 +150,7 @@
     <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Astrophysics\SwindFlow.h" />
     <ClInclude Include="Core\constants.h" />
+    <ClInclude Include="Draw\combinepics.h" />
     <ClInclude Include="Draw\crop.h" />
     <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />

@@ -61,8 +61,7 @@ public:
 		// relative flow X
 		//Plot2D::plot( applyQuantile( FlowX - SourcePredicX, quanBot, quanTop ), "diffrot relative flow X", "time [days]", "solar latitude [deg]", "relative horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DrXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 
-		// relative flow binary X
-		//showimg( combineTwoPics( FlowX - SourcePredicX, SourceImage, bluered, sigma ), "diffrot relative flow X binary", false, quanBot, quanTop );
+
 
 	}
 
