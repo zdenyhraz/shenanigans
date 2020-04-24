@@ -2,10 +2,10 @@
 #include "Core/functionsBaseCV.h"
 #include "Draw/colormap.h"
 
-enum class CombineType
+enum CombineType
 {
-	JET,
-	BIN
+	COMBINE_JET,
+	COMBINE_BIN
 };
 
 inline Mat combinePics( const Mat &img1In, const Mat &img2In, CombineType ctype, double quanB = 0, double quanT = 1 )
@@ -23,7 +23,7 @@ inline Mat combinePics( const Mat &img1In, const Mat &img2In, CombineType ctype,
 
 	switch ( ctype )
 	{
-		case CombineType::JET:
+		case COMBINE_JET:
 		{
 			for ( int r = 0; r < out.rows; r++ )
 			{
@@ -39,7 +39,7 @@ inline Mat combinePics( const Mat &img1In, const Mat &img2In, CombineType ctype,
 			}
 			break;
 		}
-		case CombineType::BIN:
+		case COMBINE_BIN:
 		{
 
 			break;
