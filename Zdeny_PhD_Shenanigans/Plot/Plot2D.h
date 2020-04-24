@@ -3,6 +3,7 @@
 #include "qcustomplot.h"
 #include "Gui/Windows/Plot/WindowPlot.h"
 #include "Plot.h"
+#include "Core/vectmat.h"
 
 class Plot2D
 {
