@@ -237,13 +237,16 @@
     <ClInclude Include="Draw\colormap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\vectmat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\export.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Draw\showsave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\vectmat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw\crop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -51,4 +51,5 @@
 #include "Plot/Plot2D.h"
 #include "Draw/showsave.h"
 #include "Draw/draw.h"
+#include "Draw/crop.h"
 

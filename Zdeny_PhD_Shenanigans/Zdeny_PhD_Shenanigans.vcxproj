@@ -150,9 +150,10 @@
     <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Astrophysics\SwindFlow.h" />
     <ClInclude Include="Core\constants.h" />
-    <ClInclude Include="Core\export.h" />
+    <ClInclude Include="Draw\crop.h" />
+    <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />
-    <ClInclude Include="Core\vectmat.h" />
+    <ClInclude Include="Utils\vectmat.h" />
     <ClInclude Include="Draw\colormap.h" />
     <ClInclude Include="Draw\draw.h" />
     <ClInclude Include="Draw\showsave.h" />
