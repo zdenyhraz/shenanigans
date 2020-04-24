@@ -51,6 +51,8 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
+	LOG_INFO( "Debug started" );
+
 	if ( 0 ) //plot in optimization
 	{
 		Evolution Evo( 2 );
@@ -142,12 +144,14 @@ void Zdeny_PhD_Shenanigans::debug()
 	if ( 1 ) //2d poylfit
 	{
 		int size = 100;
-		int trials = 1000;
-		int degree = 7;
+		int size2 = 1000;
+		int trials = 500;
+		int degree = 5;
 		std::vector<double> xdata( trials );
 		std::vector<double> ydata( trials );
 		std::vector<double> zdata( trials );
 		std::vector<Point2f> pts( trials );
+		Mat pointiky = Mat::zeros( size2, size2, CV_8UC3 );
 
 		Mat orig = Mat::zeros( size, size, CV_32F );
 		for ( int r = 0; r < size; r++ )
@@ -167,15 +171,18 @@ void Zdeny_PhD_Shenanigans::debug()
 			ydata[i] = randunit();
 			pts[i] = Point2f( xdata[i], ydata[i] );
 			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 ) + 0.1 * sin( 0.1 * ( xdata[i] * 99 + ydata[i] * 99 ) + 1 );
+			drawPoint( pointiky, size2 * pts[i], Scalar( rand() % 256, rand() % 256, rand() % 256 ), 5, 3 );
 		}
 
 		Mat fitPoly = polyfit( xdata, ydata, zdata, degree, 0, 1, 0, 1, size, size );
 		Mat fitNn = nnfit( pts, zdata, 0, 1, 0, 1, size, size );
+		Mat fitwNn = wnnfit( pts, zdata, 0, 1, 0, 1, size, size );
 
-		showimg( fitPoly, "fitPoly", true );
-		showimg( fitNn, "fitNn", true );
-		showimg( orig, "orig", true );
-
+		showimg( fitPoly, "fit - polynomial5", true );
+		showimg( fitNn, "fit - nearest neighbor", true );
+		showimg( fitwNn, "fit - weighted nearest neighbors", true );
+		showimg( orig, "original", true );
+		showimg( pointiky, "trials" );
 	}
 
 	LOG_INFO( "Debug finished." );

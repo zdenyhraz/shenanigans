@@ -707,16 +707,6 @@ inline Point2d mean( const std::vector<Point2d> &vec )
 	return mean * ( 1. / vec.size() );
 }
 
-inline Point2f GetFeatureMatchShift( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
-{
-	return kp2[match.trainIdx].pt - kp1[match.queryIdx].pt;
-}
-
-inline std::pair<Point2f, Point2f> GetFeatureMatchPoints( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
-{
-	return std::make_pair( kp1[match.queryIdx].pt, kp2[match.trainIdx].pt );
-}
-
 inline double magnitude( const Point2f &pt )
 {
 	return sqrt( sqr( pt.x ) + sqr( pt.y ) );

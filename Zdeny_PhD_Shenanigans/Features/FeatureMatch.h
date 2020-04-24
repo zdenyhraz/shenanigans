@@ -39,7 +39,19 @@ struct FeatureMatchData
 	std::string path2;
 	std::string path;
 	int degree;
+	int proxpts;
+	double proxcoeff;
 };
+
+inline Point2f GetFeatureMatchShift( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+{
+	return kp2[match.trainIdx].pt - kp1[match.queryIdx].pt;
+}
+
+inline std::pair<Point2f, Point2f> GetFeatureMatchPoints( const DMatch &match, const std::vector<KeyPoint> &kp1, const std::vector<KeyPoint> &kp2 )
+{
+	return std::make_pair( kp1[match.queryIdx].pt, kp2[match.trainIdx].pt );
+}
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
 {
@@ -152,10 +164,10 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Ma
 	Mat outMpoly = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
 	Mat outPpoly = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
 
-	Mat outMnn = nnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-	Mat outPnn = nnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
+	Mat outMwnn = wnnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
+	Mat outPwnn = wnnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
 
-	return std::make_tuple( out, outPt, outMpoly, outPpoly, outMnn, outPnn );
+	return std::make_tuple( out, outPt, outMpoly, outPpoly, outMwnn, outPwnn );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -232,7 +244,7 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
 	showimg( std::get<2>( mats ), "Velocity surface Mpoly", true );
 	showimg( std::get<3>( mats ), "Velocity surface Ppoly", true );
-	showimg( std::get<4>( mats ), "Velocity surface Mnn", true );
-	showimg( std::get<5>( mats ), "Velocity surface Pnn", true );
+	showimg( std::get<4>( mats ), "Velocity surface Mwnn", true );
+	showimg( std::get<5>( mats ), "Velocity surface Pwnn", true );
 }
 
