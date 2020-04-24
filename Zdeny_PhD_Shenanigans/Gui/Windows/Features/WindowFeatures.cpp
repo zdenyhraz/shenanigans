@@ -22,6 +22,8 @@ void WindowFeatures::FeatureMatch()
 	data.quanB = ui.lineEdit_6->text().toDouble();
 	data.quanT = ui.lineEdit_7->text().toDouble();
 	data.degree = ui.lineEdit_9->text().toInt();
+	data.proxpts = ui.lineEdit_10->text().toInt();
+	data.proxcoeff = ui.lineEdit_11->text().toDouble();
 
 	featureMatch( data );
 
