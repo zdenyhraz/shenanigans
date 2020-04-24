@@ -154,6 +154,9 @@
     <ClInclude Include="Features\FeatureMatch.h" />
     <ClInclude Include="Filtering\filtering.h" />
     <ClInclude Include="Astrophysics\FITS.h" />
+    <ClInclude Include="Fit\nnfit.h" />
+    <ClInclude Include="Fit\polyfit.h" />
+    <ClInclude Include="Fit\trigfit.h" />
     <ClInclude Include="Fourier\fourier.h" />
     <ClInclude Include="Fractal\fractal.h" />
     <ClInclude Include="Astrophysics\SDOipcOpt.h" />
