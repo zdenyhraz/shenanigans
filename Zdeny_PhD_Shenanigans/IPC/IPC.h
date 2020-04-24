@@ -255,7 +255,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 				if ( set.broadcast )
 				{
 					LOG_DEBUG( "L2Upeak location before iterations: {}", to_string( L2Upeak ) );
-					LOG_DEBUG( "L2Upeak location before iterations findCentroid double: {}", to_string( findCentroidDouble( L2U ) ) );
+					LOG_DEBUG( "L2Upeak location before iterations findCentroid double: {}", to_string( findCentroid( L2U ) ) );
 				}
 
 				int L1size = std::round( ( float )L2U.cols * set.L1ratio );
@@ -263,7 +263,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 
 				Mat L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
 				Point2f L1mid( L1.cols / 2, L1.rows / 2 );
-				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroidDouble( L1 ) - L1mid;
+				imageshift_SUBPIXEL = ( Point2f )L3peak - L3mid + findCentroid( L1 ) - L1mid;
 
 				for ( int i = 0; i < maxPCit; i++ )
 				{
@@ -271,7 +271,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 						LOG_DEBUG( "======= iteration {} =======", i + 1 );
 
 					L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
-					Point2f L1peak = findCentroidDouble( L1 );
+					Point2f L1peak = findCentroid( L1 );
 
 					if ( set.broadcast )
 						LOG_DEBUG( "L1peak: {}", to_string( L1peak ) );
@@ -286,7 +286,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 					}
 					if ( set.broadcast )
 					{
-						LOG_DEBUG( "L1peak findCentroid double delta: {}/{}", to_string( findCentroidDouble( L1 ).x - L1mid.x ), to_string( findCentroidDouble( L1 ).y - L1mid.y ) );
+						LOG_DEBUG( "L1peak findCentroid double delta: {}/{}", to_string( findCentroid( L1 ).x - L1mid.x ), to_string( findCentroid( L1 ).y - L1mid.y ) );
 						LOG_DEBUG( "Resulting L2Upeak in this iteration: {}", to_string( L2Upeak ) );
 					}
 					if ( ( abs( L1peak.x - L1mid.x ) < 0.5 ) && ( abs( L1peak.y - L1mid.y ) < 0.5 ) )
@@ -321,8 +321,8 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 
 				if ( converged )
 				{
-					imageshift_SUBPIXEL.x = ( float )L3peak.x - ( float )L3mid.x + 1.0 / ( float )set.UC * ( ( float )L2Upeak.x - ( float )L2Umid.x + findCentroidDouble( L1 ).x - ( float )L1mid.x ); //image shift in L3 - final
-					imageshift_SUBPIXEL.y = ( float )L3peak.y - ( float )L3mid.y + 1.0 / ( float )set.UC * ( ( float )L2Upeak.y - ( float )L2Umid.y + findCentroidDouble( L1 ).y - ( float )L1mid.y ); //image shift in L3 - final
+					imageshift_SUBPIXEL.x = ( float )L3peak.x - ( float )L3mid.x + 1.0 / ( float )set.UC * ( ( float )L2Upeak.x - ( float )L2Umid.x + findCentroid( L1 ).x - ( float )L1mid.x ); //image shift in L3 - final
+					imageshift_SUBPIXEL.y = ( float )L3peak.y - ( float )L3mid.y + 1.0 / ( float )set.UC * ( ( float )L2Upeak.y - ( float )L2Umid.y + findCentroid( L1 ).y - ( float )L1mid.y ); //image shift in L3 - final
 
 					if ( set.broadcast )
 					{
