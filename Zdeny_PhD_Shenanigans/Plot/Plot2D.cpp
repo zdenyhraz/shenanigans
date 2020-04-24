@@ -32,6 +32,9 @@ void Plot2D::plotcore( const std::vector<std::vector<double>> &z, std::string na
 	}
 	else
 	{
+		if ( colRowRatio == 0 )
+			colRowRatio = ( double )z[0].size() / z.size();
+
 		windowPlot = new WindowPlot( name, colRowRatio, OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;

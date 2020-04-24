@@ -106,7 +106,7 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
-inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
+inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
 	Mat out;
 	cvtColor( img, out, COLOR_GRAY2BGR );
@@ -162,13 +162,10 @@ inline std::tuple<Mat, Mat, Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Ma
 		}
 	}
 
-	Mat outMpoly = polyfit( xdata, ydata, velMdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-	Mat outPpoly = polyfit( xdata, ydata, velPdata, data.degree, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows );
-
 	Mat outMwnn = wnnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
 	Mat outPwnn = wnnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
 
-	return std::make_tuple( out, outPt, outMpoly, outPpoly, outMwnn, outPwnn );
+	return std::make_tuple( out, outPt, outMwnn, outPwnn );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -245,11 +242,13 @@ inline void featureMatch( const FeatureMatchData &data )
 	auto mats = DrawFeatureMatchArrows( img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data );
 	showimg( std::get<0>( mats ), "Match arrows", false, 0, 1, 1200 );
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
-	showimg( std::get<2>( mats ), "Velocity surface Mpoly", true );
-	showimg( std::get<3>( mats ), "Velocity surface Ppoly", true );
-	showimg( std::get<4>( mats ), "Velocity surface Mwnn", true );
-	showimg( std::get<5>( mats ), "Velocity surface Pwnn", true );
+	showimg( std::get<2>( mats ), "Velocity surface Mwnn", true );
+	showimg( std::get<3>( mats ), "Velocity surface Pwnn", true );
 
-	showimg( combinePics( img_base_ups, std::get<4>( mats ), CombineType::JET, 0.05, 0.95 ), "Combined" );
+	Plot2D::plot( applyQuantile( img_base, 0.05, 0.95 ), "Image source" );
+	Plot2D::plot( std::get<2>( mats ), "Velocity magnitude [km/s]" );
+	Plot2D::plot( std::get<3>( mats ), "Velocity angle [deg]" );
+
+	showimg( combinePics( img_base_ups, std::get<2>( mats ), COMBINE_JET, 0.05, 0.95 ), "Combined" );
 }
 
