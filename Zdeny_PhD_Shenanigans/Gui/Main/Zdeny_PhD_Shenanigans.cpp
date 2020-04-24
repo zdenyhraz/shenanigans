@@ -3,6 +3,8 @@
 #include "Optimization/optimization.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
+#include "Fit/polyfit.h"
+#include "Fit/nnfit.h"
 
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( parent )
 {

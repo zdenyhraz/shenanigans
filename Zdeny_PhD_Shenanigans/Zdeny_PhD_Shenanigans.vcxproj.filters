@@ -222,6 +222,15 @@
     <ClInclude Include="Features\FeatureMatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Fit\polyfit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fit\nnfit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fit\trigfit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Plot\qcustomplot.h">

@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
+#include "Fit/polyfit.h"
+#include "Fit/nnfit.h"
 
 static constexpr int piccnt = 10;//number of pics
 static constexpr double scale = 10;//scale for visualization

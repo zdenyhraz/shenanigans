@@ -3,6 +3,8 @@
 #include "Core/functionsBaseCV.h"
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
+#include "Fit/polyfit.h"
+#include "Fit/trigfit.h"
 
 class DiffrotResults
 {
