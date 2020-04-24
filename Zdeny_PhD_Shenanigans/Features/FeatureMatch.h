@@ -4,6 +4,7 @@
 #include "Core/functionsBaseCV.h"
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
+#include "Draw/combinepics.h"
 
 static constexpr int piccnt = 10;//number of pics
 static constexpr double scale = 10;//scale for visualization
@@ -246,5 +247,7 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<3>( mats ), "Velocity surface Ppoly", true );
 	showimg( std::get<4>( mats ), "Velocity surface Mwnn", true );
 	showimg( std::get<5>( mats ), "Velocity surface Pwnn", true );
+
+	showimg( combinePics( img_base, std::get<4>( mats ), CombineType::JET, 0.05, 0.95 ), "Combined" );
 }
 

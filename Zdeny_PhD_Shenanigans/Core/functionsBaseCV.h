@@ -9,9 +9,6 @@ using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-enum ColorMapStyle { CM_JET, CM_BINARY };
-enum CombinePicsStyle { huebright, bluered };
-
 inline double magnitude( const Point2f &pt )
 {
 	return sqrt( sqr( pt.x ) + sqr( pt.y ) );

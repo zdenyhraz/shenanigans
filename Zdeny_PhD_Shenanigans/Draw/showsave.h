@@ -62,34 +62,3 @@ inline void saveimg( std::string path, const Mat &sourceimgIn, bool bilinear = f
 	}
 	imwrite( path, sourceimg );
 }
-
-inline void colorMapDebug( double sigmaa )
-{
-	int rows = 500;
-	int cols = 1500;
-	Mat colormap = Mat::zeros( rows, cols, CV_8UC3 );
-	ColorMapStyle colormapStyle = CM_BINARY;
-	for ( int r = 0; r < rows; r++ )
-	{
-		for ( int c = 0; c < cols; c++ )
-		{
-			std::tuple<int, int, int>BGR;
-
-			if ( colormapStyle == CM_JET )
-			{
-				double x = 255.*c / ( cols - 1. );
-				BGR = colorMapJET( x );
-			}
-			if ( colormapStyle == CM_BINARY )
-			{
-				double x = 2.*( ( double )c / ( cols - 1. ) ) - 1.;
-				BGR = colorMapBINARY( x, -1, 1, sigmaa );
-			}
-
-			colormap.at<Vec3b>( r, c )[0] = std::get<0>( BGR );
-			colormap.at<Vec3b>( r, c )[1] = std::get<1>( BGR );
-			colormap.at<Vec3b>( r, c )[2] = std::get<2>( BGR );
-		}
-	}
-	showimg( colormap, "colormap" );
-}
