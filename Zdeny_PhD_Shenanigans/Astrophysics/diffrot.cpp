@@ -67,8 +67,8 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				double diffX = mean( omegasX ) - mean( omegasXavg );
 				double diffY = mean( omegasY ) - mean( omegasYavg );
 
-				static constexpr double diffThreshX = 1;//1
-				static constexpr double diffThreshY = 2;//2
+				const double diffThreshX = 1;//1
+				const double diffThreshY = 2;//2
 
 				// filter outlier X data
 				if ( abs( diffX ) < diffThreshX )
@@ -187,10 +187,12 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 
 	if ( pic.params().succload )
 	{
+		LOG_DEBUG( "Successfully loaded fits image {}", time.path() );
 		return;
 	}
 	else
 	{
+		LOG_DEBUG( "Unsuccessfully loaded fits image {}, trying to load temporally adjacent...", time.path() );
 		for ( int pm = 1; pm < plusminusbufer; pm++ )
 		{
 			if ( !( pm % 2 ) )
@@ -201,7 +203,10 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
 			pic.reload( time.path() );
 
 			if ( pic.params().succload )
+			{
+				LOG_DEBUG( "Successfully loaded fits image {}", time.path() );
 				return;
+			}
 		}
 	}
 
