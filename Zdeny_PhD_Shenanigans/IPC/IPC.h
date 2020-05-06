@@ -109,7 +109,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	{
 		showMatsGRS.push_back( sourceimg1 );
 		showMatsGRS.push_back( sourceimg2 );
-		//showMatsCLR.push_back( set.bandpass );
+		showMatsCLR.push_back( set.bandpass );
 	}
 
 	if ( set.save )
@@ -191,9 +191,9 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	if ( set.minimalShift )
 		L3 = L3.mul( 1 - kirkl( L3.rows, L3.cols, set.minimalShift ) );
 
-	Point2i L3peak, L3bot;
-	double maxR, minR;
-	minMaxLoc( L3, &minR, &maxR, &L3bot, &L3peak );
+	Point2i L3peak;
+	double maxR;
+	minMaxLoc( L3, nullptr, &maxR, nullptr, &L3peak );
 	Point2f L3mid( L3.cols / 2, L3.rows / 2 );
 	Point2f imageshift_PIXEL( L3peak.x - L3mid.x, L3peak.y - L3mid.y );
 	if ( set.broadcast || forceshow )
@@ -218,13 +218,19 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	{
 		bool converged = false;
 		int L2size = set.L2size;
-		if ( !( L2size % 2 ) ) L2size++; //odd!+
+		if ( !( L2size % 2 ) )
+			L2size++; //odd!+
 		while ( !converged )
 		{
-			if ( ( ( L3peak.x - L2size / 2 ) < 0 ) || ( ( L3peak.y - L2size / 2 ) < 0 ) || ( ( L3peak.x + L2size / 2 + 1 ) > L3.cols ) || ( ( L3peak.y + L2size / 2 + 1 ) > L3.rows ) )
+			if ( ( ( L3peak.x - L2size / 2 ) < 0 ) || ( ( L3peak.y - L2size / 2 ) < 0 ) || ( ( L3peak.x + L2size / 2 ) > L3.cols ) || ( ( L3peak.y + L2size / 2 ) > L3.rows ) )
 			{
-				LOG_ERROR( "Degenerate peak, results might be inaccurate, reducing L2size from {} to {} ", L2size, L2size - 2 );
+				LOG_ERROR( "Degenerate peak (Imgsize=[{},{}],L3peak=[{},{}],L2size=[{},{}]) - results might be inaccurate, reducing L2size from {} to {} ", L3.cols, L3.rows, L3peak.x, L3peak.y, L2size, L2size, L2size, L2size - 2 );
 				L2size += -2;
+				if ( L2size < 3 )
+				{
+					LOG_ERROR( "Completely degenerate peak, returning just with pixel accuracy" );
+					break;
+				}
 			}
 			else
 			{
@@ -259,7 +265,8 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 				}
 
 				int L1size = std::round( ( float )L2U.cols * set.L1ratio );
-				if ( !( L1size % 2 ) ) L1size++; //odd!+
+				if ( !( L1size % 2 ) )
+					L1size++; //odd!+
 
 				Mat L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
 				Point2f L1mid( L1.cols / 2, L1.rows / 2 );

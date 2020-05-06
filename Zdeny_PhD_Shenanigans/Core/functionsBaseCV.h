@@ -7,7 +7,7 @@
 
 using namespace std;
 using namespace cv;
-using namespace cv::xfeatures2d;
+//using namespace cv::xfeatures2d;
 
 inline double magnitude( const Point2f &pt )
 {
