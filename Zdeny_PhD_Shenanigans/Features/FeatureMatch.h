@@ -56,7 +56,7 @@ inline std::pair<Point2f, Point2f> GetFeatureMatchPoints( const DMatch &match, c
 
 inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
 {
-	switch ( data.ftype )
+	/*switch ( data.ftype )
 	{
 		case FeatureType::SURF:
 			return DescriptorMatcher::MatcherType::BRUTEFORCE;
@@ -77,7 +77,8 @@ inline int GetFeatureTypeMatcher( const FeatureMatchData &data )
 		case FeatureType::AKAZE:
 			return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 	}
-	return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
+	return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;*/
+	return 0;
 }
 
 inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
@@ -85,7 +86,7 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	switch ( data.ftype )
 	{
 		case FeatureType::SURF:
-			return SURF::create( data.thresh );
+		//return SURF::create( data.thresh );
 		case FeatureType::BRISK:
 			return BRISK::create();
 		case FeatureType::ORB:
@@ -199,7 +200,7 @@ inline void featureMatch( const FeatureMatchData &data )
 		keypoints2_all[pic] = keypoints2 ;
 
 		//matching descriptor vectors
-		Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create( ( DescriptorMatcher::MatcherType )GetFeatureTypeMatcher( data ) );
+		Ptr<DescriptorMatcher> matcher;// = DescriptorMatcher::create((DescriptorMatcher::MatcherType)GetFeatureTypeMatcher(data));
 		std::vector< std::vector<DMatch>> knn_matches;
 		matcher->knnMatch( descriptors1, descriptors2, knn_matches, 2 );
 
