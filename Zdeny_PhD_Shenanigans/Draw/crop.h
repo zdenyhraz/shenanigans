@@ -1,13 +1,6 @@
 #pragma once
 #include "Core/functionsBaseCV.h"
 
-inline Mat roicrop( const Mat &sourceimgIn, int x, int y, int w, int h )
-{
-	Rect roi = Rect( x - std::floor( ( double )w / 2. ), y - std::floor( ( double )h / 2. ), w, h );
-	Mat crop = sourceimgIn( roi );
-	return crop.clone();
-}
-
 inline Mat kirkl( unsigned size )
 {
 	Mat kirkl = Mat::zeros( size, size, CV_32F );
