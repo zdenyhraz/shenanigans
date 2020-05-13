@@ -35,16 +35,16 @@ public:
 		double endTheta = SourceThetas.back();
 
 		// diffrot profile X
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourcePredicX1, SourcePredicX2}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"average", "fit", "predicX1", "predicX2"}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourcePredics[0], SourcePredics[1]}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"average", "polyfit2", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
 
 		// diffrot profile Y
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasYavg, SourceOmegasYavgpolyfit}, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"average", "fit"}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasYavg, SourceOmegasYavgpolyfit}, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"average", "polyfit3"}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile X
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsX, polyfit( SourceThetas, SourceShiftsX, 2 )}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"average", "fit"}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsX, polyfit( SourceThetas, SourceShiftsX, 2 )}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"average", "polyfit2"}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
 
 		// shifts profile Y
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"average", "fit"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsY, polyfit( SourceThetas, SourceShiftsY, 3 )}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"average", "polyfit3"}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
 
 		// flow X
 		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
@@ -60,7 +60,7 @@ public:
 		flip( matFromVector( flowY, true ), SourceFlowY, 1 );
 	}
 
-	void SetData1D( const std::vector<double> &thetas, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &omegasXavgpolyfit, const std::vector<double> &omegasYavgpolyfit, const std::vector<double> &omegasXavgsin2sin4fit, const std::vector<double> &predicX1, const std::vector<double> &predicX2, const std::vector<double> &shiftsX, const std::vector<double> &shiftsY )
+	void SetData1D( const std::vector<double> &thetas, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &omegasXavgpolyfit, const std::vector<double> &omegasYavgpolyfit, const std::vector<double> &omegasXavgsin2sin4fit, const std::vector<std::vector<double>> &predics, const std::vector<double> &shiftsX, const std::vector<double> &shiftsY )
 	{
 		SourceThetas = ( 360. / Constants::TwoPi ) * thetas;
 		SourceOmegasXavg = omegasXavg;
@@ -68,16 +68,16 @@ public:
 		SourceOmegasXavgpolyfit = omegasXavgpolyfit;
 		SourceOmegasYavgpolyfit = omegasYavgpolyfit;
 		SourceOmegasXavgsin2sin4fit = omegasXavgsin2sin4fit;
-		SourcePredicX1 = predicX1;
-		SourcePredicX2 = predicX2;
+		SourcePredics = predics;
 		SourceShiftsX = shiftsX;
 		SourceShiftsY = shiftsY;
 	}
 
-	void SetParams( int pics, int stride )
+	void SetParams( int pics, int stride, std::string savepath )
 	{
 		SourcePics = pics;
 		SourceStride = stride;
+		saveDir = savepath;
 	}
 
 private:
@@ -94,8 +94,7 @@ private:
 	std::vector<double> SourceOmegasXavgpolyfit;
 	std::vector<double> SourceOmegasYavgpolyfit;
 	std::vector<double> SourceOmegasXavgsin2sin4fit;
-	std::vector<double> SourcePredicX1;
-	std::vector<double> SourcePredicX2;
+	std::vector<std::vector<double>> SourcePredics;
 	std::vector<double> SourceShiftsX;
 	std::vector<double> SourceShiftsY;
 
@@ -104,6 +103,6 @@ private:
 	Mat FlowY;
 	Mat FlowM;
 	Mat FlowP;
-	std::string saveDir = "C:\\Users\\Zdeny\\Desktop\\PhD_things\\diffrot\\plotsave\\";
+	std::string saveDir;
 	static constexpr double colRowRatio = 2;
 };

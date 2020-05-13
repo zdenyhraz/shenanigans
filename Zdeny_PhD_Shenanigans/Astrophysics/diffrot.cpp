@@ -109,7 +109,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				omegasXavgpolyfit = polyfit( thetas, omegasXavg, 2 );
 				omegasYavgpolyfit = polyfit( thetas, omegasYavg, 3 );
 
-				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "predicX1", "predicX2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
+				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasXavg, omegasXavgpolyfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>> {shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string> {"omegasXavg", "omegasXavgpolyfit", "predic1", "predic2", "omegasX"}, std::vector<std::string> {"shiftsXavg"} );
 				Plot1D::plot( ( 360. / Constants::TwoPi ) * thetas, std::vector<std::vector<double>> { omegasYavg, omegasYavgpolyfit, omegasY}, std::vector<std::vector<double>> {shiftsYavg}, "diffrot1DY", "solar latitude [deg]", "vertical material flow speed [deg/day]", "vertical px shift [px]", std::vector<std::string> {"omegasYavg", "omegasYavgpolyfit", "omegasY"}, std::vector<std::string> {"shiftsYavg"} );
 
 				Plot2D::plot( applyQuantile( matFromVector( omegasX2D ), 0.01, 0.99 ), "diffrot2DX", "solar latitude [deg]", "solar longitude [pics]", "horizontal material flow speed [deg/day]", ( 360. / Constants::TwoPi )*thetas.back(), ( 360. / Constants::TwoPi )*thetas.front(), 0, 1, 2 );
@@ -132,9 +132,9 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	logFitCoeffs( xcoeffsPoly, xcoeffsTrig, ycoeffsPoly );
 
 	DiffrotResults dr;
-	dr.SetData1D( thetas, omegasXavg, omegasYavg, omegasXavgpolyfit, omegasYavgpolyfit, omegasXavgsin2sin4fit, predicXs[0], predicXs[1], shiftsXavg, shiftsYavg );
+	dr.SetData1D( thetas, omegasXavg, omegasYavg, omegasXavgpolyfit, omegasYavgpolyfit, omegasXavgsin2sin4fit, predicXs, shiftsXavg, shiftsYavg );
 	dr.SetData2D( image2D, omegasX2D, omegasY2D );
-	dr.SetParams( drset.pics, drset.sPic );
+	dr.SetParams( drset.pics, drset.sPic, drset.savepath );
 	return dr;
 }
 
@@ -170,13 +170,13 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		shiftsY[y] = clamp( shiftsY[y], Constants::Min, Constants::Max );
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
 		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / ( double )( drset.dPic * drset.dSec ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
-		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.713, -2.396, -1.787 );
-		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 );
+		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
+		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 ); //Howard et al. (1983)
 		// etc...
 	}
 }
 
-double predictDiffrotProfile( double theta, double A, double B, double C )
+double predictDiffrotProfile( double theta, double A, double B, double C = 0 )
 {
 	return ( A + B * pow( sin( theta ), 2 ) + C * pow( sin( theta ), 4 ) );
 }

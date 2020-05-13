@@ -20,6 +20,7 @@ struct DiffrotSettings
 	int medianFilterSize;
 	int movavgFilterSize;
 	bool visual;
+	std::string savepath;
 };
 
 DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &time, const DiffrotSettings &drset );
