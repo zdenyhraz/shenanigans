@@ -9,6 +9,13 @@ using namespace std;
 using namespace cv;
 //using namespace cv::xfeatures2d;
 
+inline Mat roicrop( const Mat &sourceimgIn, int x, int y, int w, int h )
+{
+	Rect roi = Rect( x - std::floor( ( double )w / 2. ), y - std::floor( ( double )h / 2. ), w, h );
+	Mat crop = sourceimgIn( roi );
+	return crop.clone();
+}
+
 inline double magnitude( const Point2f &pt )
 {
 	return sqrt( sqr( pt.x ) + sqr( pt.y ) );
