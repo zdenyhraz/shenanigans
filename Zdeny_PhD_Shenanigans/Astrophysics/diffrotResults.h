@@ -46,28 +46,20 @@ public:
 
 		// ======================================================== PLOTS ========================================================
 
-		// diffrot profile X
+		// diffrot profiles
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasXavg, SourceOmegasXavgpolyfit, SourcePdarkBlueics[0], SourcePdarkBlueics[1]}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"average", "polyfit2", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
-
-		// diffrot profile Y
 		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceOmegasYavg, SourceOmegasYavgpolyfit}, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"average", "polyfit3"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" ); //rgb(119, 136, 153)
 
-		// shifts profile X
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsXavg, polyfit( SourceThetas, SourceShiftsXavg, 2 ), shiftsXErrorsBot, shiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"average", "polyfit2", "errBot", "errTop"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 119, 136, 153 ), 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 119, 136, 153 ), 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
+		// shifts profiles
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsXavg, polyfit( SourceThetas, SourceShiftsXavg, 2 ), shiftsXErrorsBot, shiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"average", "polyfit2", "average - SEM", "average + SEM"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsYavg, polyfit( SourceThetas, SourceShiftsYavg, 3 ), shiftsYErrorsBot, shiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"average", "polyfit3", "average - SEM", "average + SEM"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
 
-		// shifts profile Y
-		Plot1D::plot( SourceThetas, std::vector<std::vector<double>> {SourceShiftsYavg, polyfit( SourceThetas, SourceShiftsYavg, 3 ), shiftsYErrorsBot, shiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"average", "polyfit3", "errBot", "errTop"}, std::vector<QPen> { QPen( Qt::blue, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 119, 136, 153 ), 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 119, 136, 153 ), 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
+		// shifts mean errors
+		//Plot1D::plot( SourceThetas, shiftsXErrors, "shifts X errors", "solar latitude [deg]", "horizontal image shift error[px]", std::vector<QPen> { QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DeXs" + to_string( SourceStride ) + ".png" );
+		//Plot1D::plot( SourceThetas, shiftsYErrors, "shifts Y errors", "solar latitude [deg]", "vertical image shift error[px]", std::vector<QPen> { QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DeYs" + to_string( SourceStride ) + ".png" );
 
-		// mean errors X
-		Plot1D::plot( SourceThetas, shiftsXErrors, "shifts X errors", "solar latitude [deg]", "horizontal image shift error[px]", std::vector<QPen> { QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DeXs" + to_string( SourceStride ) + ".png" );
-
-		// mean errors Y
-		Plot1D::plot( SourceThetas, shiftsYErrors, "shifts Y errors", "solar latitude [deg]", "vertical image shift error[px]", std::vector<QPen> { QPen( Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DeYs" + to_string( SourceStride ) + ".png" );
-
-		// flow X
+		// flows
 		Plot2D::plot( applyQuantile( FlowX, quanBot, quanTop ), "diffrot flow X", "time [days]", "solar latitude [deg]", "horizontal material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DXm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
-
-		// flow Y
 		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", startTime, endTime, startTheta, endTheta, colRowRatio, saveDir + "2DYm" + to_string( medianSize ) + "s" + to_string( SourceStride ) + ".png" );
 	}
 
