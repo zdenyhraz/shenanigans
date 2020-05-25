@@ -150,13 +150,24 @@ inline double mean2( const std::vector<std::vector<T>> &vec )
 }
 
 template <typename T>
-inline double stdev( std::vector<T> &vec )
+inline double stdev( const std::vector<T> &vec )
 {
 	double m = mean( vec );
 	double stdev = 0;
 	for ( auto &x : vec )
 		stdev += sqr( x - m );
 	stdev /= vec.size();
+	return sqrt( stdev );
+}
+
+template <typename T>
+inline double stdevs( const std::vector<T> &vec )
+{
+	double m = mean( vec );
+	double stdev = 0;
+	for ( auto &x : vec )
+		stdev += sqr( x - m );
+	stdev /= ( vec.size() - 1 );
 	return sqrt( stdev );
 }
 
@@ -553,4 +564,42 @@ inline double getQuantile( const std::vector<std::vector<double>> &vec, double q
 	}
 	std::sort( out.begin(), out.end() );
 	return out[( int )( quan * ( out.size() - 1 ) )];
+}
+
+inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTheMeanHorizontal( const std::vector<std::vector<double>> &vec )
+{
+	std::vector<double> errorsBot( vec.size() );
+	std::vector<double> errorsTop( vec.size() );
+
+	for ( int i = 0; i < vec.size(); i++ )
+	{
+		double m = mean( vec[i] );
+		double s = stdevs( vec[i] );
+		double n = vec[i].size();
+		double e = s / sqrt( n );
+		errorsBot[i] = m - e;
+		errorsTop[i] = m + e;
+	}
+	return std::make_pair( errorsBot, errorsTop );
+}
+
+inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTheMeanVertical( const std::vector<std::vector<double>> &vec )
+{
+	std::vector<double> errorsBot( vec[0].size() );
+	std::vector<double> errorsTop( vec[0].size() );
+
+	for ( int i = 0; i < vec[0].size(); i++ )
+	{
+		std::vector<double> v( vec.size() );
+		for ( int j = 0; j < vec.size(); j++ )
+			v[j] = vec[j][i];
+
+		double m = mean( v );
+		double s = stdevs( v );
+		double n = v.size();
+		double e = s / sqrt( n );
+		errorsBot[i] = m - e;
+		errorsTop[i] = m + e;
+	}
+	return std::make_pair( errorsBot, errorsTop );
 }
