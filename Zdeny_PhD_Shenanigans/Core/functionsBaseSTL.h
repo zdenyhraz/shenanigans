@@ -566,10 +566,9 @@ inline double getQuantile( const std::vector<std::vector<double>> &vec, double q
 	return out[( int )( quan * ( out.size() - 1 ) )];
 }
 
-inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTheMeanHorizontal( const std::vector<std::vector<double>> &vec )
+inline std::vector<double> getStandardErrorsOfTheMeanHorizontal( const std::vector<std::vector<double>> &vec )
 {
-	std::vector<double> errorsBot( vec.size() );
-	std::vector<double> errorsTop( vec.size() );
+	std::vector<double> errors( vec.size() );
 
 	for ( int i = 0; i < vec.size(); i++ )
 	{
@@ -577,16 +576,14 @@ inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTh
 		double s = stdevs( vec[i] );
 		double n = vec[i].size();
 		double e = s / sqrt( n );
-		errorsBot[i] = m - e;
-		errorsTop[i] = m + e;
+		errors[i] = e;
 	}
-	return std::make_pair( errorsBot, errorsTop );
+	return errors;
 }
 
-inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTheMeanVertical( const std::vector<std::vector<double>> &vec )
+inline std::vector<double> getStandardErrorsOfTheMeanVertical( const std::vector<std::vector<double>> &vec )
 {
-	std::vector<double> errorsBot( vec[0].size() );
-	std::vector<double> errorsTop( vec[0].size() );
+	std::vector<double> errors( vec[0].size() );
 
 	for ( int i = 0; i < vec[0].size(); i++ )
 	{
@@ -598,8 +595,7 @@ inline std::pair<std::vector<double>, std::vector<double>> getStandardErrorsOfTh
 		double s = stdevs( v );
 		double n = v.size();
 		double e = s / sqrt( n );
-		errorsBot[i] = m - e;
-		errorsTop[i] = m + e;
+		errors[i] = e;
 	}
-	return std::make_pair( errorsBot, errorsTop );
+	return errors;
 }
