@@ -11,38 +11,12 @@ class DiffrotResults
 public:
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
-		//reset
-		FlowX = SourceFlowX.clone();
-		FlowY = SourceFlowY.clone();
-		resize( FlowY, FlowY, FlowX.size() );
+		Reset();
 
-		//apply median filters
-		if ( medianSize )
-		{
-			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
-			{
-				medianBlur( FlowX, FlowX, med );
-				medianBlur( FlowY, FlowY, med );
-			}
-		}
-
-		//calculate the magnitude & phase
-		magnitude( FlowX, FlowY, FlowM );
-		phase( FlowX, FlowY, FlowP, true );
-
-		//calculate axis limits (time, theta)
-		double startTime = 0;
-		double endTime = ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24;
-		double startTheta = SourceThetas.front();
-		double endTheta = SourceThetas.back();
-
-		//calculate image shift profile error bars
-		shiftsXErrors = getStandardErrorsOfTheMeanVertical( SourceShiftsX );
-		shiftsYErrors = getStandardErrorsOfTheMeanVertical( SourceShiftsY );
-		shiftsXErrorsBot = SourceShiftsXavg - shiftsXErrors;
-		shiftsYErrorsBot = SourceShiftsYavg - shiftsYErrors;
-		shiftsXErrorsTop = SourceShiftsXavg + shiftsXErrors;
-		shiftsYErrorsTop = SourceShiftsYavg + shiftsYErrors;
+		CalculateMedianFilters( medianSize );
+		CalculateMagnitudeAndPhase();
+		CalculateAxisLimits();
+		CalculateErrors();
 
 		// ======================================================== PLOTS ========================================================
 
@@ -124,4 +98,52 @@ private:
 	std::vector<double> shiftsXErrorsTop;
 	std::vector<double> shiftsYErrorsBot;
 	std::vector<double> shiftsYErrorsTop;
+	double startTime;
+	double endTime;
+	double startTheta;
+	double endTheta;
+
+	void Reset()
+	{
+		FlowX = SourceFlowX.clone();
+		FlowY = SourceFlowY.clone();
+		resize( FlowY, FlowY, FlowX.size() );
+	}
+
+	void CalculateMedianFilters( int medianSize )
+	{
+		if ( medianSize )
+		{
+			for ( int med = 3; med <= min( medianSize, 7 ); med += 2 )
+			{
+				medianBlur( FlowX, FlowX, med );
+				medianBlur( FlowY, FlowY, med );
+			}
+		}
+	}
+
+	void CalculateErrors()
+	{
+		shiftsXErrors = getStandardErrorsOfTheMeanVertical( SourceShiftsX );
+		shiftsYErrors = getStandardErrorsOfTheMeanVertical( SourceShiftsY );
+		shiftsXErrorsBot = SourceShiftsXavg - shiftsXErrors;
+		shiftsYErrorsBot = SourceShiftsYavg - shiftsYErrors;
+		shiftsXErrorsTop = SourceShiftsXavg + shiftsXErrors;
+		shiftsYErrorsTop = SourceShiftsYavg + shiftsYErrors;
+	}
+
+	void CalculateAxisLimits()
+	{
+		startTime = 0;
+		endTime = ( double )( SourcePics - 1 ) * SourceStride * 45 / 60 / 60 / 24;
+		startTheta = SourceThetas.front();
+		endTheta = SourceThetas.back();
+	}
+
+	void CalculateMagnitudeAndPhase()
+	{
+		magnitude( FlowX, FlowY, FlowM );
+		phase( FlowX, FlowY, FlowP, true );
+	}
+
 };
