@@ -37,13 +37,13 @@ void Plot1D::Reset( std::string name )
 	}
 }
 
-void Plot1D::plotcore( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
+void Plot1D::plotcore( const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath )
 {
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
 	int ycnt = y1cnt + y2cnt;
 
-	WindowPlot *windowPlot = RefreshGraph( name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
+	WindowPlot *windowPlot = RefreshGraph( name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens );
 
 	for ( int i = 0; i < ycnt; i++ )
 	{
@@ -61,13 +61,13 @@ void Plot1D::plotcore( const std::vector<double> &x, const std::vector<std::vect
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
-void Plot1D::plotcore( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::string savepath )
+void Plot1D::plotcore( double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath )
 {
 	int y1cnt = y1s.size();
 	int y2cnt = y2s.size();
 	int ycnt = y1cnt + y2cnt;
 
-	WindowPlot *windowPlot = RefreshGraph( name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
+	WindowPlot *windowPlot = RefreshGraph( name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens );
 
 	for ( int i = 0; i < ycnt; i++ )
 	{
@@ -85,7 +85,7 @@ void Plot1D::plotcore( double x, const std::vector<double> &y1s, const std::vect
 		windowPlot->ui.widget->savePng( QString::fromStdString( savepath ), 0, 0, 3, -1 );
 }
 
-WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
+WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens )
 {
 	WindowPlot *windowPlot;
 	auto idx = Plot::plots.find( name );
@@ -98,12 +98,12 @@ WindowPlot *Plot1D::RefreshGraph( std::string name, int ycnt, int y1cnt, int y2c
 		windowPlot = new WindowPlot( name, 1.2, OnClose );
 		windowPlot->move( Plot::GetNewPlotPosition( windowPlot ) );
 		Plot::plots[name] = windowPlot;
-		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names );
+		SetupGraph( windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens );
 	}
 	return windowPlot;
 }
 
-void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names )
+void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens )
 {
 	windowPlot->ui.widget->xAxis->setTickLabelFont( Plot::fontTicks );
 	windowPlot->ui.widget->yAxis->setTickLabelFont( Plot::fontTicks );
@@ -136,10 +136,10 @@ void Plot1D::SetupGraph( WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt,
 				windowPlot->ui.widget->graph( i )->setName( QString::fromStdString( "y2_" + to_string( i - y1cnt + 1 ) ) );
 		}
 
-		if ( Plot::plotPens.size() > i )
-			windowPlot->ui.widget->graph( i )->setPen( Plot::plotPens[i] );
+		if ( i < pens.size() )
+			windowPlot->ui.widget->graph( i )->setPen( pens[i] );
 		else
-			windowPlot->ui.widget->graph( i )->setPen( Plot::plotPens[1] );
+			windowPlot->ui.widget->graph( i )->setPen( QPen( Qt::blue, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
 	}
 
 	if ( y2cnt > 0 )
