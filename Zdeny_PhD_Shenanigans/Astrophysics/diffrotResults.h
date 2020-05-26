@@ -35,6 +35,10 @@ public:
 		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {polyfit( OmegasXavgN, 2 ), polyfit( OmegasXavgS, 2 ), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"polyfit2 North", "polyfit2 South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)" }, std::vector<QPen> { QPen( QColor( 30, 100, 255 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DNSXs" + to_string( SourceStride ) + ".png" );
 		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {polyfit( OmegasYavgN, 3 ), polyfit( OmegasYavgS, 3 ), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]", "absolute vertical material flow speed [deg/day]", std::vector<std::string> {"polyfit3 North", "polyfit3 South", "average North", "average South" }, std::vector<QPen> { QPen( QColor( 30, 100, 255 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DNSYs" + to_string( SourceStride ) + ".png" );
 
+		// diffrot profiles NS cut
+		Plot1D::plot( ThetasNScut, std::vector<std::vector<double>> {polyfit( OmegasXavgNcut, 2 ), polyfit( OmegasXavgScut, 2 ), OmegasXavgNcut, OmegasXavgScut, PredicXsNScut[0], PredicXsNScut[1]}, "diffrot profile NS cut X", "absolute solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"polyfit2 North", "polyfit2 South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)" }, std::vector<QPen> { QPen( QColor( 30, 100, 255 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DNScXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( ThetasNScut, std::vector<std::vector<double>> {polyfit( OmegasYavgNcut, 3 ), polyfit( OmegasYavgScut, 3 ), OmegasYavgNcut, OmegasYavgScut}, "diffrot profile NS cut Y", "absolute solar latitude [deg]", "absolute vertical material flow speed [deg/day]", std::vector<std::string> {"polyfit3 North", "polyfit3 South", "average North", "average South" }, std::vector<QPen> { QPen( QColor( 30, 100, 255 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::black, 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DNScYs" + to_string( SourceStride ) + ".png" );
+
 		// shifts profiles
 		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {polyfit( SourceThetasavg, SourceShiftsXavg, 2 ), SourceShiftsXavg, ShiftsXErrorsBot, ShiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "horizontal image shift [px]", std::vector<std::string> {"polyfit2", "average", "average - stdev", "average + stdev"}, std::vector<QPen> { QPen( QColor( 220, 20, 60 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsXs" + to_string( SourceStride ) + ".png" );
 		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {polyfit( SourceThetasavg, SourceShiftsYavg, 3 ), SourceShiftsYavg, ShiftsYErrorsBot, ShiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "vertical image shift [px]", std::vector<std::string> {"polyfit3", "average", "average - stdev", "average + stdev"}, std::vector<QPen> { QPen( QColor( 220, 20, 60 ), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( QColor( 30, 100, 255 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::cyan, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ), QPen( Qt::magenta, 0.75, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin )}, saveDir + "1DsYs" + to_string( SourceStride ) + ".png" );
@@ -109,11 +113,17 @@ private:
 	std::vector<double> ShiftsYErrorsBot;
 	std::vector<double> ShiftsYErrorsTop;
 	std::vector<std::vector<double>> PredicXsNS;
+	std::vector<std::vector<double>> PredicXsNScut;
 	std::vector<double> ThetasNS;
+	std::vector<double> ThetasNScut;
 	std::vector<double> OmegasXavgN;
+	std::vector<double> OmegasXavgNcut;
 	std::vector<double> OmegasXavgS;
+	std::vector<double> OmegasXavgScut;
 	std::vector<double> OmegasYavgN;
+	std::vector<double> OmegasYavgNcut;
 	std::vector<double> OmegasYavgS;
+	std::vector<double> OmegasYavgScut;
 	double StartTime;
 	double EndTime;
 	double StartTheta;
@@ -176,6 +186,7 @@ private:
 	void CalculateNS()
 	{
 		PredicXsNS.resize( predicCnt );
+		PredicXsNScut.resize( predicCnt );
 
 		int zeroidx = 0;
 		for ( int i = 0; i < SourceThetasavg.size() - 1; i++ )
@@ -201,7 +212,7 @@ private:
 		std::reverse( OmegasXavgS.begin(), OmegasXavgS.end() );
 		std::reverse( OmegasYavgS.begin(), OmegasYavgS.end() );
 
-		//cut off stuff near the equator for both hemispheres for nicer polyfit
+		//cut off stuff near the equator for both hemispheres for a (potentially?) nicer polyfit
 		double offs = 10;//deg
 		int offsidx = 0;
 		for ( int i = 0; i < ThetasNS.size() - 1; i++ )
@@ -213,13 +224,13 @@ private:
 			}
 		}
 
-		ThetasNS = std::vector<double>( ThetasNS.begin(), ThetasNS.begin() + offsidx );
-		PredicXsNS[0] = std::vector<double>( PredicXsNS[0].begin(), PredicXsNS[0].begin() + offsidx );
-		PredicXsNS[1] = std::vector<double>( PredicXsNS[1].begin(), PredicXsNS[1].begin() + offsidx );
-		OmegasXavgN = std::vector<double>( OmegasXavgN.begin(), OmegasXavgN.begin() + offsidx );
-		OmegasYavgN = std::vector<double>( OmegasYavgN.begin(), OmegasYavgN.begin() + offsidx );
-		OmegasXavgS = std::vector<double>( OmegasXavgS.begin(), OmegasXavgS.begin() + offsidx );
-		OmegasYavgS = std::vector<double>( OmegasYavgS.begin(), OmegasYavgS.begin() + offsidx );
+		ThetasNScut = std::vector<double>( ThetasNS.begin(), ThetasNS.begin() + offsidx );
+		PredicXsNScut[0] = std::vector<double>( PredicXsNS[0].begin(), PredicXsNS[0].begin() + offsidx );
+		PredicXsNScut[1] = std::vector<double>( PredicXsNS[1].begin(), PredicXsNS[1].begin() + offsidx );
+		OmegasXavgNcut = std::vector<double>( OmegasXavgN.begin(), OmegasXavgN.begin() + offsidx );
+		OmegasYavgNcut = std::vector<double>( OmegasYavgN.begin(), OmegasYavgN.begin() + offsidx );
+		OmegasXavgScut = std::vector<double>( OmegasXavgS.begin(), OmegasXavgS.begin() + offsidx );
+		OmegasYavgScut = std::vector<double>( OmegasYavgS.begin(), OmegasYavgS.begin() + offsidx );
 	}
 
 };
