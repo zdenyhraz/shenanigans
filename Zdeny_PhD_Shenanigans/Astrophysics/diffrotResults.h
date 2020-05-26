@@ -158,8 +158,8 @@ private:
 		predicXs = zerovect2( 2, SourceThetasavg.size() );
 		for ( int i = 0; i < SourceThetasavg.size(); i++ )
 		{
-			predicXs[0][i] = predictDiffrotProfile( SourceThetasavg[i], 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
-			predicXs[1][i] = predictDiffrotProfile( SourceThetasavg[i], 14.192, -1.70, -2.36 ); //Howard et al. (1983)
+			predicXs[0][i] = predictDiffrotProfile( toRadians( SourceThetasavg[i] ), 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
+			predicXs[1][i] = predictDiffrotProfile( toRadians( SourceThetasavg[i] ), 14.192, -1.70, -2.36 ); //Howard et al. (1983)
 			// etc...
 		}
 	}
@@ -198,7 +198,7 @@ private:
 		std::reverse( OmegasXavgS.begin(), OmegasXavgS.end() );
 		std::reverse( OmegasYavgS.begin(), OmegasYavgS.end() );
 
-		//cut off stuff near the equator for both hemispheres for nicer poly2 fit
+		//cut off stuff near the equator for both hemispheres for nicer polyfit
 		double offs = 10;//deg
 		int offsidx = 0;
 		for ( int i = 0; i < ThetasNS.size() - 1; i++ )
