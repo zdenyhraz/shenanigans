@@ -5,10 +5,15 @@
 std::map<std::string, WindowPlot *> Plot::plots;
 
 QFont Plot::fontTicks( "Newyork", 9 );
-
 QFont Plot::fontLabels( "Newyork", 12 );
-
 std::vector<QPen> Plot::emptyvectpen{};
+QColor Plot::blue( 30, 80, 255 );
+QColor Plot::black( 50, 50, 50 );
+QColor Plot::red( 220, 20, 60 );
+QColor Plot::orange( 255, 165, 0 );
+QColor Plot::cyan( 64, 224, 208 );
+QColor Plot::magenta( 150, 0, 150 );
+
 
 QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 {
