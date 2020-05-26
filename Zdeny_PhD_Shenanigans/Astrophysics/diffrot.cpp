@@ -37,20 +37,21 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	image2D.reserve( drset.pics );
 
 	FitsImage pic1, pic2;
+	int lag1, lag2;
 
 	for ( int pic = 0; pic < drset.pics; pic++ )
 	{
 		time.advanceTime( ( bool )pic * ( drset.sPic - drset.dPic ) * drset.dSec );
-		loadFitsFuzzy( pic1, time );
+		loadFitsFuzzy( pic1, time, lag1 );
 		time.advanceTime( drset.dPic * drset.dSec );
-		loadFitsFuzzy( pic2, time );
+		loadFitsFuzzy( pic2, time, lag2 );
 
 		if ( pic1.params().succload && pic2.params().succload )
 		{
 			double R = ( pic1.params().R + pic2.params().R ) / 2.;
 			double theta0 = ( pic1.params().theta0 + pic2.params().theta0 ) / 2.;
 
-			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy );
+			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy, lag1, lag2 );
 
 			image2D.emplace_back( image );
 
@@ -142,7 +143,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	return dr;
 }
 
-void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy )
+void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2 )
 {
 	#pragma omp parallel for
 	for ( int y = 0; y < drset.ys; y++ )
@@ -172,38 +173,49 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - sy ) / R ) + theta0;
 		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
 		shiftsY[y] = clamp( shiftsY[y], Constants::Min, Constants::Max );
-		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
-		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / ( double )( drset.dPic * drset.dSec ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
+		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec + lag2 - lag1 ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
+		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / ( double )( drset.dPic * drset.dSec + lag2 - lag1 ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 ); //Howard et al. (1983)
 		// etc...
 	}
 }
 
-void loadFitsFuzzy( FitsImage &pic, FitsTime &time )
+void loadFitsFuzzy( FitsImage &pic, FitsTime &time, int &lag )
 {
 	pic.reload( time.path() );
 
 	if ( pic.params().succload )
 	{
+		lag = 0;
 		return;
 	}
 	else
 	{
 		for ( int pm = 1; pm < plusminusbufer; pm++ )
 		{
+			int shift = 0;;
+
 			if ( !( pm % 2 ) )
+			{
 				time.advanceTime( pm );
+				shift += pm;
+			}
 			else
+			{
 				time.advanceTime( -pm );
+				shift += -pm;
+			}
 
 			pic.reload( time.path() );
-
 			if ( pic.params().succload )
+			{
+				lag = shift;
 				return;
+			}
 		}
 	}
-
+	lag = 0;
 	time.advanceTime( plusminusbufer / 2 );
 }
 

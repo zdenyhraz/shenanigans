@@ -244,7 +244,7 @@ void Zdeny_PhD_Shenanigans::fitsDownloader()
 {
 	std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
 	//generateFitsDownloadUrlSingles( 1, 2000, urlmain );
-	generateFitsDownloadUrlPairs( 1, 25, 2000, urlmain );
+	generateFitsDownloadUrlPairs( 1, 25, 2500, urlmain );
 	LOG_INFO( "Fits download urls created" );
 }
 
