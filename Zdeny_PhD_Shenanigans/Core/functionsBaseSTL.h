@@ -215,6 +215,15 @@ inline std::vector<T> operator*( double val, const std::vector<T> &vec )
 }
 
 template <typename T>
+inline std::vector<T> abs( const std::vector<T> &vec )
+{
+	auto result = vec;
+	for ( int i = 0; i < vec.size(); i++ )
+		result[i] = abs( vec[i] );
+	return result;
+}
+
+template <typename T>
 inline double median( std::vector<T> &vec )
 {
 	//function changes the vec order, watch out
