@@ -608,3 +608,18 @@ inline std::vector<double> getStandardErrorsOfTheMeanVertical( const std::vector
 	}
 	return errors;
 }
+
+inline std::vector<double> getStandardDeviationsVertical( const std::vector<std::vector<double>> &vec )
+{
+	std::vector<double> stddevs( vec[0].size() );
+
+	for ( int i = 0; i < vec[0].size(); i++ )
+	{
+		std::vector<double> v( vec.size() );
+		for ( int j = 0; j < vec.size(); j++ )
+			v[j] = vec[j][i];
+
+		stddevs[i] = stdevs( v );
+	}
+	return stddevs;
+}
