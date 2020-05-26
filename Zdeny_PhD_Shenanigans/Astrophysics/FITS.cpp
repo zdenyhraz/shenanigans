@@ -110,7 +110,7 @@ Mat loadfits( std::string path, FitsParams &params )
 
 void generateFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain )
 {
-	std::ofstream urls( "D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::app );
+	std::ofstream urls( "D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc );
 	std::size_t posR = urlmain.find( "record=" );
 	std::size_t posN = posR + 7;
 	std::string stringcislo = urlmain.substr( posN, 8 ); //8mistne cislo
@@ -131,7 +131,7 @@ void generateFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain
 
 void generateFitsDownloadUrlSingles( int delta, int pics, string urlmain )
 {
-	std::ofstream urls( "D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::app );
+	std::ofstream urls( "D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc );
 	std::size_t posR = urlmain.find( "record=" );
 	std::size_t posN = posR + 7;
 	std::string stringcislo = urlmain.substr( posN, 8 ); //8mistne cislo
