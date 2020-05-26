@@ -12,6 +12,14 @@ public:
 	static QPoint GetNewPlotPosition( WindowPlot *windowPlot );
 	static std::vector<QPen> emptyvectpen;
 
+	//plot colors
+	static QColor blue;
+	static QColor black;
+	static QColor red;
+	static QColor orange;
+	static QColor cyan;
+	static QColor magenta;
+
 private:
 
 };
