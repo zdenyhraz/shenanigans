@@ -5,6 +5,7 @@
 #define LOG_INFO(...) Logger::GetLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...) Logger::GetLogger()->error(__VA_ARGS__)
 #define LOG_FATAL(...) Logger::GetLogger()->critical(__VA_ARGS__)
+#define LOG_NEWLINE Logger::GetLogger()->debug("")
 
 class Logger
 {

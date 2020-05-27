@@ -127,11 +127,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	shiftsXavg = meanVertical( shiftsX2D );
 	shiftsYavg = meanVertical( shiftsY2D );
 
-	auto xcoeffsPoly = polyfitCoeffs( thetasavg, omegasXavg, 2 );
-	auto xcoeffsTrig = sin2sin4fitCoeffs( thetasavg, omegasXavg );
-	auto ycoeffsPoly = polyfitCoeffs( thetasavg, omegasYavg, 3 );
-	logFitCoeffs( xcoeffsPoly, xcoeffsTrig, ycoeffsPoly );
-
 	DiffrotResults dr;
 	dr.SetData1D( thetasavg, omegasXavg, omegasYavg, shiftsXavg, shiftsYavg );
 	dr.SetData2D( image2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D );
@@ -213,24 +208,4 @@ void loadFitsFuzzy( FitsImage &pic, FitsTime &time, int &lag )
 	}
 	lag = 0;
 	time.advanceTime( plusminusbufer / 2 );
-}
-
-void logFitCoeffs( const std::vector<double> &xcoeffsPoly, const std::vector<double> &xcoeffsTrig, const std::vector<double> &ycoeffsPoly )
-{
-	for ( int i = 0; i < xcoeffsPoly.size(); i++ )
-	{
-		LOG_INFO( "X flow speed polynomial fit coefficient {} = {}", ( char )( i + 'A' ), xcoeffsPoly[i] );
-	}
-
-	for ( int i = 0; i < xcoeffsTrig.size(); i++ )
-	{
-		LOG_INFO( "X flow speed trigonometric fit coefficient {} = {}", ( char )( i + 'A' ), xcoeffsTrig[i] );
-	}
-
-	for ( int i = 0; i < ycoeffsPoly.size(); i++ )
-	{
-		LOG_INFO( "Y flow speed polynomial fit coefficient {} = {}", ( char )( i + 'A' ), ycoeffsPoly[i] );
-	}
-
-
 }
