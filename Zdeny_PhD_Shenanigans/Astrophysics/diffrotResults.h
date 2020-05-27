@@ -28,8 +28,8 @@ public:
 		// ======================================================== PLOTS ========================================================
 
 		// diffrot profiles
-		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {SourceOmegasXavgpolyfit, SourceOmegasXavg, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, std::vector<QPen> { QPen( Plot::red, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::orange, 2 ), QPen( Plot::magenta, 2 )}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
-		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {SourceOmegasYavgpolyfit, SourceOmegasYavg }, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"polyfit3", "average" }, std::vector<QPen> { QPen( Plot::red, 3 ), QPen( Plot::blue, 1.5 )}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" ); //rgb(119, 136, 153)
+		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {polyfit( SourceThetasavg, SourceOmegasXavg, 2 ), SourceOmegasXavg, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, std::vector<QPen> { QPen( Plot::red, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::orange, 2 ), QPen( Plot::magenta, 2 )}, saveDir + "1DXs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( SourceThetasavg, std::vector<std::vector<double>> {polyfit( SourceThetasavg, SourceOmegasYavg, 3 ), SourceOmegasYavg }, "diffrot profile Y", "solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"polyfit3", "average" }, std::vector<QPen> { QPen( Plot::red, 3 ), QPen( Plot::blue, 1.5 )}, saveDir + "1DYs" + to_string( SourceStride ) + ".png" ); //rgb(119, 136, 153)
 
 		// diffrot profiles NS
 		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {polyfit( OmegasXavgN, 2 ), polyfit( OmegasXavgS, 2 ), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"polyfit2 North", "polyfit2 South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)" }, std::vector<QPen> { QPen( Plot::blue, 3 ), QPen( Plot::black, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::black, 1.5 ), QPen( Plot::orange, 2 ), QPen( Plot::magenta, 2 )}, saveDir + "1DNSXs" + to_string( SourceStride ) + ".png" );
@@ -61,13 +61,11 @@ public:
 		SourceShiftsY = shiftsY;
 	}
 
-	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &omegasXavgpolyfit, const std::vector<double> &omegasYavgpolyfit, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
+	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
 	{
 		SourceThetasavg = ( 360. / Constants::TwoPi ) * thetasavg;
 		SourceOmegasXavg = omegasXavg;
 		SourceOmegasYavg = omegasYavg;
-		SourceOmegasXavgpolyfit = omegasXavgpolyfit;
-		SourceOmegasYavgpolyfit = omegasYavgpolyfit;
 		SourceShiftsXavg = shiftsXavg;
 		SourceShiftsYavg = shiftsYavg;
 	}
@@ -92,8 +90,6 @@ private:
 	std::vector<double> SourceThetasavg;
 	std::vector<double> SourceOmegasXavg;
 	std::vector<double> SourceOmegasYavg;
-	std::vector<double> SourceOmegasXavgpolyfit;
-	std::vector<double> SourceOmegasYavgpolyfit;
 	std::vector<double> SourceShiftsXavg;
 	std::vector<double> SourceShiftsYavg;
 
