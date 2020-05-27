@@ -540,6 +540,16 @@ inline double toRadians( double deg )
 	return deg / Constants::Rad;
 }
 
+inline std::vector<double> toRadians( const std::vector<double> &vecdeg )
+{
+	auto vecrad = vecdeg;
+	for ( int i = 0; i < vecdeg.size(); i++ )
+	{
+		vecrad[i] = toRadians( vecdeg[i] );
+	}
+	return vecrad;
+}
+
 inline std::string to_stringp( double val, int prec )
 {
 	std::string vals = to_string( val );
