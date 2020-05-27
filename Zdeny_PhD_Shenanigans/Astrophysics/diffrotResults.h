@@ -24,6 +24,7 @@ public:
 		CalculatePredics();
 		CalculateErrors();
 		CalculateNS();
+		CalculateFitCoeffs();
 
 		// ======================================================== PLOTS ========================================================
 
@@ -227,6 +228,31 @@ private:
 		OmegasYavgNcut = std::vector<double>( OmegasYavgN.begin(), OmegasYavgN.begin() + offsidx );
 		OmegasXavgScut = std::vector<double>( OmegasXavgS.begin(), OmegasXavgS.begin() + offsidx );
 		OmegasYavgScut = std::vector<double>( OmegasYavgS.begin(), OmegasYavgS.begin() + offsidx );
+	}
+
+	void CalculateFitCoeffs()
+	{
+		//both
+		LogFitCoeffs( "XcoeffsPoly2", polyfitCoeffs( toRadians( SourceThetasavg ), SourceOmegasXavg, 2 ) );
+		LogFitCoeffs( "YcoeffsPoly3", polyfitCoeffs( toRadians( SourceThetasavg ), SourceOmegasYavg, 3 ) );
+		LogFitCoeffs( "XcoeffsTrig", sin2sin4fitCoeffs( toRadians( SourceThetasavg ), SourceOmegasXavg ) );
+
+		//north
+		LogFitCoeffs( "XcoeffsTrigN", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasXavgN ) );
+		LogFitCoeffs( "YcoeffsTrigN", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasYavgN ) );
+
+		//south
+		LogFitCoeffs( "XcoeffsTrigS", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasXavgS ) );
+		LogFitCoeffs( "YcoeffsTrigS", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasYavgS ) );
+	}
+
+	void LogFitCoeffs( const std::string &fitname, const std::vector<double> &coeffs )
+	{
+		for ( int i = 0; i < coeffs.size(); i++ )
+		{
+			LOG_INFO( "{} fit coefficient {} = {}", fitname, ( char )( 'A' + i ), coeffs[i] );
+		}
+		LOG_NEWLINE;
 	}
 
 };
