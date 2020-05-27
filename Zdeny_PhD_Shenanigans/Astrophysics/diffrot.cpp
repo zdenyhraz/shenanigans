@@ -27,7 +27,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	std::vector<double> shiftsYavg( drset.ys );
 	std::vector<double> omegasXavgpolyfit( drset.ys );
 	std::vector<double> omegasYavgpolyfit( drset.ys );
-	std::vector<double> omegasXavgsin2sin4fit( drset.ys );
 
 	thetas2D.reserve( drset.pics );
 	omegasX2D.reserve( drset.pics );
@@ -127,9 +126,6 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	omegasYavg = meanVertical( omegasY2D );
 	shiftsXavg = meanVertical( shiftsX2D );
 	shiftsYavg = meanVertical( shiftsY2D );
-	omegasXavgpolyfit = polyfit( thetasavg, omegasXavg, 2 );
-	omegasYavgpolyfit = polyfit( thetasavg, omegasYavg, 3 );
-	omegasXavgsin2sin4fit = sin2sin4fit( thetasavg, omegasXavg );
 
 	auto xcoeffsPoly = polyfitCoeffs( thetasavg, omegasXavg, 2 );
 	auto xcoeffsTrig = sin2sin4fitCoeffs( thetasavg, omegasXavg );
