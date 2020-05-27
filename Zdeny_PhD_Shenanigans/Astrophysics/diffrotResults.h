@@ -34,7 +34,7 @@ public:
 
 		// diffrot profiles NS
 		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {sin2sin4fit( toRadians( ThetasNS ), OmegasXavgN ), sin2sin4fit( toRadians( ThetasNS ), OmegasXavgS ), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)" }, std::vector<QPen> { QPen( Plot::blue, 3 ), QPen( Plot::black, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::black, 1.5 ), QPen( Plot::orange, 2 ), QPen( Plot::magenta, 2 )}, saveDir + "1DNSXs" + to_string( SourceStride ) + ".png" );
-		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {sin2sin4fit( toRadians( ThetasNS ), OmegasYavgN ), sin2sin4fit( toRadians( ThetasNS ), OmegasYavgS ), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]", "absolute vertical material flow speed [deg/day]", std::vector<std::string> {"trigfit North", "trigfit South", "average North", "average South" }, std::vector<QPen> { QPen( Plot::blue, 3 ), QPen( Plot::black, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::black, 1.5 )}, saveDir + "1DNSYs" + to_string( SourceStride ) + ".png" );
+		Plot1D::plot( ThetasNS, std::vector<std::vector<double>> {sin2sin4fit( toRadians( ThetasNS ), OmegasYavgN ), sin2sin4fit( toRadians( ThetasNS ), OmegasYavgS ), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]", "vertical material flow speed [deg/day]", std::vector<std::string> {"trigfit North", "trigfit South", "average North", "average South" }, std::vector<QPen> { QPen( Plot::blue, 3 ), QPen( Plot::black, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::black, 1.5 )}, saveDir + "1DNSYs" + to_string( SourceStride ) + ".png" );
 
 		// diffrot profiles NS cut
 		Plot1D::plot( ThetasNScut, std::vector<std::vector<double>> {sin2sin4fit( toRadians( ThetasNScut ), OmegasXavgNcut ), sin2sin4fit( toRadians( ThetasNScut ), OmegasXavgScut ), OmegasXavgNcut, OmegasXavgScut, PredicXsNScut[0], PredicXsNScut[1]}, "diffrot profile NS cut X", "absolute solar latitude [deg]", "horizontal material flow speed [deg/day]", std::vector<std::string> {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)" }, std::vector<QPen> { QPen( Plot::blue, 3 ), QPen( Plot::black, 3 ), QPen( Plot::blue, 1.5 ), QPen( Plot::black, 1.5 ), QPen( Plot::orange, 2 ), QPen( Plot::magenta, 2 )}, saveDir + "1DNScXs" + to_string( SourceStride ) + ".png" );
@@ -201,11 +201,11 @@ private:
 		PredicXsNS[0] = std::vector<double>( PredicXs[0].begin(), PredicXs[0].begin() + zeroidx + 1 );
 		PredicXsNS[1] = std::vector<double>( PredicXs[1].begin(), PredicXs[1].begin() + zeroidx + 1 );
 		OmegasXavgN = std::vector<double>( SourceOmegasXavg.begin(), SourceOmegasXavg.begin() + zeroidx + 1 );
-		OmegasYavgN = abs( std::vector<double>( SourceOmegasYavg.begin(), SourceOmegasYavg.begin() + zeroidx + 1 ) );
+		OmegasYavgN = std::vector<double>( SourceOmegasYavg.begin(), SourceOmegasYavg.begin() + zeroidx + 1 );
 
 		//south hemisphere
 		OmegasXavgS = std::vector<double>( SourceOmegasXavg.begin() + zeroidx, SourceOmegasXavg.begin() + 2 * zeroidx + 1 );
-		OmegasYavgS = abs( std::vector<double>( SourceOmegasYavg.begin() + zeroidx, SourceOmegasYavg.begin() + 2 * zeroidx + 1 ) );
+		OmegasYavgS = std::vector<double>( SourceOmegasYavg.begin() + zeroidx, SourceOmegasYavg.begin() + 2 * zeroidx + 1 );
 		std::reverse( OmegasXavgS.begin(), OmegasXavgS.end() );
 		std::reverse( OmegasYavgS.begin(), OmegasYavgS.end() );
 
@@ -232,17 +232,19 @@ private:
 
 	void CalculateFitCoeffs()
 	{
-		//both
+		LOG_NEWLINE;
+
+		//XY both
 		LogFitCoeffs( "XcoeffsPoly2", polyfitCoeffs( toRadians( SourceThetasavg ), SourceOmegasXavg, 2 ) );
 		LogFitCoeffs( "YcoeffsPoly3", polyfitCoeffs( toRadians( SourceThetasavg ), SourceOmegasYavg, 3 ) );
 		LogFitCoeffs( "XcoeffsTrig", sin2sin4fitCoeffs( toRadians( SourceThetasavg ), SourceOmegasXavg ) );
 
-		//north
+		//X NS
 		LogFitCoeffs( "XcoeffsTrigN", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasXavgN ) );
-		LogFitCoeffs( "YcoeffsTrigN", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasYavgN ) );
-
-		//south
 		LogFitCoeffs( "XcoeffsTrigS", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasXavgS ) );
+
+		//Y NS
+		LogFitCoeffs( "YcoeffsTrigN", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasYavgN ) );
 		LogFitCoeffs( "YcoeffsTrigS", sin2sin4fitCoeffs( toRadians( ThetasNS ), OmegasYavgS ) );
 	}
 
