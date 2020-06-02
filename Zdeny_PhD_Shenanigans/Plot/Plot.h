@@ -19,7 +19,6 @@ public:
 	static QColor orange;
 	static QColor cyan;
 	static QColor magenta;
-
-private:
+	static QColor green;
 
 };
