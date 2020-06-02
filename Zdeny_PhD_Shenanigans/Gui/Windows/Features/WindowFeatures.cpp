@@ -24,6 +24,7 @@ void WindowFeatures::FeatureMatch()
 	data.degree = ui.lineEdit_9->text().toInt();
 	data.proxpts = ui.lineEdit_10->text().toInt();
 	data.proxcoeff = ui.lineEdit_11->text().toDouble();
+	data.pathout = ui.lineEdit_12->text().toStdString();
 
 	featureMatch( data );
 
