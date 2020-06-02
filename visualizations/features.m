@@ -15,7 +15,7 @@ V=-SPD.*sin(deg2rad(DIR));%reversed
 width=300;
 height=200;
 arrows=20;
-contours=20;
+contours=10;
 contourwidth=1.0;
 arrowscale=1.5;
 arrowwidth=1.0;
@@ -34,7 +34,7 @@ vspace=figheight+100;
 
 %image
 figure('Position',[offset offset+vspace figwidth figheight])
-contourf(XMESH,YMESH,IMG,100,'LineStyle','none');
+contourf(XMESH,YMESH,IMG,256,'LineStyle','none');
 hold on
 quiver(X,Y,U,V,arrowscale,'LineWidth',arrowwidth,'Color','red')
 hold off
@@ -121,17 +121,25 @@ colorbar
 %== all in one ==
 
 figure('Position',[offset offset+vspace figwidth figheight])
-%contourf(XMESH,YMESH,IMG,100,'LineStyle','none');
-image(IMG);
+ax1 = axes;
+image(ax1,IMG,'CDataMapping','direct');
+ax2 = axes;
+axis ij
 hold on
-contour(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'nearest'),contours,'LineWidth',contourwidth);
-quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'nearest'),griddata(X,Y,V,QXMESH,QYMESH,'nearest'),arrowscale,'LineWidth',arrowwidth,'Color','magenta')
+contour(ax2,XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'natural'),contours,'LineWidth',contourwidth);
+quiver(ax2,QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'natural'),griddata(X,Y,V,QXMESH,QYMESH,'natural'),arrowscale,'LineWidth',arrowwidth,'Color','magenta')
 hold off
+linkaxes([ax1,ax2])
+ax2.Visible = 'off';
+ax2.XTick = [];
+ax2.YTick = [];
+colormap(ax1,'gray')
+colormap(ax2,'jet')
+set([ax1,ax2],'Position',[.07 .11 .785 .815]);
+cb2 = colorbar(ax2,'Position',[.88 .11 .0375 .815]);
 xlim([0,width-1]);
 ylim([0,height-1]);
-axis ij
-colormap gray
-title('ALL')
+
 
 
 
