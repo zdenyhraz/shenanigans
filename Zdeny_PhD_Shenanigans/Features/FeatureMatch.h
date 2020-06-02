@@ -5,6 +5,7 @@
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
 #include "Draw/combinepics.h"
+#include "Utils/export.h"
 
 static constexpr int piccnt = 10;//number of pics
 static constexpr double scale = 10;//scale for visualization
@@ -199,6 +200,8 @@ inline void featureMatch( const FeatureMatchData &data )
 		Mat img1 = imread( path1, IMREAD_GRAYSCALE );
 		Mat img2 = imread( path2, IMREAD_GRAYSCALE );
 
+		//saveMatToCsv( data.pathout + "image.csv", img1 );
+
 		//detect the keypoints, compute the descriptors
 		Ptr<Feature2D> detector = GetFeatureDetector( data );
 		std::vector<KeyPoint> keypoints1, keypoints2;
@@ -253,10 +256,5 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<0>( mats ), "Match arrows", false, 0, 1, 1200 );
 	showimg( std::get<1>( mats ), "Match points", false, 0, 1 );
 	showimg( std::get<2>( mats ), "Velocity surface Mwnn", true );
-	showimg( std::get<3>( mats ), "Velocity surface Pwnn", true );
-
-	Plot2D::plot( applyQuantile( img_base, 0.05, 0.95 ), "Image source" );
-
-	showimg( combinePics( img_base_ups, std::get<2>( mats ), COMBINE_JET, 0.05, 0.95 ), "Combined" );
 }
 
