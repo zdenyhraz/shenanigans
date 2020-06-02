@@ -19,7 +19,7 @@ contours=10;
 contourwidth=1.0;
 arrowscale=1.5;
 arrowwidth=1.0;
-arrowcolor='white';
+arrowcolor='magenta';
 
 [XMESH,YMESH] = meshgrid(0:width-1,0:height-1);
 [QXMESH,QYMESH] = meshgrid(linspace(0,width-1,arrows),linspace(0,height-1,arrows));
@@ -57,30 +57,6 @@ colormap jet
 title('PTS')
 
 %== speeds==
-
-figure('Position',[offset offset+vspace figwidth figheight])
-contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'nearest'),contours,'LineWidth',contourwidth);
-hold on
-quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'nearest'),griddata(X,Y,V,QXMESH,QYMESH,'nearest'),arrowscale,'LineWidth',arrowwidth,'Color',arrowcolor)
-hold off
-axis ij
-title('nearest')
-colormap jet
-xlim([0,width-1]);
-ylim([0,height-1]);
-colorbar
-
-figure('Position',[offset+hspace offset figwidth figheight])
-contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'linear'),contours,'LineWidth',contourwidth);
-hold on
-quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'linear'),griddata(X,Y,V,QXMESH,QYMESH,'linear'),arrowscale,'LineWidth',arrowwidth,'Color',arrowcolor)
-hold off
-axis ij
-title('linear')
-colormap jet
-xlim([0,width-1]);
-ylim([0,height-1]);
-colorbar
 
 figure('Position',[offset+hspace offset+vspace figwidth figheight])
 contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'natural'),contours,'LineWidth',contourwidth);
@@ -120,14 +96,14 @@ colorbar
 
 %== all in one ==
 
-figure('Position',[offset offset+vspace figwidth figheight])
+figure('Position',[offset+hspace offset figwidth figheight])
 ax1 = axes;
 image(ax1,IMG,'CDataMapping','direct');
 ax2 = axes;
 axis ij
 hold on
-contour(ax2,XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'natural'),contours,'LineWidth',contourwidth);
-quiver(ax2,QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'natural'),griddata(X,Y,V,QXMESH,QYMESH,'natural'),arrowscale,'LineWidth',arrowwidth,'Color','magenta')
+contour(ax2,XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'v4'),contours,'LineWidth',contourwidth);
+quiver(ax2,QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'v4'),griddata(X,Y,V,QXMESH,QYMESH,'v4'),arrowscale,'LineWidth',arrowwidth,'Color','magenta')
 hold off
 linkaxes([ax1,ax2])
 ax2.Visible = 'off';
