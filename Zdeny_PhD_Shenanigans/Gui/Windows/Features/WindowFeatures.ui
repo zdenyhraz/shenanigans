@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>290</height>
+    <width>338</width>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,7 +106,7 @@
      <rect>
       <x>10</x>
       <y>94</y>
-      <width>101</width>
+      <width>106</width>
       <height>150</height>
      </rect>
     </property>
@@ -114,7 +114,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>match count</string>
+        <string>f. match count</string>
        </property>
       </widget>
      </item>
@@ -128,7 +128,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>threshold</string>
+        <string>f. threshold</string>
        </property>
       </widget>
      </item>
@@ -142,7 +142,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>magnitudew</string>
+        <string>sort magnitudew</string>
        </property>
       </widget>
      </item>
@@ -156,7 +156,7 @@
      <item row="3" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>quantileB</string>
+        <string>spd quantileB</string>
        </property>
       </widget>
      </item>
@@ -170,7 +170,7 @@
      <item row="4" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>quantileT</string>
+        <string>spd quantileT</string>
        </property>
       </widget>
      </item>
@@ -184,7 +184,7 @@
      <item row="5" column="0">
       <widget class="QLabel" name="label_10">
        <property name="text">
-        <string>degree</string>
+        <string>fit degree</string>
        </property>
       </widget>
      </item>
@@ -198,7 +198,7 @@
      <item row="6" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>proxpts</string>
+        <string>fit proxpts</string>
        </property>
       </widget>
      </item>
@@ -212,7 +212,7 @@
      <item row="7" column="0">
       <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>proxcoeff</string>
+        <string>fit proxcoeff</string>
        </property>
       </widget>
      </item>
