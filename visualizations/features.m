@@ -135,7 +135,7 @@ ax2.XTick = [];
 ax2.YTick = [];
 colormap(ax1,'gray')
 colormap(ax2,'jet')
-set([ax1,ax2],'Position',[.07 .11 .785 .815]);
+set([ax1,ax2],'Position',[.08 .11 .775 .815]);
 cb2 = colorbar(ax2,'Position',[.88 .11 .0375 .815]);
 xlim([0,width-1]);
 ylim([0,height-1]);
