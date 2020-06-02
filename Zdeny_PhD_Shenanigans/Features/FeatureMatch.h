@@ -39,6 +39,7 @@ struct FeatureMatchData
 	std::string path1;
 	std::string path2;
 	std::string path;
+	std::string pathout;
 	int degree;
 	int proxpts;
 	double proxcoeff;
@@ -106,6 +107,17 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 	return ORB::create();
 }
 
+inline void exportFeaturesToCsv( const std::string &path, const std::vector<Point2f> &points, const std::vector<double> &speeds, const std::vector<double> &directions )
+{
+	std::ofstream csv( path + "features.csv", std::ios::out | std::ios::trunc );
+	csv << "X,Y,SPD,DIR" << endl;
+	for ( int i = 0; i < points.size(); i++ )
+	{
+		csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << endl;
+	}
+	LOG_INFO( "Feature data exported to {}", path + "features.csv" );
+}
+
 inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
 {
 	Mat out;
@@ -117,11 +129,9 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, co
 	double minspd = getQuantile( speeds_all, data.quanB );
 	double maxspd = getQuantile( speeds_all, data.quanT );
 
-	std::vector<double> xdata;
-	std::vector<double> ydata;
 	std::vector<Point2f> points;
-	std::vector<double> velMdata;
-	std::vector<double> velPdata;
+	std::vector<double> speeds;
+	std::vector<double> directions;
 
 	for ( int pic = 0; pic < piccnt - 1; pic++ )
 	{
@@ -154,18 +164,18 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, co
 			drawPoint( outPt, arrStart, clr, scale, scale / 2 );
 			putText( out, to_stringp( spd, 1 ), textpos, 1, text_scale, clr, text_thickness );
 
-			xdata.push_back( pts.first.x );
-			ydata.push_back( pts.first.y );
 			points.push_back( pts.first );
-			velMdata.push_back( spd );
-			velPdata.push_back( dir );
+			speeds.push_back( spd );
+			directions.push_back( dir );
 		}
 	}
 
-	Mat outMwnn = wnnfit( points, velMdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
-	Mat outPwnn = wnnfit( points, velPdata, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
+	exportFeaturesToCsv( data.pathout, points, speeds, directions );
 
-	return std::make_tuple( out, outPt, outMwnn, outPwnn );
+	Mat outSwnn = wnnfit( points, speeds, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
+	Mat outDwnn = wnnfit( points, directions, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff );
+
+	return std::make_tuple( out, outPt, outSwnn, outDwnn );
 }
 
 inline void featureMatch( const FeatureMatchData &data )
@@ -246,8 +256,6 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<3>( mats ), "Velocity surface Pwnn", true );
 
 	Plot2D::plot( applyQuantile( img_base, 0.05, 0.95 ), "Image source" );
-	Plot2D::plot( std::get<2>( mats ), "Velocity magnitude [km/s]" );
-	Plot2D::plot( std::get<3>( mats ), "Velocity angle [deg]" );
 
 	showimg( combinePics( img_base_ups, std::get<2>( mats ), COMBINE_JET, 0.05, 0.95 ), "Combined" );
 }
