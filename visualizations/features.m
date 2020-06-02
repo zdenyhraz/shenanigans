@@ -120,7 +120,18 @@ colorbar
 
 %== all in one ==
 
-
+figure('Position',[offset offset+vspace figwidth figheight])
+%contourf(XMESH,YMESH,IMG,100,'LineStyle','none');
+image(IMG);
+hold on
+contour(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'nearest'),contours,'LineWidth',contourwidth);
+quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'nearest'),griddata(X,Y,V,QXMESH,QYMESH,'nearest'),arrowscale,'LineWidth',arrowwidth,'Color','magenta')
+hold off
+xlim([0,width-1]);
+ylim([0,height-1]);
+axis ij
+colormap gray
+title('ALL')
 
 
 
