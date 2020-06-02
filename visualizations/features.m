@@ -3,6 +3,7 @@ clearvars;
 clc;
 
 M=readmatrix('D:\MainOutput\S-wind\features\features.csv');%header is omitted automatically by readmatrix
+IMG=readmatrix('D:\MainOutput\S-wind\features\image.csv');
 
 X=M(:,1);
 Y=M(:,2);
@@ -31,11 +32,23 @@ offset=50;
 hspace=figwidth+20;
 vspace=figheight+100;
 
+%image
+figure('Position',[offset offset+vspace figwidth figheight])
+contourf(XMESH,YMESH,IMG,100,'LineStyle','none');
+hold on
+quiver(X,Y,U,V,arrowscale,'LineWidth',arrowwidth,'Color','red')
+hold off
+xlim([0,width-1]);
+ylim([0,height-1]);
+axis ij
+colormap gray
+title('IMG')
+
 %points
 figure('Position',[offset offset figwidth figheight])
 scatter(X,Y,'filled');
 hold on
-quiver(X,Y,U,V,arrowscale,'LineWidth',arrowwidth,'Color',[0.4660 0.6740 0.1880])
+quiver(X,Y,U,V,arrowscale,'LineWidth',2*arrowwidth,'Color',[0.4660 0.6740 0.1880])
 hold off
 xlim([0,width-1]);
 ylim([0,height-1]);
@@ -43,7 +56,8 @@ axis ij
 colormap jet
 title('PTS')
 
-%speeds
+%== speeds==
+
 figure('Position',[offset offset+vspace figwidth figheight])
 contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'nearest'),contours,'LineWidth',contourwidth);
 hold on
@@ -103,6 +117,10 @@ colormap jet
 xlim([0,width-1]);
 ylim([0,height-1]);
 colorbar
+
+%== all in one ==
+
+
 
 
 
