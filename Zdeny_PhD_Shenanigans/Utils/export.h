@@ -8,11 +8,11 @@ inline void saveMatToCsv( const std::string &path, const Mat &matIn )
 	mat.convertTo( mat, CV_32F );
 	for ( int r = 0; r < mat.rows; r++ )
 	{
-		for ( int c = 0; c < mat.cols; c++ )
+		for ( int c = 0; c < mat.cols - 1; c++ )
 		{
 			listing << mat.at<float>( r, c ) << ",";
 		}
-		listing << endl;
+		listing << mat.at<float>( r, mat.cols - 1 ) << endl;
 	}
 }
 
