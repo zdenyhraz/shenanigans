@@ -7,7 +7,6 @@
 
 using namespace std;
 using namespace cv;
-// using namespace cv::xfeatures2d;
 
 inline Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)
 {
