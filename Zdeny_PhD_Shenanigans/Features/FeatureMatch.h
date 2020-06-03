@@ -149,10 +149,10 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, co
 			if ( spd > maxspd )
 				continue;
 
-			if ( dir > 0.8 * 360 )
+			if ( dir < 0.50 * 360 )
 				continue;
 
-			if ( dir < 0.5 * 360 )
+			if ( dir > 0.75 * 360 )
 				continue;
 
 			auto pts = GetFeatureMatchPoints( match, kp1_all[pic], kp2_all[pic] );
