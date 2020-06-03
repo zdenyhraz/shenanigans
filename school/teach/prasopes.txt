@@ -1,0 +1,9 @@
+1. cviko ODR1 (jen separace promìnných a LODR1 - variace konstanty)
+2. cviko LODRn s konst koef (+neurèitý koeficienty) to n je vìtšinou 2 max 3 + pøevod soustavy LODR1 na LODRn
+3. cviko písemka na pøedešlé 
+4. cviko popisná statistika
+5. cviko klasická pravdìpodobnost, podmínìná pravdìpodobnost
+6. cviko 1D náhodná velièina (spojitá i diskrétní)
+7. cviko písemka
+
+nìjaký pøíklady sou na tìch tabulích (odkazy na pøíklady sou do Krpíškovejch skript 4M)
