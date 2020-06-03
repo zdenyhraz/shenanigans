@@ -245,7 +245,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>C:\\Users\\Zdeny\\source\\repos\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop0.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop0.PNG</string>
        </property>
       </widget>
      </item>
@@ -259,7 +259,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>C:\\Users\\Zdeny\\source\\repos\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop1.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop1.PNG</string>
        </property>
       </widget>
      </item>
@@ -273,7 +273,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_8">
        <property name="text">
-        <string>C:\\Users\\Zdeny\\source\\repos\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop</string>
        </property>
       </widget>
      </item>
@@ -287,7 +287,7 @@
      <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_12">
        <property name="text">
-        <string>C:\\Users\\Zdeny\\source\\repos\\Zdeny_PhD_Shenanigans\\articles\\swind\\csv\\</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\csv\\</string>
        </property>
       </widget>
      </item>
