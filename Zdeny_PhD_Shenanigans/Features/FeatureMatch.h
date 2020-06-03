@@ -110,13 +110,14 @@ inline Ptr<Feature2D> GetFeatureDetector( const FeatureMatchData &data )
 
 inline void exportFeaturesToCsv( const std::string &path, const std::vector<Point2f> &points, const std::vector<double> &speeds, const std::vector<double> &directions )
 {
-	std::ofstream csv( path + "features.csv", std::ios::out | std::ios::trunc );
+	std::string pth = path + "features.csv";
+	std::ofstream csv( pth, std::ios::out | std::ios::trunc );
 	csv << "X,Y,SPD,DIR" << endl;
 	for ( int i = 0; i < points.size(); i++ )
 	{
 		csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << endl;
 	}
-	LOG_INFO( "Feature data exported to {}", path + "features.csv" );
+	LOG_INFO( "Feature data exported to {}", pth );
 }
 
 inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows( const Mat &img, const std::vector<std::vector<DMatch>> &matches_all, const std::vector<std::vector<KeyPoint>> &kp1_all, const std::vector<std::vector<KeyPoint>> &kp2_all, const std::vector<std::vector<double>> &speeds_all, const FeatureMatchData &data )
