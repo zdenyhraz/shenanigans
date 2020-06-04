@@ -4,11 +4,11 @@
 
 std::map<std::string, WindowPlot *> Plot::plots;
 
-QFont Plot::fontTicks( "Newyork", 9 );
-QFont Plot::fontLabels( "Newyork", 12 );
+QFont Plot::fontTicks( "Newyork", 13 );//9
+QFont Plot::fontLabels( "Newyork", 17 );//12
 std::vector<QPen> Plot::emptyvectpen{};
 QColor Plot::black( 50, 50, 50 );
-QColor Plot::green( 0.4660 * 255, 0.6740 * 255, 0.1880 * 255 );
+QColor Plot::green( 119, 182, 48 );
 QColor Plot::blue( 30, 80, 255 );
 QColor Plot::red( 220, 20, 60 );
 QColor Plot::orange( 255, 165, 0 );
