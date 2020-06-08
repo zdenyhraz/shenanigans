@@ -12,7 +12,7 @@ static constexpr double scale = 10;//scale for visualization
 static constexpr double kmpp = 696010. / 378.3;//kilometers per pixel
 static constexpr double dt = 11.88;//dt temporally adjacent pics
 static constexpr double arrow_scale = 2;//size of the arrow
-const constexpr double ratio_thresh = 0.7;//Lowe's ratio test
+static constexpr double ratio_thresh = 0.7;//Lowe's ratio test
 static constexpr double text_scale = scale / 4;//text scale
 static constexpr double text_thickness = scale / 4;//text thickness
 
@@ -220,12 +220,8 @@ inline void featureMatch( const FeatureMatchData &data )
 		//filter matches using the Lowe's ratio test
 		std::vector<DMatch> matches;
 		for ( size_t i = 0; i < knn_matches.size(); i++ )
-		{
 			if ( knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance )
-			{
 				matches.push_back( knn_matches[i][0] );
-			}
-		}
 
 		//get first n smallest shifts & best fits
 		std::sort( matches.begin(), matches.end(), [&]( DMatch a, DMatch b ) { return ( data.magnitudeweight * magnitude( GetFeatureMatchShift( a, keypoints1, keypoints2 ) ) + a.distance ) < ( data.magnitudeweight * magnitude( GetFeatureMatchShift( b, keypoints1, keypoints2 ) ) + b.distance ); } );
