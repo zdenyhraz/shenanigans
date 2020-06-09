@@ -42,7 +42,7 @@ xlim([0,width-1]);
 ylim([0,height-1]);
 axis ij
 colormap gray
-title('IMG')
+title('image + arrows')
 
 %== speeds==
 
@@ -83,12 +83,12 @@ ylim([0,height-1]);
 colorbar
 
 figure('Position',[offset+2*hspace offset+vspace figwidth figheight])
-contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'v4'),contours,'LineWidth',contourwidth);
+contourf(XMESH,YMESH,griddata(X,Y,SPD,XMESH,YMESH,'nearest'),contours,'LineWidth',contourwidth);
 hold on
-quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'v4'),griddata(X,Y,V,QXMESH,QYMESH,'v4'),arrowscale,'LineWidth',arrowwidth,'Color',arrowcolor)
+quiver(QXMESH,QYMESH,griddata(X,Y,U,QXMESH,QYMESH,'nearest'),griddata(X,Y,V,QXMESH,QYMESH,'nearest'),arrowscale,'LineWidth',arrowwidth,'Color',arrowcolor)
 hold off
 axis ij
-title('v4')
+title('nearest')
 colormap jet
 xlim([0,width-1]);
 ylim([0,height-1]);
@@ -97,6 +97,7 @@ colorbar
 %== all in one ==
 
 figure('Position',[offset offset figwidth figheight])
+title('article')
 ax1 = axes;
 image(ax1,IMG,'CDataMapping','direct');
 ax2 = axes;
@@ -115,6 +116,7 @@ set([ax1,ax2],'Position',[.08 .11 .775 .815]);
 cb2 = colorbar(ax2,'Position',[.88 .11 .0375 .815]);
 xlim([0,width-1]);
 ylim([0,height-1]);
+
 
 
 
