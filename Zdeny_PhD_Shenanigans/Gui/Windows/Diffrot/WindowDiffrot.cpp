@@ -105,11 +105,11 @@ void WindowDiffrot::checkDiskShifts()
 		}
 	}
 
-	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC median   /   FITS median   /   ABSDIFF median   >>>>>>>>>>>>>>>>>>>>>" );
-	LOG_INFO( "Diffrot shifts N = {} / {} / {}", median( shiftsN ), median( shiftsFY ), median( abs( shiftsN - shiftsFY ) ) );
-	LOG_INFO( "Diffrot shifts S = {} / {} / {}", median( shiftsS ), median( shiftsFY ), median( abs( shiftsS - shiftsFY ) ) );
-	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( abs( shiftsW - shiftsFX ) ) );
-	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( abs( shiftsE - shiftsFX ) ) );
+	LOG_INFO( "<<<<<<<<<<<<<<<<<<   ABSIPC median   /   ABSFITS median   /   ABSDIFF median   >>>>>>>>>>>>>>>>>>>>>" );
+	LOG_INFO( "Diffrot shifts N = {} / {} / {}", median( abs( shiftsN ) ), median( abs( shiftsFY ) ), median( abs( shiftsN - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts S = {} / {} / {}", median( abs( shiftsS ) ), median( abs( shiftsFY ) ), median( abs( shiftsS - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( abs( shiftsW ) ), median( abs( shiftsFX ) ), median( abs( shiftsW - shiftsFX ) ) );
+	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( abs( shiftsE ) ), median( abs( shiftsFX ) ), median( abs( shiftsE - shiftsFX ) ) );
 
 	std::vector<Mat> picsshow( 4 );
 	picsshow[0] = roicrop( picshow, center, edgeN, set.getcols(), set.getrows() );
