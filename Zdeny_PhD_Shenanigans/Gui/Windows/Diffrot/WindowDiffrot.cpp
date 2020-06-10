@@ -16,7 +16,7 @@ WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow(
 void WindowDiffrot::calculateDiffrot()
 {
 	LOG_INFO( "Calculating diffrot profile..." );
-	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 
 	DiffrotSettings drset;
 	drset.pics = ui.lineEdit_7->text().toDouble();
@@ -32,7 +32,7 @@ void WindowDiffrot::calculateDiffrot()
 	drset.visual = ui.checkBox_3->isChecked();
 	drset.savepath = ui.lineEdit_9->text().toStdString();
 
-	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, fitsTime, drset );
+	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, time, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );
 }
 
@@ -51,12 +51,12 @@ void WindowDiffrot::showIPC()
 	IPCsettings set = *globals->IPCset;
 	set.broadcast = true;
 	//set.save = true;
-	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
-	LOG_INFO( "Loading file '" + fitsTime.path() + "'..." );
-	Mat pic1 = roicrop( loadfits( fitsTime.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
-	fitsTime.advanceTime( ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble() );
-	LOG_INFO( "Loading file '" + fitsTime.path() + "'..." );
-	Mat pic2 = roicrop( loadfits( fitsTime.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
+	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+	LOG_INFO( "Loading file '" + time.path() + "'..." );
+	Mat pic1 = roicrop( loadfits( time.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
+	time.advanceTime( ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble() );
+	LOG_INFO( "Loading file '" + time.path() + "'..." );
+	Mat pic2 = roicrop( loadfits( time.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
 
 	auto shifts = phasecorrel( pic1, pic2, set );
 }
@@ -64,25 +64,9 @@ void WindowDiffrot::showIPC()
 void WindowDiffrot::checkDiskShifts()
 {
 	LOG_INFO( "Checking diffrot disk shifts..." );
-	FitsTime fitsTime( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
-	FitsParams params1, params2;
-
-	// NSWE shifts
+	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	IPCsettings set = *globals->IPCset;
-	set.broadcast = true;
-
-	// fulldisk shift
-	IPCsettings setG = *globals->IPCset;
-	setG.broadcast = true;
-	setG.setSize( 4096, 4096 );
-
-	LOG_INFO( "Loading file '" + fitsTime.path() + "'..." );
-	Mat pic1 = loadfits( fitsTime.path(), params1 );
-
-	fitsTime.advanceTime( ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble() );
-
-	LOG_INFO( "Loading file '" + fitsTime.path() + "'..." );
-	Mat pic2 = loadfits( fitsTime.path(), params1 );
+	//set.broadcast = true;
 
 	int edgeN = 0.025 * 4096;
 	int edgeS = 0.974 * 4096;
@@ -90,26 +74,51 @@ void WindowDiffrot::checkDiskShifts()
 	int edgeE = 0.975 * 4096;
 	int center = 0.5 * 4096;
 
-	std::vector<Mat> pics( 4 );
-	pics[0] = roicrop( pic1, center, edgeN, set.getcols(), set.getrows() );
-	pics[3] = roicrop( pic1, center, edgeS, set.getcols(), set.getrows() );
-	pics[2] = roicrop( pic1, edgeW, center, set.getcols(), set.getrows() );
-	pics[1] = roicrop( pic1, edgeE, center, set.getcols(), set.getrows() );
+	int pics = 11;
+	std::vector<double> shiftsN( pics );
+	std::vector<double> shiftsS( pics );
+	std::vector<double> shiftsW( pics );
+	std::vector<double> shiftsE( pics );
+	std::vector<double> shiftsFX( pics );
+	std::vector<double> shiftsFY( pics );
+	std::vector<double> iotam( pics );
+	FitsImage pic1, pic2;
+	int lag1, lag2;
+	Mat picshow;
 
-	showimg( pics, "pics" );
+	for ( int pic = 0; pic < pics; pic++ )
+	{
+		time.advanceTime( ( bool )pic * ( ui.lineEdit_6->text().toDouble() - ui.lineEdit_5->text().toDouble() ) * ui.lineEdit_8->text().toDouble() );
+		loadFitsFuzzy( pic1, time, lag1 );
+		time.advanceTime( ui.lineEdit_5->text().toDouble() * ui.lineEdit_8->text().toDouble() );
+		loadFitsFuzzy( pic2, time, lag2 );
 
-	//auto shiftsG = phasecorrel( pic1, pic2, setG );
-	auto shiftsN = phasecorrel( roicrop( pic1, center, edgeN, set.getcols(), set.getrows() ), roicrop( pic2, center, edgeN, set.getcols(), set.getrows() ), set );
-	auto shiftsS = phasecorrel( roicrop( pic1, center, edgeS, set.getcols(), set.getrows() ), roicrop( pic2, center, edgeS, set.getcols(), set.getrows() ), set );
-	auto shiftsW = phasecorrel( roicrop( pic1, edgeW, center, set.getcols(), set.getrows() ), roicrop( pic2, edgeW, center, set.getcols(), set.getrows() ), set );
-	auto shiftsE = phasecorrel( roicrop( pic1, edgeE, center, set.getcols(), set.getrows() ), roicrop( pic2, edgeE, center, set.getcols(), set.getrows() ), set );
+		if ( !pic ) picshow = pic1.image().clone();
 
-	//LOG_INFO( "Diffrot shifts G = [{},{}]", shiftsG.x, shiftsG.y );
-	LOG_INFO( "Diffrot shifts N = {}", shiftsN.y );
-	LOG_INFO( "Diffrot shifts S = {}", shiftsS.y );
-	LOG_INFO( "Diffrot shifts W = {}", shiftsW.x );
-	LOG_INFO( "Diffrot shifts E = {}", shiftsE.x );
+		iotam[pic] = pic + 1;
+		shiftsN[pic] = phasecorrel( roicrop( pic1.image(), center, edgeN, set.getcols(), set.getrows() ), roicrop( pic2.image(), center, edgeN, set.getcols(), set.getrows() ), set ).y;
+		shiftsS[pic] = phasecorrel( roicrop( pic1.image(), center, edgeS, set.getcols(), set.getrows() ), roicrop( pic2.image(), center, edgeS, set.getcols(), set.getrows() ), set ).y;
+		shiftsW[pic] = phasecorrel( roicrop( pic1.image(), edgeW, center, set.getcols(), set.getrows() ), roicrop( pic2.image(), edgeW, center, set.getcols(), set.getrows() ), set ).x;
+		shiftsE[pic] = phasecorrel( roicrop( pic1.image(), edgeE, center, set.getcols(), set.getrows() ), roicrop( pic2.image(), edgeE, center, set.getcols(), set.getrows() ), set ).x;
+		shiftsFX[pic] = pic2.params().fitsMidX - pic1.params().fitsMidX;
+		shiftsFY[pic] = pic2.params().fitsMidY - pic1.params().fitsMidY;
+	}
 
+	std::vector<Mat> picsshow( 4 );
+	picsshow[0] = roicrop( picshow, center, edgeN, set.getcols(), set.getrows() );
+	picsshow[3] = roicrop( picshow, center, edgeS, set.getcols(), set.getrows() );
+	picsshow[2] = roicrop( picshow, edgeW, center, set.getcols(), set.getrows() );
+	picsshow[1] = roicrop( picshow, edgeE, center, set.getcols(), set.getrows() );
+	showimg( picsshow, "pics" );
+
+	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC   /   FITS   /   DIFF   >>>>>>>>>>>>>>>>>>>>>" );
+	LOG_INFO( "Diffrot shifts N = {} / {} / {}", median( shiftsN ), median( shiftsFY ), median( shiftsN - shiftsFY ) );
+	LOG_INFO( "Diffrot shifts S = {} / {} / {}", median( shiftsS ), median( shiftsFY ), median( shiftsS - shiftsFY ) );
+	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( shiftsW - shiftsFX ) );
+	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( shiftsE - shiftsFX ) );
+
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "pic", "shiftX" );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "pic", "shiftY" );
 
 }
 
