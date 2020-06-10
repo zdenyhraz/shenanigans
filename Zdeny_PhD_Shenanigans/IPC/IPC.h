@@ -109,7 +109,10 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	{
 		showMatsGRS.push_back( sourceimg1 );
 		showMatsGRS.push_back( sourceimg2 );
-		showMatsCLR.push_back( set.bandpass );
+		if ( set.applyBandpass )
+			showMatsCLR.push_back( set.bandpass );
+		if ( set.applyWindow )
+			showMatsCLR.push_back( set.window );
 	}
 
 	if ( set.save )

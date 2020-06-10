@@ -141,7 +141,7 @@ void Zdeny_PhD_Shenanigans::debug()
 			saveimg( path + "cropped5//crop" + to_string( i ) + ".PNG", pic );
 		}
 	}
-	if ( 1 ) //2d poylfit
+	if ( 0 ) //2d poylfit
 	{
 		int size = 100;
 		int size2 = 1000;

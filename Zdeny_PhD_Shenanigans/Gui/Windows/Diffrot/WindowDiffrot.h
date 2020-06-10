@@ -19,5 +19,5 @@ private slots:
 	void calculateDiffrot();
 	void showResults();
 	void showIPC();
-	void optimizeDiffrot();
+	void checkDiskShifts();
 };
