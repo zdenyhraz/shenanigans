@@ -111,12 +111,6 @@ void WindowDiffrot::checkDiskShifts()
 	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( abs( shiftsW - shiftsFX ) ) );
 	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( abs( shiftsE - shiftsFX ) ) );
 
-	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC mean   /   FITS mean   /   ABSDIFF mean   >>>>>>>>>>>>>>>>>>>>>" );
-	LOG_INFO( "Diffrot shifts N = {} / {} / {}", mean( shiftsN ), mean( shiftsFY ), mean( abs( shiftsN - shiftsFY ) ) );
-	LOG_INFO( "Diffrot shifts S = {} / {} / {}", mean( shiftsS ), mean( shiftsFY ), mean( abs( shiftsS - shiftsFY ) ) );
-	LOG_INFO( "Diffrot shifts W = {} / {} / {}", mean( shiftsW ), mean( shiftsFX ), mean( abs( shiftsW - shiftsFX ) ) );
-	LOG_INFO( "Diffrot shifts E = {} / {} / {}", mean( shiftsE ), mean( shiftsFX ), mean( abs( shiftsE - shiftsFX ) ) );
-
 	std::vector<Mat> picsshow( 4 );
 	picsshow[0] = roicrop( picshow, center, edgeN, set.getcols(), set.getrows() );
 	picsshow[3] = roicrop( picshow, center, edgeS, set.getcols(), set.getrows() );
