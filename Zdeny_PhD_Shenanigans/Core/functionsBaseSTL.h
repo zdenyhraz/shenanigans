@@ -226,9 +226,9 @@ inline std::vector<T> abs( const std::vector<T> &vec )
 template <typename T>
 inline double median( const std::vector<T> &vec )
 {
-	auto Vec = vec;
-	std::sort( Vec.begin(), Vec.end() );
-	return Vec[Vec.size() / 2];
+	auto result = vec;
+	std::sort( result.begin(), result.end() );
+	return result[result.size() / 2];
 }
 
 template <typename Func>
