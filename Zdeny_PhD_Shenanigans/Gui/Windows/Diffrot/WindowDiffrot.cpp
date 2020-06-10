@@ -117,8 +117,8 @@ void WindowDiffrot::checkDiskShifts()
 	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( shiftsW - shiftsFX ) );
 	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( shiftsE - shiftsFX ) );
 
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "pic", "shiftX" );
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "pic", "shiftY" );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "pic", "shiftX", std::vector<std::string> {"shiftsFX", "shiftsW", "shiftsE"} );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "pic", "shiftY", std::vector<std::string> {"shiftsFY", "shiftsN", "shiftsS"} );
 
 }
 
