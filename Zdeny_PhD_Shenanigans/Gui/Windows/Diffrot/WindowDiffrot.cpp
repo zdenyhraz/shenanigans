@@ -66,7 +66,6 @@ void WindowDiffrot::checkDiskShifts()
 	LOG_INFO( "Checking diffrot disk shifts..." );
 	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	IPCsettings set = *globals->IPCset;
-	//set.broadcast = true;
 
 	int edgeN = 0.025 * 4096;
 	int edgeS = 0.974 * 4096;
@@ -81,7 +80,6 @@ void WindowDiffrot::checkDiskShifts()
 	std::vector<double> shiftsE;
 	std::vector<double> shiftsFX;
 	std::vector<double> shiftsFY;
-	std::vector<double> iotam;
 	FitsImage pic1, pic2;
 	int lag1, lag2;
 	Mat picshow;
@@ -104,15 +102,20 @@ void WindowDiffrot::checkDiskShifts()
 			shiftsE.push_back( phasecorrel( roicrop( pic1.image(), edgeE, center, set.getcols(), set.getrows() ), roicrop( pic2.image(), edgeE, center, set.getcols(), set.getrows() ), set ).x );
 			shiftsFX.push_back( pic2.params().fitsMidX - pic1.params().fitsMidX );
 			shiftsFY.push_back( pic2.params().fitsMidY - pic1.params().fitsMidY );
-			iotam.push_back( iotam.size() ? iotam.back() + 1 : 1 );
 		}
 	}
 
-	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC   /   FITS   /   DIFF   >>>>>>>>>>>>>>>>>>>>>" );
-	LOG_INFO( "Diffrot shifts N = {} / {} / {}", median( shiftsN ), median( shiftsFY ), median( shiftsN - shiftsFY ) );
-	LOG_INFO( "Diffrot shifts S = {} / {} / {}", median( shiftsS ), median( shiftsFY ), median( shiftsS - shiftsFY ) );
-	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( shiftsW - shiftsFX ) );
-	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( shiftsE - shiftsFX ) );
+	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC median   /   FITS median   /   ABSDIFF median   >>>>>>>>>>>>>>>>>>>>>" );
+	LOG_INFO( "Diffrot shifts N = {} / {} / {}", median( shiftsN ), median( shiftsFY ), median( abs( shiftsN - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts S = {} / {} / {}", median( shiftsS ), median( shiftsFY ), median( abs( shiftsS - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts W = {} / {} / {}", median( shiftsW ), median( shiftsFX ), median( abs( shiftsW - shiftsFX ) ) );
+	LOG_INFO( "Diffrot shifts E = {} / {} / {}", median( shiftsE ), median( shiftsFX ), median( abs( shiftsE - shiftsFX ) ) );
+
+	LOG_INFO( "<<<<<<<<<<<<<<<<<<   IPC mean   /   FITS mean   /   ABSDIFF mean   >>>>>>>>>>>>>>>>>>>>>" );
+	LOG_INFO( "Diffrot shifts N = {} / {} / {}", mean( shiftsN ), mean( shiftsFY ), mean( abs( shiftsN - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts S = {} / {} / {}", mean( shiftsS ), mean( shiftsFY ), mean( abs( shiftsS - shiftsFY ) ) );
+	LOG_INFO( "Diffrot shifts W = {} / {} / {}", mean( shiftsW ), mean( shiftsFX ), mean( abs( shiftsW - shiftsFX ) ) );
+	LOG_INFO( "Diffrot shifts E = {} / {} / {}", mean( shiftsE ), mean( shiftsFX ), mean( abs( shiftsE - shiftsFX ) ) );
 
 	std::vector<Mat> picsshow( 4 );
 	picsshow[0] = roicrop( picshow, center, edgeN, set.getcols(), set.getrows() );
@@ -121,8 +124,10 @@ void WindowDiffrot::checkDiskShifts()
 	picsshow[1] = roicrop( picshow, edgeE, center, set.getcols(), set.getrows() );
 	showimg( picsshow, "pics" );
 
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "pic", "shiftX", std::vector<std::string> {"shiftsFX", "shiftsW", "shiftsE"} );
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "pic", "shiftY", std::vector<std::string> {"shiftsFY", "shiftsN", "shiftsS"} );
+	std::vector<double> iotam( shiftsFX.size() );
+	std::iota( iotam.begin(), iotam.end(), 1 );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "picture pair index", "45sec shiftX [px]", std::vector<std::string> {"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"} );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "picture pair index", "45sec shiftY [px]", std::vector<std::string> {"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"} );
 
 }
 
