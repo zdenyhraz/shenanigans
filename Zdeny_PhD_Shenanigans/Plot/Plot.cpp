@@ -3,17 +3,16 @@
 #include "Gui/Windows/Plot/WindowPlot.h"
 
 std::map<std::string, WindowPlot *> Plot::plots;
-
 QFont Plot::fontTicks( "Newyork", 13 );//9
 QFont Plot::fontLabels( "Newyork", 17 );//12
-std::vector<QPen> Plot::emptyvectpen{};
-QColor Plot::black( 50, 50, 50 );
-QColor Plot::green( 119, 182, 48 );
 QColor Plot::blue( 30, 80, 255 );
 QColor Plot::red( 220, 20, 60 );
+QColor Plot::green( 119, 182, 48 );
+QColor Plot::black( 50, 50, 50 );
 QColor Plot::orange( 255, 165, 0 );
 QColor Plot::cyan( 64, 224, 208 );
 QColor Plot::magenta( 150, 0, 150 );
+std::vector<QPen> Plot::defaultpens{ QPen( blue ), QPen( red ), QPen( green ), QPen( black ), QPen( orange ), QPen( cyan ), QPen( magenta ) };
 
 QPoint Plot::GetNewPlotPosition( WindowPlot *windowPlot )
 {

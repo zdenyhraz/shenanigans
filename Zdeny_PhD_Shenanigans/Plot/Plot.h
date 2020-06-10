@@ -10,7 +10,7 @@ public:
 	static QFont fontTicks;
 	static QFont fontLabels;
 	static QPoint GetNewPlotPosition( WindowPlot *windowPlot );
-	static std::vector<QPen> emptyvectpen;
+	static std::vector<QPen> defaultpens;
 
 	//plot colors
 	static QColor blue;
