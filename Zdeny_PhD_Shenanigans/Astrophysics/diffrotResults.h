@@ -14,6 +14,8 @@ inline double predictDiffrotProfile( double theta, double A, double B, double C 
 class DiffrotResults
 {
 public:
+	bool calculated = false;
+
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
 		Reset();
@@ -56,6 +58,7 @@ public:
 		flip( matFromVector( flowY, true ), SourceFlowY, 1 );
 		SourceShiftsX = shiftsX;
 		SourceShiftsY = shiftsY;
+		calculated = true;
 	}
 
 	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
