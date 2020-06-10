@@ -127,8 +127,8 @@ void WindowDiffrot::checkDiskShifts()
 	std::vector<double> iotam( shiftsFX.size() );
 	std::iota( iotam.begin(), iotam.end(), 0 );
 	iotam = ( double )( ui.lineEdit_7->text().toDouble() - 1 ) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / ( iotam.size() - 1 ) * iotam;
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]", std::vector<std::string> {"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"}, Plot::defaultpens, ui.lineEdit_9->text().toStdString() + "diskshiftX.png" );
-	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]", std::vector<std::string> {"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"}, Plot::defaultpens, ui.lineEdit_9->text().toStdString() + "diskshiftY.png" );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]", std::vector<std::string> {"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"} );
+	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]", std::vector<std::string> {"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"} );
 
 }
 

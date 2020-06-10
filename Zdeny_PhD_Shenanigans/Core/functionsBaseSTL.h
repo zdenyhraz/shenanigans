@@ -224,11 +224,11 @@ inline std::vector<T> abs( const std::vector<T> &vec )
 }
 
 template <typename T>
-inline double median( std::vector<T> &vec )
+inline double median( const std::vector<T> &vec )
 {
-	//function changes the vec order, watch out
-	std::sort( vec.begin(), vec.end() );
-	return vec[vec.size() / 2];
+	auto Vec = vec;
+	std::sort( Vec.begin(), Vec.end() );
+	return Vec[Vec.size() / 2];
 }
 
 template <typename Func>
