@@ -56,7 +56,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			if ( pic < 10 )
 			{
-				LOG_SUCC( "Calculating diffrot profile... {}%, estimating initial profile", ( double )( pic + 1 ) / drset.pics * 100 );
+				LOG_SUCC( "{} / {} estimating initial profile", pic + 1, drset.pics );
 				thetas2D.emplace_back( thetas );
 				omegasX2D.emplace_back( omegasX );
 				omegasY2D.emplace_back( omegasY );
@@ -97,7 +97,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				// log progress
 				if ( abs( diffX ) < diffThreshX && abs( diffY ) < diffThreshY )
 				{
-					LOG_SUCC( "Calculating diffrot profile... {}% done, diff X/Y = {}/{}, adding", ( double )( pic + 1 ) / drset.pics * 100, diffX, diffY );
+					LOG_SUCC( "{} / {} ... diff X/Y = {}/{}, adding", pic + 1, drset.pics, diffX, diffY );
 				}
 			}
 
