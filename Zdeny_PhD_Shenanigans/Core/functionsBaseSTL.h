@@ -52,8 +52,6 @@ struct Timerrr//benchmarking struct
 	}
 };
 
-enum class Norm : char { L1, L2 };
-
 inline double randunit()
 {
 	return ( double )rand() / RAND_MAX;
