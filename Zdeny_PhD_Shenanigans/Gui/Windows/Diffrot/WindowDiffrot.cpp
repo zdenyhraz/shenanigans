@@ -1,16 +1,18 @@
 #include "stdafx.h"
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
-
+#include "Astrophysics/diffrotFileIO.h"
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
 {
 	ui.setupUi( this );
-	diffrotResults = new DiffrotResults;
+	diffrotResults = std::make_unique<DiffrotResults>();
 	connect( ui.pushButton, SIGNAL( clicked() ), this, SLOT( calculateDiffrot() ) );
 	connect( ui.pushButton_2, SIGNAL( clicked() ), this, SLOT( showResults() ) );
 	connect( ui.pushButton_3, SIGNAL( clicked() ), this, SLOT( showIPC() ) );
 	connect( ui.pushButton_5, SIGNAL( clicked() ), this, SLOT( checkDiskShifts() ) );
+	connect( ui.pushButton_6, SIGNAL( clicked() ), this, SLOT( saveDiffrot() ) );
+	connect( ui.pushButton_7, SIGNAL( clicked() ), this, SLOT( loadDiffrot() ) );
 }
 
 void WindowDiffrot::calculateDiffrot()
@@ -41,7 +43,7 @@ void WindowDiffrot::showResults()
 	if ( diffrotResults->calculated )
 		diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
 	else
-		LOG_DEBUG( "Diffrot results not yet calculated!" );
+		LOG_ERROR( "Diffrot results not yet calculated!" );
 }
 
 void WindowDiffrot::showIPC()
@@ -123,6 +125,19 @@ void WindowDiffrot::checkDiskShifts()
 	iotam = ( double )( ui.lineEdit_7->text().toDouble() - 1 ) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / ( iotam.size() - 1 ) * iotam;
 	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]", std::vector<std::string> {"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"} );
 	Plot1D::plot( iotam, std::vector<std::vector<double>> {shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]", std::vector<std::string> {"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"} );
+}
+
+void WindowDiffrot::saveDiffrot()
+{
+	if ( diffrotResults->calculated )
+		SaveDiffrotResultsToFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), diffrotResults.get() );
+	else
+		LOG_ERROR( "Diffrot results not yet calculated!" );
+}
+
+void WindowDiffrot::loadDiffrot()
+{
+	LoadDiffrotResultsFromFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), diffrotResults.get() );
 }
 
 

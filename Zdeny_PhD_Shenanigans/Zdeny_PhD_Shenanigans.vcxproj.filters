@@ -252,6 +252,9 @@
     <ClInclude Include="Draw\combinepics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Astrophysics\diffrotFileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Plot\qcustomplot.h">
