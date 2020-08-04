@@ -9,10 +9,35 @@ void SaveTupleToStorage( std::vector<T> data, std::vector<const char *> labels, 
 		fs << labels[i] << data[i];
 }
 
+bool CheckIfFileExists( const std::string &path )
+{
+	if ( !std::filesystem::exists( path ) )
+	{
+		LOG_ERROR( "File {} does not exist", path );
+		return false;
+	}
+	return true;
+}
+
+bool CheckIfFileAlreadyExists( const std::string &path )
+{
+	if ( std::filesystem::exists( path ) )
+	{
+		LOG_ERROR( "File {} already exists", path );
+		return true;
+	}
+	return false;
+}
+
 void SaveDiffrotResultsToFile( const std::string &dir, const std::string &filename, DiffrotResults *dr )
 {
+	LOG_STARTEND( "Saving diffrot results ...", "Diffrot results saved" );
+
 	std::string path = dir + filename + ".diffrot";
-	LOG_DEBUG( "Saving diffrot results to {}", path );
+	if ( CheckIfFileAlreadyExists( path ) )
+		return;
+
+	return;
 	FileStorage fs( path, FileStorage::WRITE );
 
 	auto [dataVecs1D, labelsVecs1D] = dr->GetVecs1D();
@@ -24,13 +49,11 @@ void SaveDiffrotResultsToFile( const std::string &dir, const std::string &filena
 	SaveTupleToStorage( dataVecs2D, labelsVecs2D, fs );
 	SaveTupleToStorage( dataMats, labelsMats, fs );
 	SaveTupleToStorage( dataParams, labelsParams, fs );
-
-	LOG_DEBUG( "Diffrot results saved" );
 }
 
 void LoadDiffrotResultsFromFile( const std::string &path, DiffrotResults *dr )
 {
-	LOG_DEBUG( "Loading diffrot results from {}", path );
+	LOG_STARTEND( "Loading diffrot results ...", "Diffrot results loaded" );
 	if ( !CheckIfFileExists( path ) )
 		return;
 
@@ -67,6 +90,4 @@ void LoadDiffrotResultsFromFile( const std::string &path, DiffrotResults *dr )
 	fs["SourcePics"] >> SourcePics;
 	fs["SourceStride"] >> SourceStride;
 	dr->SetParamsRaw( SourcePics, SourceStride );
-
-	LOG_DEBUG( "Diffrot results loaded" );
 }
