@@ -6,27 +6,27 @@
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
 
-Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( parent )
+Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) :
+	QMainWindow( parent ),
+	globals( std::make_unique<Globals>() ),
+	windowIPCparameters( std::make_unique<WindowIPCparameters>( this, globals.get() ) ),
+	windowIPCoptimize( std::make_unique<WindowIPCoptimize>( this, globals.get() ) ),
+	windowIPC2PicAlign( std::make_unique<WindowIPC2PicAlign>( this, globals.get() ) ),
+	windowDiffrot( std::make_unique<WindowDiffrot>( this, globals.get() ) ),
+	windowFeatures( std::make_unique<WindowFeatures>( this, globals.get() ) )
 {
+	//setup Qt ui - meta compiled
 	ui.setupUi( this );
 
 	//show the logo
-	QPixmap pm( "Resources/logo.png" ); // <- path to image file
+	QPixmap pm( "Resources/logo.png" );
 	ui.label_2->setPixmap( pm );
 	ui.label_2->setScaledContents( true );
 
 	//init logger
 	Logger::Init();
-
-	//allocate all globals - main window is loaded once only
-	globals = std::make_unique<Globals>();
-
-	//create all windows
-	windowIPCparameters = std::make_unique<WindowIPCparameters>( this, globals.get() );
-	windowIPCoptimize = std::make_unique<WindowIPCoptimize>( this, globals.get() );
-	windowIPC2PicAlign = std::make_unique<WindowIPC2PicAlign>( this, globals.get() );
-	windowDiffrot = std::make_unique<WindowDiffrot>( this, globals.get() );
-	windowFeatures = std::make_unique<WindowFeatures>( this, globals.get() );
+	//log a welcome message
+	LOG_SUCC( "Welcome back, my friend." );
 
 	//make signal to slot connections
 	connect( ui.actionExit, SIGNAL( triggered() ), this, SLOT( exit() ) );
@@ -43,8 +43,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 	connect( ui.actionFits_downloader, SIGNAL( triggered() ), this, SLOT( fitsDownloader() ) );
 	connect( ui.actionFits_checker, SIGNAL( triggered() ), this, SLOT( fitsDownloadChecker() ) );
 	connect( ui.actionFeature_match, SIGNAL( triggered() ), this, SLOT( featureMatch() ) );
-
-	LOG_SUCC( "Welcome back, my friend." ); //log a welcome message
 }
 
 void Zdeny_PhD_Shenanigans::exit()
@@ -262,7 +260,7 @@ void Zdeny_PhD_Shenanigans::fitsDownloadChecker()
 
 void Zdeny_PhD_Shenanigans::closeEvent( QCloseEvent *event )
 {
-	QMessageBox::StandardButton resBtn = QMessageBox::question( this, "hehe XD", tr( "Are you sure u wanna exit?\n" ), QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes );
+	QMessageBox::StandardButton resBtn = QMessageBox::question( this, "hehe XD", "Are you sure u wanna exit?\n", QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes );
 	if ( resBtn != QMessageBox::Yes )
 	{
 		event->ignore();

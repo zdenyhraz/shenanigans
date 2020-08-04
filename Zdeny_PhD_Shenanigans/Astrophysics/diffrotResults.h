@@ -19,8 +19,10 @@ public:
 
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
-		Reset();
+		if ( !calculated )
+			LOG_ERROR( "Diffrot results not yet calculated!" );
 
+		Reset();
 		CalculateMedianFilters( medianSize );
 		CalculateMagnitudeAndPhase();
 		CalculateAxisLimits();
