@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>328</width>
-    <height>398</height>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>177</x>
-      <y>156</y>
+      <y>179</y>
       <width>90</width>
       <height>121</height>
      </rect>
@@ -306,7 +306,7 @@
     <property name="geometry">
      <rect>
       <x>77</x>
-      <y>288</y>
+      <y>318</y>
       <width>170</width>
       <height>54</height>
      </rect>
@@ -375,7 +375,7 @@
     <property name="geometry">
      <rect>
       <x>29</x>
-      <y>154</y>
+      <y>180</y>
       <width>111</width>
       <height>131</height>
      </rect>
@@ -428,10 +428,10 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>89</y>
+      <x>10</x>
+      <y>90</y>
       <width>301</width>
-      <height>55</height>
+      <height>74</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_6">
@@ -459,14 +459,14 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_9">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_23">
        <property name="text">
-        <string>diffrot filename</string>
+        <string>diffrot save filename</string>
        </property>
       </widget>
      </item>
@@ -474,6 +474,20 @@
       <widget class="QLineEdit" name="lineEdit_23">
        <property name="text">
         <string>diffrot_test</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_24">
+       <property name="text">
+        <string>diffrot load filepath</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="lineEdit_24">
+       <property name="text">
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\diffrot_test.diffrot</string>
        </property>
       </widget>
      </item>
