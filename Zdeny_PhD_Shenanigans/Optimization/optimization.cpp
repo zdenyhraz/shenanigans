@@ -20,11 +20,11 @@ std::vector<double> Evolution::optimize( std::function<double( std::vector<doubl
 	success = false;
 
 	//establish population matrix, fitness vector and other intrinsics
-	vector<vector<double>> population( NP, zerovect( N ) );
+	vector<vector<double>> population( NP, zerovect( N, 0. ) );
 	vector<queue<double>> histories( NP );
 	bool historyConstant = false;
-	vector<double> fitness = zerovect( NP );
-	vector<double> bestEntity = zerovect( N );
+	vector<double> fitness = zerovect( NP, 0. );
+	vector<double> bestEntity = zerovect( N, 0. );
 	double bestFitness = std::numeric_limits<double>::max();
 	double fitness_prev = std::numeric_limits<double>::max();
 	double fitness_curr = std::numeric_limits<double>::max();
@@ -277,10 +277,10 @@ std::vector<double> PatternSearch::optimize( std::function<double( std::vector<d
 	funEvals = 0;
 	multistartCnt = 0;
 	//multistart algorithm - initialize global results
-	vector<double> topPoint = zerovect( N );
+	vector<double> topPoint = zerovect( N, 0. );
 	double topPointFitness = std::numeric_limits<double>::max();
 	//generate all starting points
-	vector<vector<double>> mainPointsInitial( multistartMaxCnt, zerovect( N ) );
+	vector<vector<double>> mainPointsInitial( multistartMaxCnt, zerovect( N, 0. ) );
 	for ( int run = 0; run < multistartMaxCnt; run++ )
 	{
 		for ( int indexParam = 0; indexParam < N; indexParam++ )

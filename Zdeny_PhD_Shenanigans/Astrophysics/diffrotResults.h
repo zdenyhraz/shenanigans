@@ -81,24 +81,32 @@ public:
 	}
 
 	// fileIO store
-	auto GetVecs1D() const
+	auto GetVecs1D( std::vector<double> &sourceThetasavg, std::vector<double> &sourceOmegasXavg, std::vector<double> &sourceOmegasYavg,  std::vector<double> &sourceShiftsXavg, std::vector<double> &sourceShiftsYavg ) const
 	{
-		return std::make_pair( std::vector<std::vector<double>> { SourceThetasavg, SourceOmegasXavg, SourceOmegasYavg, SourceShiftsXavg, SourceShiftsYavg }, std::vector<const char *> { "SourceThetasavg", "SourceOmegasXavg", "SourceOmegasYavg", "SourceShiftsXavg", "SourceShiftsYavg" } );
+		sourceThetasavg = SourceThetasavg;
+		sourceOmegasXavg = SourceOmegasXavg;
+		sourceOmegasYavg = SourceOmegasYavg;
+		sourceShiftsXavg = SourceShiftsXavg;
+		sourceShiftsYavg = SourceShiftsYavg;
 	}
 
-	auto GetVecs2D() const
+	auto GetVecs2D(  std::vector<std::vector<double>> &sourceShiftsX,  std::vector<std::vector<double>> &sourceShiftsY ) const
 	{
-		return std::make_pair( std::vector<std::vector<std::vector<double>>> {SourceShiftsX, SourceShiftsY }, std::vector<const char *> { "SourceShiftsX", "SourceShiftsY" } );
+		sourceShiftsX = SourceShiftsX;
+		sourceShiftsY = SourceShiftsY;
 	}
 
-	auto GetMats() const
+	auto GetMats(  Mat &sourceImage,  Mat &sourceFlowX, Mat &sourceFlowY ) const
 	{
-		return std::make_pair( std::vector<Mat> { SourceImage, SourceFlowX, SourceFlowY }, std::vector<const char *> { "SourceImage", "SourceFlowX", "SourceFlowY" } );
+		sourceImage = SourceImage;
+		sourceFlowX = SourceFlowX;
+		sourceFlowY = SourceFlowY;
 	}
 
-	auto GetParams() const
+	auto GetParams( int sourcePics, int sourceStride ) const
 	{
-		return std::make_pair( std::vector<int> { SourcePics, SourceStride }, std::vector<const char *> { "SourcePics", "SourceStride"} );
+		sourcePics = SourcePics;
+		sourceStride = SourceStride;
 	}
 
 	// fileIO load
@@ -206,7 +214,7 @@ private:
 
 	void CalculatePredics()
 	{
-		PredicXs = zerovect2( predicCnt, SourceThetasavg.size() );
+		PredicXs = zerovect2( predicCnt, SourceThetasavg.size(), 0. );
 		for ( int i = 0; i < SourceThetasavg.size(); i++ )
 		{
 			PredicXs[0][i] = predictDiffrotProfile( toRadians( SourceThetasavg[i] ), 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)

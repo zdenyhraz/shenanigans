@@ -95,8 +95,8 @@ void Zdeny_PhD_Shenanigans::debug()
 		// 1D
 		int N = 1000;
 		auto X = zerovect( N );
-		auto Y1s = zerovect2( 3, N );
-		auto Y2s = zerovect2( 2, N );
+		auto Y1s = zerovect2( 3, N, 0. );
+		auto Y2s = zerovect2( 2, N, 0. );
 		double s1 = randunit();
 		double s2 = randunit();
 		double s3 = randunit();
@@ -116,7 +116,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		// 2D
 		int Ny = 1000;
 		int Nx = 1000;
-		auto Z = zerovect2( Ny, Nx );
+		auto Z = zerovect2( Ny, Nx, 0. );
 
 		for ( int y = 0; y < Ny; y++ )
 		{

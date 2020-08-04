@@ -57,29 +57,48 @@ inline double randunit()
 	return ( double )rand() / RAND_MAX;
 }
 
-inline std::vector<double> zerovect( int N, double value = 0 )
+inline double rand01()
 {
-	return std::vector<double>( N, value );
+	return ( double )rand() / RAND_MAX;
 }
 
-inline std::vector<std::vector<double>> zerovect2( int N, int M, double value = 0 )
+inline double rand11()
 {
-	return std::vector<std::vector<double>>( N, zerovect( M, value ) );
+	return 2.0 * rand01() - 1.0;
 }
 
-inline std::vector<std::vector<std::vector<double>>> zerovect3( int N, int M, int O, double value = 0 )
+inline double clamp( double x, double clampMin, double clampMax )
 {
-	return std::vector<std::vector<std::vector<double>>>( N, zerovect2( M, O, value ) );
+	return min( max( x, clampMin ), clampMax );
 }
 
-inline std::vector<std::vector<std::vector<std::vector<double>>>> zerovect4( int N, int M, int O, int P, double value = 0 )
+inline double clampSmooth( double x_new, double x_prev, double clampMin, double clampMax )
 {
-	return std::vector<std::vector<std::vector<std::vector<double>>>>( N, zerovect3( M, O, P, value ) );
+	return x_new < clampMin ? ( x_prev + clampMin ) / 2 : x_new > clampMax ? ( x_prev + clampMax ) / 2 : x_new;
 }
 
-inline std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>> zerovect5( int N, int M, int O, int P, int Q, double value = 0 )
+template <typename T = double>
+inline auto zerovect( int N, T value = 0. )
 {
-	return std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>>( N, zerovect4( M, O, P, Q, value ) );
+	return std::vector<T>( N, value );
+}
+
+template <typename T = double>
+inline auto zerovect2( int N, int M, T value = 0. )
+{
+	return std::vector<std::vector<T>>( N, zerovect( M, value ) );
+}
+
+template <typename T = double>
+inline auto zerovect3( int N, int M, int O, T value = 0. )
+{
+	return std::vector<std::vector<std::vector<T>>>( N, zerovect2( M, O, value ) );
+}
+
+template <typename T = double>
+inline auto zerovect4( int N, int M, int O, int P, T value = 0. )
+{
+	return std::vector<std::vector<std::vector<std::vector<T>>>>( N, zerovect3( M, O, P, value ) );
 }
 
 template <typename T>
@@ -102,7 +121,7 @@ inline ostream &operator<<( ostream &out, std::vector<std::vector<T>> &vec )
 	for ( int r = 0; r < vec.size(); r++ )
 	{
 		out << "[";
-		for ( int c = 0; c < vec[0].size(); c++ )
+		for ( int c = 0; c < vec[r].size(); c++ )
 		{
 			out << vec[r][c];
 			if ( c < vec[r].size() - 1 ) out << ", ";
@@ -123,7 +142,7 @@ inline ostream &operator<<( ostream &out, std::vector<std::string> &vec )
 }
 
 template <typename T>
-inline T sqr( T x )
+inline constexpr T sqr( T x )
 {
 	return x * x;
 }
@@ -138,7 +157,7 @@ inline double mean( const std::vector<T> &vec )
 }
 
 template <typename T>
-inline double mean2( const std::vector<std::vector<T>> &vec )
+inline double mean( const std::vector<std::vector<T>> &vec )
 {
 	double mean = 0;
 	for ( auto &row : vec )
@@ -229,33 +248,6 @@ inline double median( const std::vector<T> &vec )
 	return result[result.size() / 2];
 }
 
-template <typename Func>
-inline void RunInParallelOrInSerial( int zeroIndex, int maxIndex, bool isParallelRunEnabled, bool openMP, Func fnc )
-{
-	if ( isParallelRunEnabled )
-	{
-		if ( openMP ) //OpenMP parallelism
-		{
-			#pragma omp parallel for
-			for ( int i = zeroIndex; i < maxIndex; i++ )
-			{
-				fnc( i );
-			}
-		}
-		else//Windows parallelism
-		{
-			//Concurrency::parallel_for(zeroIndex, maxIndex, fnc);
-		}
-	}
-	else//serial
-	{
-		for ( int i = zeroIndex; i < maxIndex; i++ )
-		{
-			fnc( i );
-		}
-	}
-}
-
 inline bool vectorLess( std::vector<double> &left, std::vector<double> &right )
 {
 	double L = 0, R = 0;
@@ -265,16 +257,6 @@ inline bool vectorLess( std::vector<double> &left, std::vector<double> &right )
 		R += abs( right[i] );
 	}
 	return L < R;
-}
-
-inline double clamp( double x, double clampMin, double clampMax )
-{
-	return min( max( x, clampMin ), clampMax );
-}
-
-inline double clampSmooth( double x_new, double x_prev, double clampMin, double clampMax )
-{
-	return x_new < clampMin ? ( x_prev + clampMin ) / 2 : x_new > clampMax ? ( x_prev + clampMax ) / 2 : x_new;
 }
 
 template <typename T>

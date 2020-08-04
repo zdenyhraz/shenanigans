@@ -12,7 +12,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	std::vector<std::vector<double>> shiftsX2D;
 	std::vector<std::vector<double>> shiftsY2D;
 	std::vector<std::vector<double>> image2D;
-	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys );
+	std::vector<std::vector<double>> predicXs = zerovect2( 2, drset.ys, 0. );
 	std::vector<double> thetas( drset.ys );
 	std::vector<double> shiftsX( drset.ys );
 	std::vector<double> shiftsY( drset.ys );
