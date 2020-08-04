@@ -13,7 +13,7 @@ public:
 	Logger()
 	{
 		spdlogger = spdlog::stdout_color_mt( "console" );
-		spdlog::set_pattern( "%^[%T]%$ %v " );
+		spdlog::set_pattern( "[%T] %^%v%$" );
 		spdlog::set_level( spdlog::level::debug );
 	}
 
@@ -21,5 +21,23 @@ public:
 
 private:
 	static std::shared_ptr<spdlog::logger> spdlogger;
+	//static std::unique_ptr<Logger> logger;
 };
 
+class LOG_STARTEND
+{
+public:
+	LOG_STARTEND( std::string &&startmsg, std::string &&endmsg )
+	{
+		Endmsg = std::move( endmsg );
+		LOG_INFO( startmsg );
+	}
+
+	~LOG_STARTEND()
+	{
+		LOG_SUCC( Endmsg );
+	}
+
+private:
+	std::string Endmsg;
+};
