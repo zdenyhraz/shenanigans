@@ -5,6 +5,7 @@
 #define LOG_ERROR(...) Logger::GetLogger()->error(__VA_ARGS__)
 #define LOG_FATAL(...) Logger::GetLogger()->critical(__VA_ARGS__)
 #define LOG_NEWLINE Logger::GetLogger()->debug("")
+#define LOG_STARTEND(s,e) std::unique_ptr<LOG_STARTEND_IMPL> log_startend_impl = std::make_unique<LOG_STARTEND_IMPL>(s,e)
 
 class Logger
 {
@@ -23,16 +24,16 @@ private:
 	//static std::unique_ptr<Logger> logger;
 };
 
-class LOG_STARTEND
+class LOG_STARTEND_IMPL
 {
 public:
-	LOG_STARTEND( std::string &&startmsg, std::string &&endmsg )
+	LOG_STARTEND_IMPL( const std::string &startmsg, const std::string &endmsg )
 	{
-		Endmsg = std::move( endmsg );
+		Endmsg = endmsg;
 		LOG_INFO( startmsg );
 	}
 
-	~LOG_STARTEND()
+	~LOG_STARTEND_IMPL()
 	{
 		LOG_SUCC( Endmsg );
 	}
@@ -41,4 +42,4 @@ private:
 	std::string Endmsg;
 };
 
-bool CheckIfFileExists( const std::string &path );
+
