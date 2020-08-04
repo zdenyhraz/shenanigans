@@ -15,15 +15,18 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans( QWidget *parent ) : QMainWindow( p
 	ui.label_2->setPixmap( pm );
 	ui.label_2->setScaledContents( true );
 
+	//init logger
+	Logger::Init();
+
 	//allocate all globals - main window is loaded once only
-	globals = new Globals();
+	globals = std::make_unique<Globals>();
 
 	//create all windows
-	windowIPCparameters = new WindowIPCparameters( this, globals );
-	windowIPCoptimize = new WindowIPCoptimize( this, globals );
-	windowIPC2PicAlign = new WindowIPC2PicAlign( this, globals );
-	windowDiffrot = new WindowDiffrot( this, globals );
-	windowFeatures = new WindowFeatures( this, globals );
+	windowIPCparameters = std::make_unique<WindowIPCparameters>( this, globals.get() );
+	windowIPCoptimize = std::make_unique<WindowIPCoptimize>( this, globals.get() );
+	windowIPC2PicAlign = std::make_unique<WindowIPC2PicAlign>( this, globals.get() );
+	windowDiffrot = std::make_unique<WindowDiffrot>( this, globals.get() );
+	windowFeatures = std::make_unique<WindowFeatures>( this, globals.get() );
 
 	//make signal to slot connections
 	connect( ui.actionExit, SIGNAL( triggered() ), this, SLOT( exit() ) );

@@ -1,10 +1,10 @@
 #pragma once
-#define LOG_DEBUG(...) Logger::GetLogger()->debug(__VA_ARGS__)
-#define LOG_SUCC(...) Logger::GetLogger()->info(__VA_ARGS__)
-#define LOG_INFO(...) Logger::GetLogger()->warn(__VA_ARGS__)
-#define LOG_ERROR(...) Logger::GetLogger()->error(__VA_ARGS__)
-#define LOG_FATAL(...) Logger::GetLogger()->critical(__VA_ARGS__)
-#define LOG_NEWLINE Logger::GetLogger()->debug("")
+#define LOG_DEBUG(...) Logger::Get()->debug(__VA_ARGS__)
+#define LOG_SUCC(...) Logger::Get()->info(__VA_ARGS__)
+#define LOG_INFO(...) Logger::Get()->warn(__VA_ARGS__)
+#define LOG_ERROR(...) Logger::Get()->error(__VA_ARGS__)
+#define LOG_FATAL(...) Logger::Get()->critical(__VA_ARGS__)
+#define LOG_NEWLINE Logger::Get()->debug("")
 #define LOG_STARTEND(s,e) std::unique_ptr<LOG_STARTEND_IMPL> log_startend_impl = std::make_unique<LOG_STARTEND_IMPL>(s,e)
 
 class Logger
@@ -17,29 +17,30 @@ public:
 		spdlog::set_level( spdlog::level::debug );
 	}
 
-	inline static std::shared_ptr<spdlog::logger> &GetLogger() { return spdlogger; }
+	inline static std::shared_ptr<spdlog::logger> &Get() { return spdlogger; }
+	inline static void Init() { logger = std::make_unique<Logger>(); }
 
 private:
 	static std::shared_ptr<spdlog::logger> spdlogger;
-	//static std::unique_ptr<Logger> logger;
+	static std::unique_ptr<Logger> logger;
 };
 
 class LOG_STARTEND_IMPL
 {
 public:
-	LOG_STARTEND_IMPL( const std::string &startmsg, const std::string &endmsg )
+	LOG_STARTEND_IMPL( const std::string &startMsg, const std::string &endMsg )
 	{
-		Endmsg = endmsg;
-		LOG_INFO( startmsg );
+		EndMsg = endMsg;
+		LOG_INFO( startMsg );
 	}
 
 	~LOG_STARTEND_IMPL()
 	{
-		LOG_SUCC( Endmsg );
+		LOG_SUCC( EndMsg );
 	}
 
 private:
-	std::string Endmsg;
+	std::string EndMsg;
 };
 
 
