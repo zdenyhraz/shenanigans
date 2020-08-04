@@ -1,19 +1,18 @@
 #pragma once
 #include "stdafx.h"
 #include "IPC/IPC.h"
-#include "Log/logger.h"
 
 class Globals
 {
 public:
-	IPCsettings *IPCset;
-
 	Globals()
 	{
-		IPCset = new IPCsettings( 100, 100, 5, 20 );
-		logger = new Logger();
+		IPCset = std::make_unique<IPCsettings>( 100, 100, 5, 20 );
+		mLogger = std::make_unique<Logger>();
 	}
-private:
-	Logger *logger;
 
+	std::unique_ptr<IPCsettings> IPCset;
+
+private:
+	std::unique_ptr<Logger> mLogger;
 };
