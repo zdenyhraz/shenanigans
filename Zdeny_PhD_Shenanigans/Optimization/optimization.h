@@ -8,8 +8,8 @@ using namespace std;
 struct OptimizationAlgorithm//the main parent optimizer class
 {
 	int N = 1;//the problem dimension
-	vector<double> lowerBounds = zerovect( N, -1 ); //lower search space bounds
-	vector<double> upperBounds = zerovect( N, +1 ); //upper search space bounds
+	vector<double> lowerBounds = zerovect( N, -1. ); //lower search space bounds
+	vector<double> upperBounds = zerovect( N, +1. ); //upper search space bounds
 	double optimalFitness = 0;//satisfactory function value
 	int funEvals = 0;//current # of function evaluations
 	int maxFunEvals = 1e10;//maximum # of function evaluations
@@ -18,7 +18,7 @@ struct OptimizationAlgorithm//the main parent optimizer class
 	bool logPoints = false;//switch for logging of explored points
 	vector<vector<vector<double>>> visitedPoints;//the 3D vector of visited points [run][iter][dim]
 	string terminationReason = "optimization not run yet";//the reason for algorithm termination
-	OptimizationAlgorithm( int N ) : N( N ), lowerBounds( zerovect( N, -1 ) ), upperBounds( zerovect( N, 1 ) ) {}; //construct some default bounds
+	OptimizationAlgorithm( int N ) : N( N ), lowerBounds( zerovect( N, -1. ) ), upperBounds( zerovect( N, 1. ) ) {}; //construct some default bounds
 
 	virtual std::vector<double> optimize( std::function<double( std::vector<double> )> f ) = 0;
 };

@@ -24,7 +24,7 @@ inline std::vector<double> mat1ToVect( const Mat &mat )
 
 inline std::vector<std::vector<double>> matToVect2( const Mat &mat )
 {
-	std::vector<std::vector<double>> result = zerovect2( mat.rows, mat.cols );
+	std::vector<std::vector<double>> result = zerovect2( mat.rows, mat.cols, 0. );
 	for ( int r = 0; r < mat.rows; r++ )
 		for ( int c = 0; c < mat.cols; c++ )
 			result[r][c] = mat.at<float>( r, c );
