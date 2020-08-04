@@ -2,13 +2,71 @@
 #include "stdafx.h"
 #include "diffrotResults.h"
 
+template <typename T>
+void SaveTupleToStorage( std::vector<T> data, std::vector<const char *> labels, FileStorage &fs )
+{
+	for ( int i = 0; i < labels.size(); i++ )
+		fs << labels[i] << data[i];
+}
+
 void SaveDiffrotResultsToFile( const std::string &dir, const std::string &filename, DiffrotResults *dr )
 {
 	std::string path = dir + filename + ".diffrot";
-	std::ofstream file( path, std::ios::out | std::ios::trunc );
-	file << "Writing this to a file.\n";
+	LOG_DEBUG( "Saving diffrot results to {}", path );
+	FileStorage fs( path, FileStorage::WRITE );
+
+	auto [dataVecs1D, labelsVecs1D] = dr->GetVecs1D();
+	auto [dataVecs2D, labelsVecs2D] = dr->GetVecs2D();
+	auto [dataMats, labelsMats] = dr->GetMats();
+	auto [dataParams, labelsParams] = dr->GetParams();
+
+	SaveTupleToStorage( dataVecs1D, labelsVecs1D, fs );
+	SaveTupleToStorage( dataVecs2D, labelsVecs2D, fs );
+	SaveTupleToStorage( dataMats, labelsMats, fs );
+	SaveTupleToStorage( dataParams, labelsParams, fs );
+
+	LOG_DEBUG( "Diffrot results saved" );
 }
 
-void LoadDiffrotResultsFromFile( const std::string &dir, const std::string &filename, DiffrotResults *dr )
+void LoadDiffrotResultsFromFile( const std::string &path, DiffrotResults *dr )
 {
+	LOG_DEBUG( "Loading diffrot results from {}", path );
+	if ( !CheckIfFileExists( path ) )
+		return;
+
+	FileStorage fs( path, FileStorage::READ );
+
+	std::vector<double> SourceThetasavg;
+	std::vector<double> SourceOmegasXavg;
+	std::vector<double> SourceOmegasYavg;
+	std::vector<double> SourceShiftsXavg;
+	std::vector<double> SourceShiftsYavg;
+	fs["SourceThetasavg"] >> SourceThetasavg;
+	fs["SourceOmegasXavg"] >> SourceOmegasXavg;
+	fs["SourceOmegasYavg"] >> SourceOmegasYavg;
+	fs["SourceShiftsXavg"] >> SourceShiftsXavg;
+	fs["SourceShiftsYavg"] >> SourceShiftsYavg;
+	dr->SetVecs1DRaw( SourceThetasavg, SourceOmegasXavg, SourceOmegasYavg, SourceShiftsXavg, SourceShiftsYavg );
+
+	std::vector<std::vector<double>> SourceShiftsX;
+	std::vector<std::vector<double>> SourceShiftsY;
+	fs["SourceShiftsX"] >> SourceShiftsX;
+	fs["SourceShiftsY"] >> SourceShiftsY;
+	dr->SetVecs2DRaw( SourceShiftsX, SourceShiftsY );
+
+	Mat SourceImage;
+	Mat SourceFlowX;
+	Mat SourceFlowY;
+	fs["SourceImage"] >> SourceImage;
+	fs["SourceFlowX"] >> SourceFlowX;
+	fs["SourceFlowY"] >> SourceFlowY;
+	dr->SetMatsRaw( SourceImage, SourceFlowX, SourceFlowY );
+
+	int SourcePics;
+	int SourceStride;
+	fs["SourcePics"] >> SourcePics;
+	fs["SourceStride"] >> SourceStride;
+	dr->SetParamsRaw( SourcePics, SourceStride );
+
+	LOG_DEBUG( "Diffrot results loaded" );
 }

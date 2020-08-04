@@ -15,6 +15,7 @@ class DiffrotResults
 {
 public:
 	bool calculated = false;
+	std::string saveDir;
 
 	void ShowResults( int medianSize, double sigma, double quanBot = 0, double quanTop = 1 )
 	{
@@ -51,6 +52,15 @@ public:
 		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", StartTime, EndTime, StartTheta, EndTheta, colRowRatio2, saveDir + "2DYm" + to_string( medianSize ) + "r2s" + to_string( SourceStride ) + ".png" );
 	}
 
+	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
+	{
+		SourceThetasavg = ( 360. / Constants::TwoPi ) * thetasavg;
+		SourceOmegasXavg = omegasXavg;
+		SourceOmegasYavg = omegasYavg;
+		SourceShiftsXavg = shiftsXavg;
+		SourceShiftsYavg = shiftsYavg;
+	}
+
 	void SetData2D( const std::vector<std::vector<double>> &image, const std::vector<std::vector<double>> &flowX, const std::vector<std::vector<double>> &flowY, const std::vector<std::vector<double>> &shiftsX, const std::vector<std::vector<double>> &shiftsY )
 	{
 		flip( matFromVector( image, true ), SourceImage, 1 );
@@ -61,15 +71,6 @@ public:
 		calculated = true;
 	}
 
-	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
-	{
-		SourceThetasavg = ( 360. / Constants::TwoPi ) * thetasavg;
-		SourceOmegasXavg = omegasXavg;
-		SourceOmegasYavg = omegasYavg;
-		SourceShiftsXavg = shiftsXavg;
-		SourceShiftsYavg = shiftsYavg;
-	}
-
 	void SetParams( int pics, int stride, std::string savepath )
 	{
 		SourcePics = pics;
@@ -77,8 +78,57 @@ public:
 		saveDir = savepath;
 	}
 
-private:
+	// fileIO store
+	auto GetVecs1D() const
+	{
+		return std::make_pair( std::vector<std::vector<double>> { SourceThetasavg, SourceOmegasXavg, SourceOmegasYavg, SourceShiftsXavg, SourceShiftsYavg }, std::vector<const char *> { "SourceThetasavg", "SourceOmegasXavg", "SourceOmegasYavg", "SourceShiftsXavg", "SourceShiftsYavg" } );
+	}
 
+	auto GetVecs2D() const
+	{
+		return std::make_pair( std::vector<std::vector<std::vector<double>>> {SourceShiftsX, SourceShiftsY }, std::vector<const char *> { "SourceShiftsX", "SourceShiftsY" } );
+	}
+
+	auto GetMats() const
+	{
+		return std::make_pair( std::vector<Mat> { SourceImage, SourceFlowX, SourceFlowY }, std::vector<const char *> { "SourceImage", "SourceFlowX", "SourceFlowY" } );
+	}
+
+	auto GetParams() const
+	{
+		return std::make_pair( std::vector<int> { SourcePics, SourceStride }, std::vector<const char *> { "SourcePics", "SourceStride"} );
+	}
+
+	// fileIO load
+	void SetVecs1DRaw( const std::vector<double> &sourceThetasavg, const std::vector<double> &sourceOmegasXavg, const std::vector<double> &sourceOmegasYavg, const std::vector<double> &sourceShiftsXavg, const std::vector<double> &sourceShiftsYavg )
+	{
+		SourceThetasavg = sourceThetasavg;
+		SourceOmegasXavg = sourceOmegasXavg;
+		SourceOmegasYavg = sourceOmegasYavg;
+		SourceShiftsXavg = sourceShiftsXavg;
+		SourceShiftsYavg = sourceShiftsYavg;
+	}
+
+	void SetVecs2DRaw( const std::vector<std::vector<double>> &sourceShiftsX, const std::vector<std::vector<double>> &sourceShiftsY )
+	{
+		SourceShiftsX = sourceShiftsX;
+		SourceShiftsY = sourceShiftsY;
+	}
+
+	void SetMatsRaw( const Mat &sourceImage, const Mat &sourceFlowX, const Mat &sourceFlowY )
+	{
+		SourceImage = sourceImage;
+		SourceFlowX = sourceFlowX;
+		SourceFlowY = sourceFlowY;
+	}
+
+	void SetParamsRaw( int sourcePics, int sourceStride )
+	{
+		SourcePics = sourcePics;
+		SourceStride = sourceStride;
+	}
+
+private:
 	// source data
 	Mat SourceImage;
 	Mat SourceFlowX;
@@ -98,7 +148,6 @@ private:
 	Mat FlowY;
 	Mat FlowM;
 	Mat FlowP;
-	std::string saveDir;
 	static constexpr double colRowRatio1 = 2;
 	static constexpr double colRowRatio2 = 1.5;
 	static constexpr int predicCnt = 2;

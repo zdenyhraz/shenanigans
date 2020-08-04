@@ -1,5 +1,4 @@
 #pragma once
-
 #define LOG_DEBUG(...) Logger::GetLogger()->debug(__VA_ARGS__)
 #define LOG_SUCC(...) Logger::GetLogger()->info(__VA_ARGS__)
 #define LOG_INFO(...) Logger::GetLogger()->warn(__VA_ARGS__)
@@ -41,3 +40,5 @@ public:
 private:
 	std::string Endmsg;
 };
+
+bool CheckIfFileExists( const std::string &path );
