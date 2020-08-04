@@ -15,14 +15,14 @@ public:
 
 private:
 	Ui::Zdeny_PhD_ShenanigansClass ui;
-	Globals *globals;
+	std::unique_ptr<Globals> globals;
 
 	//windows
-	WindowIPCparameters *windowIPCparameters;
-	WindowIPCoptimize *windowIPCoptimize;
-	WindowIPC2PicAlign *windowIPC2PicAlign;
-	WindowDiffrot *windowDiffrot;
-	WindowFeatures *windowFeatures;
+	std::unique_ptr<WindowIPCparameters> windowIPCparameters;
+	std::unique_ptr<WindowIPCoptimize> windowIPCoptimize;
+	std::unique_ptr<WindowIPC2PicAlign> windowIPC2PicAlign;
+	std::unique_ptr<WindowDiffrot> windowDiffrot;
+	std::unique_ptr<WindowFeatures> windowFeatures;
 
 private slots:
 	void exit();
