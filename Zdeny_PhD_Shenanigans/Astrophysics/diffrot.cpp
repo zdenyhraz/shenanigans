@@ -131,6 +131,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	dr.SetData1D( thetasavg, omegasXavg, omegasYavg, shiftsXavg, shiftsYavg );
 	dr.SetData2D( image2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D );
 	dr.SetParams( drset.pics, drset.sPic, drset.savepath );
+
 	return dr;
 }
 

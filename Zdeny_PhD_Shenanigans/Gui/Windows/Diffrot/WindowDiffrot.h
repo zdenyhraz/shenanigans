@@ -13,11 +13,13 @@ public:
 private:
 	Ui::WindowDiffrot ui;
 	Globals *globals;
-	DiffrotResults *diffrotResults;
+	std::unique_ptr<DiffrotResults> diffrotResults;
 
 private slots:
 	void calculateDiffrot();
 	void showResults();
 	void showIPC();
 	void checkDiskShifts();
+	void saveDiffrot();
+	void loadDiffrot();
 };
