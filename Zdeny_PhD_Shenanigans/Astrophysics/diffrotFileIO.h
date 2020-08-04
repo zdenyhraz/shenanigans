@@ -31,6 +31,12 @@ bool CheckIfFileAlreadyExists( const std::string &path )
 
 void SaveDiffrotResultsToFile( const std::string &dir, const std::string &filename, DiffrotResults *dr )
 {
+	if ( !dr->calculated )
+	{
+		LOG_ERROR( "Diffrot results not yet calculated!" );
+		return;
+	}
+
 	LOG_STARTEND( "Saving diffrot results ...", "Diffrot results saved" );
 
 	std::string path = dir + filename + ".diffrot";

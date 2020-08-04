@@ -3,10 +3,12 @@
 #include "Astrophysics/diffrot.h"
 #include "Astrophysics/diffrotFileIO.h"
 
-WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) : QMainWindow( parent ), globals( globals )
+WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) :
+	QMainWindow( parent ),
+	globals( globals ),
+	diffrotResults( std::make_unique<DiffrotResults>() )
 {
 	ui.setupUi( this );
-	diffrotResults = std::make_unique<DiffrotResults>();
 	connect( ui.pushButton, SIGNAL( clicked() ), this, SLOT( calculateDiffrot() ) );
 	connect( ui.pushButton_2, SIGNAL( clicked() ), this, SLOT( showResults() ) );
 	connect( ui.pushButton_3, SIGNAL( clicked() ), this, SLOT( showIPC() ) );
@@ -40,10 +42,7 @@ void WindowDiffrot::calculateDiffrot()
 
 void WindowDiffrot::showResults()
 {
-	if ( diffrotResults->calculated )
-		diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
-	else
-		LOG_ERROR( "Diffrot results not yet calculated!" );
+	diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
 }
 
 void WindowDiffrot::showIPC()
@@ -129,10 +128,7 @@ void WindowDiffrot::checkDiskShifts()
 
 void WindowDiffrot::saveDiffrot()
 {
-	if ( diffrotResults->calculated )
-		SaveDiffrotResultsToFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), diffrotResults.get() );
-	else
-		LOG_ERROR( "Diffrot results not yet calculated!" );
+	SaveDiffrotResultsToFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), diffrotResults.get() );
 }
 
 void WindowDiffrot::loadDiffrot()
