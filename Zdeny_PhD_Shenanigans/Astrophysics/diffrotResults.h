@@ -61,6 +61,8 @@ public:
 		SourceOmegasYavg = omegasYavg;
 		SourceShiftsXavg = shiftsXavg;
 		SourceShiftsYavg = shiftsYavg;
+		Data1DSet = true;
+		UpdateCalculated();
 	}
 
 	void SetData2D( const std::vector<std::vector<double>> &image, const std::vector<std::vector<double>> &flowX, const std::vector<std::vector<double>> &flowY, const std::vector<std::vector<double>> &shiftsX, const std::vector<std::vector<double>> &shiftsY )
@@ -70,7 +72,8 @@ public:
 		flip( matFromVector( flowY, true ), SourceFlowY, 1 );
 		SourceShiftsX = shiftsX;
 		SourceShiftsY = shiftsY;
-		calculated = true;
+		Data2DSet = true;
+		UpdateCalculated();
 	}
 
 	void SetParams( int pics, int stride, std::string savepath )
@@ -78,6 +81,8 @@ public:
 		SourcePics = pics;
 		SourceStride = stride;
 		saveDir = savepath;
+		ParamsSet = true;
+		UpdateCalculated();
 	}
 
 	// fileIO store
@@ -103,7 +108,7 @@ public:
 		sourceFlowY = SourceFlowY;
 	}
 
-	auto GetParams( int sourcePics, int sourceStride ) const
+	auto GetParams( int &sourcePics, int &sourceStride ) const
 	{
 		sourcePics = SourcePics;
 		sourceStride = SourceStride;
@@ -154,6 +159,9 @@ private:
 	std::vector<double> SourceShiftsYavg;
 
 	// internal data
+	bool Data1DSet = false;
+	bool Data2DSet = false;
+	bool ParamsSet = false;
 	Mat FlowX;
 	Mat FlowY;
 	Mat FlowM;
@@ -184,6 +192,11 @@ private:
 		FlowX = SourceFlowX.clone();
 		FlowY = SourceFlowY.clone();
 		resize( FlowY, FlowY, FlowX.size() );
+	}
+
+	void UpdateCalculated()
+	{
+		calculated = Data1DSet && Data2DSet && ParamsSet;
 	}
 
 	void CalculateMedianFilters( int medianSize )

@@ -98,4 +98,9 @@ void LoadDiffrotResultsFromFile( const std::string &path, DiffrotResults *dr )
 	fs["SourcePics"] >> SourcePics;
 	fs["SourceStride"] >> SourceStride;
 	dr->SetParamsRaw( SourcePics, SourceStride );
+
+	LOG_DEBUG( "SourcePics = {}", SourcePics );
+	LOG_DEBUG( "SourceStride = {}", SourceStride );
+
+	dr->calculated = true;
 }
