@@ -134,7 +134,6 @@ void WindowDiffrot::saveDiffrot()
 void WindowDiffrot::loadDiffrot()
 {
 	LoadDiffrotResultsFromFile( ui.lineEdit_24->text().toStdString(), diffrotResults.get() );
-	diffrotResults->calculated = true;
 	diffrotResults->saveDir = ui.lineEdit_9->text().toStdString();
 }
 
