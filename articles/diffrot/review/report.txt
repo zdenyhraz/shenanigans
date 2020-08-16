@@ -3,7 +3,7 @@ Title: MEASURING SOLAR DIFFERENTIAL ROTATION WITH AN ITERATIVE PHASE CORRELATION
 Corresponding Author: Zdenek Hrazdira
 
 
-Stats reviewer's comments:
+Stats Reviewer's Comments:
 
 1. There is a vast literature on the image registration problem in the computer vision literature, some of it involving phase registration. Can the authors describe how their method relates to published work such as:
 - Kuglin, C.D., Hines, D.C.: The phase correlation image alignment method. In: Proceeding of IEEE International Conference on Cybernetics and Society, 163-165 (1975)
