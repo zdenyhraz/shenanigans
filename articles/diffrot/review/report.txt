@@ -1,0 +1,63 @@
+Manuscript: AAS25136
+Title: MEASURING SOLAR DIFFERENTIAL ROTATION WITH AN ITERATIVE PHASE CORRELATION METHOD
+Corresponding Author: Zdenek Hrazdira
+Aug 16 2020
+
+
+Stats reviewer's comments:
+
+1. There is a vast literature on the image registration problem in the computer vision literature, some of it involving phase registration. Can the authors describe how their method relates to published work such as:
+- Kuglin, C.D., Hines, D.C.: The phase correlation image alignment method. In: Proceeding of IEEE International Conference on Cybernetics and Society, 163-165 (1975)
+- Foroosh, H., Zerubia, J.B., Marc, B.: Extension of phase correlation to subpixel registration. IEEE Trans. Image Process. 11(3), 188-200 (2002)
+- Takita, K., et al.: High-accuracy subpixel image registration based on phase-only correlation. IEICE Trans. Fundam. E86A(8), 1925-1934 (2003)
+- Foroosh, H., Balci, M.: Subpixel registration directly from the phase difference. EURASIP J. Appl. Signal Process. 2006, 1-11 (2006)
+- Y. Douini et al., An image registration algorithm based on phase correlation and the classical Lucas-Kanade technique, Signal, Image and Video Processing volume 11, 1321-1328 (2017)
+
+2. Figure 1d shows a difference between the mean (centroid) and mode of the statistic used for image registration. The authors choose to use the mean: would the science result differ significantly if the mode was used?
+
+
+Reviewer's Comments:
+
+The technique determines shifts in the x- and y-direction. I suggest to use a different naming convention throughout the manuscript: Both shifts represent horizontal flows on the solar surface and not a radial flow. The "horizontal" shift could be named "east-west" shift, while the "vertical" shift could be called "north-south" shift or something similar.
+
+Page 2:
+The authors state that they apply their technique to full-disk continuum intensity data obtained with the HMI instrument onboard SDO. The wavelength is given as 1700 A. There seems to be a mistake: the HMI continuum intensity wavelength is Fe I 6173 A, while 1700 A is a wavelength of the AIA instrument on SDO. Please clarify.
+
+The authors should acknowledge the source of their data. The obvious source of SDO data is the JSOC (jsoc.stanford.edu).
+
+Page 2; Section 2.2.
+The authors state that the advantages and limitations of their technique are well known (discussed in a previous paper). The authors might want to briefly describe those that are relevant to this study.
+
+Page 5; Section 3.1.
+The authors use areas of 64x64 pixel shifted by 1 time step of 45s (pairs of consecutive images). Have the authors tried larger spatial sizes and/or longer time steps? The rotation rate is about 0.25 pixel at the equator and less than 0.1 pixel at 60 deg latitude. The authors rely on accurately deriving subpixel shifts of the order of 0.1 to 0.01 pixels. By using longer time steps and appropriately sized areas, the authors could improve the results. This is especially important for the meridional flow, the large-scale flow in the north-south direction, which is called vertical flow by the authors. It is well-established that the meridional flow is about two orders of magnitude smaller than the rotation rate. This would require an accuracy of 0.001 to 0.0001 pixels when using a temporal shift of 1 time step of 45s.
+
+The authors should therefore repeat the analysis with a longer time step. Given the claimed accuracy of their technique and the magnitude of solar flows, suitable choices would range from 100 to 1,000 time steps (1.25 hrs to 12.5 hrs).
+
+Page 6; Section 3.4.
+The pixel shifts of 0.01 at midlatitudes of 25 deg and 0.025 at 50 deg imply an equatorward flow of about 80 m/s and 200 m/s respectively (without taking geometry into account). The meridional flow measured by other techniques is mainly poleward in each hemisphere with a maximum amplitude of about 25 m/s at mid-latitudes. A 3- to 8-times larger equatorward flow would not have escaped notice.
+
+The authors should test whether the results are the same for longer temporal shifts (see comment above).
+
+In addition, I suggest that the authors search for possible systematic effects in publications about large-scale solar flows derived with correlation techniques and about the instruments on SDO. The references in Lamb (2017), cited by the authors in their manuscript, are a good starting point. For example, publications with Ulrich, Roger or Hathaway, David. For details about SDO, see publications with Scherrer, Phil.
+
+Page 6; Section 3.5.
+The first sentence needs to be rephrased. Studies from 2000 and 2015 have shown faster rotation rates in the southern hemisphere compared to the northern one, which agrees with the presented results. However, that does not mean that the previous studies predicted the rotation rate in 2020.
+
+Page 6; Equations (12) and (13).
+I suggest to change the name of the "C" parameter in equation (13) to "B" to match equation (12) and use a different letter for the linear parameter in equation (13), such as "b", for example. This would reduce the potential confusion in Table 1.
+
+Page 7; Figure 3.
+The authors include two rotation rates from other studies for comparison. Lamb (2017) tracked small magnetic features in SDO/HMI magnetograms. Howard et al. (1983) determined the solar rotation rate from MWO Dopplergrams. The three curves agree reasonably well in the southern hemisphere. However, the measured rotation rate (black) is much slower than the other two (red, blue) in the northern hemisphere. The curves of the previous studies (red, blue) thus agree better with each other than the results of this study (black) with either of them. The authors should discuss this discrepancy.
+
+Since the authors use small patches of 64 pixels, their rotation rate might be close to the rate determined from granular or supergranular patterns. The authors might want to search whether the rotation rates of these patterns have been reported by other studies.
+
+Page 7; Section 4.
+The authors overstate the usefulness of their technique compared to other correlation techniques. While it is true that their technique does not rely on the presence of contrasty (magnetic) features, this is also true for any analysis of Dopplergrams or intensity images with a correlation technique or with a helioseismology technique, for example.
+
+Feature tracking is used to determine the rotation rate of magnetic features, such as sunspots. Different magnetic tracers lead to different rotation rates due to their differences in age, evolution, and other characteristics and their study helps to improve the understanding of magnetic activity.
+
+However, a technique, such as used by Howard et al. (1983), does not depend on magnetic features and can derive the rotation rate as a function of latitude throughout a solar cycle. In addition, small magnetic features are present everywhere at all times and can be used in a correlation analysis to derive the rotation rate as a function of latitude any time during a solar cycle.
+
+The advantage of the presented technique is the ability to determine shifts with subgrid accuracy, which allows the authors to use short time steps and small spatial scales.
+
+The authors have shown that their technique is potentially useful to derive the rotation rate. Their derived rate is similar to other results in the southern hemisphere but not in the northern one. Their derived flows in the north-south direction are equatorward and large, which is in contrast to the small and poleward meridional flows of other observations. Clearly, more work needs to be done by the authors to resolve these discrepancies before they can claim that their technique is superior to others.
