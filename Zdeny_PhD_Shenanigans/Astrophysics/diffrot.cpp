@@ -50,7 +50,14 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			double R = ( pic1.params().R + pic2.params().R ) / 2.;
 			double theta0 = ( pic1.params().theta0 + pic2.params().theta0 ) / 2.;
 
-			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy, lag1, lag2 );
+			int predShift = 0;
+			if ( drset.pred )
+			{
+				predShift = predictDiffrotShift( drset.dPic, drset.dSec, R );
+				LOG_DEBUG( "Predicted shift used = {}", predShift );
+			}
+
+			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy, lag1, lag2, predShift );
 
 			image2D.emplace_back( image );
 
@@ -135,16 +142,16 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 	return dr;
 }
 
-void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2 )
+void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift )
 {
 	#pragma omp parallel for
 	for ( int y = 0; y < drset.ys; y++ )
 	{
-		Mat crop1 = roicrop( pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
-		Mat crop2 = roicrop( pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy, ipcset.getcols(), ipcset.getrows() );
-		image[y] = pic1.image().at<ushort>( pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + sy );
+		Mat crop1 = roicrop( pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + drset.sy, ipcset.getcols(), ipcset.getrows() );
+		Mat crop2 = roicrop( pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + drset.sy, ipcset.getcols(), ipcset.getrows() );
+		image[y] = pic1.image().at<ushort>( pic1.params().fitsMidX, pic1.params().fitsMidY + dy * ( double )( y - drset.ys / 2 ) + drset.sy );
 		auto shift = phasecorrel( std::move( crop1 ), std::move( crop2 ), ipcset, y == yshow );
-		shiftsX[y] = shift.x;
+		shiftsX[y] = shift.x + predShift;
 		shiftsY[y] = shift.y;
 	}
 
@@ -160,10 +167,13 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		filterMovavg( shiftsY, drset.movavgFilterSize );
 	}
 
+	if ( lag1 != 0 || lag2 != 0 )
+		LOG_DEBUG( "Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2 );
+
 	const double dt = ( double )( drset.dPic * drset.dSec + lag2 - lag1 );
 	for ( int y = 0; y < drset.ys; y++ )
 	{
-		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - sy ) / R ) + theta0;
+		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - drset.sy ) / R ) + theta0;
 		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / dt * Constants::RadPerSecToDegPerDay;
 		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / dt * Constants::RadPerSecToDegPerDay;

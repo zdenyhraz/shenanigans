@@ -11,6 +11,14 @@ inline double predictDiffrotProfile( double theta, double A, double B, double C 
 	return ( A + B * pow( sin( theta ), 2 ) + C * pow( sin( theta ), 4 ) );
 }
 
+inline int predictDiffrotShift( int dPic, int dSec, double R )
+{
+	double degPerDay = predictDiffrotProfile( 0.0, 14.296, -1.847, -2.615 );
+	double days = dPic * dSec / Constants::SecondsInDay;
+	double degs = degPerDay * days;
+	return R * sin( degs / Constants::Rad );
+}
+
 class DiffrotResults
 {
 public:

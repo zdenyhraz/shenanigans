@@ -4,7 +4,6 @@
 #include "diffrotResults.h"
 
 static constexpr int plusminusbufer = 4;//even!
-static constexpr int sy = 0;//sunspot shift
 static constexpr int yshow = 1400;//ipc show y index
 
 struct DiffrotSettings
@@ -20,6 +19,8 @@ struct DiffrotSettings
 	int medianFilterSize;
 	int movavgFilterSize;
 	bool visual;
+	int sy;
+	bool pred;
 	std::string savepath;
 };
 
@@ -27,4 +28,4 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 void loadFitsFuzzy( FitsImage &pic, FitsTime &time, int &lag );
 
-void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2 );
+void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift );
