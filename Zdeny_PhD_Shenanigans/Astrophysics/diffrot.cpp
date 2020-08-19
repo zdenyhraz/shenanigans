@@ -160,13 +160,13 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 		filterMovavg( shiftsY, drset.movavgFilterSize );
 	}
 
+	const double dt = ( double )( drset.dPic * drset.dSec + lag2 - lag1 );
 	for ( int y = 0; y < drset.ys; y++ )
 	{
 		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - sy ) / R ) + theta0;
 		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
-		shiftsY[y] = clamp( shiftsY[y], Constants::Min, Constants::Max );
-		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / ( double )( drset.dPic * drset.dSec + lag2 - lag1 ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
-		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / ( double )( drset.dPic * drset.dSec + lag2 - lag1 ) * ( 360. / Constants::TwoPi ) * ( 60. * 60. * 24. );
+		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / dt * Constants::RadPerSecToDegPerDay;
+		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / dt * Constants::RadPerSecToDegPerDay;
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
 		predicXs[1][y] = predictDiffrotProfile( thetas[y], 14.192, -1.70, -2.36 ); //Howard et al. (1983)
 		// etc...
