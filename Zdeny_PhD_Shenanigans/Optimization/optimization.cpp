@@ -7,7 +7,7 @@
 #include "optimization.h"
 #include "Plot/Plot1D.h"
 
-std::vector<double> Evolution::optimize( std::function<double( std::vector<double> )> f )
+std::vector<double> Evolution::optimize( std::function<double( const std::vector<double>& )> f )
 {
 	LOG_DEBUG( "Optimization started (evolution)" );
 	Plot1D::Reset( "evolution" );
@@ -268,7 +268,7 @@ std::vector<double> Evolution::optimize( std::function<double( std::vector<doubl
 	return bestEntity;
 }//optimize function end
 
-std::vector<double> PatternSearch::optimize( std::function<double( std::vector<double> )> f )
+std::vector<double> PatternSearch::optimize( std::function<double( const std::vector<double>& )> f )
 {
 	//LOG_DEBUG    ">> Optimization started (pattern search)"  ;
 
