@@ -2,6 +2,7 @@
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
 #include "Astrophysics/diffrotFileIO.h"
+#include "Optimization/optimization.h"
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) :
 	QMainWindow( parent ),
@@ -139,16 +140,28 @@ void WindowDiffrot::loadDiffrot()
 void WindowDiffrot::optimizeDiffrot()
 {
 	LOG_STARTEND( "Optimizing diffrot...", "Diffrot optimized" );
-
-	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 	updateDrset();
+	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 
-	auto fn = [&]( const std::vector<double> &args )
+	auto f = [&]( const std::vector<double> &args )
 	{
-		IPCsettings ipcset( 64, 64, args[0], args[1] );
-		auto dr = calculateDiffrotProfile( ipcset, time, drset );
+		IPCsettings ipcset_opt( 64, 64, args[0], args[1] );
+		FitsTime time_opt = time;
+		DiffrotSettings drset_opt = drset;
+		drset_opt.pics = 10;
+		drset_opt.pred = false;
+		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
 		return dr.GetError();
 	};
+
+	Evolution evo( 2 );
+	evo.NP = 10;
+	evo.lowerBounds = std::vector<double> {0, 0};
+	evo.upperBounds = std::vector<double> {20, 1000};
+	evo.mutStrat = Evolution::MutationStrategy::RAND1;
+	auto result = evo.optimize( f );
+
+	std::cout << "Evolution result = " << result << std::endl;
 }
 
 void WindowDiffrot::updateDrset()
