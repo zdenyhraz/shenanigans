@@ -38,11 +38,13 @@ void WindowDiffrot::calculateDiffrot()
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, time, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );
+	showResults();
 }
 
 void WindowDiffrot::showResults()
 {
 	diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
+	LOG_SUCC( "Differential rotation profile shown." );
 }
 
 void WindowDiffrot::showIPC()
