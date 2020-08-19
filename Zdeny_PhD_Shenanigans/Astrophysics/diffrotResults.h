@@ -62,6 +62,20 @@ public:
 		Plot2D::plot( applyQuantile( FlowY, quanBot, quanTop ), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "vertical material flow speed [deg/day]", StartTime, EndTime, StartTheta, EndTheta, colRowRatio2, saveDir + "2DYm" + to_string( medianSize ) + "r2s" + to_string( SourceStride ) + ".png" );
 	}
 
+	double GetError()
+	{
+		// used for optimizing - closest profile to literature profiles
+		double error = 0;
+		auto x1 = polyfit( SourceThetasavg, SourceOmegasXavg, 2 );
+		auto x2 = PredicXs[0];
+		int count = x1.size();
+		for ( int i = 0; i < count; i++ )
+		{
+			error += std::pow( x1[i] - x2[i], 2 );
+		}
+		return error / count;
+	}
+
 	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )
 	{
 		SourceThetasavg = ( 360. / Constants::TwoPi ) * thetasavg;
@@ -309,5 +323,4 @@ private:
 		}
 		LOG_NEWLINE;
 	}
-
 };

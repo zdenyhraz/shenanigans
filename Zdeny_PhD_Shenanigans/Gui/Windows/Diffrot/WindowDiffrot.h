@@ -2,6 +2,7 @@
 #include "ui_WindowDiffrot.h"
 #include "Core/globals.h"
 #include "Astrophysics/diffrotResults.h"
+#include "Astrophysics/diffrot.h"
 
 class WindowDiffrot : public QMainWindow
 {
@@ -13,7 +14,8 @@ public:
 private:
 	Ui::WindowDiffrot ui;
 	Globals *globals;
-	std::unique_ptr<DiffrotResults> diffrotResults;
+	DiffrotResults drres;
+	DiffrotSettings drset;
 
 private slots:
 	void calculateDiffrot();
@@ -22,4 +24,6 @@ private slots:
 	void checkDiskShifts();
 	void saveDiffrot();
 	void loadDiffrot();
+	void optimizeDiffrot();
+	void updateDrset();
 };
