@@ -5,8 +5,7 @@
 
 WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) :
 	QMainWindow( parent ),
-	globals( globals ),
-	diffrotResults( std::make_unique<DiffrotResults>() )
+	globals( globals )
 {
 	ui.setupUi( this );
 	connect( ui.pushButton, SIGNAL( clicked() ), this, SLOT( calculateDiffrot() ) );
@@ -15,6 +14,7 @@ WindowDiffrot::WindowDiffrot( QWidget *parent, Globals *globals ) :
 	connect( ui.pushButton_5, SIGNAL( clicked() ), this, SLOT( checkDiskShifts() ) );
 	connect( ui.pushButton_6, SIGNAL( clicked() ), this, SLOT( saveDiffrot() ) );
 	connect( ui.pushButton_7, SIGNAL( clicked() ), this, SLOT( loadDiffrot() ) );
+	connect( ui.pushButton_8, SIGNAL( clicked() ), this, SLOT( optimizeDiffrot() ) );
 }
 
 void WindowDiffrot::calculateDiffrot()
@@ -22,30 +22,16 @@ void WindowDiffrot::calculateDiffrot()
 	LOG_INFO( "Calculating diffrot profile..." );
 	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 
-	DiffrotSettings drset;
-	drset.pics = ui.lineEdit_7->text().toDouble();
-	drset.ys = ui.lineEdit_2->text().toDouble();
-	drset.sPic = ui.lineEdit_6->text().toDouble();
-	drset.dPic = ui.lineEdit_5->text().toDouble();
-	drset.vFov = ui.lineEdit_4->text().toDouble();
-	drset.dSec = ui.lineEdit_8->text().toDouble();
-	drset.medianFilter = ui.checkBox->isChecked();
-	drset.movavgFilter = ui.checkBox_2->isChecked();
-	drset.medianFilterSize = ui.lineEdit_21->text().toDouble();
-	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
-	drset.visual = ui.checkBox_3->isChecked();
-	drset.savepath = ui.lineEdit_9->text().toStdString();
-	drset.sy = ui.lineEdit_25->text().toDouble();
-	drset.pred = ui.checkBox_4->isChecked();
+	updateDrset();
 
-	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, time, drset );
+	drres = calculateDiffrotProfile( *globals->IPCset, time, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );
 	showResults();
 }
 
 void WindowDiffrot::showResults()
 {
-	diffrotResults->ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
+	drres.ShowResults( ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble() );
 	LOG_SUCC( "Differential rotation profile shown." );
 }
 
@@ -141,15 +127,44 @@ void WindowDiffrot::checkDiskShifts()
 
 void WindowDiffrot::saveDiffrot()
 {
-	SaveDiffrotResultsToFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), diffrotResults.get() );
+	SaveDiffrotResultsToFile( ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres );
 }
 
 void WindowDiffrot::loadDiffrot()
 {
-	LoadDiffrotResultsFromFile( ui.lineEdit_24->text().toStdString(), diffrotResults.get() );
-	diffrotResults->saveDir = ui.lineEdit_9->text().toStdString();
+	LoadDiffrotResultsFromFile( ui.lineEdit_24->text().toStdString(), &drres );
+	drres.saveDir = ui.lineEdit_9->text().toStdString();
 }
 
+void WindowDiffrot::optimizeDiffrot()
+{
+	LOG_STARTEND( "Optimizing diffrot...", "Diffrot optimized" );
 
+	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+	updateDrset();
 
+	auto fn = [&]( const std::vector<double> &args )
+	{
+		IPCsettings ipcset( 64, 64, args[0], args[1] );
+		auto dr = calculateDiffrotProfile( ipcset, time, drset );
+		return dr.GetError();
+	};
+}
 
+void WindowDiffrot::updateDrset()
+{
+	drset.pics = ui.lineEdit_7->text().toDouble();
+	drset.ys = ui.lineEdit_2->text().toDouble();
+	drset.sPic = ui.lineEdit_6->text().toDouble();
+	drset.dPic = ui.lineEdit_5->text().toDouble();
+	drset.vFov = ui.lineEdit_4->text().toDouble();
+	drset.dSec = ui.lineEdit_8->text().toDouble();
+	drset.medianFilter = ui.checkBox->isChecked();
+	drset.movavgFilter = ui.checkBox_2->isChecked();
+	drset.medianFilterSize = ui.lineEdit_21->text().toDouble();
+	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
+	drset.visual = ui.checkBox_3->isChecked();
+	drset.savepath = ui.lineEdit_9->text().toStdString();
+	drset.sy = ui.lineEdit_25->text().toDouble();
+	drset.pred = ui.checkBox_4->isChecked();
+}
