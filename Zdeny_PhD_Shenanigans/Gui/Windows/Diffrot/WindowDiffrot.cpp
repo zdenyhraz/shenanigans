@@ -35,6 +35,8 @@ void WindowDiffrot::calculateDiffrot()
 	drset.movavgFilterSize = ui.lineEdit_22->text().toDouble();
 	drset.visual = ui.checkBox_3->isChecked();
 	drset.savepath = ui.lineEdit_9->text().toStdString();
+	drset.sy = ui.lineEdit_25->text().toDouble();
+	drset.pred = ui.checkBox_4->isChecked();
 
 	*diffrotResults = calculateDiffrotProfile( *globals->IPCset, time, drset );
 	LOG_SUCC( "Differential rotation profile calculated." );
@@ -55,13 +57,22 @@ void WindowDiffrot::showIPC()
 	set.broadcast = true;
 	//set.save = true;
 	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
+
 	LOG_INFO( "Loading file '" + time.path() + "'..." );
 	Mat pic1 = roicrop( loadfits( time.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
-	time.advanceTime( ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble() );
-	LOG_INFO( "Loading file '" + time.path() + "'..." );
-	Mat pic2 = roicrop( loadfits( time.path(), params1 ), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows() );
 
-	auto shifts = phasecorrel( pic1, pic2, set );
+	time.advanceTime( ui.lineEdit_5->text().toDouble()*ui.lineEdit_8->text().toDouble() );
+	int predShift = 0;
+	if ( ui.checkBox_4->isChecked() )
+	{
+		predShift = predictDiffrotShift( ui.lineEdit_5->text().toDouble(), ui.lineEdit_8->text().toDouble(), params1.R );
+		LOG_DEBUG( "Predicted shift used = {}", predShift );
+	}
+
+	LOG_INFO( "Loading file '" + time.path() + "'..." );
+	Mat pic2 = roicrop( loadfits( time.path(), params1 ), params1.fitsMidX + predShift, params1.fitsMidY, set.getcols(), set.getrows() );
+
+	phasecorrel( pic1, pic2, set );
 }
 
 void WindowDiffrot::checkDiskShifts()
