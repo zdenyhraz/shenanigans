@@ -49,7 +49,7 @@ double absoluteSubpixelRegistrationError( IPCsettings &set, const Mat &src, doub
 	return returnVal;
 }
 
-double IPCparOptFun( std::vector<double> &args, const IPCsettings &settingsMaster, const Mat &source, double noisestddev, double maxShift, double accuracy )
+double IPCparOptFun( const std::vector<double> &args, const IPCsettings &settingsMaster, const Mat &source, double noisestddev, double maxShift, double accuracy )
 {
 	IPCsettings settings = settingsMaster;
 	settings.setBandpassParameters( args[0], args[1] );
@@ -67,7 +67,7 @@ void optimizeIPCParameters( const IPCsettings &settingsMaster, std::string pathI
 	std::string windowname = "objective function source";
 	showimg( pic, windowname );
 	double noisestdev = 0;
-	auto f = [&]( std::vector<double> &args ) {return IPCparOptFun( args, settingsMaster, pic, noisestdev, maxShift, accuracy ); };
+	auto f = [&]( const std::vector<double> &args ) {return IPCparOptFun( args, settingsMaster, pic, noisestdev, maxShift, accuracy ); };
 
 	for ( int iterOpt = 0; iterOpt < runs; iterOpt++ )
 	{
@@ -97,7 +97,7 @@ void optimizeIPCParametersForAllWavelengths( const IPCsettings &settingsMaster, 
 			showimg( pic, "objfun current source" );
 			if ( 1 ) //optimize
 			{
-				auto f = [&]( std::vector<double> &args ) {return IPCparOptFun( args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy ); };
+				auto f = [&]( const std::vector<double> &args ) {return IPCparOptFun( args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy ); };
 				for ( int iterOpt = 0; iterOpt < runs; iterOpt++ )
 				{
 					Evolution Evo( 4 );
