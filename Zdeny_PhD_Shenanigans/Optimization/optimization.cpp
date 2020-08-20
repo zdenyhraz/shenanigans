@@ -201,7 +201,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				bestFitness = fitness[indexEntity];
 				fitness_prev = fitness_curr;
 				fitness_curr = bestFitness;
-				std::cout << "New best entity params = " << bestEntity << "\n";
+				std::cout << "New best entity params (f = " << bestFitness << ") = " << bestEntity << "\n";
 				if ( ( fitness_prev - fitness_curr ) / fitness_prev * 100 > 2 )
 				{
 					LOG_DEBUG( "Gen " + to_string( generation ) + " best entity: " + to_string( bestFitness ) );
