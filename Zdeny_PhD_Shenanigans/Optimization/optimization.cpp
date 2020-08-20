@@ -63,8 +63,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			}
 		}
 	}
-
-	LOG_SUCC( "Initial population created\n" );
+	LOG_DEBUG( "Initial population created" );
 
 	//calculate initial fitness vector
 	#pragma omp parallel for
@@ -78,7 +77,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 		}
 	}
 	funEvals += NP;
-	LOG_SUCC( "Initial population evaluated\n" );
+	LOG_SUCC( "Initial population evaluated" );
 
 	//run main evolution cycle
 	for ( int generation = 1; generation < 1e8; generation++ )
