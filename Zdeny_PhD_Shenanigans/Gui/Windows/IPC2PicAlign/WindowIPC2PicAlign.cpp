@@ -27,7 +27,7 @@ void WindowIPC2PicAlign::align()
 	img2 = roicrop( img2, 0.5 * img2.cols, 0.5 * img2.rows, size, size );
 
 	IPCsettings set = *globals->IPCset;
-	set.broadcast = true;
+	set.speak = true;
 
 	if ( 0 ) //artificial misalign
 	{
@@ -65,7 +65,7 @@ void WindowIPC2PicAlign::alignXY()
 	img2 = roicrop( img2, ui.lineEdit_4->text().toDouble() * img2.cols, ui.lineEdit_5->text().toDouble() * img2.rows, sizeX, sizeY );
 
 	IPCsettings set = *globals->IPCset;//copy
-	set.broadcast = true;//show
+	set.speak = true;//show
 
 	showimg( img1, "img1" );
 	showimg( img2, "img2" );

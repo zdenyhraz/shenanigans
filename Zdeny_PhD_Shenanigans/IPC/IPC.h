@@ -30,7 +30,7 @@ public:
 	bool applyBandpass = 1;
 	bool subpixel = 1;
 	bool crossCorrel = 0;
-	bool broadcast = false;
+	bool speak = false;
 	bool save = false;
 	double minimalShift = 0;
 	bool logar = false;
@@ -105,7 +105,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 		multiply( sourceimg2, set.window, sourceimg2 );
 	}
 
-	if ( set.broadcast || forceshow )
+	if ( set.speak || forceshow )
 	{
 		showMatsGRS.push_back( sourceimg1 );
 		showMatsGRS.push_back( sourceimg2 );
@@ -162,7 +162,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 		Mat L3planes[2];
 		split( L3complex, L3planes );
 
-		if ( set.broadcast )
+		if ( set.speak )
 		{
 			auto minmaxR = minMaxMat( L3planes[0] );
 			auto minmaxI = minMaxMat( L3planes[1] );
@@ -175,7 +175,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	else//real only (assume pure real input)
 	{
 		dft( CrossPower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT );
-		if ( set.broadcast )
+		if ( set.speak )
 		{
 			auto minmax = minMaxMat( L3 );
 			LOG_DEBUG( "L3 real min/max: {}/{}", std::get<0>( minmax ), std::get<1>( minmax ) );
@@ -199,7 +199,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 	minMaxLoc( L3, nullptr, &maxR, nullptr, &L3peak );
 	Point2f L3mid( L3.cols / 2, L3.rows / 2 );
 	Point2f imageshift_PIXEL( L3peak.x - L3mid.x, L3peak.y - L3mid.y );
-	if ( set.broadcast || forceshow )
+	if ( set.speak || forceshow )
 	{
 		Mat L3v;
 		resize( L3, L3v, cv::Size( 2000, 2000 ), 0, 0, INTER_NEAREST );
@@ -210,7 +210,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 			saveimg( set.auxdir + "ipc_L3.png", L3vs );
 		}
 	}
-	if ( set.broadcast )
+	if ( set.speak )
 	{
 		LOG_DEBUG( "Phase correlation max: {} at location: {}", maxR, to_string( L3peak ) );
 		LOG_DEBUG( "Calculated shift with pixel accuracy: {} pixels", to_string( imageshift_PIXEL ) );
@@ -250,7 +250,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 				Point2f L2Umid( L2U.cols / 2, L2U.rows / 2 );
 				Point2f L2Upeak = L2Umid;
 
-				if ( set.broadcast || forceshow )
+				if ( set.speak || forceshow )
 				{
 					Mat L2Uv;
 					resize( L2U, L2Uv, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
@@ -261,7 +261,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 						saveimg( set.auxdir + "ipc_L2.png", L2Uvs );
 					}
 				}
-				if ( set.broadcast )
+				if ( set.speak )
 				{
 					LOG_DEBUG( "L2Upeak location before iterations: {}", to_string( L2Upeak ) );
 					LOG_DEBUG( "L2Upeak location before iterations findCentroid double: {}", to_string( findCentroid( L2U ) ) );
@@ -277,13 +277,13 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 
 				for ( int i = 0; i < maxPCit; i++ )
 				{
-					if ( set.broadcast )
+					if ( set.speak )
 						LOG_DEBUG( "======= iteration {} =======", i + 1 );
 
 					L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
 					Point2f L1peak = findCentroid( L1 );
 
-					if ( set.broadcast )
+					if ( set.speak )
 						LOG_DEBUG( "L1peak: {}", to_string( L1peak ) );
 
 					L2Upeak.x += round( L1peak.x - L1mid.x );
@@ -294,7 +294,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 						L2size += -2;
 						break;
 					}
-					if ( set.broadcast )
+					if ( set.speak )
 					{
 						LOG_DEBUG( "L1peak findCentroid double delta: {}/{}", to_string( findCentroid( L1 ).x - L1mid.x ), to_string( findCentroid( L1 ).y - L1mid.y ) );
 						LOG_DEBUG( "Resulting L2Upeak in this iteration: {}", to_string( L2Upeak ) );
@@ -302,11 +302,11 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 					if ( ( abs( L1peak.x - L1mid.x ) < 0.5 ) && ( abs( L1peak.y - L1mid.y ) < 0.5 ) )
 					{
 						L1 = kirklcrop( L2U, L2Upeak.x, L2Upeak.y, L1size );
-						if ( set.broadcast )
+						if ( set.speak )
 						{
 							LOG_DEBUG( "Iterative phase correlation accuracy reached, L2size: {}, L2Upeak: " + to_string( L2Upeak ), L2size );
 						}
-						if ( set.broadcast || forceshow )
+						if ( set.speak || forceshow )
 						{
 							Mat L1v;
 							resize( L1, L1v, cv::Size( 2000, 2000 ), 0, 0, INTER_LINEAR );
@@ -322,7 +322,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 					}
 					else if ( i == maxPCit - 1 )
 					{
-						if ( set.broadcast )
+						if ( set.speak )
 							LOG_DEBUG( "IPC centroid oscilated, reducing L2size from {} to {} ", L2size, L2size - 2 );
 
 						L2size += -2;
@@ -334,7 +334,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 					imageshift_SUBPIXEL.x = ( float )L3peak.x - ( float )L3mid.x + 1.0 / ( float )set.UC * ( ( float )L2Upeak.x - ( float )L2Umid.x + findCentroid( L1 ).x - ( float )L1mid.x ); //image shift in L3 - final
 					imageshift_SUBPIXEL.y = ( float )L3peak.y - ( float )L3mid.y + 1.0 / ( float )set.UC * ( ( float )L2Upeak.y - ( float )L2Umid.y + findCentroid( L1 ).y - ( float )L1mid.y ); //image shift in L3 - final
 
-					if ( set.broadcast )
+					if ( set.speak )
 					{
 						LOG_DEBUG( "L3 size: " + to_string( L3.cols ) + ", L2 size: " + to_string( L2.cols ) + ", L2U size: " + to_string( L2U.cols ) + ", L1 size: " + to_string( L1.cols ) );
 						LOG_DEBUG( "Upsample pixel accuracy theoretical maximum: " + to_string( 1.0 / ( float )set.UC ) );
@@ -352,7 +352,7 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 		}
 	}
 
-	if ( set.broadcast || forceshow )
+	if ( set.speak || forceshow )
 	{
 		showimg( showMatsGRS, "IPC input", false );
 		showimg( showMatsCLR, "IPC pipeline", true );
