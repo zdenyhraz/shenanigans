@@ -54,7 +54,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 			if ( drset.pred )
 			{
 				predShift = predictDiffrotShift( drset.dPic, drset.dSec, R );
-				LOG_DEBUG( "Predicted shift used = {}", predShift );
+				LOG_DEBUG_IF( drset.speak, "Predicted shift used = {}", predShift );
 			}
 
 			calculateOmegas( pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy, lag1, lag2, predShift );
@@ -63,7 +63,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 
 			if ( pic < 10 )
 			{
-				LOG_SUCC( "{} / {} estimating initial profile", pic + 1, drset.pics );
+				LOG_SUCC_IF( drset.speak, "{} / {} estimating initial profile", pic + 1, drset.pics );
 				thetas2D.emplace_back( thetas );
 				omegasX2D.emplace_back( omegasX );
 				omegasY2D.emplace_back( omegasY );
@@ -87,7 +87,7 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				}
 				else
 				{
-					LOG_ERROR( "Abnormal profile detected, diff X = {}, skipping", diffX );
+					LOG_ERROR_IF( drset.speak, "Abnormal profile detected, diff X = {}, skipping", diffX );
 				}
 
 				// filter outlier Y data
@@ -98,13 +98,13 @@ DiffrotResults calculateDiffrotProfile( const IPCsettings &ipcset, FitsTime &tim
 				}
 				else
 				{
-					LOG_ERROR( "Abnormal profile detected, diff Y = {}, skipping", diffY );
+					LOG_ERROR_IF( drset.speak, "Abnormal profile detected, diff Y = {}, skipping", diffY );
 				}
 
 				// log progress
 				if ( abs( diffX ) < diffThreshX && abs( diffY ) < diffThreshY )
 				{
-					LOG_SUCC( "{} / {} ... diff X/Y = {}/{}, adding", pic + 1, drset.pics, diffX, diffY );
+					LOG_SUCC_IF( drset.speak, "{} / {} ... diff X/Y = {}/{}, adding", pic + 1, drset.pics, diffX, diffY );
 				}
 			}
 
@@ -168,7 +168,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	}
 
 	if ( lag1 != 0 || lag2 != 0 )
-		LOG_DEBUG( "Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2 );
+		LOG_DEBUG_IF( drset.speak, "Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2 );
 
 	const double dt = ( double )( drset.dPic * drset.dSec + lag2 - lag1 );
 	for ( int y = 0; y < drset.ys; y++ )

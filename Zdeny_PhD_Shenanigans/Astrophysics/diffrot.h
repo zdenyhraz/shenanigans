@@ -21,6 +21,7 @@ struct DiffrotSettings
 	bool visual;
 	int sy;
 	bool pred;
+	bool speak = true;
 	std::string savepath;
 };
 

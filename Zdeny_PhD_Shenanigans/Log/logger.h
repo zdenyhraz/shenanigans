@@ -5,6 +5,12 @@
 #define LOG_ERROR(...) Logger::Get()->error(__VA_ARGS__)
 #define LOG_FATAL(...) Logger::Get()->critical(__VA_ARGS__)
 #define LOG_NEWLINE Logger::Get()->debug("")
+#define LOG_DEBUG_IF(c, ...) if (c) Logger::Get()->debug(__VA_ARGS__)
+#define LOG_SUCC_IF(c, ...) if (c) Logger::Get()->info(__VA_ARGS__)
+#define LOG_INFO_IF(c, ...) if (c) Logger::Get()->warn(__VA_ARGS__)
+#define LOG_ERROR_IF(c, ...) if (c) Logger::Get()->error(__VA_ARGS__)
+#define LOG_FATAL_IF(c, ...) if (c) Logger::Get()->critical(__VA_ARGS__)
+#define LOG_NEWLINE_IF(c) if (c) Logger::Get()->debug("")
 #define LOG_STARTEND(s,e) std::unique_ptr<LOG_STARTEND_IMPL> log_startend_impl = std::make_unique<LOG_STARTEND_IMPL>(s,e)
 
 class Logger
