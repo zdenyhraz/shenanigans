@@ -153,17 +153,17 @@ void WindowDiffrot::optimizeDiffrot()
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 10;
 		drset_opt.ys = 171;
+		drset_opt.dPic = 1;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
-		drset_opt.dPic = args[6];
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
 		return dr.GetError();
 	};
 
-	Evolution evo( 7 );
+	Evolution evo( 6 );
 	evo.NP = 50;
-	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 32, 1};
-	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512, 10};
+	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 32};
+	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512};
 	evo.mutStrat = Evolution::MutationStrategy::RAND1;
 
 	auto result = evo.optimize( f );
