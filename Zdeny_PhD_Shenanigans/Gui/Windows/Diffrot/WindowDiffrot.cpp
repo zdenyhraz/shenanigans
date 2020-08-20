@@ -41,7 +41,7 @@ void WindowDiffrot::showIPC()
 	LOG_INFO( "Showimg diffrot profile IPC landscape..." );
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCset;
-	set.broadcast = true;
+	set.speak = true;
 	//set.save = true;
 	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 
