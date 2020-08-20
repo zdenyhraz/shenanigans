@@ -48,11 +48,11 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			for ( int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++ ) //check distance to all other entities
 			{
 				double avgDist = averageVectorDistance( population[indexEntity], population[indexEntity2], boundsRange ); //calculate how distinct the entity is to another entity
-				LOG_DEBUG( "entity" + to_string( indexEntity ) + " trial " + to_string( distinctEntityTrials ) + " avgDist to entity" + to_string( indexEntity2 ) + ": " + to_string( avgDist ) + ", minimum dist: " + to_string( initialMinAvgDist ) );
+				LOG_DEBUG( "Entity" + to_string( indexEntity ) + " trial " + to_string( distinctEntityTrials ) + " avgDist to entity" + to_string( indexEntity2 ) + ": " + to_string( avgDist ) + ", minimum dist: " + to_string( initialMinAvgDist ) );
 				if ( avgDist < initialMinAvgDist ) //check if entity is distinct
 				{
 					distinctEntity = false;
-					LOG_DEBUG( "entity" + to_string( indexEntity ) + " is not distinct to entity " + to_string( indexEntity2 ) + ", bruh moment" );
+					LOG_DEBUG( "Entity" + to_string( indexEntity ) + " is not distinct to entity " + to_string( indexEntity2 ) + ", bruh moment" );
 					break;//needs to be distinct from all entities
 				}
 			}
@@ -203,12 +203,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				fitness_curr = bestFitness;
 				std::cout << "New best entity params (f = " << bestFitness << ") = " << bestEntity << "\n";
 				if ( ( fitness_prev - fitness_curr ) / fitness_prev * 100 > 2 )
-				{
-					LOG_DEBUG( "Gen " + to_string( generation ) + " best entity: " + to_string( bestFitness ) );
-					LOG_DEBUG( "CBI = " + to_string( ( fitness_prev - fitness_curr ) / fitness_prev * 100 ) + "%, AHI = " + to_string( averageImprovement * 100 ) + "%" );
-					if ( ( fitness_prev - fitness_curr ) / fitness_prev * 100 > 25 )
-						LOG_SUCC( "Big improvement!\n" );
-				}
+					LOG_DEBUG( "Gen " + to_string( generation ) + " best entity: " + to_string( bestFitness ) + "CBI = " + to_string( ( fitness_prev - fitness_curr ) / fitness_prev * 100 ) + "%, AHI = " + to_string( averageImprovement * 100 ) + "%" );
 			}
 		}
 
