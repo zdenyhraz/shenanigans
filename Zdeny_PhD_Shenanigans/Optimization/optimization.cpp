@@ -203,7 +203,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				fitness_curr = bestFitness;
 				std::cout << "New best entity params (f = " << bestFitness << ") = " << bestEntity << "\n";
 				if ( ( fitness_prev - fitness_curr ) / fitness_prev * 100 > 2 )
-					LOG_DEBUG( "Gen " + to_string( generation ) + " best entity: " + to_string( bestFitness ) + "CBI = " + to_string( ( fitness_prev - fitness_curr ) / fitness_prev * 100 ) + "%, AHI = " + to_string( averageImprovement * 100 ) + "%" );
+					LOG_DEBUG( "Gen {} best entity: {}, CBI = {}%, AHI = {}%", generation, bestFitness, ( fitness_prev - fitness_curr ) / fitness_prev * 100, averageImprovement * 100 );
 			}
 		}
 
