@@ -102,7 +102,7 @@ inline auto zerovect4( int N, int M, int O, int P, T value = 0. )
 }
 
 template <typename T>
-inline ostream &operator<<( ostream &out, std::vector<T> &vec )
+inline std::ostream &operator<<( std::ostream &out, const std::vector<T> &vec )
 {
 	out << "[";
 	for ( int i = 0; i < vec.size(); i++ )
@@ -115,9 +115,8 @@ inline ostream &operator<<( ostream &out, std::vector<T> &vec )
 }
 
 template <typename T>
-inline ostream &operator<<( ostream &out, std::vector<std::vector<T>> &vec )
+inline std::ostream &operator<<( std::ostream &out, const std::vector<std::vector<T>> &vec )
 {
-	out << endl;
 	for ( int r = 0; r < vec.size(); r++ )
 	{
 		out << "[";
@@ -126,18 +125,15 @@ inline ostream &operator<<( ostream &out, std::vector<std::vector<T>> &vec )
 			out << vec[r][c];
 			if ( c < vec[r].size() - 1 ) out << ", ";
 		}
-		out << "]";
-		out << endl;
+		out << "]\n";
 	}
 	return out;
 }
 
-inline ostream &operator<<( ostream &out, std::vector<std::string> &vec )
+inline std::ostream &operator<<( std::ostream &out, const std::vector<std::string> &vec )
 {
 	for ( int i = 0; i < vec.size(); i++ )
-	{
-		out << vec[i] << endl;
-	}
+		out << vec[i] << "\n";
 	return out;
 }
 
