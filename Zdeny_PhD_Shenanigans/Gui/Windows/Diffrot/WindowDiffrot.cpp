@@ -168,7 +168,7 @@ void WindowDiffrot::optimizeDiffrot()
 
 	auto result = evo.optimize( f );
 
-	std::cout << "Evolution result = " << result << "\n";
+	LOG_SUCC( "Evolution result = {}", result );
 }
 
 void WindowDiffrot::updateDrset()
