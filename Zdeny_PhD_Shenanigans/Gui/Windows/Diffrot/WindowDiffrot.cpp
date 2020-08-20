@@ -162,13 +162,13 @@ void WindowDiffrot::optimizeDiffrot()
 
 	Evolution evo( 6 );
 	evo.NP = 50;
+	evo.mutStrat = Evolution::MutationStrategy::RAND1;
 	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 32};
 	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512};
-	evo.mutStrat = Evolution::MutationStrategy::RAND1;
 
 	auto result = evo.optimize( f );
 
-	std::cout << "Evolution result = " << result << std::endl;
+	std::cout << "Evolution result = " << result << "\n";
 }
 
 void WindowDiffrot::updateDrset()
