@@ -145,20 +145,26 @@ void WindowDiffrot::optimizeDiffrot()
 
 	auto f = [&]( const std::vector<double> &args )
 	{
-		IPCsettings ipcset_opt( 64, 64, args[0], args[1] );
+		IPCsettings ipcset_opt( args[5], args[5], args[0], args[1] );
+		ipcset_opt.L2size = args[2];
+		ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
+		ipcset_opt.applyWindow = args[4] > 0 ? true : false;
 		FitsTime time_opt = time;
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 10;
+		drset_opt.ys = 171;
 		drset_opt.pred = false;
+		drset_opt.speak = false;
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
 		return dr.GetError();
 	};
 
-	Evolution evo( 2 );
-	evo.NP = 10;
-	evo.lowerBounds = std::vector<double> {0, 0};
-	evo.upperBounds = std::vector<double> {20, 1000};
+	Evolution evo( 6 );
+	evo.NP = 50;
+	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 32};
+	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512};
 	evo.mutStrat = Evolution::MutationStrategy::RAND1;
+
 	auto result = evo.optimize( f );
 
 	std::cout << "Evolution result = " << result << std::endl;
