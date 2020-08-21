@@ -185,6 +185,31 @@ void Zdeny_PhD_Shenanigans::debug()
 		showimg( orig, "original", true );
 		showimg( pointiky, "trials" );
 	}
+	if ( 1 ) //blaze test
+	{
+		blaze::DynamicVector<double> a( 3 );//column vec - default
+		blaze::DynamicVector<double, blaze::rowVector> b( 3 );//row vec
+		blaze::StaticVector<double, 3> c( 1 );
+
+		a = { -1, 5, -5 };
+		b = { 1, 2, 3 };
+		c = { 5, 3, 1 };
+
+		LOG_DEBUG( "a = \n{}", a );
+		LOG_DEBUG( "b = \n{}", b );
+		LOG_DEBUG( "c = \n{}", c );
+		LOG_DEBUG( "a * b = \n{}", a * b );
+		LOG_DEBUG( "a * b' = \n{}", a * blaze::trans( b ) );
+
+		blaze::DynamicMatrix<double> A( 3, 4 );//row major - default
+		blaze::DynamicMatrix<double, blaze::columnMajor> B( 3, 4 );//column major
+		blaze::StaticMatrix<double, 3, 4> C( 1 );
+
+		LOG_DEBUG( "A = \n{}", A );
+		LOG_DEBUG( "B = \n{}", B );
+		LOG_DEBUG( "C = \n{}", C );
+		LOG_DEBUG( "A + C = \n{}", A + C );
+	}
 
 	LOG_INFO( "Debug finished." );
 }
