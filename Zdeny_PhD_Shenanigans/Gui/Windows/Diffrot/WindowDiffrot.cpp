@@ -153,7 +153,7 @@ void WindowDiffrot::optimizeDiffrot()
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 10;
 		drset_opt.ys = 171;
-		drset_opt.dPic = 1;
+		drset_opt.dPic = 5;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
