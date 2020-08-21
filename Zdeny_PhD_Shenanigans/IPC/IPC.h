@@ -225,10 +225,10 @@ inline Point2f ipccore( Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &s
 			L2size++; //odd!+
 		while ( !converged )
 		{
-			if ( ( ( L3peak.x - L2size / 2 ) < 0 ) || ( ( L3peak.y - L2size / 2 ) < 0 ) || ( ( L3peak.x + L2size / 2 ) > L3.cols ) || ( ( L3peak.y + L2size / 2 ) > L3.rows ) )
+			if ( ( ( L3peak.x - L2size / 2 ) < 0 ) || ( ( L3peak.y - L2size / 2 ) < 0 ) || ( ( L3peak.x + L2size / 2 ) >= L3.cols ) || ( ( L3peak.y + L2size / 2 ) >= L3.rows ) )
 			{
 				LOG_ERROR( "Degenerate peak (Imgsize=[{},{}],L3peak=[{},{}],L2size=[{},{}]) - results might be inaccurate, reducing L2size from {} to {} ", L3.cols, L3.rows, L3peak.x, L3peak.y, L2size, L2size, L2size, L2size - 2 );
-				L2size += -2;
+				L2size -= 2;
 				if ( L2size < 3 )
 				{
 					LOG_ERROR( "Completely degenerate peak, returning just with pixel accuracy" );

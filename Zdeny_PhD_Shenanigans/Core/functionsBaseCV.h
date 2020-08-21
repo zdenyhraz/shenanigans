@@ -11,7 +11,7 @@ using namespace cv;
 
 inline Mat roicrop( const Mat &sourceimgIn, int x, int y, int w, int h )
 {
-	Rect roi = Rect( x - std::floor( ( double )w / 2. ), y - std::floor( ( double )h / 2. ), w, h );
+	Rect roi = Rect( x - w / 2, y - h / 2, w, h );
 	Mat crop = sourceimgIn( roi );
 	return crop.clone();
 }
