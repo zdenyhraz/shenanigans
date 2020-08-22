@@ -85,7 +85,7 @@ void Zdeny_PhD_Shenanigans::debug()
 		warpAffine( img2, img2, T, cv::Size( img2.cols, img2.rows ) );
 
 		IPCsettings set = *globals->IPCset;
-		set.speak = true;
+		set.speak = IPCsettings::All;
 		set.setSize( img1.rows, img1.cols );
 
 		auto shifts = phasecorrel( img1, img2, set );
