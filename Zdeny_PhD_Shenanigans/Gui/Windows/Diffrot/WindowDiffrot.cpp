@@ -41,7 +41,7 @@ void WindowDiffrot::showIPC()
 	LOG_INFO( "Showimg diffrot profile IPC landscape..." );
 	FitsParams params1, params2;
 	IPCsettings set = *globals->IPCset;
-	set.speak = true;
+	set.speak = IPCsettings::All;
 	//set.save = true;
 	FitsTime time( ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt() );
 
@@ -149,11 +149,12 @@ void WindowDiffrot::optimizeDiffrot()
 		ipcset_opt.L2size = round ( args[2] );
 		ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
 		ipcset_opt.applyWindow = args[4] > 0 ? true : false;
+		ipcset_opt.speak = IPCsettings::None;
 		FitsTime time_opt = time;
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 50;
 		drset_opt.ys = 171;
-		drset_opt.dPic = 1;
+		drset_opt.dPic = 10;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
