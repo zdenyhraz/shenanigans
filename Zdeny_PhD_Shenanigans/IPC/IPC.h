@@ -27,7 +27,7 @@ public:
 		Errors,
 		All
 	};
-	double L2size = 17;
+	int L2size = 17;
 	double L1ratio = 0.35;
 	int UC = 31;
 	double epsilon = 0;
