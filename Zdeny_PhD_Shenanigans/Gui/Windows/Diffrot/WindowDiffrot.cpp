@@ -145,8 +145,8 @@ void WindowDiffrot::optimizeDiffrot()
 
 	auto f = [&]( const std::vector<double> &args )
 	{
-		IPCsettings ipcset_opt( round( args[5] ), round( args[5] ), args[0], args[1] );
-		ipcset_opt.L2size = round ( args[2] );
+		IPCsettings ipcset_opt( floor( args[5] ), floor( args[5] ), args[0], args[1] );
+		ipcset_opt.L2size = floor( args[2] );
 		ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
 		ipcset_opt.applyWindow = args[4] > 0 ? true : false;
 		ipcset_opt.speak = IPCsettings::None;
