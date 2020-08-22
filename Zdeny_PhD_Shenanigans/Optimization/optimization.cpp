@@ -199,8 +199,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				bestFitness = fitness[indexEntity];
 				fitness_prev = fitness_curr;
 				fitness_curr = bestFitness;
-				if ( ( fitness_prev - fitness_curr ) / fitness_prev * 100 > 2 )
-					LOG_DEBUG( "Gen {} best entity: {} ({}), CBI = {}%, AHI = {}%", generation, bestEntity, bestFitness, ( fitness_prev - fitness_curr ) / fitness_prev * 100, averageImprovement * 100 );
+				LOG_DEBUG( "Gen {} best entity: {} ({}), CBI = {}%, AHI = {}%", generation, bestEntity, bestFitness, ( fitness_prev - fitness_curr ) / fitness_prev * 100, averageImprovement * 100 );
 			}
 		}
 

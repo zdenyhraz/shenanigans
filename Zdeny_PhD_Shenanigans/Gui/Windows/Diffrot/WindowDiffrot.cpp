@@ -151,9 +151,9 @@ void WindowDiffrot::optimizeDiffrot()
 		ipcset_opt.applyWindow = args[4] > 0 ? true : false;
 		FitsTime time_opt = time;
 		DiffrotSettings drset_opt = drset;
-		drset_opt.pics = 10;
+		drset_opt.pics = 50;
 		drset_opt.ys = 171;
-		drset_opt.dPic = 5;
+		drset_opt.dPic = 1;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
@@ -161,7 +161,7 @@ void WindowDiffrot::optimizeDiffrot()
 	};
 
 	Evolution evo( 6 );
-	evo.NP = 50;
+	evo.NP = 100;
 	evo.mutStrat = Evolution::MutationStrategy::RAND1;
 	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 128};
 	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512};
