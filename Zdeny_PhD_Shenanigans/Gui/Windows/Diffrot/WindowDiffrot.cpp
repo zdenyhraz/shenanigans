@@ -145,8 +145,12 @@ void WindowDiffrot::optimizeDiffrot()
 
 	auto f = [&]( const std::vector<double> &args )
 	{
-		IPCsettings ipcset_opt( floor( args[5] ), floor( args[5] ), args[0], args[1] );
-		ipcset_opt.L2size = floor( args[2] );
+		int winsize = std::floor( args[5] );
+		int L2size = std::floor( args[2] );
+		winsize = winsize % 2 ? winsize + 1 : winsize;
+		L2size = L2size % 2 ? L2size : L2size + 1;
+		IPCsettings ipcset_opt( winsize, winsize, args[0], args[1] );
+		ipcset_opt.L2size = L2size;
 		ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
 		ipcset_opt.applyWindow = args[4] > 0 ? true : false;
 		ipcset_opt.speak = IPCsettings::None;
@@ -160,6 +164,8 @@ void WindowDiffrot::optimizeDiffrot()
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
 		return dr.GetError();
 	};
+
+	LOG_INFO( "Previous hardcoded result f = {}", f( { 19.2052, 168.783, 20.081, 0.755, -0.86, 239.321 } ) );
 
 	Evolution evo( 6 );
 	evo.NP = 50;
