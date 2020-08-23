@@ -67,8 +67,8 @@ public:
 		// used for optimizing - closest profile to literature profiles
 		double error = 0;
 		CalculatePredics();
-		auto x1 = polyfit( SourceThetasavg, SourceOmegasXavg, 2 );
-		auto x2 = PredicXs[0];
+		auto &x1 = SourceOmegasXavg;
+		auto &x2 = PredicXs[0];
 		int count = x1.size();
 		for ( int i = 0; i < count; i++ )
 		{
