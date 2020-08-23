@@ -158,14 +158,14 @@ void WindowDiffrot::optimizeDiffrot()
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 50;
 		drset_opt.ys = 171;
-		drset_opt.dPic = 10;
+		drset_opt.dPic = 1;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
 		auto dr = calculateDiffrotProfile( ipcset_opt, time_opt, drset_opt );
 		return dr.GetError();
 	};
 
-	LOG_INFO( "Previous hardcoded result f = {}", f( { 19.2052, 168.783, 20.081, 0.755, -0.86, 239.321 } ) );
+	//LOG_INFO( "Previous hardcoded result f = {}", f( { 19.2052, 168.783, 20.081, 0.755, -0.86, 239.321 } ) );
 
 	Evolution evo( 6 );
 	evo.NP = 50;
