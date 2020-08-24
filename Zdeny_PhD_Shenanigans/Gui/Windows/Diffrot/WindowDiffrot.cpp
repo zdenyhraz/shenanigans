@@ -157,7 +157,7 @@ void WindowDiffrot::optimizeDiffrot()
 		FitsTime time_opt = time;
 		DiffrotSettings drset_opt = drset;
 		drset_opt.pics = 50;
-		drset_opt.ys = 171;
+		drset_opt.ys = 201;
 		drset_opt.dPic = 1;
 		drset_opt.pred = false;
 		drset_opt.speak = false;
