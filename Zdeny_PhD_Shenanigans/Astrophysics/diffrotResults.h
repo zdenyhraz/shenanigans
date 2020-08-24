@@ -67,12 +67,13 @@ public:
 		// used for optimizing - closest profile to literature profiles
 		double error = 0;
 		CalculatePredics();
-		auto &x1 = SourceOmegasXavg;
-		auto &x2 = PredicXs[0];
+		auto &x = SourceOmegasXavg;
+		auto &x1 = PredicXs[0];
+		auto &x2 = PredicXs[1];
 		int count = x1.size();
 		for ( int i = 0; i < count; i++ )
 		{
-			error += std::pow( x1[i] - x2[i], 2 );
+			error += 0.5 * std::pow( x[i] - x1[i], 2 ) + 0.5 * std::pow( x[i] - x2[i], 2 );
 		}
 		return error / count;
 	}
