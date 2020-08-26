@@ -71,10 +71,10 @@ public:
 		auto &x1 = PredicXs[0];
 		auto &x2 = PredicXs[1];
 		int count = x1.size();
+
 		for ( int i = 0; i < count; i++ )
-		{
 			error += 0.5 * std::pow( x[i] - x1[i], 2 ) + 0.5 * std::pow( x[i] - x2[i], 2 );
-		}
+
 		return error / count;
 	}
 
@@ -262,8 +262,8 @@ private:
 
 	void CalculateErrors()
 	{
-		ShiftsXErrors = getStandardDeviationsVertical( SourceShiftsX );//getStandardErrorsOfTheMeanVertical( SourceShiftsX );//too small
-		ShiftsYErrors = getStandardDeviationsVertical( SourceShiftsY );//getStandardErrorsOfTheMeanVertical( SourceShiftsY );//too small
+		ShiftsXErrors = getStandardDeviationsVertical( SourceShiftsX );
+		ShiftsYErrors = getStandardDeviationsVertical( SourceShiftsY );
 		ShiftsXErrorsBot = SourceShiftsXavg - ShiftsXErrors;
 		ShiftsYErrorsBot = SourceShiftsYavg - ShiftsYErrors;
 		ShiftsXErrorsTop = SourceShiftsXavg + ShiftsXErrors;
