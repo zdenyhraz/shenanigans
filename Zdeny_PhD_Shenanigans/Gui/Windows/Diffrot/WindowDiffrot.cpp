@@ -165,11 +165,10 @@ void WindowDiffrot::optimizeDiffrot()
 		return dr.GetError();
 	};
 
-	//LOG_INFO( "Previous hardcoded result f = {}", f( { 19.2052, 168.783, 20.081, 0.755, -0.86, 239.321 } ) );
-
 	Evolution evo( 6 );
 	evo.NP = 50;
-	evo.mutStrat = Evolution::MutationStrategy::RAND1;
+	evo.mutStrat = Evolution::RAND1;
+	evo.historyImprovTresholdPercent = 1;
 	evo.lowerBounds = std::vector<double> {0.1, 1, 5, -1, -1, 128};
 	evo.upperBounds = std::vector<double> {20, 500, 21, 1, 1, 512};
 

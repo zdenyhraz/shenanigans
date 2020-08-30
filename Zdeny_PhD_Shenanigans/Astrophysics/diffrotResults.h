@@ -66,16 +66,15 @@ public:
 	{
 		// used for optimizing - closest profile to literature profiles
 		double error = 0;
+		size_t ycount = SourceOmegasXavg.size();
+		size_t pcount = PredicXs.size();
 		CalculatePredics();
-		auto &x = SourceOmegasXavg;
-		auto &x1 = PredicXs[0];
-		auto &x2 = PredicXs[1];
-		int count = x1.size();
 
-		for ( int i = 0; i < count; i++ )
-			error += 0.5 * std::pow( x[i] - x1[i], 2 ) + 0.5 * std::pow( x[i] - x2[i], 2 );
+		for ( size_t y = 0; y < ycount; ++y )
+			for ( size_t p = 0; p < pcount; ++p )
+				error += std::pow( SourceOmegasXavg[y] - PredicXs[p][y], 2 );
 
-		return error / count;
+		return error / ycount / pcount;
 	}
 
 	void SetData1D( const std::vector<double> &thetasavg, const std::vector<double> &omegasXavg, const std::vector<double> &omegasYavg, const std::vector<double> &shiftsXavg, const std::vector<double> &shiftsYavg )

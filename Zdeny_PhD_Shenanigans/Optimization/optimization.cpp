@@ -39,12 +39,13 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 		while ( !distinctEntity ) //loop until they are distinct enough
 		{
 			distinctEntity = true;//assume entity is distinct
-			distinctEntityTrials++;
+
 			for ( int indexParam = 0; indexParam < N; indexParam++ ) //generate initial entity
-			{
-				population[indexEntity][indexParam] = randInRange( lowerBounds[indexParam], upperBounds[indexParam] );
-			}
-			if ( distincEntityMaxTrials == 0 ) break;
+				population[indexEntity][indexParam] = randr( lowerBounds[indexParam], upperBounds[indexParam] );
+
+			if ( !distincEntityMaxTrials )
+				break;
+
 			for ( int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++ ) //check distance to all other entities
 			{
 				double avgDist = averageVectorDistance( population[indexEntity], population[indexEntity2], boundsRange ); //calculate how distinct the entity is to another entity
@@ -56,6 +57,9 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 					break;//needs to be distinct from all entities
 				}
 			}
+
+			distinctEntityTrials++;
+
 			if ( distinctEntityTrials >= distincEntityMaxTrials )
 			{
 				initialMinAvgDist *= 0.8;
@@ -108,11 +112,13 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 					numberOfParents = 4;
 					break;
 			}
+
 			vector<int> parentIndices( numberOfParents, 0 );
 			for ( auto &idx : parentIndices )
 			{
 				int idxTst;
-				do { idxTst = rand() % NP; }
+				do
+					idxTst = rand() % NP;
 				while ( !isDistinct( idxTst, parentIndices, indexEntity ) );
 				idx = idxTst;
 			}
@@ -126,16 +132,18 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 					int definite = rand() % N;//at least one param undergoes crossover
 					for ( int indexParam = 0; indexParam < N; indexParam++ )
 					{
-						double random = randInRange();
-						if ( random < CR || indexParam == definite ) paramIsCrossed[indexParam] = true;
+						double random = rand01();
+						if ( random < CR || indexParam == definite )
+							paramIsCrossed[indexParam] = true;
 					}
 					break;
 				}
 				case CrossoverStrategy::EXP:
 				{
 					int L = 0;
-					do { L++; }
-					while ( ( randInRange() < CR ) && ( L < N ) ); //at least one param undergoes crossover
+					do
+						L++;
+					while ( ( rand01() < CR ) && ( L < N ) ); //at least one param undergoes crossover
 					int indexParam = rand() % N;
 					for ( int i = 0; i < L; i++ )
 					{
@@ -187,7 +195,9 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				population[indexEntity] = newEntity;
 				fitness[indexEntity] = newFitness;
 			}
+
 		}//entity cycle end
+
 		funEvals += NP;
 
 		//determine the best entity
@@ -214,17 +224,22 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			{
 				histories[indexEntity].pop();//remove first element - keep que size constant
 				histories[indexEntity].push( fitness[indexEntity] ); //insert at the end
-				if ( stopCrit == StoppingCriterion::ALLIMP ) { if ( abs( histories[indexEntity].front() - histories[indexEntity].back() ) / abs( histories[indexEntity].front() ) > historyImprovTresholdPercent / 100 ) historyConstant = false; } //fitness improved less than x% for all entities
+				if ( stopCrit == StoppingCriterion::ALLIMP )//fitness improved less than x% for all entities
+					if ( abs( histories[indexEntity].front() - histories[indexEntity].back() ) / abs( histories[indexEntity].front() ) > historyImprovTresholdPercent / 100 )
+						historyConstant = false;
 			}
 			else
 			{
 				histories[indexEntity].push( fitness[indexEntity] ); //insert at the end
 				historyConstant = false;//too early to stop, go on
 			}
-			if ( histories[indexEntity].size() > 2 ) averageImprovement += abs( histories[indexEntity].front() ) == 0 ? 0 : abs( histories[indexEntity].front() - histories[indexEntity].back() ) / abs( histories[indexEntity].front() );
+			if ( histories[indexEntity].size() > 2 )
+				averageImprovement += abs( histories[indexEntity].front() ) == 0 ? 0 : abs( histories[indexEntity].front() - histories[indexEntity].back() ) / abs( histories[indexEntity].front() );
 		}
 		averageImprovement /= NP;
-		if ( stopCrit == StoppingCriterion::AVGIMP ) { if ( 100 * averageImprovement > historyImprovTresholdPercent ) historyConstant = false; } //average fitness improved less than x%
+		if ( stopCrit == StoppingCriterion::AVGIMP )//average fitness improved less than x%
+			if ( 100 * averageImprovement > historyImprovTresholdPercent )
+				historyConstant = false;
 
 		//termination criterions
 		if ( bestFitness < optimalFitness ) //fitness goal reached
@@ -256,7 +271,10 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			break;
 		}
 	}//generation cycle end
-	if ( logPoints ) visitedPoints.push_back( visitedPointsThisRun );
+
+	if ( logPoints )
+		visitedPoints.push_back( visitedPointsThisRun );
+
 	return bestEntity;
 }//optimize function end
 
@@ -274,19 +292,16 @@ std::vector<double> PatternSearch::optimize( std::function<double( const std::ve
 	//generate all starting points
 	vector<vector<double>> mainPointsInitial( multistartMaxCnt, zerovect( N, 0. ) );
 	for ( int run = 0; run < multistartMaxCnt; run++ )
-	{
 		for ( int indexParam = 0; indexParam < N; indexParam++ )
-		{
-			mainPointsInitial[run][indexParam] = randInRange( lowerBounds[indexParam], upperBounds[indexParam] ); //idk dude
-		}
-	}
+			mainPointsInitial[run][indexParam] = randr( lowerBounds[indexParam], upperBounds[indexParam] ); //idk dude
 
 	//multistart pattern search
 	volatile bool flag = false;
 	#pragma omp parallel for shared(flag)
 	for ( int run = 0; run < multistartMaxCnt; run++ )
 	{
-		if ( flag ) continue;
+		if ( flag )
+			continue;
 
 		vector<vector<double>> visitedPointsThisRun;
 		vector<vector<double>> visitedPointsMainThisRun;
@@ -299,13 +314,12 @@ std::vector<double> PatternSearch::optimize( std::function<double( const std::ve
 		vector<vector<vector<double>>> pattern;//N-2-N (N pairs of N-dimensional points)
 		vector<vector<double>> patternFitness( N, zerovect( 2, std::numeric_limits<double>::max() ) ); //N-2 (N pairs of fitness)
 		pattern.resize( N );
+
 		for ( int dim = 0; dim < N; dim++ )
 		{
 			pattern[dim].resize( 2 );
 			for ( int pm = 0; pm < 2; pm++ )
-			{
 				pattern[dim][pm].resize( N );
-			}
 		}
 
 		//main search cycle
@@ -325,7 +339,8 @@ std::vector<double> PatternSearch::optimize( std::function<double( const std::ve
 					patternFitness[dim][pm] = f( pattern[dim][pm] );
 					funEvalsThisRun++;
 
-					if ( logPoints ) visitedPointsThisRun.push_back( pattern[dim][pm] );
+					if ( logPoints )
+						visitedPointsThisRun.push_back( pattern[dim][pm] );
 
 					//select best pattern vertex and replace
 					if ( patternFitness[dim][pm] < mainPointFitness )
@@ -344,7 +359,10 @@ std::vector<double> PatternSearch::optimize( std::function<double( const std::ve
 								testPoint[dim] = clampSmooth( testPoint[dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim] );
 								testPointFitness = f( testPoint );
 								funEvalsThisRun++;
-								if ( logPoints ) visitedPointsThisRun.push_back( testPoint );
+
+								if ( logPoints )
+									visitedPointsThisRun.push_back( testPoint );
+
 								if ( testPointFitness < mainPointFitness )
 								{
 									mainPoint = testPoint;
@@ -410,13 +428,17 @@ std::vector<double> PatternSearch::optimize( std::function<double( const std::ve
 		{
 			multistartCnt++;
 			funEvals += funEvalsThisRun;
-			if ( logPoints ) visitedPoints.push_back( visitedPointsThisRun );
+			if ( logPoints )
+				visitedPoints.push_back( visitedPointsThisRun );
+
 			//LOG_DEBUG  "> run "  run  ": ";
 			if ( mainPointFitness < topPointFitness )
 			{
 				topPoint = mainPoint;
 				topPointFitness = mainPointFitness;
-				if ( topPointFitness < optimalFitness ) flag = true; //dont do other runs, fitness goal reached
+
+				if ( topPointFitness < optimalFitness )
+					flag = true; //dont do other runs, fitness goal reached
 			}
 			else
 			{

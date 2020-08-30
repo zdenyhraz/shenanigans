@@ -97,9 +97,9 @@ void Zdeny_PhD_Shenanigans::debug()
 		auto X = zerovect( N );
 		auto Y1s = zerovect2( 3, N, 0. );
 		auto Y2s = zerovect2( 2, N, 0. );
-		double s1 = randunit();
-		double s2 = randunit();
-		double s3 = randunit();
+		double s1 = rand01();
+		double s2 = rand01();
+		double s3 = rand01();
 
 		for ( int x = 0; x < N; x++ )
 		{
@@ -168,8 +168,8 @@ void Zdeny_PhD_Shenanigans::debug()
 
 		for ( int i = 0; i < trials; i++ )
 		{
-			xdata[i] = randunit();
-			ydata[i] = randunit();
+			xdata[i] = rand01();
+			ydata[i] = rand01();
 			pts[i] = Point2f( xdata[i], ydata[i] );
 			zdata[i] = sqr( xdata[i] - 0.75 ) + sqr( ydata[i] - 0.25 ) + 0.1 * sin( 0.1 * ( xdata[i] * 99 + ydata[i] * 99 ) + 1 );
 			drawPoint( pointiky, size2 * pts[i], Scalar( rand() % 256, rand() % 256, rand() % 256 ), 5, 3 );
