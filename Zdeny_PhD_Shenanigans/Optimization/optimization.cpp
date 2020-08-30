@@ -31,7 +31,8 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 
 	//initialize random starting population matrix within bounds
 	LOG_DEBUG( "Initializing population within bounds ... " );
-	double initialMinAvgDist = 0.5;
+	const double initialMinAvgDist = 0.5;
+	double minAvgDist = initialMinAvgDist;
 	for ( int indexEntity = 0; indexEntity < NP; indexEntity++ )
 	{
 		int distinctEntityTrials = 0;
@@ -49,11 +50,10 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			for ( int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++ ) //check distance to all other entities
 			{
 				double avgDist = averageVectorDistance( population[indexEntity], population[indexEntity2], boundsRange ); //calculate how distinct the entity is to another entity
-				LOG_DEBUG( "Entity" + to_string( indexEntity ) + " trial " + to_string( distinctEntityTrials ) + " avgDist to entity" + to_string( indexEntity2 ) + ": " + to_string( avgDist ) + ", minimum dist: " + to_string( initialMinAvgDist ) );
-				if ( avgDist < initialMinAvgDist ) //check if entity is distinct
+				if ( avgDist < minAvgDist ) //check if entity is distinct
 				{
 					distinctEntity = false;
-					LOG_DEBUG( "Entity" + to_string( indexEntity ) + " is not distinct to entity " + to_string( indexEntity2 ) + ", bruh moment" );
+					LOG_DEBUG( "Entity {}: Trial {}: Entity is not distinct to Entity {} ({} < {})", indexEntity, distinctEntityTrials, indexEntity2, avgDist, minAvgDist );
 					break;//needs to be distinct from all entities
 				}
 			}
@@ -62,10 +62,16 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 
 			if ( distinctEntityTrials >= distincEntityMaxTrials )
 			{
-				initialMinAvgDist *= 0.8;
+				minAvgDist *= 0.8;
+				LOG_ERROR( "Entity {}: Max trials ({}) reached, reducing min avg dist to {}", indexEntity, distinctEntityTrials, minAvgDist );
 				distinctEntityTrials = 0;
 			}
 		}
+
+		if ( distinctEntity )
+			LOG_SUCC( "Entity {}: Distinct from other entities with min distance {}", indexEntity, minAvgDist );
+		else
+			LOG_ERROR( "Entity {}: Not distinct from other entities with min distance {}", indexEntity, minAvgDist );
 	}
 	LOG_DEBUG( "Initial population created" );
 
