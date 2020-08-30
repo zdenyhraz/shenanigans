@@ -53,7 +53,7 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 				if ( avgDist < minAvgDist ) //check if entity is distinct
 				{
 					distinctEntity = false;
-					LOG_DEBUG( "Entity {}: Trial {}: Entity is not distinct to Entity {} ({} < {})", indexEntity, distinctEntityTrials, indexEntity2, avgDist, minAvgDist );
+					LOG_DEBUG( "Entity {}: Trial {}: Entity is not distinct to Entity {} ({:.3f} < {:.3f})", indexEntity, distinctEntityTrials, indexEntity2, avgDist, minAvgDist );
 					break;//needs to be distinct from all entities
 				}
 			}
@@ -63,11 +63,11 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			if ( distinctEntityTrials >= distincEntityMaxTrials )
 			{
 				minAvgDist *= 0.8;
-				LOG_ERROR( "Entity {}: Max trials ({}) reached, reducing min dist to {}", indexEntity, distinctEntityTrials, minAvgDist );
+				LOG_ERROR( "Entity {}: Max trials ({}) reached, reducing min dist to {:.3f}", indexEntity, distinctEntityTrials, minAvgDist );
 				distinctEntityTrials = 0;
 			}
 		}
-		LOG_SUCC( "Entity {}: Distinct from other entities with min distance {}", indexEntity, minAvgDist );
+		LOG_SUCC( "Entity {}: Distinct from other entities with min distance {:.3f}", indexEntity, minAvgDist );
 	}
 	LOG_DEBUG( "Initial population created" );
 
