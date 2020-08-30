@@ -52,11 +52,6 @@ struct Timerrr//benchmarking struct
 	}
 };
 
-inline double randunit()
-{
-	return ( double )rand() / RAND_MAX;
-}
-
 inline double rand01()
 {
 	return ( double )rand() / RAND_MAX;
@@ -65,6 +60,11 @@ inline double rand01()
 inline double rand11()
 {
 	return 2.0 * rand01() - 1.0;
+}
+
+inline double randr( double min_, double max_ )
+{
+	return min_ + rand01() * ( max_ - min_ );
 }
 
 inline double clamp( double x, double clampMin, double clampMax )
@@ -340,11 +340,6 @@ constexpr int factorial( int n )
 	return ( n == 1 || n == 0 ) ? 1 : factorial( n - 1 ) * n;
 }
 
-inline double randInRange( double min_ = 0, double max_ = 1 )
-{
-	return min_ + ( double )rand() / RAND_MAX * ( max_ - min_ );
-}
-
 inline void linreg( int n, const std::vector<double> &x, const std::vector<double> &y, double &k, double &q )
 {
 	double sumx = 0.;                        /* sum of x                      */
@@ -387,9 +382,8 @@ inline double averageVectorDistance( std::vector<double> &vec1, std::vector<doub
 {
 	double result = 0;
 	for ( int i = 0; i < vec1.size(); i++ )
-	{
 		result += abs( vec1[i] - vec2[i] ) / boundsRange[i]; //normalize -> 0 to 1
-	}
+
 	result /= vec1.size();//coordinate average
 	return result;
 }
