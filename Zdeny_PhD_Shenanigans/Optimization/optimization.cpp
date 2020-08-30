@@ -63,15 +63,11 @@ std::vector<double> Evolution::optimize( std::function<double( const std::vector
 			if ( distinctEntityTrials >= distincEntityMaxTrials )
 			{
 				minAvgDist *= 0.8;
-				LOG_ERROR( "Entity {}: Max trials ({}) reached, reducing min avg dist to {}", indexEntity, distinctEntityTrials, minAvgDist );
+				LOG_ERROR( "Entity {}: Max trials ({}) reached, reducing min dist to {}", indexEntity, distinctEntityTrials, minAvgDist );
 				distinctEntityTrials = 0;
 			}
 		}
-
-		if ( distinctEntity )
-			LOG_SUCC( "Entity {}: Distinct from other entities with min distance {}", indexEntity, minAvgDist );
-		else
-			LOG_ERROR( "Entity {}: Not distinct from other entities with min distance {}", indexEntity, minAvgDist );
+		LOG_SUCC( "Entity {}: Distinct from other entities with min distance {}", indexEntity, minAvgDist );
 	}
 	LOG_DEBUG( "Initial population created" );
 
