@@ -15,5 +15,6 @@ TabWidth: '2'
 UseTab: Never
 FixNamespaceComments: 'false'
 IndentPPDirectives: 'AfterHash'
+SortIncludes: 'false'
 
 ...

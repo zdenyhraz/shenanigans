@@ -1,7 +1,7 @@
 #pragma once
+#include "stdafx.h"
 #include "IPC/IPC.h"
 #include "diffrotResults.h"
-#include "stdafx.h"
 
 static constexpr int plusminusbufer = 4; // even!
 static constexpr int yshow = 1400;       // ipc show y index
