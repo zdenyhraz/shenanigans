@@ -9,9 +9,7 @@ static constexpr double E = 2.7182818284590452353602874;
 static constexpr double Rad = 360. / TwoPi;
 static constexpr double SecondsInDay = 24. * 60. * 60.;
 static constexpr double RadPerSecToDegPerDay = Rad * SecondsInDay;
-static constexpr double Max = std::numeric_limits<double>::max();
-static constexpr double Min = std::numeric_limits<double>::lowest();
-static constexpr double Eps = std::numeric_limits<double>::epsilon();
+static constexpr double Inf = std::numeric_limits<double>::max();
 
 static const std::vector<double> emptyvect = std::vector<double> {};
 static const std::vector<std::vector<double>> emptyvect2 = std::vector<std::vector<double>> {};

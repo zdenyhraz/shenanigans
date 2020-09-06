@@ -5,7 +5,7 @@
 inline int findNearestNeighborIndex( const std::vector<Point2f> &pts, Point2f pt )
 {
 	int idx = 0;
-	double mindist = Constants::Max;
+	double mindist = Constants::Inf;
 	double dist;
 	for ( int i = 0; i < pts.size(); i++ )
 	{
