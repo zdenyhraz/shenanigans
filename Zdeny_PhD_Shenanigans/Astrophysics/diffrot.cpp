@@ -49,9 +49,9 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
     {
       if (drset.video)
       {
-        Mat crop = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, 100, 100);
+        Mat crop = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, 64, 36);
         normalize(crop, crop, 0, 65535, NORM_MINMAX);
-        saveimg(drset.savepath + to_string(pic) + ".png", crop, true, cv::Size(500, 500));
+        saveimg(drset.savepath + to_string(pic) + ".png", crop, true, cv::Size(640, 360));
         continue;
       }
 
