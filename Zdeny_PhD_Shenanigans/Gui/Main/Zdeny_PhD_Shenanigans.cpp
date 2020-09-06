@@ -52,6 +52,7 @@ void Zdeny_PhD_Shenanigans::exit()
 
 void Zdeny_PhD_Shenanigans::debug()
 {
+	Timer timer( "Debug" );
 	LOG_INFO( "Debug started" );
 
 	if ( 0 ) //plot in optimization

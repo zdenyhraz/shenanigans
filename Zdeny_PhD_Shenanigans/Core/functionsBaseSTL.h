@@ -15,40 +15,28 @@
 
 using namespace std;
 
-const std::string delimiter = ",";
-
-struct Timerr//benchmarking struct
+class Timer//benchmarking struct
 {
-	std::chrono::time_point<std::chrono::high_resolution_clock> startTimepoint;
+	using clock = std::chrono::high_resolution_clock;
+	using timepoint = std::chrono::time_point<clock>;
+	using duration = std::chrono::milliseconds;
+
 	std::string name;
-	Timerr( std::string name ) : name( name )
+	timepoint stp;
+
+public:
+
+	Timer( const std::string &name ) :
+		name( name ),
+		stp( clock::now() )
 	{
-		startTimepoint = std::chrono::high_resolution_clock::now();
 	}
 
-	~Timerr()
+	~Timer()
 	{
-		std::chrono::time_point<std::chrono::high_resolution_clock> endTimepoint = std::chrono::high_resolution_clock::now();
-		auto start = std::chrono::time_point_cast<std::chrono::microseconds>( startTimepoint ).time_since_epoch().count();
-		auto end = std::chrono::time_point_cast<std::chrono::microseconds>( endTimepoint ).time_since_epoch().count();
-		cout << "<<" << name << ">> took " << double( end - start ) << " mics" << endl;
-	}
-};
-
-struct Timerrr//benchmarking struct
-{
-	double startTimepoint;
-	std::string name;
-	clock_t t;
-	Timerrr( std::string name ) : name( name )
-	{
-		t = clock();
-	}
-
-	~Timerrr()
-	{
-		t = clock() - t;
-		cout << "<<" << name << ">> took " << std::setprecision( 20 ) << t << " ms" << endl;
+		const auto start = std::chrono::time_point_cast<duration>( stp ).time_since_epoch().count();
+		const auto end = std::chrono::time_point_cast<duration>( clock::now() ).time_since_epoch().count();
+		LOG_INFO( "<< {} >> took {} ms", name, end - start );
 	}
 };
 
