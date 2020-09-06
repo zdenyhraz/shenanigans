@@ -205,7 +205,7 @@ void registrationDuelDebug( IPCsettings &IPC_settings1, IPCsettings &IPC_setting
 			//list results to .csv
 			#pragma omp critical
 			{
-				listing << shiftX << delimiter << shifts1.x << delimiter << shifts2.x << endl;
+				listing << shiftX << "," << shifts1.x << "," << shifts2.x << endl;
 				progress++;
 				cout << "> IPC benchmark progress " << progress << " / " << trialsPerStartPos *startFractionX.size() << endl;
 			}
