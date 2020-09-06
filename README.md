@@ -1,5 +1,5 @@
 # Zdeny_PhD_Shenanigans
-Zdenek Hrazdira, 2019 / 2020
+Zdenek Hrazdira, 2019 / 2020 / 2021
 
 Semi-random PhD funky stuff (mainly astrophysics - Solar Dynamics Observatory image processing, image registration, also non-convex optimization, fractals) w/ Qt GUI, #uses OpenCV, STL, fftw, QCustomPlot, spdlog, OpenMP, cuda.
 
