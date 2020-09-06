@@ -18,11 +18,16 @@ using namespace std;
 class Timer//benchmarking struct
 {
 	using clock = std::chrono::high_resolution_clock;
-	using timepoint = std::chrono::time_point<clock>;
-	using duration = std::chrono::milliseconds;
+	using tp = std::chrono::time_point<clock>;
+	using dur = std::chrono::milliseconds;
 
 	std::string name;
-	timepoint stp;
+	tp stp;
+
+	static constexpr auto tse( const tp &tmp )
+	{
+		return std::chrono::time_point_cast<dur>( tmp ).time_since_epoch().count();
+	}
 
 public:
 
@@ -34,9 +39,7 @@ public:
 
 	~Timer()
 	{
-		const auto start = std::chrono::time_point_cast<duration>( stp ).time_since_epoch().count();
-		const auto end = std::chrono::time_point_cast<duration>( clock::now() ).time_since_epoch().count();
-		LOG_INFO( "<< {} >> took {} ms", name, end - start );
+		LOG_INFO( "<< {} >> took {} ms", name, tse( clock::now() ) - tse( stp ) );
 	}
 };
 
