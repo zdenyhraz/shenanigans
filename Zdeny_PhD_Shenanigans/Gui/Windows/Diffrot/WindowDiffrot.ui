@@ -479,13 +479,13 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>173</y>
-      <width>141</width>
-      <height>145</height>
+      <x>11</x>
+      <y>175</y>
+      <width>131</width>
+      <height>166</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_7">
@@ -553,6 +553,13 @@
       <widget class="QPushButton" name="pushButton_8">
        <property name="text">
         <string>Optimize diffrot params</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QPushButton" name="pushButton_9">
+       <property name="text">
+        <string>Video</string>
        </property>
       </widget>
      </item>

@@ -47,6 +47,14 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
 
     if (pic1.params().succload && pic2.params().succload)
     {
+      if (drset.video)
+      {
+        Mat crop = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, 100, 100);
+        // normalize(crop, crop, 0, 65535, NORM_MINMAX);
+        saveimg(drset.savepath + to_string(pic) + ".png", crop, true, cv::Size(1000, 1000));
+        continue;
+      }
+
       double R = (pic1.params().R + pic2.params().R) / 2.;
       double theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2.;
 

@@ -6,24 +6,25 @@
 
 class WindowDiffrot : public QMainWindow
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	WindowDiffrot( QWidget *parent, Globals *globals );
+  WindowDiffrot(QWidget *parent, Globals *globals);
 
 private:
-	Ui::WindowDiffrot ui;
-	Globals *globals;
-	DiffrotResults drres;
-	DiffrotSettings drset;
+  Ui::WindowDiffrot ui;
+  Globals *globals;
+  DiffrotResults drres;
+  DiffrotSettings drset;
 
 private slots:
-	void calculateDiffrot();
-	void showResults();
-	void showIPC();
-	void checkDiskShifts();
-	void saveDiffrot();
-	void loadDiffrot();
-	void optimizeDiffrot();
-	void updateDrset();
+  void calculateDiffrot();
+  void showResults();
+  void showIPC();
+  void checkDiskShifts();
+  void saveDiffrot();
+  void loadDiffrot();
+  void optimizeDiffrot();
+  void updateDrset();
+  void video();
 };

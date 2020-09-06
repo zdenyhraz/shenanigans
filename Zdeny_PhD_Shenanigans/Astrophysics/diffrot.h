@@ -23,6 +23,7 @@ struct DiffrotSettings
   bool pred;
   bool speak = true;
   std::string savepath;
+  bool video = false;
 };
 
 DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time, const DiffrotSettings &drset);
