@@ -174,7 +174,7 @@ void calculateOmegas( const FitsImage &pic1, const FitsImage &pic2, std::vector<
 	for ( int y = 0; y < drset.ys; y++ )
 	{
 		thetas[y] = asin( ( dy * ( double )( drset.ys / 2 - y ) - drset.sy ) / R ) + theta0;
-		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Max );
+		shiftsX[y] = clamp( shiftsX[y], 0, Constants::Inf );
 		omegasX[y] = asin( shiftsX[y] / ( R * cos( thetas[y] ) ) ) / dt * Constants::RadPerSecToDegPerDay;
 		omegasY[y] = ( thetas[y] - asin( sin( thetas[y] ) - shiftsY[y] / R ) ) / dt * Constants::RadPerSecToDegPerDay;
 		predicXs[0][y] = predictDiffrotProfile( thetas[y], 14.296, -1.847, -2.615 ); //Derek A. Lamb (2017)
