@@ -134,10 +134,9 @@ void WindowDiffrot::loadDiffrot()
 void WindowDiffrot::optimizeDiffrot()
 {
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
-  updateDrset();
   FitsTime time = GetStartFitsTime();
 
-  if (0) // all variable
+  if (1) // all variables
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
