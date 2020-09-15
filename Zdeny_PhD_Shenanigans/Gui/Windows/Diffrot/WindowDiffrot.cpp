@@ -137,36 +137,67 @@ void WindowDiffrot::optimizeDiffrot()
   updateDrset();
   FitsTime time = GetStartFitsTime();
 
-  auto f = [&](const std::vector<double> &args) {
-    int winsize = std::floor(args[5]);
-    int L2size = std::floor(args[2]);
-    winsize = winsize % 2 ? winsize + 1 : winsize;
-    L2size = L2size % 2 ? L2size : L2size + 1;
-    IPCsettings ipcset_opt(winsize, winsize, args[0], args[1]);
-    ipcset_opt.L2size = L2size;
-    ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
-    ipcset_opt.applyWindow = args[4] > 0 ? true : false;
-    ipcset_opt.speak = IPCsettings::None;
-    FitsTime time_opt = time;
-    DiffrotSettings drset_opt = drset;
-    drset_opt.pics = 50;
-    drset_opt.ys = 201;
-    drset_opt.dPic = 1;
-    drset_opt.pred = false;
-    drset_opt.speak = false;
-    return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
-  };
+  if (0) // all variable
+  {
+    auto f = [&](const std::vector<double> &args) {
+      int winsize = std::floor(args[5]);
+      int L2size = std::floor(args[2]);
+      winsize = winsize % 2 ? winsize + 1 : winsize;
+      L2size = L2size % 2 ? L2size : L2size + 1;
+      IPCsettings ipcset_opt(winsize, winsize, args[0], args[1]);
+      ipcset_opt.L2size = L2size;
+      ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
+      ipcset_opt.applyWindow = args[4] > 0 ? true : false;
+      ipcset_opt.speak = IPCsettings::None;
+      FitsTime time_opt = time;
+      DiffrotSettings drset_opt = drset;
+      drset_opt.pics = 50;
+      drset_opt.ys = 201;
+      drset_opt.dPic = 1;
+      drset_opt.pred = false;
+      drset_opt.speak = false;
+      return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
+    };
 
-  Evolution evo(6);
-  evo.NP = 50;
-  evo.mutStrat = Evolution::RAND1;
-  evo.historyImprovTresholdPercent = 1;
-  evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 128};
-  evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512};
+    Evolution evo(6);
+    evo.NP = 50;
+    evo.mutStrat = Evolution::RAND1;
+    evo.historyImprovTresholdPercent = 1;
+    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 128};
+    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512};
+    auto result = evo.optimize(f);
+    LOG_SUCC("Evolution result = {}", result);
+  }
 
-  auto result = evo.optimize(f);
+  if (1) // fixed window size
+  {
+    auto f = [&](const std::vector<double> &args) {
+      int L2size = std::floor(args[2]);
+      L2size = L2size % 2 ? L2size : L2size + 1;
+      IPCsettings ipcset_opt(64, 64, args[0], args[1]);
+      ipcset_opt.L2size = L2size;
+      ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
+      ipcset_opt.applyWindow = args[4] > 0 ? true : false;
+      ipcset_opt.speak = IPCsettings::None;
+      FitsTime time_opt = time;
+      DiffrotSettings drset_opt = drset;
+      drset_opt.pics = 50;
+      drset_opt.ys = 201;
+      drset_opt.dPic = 1;
+      drset_opt.pred = false;
+      drset_opt.speak = false;
+      return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
+    };
 
-  LOG_SUCC("Evolution result = {}", result);
+    Evolution evo(5);
+    evo.NP = 50;
+    evo.mutStrat = Evolution::RAND1;
+    evo.historyImprovTresholdPercent = 1;
+    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1};
+    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1};
+    auto result = evo.optimize(f);
+    LOG_SUCC("Evolution result = {}", result);
+  }
 }
 
 void WindowDiffrot::updateDrset()
