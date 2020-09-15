@@ -154,8 +154,7 @@ void WindowDiffrot::optimizeDiffrot()
     drset_opt.dPic = 1;
     drset_opt.pred = false;
     drset_opt.speak = false;
-    auto dr = calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt);
-    return dr.GetError();
+    return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
   };
 
   Evolution evo(6);
@@ -201,8 +200,30 @@ void WindowDiffrot::video()
 void WindowDiffrot::movingPeak()
 {
   LOG_STARTEND("Creating moving diffrot peak images...", "Moving diffrot peak images created.");
+  IPCsettings ipcset = *globals->IPCset;
+  ipcset.save = true;
+  ipcset.savedir = ui.lineEdit_9->text().toStdString();
   FitsTime time = GetStartFitsTime();
+  FitsImage pic1, pic2;
+  int lag1, lag2;
 
+  for (int pic = 0; pic < drset.pics; ++pic)
+  {
+    time.advanceTime((bool)pic * (drset.sPic - drset.dPic) * drset.dSec);
+    loadFitsFuzzy(pic1, time, lag1);
+    time.advanceTime(drset.dPic * drset.dSec);
+    loadFitsFuzzy(pic2, time, lag2);
+
+    if (pic1.params().succload && pic2.params().succload)
+    {
+      Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, ipcset.getcols(), ipcset.getrows());
+      Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY, ipcset.getcols(), ipcset.getrows());
+      auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, true);
+    }
+    else
+      return;
+  }
+  destroyAllWindows();
   return;
 }
 
