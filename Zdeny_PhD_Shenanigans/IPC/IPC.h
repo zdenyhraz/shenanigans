@@ -46,7 +46,7 @@ public:
   bool save = false;
   string savedir = "";
   cv::Size savesize = cv::Size(500, 500);
-  mutable size_t savecntr = 0;
+  mutable int savecntr = -1;
 
   IPCsettings(int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
   {

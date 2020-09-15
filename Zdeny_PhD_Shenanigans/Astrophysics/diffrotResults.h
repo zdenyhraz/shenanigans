@@ -263,17 +263,44 @@ private:
     ShiftsYErrorsTop = SourceShiftsYavg + ShiftsYErrors;
   }
 
+  double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
+  {
+    int l, u;
+    double r;
+
+    for (int i = 0; i < xs.size() - 2; ++i)
+    {
+      if (xs[i] < x && xs[i + 1] > x)
+      {
+        l = i;
+        u = i + 1;
+        r = (x - xs[l]) / (xs[u] - xs[l]);
+        break;
+      }
+
+      if (xs[i] > x && xs[i + 1] < x)
+      {
+        u = i;
+        l = i + 1;
+        r = (x - xs[l]) / (xs[u] - xs[l]);
+        break;
+      }
+    }
+
+    return ys[l] + r * (ys[u] - ys[l]);
+  }
+
   void CalculateNS()
   {
     PredicXsNS.resize(predicCnt);
 
     int zeroidx = 0;
-    for (int i = 0; i < SourceThetasavg.size() - 1; i++)
+    for (int i = 0; i < SourceThetasavg.size() - 2; ++i)
     {
       if ((SourceThetasavg[i] > 0 && SourceThetasavg[i + 1] < 0) || SourceThetasavg[i] == 0)
       {
-        zeroidx = i + 1;
-        LOG_DEBUG("Diffrot NS zeroidx = {} / {}", zeroidx, SourceThetasavg.size());
+        zeroidx = i;
+        LOG_DEBUG("Diffrot NS zeroidx = {}, ({} => {})", zeroidx, SourceThetasavg[i], SourceThetasavg[i + 1]);
         break;
       }
     }
@@ -285,11 +312,26 @@ private:
     OmegasXavgN = std::vector<double>(SourceOmegasXavg.begin(), SourceOmegasXavg.begin() + zeroidx + 1);
     OmegasYavgN = std::vector<double>(SourceOmegasYavg.begin(), SourceOmegasYavg.begin() + zeroidx + 1);
 
+    LOG_DEBUG("<NS> Last North theta = {}", ThetasNS.back());
+
     // south hemisphere
-    OmegasXavgS = std::vector<double>(SourceOmegasXavg.begin() + zeroidx, SourceOmegasXavg.begin() + 2 * zeroidx + 1);
-    OmegasYavgS = std::vector<double>(SourceOmegasYavg.begin() + zeroidx, SourceOmegasYavg.begin() + 2 * zeroidx + 1);
-    std::reverse(OmegasXavgS.begin(), OmegasXavgS.end());
-    std::reverse(OmegasYavgS.begin(), OmegasYavgS.end());
+    OmegasXavgS.resize(OmegasXavgN.size());
+    OmegasYavgS.resize(OmegasXavgS.size());
+
+    for (int i = 0; i < OmegasXavgN.size(); i++)
+    {
+      OmegasXavgS[i] = Interpolate(SourceThetasavg, SourceOmegasXavg, -ThetasNS[i]);
+      OmegasYavgS[i] = Interpolate(SourceThetasavg, SourceOmegasYavg, -ThetasNS[i]);
+    }
+
+    if (OmegasXavgN.size() != OmegasXavgS.size() || OmegasYavgN.size() != OmegasYavgS.size())
+    {
+      LOG_ERROR("<NS> NS sizes mismatch: {} != {} & {} != {}", OmegasXavgN.size(), OmegasXavgS.size(), OmegasYavgN.size(), OmegasYavgS.size());
+      throw;
+    }
+
+    LOG_DEBUG("<NS> NS equator values X: {} = {}", OmegasXavgN.back(), OmegasXavgS.back());
+    LOG_DEBUG("<NS> NS equator values Y: {} = {}", OmegasYavgN.back(), OmegasYavgS.back());
   }
 
   void CalculateFitCoeffs()
