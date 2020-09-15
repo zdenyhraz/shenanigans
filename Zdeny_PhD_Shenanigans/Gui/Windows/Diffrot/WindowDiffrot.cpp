@@ -203,28 +203,45 @@ void WindowDiffrot::movingPeak()
   IPCsettings ipcset = *globals->IPCset;
   ipcset.save = true;
   ipcset.savedir = ui.lineEdit_9->text().toStdString();
-  FitsTime time = GetStartFitsTime();
   FitsImage pic1, pic2;
   int lag1, lag2;
+  bool saveimgs = false;
 
-  for (int pic = 0; pic < drset.pics; ++pic)
+  std::vector<double> dts;
+  std::vector<std::vector<double>> shiftsX;
+
+  const int profiles = 1;
+
+  for (int profile = 0; profile < profiles; ++profile)
   {
-    time.advanceTime((bool)pic * (drset.sPic - drset.dPic) * drset.dSec);
-    loadFitsFuzzy(pic1, time, lag1);
-    time.advanceTime(drset.dPic * drset.dSec);
-    loadFitsFuzzy(pic2, time, lag2);
-
-    if (pic1.params().succload && pic2.params().succload)
+    int sy = 0;
+    LOG_DEBUG("profile {} ...", profile);
+    shiftsX.push_back({});
+    for (int dpic = 0; dpic < drset.pics; ++dpic)
     {
-      Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, ipcset.getcols(), ipcset.getrows());
-      Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY, ipcset.getcols(), ipcset.getrows());
-      auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, true);
+      FitsTime time = GetStartFitsTime();
+      loadFitsFuzzy(pic1, time, lag1);
+      time.advanceTime(dpic * drset.dSec);
+      loadFitsFuzzy(pic2, time, lag2);
+
+      if (pic1.params().succload && pic2.params().succload)
+      {
+        Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());
+        Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());
+        auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, saveimgs);
+
+        if (!profile)
+          dts.push_back((double)dpic * drset.dSec / 60);
+
+        shiftsX[profile].push_back(shift.x);
+      }
     }
-    else
-      return;
+    profile++;
   }
+
   destroyAllWindows();
-  return;
+
+  Plot1D::plot(dts, shiftsX, "shiftsX", "time step [min]", "west-east image shift [px]", {}, Plot::defaultpens, ipcset.savedir + "plot.png");
 }
 
 FitsTime WindowDiffrot::GetStartFitsTime()
