@@ -482,10 +482,10 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>175</y>
+      <x>13</x>
+      <y>177</y>
       <width>131</width>
-      <height>166</height>
+      <height>187</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_7">
@@ -560,6 +560,13 @@
       <widget class="QPushButton" name="pushButton_9">
        <property name="text">
         <string>Video</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QPushButton" name="pushButton_10">
+       <property name="text">
+        <string>Moving peak</string>
        </property>
       </widget>
      </item>

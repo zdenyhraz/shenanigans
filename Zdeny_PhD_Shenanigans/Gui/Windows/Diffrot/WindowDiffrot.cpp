@@ -15,13 +15,13 @@ WindowDiffrot::WindowDiffrot(QWidget *parent, Globals *globals) : QMainWindow(pa
   connect(ui.pushButton_7, SIGNAL(clicked()), this, SLOT(loadDiffrot()));
   connect(ui.pushButton_8, SIGNAL(clicked()), this, SLOT(optimizeDiffrot()));
   connect(ui.pushButton_9, SIGNAL(clicked()), this, SLOT(video()));
+  connect(ui.pushButton_10, SIGNAL(clicked()), this, SLOT(movingPeak()));
 }
 
 void WindowDiffrot::calculateDiffrot()
 {
   LOG_STARTEND("Calculating diffrot profile...", "Differential rotation profile calculated.");
-  FitsTime time(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-  updateDrset();
+  FitsTime time = GetStartFitsTime();
   drres = calculateDiffrotProfile(*globals->IPCset, time, drset);
   showResults();
 }
@@ -39,7 +39,7 @@ void WindowDiffrot::showIPC()
   IPCsettings set = *globals->IPCset;
   set.speak = IPCsettings::All;
   // set.save = true;
-  FitsTime time(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+  FitsTime time = GetStartFitsTime();
 
   LOG_INFO("Loading file '" + time.path() + "'...");
   Mat pic1 = roicrop(loadfits(time.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
@@ -61,7 +61,7 @@ void WindowDiffrot::showIPC()
 void WindowDiffrot::checkDiskShifts()
 {
   LOG_INFO("Checking diffrot disk shifts...");
-  FitsTime time(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+  FitsTime time = GetStartFitsTime();
   IPCsettings set = *globals->IPCset;
 
   int edgeN = 0.025 * 4096;
@@ -135,7 +135,7 @@ void WindowDiffrot::optimizeDiffrot()
 {
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   updateDrset();
-  FitsTime time(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+  FitsTime time = GetStartFitsTime();
 
   auto f = [&](const std::vector<double> &args) {
     int winsize = std::floor(args[5]);
@@ -191,10 +191,23 @@ void WindowDiffrot::updateDrset()
 void WindowDiffrot::video()
 {
   LOG_STARTEND("Creating diffrot video...", "Diffrot video created.");
-  FitsTime time(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
-  updateDrset();
+  FitsTime time = GetStartFitsTime();
 
   drset.video = true;
   calculateDiffrotProfile(*globals->IPCset, time, drset);
   drset.video = false;
+}
+
+void WindowDiffrot::movingPeak()
+{
+  LOG_STARTEND("Creating moving diffrot peak images...", "Moving diffrot peak images created.");
+  FitsTime time = GetStartFitsTime();
+
+  return;
+}
+
+FitsTime WindowDiffrot::GetStartFitsTime()
+{
+  updateDrset();
+  return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 }
