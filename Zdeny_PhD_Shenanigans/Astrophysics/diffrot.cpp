@@ -205,7 +205,6 @@ void loadFitsFuzzy(FitsImage &pic, FitsTime &time, int &lag)
     for (int pm = 1; pm < plusminusbufer; pm++)
     {
       int shift = 0;
-      ;
 
       if (!(pm % 2))
       {
