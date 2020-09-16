@@ -155,6 +155,9 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
 
+    // best: [0.309235, 20.0541, 11, +, -, 302] (0.018705611)
+    // good: [0.187601, 162.875, 11, +, -, 302] (0.018751598)
+
     Evolution evo(7);
     evo.NP = 50;
     evo.mutStrat = Evolution::RAND1;
@@ -232,9 +235,9 @@ void WindowDiffrot::movingPeak()
   FitsImage pic1, pic2;
   int lag1, lag2;
 
-  const int profiles = 9;
+  const int profiles = 1;
   const int sy = 0;
-  const bool saveimgs = false;
+  const bool saveimgs = true;
 
   std::vector<double> dts;
   std::vector<std::vector<double>> shiftsX(profiles);

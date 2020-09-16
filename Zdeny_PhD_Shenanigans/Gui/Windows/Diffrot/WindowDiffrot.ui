@@ -50,7 +50,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="text">
-          <string>171</string>
+          <string>851</string>
          </property>
         </widget>
        </item>
@@ -142,7 +142,7 @@
        <item row="2" column="1">
         <widget class="QLineEdit" name="lineEdit_7">
          <property name="text">
-          <string>50</string>
+          <string>2500</string>
          </property>
         </widget>
        </item>

@@ -189,7 +189,7 @@ inline Point2f ipccore(Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &se
   }
 
   L3 = quadrantswap(L3);
-  normalize(L3, L3, 0, 1, NORM_MINMAX);
+  // normalize(L3, L3, 0, 1, NORM_MINMAX); //not needed, can see the quality by value at peak
 
   if (set.minimalShift)
     L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
@@ -215,6 +215,7 @@ inline Point2f ipccore(Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &se
       auto L3vzs = applyQuantileColorMap(L3vz);
       // ipcsaveimg("ipc_L3.png", L3vs, set);
       ipcsaveimg("ipc_L3_interp_zoom.png", L3vzs, set);
+      Plot2D::plot(L3vz, std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png", "x [px]", "y [px]", "phase correlation", -L3.cols / 7 / 2, +L3.cols / 7 / 2, -L3.rows / 7 / 2, +L3.rows / 7 / 2, 0, set.savedir + std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png");
     }
   }
   if (set.speak > IPCsettings::Errors)
