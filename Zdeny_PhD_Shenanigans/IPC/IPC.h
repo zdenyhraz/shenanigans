@@ -48,6 +48,8 @@ public:
   cv::Size savesize = cv::Size(500, 500);
   mutable int savecntr = -1;
 
+  cv::Point2f Calculate(const Mat &img1, const Mat &img2) { return cv::Point2f(); }
+
   IPCsettings(int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
   {
     bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
