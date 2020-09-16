@@ -136,7 +136,7 @@ void WindowDiffrot::optimizeDiffrot()
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   FitsTime starttime = GetStartFitsTime();
 
-  if (0) // all variables (except dpic)
+  if (0) // all variables
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -150,21 +150,22 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.speak = IPCsettings::None;
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
+      drset_opt.dPic = std::floor(args[6]);
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
 
-    Evolution evo(6);
+    Evolution evo(7);
     evo.NP = 50;
     evo.mutStrat = Evolution::RAND1;
     evo.historyImprovTresholdPercent = 1;
-    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 128};
-    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512};
+    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 128, 1};
+    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512, 5};
     auto result = evo.optimize(f);
     LOG_SUCC("Evolution result = {}", result);
   }
 
-  if (1) // fixed window size
+  if (1) // fixed window size, fixed dpic (fixed from GUI)
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = globals->IPCset->getrows();
