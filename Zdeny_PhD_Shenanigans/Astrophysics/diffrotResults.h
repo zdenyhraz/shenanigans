@@ -66,9 +66,10 @@ public:
     double error = 0;
     size_t ycount = SourceOmegasXavg.size();
     size_t pcount = PredicXs.size();
+    size_t y, p;
 
-    for (size_t y = 0; y < ycount; ++y)
-      for (size_t p = 0; p < pcount; ++p)
+    for (y = 0; y < ycount; ++y)
+      for (p = 0; p < pcount; ++p)
         error += std::pow(SourceOmegasXavg[y] - PredicXs[p][y], 2);
 
     return error / ycount / pcount;

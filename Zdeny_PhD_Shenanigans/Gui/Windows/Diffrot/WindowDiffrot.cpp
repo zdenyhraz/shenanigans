@@ -136,7 +136,7 @@ void WindowDiffrot::optimizeDiffrot()
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   FitsTime starttime = GetStartFitsTime();
 
-  if (1) // all variables
+  if (0) // all variables (except dpic)
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -150,10 +150,6 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.speak = IPCsettings::None;
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
-      drset_opt.pics = 50;
-      drset_opt.ys = 201;
-      drset_opt.dPic = 1;
-      drset_opt.pred = false;
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
@@ -168,10 +164,10 @@ void WindowDiffrot::optimizeDiffrot()
     LOG_SUCC("Evolution result = {}", result);
   }
 
-  if (0) // fixed window size
+  if (1) // fixed window size
   {
     auto f = [&](const std::vector<double> &args) {
-      int winsize = 64;
+      int winsize = globals->IPCset->getrows();
       int L2size = std::floor(args[2]);
       winsize = winsize % 2 ? winsize + 1 : winsize;
       L2size = L2size % 2 ? L2size : L2size + 1;
@@ -182,10 +178,6 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.speak = IPCsettings::None;
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
-      drset_opt.pics = 50;
-      drset_opt.ys = 201;
-      drset_opt.dPic = 1;
-      drset_opt.pred = false;
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
