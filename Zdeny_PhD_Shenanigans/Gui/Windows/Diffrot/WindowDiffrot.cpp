@@ -232,26 +232,32 @@ void WindowDiffrot::video()
 void WindowDiffrot::movingPeak()
 {
   LOG_STARTEND("Creating moving diffrot peak images...", "Moving diffrot peak images created.");
+  FitsTime starttime = GetStartFitsTime();
   IPCsettings ipcset = *globals->IPCset;
   ipcset.save = true;
   ipcset.savedir = ui.lineEdit_9->text().toStdString();
   FitsImage pic1, pic2;
   int lag1, lag2;
-  bool saveimgs = false;
+
+  const int profiles = 9;
+  const double syR = 400;
+  const double dsy = 2. * syR / (profiles - 1);
+  const bool saveimgs = false;
 
   std::vector<double> dts;
-  std::vector<std::vector<double>> shiftsX;
-
-  const int profiles = 1;
+  std::vector<std::vector<double>> shiftsX(profiles);
 
   for (int profile = 0; profile < profiles; ++profile)
   {
-    int sy = 0;
-    LOG_DEBUG("profile {} ...", profile);
-    shiftsX.push_back({});
+    // const int sy = -syR + profile * dsy;
+    const int sy = 0;
+
+    LOG_DEBUG("profile {}/{}, sy = {} ...", profile + 1, profiles, sy);
+
     for (int dpic = 0; dpic < drset.pics; ++dpic)
     {
-      FitsTime time = GetStartFitsTime();
+      FitsTime time = starttime;
+      time.advanceTime(profile * drset.dSec);
       loadFitsFuzzy(pic1, time, lag1);
       time.advanceTime(dpic * drset.dSec);
       loadFitsFuzzy(pic2, time, lag2);
@@ -268,7 +274,6 @@ void WindowDiffrot::movingPeak()
         shiftsX[profile].push_back(shift.x);
       }
     }
-    profile++;
   }
 
   destroyAllWindows();
