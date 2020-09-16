@@ -136,7 +136,7 @@ void WindowDiffrot::optimizeDiffrot()
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   FitsTime time = GetStartFitsTime();
 
-  if (1) // all variables
+  if (0) // all variables
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -171,9 +171,11 @@ void WindowDiffrot::optimizeDiffrot()
   if (1) // fixed window size
   {
     auto f = [&](const std::vector<double> &args) {
+      int winsize = 64;
       int L2size = std::floor(args[2]);
+      winsize = winsize % 2 ? winsize + 1 : winsize;
       L2size = L2size % 2 ? L2size : L2size + 1;
-      IPCsettings ipcset_opt(64, 64, args[0], args[1]);
+      IPCsettings ipcset_opt(winsize, winsize, args[0], args[1]);
       ipcset_opt.L2size = L2size;
       ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
       ipcset_opt.applyWindow = args[4] > 0 ? true : false;
