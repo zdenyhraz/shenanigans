@@ -9,17 +9,27 @@
 
 std::vector<double> Evolution::optimize(std::function<double(const std::vector<double> &)> f)
 {
-  LOG_DEBUG("Optimization started (evolution)");
+  LOG_STARTEND("Evolution optimization started", "Evolution optimization ended");
   Plot1D::Reset("evolution");
+  funEvals = 0;
+  success = false;
 
+  LOG_INFO("Checking objective function normality...");
+  if (!isfinite(f(0.5 * (lowerBounds + upperBounds))))
+  {
+    LOG_ERROR("Objective function is not normal!");
+    return {};
+  }
+  else
+  {
+    LOG_SUCC("Objective function is normal");
+  }
+
+  // establish population matrix, fitness vector and other internals
   vector<double> boundsRange = upperBounds - lowerBounds;
   vector<vector<double>> visitedPointsMainThisRun;
   vector<vector<double>> visitedPointsThisRun;
   double averageImprovement = 0;
-  funEvals = 0;
-  success = false;
-
-  // establish population matrix, fitness vector and other intrinsics
   vector<vector<double>> population(NP, zerovect(N, 0.));
   vector<queue<double>> histories(NP);
   bool historyConstant = false;
@@ -30,7 +40,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   double fitness_curr = Constants::Inf;
 
   // initialize random starting population matrix within bounds
-  LOG_DEBUG("Initializing population within bounds ... ");
+  LOG_INFO("Initializing population within bounds ... ");
   const double initialMinAvgDist = 0.5;
   double minAvgDist = initialMinAvgDist;
   for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -53,7 +63,6 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         if (avgDist < minAvgDist)                                                                               // check if entity is distinct
         {
           distinctEntity = false;
-          LOG_DEBUG("Entity {}: Trial {}: Entity is not distinct to Entity {} ({:.3f} < {:.3f})", indexEntity, distinctEntityTrials, indexEntity2, avgDist, minAvgDist);
           break; // needs to be distinct from all entities
         }
       }
@@ -63,15 +72,14 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
       if (distinctEntityTrials >= distincEntityMaxTrials)
       {
         minAvgDist *= 0.8;
-        LOG_ERROR("Entity {}: Max trials ({}) reached, reducing min dist to {:.3f}", indexEntity, distinctEntityTrials, minAvgDist);
         distinctEntityTrials = 0;
       }
     }
-    LOG_SUCC("Entity {}: Distinct from other entities with min distance {:.3f}", indexEntity, minAvgDist);
   }
-  LOG_DEBUG("Initial population created");
+  LOG_SUCC("Initial population created");
 
-// calculate initial fitness vector
+  // calculate initial fitness vector
+  LOG_INFO("Evaluating initial population...");
 #pragma omp parallel for
   for (int indexEntity = 0; indexEntity < NP; indexEntity++)
   {
@@ -86,6 +94,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   LOG_SUCC("Initial population evaluated");
 
   // run main evolution cycle
+  LOG_INFO("Running evolution...");
   for (int generation = 1; generation < 1e8; generation++)
   {
 #pragma omp parallel for
@@ -211,7 +220,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         bestFitness = fitness[indexEntity];
         fitness_prev = fitness_curr;
         fitness_curr = bestFitness;
-        LOG_DEBUG("Gen {} best entity: {} ({}), CBI = {}%, AHI = {}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
+        LOG_SUCC("Gen {} best entity: {} ({:.2f}), CBI = {:.2f}%, AHI = {:.2f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
       }
     }
 

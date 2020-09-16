@@ -134,9 +134,9 @@ void WindowDiffrot::loadDiffrot()
 void WindowDiffrot::optimizeDiffrot()
 {
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
-  FitsTime time = GetStartFitsTime();
+  FitsTime starttime = GetStartFitsTime();
 
-  if (0) // all variables
+  if (1) // all variables
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -148,7 +148,7 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
       ipcset_opt.applyWindow = args[4] > 0 ? true : false;
       ipcset_opt.speak = IPCsettings::None;
-      FitsTime time_opt = time;
+      FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
       drset_opt.pics = 50;
       drset_opt.ys = 201;
@@ -168,7 +168,7 @@ void WindowDiffrot::optimizeDiffrot()
     LOG_SUCC("Evolution result = {}", result);
   }
 
-  if (1) // fixed window size
+  if (0) // fixed window size
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = 64;
@@ -180,7 +180,7 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
       ipcset_opt.applyWindow = args[4] > 0 ? true : false;
       ipcset_opt.speak = IPCsettings::None;
-      FitsTime time_opt = time;
+      FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
       drset_opt.pics = 50;
       drset_opt.ys = 201;
@@ -240,8 +240,7 @@ void WindowDiffrot::movingPeak()
   int lag1, lag2;
 
   const int profiles = 9;
-  const double syR = 400;
-  const double dsy = 2. * syR / (profiles - 1);
+  const int sy = 0;
   const bool saveimgs = false;
 
   std::vector<double> dts;
@@ -249,10 +248,7 @@ void WindowDiffrot::movingPeak()
 
   for (int profile = 0; profile < profiles; ++profile)
   {
-    // const int sy = -syR + profile * dsy;
-    const int sy = 0;
-
-    LOG_DEBUG("profile {}/{}, sy = {} ...", profile + 1, profiles, sy);
+    LOG_DEBUG("profile {}/{} ...", profile + 1, profiles);
 
     for (int dpic = 0; dpic < drset.pics; ++dpic)
     {

@@ -95,7 +95,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
         }
         else
         {
-          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {}, skipping", diffX);
+          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, skipping", diffX);
         }
 
         // filter outlier Y data
@@ -106,13 +106,13 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
         }
         else
         {
-          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff Y = {}, skipping", diffY);
+          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff Y = {:.2f}, skipping", diffY);
         }
 
         // log progress
         if (abs(diffX) < diffThreshX && abs(diffY) < diffThreshY)
         {
-          LOG_SUCC_IF(drset.speak, "{} / {} ... diff X/Y = {}/{}, adding", pic + 1, drset.pics, diffX, diffY);
+          LOG_SUCC_IF(drset.speak, "{} / {} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
         }
       }
 

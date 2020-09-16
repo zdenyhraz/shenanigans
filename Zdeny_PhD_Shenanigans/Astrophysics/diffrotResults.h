@@ -62,10 +62,10 @@ public:
   double GetError()
   {
     // used for optimizing - closest profile to literature profiles
+    CalculatePredics();
     double error = 0;
     size_t ycount = SourceOmegasXavg.size();
     size_t pcount = PredicXs.size();
-    CalculatePredics();
 
     for (size_t y = 0; y < ycount; ++y)
       for (size_t p = 0; p < pcount; ++p)
