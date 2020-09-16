@@ -71,17 +71,17 @@ public:
     window = edgemask(rows, cols);
   }
 
-  const int &getrows() const { return rows; }
+  const int getrows() const { return rows; }
 
-  const int &getcols() const { return cols; }
+  const int getcols() const { return cols; }
 
-  const double &getL() const { return stdevLmultiplier; }
+  const double getL() const { return stdevLmultiplier; }
 
-  const double &getH() const { return stdevHmultiplier; }
+  const double getH() const { return stdevHmultiplier; }
 
-  const Mat &getWindow() const { return window; }
+  const Mat getWindow() const { return window; }
 
-  const Mat &getBandpass() const { return bandpass; }
+  const Mat getBandpass() const { return bandpass; }
 };
 
 inline void ipcsaveimg(const char *filename, const Mat &img, const IPCsettings &set) { saveimg(set.savedir + to_string(set.savecntr) + "_" + filename, img, false, set.savesize, true, 0, 1); }
