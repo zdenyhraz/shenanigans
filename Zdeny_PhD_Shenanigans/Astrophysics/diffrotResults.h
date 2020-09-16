@@ -301,7 +301,7 @@ private:
       if ((SourceThetasavg[i] > 0 && SourceThetasavg[i + 1] < 0) || SourceThetasavg[i] == 0)
       {
         zeroidx = i;
-        LOG_DEBUG("Diffrot NS zeroidx = {}, ({} => {})", zeroidx, SourceThetasavg[i], SourceThetasavg[i + 1]);
+        LOG_DEBUG("Diffrot NS zeroidx = {}, ({:.2f} => {:.2f})", zeroidx, SourceThetasavg[i], SourceThetasavg[i + 1]);
         break;
       }
     }
@@ -313,7 +313,7 @@ private:
     OmegasXavgN = std::vector<double>(SourceOmegasXavg.begin(), SourceOmegasXavg.begin() + zeroidx + 1);
     OmegasYavgN = std::vector<double>(SourceOmegasYavg.begin(), SourceOmegasYavg.begin() + zeroidx + 1);
 
-    LOG_DEBUG("<NS> Last North theta = {}", ThetasNS.back());
+    LOG_DEBUG("<NS> Last North theta = {:.2f}", ThetasNS.back());
 
     // south hemisphere
     OmegasXavgS.resize(OmegasXavgN.size());
@@ -331,8 +331,8 @@ private:
       throw;
     }
 
-    LOG_DEBUG("<NS> NS equator values X: {} = {}", OmegasXavgN.back(), OmegasXavgS.back());
-    LOG_DEBUG("<NS> NS equator values Y: {} = {}", OmegasYavgN.back(), OmegasYavgS.back());
+    LOG_DEBUG("<NS> NS equator values X: {:.2f} = {:.2f}", OmegasXavgN.back(), OmegasXavgS.back());
+    LOG_DEBUG("<NS> NS equator values Y: {:.2f} = {:.2f}", OmegasYavgN.back(), OmegasYavgS.back());
   }
 
   void CalculateFitCoeffs()
@@ -357,7 +357,7 @@ private:
   {
     for (int i = 0; i < coeffs.size(); i++)
     {
-      LOG_INFO("{} fit coefficient {} = {}", fitname, (char)('A' + i), coeffs[i]);
+      LOG_INFO("{} fit coefficient {} = {:.2f}", fitname, (char)('A' + i), coeffs[i]);
     }
     LOG_NEWLINE;
   }

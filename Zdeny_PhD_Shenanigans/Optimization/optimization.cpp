@@ -40,7 +40,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   double fitness_curr = Constants::Inf;
 
   // initialize random starting population matrix within bounds
-  LOG_INFO("Initializing population within bounds ... ");
+  LOG_INFO("Creating initial population within bounds ... ");
   const double initialMinAvgDist = 0.5;
   double minAvgDist = initialMinAvgDist;
   for (int indexEntity = 0; indexEntity < NP; indexEntity++)
@@ -92,6 +92,17 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   }
   funEvals += NP;
   LOG_SUCC("Initial population evaluated");
+
+  // determine the best entity in the initial population
+  for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+  {
+    if (fitness[indexEntity] <= bestFitness)
+    {
+      bestEntity = population[indexEntity];
+      bestFitness = fitness[indexEntity];
+    }
+  }
+  LOG_INFO("Initial population best entity: {} ({:.2f})", bestEntity, bestFitness);
 
   // run main evolution cycle
   LOG_INFO("Running evolution...");
