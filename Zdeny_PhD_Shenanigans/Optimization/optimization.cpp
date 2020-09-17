@@ -102,7 +102,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
       bestFitness = fitness[indexEntity];
     }
   }
-  LOG_INFO("Initial population best entity: {} ({:.2f})", bestEntity, bestFitness);
+  LOG_INFO("Initial population best entity: {} ({:.3f})", bestEntity, bestFitness);
 
   // run main evolution cycle
   LOG_INFO("Running evolution...");
@@ -231,7 +231,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         bestFitness = fitness[indexEntity];
         fitness_prev = fitness_curr;
         fitness_curr = bestFitness;
-        LOG_SUCC("Gen {} best entity: {} ({:.2f}), CBI = {:.2f}%, AHI = {:.2f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
+        LOG_SUCC("Gen {} best entity: {} ({:.3f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
       }
     }
 

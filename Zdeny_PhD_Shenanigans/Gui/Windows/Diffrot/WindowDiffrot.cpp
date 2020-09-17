@@ -136,7 +136,7 @@ void WindowDiffrot::optimizeDiffrot()
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   FitsTime starttime = GetStartFitsTime();
 
-  if (0) // all variables
+  if (1) // all variables
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -150,7 +150,7 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.speak = IPCsettings::None;
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
-      drset_opt.dPic = std::floor(args[6]);
+      // drset_opt.dPic = std::floor(args[6]);
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
@@ -158,17 +158,20 @@ void WindowDiffrot::optimizeDiffrot()
     // best: [0.309235, 20.0541, 11, +, -, 302] (0.018705611)
     // good: [0.187601, 162.875, 11, +, -, 302] (0.018751598)
 
-    Evolution evo(7);
+    LOG_INFO("Objective function test1 = {}", f({0.1, 1, 5, -1, -1, 64}));
+    LOG_INFO("Objective function test2 = {}", f({0.309235, 20.0541, 11, +1, -1, 302}));
+
+    Evolution evo(6);
     evo.NP = 50;
     evo.mutStrat = Evolution::RAND1;
     evo.historyImprovTresholdPercent = 1;
-    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 128, 1};
-    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512, 5};
+    evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 64};
+    evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512};
     auto result = evo.optimize(f);
     LOG_SUCC("Evolution result = {}", result);
   }
 
-  if (1) // fixed window size, fixed dpic (fixed from GUI)
+  if (0) // fixed window size, fixed dpic (fixed from GUI)
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = globals->IPCset->getrows();
@@ -186,6 +189,11 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
 
+    LOG_INFO("Objective function test1 = {}", f({0.1, 1, 5, -1, -1}));
+    LOG_INFO("Objective function test2 = {}", f({20, 500, 21, 1, 1}));
+    LOG_INFO("Objective function test3 = {}", f({5, 200, 9, -1, 1}));
+    LOG_INFO("Objective function test4 = {}", f({5, 200, 11, -1, 1}));
+
     Evolution evo(5);
     evo.NP = 50;
     evo.mutStrat = Evolution::RAND1;
@@ -197,7 +205,7 @@ void WindowDiffrot::optimizeDiffrot()
   }
 }
 
-void WindowDiffrot::updateDrset()
+void WindowDiffrot::UpdateDrset()
 {
   drset.pics = ui.lineEdit_7->text().toDouble();
   drset.ys = ui.lineEdit_2->text().toDouble();
@@ -275,6 +283,6 @@ void WindowDiffrot::movingPeak()
 
 FitsTime WindowDiffrot::GetStartFitsTime()
 {
-  updateDrset();
+  UpdateDrset();
   return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 }
