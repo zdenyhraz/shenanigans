@@ -95,7 +95,6 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
     else if (!ReduceL2size())
       return result;
   }
-  return result;
 }
 
 inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2)
