@@ -118,6 +118,7 @@ void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
 
   LOG_DEBUG("SourcePics = {}", SourcePics);
   LOG_DEBUG("SourceStride = {}", SourceStride);
+  LOG_DEBUG_IF(!winsize, "IPC parameters not specified");
   LOG_DEBUG_IF(winsize, "IPC parameters = {}", std::vector<double>{L, H, (double)L2size, (double)applyBandpass, (double)applyWindow, (double)winsize});
 
   dr->calculated = true;
