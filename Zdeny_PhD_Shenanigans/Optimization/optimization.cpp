@@ -21,9 +21,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
     return {};
   }
   else
-  {
     LOG_SUCC("Objective function is normal");
-  }
 
   // establish population matrix, fitness vector and other internals
   vector<double> boundsRange = upperBounds - lowerBounds;
