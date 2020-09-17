@@ -269,7 +269,7 @@ inline Point2f ipccore(Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &se
         }
         LOG_DEBUG_IF(set.speak > IPCsettings::Errors, "L2Upeak location before iterations: {}", to_string(L2Upeak));
         LOG_DEBUG_IF(set.speak > IPCsettings::Errors, "L2Upeak location before iterations findCentroid double: {}", to_string(findCentroid(L2U)));
-        int L1size = std::round((float)L2U.cols * set.L1ratio);
+        int L1size = std::floor((float)L2U.cols * set.L1ratio);
         if (!(L1size % 2))
           L1size++; // odd!+
         Mat L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
