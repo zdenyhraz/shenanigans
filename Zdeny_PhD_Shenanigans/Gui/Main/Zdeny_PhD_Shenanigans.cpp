@@ -242,6 +242,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
     LOG_INFO("shift1 = {}", shift1);
     LOG_INFO("shift2 = {}", shift2);
+
     LOG_INFO("shift1n = {}", shift1n);
     LOG_INFO("shift2n = {}", shift2n);
   }
