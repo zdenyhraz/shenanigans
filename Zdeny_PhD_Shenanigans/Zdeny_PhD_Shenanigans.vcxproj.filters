@@ -130,6 +130,9 @@
     <ClCompile Include="Gui\Windows\Features\WindowFeatures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IPC\IterativePhaseCorrelation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -253,6 +256,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Astrophysics\diffrotFileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC\IterativePhaseCorrelation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
