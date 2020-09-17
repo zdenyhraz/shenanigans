@@ -44,7 +44,7 @@ void Zdeny_PhD_Shenanigans::exit() { QApplication::exit(); }
 
 void Zdeny_PhD_Shenanigans::debug()
 {
-  Timer timer("Debug");
+  TIMER("Debug");
   LOG_INFO("Debug started");
 
   if (0) // plot in optimization

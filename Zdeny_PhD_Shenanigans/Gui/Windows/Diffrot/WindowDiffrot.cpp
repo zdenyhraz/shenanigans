@@ -22,7 +22,7 @@ void WindowDiffrot::calculateDiffrot()
 {
   LOG_STARTEND("Calculating diffrot profile...", "Differential rotation profile calculated.");
   FitsTime time = GetStartFitsTime();
-  drres = calculateDiffrotProfile(*globals->IPCset, time, drset);
+  drres = calculateDiffrotProfile(*globals->IPC, time, drset);
   showResults();
 }
 
@@ -143,11 +143,10 @@ void WindowDiffrot::optimizeDiffrot()
       int L2size = std::floor(args[2]);
       winsize = winsize % 2 ? winsize + 1 : winsize;
       L2size = L2size % 2 ? L2size : L2size + 1;
-      IPCsettings ipcset_opt(winsize, winsize, args[0], args[1]);
-      ipcset_opt.L2size = L2size;
-      ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
-      ipcset_opt.applyWindow = args[4] > 0 ? true : false;
-      ipcset_opt.speak = IPCsettings::None;
+      IterativePhaseCorrelation ipcset_opt(winsize, winsize, args[0], args[1]);
+      ipcset_opt.SetL2size(L2size);
+      ipcset_opt.SetApplyBandpass(args[3] > 0 ? true : false);
+      ipcset_opt.SetApplyWindow(args[4] > 0 ? true : false);
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
       drset_opt.speak = false;
@@ -173,15 +172,14 @@ void WindowDiffrot::optimizeDiffrot()
   if (0) // fixed window size, fixed dpic (fixed from GUI)
   {
     auto f = [&](const std::vector<double> &args) {
-      int winsize = globals->IPCset->getrows();
+      int winsize = globals->IPC->GetSize();
       int L2size = std::floor(args[2]);
       winsize = winsize % 2 ? winsize + 1 : winsize;
       L2size = L2size % 2 ? L2size : L2size + 1;
-      IPCsettings ipcset_opt(winsize, winsize, args[0], args[1]);
-      ipcset_opt.L2size = L2size;
-      ipcset_opt.applyBandpass = args[3] > 0 ? true : false;
-      ipcset_opt.applyWindow = args[4] > 0 ? true : false;
-      ipcset_opt.speak = IPCsettings::None;
+      IterativePhaseCorrelation ipcset_opt(winsize, winsize, args[0], args[1]);
+      ipcset_opt.SetL2size(L2size);
+      ipcset_opt.SetApplyBandpass(args[3] > 0 ? true : false);
+      ipcset_opt.SetApplyWindow(args[4] > 0 ? true : false);
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
       drset_opt.speak = false;
@@ -228,7 +226,7 @@ void WindowDiffrot::video()
   FitsTime time = GetStartFitsTime();
 
   drset.video = true;
-  calculateDiffrotProfile(*globals->IPCset, time, drset);
+  calculateDiffrotProfile(*globals->IPC, time, drset);
   drset.video = false;
 }
 
