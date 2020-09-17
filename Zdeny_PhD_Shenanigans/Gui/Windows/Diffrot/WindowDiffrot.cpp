@@ -157,8 +157,8 @@ void WindowDiffrot::optimizeDiffrot()
   evo.NP = 50;
   evo.mutStrat = Evolution::RAND1;
   evo.historyImprovTresholdPercent = 1;
-  evo.lowerBounds = std::vector<double>{0.1, 1, 5, -1, -1, 64};
-  evo.upperBounds = std::vector<double>{20, 500, 21, 1, 1, 512};
+  evo.lowerBounds = std::vector<double>{0.01, 1, 5, -1, -1, 64};
+  evo.upperBounds = std::vector<double>{10, 500, 17, 1, 1, 512};
   auto result = evo.optimize(f);
   LOG_SUCC("Evolution result = {}", result);
 }
