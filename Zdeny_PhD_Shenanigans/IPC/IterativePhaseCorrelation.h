@@ -10,30 +10,9 @@
 class IterativePhaseCorrelation
 {
 public:
-  IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH) : mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
-  {
-    mWindow = edgemask(mRows, mCols);
-    mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
-    CalculateFrequencyBandpass();
-  }
-
-  void SetBandpassParameters(double bandpassL, double bandpassH)
-  {
-    mBandpassL = bandpassL;
-    mBandpassH = bandpassH;
-    mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
-    CalculateFrequencyBandpass();
-  }
-
-  void SetSize(int rows, int cols = -1)
-  {
-    mRows = rows;
-    mCols = cols > 0 ? cols : rows;
-    mWindow = edgemask(mRows, mCols);
-    mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
-    CalculateFrequencyBandpass();
-  }
-
+  IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH);
+  void SetSize(int rows, int cols = -1);
+  void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
   void SetUpsampleCoeff(int UpsampleCoeff) { mUpsampleCoeff = UpsampleCoeff; }
@@ -57,8 +36,8 @@ public:
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
-  inline cv::Point2f Calculate(const Mat &image1, const Mat &image2);
-  inline cv::Point2f Calculate(Mat &&image1, Mat &&image2);
+  cv::Point2f Calculate(const Mat &image1, const Mat &image2);
+  cv::Point2f Calculate(Mat &&image1, Mat &&image2);
 
 private:
   int mRows = 0;
@@ -92,6 +71,7 @@ private:
   Mat CalculateL3(const Mat &crosspower);
   void SwapQuadrants(Mat &mat);
   std::pair<Point2i, double> GetPeak(const Mat &mat);
+  Point2f GetPeakSubpixel(const Mat &mat);
   Mat CalculateL2(const Mat &L3, const Point2i &L3peak);
   Mat CalculateL2U(const Mat &L2);
   int GetL1size(const Mat &L2U);
