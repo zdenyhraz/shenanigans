@@ -123,7 +123,7 @@ void WindowDiffrot::checkDiskShifts()
   Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]", std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
 }
 
-void WindowDiffrot::saveDiffrot() { SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, globals->IPCset.get()); }
+void WindowDiffrot::saveDiffrot() { SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, globals->IPC.get()); }
 
 void WindowDiffrot::loadDiffrot()
 {

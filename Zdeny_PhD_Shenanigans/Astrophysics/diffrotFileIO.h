@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "diffrotResults.h"
 
-void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filename, DiffrotResults *dr, IPCsettings *ipc)
+void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filename, DiffrotResults *dr, IterativePhaseCorrelation *ipc)
 {
   LOG_STARTEND("Saving diffrot results ...", "Diffrot results saved");
 
@@ -54,12 +54,12 @@ void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filenam
   fs << "SourcePics" << SourcePics;
   fs << "SourceStride" << SourceStride;
 
-  fs << "IPCL" << ipc->getL();
-  fs << "IPCH" << ipc->getH();
-  fs << "IPCL2size" << ipc->L2size;
-  fs << "IPCapplybandpass" << ipc->applyBandpass;
-  fs << "IPCapplywindow" << ipc->applyWindow;
-  fs << "IPCwinsize" << ipc->getrows();
+  fs << "BandpassL" << ipc->GetBandpassL();
+  fs << "BandpassH" << ipc->GetBandpassH();
+  fs << "L2size" << ipc->GetL2size();
+  fs << "ApplyWindow" << ipc->GetApplyWindow();
+  fs << "ApplyBandpass" << ipc->GetApplyBandpass();
+  fs << "WindowSize" << ipc->GetSize();
 }
 
 void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
@@ -108,18 +108,18 @@ void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
 
   double L, H;
   int winsize, L2size;
-  bool applyBandpass, applyWindow;
-  fs["IPCL"] >> L;
-  fs["IPCH"] >> H;
-  fs["IPCL2size"] >> L2size;
-  fs["IPCapplybandpass"] >> applyBandpass;
-  fs["IPCapplywindow"] >> applyWindow;
-  fs["IPCwinsize"] >> winsize;
+  bool applyWindow, applyBandpass;
+  fs["BandpassL"] >> L;
+  fs["BandpassH"] >> H;
+  fs["L2size"] >> L2size;
+  fs["ApplyWindow"] >> applyWindow;
+  fs["ApplyBandpass"] >> applyBandpass;
+  fs["WindowSize"] >> winsize;
 
   LOG_DEBUG("SourcePics = {}", SourcePics);
   LOG_DEBUG("SourceStride = {}", SourceStride);
   LOG_DEBUG_IF(!winsize, "IPC parameters not specified");
-  LOG_DEBUG_IF(winsize, "IPC parameters = {}", std::vector<double>{L, H, (double)L2size, (double)applyBandpass, (double)applyWindow, (double)winsize});
+  LOG_DEBUG_IF(winsize, "IPC parameters = {}", std::vector<double>{L, H, (double)L2size, (double)applyWindow, (double)applyBandpass, (double)winsize});
 
   dr->calculated = true;
 }

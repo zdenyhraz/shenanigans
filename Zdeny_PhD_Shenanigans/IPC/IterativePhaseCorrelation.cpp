@@ -36,7 +36,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
 {
   ConvertToUnitFloat(img1, img2);
   ApplyWindow(img1, img2);
-  auto [dft1, dft2] = CalculateFourierTransforms(std::move(img1), std::move(img2));
+  auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
   ApplyBandpass(crosspower);
   Mat L3 = CalculateL3(crosspower);
@@ -66,8 +66,8 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
 
     // L1
     int L1size = GetL1size(L2U);
-    Point2f L1mid(L1size / 2, L1size / 2);
     Mat L1;
+    Point2f L1mid(L1size / 2, L1size / 2);
     Point2f L1peak;
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -117,7 +117,7 @@ inline void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2) const
   multiply(img2, mWindow, img2);
 }
 
-inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat &&img1, Mat &&img2) const { return std::make_pair(fourier(std::move(img1)), fourier(std::move(img2))); }
+inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat &img1, Mat &img2) const { return std::make_pair(fourier(std::move(img1)), fourier(std::move(img2))); }
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2) const
 {
@@ -234,7 +234,7 @@ inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
 
 inline int IterativePhaseCorrelation::GetL1size(const Mat &L2U) const
 {
-  int L1size = std::round(mL1ratio * L2U.cols);
+  int L1size = std::floor(mL1ratio * L2U.cols);
   L1size = L1size % 2 ? L1size : L1size + 1;
   return L1size;
 }

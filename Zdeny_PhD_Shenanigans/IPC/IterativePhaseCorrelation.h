@@ -33,6 +33,8 @@ public:
   int GetL2size() const { return mL2size; }
   int GetL1ratio() const { return mL1ratio; }
   int GetUpsampleCoeff() const { return mUpsampleCoeff; }
+  bool GetApplyWindow() const { return mApplyWindow; }
+  bool GetApplyBandpass() const { return mApplyBandpass; }
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
@@ -44,8 +46,8 @@ private:
   int mCols = 0;
   double mBandpassL = 1;
   double mBandpassH = 200;
-  double mL1ratio = 0.35;
   int mL2size = 15;
+  double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
   double mDivisionEpsilon = 0;
   int mMaxIterations = 20;
@@ -64,7 +66,7 @@ private:
 
   void ConvertToUnitFloat(Mat &img1, Mat &img2) const;
   void ApplyWindow(Mat &img1, Mat &img2) const;
-  std::pair<Mat, Mat> CalculateFourierTransforms(Mat &&img1, Mat &&img2) const;
+  std::pair<Mat, Mat> CalculateFourierTransforms(Mat &img1, Mat &img2) const;
   Mat CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2) const;
   void ApplyBandpass(Mat &crosspower) const;
   void CalculateFrequencyBandpass();
