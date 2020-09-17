@@ -127,7 +127,7 @@ void WindowDiffrot::saveDiffrot() { SaveDiffrotResultsToFile(ui.lineEdit_9->text
 
 void WindowDiffrot::loadDiffrot()
 {
-  LoadDiffrotResultsFromFile(ui.lineEdit_24->text().toStdString(), &drres, globals->IPCset.get());
+  LoadDiffrotResultsFromFile(ui.lineEdit_24->text().toStdString(), &drres);
   drres.saveDir = ui.lineEdit_9->text().toStdString();
 }
 

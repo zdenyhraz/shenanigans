@@ -62,7 +62,7 @@ void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filenam
   fs << "IPCwinsize" << ipc->getrows();
 }
 
-void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr, IPCsettings *ipc)
+void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
 {
   LOG_STARTEND("Loading diffrot results ...", "Diffrot results loaded");
 
@@ -116,20 +116,9 @@ void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr, IPC
   fs["IPCapplywindow"] >> applyWindow;
   fs["IPCwinsize"] >> winsize;
 
-  if (winsize)
-  {
-    ipc->setBandpassParameters(L, H);
-    ipc->L2size = L2size;
-    ipc->applyBandpass = applyBandpass;
-    ipc->applyWindow = applyWindow;
-    ipc->setSize(winsize, winsize);
-  }
-  else
-    LOG_ERROR("IPC parameters not specified in file!");
-
   LOG_DEBUG("SourcePics = {}", SourcePics);
   LOG_DEBUG("SourceStride = {}", SourceStride);
-  LOG_DEBUG("IPC parameters = {}", std::vector<double>{L, H, (double)L2size, (double)applyBandpass, (double)applyWindow, (double)winsize});
+  LOG_DEBUG_IF(winsize, "IPC parameters = {}", std::vector<double>{L, H, (double)L2size, (double)applyBandpass, (double)applyWindow, (double)winsize});
 
   dr->calculated = true;
 }
