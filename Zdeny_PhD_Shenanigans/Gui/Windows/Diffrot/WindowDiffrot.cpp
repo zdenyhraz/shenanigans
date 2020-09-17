@@ -156,9 +156,6 @@ void WindowDiffrot::optimizeDiffrot()
     // best: [0.309235, 20.0541, 11, +, -, 302] (0.018705611)
     // good: [0.187601, 162.875, 11, +, -, 302] (0.018751598)
 
-    LOG_INFO("Objective function test1 = {}", f({0.1, 1, 5, -1, -1, 64}));
-    LOG_INFO("Objective function test2 = {}", f({0.309235, 20.0541, 11, +1, -1, 302}));
-
     Evolution evo(6);
     evo.NP = 50;
     evo.mutStrat = Evolution::RAND1;
@@ -185,11 +182,6 @@ void WindowDiffrot::optimizeDiffrot()
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };
-
-    LOG_INFO("Objective function test1 = {}", f({0.1, 1, 5, -1, -1}));
-    LOG_INFO("Objective function test2 = {}", f({20, 500, 21, 1, 1}));
-    LOG_INFO("Objective function test3 = {}", f({5, 200, 9, -1, 1}));
-    LOG_INFO("Objective function test4 = {}", f({5, 200, 11, -1, 1}));
 
     Evolution evo(5);
     evo.NP = 50;

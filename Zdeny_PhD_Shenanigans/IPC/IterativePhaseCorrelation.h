@@ -72,9 +72,9 @@ private:
   void CalculateFrequencyBandpass();
   Mat CalculateL3(const Mat &crosspower) const;
   void SwapQuadrants(Mat &mat) const;
-  std::pair<Point2i, double> GetPeak(const Mat &mat) const;
+  std::pair<Point2f, double> GetPeak(const Mat &mat) const;
   Point2f GetPeakSubpixel(const Mat &mat) const;
-  Mat CalculateL2(const Mat &L3, const Point2i &L3peak, int L2size) const;
+  Mat CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const;
   Mat CalculateL2U(const Mat &L2) const;
   int GetL1size(const Mat &L2U) const;
   Mat CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) const;
