@@ -42,7 +42,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
   Mat L3 = CalculateL3(crosspower);
   auto [L3peak, L3max] = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
-  Point2f result(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
+  Point2f result = L3peak - L3mid;
 
   if (!mSubpixelEstimation)
     return result;
@@ -89,8 +89,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
 
     if (converged)
     {
-      result.x = (float)L3peak.x - L3mid.x + 1.0 / mUpsampleCoeff * (L2Upeak.x - L2Umid.x + GetPeakSubpixel(L1).x - L1mid.x); // image shift in L3 - final
-      result.y = (float)L3peak.y - L3mid.y + 1.0 / mUpsampleCoeff * (L2Upeak.y - L2Umid.y + GetPeakSubpixel(L1).y - L1mid.y); // image shift in L3 - final
+      result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
       break;
     }
     else if (!ReduceL2size(L2size))
@@ -190,7 +189,7 @@ inline void IterativePhaseCorrelation::SwapQuadrants(Mat &mat) const
   temp.copyTo(q3);
 }
 
-inline std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat) const
+inline std::pair<Point2f, double> IterativePhaseCorrelation::GetPeak(const Mat &mat) const
 {
   Point2i matpeak;
   double matmax;
@@ -223,7 +222,7 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
     return result;
 }
 
-inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i &L3peak, int L2size) const { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
+inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
 
 inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
 {
