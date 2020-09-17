@@ -237,8 +237,13 @@ void Zdeny_PhD_Shenanigans::debug()
     auto shift1 = phasecorrel(img1, img2, ipc1);
     auto shift2 = ipc2.Calculate(img1, img2);
 
+    auto shift1n = phasecorrel(img1, img1, ipc1);
+    auto shift2n = ipc2.Calculate(img1, img1);
+
     LOG_INFO("shift1 = {}", shift1);
     LOG_INFO("shift2 = {}", shift2);
+    LOG_INFO("shift1n = {}", shift1n);
+    LOG_INFO("shift2n = {}", shift2n);
   }
 
   LOG_INFO("Debug finished.");
