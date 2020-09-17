@@ -25,7 +25,7 @@ private slots:
   void saveDiffrot();
   void loadDiffrot();
   void optimizeDiffrot();
-  void updateDrset();
+  void UpdateDrset();
   void video();
   void movingPeak();
   FitsTime GetStartFitsTime();
