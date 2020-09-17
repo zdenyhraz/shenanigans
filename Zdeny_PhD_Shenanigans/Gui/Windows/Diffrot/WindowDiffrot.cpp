@@ -150,7 +150,6 @@ void WindowDiffrot::optimizeDiffrot()
       ipcset_opt.speak = IPCsettings::None;
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
-      // drset_opt.dPic = std::floor(args[6]);
       drset_opt.speak = false;
       return calculateDiffrotProfile(ipcset_opt, time_opt, drset_opt).GetError();
     };

@@ -313,7 +313,8 @@ private:
     OmegasXavgN = std::vector<double>(SourceOmegasXavg.begin(), SourceOmegasXavg.begin() + zeroidx + 1);
     OmegasYavgN = std::vector<double>(SourceOmegasYavg.begin(), SourceOmegasYavg.begin() + zeroidx + 1);
 
-    LOG_DEBUG("<NS> Last North theta = {:.2f}", ThetasNS.back());
+    LOG_DEBUG("<NS> First (max) North theta = {:.2f}", ThetasNS.front());
+    LOG_DEBUG("<NS> Last (min) North theta = {:.2f}", ThetasNS.back());
 
     // south hemisphere
     OmegasXavgS.resize(OmegasXavgN.size());
