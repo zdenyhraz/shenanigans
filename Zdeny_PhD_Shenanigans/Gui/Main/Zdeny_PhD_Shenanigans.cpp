@@ -207,8 +207,32 @@ void Zdeny_PhD_Shenanigans::debug()
     Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
 
-    IPCsettings ipc1(img1.rows, img1.cols, 1, 200);
-    IterativePhaseCorrelation ipc2(img1.rows, img1.cols, 1, 200);
+    int Rows = img1.rows;
+    int Cols = img1.cols;
+    double BandpassL = 1;
+    double BandpassH = 200;
+    double L1ratio = 0.35;
+    int L2size = 15;
+    int UpsampleCoeff = 51;
+    double DivisionEpsilon = 0;
+    int MaxIterations = 20;
+    InterpolationFlags InterpolationType = INTER_LINEAR;
+    bool ApplyWindow = true;
+    bool ApplyBandpass = true;
+    bool SubpixelEstimation = true;
+    bool CrossCorrelate = false;
+
+    IPCsettings ipc1(Rows, Cols, BandpassL, BandpassH);
+    ipc1.L1ratio = L1ratio;
+    ipc1.L2size = L2size;
+    ipc1.UC = UpsampleCoeff;
+    ipc1.epsilon = DivisionEpsilon;
+    ipc1.applyWindow = true;
+    ipc1.applyBandpass = true;
+    ipc1.subpixel = SubpixelEstimation;
+    ipc1.crossCorrel = CrossCorrelate;
+
+    IterativePhaseCorrelation ipc2(Rows, Cols, BandpassL, BandpassH);
 
     auto shift1 = phasecorrel(img1, img2, ipc1);
     auto shift2 = ipc2.Calculate(img1, img2);
