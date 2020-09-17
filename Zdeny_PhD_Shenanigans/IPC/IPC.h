@@ -48,8 +48,6 @@ public:
   cv::Size savesize = cv::Size(500, 500);
   mutable int savecntr = -1;
 
-  cv::Point2f Calculate(const Mat &img1, const Mat &img2) { return cv::Point2f(); }
-
   IPCsettings(int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
   {
     bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
@@ -71,17 +69,18 @@ public:
     window = edgemask(rows, cols);
   }
 
-  const int getrows() const { return rows; }
+  int getrows() const { return rows; }
+  int getcols() const { return cols; }
+  double getL() const { return stdevLmultiplier; }
+  double getH() const { return stdevHmultiplier; }
+  Mat getWindow() const { return window; }
+  Mat getBandpass() const { return bandpass; }
 
-  const int getcols() const { return cols; }
-
-  const double getL() const { return stdevLmultiplier; }
-
-  const double getH() const { return stdevHmultiplier; }
-
-  const Mat getWindow() const { return window; }
-
-  const Mat getBandpass() const { return bandpass; }
+  inline cv::Point2f Calculate(const Mat &img1, const Mat &img2)
+  {
+    LOG_DEBUG("XDD");
+    return cv::Point2f();
+  }
 };
 
 inline void ipcsaveimg(const char *filename, const Mat &img, const IPCsettings &set) { saveimg(set.savedir + to_string(set.savecntr) + "_" + filename, img, false, set.savesize, true, 0, 1); }
