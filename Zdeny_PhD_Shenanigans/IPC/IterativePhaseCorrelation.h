@@ -22,7 +22,7 @@ public:
   void SetInterpolationType() {}
   void SetApplyWindow(bool ApplyWindow) { mApplyWindow = ApplyWindow; }
   void SetApplyBandpass(bool ApplyBandpass) { mApplyBandpass = ApplyBandpass; }
-  void SetSubpixelExtimation(bool SubpixelEstimation) { mSubpixelEstimation = SubpixelEstimation; }
+  void SetSubpixelEstimation(bool SubpixelEstimation) { mSubpixelEstimation = SubpixelEstimation; }
   void SetCrossCorrelate(bool CrossCorrelate) { mCrossCorrelate = CrossCorrelate; }
 
   int GetRows() const { return mRows; }
@@ -36,8 +36,8 @@ public:
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
-  cv::Point2f Calculate(const Mat &image1, const Mat &image2);
-  cv::Point2f Calculate(Mat &&image1, Mat &&image2);
+  cv::Point2f Calculate(const Mat &image1, const Mat &image2) const;
+  cv::Point2f Calculate(Mat &&image1, Mat &&image2) const;
 
 private:
   int mRows = 0;
@@ -62,21 +62,21 @@ private:
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
 
-  void ConvertToUnitFloat(Mat &img1, Mat &img2);
-  void ApplyWindow(Mat &img1, Mat &img2);
-  std::pair<Mat, Mat> CalculateFourierTransforms(Mat &&img1, Mat &&img2);
-  Mat CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2);
-  void ApplyBandpass(Mat &crosspower);
+  void ConvertToUnitFloat(Mat &img1, Mat &img2) const;
+  void ApplyWindow(Mat &img1, Mat &img2) const;
+  std::pair<Mat, Mat> CalculateFourierTransforms(Mat &&img1, Mat &&img2) const;
+  Mat CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2) const;
+  void ApplyBandpass(Mat &crosspower) const;
   void CalculateFrequencyBandpass();
-  Mat CalculateL3(const Mat &crosspower);
-  void SwapQuadrants(Mat &mat);
-  std::pair<Point2i, double> GetPeak(const Mat &mat);
-  Point2f GetPeakSubpixel(const Mat &mat);
-  Mat CalculateL2(const Mat &L3, const Point2i &L3peak);
-  Mat CalculateL2U(const Mat &L2);
-  int GetL1size(const Mat &L2U);
-  Mat CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size);
-  bool IsOutOfBounds(const Point2f &peak, const Mat &mat, int size);
-  bool AccuracyReached(const Point2f &L1peak, const Point2f &L1mid);
-  bool ReduceL2size();
+  Mat CalculateL3(const Mat &crosspower) const;
+  void SwapQuadrants(Mat &mat) const;
+  std::pair<Point2i, double> GetPeak(const Mat &mat) const;
+  Point2f GetPeakSubpixel(const Mat &mat) const;
+  Mat CalculateL2(const Mat &L3, const Point2i &L3peak, int L2size) const;
+  Mat CalculateL2U(const Mat &L2) const;
+  int GetL1size(const Mat &L2U) const;
+  Mat CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) const;
+  bool IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) const;
+  bool AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) const;
+  bool ReduceL2size(int &L2size) const;
 };

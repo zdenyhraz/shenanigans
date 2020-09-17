@@ -3,7 +3,7 @@
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 
-DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time, const DiffrotSettings &drset)
+DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, FitsTime &time, const DiffrotSettings &drset)
 {
   int dy = drset.vFov / (drset.ys - 1);
   std::vector<std::vector<double>> thetas2D;
@@ -65,7 +65,7 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
         LOG_DEBUG_IF(drset.speak, "Predicted shift used = {}", predShift);
       }
 
-      calculateOmegas(pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipcset, drset, R, theta0, dy, lag1, lag2, predShift);
+      calculateOmegas(pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipc, drset, R, theta0, dy, lag1, lag2, predShift);
 
       image2D.emplace_back(image);
 
@@ -150,15 +150,17 @@ DiffrotResults calculateDiffrotProfile(const IPCsettings &ipcset, FitsTime &time
   return dr;
 }
 
-void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IPCsettings &ipcset, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
+void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
 {
 #pragma omp parallel for
   for (int y = 0; y < drset.ys; y++)
   {
-    Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipcset.getcols(), ipcset.getrows());
-    Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipcset.getcols(), ipcset.getrows());
+    Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
+    Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
     image[y] = pic1.image().at<ushort>(pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy);
-    auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, y == yshow);
+    // auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
+    auto shift = ipc.Calculate(crop1, crop2);
+
     shiftsX[y] = shift.x + predShift;
     shiftsY[y] = shift.y;
   }
