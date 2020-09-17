@@ -3,6 +3,7 @@
 
 # Custom stuff
 *.diffrot
+[Dd]ist/
 
 # User-specific files
 *.suo
