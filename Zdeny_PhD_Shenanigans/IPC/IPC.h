@@ -10,14 +10,14 @@
 using namespace std;
 using namespace cv;
 
-static constexpr int maxPCit = 10;
+static constexpr int maxPCit = 20;
 static constexpr double loglimit = 5;
 
 class IPCsettings
 {
 private:
-  double stdevLmultiplier = 5;
-  double stdevHmultiplier = 100;
+  double stdevLmultiplier = 1;
+  double stdevHmultiplier = 200;
   int rows = 0;
   int cols = 0;
 
@@ -29,9 +29,9 @@ public:
     All
   };
 
-  int L2size = 17;
+  int L2size = 15;
   double L1ratio = 0.35;
-  int UC = 31;
+  int UC = 51;
   double epsilon = 0;
   bool interpolate = 1;
   bool applyWindow = 1;
