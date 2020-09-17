@@ -39,6 +39,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
   auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
   ApplyBandpass(crosspower);
+
   Mat L3 = CalculateL3(crosspower);
   auto [L3peak, L3max] = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
