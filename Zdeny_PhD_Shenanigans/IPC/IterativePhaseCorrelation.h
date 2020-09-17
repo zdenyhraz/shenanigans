@@ -92,8 +92,11 @@ private:
   Mat CalculateL3(const Mat &crosspower);
   void SwapQuadrants(Mat &mat);
   std::pair<Point2i, double> GetPeak(const Mat &mat);
-  Mat CalculateL2(const Mat &L3, const Point2i L3peak);
+  Mat CalculateL2(const Mat &L3, const Point2i &L3peak);
   Mat CalculateL2U(const Mat &L2);
   int GetL1size(const Mat &L2U);
-  Mat CalculateL1(const Mat &L2U, const Point2f L2Upeak, int L1size);
+  Mat CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size);
+  bool IsOutOfBounds(const Point2f &peak, const Mat &mat, int size);
+  bool AccuracyReached(const Point2f &L1peak, const Point2f &L1mid);
+  bool ReduceL2size();
 };
