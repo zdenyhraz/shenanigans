@@ -20,78 +20,55 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   Point2f result(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
 
-  if (mSubpixelEstimation)
+  if (!mSubpixelEstimation)
+    return result;
+
+  bool converged = false;
+  while (!converged)
   {
-    bool converged = false;
+    if (IsOutOfBounds(L3peak, L3, mL2size))
+      if (!ReduceL2size())
+        break;
 
-    while (!converged)
+    // L2
+    Mat L2 = CalculateL2(L3, L3peak);
+    Point2f L2mid(L2.cols / 2, L2.rows / 2);
+
+    // L2U
+    Mat L2U = CalculateL2U(L2);
+    Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+    Point2f L2Upeak = L2Umid;
+
+    // L1
+    int L1size = GetL1size(L2U);
+    Point2f L1mid(L1size / 2, L1size / 2);
+    Mat L1;
+    Point2f L1peak;
+
+    for (int iter = 0; iter < mMaxIterations; ++iter)
     {
-      if (((L3peak.x - mL2size / 2) < 0) || ((L3peak.y - mL2size / 2) < 0) || ((L3peak.x + mL2size / 2) >= L3.cols) || ((L3peak.y + mL2size / 2) >= L3.rows))
+      L1 = CalculateL1(L2U, L2Upeak, L1size);
+      L1peak = findCentroid(L1);
+      L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+
+      if (IsOutOfBounds(L2Upeak, L2U, L1size))
+        break;
+
+      if (AccuracyReached(L1peak, L1mid))
       {
-        LOG_ERROR("Degenerate peak (Imgsize=[{},{}],L3peak=[{},{}],mL2size=[{},{}]) - results might be inaccurate, reducing mL2size from {} to {} ", L3.cols, L3.rows, L3peak.x, L3peak.y, mL2size, mL2size, mL2size, mL2size - 2);
-        mL2size -= 2;
-        if (mL2size < 3)
-        {
-          LOG_ERROR("Completely degenerate peak, returning just with pixel accuracy");
-          break;
-        }
-      }
-      else
-      {
-        // L2
-        Mat L2 = CalculateL2(L3, L3peak);
-        Point2f L2mid(L2.cols / 2, L2.rows / 2);
-
-        // L2U
-        Mat L2U = CalculateL2U(L2);
-        Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-        Point2f L2Upeak = L2Umid;
-
-        // L1
-        int L1size = GetL1size(L2U);
-        Point2f L1mid(L1size / 2, L1size / 2);
-        Mat L1;
-        Point2f L1peak;
-
-        for (int i = 0; i < mMaxIterations; ++i)
-        {
-          L1 = CalculateL1(L2U, L2Upeak, L1size);
-          L1peak = findCentroid(L1);
-          L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
-
-          if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
-          {
-            LOG_ERROR("IPC out of bounds - centroid diverged, reducing mL2size from {} to {} ", mL2size, mL2size - 2);
-            mL2size += -2;
-            break;
-          }
-
-          if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
-          {
-            L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-            LOG_DEBUG("Iterative phase correlation accuracy reached, mL2size: {}, L2Upeak: " + to_string(L2Upeak), mL2size);
-            converged = true;
-            break;
-          }
-          else if (i == mMaxIterations - 1)
-          {
-            LOG_DEBUG("IPC centroid oscilated, reducing mL2size from {} to {} ", mL2size, mL2size - 2);
-            mL2size += -2;
-          }
-        }
-
-        if (converged)
-        {
-          result.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.x - (float)L2Umid.x + findCentroid(L1).x - (float)L1mid.x); // image shift in L3 - final
-          result.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.y - (float)L2Umid.y + findCentroid(L1).y - (float)L1mid.y); // image shift in L3 - final
-        }
-        else if (mL2size < 3)
-        {
-          LOG_ERROR("IPC centroid did not converge with any mL2size");
-          break;
-        }
+        L1 = CalculateL1(L2U, L2Upeak, L1size);
+        converged = true;
+        break;
       }
     }
+
+    if (converged)
+    {
+      result.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.x - (float)L2Umid.x + findCentroid(L1).x - (float)L1mid.x); // image shift in L3 - final
+      result.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.y - (float)L2Umid.y + findCentroid(L1).y - (float)L1mid.y); // image shift in L3 - final
+    }
+    else if (!ReduceL2size())
+      break;
   }
   return result;
 }
@@ -162,9 +139,8 @@ void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 
 Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower)
 {
-  // real only (assume pure real input)
   Mat L3;
-  dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+  dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT); // real only (assume pure real input)
   SwapQuadrants(L3);
   return L3;
 }
@@ -196,7 +172,7 @@ std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat)
   return std::make_pair(matpeak, matmax);
 }
 
-Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i L3peak) { return roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size); }
+Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i &L3peak) { return roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size); }
 
 Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2)
 {
@@ -212,4 +188,14 @@ int IterativePhaseCorrelation::GetL1size(const Mat &L2U)
   return L1size;
 }
 
-Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f L2Upeak, int L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+
+bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) { return ((peak.x - size / 2) < 0) || ((peak.y - size / 2) < 0) || ((peak.x + size / 2) >= mat.cols) || ((peak.y + size / 2) >= mat.rows); }
+
+bool IterativePhaseCorrelation::AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) { return (abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5); }
+
+bool IterativePhaseCorrelation::ReduceL2size()
+{
+  mL2size -= 2;
+  return mL2size >= 3;
+}
