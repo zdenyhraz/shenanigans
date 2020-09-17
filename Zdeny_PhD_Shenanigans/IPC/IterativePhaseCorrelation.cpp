@@ -52,7 +52,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
   {
     if (IsOutOfBounds(L3peak, L3, mL2size))
       if (!ReduceL2size())
-        return result;
+        break;
 
     // L2
     Mat L2 = CalculateL2(L3, L3peak);
@@ -90,11 +90,12 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
     {
       result.x = (float)L3peak.x - L3mid.x + 1.0 / mUpsampleCoeff * (L2Upeak.x - L2Umid.x + GetPeakSubpixel(L1).x - L1mid.x); // image shift in L3 - final
       result.y = (float)L3peak.y - L3mid.y + 1.0 / mUpsampleCoeff * (L2Upeak.y - L2Umid.y + GetPeakSubpixel(L1).y - L1mid.y); // image shift in L3 - final
-      return result;
+      break;
     }
     else if (!ReduceL2size())
-      return result;
+      break;
   }
+  return result;
 }
 
 inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2)
@@ -232,7 +233,7 @@ inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2)
 
 inline int IterativePhaseCorrelation::GetL1size(const Mat &L2U)
 {
-  int L1size = std::floor(mL1ratio * L2U.cols);
+  int L1size = std::round(mL1ratio * L2U.cols);
   L1size = L1size % 2 ? L1size : L1size + 1;
   return L1size;
 }
