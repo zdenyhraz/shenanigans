@@ -38,42 +38,34 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
       }
       else
       {
-        Mat L2 = roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size);
-        Mat L2U;
-
-        if (mInterpolate)
-          resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
-        else
-          resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
-
+        // L2
+        Mat L2 = CalculateL2(L3, L3peak);
         Point2f L2mid(L2.cols / 2, L2.rows / 2);
+
+        // L2U
+        Mat L2U = CalculateL2U(L2);
         Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
         Point2f L2Upeak = L2Umid;
-        LOG_DEBUG("L2Upeak location before iterations: {}", to_string(L2Upeak));
-        LOG_DEBUG("L2Upeak location before iterations findCentroid double: {}", to_string(findCentroid(L2U)));
-        int L1size = std::round((float)L2U.cols * mL1ratio);
-        if (!(L1size % 2))
-          L1size++; // odd!+
-        Mat L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-        Point2f L1mid(L1.cols / 2, L1.rows / 2);
-        result = (Point2f)L3peak - L3mid + findCentroid(L1) - L1mid;
 
-        for (int i = 0; i < mMaxIterations; i++)
+        // L1
+        int L1size = GetL1size(L2U);
+        Point2f L1mid(L1size / 2, L1size / 2);
+        Mat L1;
+        Point2f L1peak;
+
+        for (int i = 0; i < mMaxIterations; ++i)
         {
-          LOG_DEBUG("======= iteration {} =======", i + 1);
-          L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-          Point2f L1peak = findCentroid(L1);
-          LOG_DEBUG("L1peak: {}", to_string(L1peak));
-          L2Upeak.x += round(L1peak.x - L1mid.x);
-          L2Upeak.y += round(L1peak.y - L1mid.y);
+          L1 = CalculateL1(L2U, L2Upeak, L1size);
+          L1peak = findCentroid(L1);
+          L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+
           if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
           {
             LOG_ERROR("IPC out of bounds - centroid diverged, reducing mL2size from {} to {} ", mL2size, mL2size - 2);
             mL2size += -2;
             break;
           }
-          LOG_DEBUG("L1peak findCentroid double delta: {}/{}", to_string(findCentroid(L1).x - L1mid.x), to_string(findCentroid(L1).y - L1mid.y));
-          LOG_DEBUG("Resulting L2Upeak in this iteration: {}", to_string(L2Upeak));
+
           if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
           {
             L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
@@ -203,3 +195,21 @@ std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat)
   minMaxLoc(mat, nullptr, &matmax, nullptr, &matpeak);
   return std::make_pair(matpeak, matmax);
 }
+
+Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i L3peak) { return roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size); }
+
+Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2)
+{
+  Mat L2U;
+  resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, mInterpolationType);
+  return L2U;
+}
+
+int IterativePhaseCorrelation::GetL1size(const Mat &L2U)
+{
+  int L1size = std::floor(mL1ratio * L2U.cols);
+  L1size = L1size % 2 ? L1size : L1size + 1;
+  return L1size;
+}
+
+Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f L2Upeak, int L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }

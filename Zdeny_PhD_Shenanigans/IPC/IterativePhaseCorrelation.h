@@ -39,7 +39,7 @@ public:
   void SetUpsampleCoeff(int UpsampleCoeff) { mUpsampleCoeff = UpsampleCoeff; }
   void SetDivisionEpsilon(double DivisionEpsilon) { mDivisionEpsilon = DivisionEpsilon; }
   void SetMaxIterations(int MaxIterations) { mMaxIterations = MaxIterations; }
-  void SetInterpolate(bool Interpolate) { mInterpolate = Interpolate; }
+  void SetInterpolationType(InterpolationFlags InterpolationType) { mInterpolationType = InterpolationType; }
   void SetInterpolationType() {}
   void SetApplyWindow(bool ApplyWindow) { mApplyWindow = ApplyWindow; }
   void SetApplyBandpass(bool ApplyBandpass) { mApplyBandpass = ApplyBandpass; }
@@ -65,12 +65,12 @@ private:
   int mCols = 0;
   double mBandpassL = 1;
   double mBandpassH = 200;
-  int mL2size = 15;
   double mL1ratio = 0.35;
+  int mL2size = 15;
   int mUpsampleCoeff = 51;
   double mDivisionEpsilon = 0;
   int mMaxIterations = 20;
-  bool mInterpolate = true;
+  InterpolationFlags mInterpolationType = INTER_LINEAR;
   bool mApplyWindow = true;
   bool mApplyBandpass = true;
   bool mSubpixelEstimation = true;
@@ -92,4 +92,8 @@ private:
   Mat CalculateL3(const Mat &crosspower);
   void SwapQuadrants(Mat &mat);
   std::pair<Point2i, double> GetPeak(const Mat &mat);
+  Mat CalculateL2(const Mat &L3, const Point2i L3peak);
+  Mat CalculateL2U(const Mat &L2);
+  int GetL1size(const Mat &L2U);
+  Mat CalculateL1(const Mat &L2U, const Point2f L2Upeak, int L1size);
 };
