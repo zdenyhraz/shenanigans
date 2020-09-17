@@ -1,7 +1,31 @@
 #include "stdafx.h"
 #include "IterativePhaseCorrelation.h"
 
-inline cv::Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &image2)
+IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH) : mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
+{
+  mWindow = edgemask(mRows, mCols);
+  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  CalculateFrequencyBandpass();
+}
+
+inline void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
+{
+  mBandpassL = bandpassL;
+  mBandpassH = bandpassH;
+  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  CalculateFrequencyBandpass();
+}
+
+inline void IterativePhaseCorrelation::SetSize(int rows, int cols)
+{
+  mRows = rows;
+  mCols = cols > 0 ? cols : rows;
+  mWindow = edgemask(mRows, mCols);
+  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  CalculateFrequencyBandpass();
+}
+
+cv::Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &image2)
 {
   Mat img1 = image1.clone();
   Mat img2 = image2.clone();
@@ -28,7 +52,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
   {
     if (IsOutOfBounds(L3peak, L3, mL2size))
       if (!ReduceL2size())
-        break;
+        return result;
 
     // L2
     Mat L2 = CalculateL2(L3, L3peak);
@@ -48,7 +72,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
     for (int iter = 0; iter < mMaxIterations; ++iter)
     {
       L1 = CalculateL1(L2U, L2Upeak, L1size);
-      L1peak = findCentroid(L1);
+      L1peak = GetPeakSubpixel(L1);
       L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
 
       if (IsOutOfBounds(L2Upeak, L2U, L1size))
@@ -64,16 +88,17 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2)
 
     if (converged)
     {
-      result.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.x - (float)L2Umid.x + findCentroid(L1).x - (float)L1mid.x); // image shift in L3 - final
-      result.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)mUpsampleCoeff * ((float)L2Upeak.y - (float)L2Umid.y + findCentroid(L1).y - (float)L1mid.y); // image shift in L3 - final
+      result.x = (float)L3peak.x - L3mid.x + 1.0 / mUpsampleCoeff * (L2Upeak.x - L2Umid.x + GetPeakSubpixel(L1).x - L1mid.x); // image shift in L3 - final
+      result.y = (float)L3peak.y - L3mid.y + 1.0 / mUpsampleCoeff * (L2Upeak.y - L2Umid.y + GetPeakSubpixel(L1).y - L1mid.y); // image shift in L3 - final
+      return result;
     }
     else if (!ReduceL2size())
-      break;
+      return result;
   }
   return result;
 }
 
-void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2)
+inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2)
 {
   double max1, max2;
   minMaxLoc(img1, nullptr, &max1);
@@ -82,7 +107,7 @@ void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2)
   img2.convertTo(img2, CV_32F, 1. / max2);
 }
 
-void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2)
+inline void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2)
 {
   if (!mApplyWindow)
     return;
@@ -91,9 +116,9 @@ void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2)
   multiply(img2, mWindow, img2);
 }
 
-std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat &&img1, Mat &&img2) { return std::make_pair(fourier(std::move(img1)), fourier(std::move(img2))); }
+inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat &&img1, Mat &&img2) { return std::make_pair(fourier(std::move(img1)), fourier(std::move(img2))); }
 
-Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2)
+inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2)
 {
   Mat planes1[2];
   Mat planes2[2];
@@ -122,7 +147,7 @@ Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft1, cons
   return CrossPower;
 }
 
-void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower)
+inline void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower)
 {
   if (!mApplyBandpass)
     return;
@@ -137,7 +162,7 @@ void IterativePhaseCorrelation::CalculateFrequencyBandpass()
   merge(bandpassFplanes, 2, mFrequencyBandpass);
 }
 
-Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower)
+inline Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower)
 {
   Mat L3;
   dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT); // real only (assume pure real input)
@@ -145,7 +170,7 @@ Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower)
   return L3;
 }
 
-void IterativePhaseCorrelation::SwapQuadrants(Mat &mat)
+inline void IterativePhaseCorrelation::SwapQuadrants(Mat &mat)
 {
   int centerX = mat.cols / 2;
   int centerY = mat.rows / 2;
@@ -164,7 +189,7 @@ void IterativePhaseCorrelation::SwapQuadrants(Mat &mat)
   temp.copyTo(q3);
 }
 
-std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat)
+inline std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat)
 {
   Point2i matpeak;
   double matmax;
@@ -172,29 +197,54 @@ std::pair<Point2i, double> IterativePhaseCorrelation::GetPeak(const Mat &mat)
   return std::make_pair(matpeak, matmax);
 }
 
-Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i &L3peak) { return roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size); }
+inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat)
+{
+  double M = 0;
+  double My = 0;
+  double Mx = 0;
+  int r, c;
 
-Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2)
+  for (r = 0; r < mat.rows; ++r)
+  {
+    for (c = 0; c < mat.cols; ++c)
+    {
+      M += mat.at<float>(r, c);
+      My += mat.at<float>(r, c) * r;
+      Mx += mat.at<float>(r, c) * c;
+    }
+  }
+
+  Point2f result(Mx / M, My / M);
+
+  if (result.x < 0 || result.y < 0 || result.x > mat.cols - 1 || result.y > mat.rows - 1)
+    return Point2f(mat.cols / 2, mat.rows / 2);
+  else
+    return result;
+}
+
+inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2i &L3peak) { return roicrop(L3, L3peak.x, L3peak.y, mL2size, mL2size); }
+
+inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2)
 {
   Mat L2U;
   resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, mInterpolationType);
   return L2U;
 }
 
-int IterativePhaseCorrelation::GetL1size(const Mat &L2U)
+inline int IterativePhaseCorrelation::GetL1size(const Mat &L2U)
 {
   int L1size = std::floor(mL1ratio * L2U.cols);
   L1size = L1size % 2 ? L1size : L1size + 1;
   return L1size;
 }
 
-Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+inline Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
 
-bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) { return ((peak.x - size / 2) < 0) || ((peak.y - size / 2) < 0) || ((peak.x + size / 2) >= mat.cols) || ((peak.y + size / 2) >= mat.rows); }
+inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) { return ((peak.x - size / 2) < 0) || ((peak.y - size / 2) < 0) || ((peak.x + size / 2) >= mat.cols) || ((peak.y + size / 2) >= mat.rows); }
 
-bool IterativePhaseCorrelation::AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) { return (abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5); }
+inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) { return (abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5); }
 
-bool IterativePhaseCorrelation::ReduceL2size()
+inline bool IterativePhaseCorrelation::ReduceL2size()
 {
   mL2size -= 2;
   return mL2size >= 3;
