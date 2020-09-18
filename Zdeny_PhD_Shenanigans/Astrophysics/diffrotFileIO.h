@@ -22,29 +22,21 @@ void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filenam
 
   FileStorage fs(path, FileStorage::WRITE);
 
-  std::vector<double> SourceThetasavg;
-  std::vector<double> SourceOmegasXavg;
-  std::vector<double> SourceOmegasYavg;
-  std::vector<double> SourceShiftsXavg;
-  std::vector<double> SourceShiftsYavg;
-  dr->GetVecs1D(SourceThetasavg, SourceOmegasXavg, SourceOmegasYavg, SourceShiftsXavg, SourceShiftsYavg);
-  fs << "SourceThetasavg" << SourceThetasavg;
-  fs << "SourceOmegasXavg" << SourceOmegasXavg;
-  fs << "SourceOmegasYavg" << SourceOmegasYavg;
-  fs << "SourceShiftsXavg" << SourceShiftsXavg;
-  fs << "SourceShiftsYavg" << SourceShiftsYavg;
-
+  std::vector<std::vector<double>> SourceThetas;
   std::vector<std::vector<double>> SourceShiftsX;
   std::vector<std::vector<double>> SourceShiftsY;
-  dr->GetVecs2D(SourceShiftsX, SourceShiftsY);
+  std::vector<std::vector<double>> SourceOmegasX;
+  std::vector<std::vector<double>> SourceOmegasY;
+  dr->GetVecs2D(SourceThetas, SourceShiftsX, SourceShiftsY, SourceOmegasX, SourceOmegasY);
+  fs << "SourceThetas" << SourceThetas;
   fs << "SourceShiftsX" << SourceShiftsX;
   fs << "SourceShiftsY" << SourceShiftsY;
+  fs << "SourceOmegasX" << SourceOmegasX;
+  fs << "SourceOmegasY" << SourceOmegasY;
 
-  Mat SourceImage;
   Mat SourceFlowX;
   Mat SourceFlowY;
-  dr->GetMats(SourceImage, SourceFlowX, SourceFlowY);
-  fs << "SourceImage" << SourceImage;
+  dr->GetMats(SourceFlowX, SourceFlowY);
   fs << "SourceFlowX" << SourceFlowX;
   fs << "SourceFlowY" << SourceFlowY;
 
@@ -74,31 +66,23 @@ void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
 
   FileStorage fs(path, FileStorage::READ);
 
-  std::vector<double> SourceThetasavg;
-  std::vector<double> SourceOmegasXavg;
-  std::vector<double> SourceOmegasYavg;
-  std::vector<double> SourceShiftsXavg;
-  std::vector<double> SourceShiftsYavg;
-  fs["SourceThetasavg"] >> SourceThetasavg;
-  fs["SourceOmegasXavg"] >> SourceOmegasXavg;
-  fs["SourceOmegasYavg"] >> SourceOmegasYavg;
-  fs["SourceShiftsXavg"] >> SourceShiftsXavg;
-  fs["SourceShiftsYavg"] >> SourceShiftsYavg;
-  dr->SetVecs1DRaw(SourceThetasavg, SourceOmegasXavg, SourceOmegasYavg, SourceShiftsXavg, SourceShiftsYavg);
-
+  std::vector<std::vector<double>> SourceThetas;
   std::vector<std::vector<double>> SourceShiftsX;
   std::vector<std::vector<double>> SourceShiftsY;
+  std::vector<std::vector<double>> SourceOmegasX;
+  std::vector<std::vector<double>> SourceOmegasY;
+  fs["SourceThetas"] >> SourceThetas;
   fs["SourceShiftsX"] >> SourceShiftsX;
   fs["SourceShiftsY"] >> SourceShiftsY;
-  dr->SetVecs2DRaw(SourceShiftsX, SourceShiftsY);
+  fs["SourceOmegasX"] >> SourceOmegasX;
+  fs["SourceOmegasY"] >> SourceOmegasY;
+  dr->SetVecs2DRaw(SourceThetas, SourceShiftsX, SourceShiftsY, SourceOmegasX, SourceOmegasY);
 
-  Mat SourceImage;
   Mat SourceFlowX;
   Mat SourceFlowY;
-  fs["SourceImage"] >> SourceImage;
   fs["SourceFlowX"] >> SourceFlowX;
   fs["SourceFlowY"] >> SourceFlowY;
-  dr->SetMatsRaw(SourceImage, SourceFlowX, SourceFlowY);
+  dr->SetMatsRaw(SourceFlowX, SourceFlowY);
 
   int SourcePics;
   int SourceStride;

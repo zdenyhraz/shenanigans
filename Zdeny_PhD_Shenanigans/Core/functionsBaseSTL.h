@@ -407,17 +407,7 @@ inline void filterMovavg(std::vector<double> &vec, int size)
   vec = vecMovavg;
 }
 
-inline double toDegrees(double rad)
-{
-  if (rad < 0)
-  {
-    return (rad + Constants::TwoPi) * Constants::Rad;
-  }
-  else
-  {
-    return rad * Constants::Rad;
-  }
-}
+inline double toDegrees(double rad) { return rad * Constants::Rad; }
 
 inline double toRadians(double deg) { return deg / Constants::Rad; }
 

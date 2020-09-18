@@ -136,6 +136,8 @@ private:
 
       if (0)
       {
+        auto [mmin, mmax] = minMaxMat(mat);
+        LOG_FATAL("min/max mat {}/{}", mmin, mmax);
         Mat xd = mat.clone();
         cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
         circle(xd, Point(fitsMid, fitsMid), params.R, Scalar(0, 0, 65535), 5);
