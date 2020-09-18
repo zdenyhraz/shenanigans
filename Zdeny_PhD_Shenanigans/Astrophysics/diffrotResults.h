@@ -270,7 +270,6 @@ private:
   double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
   {
     int l, u;
-    double r;
 
     for (int i = 0; i < xs.size() - 2; ++i)
     {
@@ -278,20 +277,18 @@ private:
       {
         l = i;
         u = i + 1;
-        r = (x - xs[l]) / (xs[u] - xs[l]);
         break;
       }
 
       if (xs[i] > x && xs[i + 1] < x)
       {
-        u = i;
         l = i + 1;
-        r = (x - xs[l]) / (xs[u] - xs[l]);
+        u = i;
         break;
       }
     }
 
-    return ys[l] + r * (ys[u] - ys[l]);
+    return ys[l] + (x - xs[l]) / (xs[u] - xs[l]) * (ys[u] - ys[l]);
   }
 
   double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
@@ -343,8 +340,21 @@ private:
       throw;
     }
 
-    LOG_INFO("<NS> NS equator values X: {:.2f} = {:.2f}", OmegasXavgN.back(), OmegasXavgS.back());
-    LOG_INFO("<NS> NS equator values Y: {:.2f} = {:.2f}", OmegasYavgN.back(), OmegasYavgS.back());
+    if (OmegasXavgN.back() != OmegasXavgS.back())
+    {
+      LOG_ERROR("<NS> OmegasNSX are not equal at equator: {} != {}", OmegasXavgN.back(), OmegasXavgS.back());
+      throw;
+    }
+    else
+      LOG_INFO("<NS> NS equator values X match: {:.2f} = {:.2f}", OmegasXavgN.back(), OmegasXavgS.back());
+
+    if (OmegasYavgN.back() != OmegasYavgS.back())
+    {
+      LOG_ERROR("<NS> OmegasNSY are not equal at equator: {} != {}", OmegasYavgN.back(), OmegasYavgS.back());
+      throw;
+    }
+    else
+      LOG_INFO("<NS> NS equator values Y match: {:.2f} = {:.2f}", OmegasYavgN.back(), OmegasYavgS.back());
   }
 
   void CalculateFitCoeffs()
