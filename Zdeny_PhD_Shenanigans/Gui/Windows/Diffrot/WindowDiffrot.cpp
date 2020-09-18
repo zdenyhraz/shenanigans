@@ -141,7 +141,7 @@ void WindowDiffrot::optimizeDiffrot()
     int L2size = std::floor(args[2]);
     winsize = winsize % 2 ? winsize + 1 : winsize;
     L2size = L2size % 2 ? L2size : L2size + 1;
-    IterativePhaseCorrelation ipc_opt(winsize, winsize, args[0], args[1]);
+    IterativePhaseCorrelation ipc_opt(winsize, winsize, abs(args[0]), abs(args[1]));
     ipc_opt.SetL2size(L2size);
     ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
     ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
@@ -158,7 +158,7 @@ void WindowDiffrot::optimizeDiffrot()
   evo.NP = 50;
   evo.mutStrat = Evolution::RAND1;
   evo.historyImprovTresholdPercent = 1;
-  evo.lowerBounds = std::vector<double>{0.01, 1, 5, -1, -1, 64, -1};
+  evo.lowerBounds = std::vector<double>{-10, -500, 5, -1, -1, 64, -1};
   evo.upperBounds = std::vector<double>{10, 500, 17, 1, 1, 512, 1};
   auto result = evo.optimize(f);
   LOG_SUCC("Evolution result = {}", result);
