@@ -235,18 +235,28 @@ void Zdeny_PhD_Shenanigans::debug()
     IterativePhaseCorrelation ipc2(Rows, Cols, BandpassL, BandpassH);
 
     auto shift1 = phasecorrel(img1, img2, ipc1);
-    auto shift2 = ipc2.Calculate(img1, img2);
-
     auto shift1n = phasecorrel(img1, img1, ipc1);
+
+    auto shift2 = ipc2.Calculate(img1, img2);
     auto shift2n = ipc2.Calculate(img1, img1);
 
     LOG_INFO("shift1 = {}", shift1);
-    LOG_INFO("shift2 = {}", shift2);
-
     LOG_INFO("shift1n = {}", shift1n);
+
+    LOG_INFO("shift2 = {}", shift2);
     LOG_INFO("shift2n = {}", shift2n);
   }
+  if (0) // ipc sign test
+  {
+    Mat img1 = loadImage("Resources\\test1.png");
+    Mat img2 = loadImage("Resources\\test2.png");
 
+    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
+
+    auto shift = ipc.Calculate(img1, img2);
+
+    LOG_INFO("shift = {}", shift);
+  }
   LOG_INFO("Debug finished.");
 }
 

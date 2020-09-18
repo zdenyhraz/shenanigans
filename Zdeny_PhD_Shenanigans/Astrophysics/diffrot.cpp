@@ -158,8 +158,7 @@ void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<d
     Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
     Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
     image[y] = pic1.image().at<ushort>(pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy);
-    // auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-    auto shift = ipc.Calculate(crop1, crop2);
+    auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
 
     shiftsX[y] = shift.x + predShift;
     shiftsY[y] = shift.y;
