@@ -64,6 +64,9 @@ private:
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
 
+  bool IsValid(const Mat &img1, const Mat &img2) const;
+  bool CheckSize(const Mat &img1, const Mat &img2) const;
+  bool CheckChannels(const Mat &img1, const Mat &img2) const;
   void ConvertToUnitFloat(Mat &img1, Mat &img2) const;
   void ApplyWindow(Mat &img1, Mat &img2) const;
   std::pair<Mat, Mat> CalculateFourierTransforms(Mat &img1, Mat &img2) const;
@@ -72,7 +75,7 @@ private:
   void CalculateFrequencyBandpass();
   Mat CalculateL3(const Mat &crosspower) const;
   void SwapQuadrants(Mat &mat) const;
-  std::pair<Point2f, double> GetPeak(const Mat &mat) const;
+  Point2f GetPeak(const Mat &mat) const;
   Point2f GetPeakSubpixel(const Mat &mat) const;
   Mat CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const;
   Mat CalculateL2U(const Mat &L2) const;
