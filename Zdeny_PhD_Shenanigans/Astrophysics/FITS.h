@@ -129,23 +129,11 @@ private:
       Mat mat(fitsSize, fitsSize, CV_16UC1);
       streamIN.read((char *)mat.data, fitsSize2 * 2);
       swapbytes((char *)mat.data, fitsSize2 * 2);
-
-      // korekce - necessarry?
-      if (1)
-      {
-        short *s = (short *)mat.data;
-        ushort *us = (ushort *)mat.data;
-        for (int i = 0; i < fitsSize2; i++)
-        {
-          int px = (int)(s[i]);
-          px += 32768;
-          us[i] = px;
-        }
-      }
-
       normalize(mat, mat, 0, 65535, NORM_MINMAX);
       warpAffine(mat, mat, getRotationMatrix2D(Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
       transpose(mat, mat);
+      params.succload = true;
+
       if (0)
       {
         Mat xd = mat.clone();
@@ -153,7 +141,7 @@ private:
         circle(xd, Point(fitsMid, fitsMid), params.R, Scalar(0, 0, 65535), 5);
         showimg(xd, "xd");
       }
-      params.succload = true;
+
       return std::make_tuple(mat, params);
     }
   }

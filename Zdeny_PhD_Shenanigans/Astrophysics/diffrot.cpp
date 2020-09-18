@@ -49,9 +49,9 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
     {
       if (drset.video)
       {
-        Mat crop = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY, 64, 36);
+        Mat crop = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY - 0.7 * pic1.params().R, 256, 256);
         normalize(crop, crop, 0, 65535, NORM_MINMAX);
-        saveimg(drset.savepath + to_string(pic) + ".png", crop, true, cv::Size(640, 360));
+        saveimg(drset.savepath + to_string(pic) + ".png", crop, true, cv::Size(1000, 1000));
         continue;
       }
 
