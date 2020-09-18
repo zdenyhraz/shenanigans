@@ -24,6 +24,7 @@ void WindowDiffrot::calculateDiffrot()
   FitsTime time = GetStartFitsTime();
   drres = calculateDiffrotProfile(*globals->IPC, time, drset);
   showResults();
+  saveDiffrot();
 }
 
 void WindowDiffrot::showResults()
