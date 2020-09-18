@@ -473,7 +473,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanHorizontal(const std::vecto
   for (int i = 0; i < vec.size(); i++)
   {
     double m = mean(vec[i]);
-    double s = stdevs(vec[i]);
+    double s = stdev(vec[i]);
     double n = vec[i].size();
     double e = s / sqrt(n);
     errors[i] = e;
@@ -492,7 +492,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<
       v[j] = vec[j][i];
 
     double m = mean(v);
-    double s = stdevs(v);
+    double s = stdev(v);
     double n = v.size();
     double e = s / sqrt(n);
     errors[i] = e;
@@ -502,7 +502,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<
 
 inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::vector<double>> &vec)
 {
-  std::vector<double> stddevs(vec[0].size());
+  std::vector<double> stdevs(vec[0].size());
 
   for (int i = 0; i < vec[0].size(); i++)
   {
@@ -510,7 +510,7 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
     for (int j = 0; j < vec.size(); j++)
       v[j] = vec[j][i];
 
-    stddevs[i] = stdevs(v);
+    stdevs[i] = stdev(v);
   }
-  return stddevs;
+  return stdevs;
 }
