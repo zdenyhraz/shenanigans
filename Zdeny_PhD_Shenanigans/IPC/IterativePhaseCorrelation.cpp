@@ -34,6 +34,9 @@ cv::Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &i
 
 inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) const
 {
+  if (!IsValid(img1, img2))
+    return {0, 0};
+
   ConvertToUnitFloat(img1, img2);
   ApplyWindow(img1, img2);
   auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
@@ -41,7 +44,7 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
   ApplyBandpass(crosspower);
 
   Mat L3 = CalculateL3(crosspower);
-  auto [L3peak, L3max] = GetPeak(L3);
+  Point2f L3peak = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   Point2f result = L3peak - L3mid;
 
@@ -99,13 +102,29 @@ inline cv::Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) 
   return result;
 }
 
+inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
+{
+  // size must be equal for matching bandpass / window
+  if (!CheckSize(img1, img2))
+    return false;
+
+  // only grayscale images are supported
+  if (!CheckChannels(img1, img2))
+    return false;
+
+  return true;
+}
+
+inline bool IterativePhaseCorrelation::CheckSize(const Mat &img1, const Mat &img2) const { return img1.rows == mRows && img1.cols == mCols && img2.rows == mRows && img2.cols == mCols; }
+
+inline bool IterativePhaseCorrelation::CheckChannels(const Mat &img1, const Mat &img2) const { return img1.channels() == 1 && img2.channels() == 1; }
+
 inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2) const
 {
-  double max1, max2;
-  minMaxLoc(img1, nullptr, &max1);
-  minMaxLoc(img2, nullptr, &max2);
-  img1.convertTo(img1, CV_32F, 1. / max1);
-  img2.convertTo(img2, CV_32F, 1. / max2);
+  img1.convertTo(img1, CV_32F);
+  img2.convertTo(img2, CV_32F);
+  normalize(img1, img1, 0, 1, CV_MINMAX);
+  normalize(img2, img2, 0, 1, CV_MINMAX);
 }
 
 inline void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2) const
@@ -156,7 +175,7 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower) const
   multiply(crosspower, mFrequencyBandpass, crosspower);
 }
 
-void IterativePhaseCorrelation::CalculateFrequencyBandpass()
+inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
   Mat bandpassF = quadrantswap(mBandpass);
   Mat bandpassFplanes[2] = {bandpassF, bandpassF};
@@ -190,12 +209,11 @@ inline void IterativePhaseCorrelation::SwapQuadrants(Mat &mat) const
   temp.copyTo(q3);
 }
 
-inline std::pair<Point2f, double> IterativePhaseCorrelation::GetPeak(const Mat &mat) const
+inline Point2f IterativePhaseCorrelation::GetPeak(const Mat &mat) const
 {
-  Point2i matpeak;
-  double matmax;
-  minMaxLoc(mat, nullptr, &matmax, nullptr, &matpeak);
-  return std::make_pair(matpeak, matmax);
+  Point2i peak;
+  minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
+  return peak;
 }
 
 inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
