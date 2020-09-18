@@ -202,9 +202,6 @@ private:
         thetaRange = SourceThetas[p].front();
     double dth = 2. * thetaRange / (ys - 1);
 
-    LOG_INFO("Theta range = {}", toDegrees(thetaRange));
-    LOG_INFO("Theta delta = {}", toDegrees(dth));
-
     // interpolate shifts and omegas based on equidisstant theta
     for (int y = 0; y < ys; ++y)
     {
@@ -214,8 +211,6 @@ private:
       OmegasX[y] = Interpolate(SourceThetas, SourceOmegasX, Thetas[y]);
       OmegasY[y] = Interpolate(SourceThetas, SourceOmegasY, Thetas[y]);
     }
-
-    LOG_INFO("Theta max/min = {}/{}", toDegrees(Thetas.front()), toDegrees(Thetas.back()));
   }
 
   void Reset()
