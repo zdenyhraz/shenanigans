@@ -145,6 +145,7 @@ void WindowDiffrot::optimizeDiffrot()
     ipc_opt.SetL2size(L2size);
     ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
     ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
+    ipc_opt.SetInterpolationType(args[6] > 0 ? INTER_CUBIC : INTER_LINEAR);
     FitsTime time_opt = starttime;
     DiffrotSettings drset_opt = drset;
     drset_opt.speak = false;
@@ -153,12 +154,12 @@ void WindowDiffrot::optimizeDiffrot()
 
   // best: [0.309235, 20.0541, 11, +, -, 302] (0.018705611)
 
-  Evolution evo(6);
+  Evolution evo(7);
   evo.NP = 50;
   evo.mutStrat = Evolution::RAND1;
   evo.historyImprovTresholdPercent = 1;
-  evo.lowerBounds = std::vector<double>{0.01, 1, 5, -1, -1, 64};
-  evo.upperBounds = std::vector<double>{10, 500, 17, 1, 1, 512};
+  evo.lowerBounds = std::vector<double>{0.01, 1, 5, -1, -1, 64, -1};
+  evo.upperBounds = std::vector<double>{10, 500, 17, 1, 1, 512, 1};
   auto result = evo.optimize(f);
   LOG_SUCC("Evolution result = {}", result);
 }
