@@ -11,16 +11,12 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
   std::vector<std::vector<double>> omegasY2D;
   std::vector<std::vector<double>> shiftsX2D;
   std::vector<std::vector<double>> shiftsY2D;
-  std::vector<std::vector<double>> image2D;
-  std::vector<std::vector<double>> predicXs = zerovect2(2, drset.ys, 0.);
   std::vector<double> thetas(drset.ys);
   std::vector<double> shiftsX(drset.ys);
   std::vector<double> shiftsY(drset.ys);
   std::vector<double> omegasX(drset.ys);
   std::vector<double> omegasY(drset.ys);
-  std::vector<double> image(drset.ys);
 
-  std::vector<double> thetasavg(drset.ys);
   std::vector<double> omegasXavg(drset.ys);
   std::vector<double> omegasYavg(drset.ys);
   std::vector<double> shiftsXavg(drset.ys);
@@ -33,7 +29,6 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
   omegasY2D.reserve(drset.pics);
   shiftsX2D.reserve(drset.pics);
   shiftsY2D.reserve(drset.pics);
-  image2D.reserve(drset.pics);
 
   FitsImage pic1, pic2;
   int lag1, lag2;
@@ -65,9 +60,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
         LOG_DEBUG_IF(drset.speak, "Predicted shift used = {}", predShift);
       }
 
-      calculateOmegas(pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, image, predicXs, ipc, drset, R, theta0, dy, lag1, lag2, predShift);
-
-      image2D.emplace_back(image);
+      calculateOmegas(pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, ipc, drset, R, theta0, dy, lag1, lag2, predShift);
 
       if (pic < 10)
       {
@@ -94,9 +87,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
           shiftsX2D.emplace_back(shiftsX);
         }
         else
-        {
           LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, skipping", diffX);
-        }
 
         // filter outlier Y data
         if (abs(diffY) < diffThreshY)
@@ -105,61 +96,38 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
           shiftsY2D.emplace_back(shiftsY);
         }
         else
-        {
           LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff Y = {:.2f}, skipping", diffY);
-        }
 
         // log progress
         if (abs(diffX) < diffThreshX && abs(diffY) < diffThreshY)
-        {
           LOG_SUCC_IF(drset.speak, "{} / {} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
-        }
       }
 
-      thetasavg = meanVertical(thetas2D);
       omegasXavg = meanVertical(omegasX2D);
       omegasYavg = meanVertical(omegasY2D);
-
-      if (drset.visual)
-      {
-        shiftsXavg = meanVertical(shiftsX2D);
-        shiftsYavg = meanVertical(shiftsY2D);
-        omegasXavgpolyfit = polyfit(thetasavg, omegasXavg, 2);
-        omegasYavgpolyfit = polyfit(thetasavg, omegasYavg, 3);
-
-        Plot1D::plot((360. / Constants::TwoPi) * thetasavg, std::vector<std::vector<double>>{omegasXavg, omegasXavgpolyfit, predicXs[0], predicXs[1], omegasX}, std::vector<std::vector<double>>{shiftsXavg}, "diffrot1DX", "solar latitude [deg]", "horizontal material flow speed [deg/day]", "horizontal px shift [px]", std::vector<std::string>{"omegasXavg", "omegasXavgpolyfit", "predic1", "predic2", "omegasX"}, std::vector<std::string>{"shiftsXavg"});
-        Plot1D::plot((360. / Constants::TwoPi) * thetasavg, std::vector<std::vector<double>>{omegasYavg, omegasYavgpolyfit, omegasY}, std::vector<std::vector<double>>{shiftsYavg}, "diffrot1DY", "solar latitude [deg]", "vertical material flow speed [deg/day]", "vertical px shift [px]", std::vector<std::string>{"omegasYavg", "omegasYavgpolyfit", "omegasY"}, std::vector<std::string>{"shiftsYavg"});
-
-        Plot2D::plot(applyQuantile(matFromVector(omegasX2D), 0.01, 0.99), "diffrot2DX", "solar latitude [deg]", "solar longitude [pics]", "horizontal material flow speed [deg/day]", (360. / Constants::TwoPi) * thetasavg.back(), (360. / Constants::TwoPi) * thetasavg.front(), 0, 1, 2);
-        Plot2D::plot(applyQuantile(matFromVector(omegasY2D), 0.01, 0.99), "diffrot2DY", "solar latitude [deg]", "solar longitude [pics]", "vertical material flow speed [deg/day]", (360. / Constants::TwoPi) * thetasavg.back(), (360. / Constants::TwoPi) * thetasavg.front(), 0, 1, 2);
-      }
     }
   }
 
-  thetasavg = meanVertical(thetas2D);
   omegasXavg = meanVertical(omegasX2D);
   omegasYavg = meanVertical(omegasY2D);
   shiftsXavg = meanVertical(shiftsX2D);
   shiftsYavg = meanVertical(shiftsY2D);
 
   DiffrotResults dr;
-  dr.SetData1D(thetasavg, omegasXavg, omegasYavg, shiftsXavg, shiftsYavg);
-  dr.SetData2D(image2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D);
+  dr.SetData2D(thetas2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D);
   dr.SetParams(drset.pics, drset.sPic, drset.savepath);
 
   return dr;
 }
 
-void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, std::vector<double> &image, std::vector<std::vector<double>> &predicXs, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
+void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
 {
 #pragma omp parallel for
   for (int y = 0; y < drset.ys; y++)
   {
     Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
     Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
-    image[y] = pic1.image().at<ushort>(pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy);
     auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-
     shiftsX[y] = shift.x + predShift;
     shiftsY[y] = shift.y;
   }
@@ -186,9 +154,6 @@ void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<d
     shiftsX[y] = clamp(shiftsX[y], 0, Constants::Inf);
     omegasX[y] = asin(shiftsX[y] / (R * cos(thetas[y]))) / dt * Constants::RadPerSecToDegPerDay;
     omegasY[y] = (thetas[y] - asin(sin(thetas[y]) - shiftsY[y] / R)) / dt * Constants::RadPerSecToDegPerDay;
-    predicXs[0][y] = predictDiffrotProfile(thetas[y], 14.296, -1.847, -2.615); // Derek A. Lamb (2017)
-    predicXs[1][y] = predictDiffrotProfile(thetas[y], 14.192, -1.70, -2.36);   // Howard et al. (1983)
-    // etc...
   }
 }
 
