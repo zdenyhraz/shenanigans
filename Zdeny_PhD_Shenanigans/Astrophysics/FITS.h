@@ -57,7 +57,7 @@ private:
     ifstream streamIN(path, ios::binary | ios::in);
     if (!streamIN)
     {
-      LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
+      // LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
       return std::make_tuple(Mat(), FitsParams());
     }
     else
