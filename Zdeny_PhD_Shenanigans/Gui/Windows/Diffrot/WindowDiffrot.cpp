@@ -153,8 +153,6 @@ void WindowDiffrot::optimizeDiffrot()
     return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
   };
 
-  // best: [0.309235, 20.0541, 11, +, -, 302] (0.018705611)
-
   Evolution evo(7);
   evo.NP = 50;
   evo.mutStrat = Evolution::RAND1;
