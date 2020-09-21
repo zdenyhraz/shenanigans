@@ -2,6 +2,8 @@
 #include "Evolution.h"
 #include "Plot/Plot1D.h"
 
+Evolution::Evolution(int N) : OptimizationAlgorithm(N), mNP(mINPm * N){};
+
 std::vector<double> Evolution::optimize(const std::function<double(const std::vector<double> &)> &f)
 {
   LOG_STARTEND("Evolution optimization started", "Evolution optimization ended");
@@ -25,10 +27,10 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
   vector<vector<double>> visitedPointsMainThisRun;
   vector<vector<double>> visitedPointsThisRun;
   double averageImprovement = 0;
-  vector<vector<double>> population(NP, zerovect(N, 0.));
-  vector<queue<double>> histories(NP);
+  vector<vector<double>> population(mNP, zerovect(N, 0.));
+  vector<queue<double>> histories(mNP);
   bool historyConstant = false;
-  vector<double> fitness = zerovect(NP, 0.);
+  vector<double> fitness = zerovect(mNP, 0.);
   vector<double> bestEntity = zerovect(N, 0.);
   double bestFitness = Constants::Inf;
   double fitness_prev = Constants::Inf;
@@ -38,7 +40,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
   LOG_INFO("Creating initial population within bounds ... ");
   const double initialMinAvgDist = 0.5;
   double minAvgDist = initialMinAvgDist;
-  for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+  for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
   {
     int distinctEntityTrials = 0;
     bool distinctEntity = false; // entities may not be too close together
@@ -49,7 +51,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       for (int indexParam = 0; indexParam < N; indexParam++) // generate initial entity
         population[indexEntity][indexParam] = randr(lowerBounds[indexParam], upperBounds[indexParam]);
 
-      if (!distincEntityMaxTrials)
+      if (!mDistincEntityMaxTrials)
         break;
 
       for (int indexEntity2 = 0; indexEntity2 < indexEntity; indexEntity2++) // check distance to all other entities
@@ -64,7 +66,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
 
       distinctEntityTrials++;
 
-      if (distinctEntityTrials >= distincEntityMaxTrials)
+      if (distinctEntityTrials >= mDistincEntityMaxTrials)
       {
         minAvgDist *= 0.8;
         distinctEntityTrials = 0;
@@ -76,7 +78,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
   // calculate initial fitness vector
   LOG_INFO("Evaluating initial population...");
 #pragma omp parallel for
-  for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+  for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
   {
     fitness[indexEntity] = f(population[indexEntity]);
     if (logPoints)
@@ -85,11 +87,11 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       visitedPointsThisRun.push_back(population[indexEntity]);
     }
   }
-  funEvals += NP;
+  funEvals += mNP;
   LOG_SUCC("Initial population evaluated");
 
   // determine the best entity in the initial population
-  for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+  for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
   {
     if (fitness[indexEntity] <= bestFitness)
     {
@@ -106,7 +108,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
   for (int generation = 1; generation < 1e8; generation++)
   {
 #pragma omp parallel for
-    for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
     {
       // create new potential entity
       vector<double> newEntity = population[indexEntity];
@@ -115,7 +117,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       // select distinct parents different from the current entity
       int numberOfParents;
       // calculate the number of parents
-      switch (mutStrat)
+      switch (mMutStrat)
       {
       case MutationStrategy::RAND1:
         numberOfParents = 3;
@@ -136,14 +138,14 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       {
         int idxTst;
         do
-          idxTst = rand() % NP;
+          idxTst = rand() % mNP;
         while (!isDistinct(idxTst, parentIndices, indexEntity));
         idx = idxTst;
       }
 
       // decide which parameters undergo crossover
       vector<bool> paramIsCrossed(N, false);
-      switch (crossStrat)
+      switch (mCrossStrat)
       {
       case CrossoverStrategy::BIN:
       {
@@ -151,7 +153,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
         for (int indexParam = 0; indexParam < N; indexParam++)
         {
           double random = rand01();
-          if (random < CR || indexParam == definite)
+          if (random < mCR || indexParam == definite)
             paramIsCrossed[indexParam] = true;
         }
         break;
@@ -161,7 +163,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
         int L = 0;
         do
           L++;
-        while ((rand01() < CR) && (L < N)); // at least one param undergoes crossover
+        while ((rand01() < mCR) && (L < N)); // at least one param undergoes crossover
         int indexParam = rand() % N;
         for (int i = 0; i < L; i++)
         {
@@ -178,19 +180,19 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       {
         if (paramIsCrossed[indexParam])
         {
-          switch (mutStrat)
+          switch (mMutStrat)
           {
           case MutationStrategy::RAND1:
-            newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]);
+            newEntity[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]);
             break;
           case MutationStrategy::BEST1:
-            newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]);
+            newEntity[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]);
             break;
           case MutationStrategy::RAND2:
-            newEntity[indexParam] = population[parentIndices[0]][indexParam] + F * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + F * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]);
+            newEntity[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + mF * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]);
             break;
           case MutationStrategy::BEST2:
-            newEntity[indexParam] = bestEntity[indexParam] + F * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + F * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]);
+            newEntity[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + mF * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]);
             break;
           }
         }
@@ -216,10 +218,10 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
 
     } // entity cycle end
 
-    funEvals += NP;
+    funEvals += mNP;
 
     // determine the best entity
-    for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
     {
       if (fitness[indexEntity] <= bestFitness)
       {
@@ -236,14 +238,14 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
     // fill history ques for all entities - termination criterion
     historyConstant = true; // assume history is constant
     averageImprovement = 0;
-    for (int indexEntity = 0; indexEntity < NP; indexEntity++)
+    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
     {
-      if (histories[indexEntity].size() == historySize)
+      if (histories[indexEntity].size() == mHistorySize)
       {
         histories[indexEntity].pop();                      // remove first element - keep que size constant
         histories[indexEntity].push(fitness[indexEntity]); // insert at the end
-        if (stopCrit == StoppingCriterion::ALLIMP)         // fitness improved less than x% for all entities
-          if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > historyImprovTresholdPercent / 100)
+        if (mStopCrit == StoppingCriterion::ALLIMP)        // fitness improved less than x% for all entities
+          if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > mHistoryImprovTresholdPercent / 100)
             historyConstant = false;
       }
       else
@@ -254,9 +256,9 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       if (histories[indexEntity].size() > 2)
         averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
     }
-    averageImprovement /= NP;
-    if (stopCrit == StoppingCriterion::AVGIMP) // average fitness improved less than x%
-      if (100 * averageImprovement > historyImprovTresholdPercent)
+    averageImprovement /= mNP;
+    if (mStopCrit == StoppingCriterion::AVGIMP) // average fitness improved less than x%
+      if (100 * averageImprovement > mHistoryImprovTresholdPercent)
         historyConstant = false;
 
     // termination criterions
@@ -281,7 +283,7 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
       success = false;
       break;
     }
-    if (historyConstant) // no entity improved last (historySize) generations
+    if (historyConstant) // no entity improved last (mHistorySize) generations
     {
       LOG_SUCC("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
       terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);

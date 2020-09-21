@@ -50,7 +50,7 @@ void Zdeny_PhD_Shenanigans::debug()
   if (0) // plot in optimization
   {
     Evolution Evo(2);
-    Evo.NP = 10;
+    Evo.mNP = 10;
     auto f = [&](std::vector<double> args) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       return abs(args[0] - args[1]);
