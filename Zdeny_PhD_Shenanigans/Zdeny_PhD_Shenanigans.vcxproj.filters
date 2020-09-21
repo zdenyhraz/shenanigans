@@ -52,12 +52,6 @@
     <ClCompile Include="Plot\qcustomplot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Optimization\graphOptimization.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Optimization\optimization.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
     <ClCompile Include="Fourier\fourier.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -142,16 +136,16 @@
     <ClCompile Include="Optimization\VisualOptimization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Optimization\Optimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Optimization\GraphOptimization.cpp">
+      <Filter>Source Files\Custom sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Optimization\graphOptimization.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Optimization\optimization.h">
-      <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
     <ClInclude Include="Fourier\fourier.h">
       <Filter>Header Files\Custom Headers</Filter>
@@ -281,6 +275,12 @@
     </ClInclude>
     <ClInclude Include="Optimization\VisualOptimization.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimization\Optimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimization\GraphOptimization.h">
+      <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

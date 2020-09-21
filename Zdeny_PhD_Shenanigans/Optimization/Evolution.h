@@ -1,5 +1,5 @@
 #pragma once
-#include "optimization.h"
+#include "Optimization.h"
 
 class Evolution : public OptimizationAlgorithm
 {
