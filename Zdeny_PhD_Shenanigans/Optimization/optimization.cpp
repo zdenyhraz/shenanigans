@@ -12,6 +12,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   LOG_STARTEND("Evolution optimization started", "Evolution optimization ended");
   Plot1D::Reset("evolution");
   std::ofstream file("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
+  file << "Evolution started." << std::endl;
   funEvals = 0;
   success = false;
 
@@ -299,7 +300,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   if (logPoints)
     visitedPoints.push_back(visitedPointsThisRun);
 
-  file << "Evolution ended." << std::endl;
+  file << "Evolution ended.\n" << std::endl;
   return bestEntity;
 } // optimize function end
 
