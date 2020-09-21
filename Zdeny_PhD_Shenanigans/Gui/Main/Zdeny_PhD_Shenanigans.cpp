@@ -202,7 +202,7 @@ void Zdeny_PhD_Shenanigans::debug()
     LOG_DEBUG("C = \n{}", C);
     LOG_DEBUG("A + C = \n{}", A + C);
   }
-  if (0) // new ipc test
+  if (1) // new ipc test
   {
     Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
@@ -257,7 +257,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
     LOG_INFO("shift = {}", shift);
   }
-  if (1) // loadfits test
+  if (0) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
   }

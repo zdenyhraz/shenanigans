@@ -11,6 +11,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
 {
   LOG_STARTEND("Evolution optimization started", "Evolution optimization ended");
   Plot1D::Reset("evolution");
+  std::ofstream file("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
   funEvals = 0;
   success = false;
 
@@ -230,6 +231,10 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         fitness_prev = fitness_curr;
         fitness_curr = bestFitness;
         LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
+        file << "Gen " + to_string(generation);
+        file << " best entity = ";
+        file << bestEntity;
+        file << " (" + to_string(bestFitness) + ")\n";
       }
     }
 
