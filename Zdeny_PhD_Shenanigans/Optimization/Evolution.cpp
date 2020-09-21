@@ -9,7 +9,7 @@ std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolut
   mOptimizing = true;
   LOG_INFO("Evolution optimization started");
 
-  if (!CheckAlreadyOptimizing)
+  if (!CheckAlreadyOptimizing())
     return {};
 
   if (!InitializeOutputs())
@@ -371,4 +371,5 @@ int Evolution::GetNumberOfParents()
   case MutationStrategy::BEST2:
     return 4;
   }
+  return 3;
 }
