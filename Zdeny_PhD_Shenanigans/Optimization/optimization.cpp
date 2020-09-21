@@ -114,8 +114,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
     for (int indexEntity = 0; indexEntity < NP; indexEntity++)
     {
       // create new potential entity
-      vector<double> newEntity(N, 0.);
-      newEntity = population[indexEntity];
+      vector<double> newEntity = population[indexEntity];
       double newFitness = 0.;
 
       // select distinct parents different from the current entity
@@ -235,10 +234,9 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         fitness_curr = bestFitness;
         LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
         file << "Gen " + to_string(generation) + " best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+        Plot1D::plot(generation, bestFitness, log(bestFitness), "evolution", "generation", "fitness", "log fitness");
       }
     }
-
-    Plot1D::plot(generation, bestFitness, log(bestFitness), "evolution", "generation", "fitness", "log fitness");
 
     // fill history ques for all entities - termination criterion
     historyConstant = true; // assume history is constant
