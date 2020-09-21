@@ -4,36 +4,39 @@
 class Evolution : public OptimizationAlgorithm
 {
 public:
-  enum MutationStrategy : char
+  Evolution(int N);
+  std::vector<double> optimize(const std::function<double(const std::vector<double> &)> &f) override;
+
+  enum MutationStrategy
   {
     RAND1,
     BEST1,
     RAND2,
     BEST2
   };
-  enum CrossoverStrategy : char
+
+  enum CrossoverStrategy
   {
     BIN,
     EXP
   };
-  enum StoppingCriterion : char
+
+  enum StoppingCriterion
   {
     ALLIMP,
     AVGIMP
   };
-  int NP = 4;
-  double F = 0.65;
-  double CR = 0.95;
-  double iNPm = 8;
-  MutationStrategy mutStrat = RAND1;
-  CrossoverStrategy crossStrat = BIN;
-  StoppingCriterion stopCrit = AVGIMP;
-  int distincEntityMaxTrials = 10;
-  int historySize = 10;
-  double historyImprovTresholdPercent = 1;
-  Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm * N){};
 
-  std::vector<double> optimize(const std::function<double(const std::vector<double> &)> &f) override;
+  int mNP = 4;
+  double mF = 0.65;
+  double mCR = 0.95;
+  double mINPm = 8;
+  MutationStrategy mMutStrat = RAND1;
+  CrossoverStrategy mCrossStrat = BIN;
+  StoppingCriterion mStopCrit = AVGIMP;
+  int mDistincEntityMaxTrials = 10;
+  int mHistorySize = 10;
+  double mHistoryImprovTresholdPercent = 1;
 
 private:
 };

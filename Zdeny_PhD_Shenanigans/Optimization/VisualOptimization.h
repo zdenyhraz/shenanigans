@@ -201,7 +201,7 @@ void optimizeWithLandscapeDebug()
   Evo.lowerBounds = lowerBounds;
   Evo.upperBounds = upperBounds;
   Evo.optimalFitness = 1e-4;
-  Evo.NP = 50;
+  Evo.mNP = 50;
 
   Pat.lowerBounds = lowerBounds;
   Pat.upperBounds = upperBounds;
