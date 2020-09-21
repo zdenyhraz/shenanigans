@@ -6,7 +6,11 @@ Evolution::Evolution(int N) : OptimizationAlgorithm(N) { mNP = N * mINPm; };
 
 std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolution::optimize(const std::function<double(const std::vector<double> &)> &f)
 {
+  mOptimizing = true;
   LOG_INFO("Evolution optimization started");
+
+  if (!CheckAlreadyOptimizing)
+    return {};
 
   if (!InitializeOutputs())
     return {};
@@ -63,6 +67,7 @@ std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolut
     mOutputFile << "Evolution ended.\n" << std::endl;
 
   LOG_INFO("Evolution optimization ended");
+  mOptimizing = false;
   return {bestEntity, terminationReason};
 }
 
@@ -350,6 +355,8 @@ std::pair<bool, OptimizationAlgorithm::TerminationReason> Evolution::CheckTermin
   }
   return {false, NotTerminated};
 }
+
+bool Evolution::CheckAlreadyOptimizing() { return !mOptimizing; }
 
 int Evolution::GetNumberOfParents()
 {
