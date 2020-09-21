@@ -52,6 +52,20 @@ template <typename T = double> inline auto zerovect3(int N, int M, int O, T valu
 
 template <typename T = double> inline auto zerovect4(int N, int M, int O, int P, T value = 0.) { return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value)); }
 
+template <typename T> inline std::string to_string(const std::vector<T> &vec)
+{
+  std::stringstream out;
+  out << "[";
+  for (int i = 0; i < vec.size(); i++)
+  {
+    out << vec[i];
+    if (i < vec.size() - 1)
+      out << ", ";
+  }
+  out << "]";
+  return out.str();
+}
+
 template <typename T> inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &vec)
 {
   out << "[";

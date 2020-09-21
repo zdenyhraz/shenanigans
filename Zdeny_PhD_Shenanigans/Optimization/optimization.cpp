@@ -102,6 +102,8 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
     }
   }
   LOG_INFO("Initial population best entity: {} ({:.3f})", bestEntity, bestFitness);
+  file << "Init best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+  Plot1D::plot(0, bestFitness, log(bestFitness), "evolution", "generation", "fitness", "log fitness");
 
   // run main evolution cycle
   LOG_INFO("Running evolution...");
@@ -231,10 +233,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
         fitness_prev = fitness_curr;
         fitness_curr = bestFitness;
         LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
-        file << "Gen " + to_string(generation);
-        file << " best entity = ";
-        file << bestEntity;
-        file << " (" + to_string(bestFitness) + ")\n";
+        file << "Gen " + to_string(generation) + " best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
       }
     }
 
@@ -300,6 +299,7 @@ std::vector<double> Evolution::optimize(std::function<double(const std::vector<d
   if (logPoints)
     visitedPoints.push_back(visitedPointsThisRun);
 
+  file << "Evolution ended." << std::endl;
   return bestEntity;
 } // optimize function end
 
