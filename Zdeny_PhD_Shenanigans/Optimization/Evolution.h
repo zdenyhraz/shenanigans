@@ -61,4 +61,7 @@ private:
   void UpdateOutputs(int generation, const std::vector<double> &bestEntity, double bestFitness, double averageImprovement, double &fitnessPrevious, double &fitnessCurrent);
   void UpdateHistories(const std::vector<double> &populationFitness, std::vector<std::queue<double>> &populationHistory, double &averageImprovement, bool &historyConstant);
   std::pair<bool, TerminationReason> CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant);
+  bool CheckAlreadyOptimizing();
+
+  bool mOptimizing = false;
 };
