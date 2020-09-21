@@ -87,7 +87,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
           omegasY2D.emplace_back(omegasY);
 
           // log progress
-          LOG_SUCC_IF(drset.speak, "{} / {} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
+          LOG_SUCC_IF(drset.speak, "{}/{} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
         }
         else
           LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, diff Y = {:.2f}, skipping", diffX, diffY);
