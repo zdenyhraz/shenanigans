@@ -7,10 +7,11 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
 {
   int dy = drset.vFov / (drset.ys - 1);
   std::vector<std::vector<double>> thetas2D;
-  std::vector<std::vector<double>> omegasX2D;
-  std::vector<std::vector<double>> omegasY2D;
   std::vector<std::vector<double>> shiftsX2D;
   std::vector<std::vector<double>> shiftsY2D;
+  std::vector<std::vector<double>> omegasX2D;
+  std::vector<std::vector<double>> omegasY2D;
+
   std::vector<double> thetas(drset.ys);
   std::vector<double> shiftsX(drset.ys);
   std::vector<double> shiftsY(drset.ys);
@@ -19,16 +20,12 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
 
   std::vector<double> omegasXavg(drset.ys);
   std::vector<double> omegasYavg(drset.ys);
-  std::vector<double> shiftsXavg(drset.ys);
-  std::vector<double> shiftsYavg(drset.ys);
-  std::vector<double> omegasXavgpolyfit(drset.ys);
-  std::vector<double> omegasYavgpolyfit(drset.ys);
 
   thetas2D.reserve(drset.pics);
-  omegasX2D.reserve(drset.pics);
-  omegasY2D.reserve(drset.pics);
   shiftsX2D.reserve(drset.pics);
   shiftsY2D.reserve(drset.pics);
+  omegasX2D.reserve(drset.pics);
+  omegasY2D.reserve(drset.pics);
 
   FitsImage pic1, pic2;
   int lag1, lag2;
@@ -66,10 +63,10 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
       {
         LOG_SUCC_IF(drset.speak, "{} / {} estimating initial profile", pic + 1, drset.pics);
         thetas2D.emplace_back(thetas);
-        omegasX2D.emplace_back(omegasX);
-        omegasY2D.emplace_back(omegasY);
         shiftsX2D.emplace_back(shiftsX);
         shiftsY2D.emplace_back(shiftsY);
+        omegasX2D.emplace_back(omegasX);
+        omegasY2D.emplace_back(omegasY);
       }
       else
       {
@@ -79,28 +76,21 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
         const double diffThreshX = 1; // 1
         const double diffThreshY = 2; // 2
 
-        // filter outlier X data
-        if (abs(diffX) < diffThreshX)
-        {
-          thetas2D.emplace_back(thetas);
-          omegasX2D.emplace_back(omegasX);
-          shiftsX2D.emplace_back(shiftsX);
-        }
-        else
-          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, skipping", diffX);
-
-        // filter outlier Y data
-        if (abs(diffY) < diffThreshY)
-        {
-          omegasY2D.emplace_back(omegasY);
-          shiftsY2D.emplace_back(shiftsY);
-        }
-        else
-          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff Y = {:.2f}, skipping", diffY);
-
-        // log progress
+        // filter outlier X/Y data
         if (abs(diffX) < diffThreshX && abs(diffY) < diffThreshY)
+        {
+          // save data
+          thetas2D.emplace_back(thetas);
+          shiftsX2D.emplace_back(shiftsX);
+          shiftsY2D.emplace_back(shiftsY);
+          omegasX2D.emplace_back(omegasX);
+          omegasY2D.emplace_back(omegasY);
+
+          // log progress
           LOG_SUCC_IF(drset.speak, "{} / {} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
+        }
+        else
+          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, diff Y = {:.2f}, skipping", diffX, diffY);
       }
 
       omegasXavg = meanVertical(omegasX2D);
@@ -110,8 +100,6 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
 
   omegasXavg = meanVertical(omegasX2D);
   omegasYavg = meanVertical(omegasY2D);
-  shiftsXavg = meanVertical(shiftsX2D);
-  shiftsYavg = meanVertical(shiftsY2D);
 
   DiffrotResults dr;
   dr.SetData2D(thetas2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D);

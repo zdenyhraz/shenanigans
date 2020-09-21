@@ -268,14 +268,14 @@ private:
 
     for (int i = 0; i < xs.size() - 2; ++i)
     {
-      if (xs[i] < x && xs[i + 1] > x)
+      if (xs[i] <= x && xs[i + 1] > x)
       {
         l = i;
         u = i + 1;
         break;
       }
 
-      if (xs[i] > x && xs[i + 1] < x)
+      if (xs[i] >= x && xs[i + 1] < x)
       {
         l = i + 1;
         u = i;
@@ -288,7 +288,7 @@ private:
 
   double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
   {
-    int ps = xs.size();
+    const int ps = xs.size();
     double mean = 0;
 
     for (int p = 0; p < ps; ++p)
