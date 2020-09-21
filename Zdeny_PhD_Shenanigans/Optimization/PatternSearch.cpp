@@ -2,13 +2,12 @@
 #include "PatternSearch.h"
 #include "Plot/Plot1D.h"
 
-std::vector<double> PatternSearch::optimize(const std::function<double(const std::vector<double> &)> &f)
+std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> PatternSearch::optimize(const std::function<double(const std::vector<double> &)> &f)
 {
   // LOG_DEBUG    ">> Optimization started (pattern search)"  ;
 
   vector<double> boundsRange = upperBounds - lowerBounds;
   double initialStep = vectorMax(boundsRange) / 4;
-  funEvals = 0;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
   vector<double> topPoint = zerovect(N, 0.);
@@ -21,21 +20,18 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
 
   // multistart pattern search
   volatile bool flag = false;
+  int funEvals = 0;
 #pragma omp parallel for shared(flag)
   for (int run = 0; run < multistartMaxCnt; run++)
   {
     if (flag)
       continue;
 
-    vector<vector<double>> visitedPointsThisRun;
-    vector<vector<double>> visitedPointsMainThisRun;
     int funEvalsThisRun = 0;
     // initialize vectors
     double step = initialStep;
     vector<double> mainPoint = mainPointsInitial[run];
     double mainPointFitness = f(mainPoint);
-    if (logPoints)
-      visitedPointsThisRun.push_back(mainPoint);
     vector<vector<vector<double>>> pattern;                                                    // N-2-N (N pairs of N-dimensional points)
     vector<vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
@@ -64,9 +60,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
           patternFitness[dim][pm] = f(pattern[dim][pm]);
           funEvalsThisRun++;
 
-          if (logPoints)
-            visitedPointsThisRun.push_back(pattern[dim][pm]);
-
           // select best pattern vertex and replace
           if (patternFitness[dim][pm] < mainPointFitness)
           {
@@ -84,9 +77,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
                 testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
                 testPointFitness = f(testPoint);
                 funEvalsThisRun++;
-
-                if (logPoints)
-                  visitedPointsThisRun.push_back(testPoint);
 
                 if (testPointFitness < mainPointFitness)
                 {
@@ -110,8 +100,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
 #pragma omp critical
         {
           // LOG_DEBUG  "> minStep value reached, terminating - generation "  generation  "."  ;
-          success = false;
-          terminationReason = "minStep value reached, final fitness: " + to_string(mainPointFitness);
         }
         break;
       }
@@ -120,8 +108,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
 #pragma omp critical
         {
           // LOG_DEBUG  "> optimalFitness value reached, terminating - generation "  generation  "."  ;
-          success = true;
-          terminationReason = "optimalFitness value reached, final fitness: " + to_string(mainPointFitness);
         }
         break;
       }
@@ -130,8 +116,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
 #pragma omp critical
         {
           // LOG_DEBUG  "> maxGen value reached, terminating - generation "  generation  "."  ;
-          success = false;
-          terminationReason = "maxGen value reached, final fitness: " + to_string(mainPointFitness);
         }
         break;
       }
@@ -140,8 +124,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
 #pragma omp critical
         {
           // LOG_DEBUG  "MaxFunEvals value reached, terminating - generation "  generation  "."  ;
-          terminationReason = "maxFunEvals value reached, final fitness: " + to_string(mainPointFitness);
-          success = false;
           flag = true; // dont do other runs, out of funEvals
         }
         break;
@@ -153,8 +135,6 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
     {
       multistartCnt++;
       funEvals += funEvalsThisRun;
-      if (logPoints)
-        visitedPoints.push_back(visitedPointsThisRun);
 
       // LOG_DEBUG  "> run "  run  ": ";
       if (mainPointFitness < topPointFitness)
@@ -171,5 +151,5 @@ std::vector<double> PatternSearch::optimize(const std::function<double(const std
       }
     }
   } // multistart end
-  return topPoint;
+  return {topPoint, NoImprovementReached};
 } // opt end
