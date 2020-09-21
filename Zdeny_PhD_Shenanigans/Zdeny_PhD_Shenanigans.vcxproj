@@ -119,12 +119,14 @@
     <ClCompile Include="IPC\ipcAux.cpp" />
     <ClCompile Include="IPC\IterativePhaseCorrelation.cpp" />
     <ClCompile Include="Log\logger.cpp" />
+    <ClCompile Include="Optimization\Evolution.cpp" />
     <ClCompile Include="Optimization\graphOptimization.cpp" />
     <ClCompile Include="InverseMap\inverseMapping.cpp" />
     <ClCompile Include="IPC\IPC.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
+    <ClCompile Include="Optimization\PatternSearch.cpp" />
     <ClCompile Include="Plot\Plot.cpp" />
     <ClCompile Include="Plot\Plot1D.cpp" />
     <ClCompile Include="Plot\Plot2D.cpp" />
@@ -157,6 +159,8 @@
     <ClInclude Include="Draw\combinepics.h" />
     <ClInclude Include="Draw\crop.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
+    <ClInclude Include="Optimization\Evolution.h" />
+    <ClInclude Include="Optimization\PatternSearch.h" />
     <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Utils\vectmat.h" />

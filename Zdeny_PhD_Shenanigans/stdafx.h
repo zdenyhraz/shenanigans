@@ -1,13 +1,13 @@
-//precompiled header
+// precompiled header
 #pragma once
-//Qt
+// Qt
 #include <QtWidgets>
 #include <QtWidgets>
 #include <QtWidgets/QApplication>
 #include <QPixmap>
 #include <QWidget>
 #include <QCloseEvent>
-//STL
+// STL
 #include <iostream>
 #include <stdio.h>
 #include <conio.h>
@@ -26,25 +26,25 @@
 #include <tuple>
 #include <thread>
 #include <memory>
-//OpenMP
+// OpenMP
 #include <omp.h>
-//OpenCV
+// OpenCV
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 //#include <opencv2/xfeatures2d.hpp>
-//QCustomPlot
+// QCustomPlot
 #include "Plot/qcustomplot.h"
-//spdlog
+// spdlog
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/fmt/ostr.h"
-//blaze
+// blaze
 #include "blaze/Blaze.h"
-//custom
+// custom
 #include "Log/logger.h"
 #include "Core/constants.h"
 #include "Core/macros.h"
@@ -55,4 +55,4 @@
 #include "Draw/showsave.h"
 #include "Draw/draw.h"
 #include "Draw/crop.h"
-
+#include "Optimization/Evolution.h"

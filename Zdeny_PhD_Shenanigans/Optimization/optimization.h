@@ -3,85 +3,25 @@
 #include "Core/functionsBaseCV.h"
 #include "Log/logger.h"
 
-using namespace std;
-
-struct OptimizationAlgorithm // the main parent optimizer class
+class OptimizationAlgorithm // the main parent optimizer class
 {
+public:
   int N = 1;                                                                                          // the problem dimension
-  vector<double> lowerBounds = zerovect(N, -1.);                                                      // lower search space bounds
-  vector<double> upperBounds = zerovect(N, +1.);                                                      // upper search space bounds
+  std::vector<double> lowerBounds = zerovect(N, -1.);                                                 // lower search space bounds
+  std::vector<double> upperBounds = zerovect(N, +1.);                                                 // upper search space bounds
   double optimalFitness = 0;                                                                          // satisfactory function value
   int funEvals = 0;                                                                                   // current # of function evaluations
   int maxFunEvals = 1e10;                                                                             // maximum # of function evaluations
   int maxGen = 1000;                                                                                  // maximum # of algorithm iterations
   bool success = false;                                                                               // success in reaching satisfactory function value
   bool logPoints = false;                                                                             // switch for logging of explored points
-  vector<vector<vector<double>>> visitedPoints;                                                       // the 3D vector of visited points [run][iter][dim]
-  string terminationReason = "optimization not run yet";                                              // the reason for algorithm termination
+  std::vector<vector<vector<double>>> visitedPoints;                                                  // the 3D vector of visited points [run][iter][dim]
+  std::string terminationReason = "optimization not run yet";                                         // the reason for algorithm termination
   OptimizationAlgorithm(int N) : N(N), lowerBounds(zerovect(N, -1.)), upperBounds(zerovect(N, 1.)){}; // construct some default bounds
 
-  virtual std::vector<double> optimize(std::function<double(const std::vector<double> &)> f) = 0;
-};
+  virtual std::vector<double> optimize(const std::function<double(const std::vector<double> &)> &f) = 0;
 
-struct Evolution : OptimizationAlgorithm
-{
-  enum MutationStrategy : char
-  {
-    RAND1,
-    BEST1,
-    RAND2,
-    BEST2
-  };
-  enum CrossoverStrategy : char
-  {
-    BIN,
-    EXP
-  };
-  enum StoppingCriterion : char
-  {
-    ALLIMP,
-    AVGIMP
-  };
-  int NP = 4;
-  double F = 0.65;
-  double CR = 0.95;
-  double iNPm = 8;
-  MutationStrategy mutStrat = RAND1;
-  CrossoverStrategy crossStrat = BIN;
-  StoppingCriterion stopCrit = AVGIMP;
-  int distincEntityMaxTrials = 10;
-  int historySize = 10;
-  double historyImprovTresholdPercent = 1;
-  Evolution(int N) : OptimizationAlgorithm(N), NP(iNPm * N){};
-
-  std::vector<double> optimize(std::function<double(const std::vector<double> &)> f) override;
-};
-
-struct PatternSearch : OptimizationAlgorithm
-{
-  double minStep = 1e-5;
-  int multistartMaxCnt = 1;
-  int multistartCnt = 0;
-  int maxExploitCnt = 0;
-  double stepReducer = 0.5;
-
-  PatternSearch(int N) : OptimizationAlgorithm(N){};
-
-  std::vector<double> optimize(std::function<double(const std::vector<double> &)> f) override;
-};
-
-struct Simplex : OptimizationAlgorithm
-{
-  Simplex(int N) : OptimizationAlgorithm(N){};
-
-  std::vector<double> optimize(std::function<double(const std::vector<double> &)> f) override;
-};
-
-struct MCS : OptimizationAlgorithm
-{
-  MCS(int N) : OptimizationAlgorithm(N){};
-
-  std::vector<double> optimize(std::function<double(const std::vector<double> &)> f) override;
+protected:
 };
 
 namespace optimizationTestFunctions
