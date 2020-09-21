@@ -127,6 +127,7 @@
     <ClCompile Include="Neural\neural.cpp" />
     <ClCompile Include="Optimization\optimization.cpp" />
     <ClCompile Include="Optimization\PatternSearch.cpp" />
+    <ClCompile Include="Optimization\VisualOptimization.cpp" />
     <ClCompile Include="Plot\Plot.cpp" />
     <ClCompile Include="Plot\Plot1D.cpp" />
     <ClCompile Include="Plot\Plot2D.cpp" />
@@ -160,7 +161,9 @@
     <ClInclude Include="Draw\crop.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Optimization\Evolution.h" />
+    <ClInclude Include="Optimization\OptimizationTestFunctions.h" />
     <ClInclude Include="Optimization\PatternSearch.h" />
+    <ClInclude Include="Optimization\VisualOptimization.h" />
     <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Utils\vectmat.h" />
