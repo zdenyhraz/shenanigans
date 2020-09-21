@@ -79,7 +79,7 @@ void optimizeIPCParameters(const IPCsettings &settingsMaster, std::string pathIn
     Evo.lowerBounds = vector<double>{0, 0, 3, -1};
     Evo.upperBounds = vector<double>{10, 200, 19, 1};
     auto Result = Evo.optimize(f);
-    listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+    // listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
   }
   destroyWindow(windowname);
 }
@@ -109,7 +109,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, d
           Evo.lowerBounds = vector<double>{0, 0, 3, -1};
           Evo.upperBounds = vector<double>{20, 200, 19, 1};
           auto Result = Evo.optimize(f);
-          listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+          // listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
         }
       }
     }

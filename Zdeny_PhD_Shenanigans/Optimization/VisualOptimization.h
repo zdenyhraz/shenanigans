@@ -5,12 +5,14 @@
 #include "PatternSearch.h"
 #include "OptimizationTestFunctions.h"
 
+#ifdef VISUAL_OPTIMIZATION
+
 inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY)
 {
   cv::Mat resultMat = cv::Mat::zeros(stepsY, stepsX, CV_32F);
   int progress = 0;
 
-#pragma omp parallel for
+#  pragma omp parallel for
   for (int r = 0; r < resultMat.rows; ++r)
   {
     for (int c = 0; c < resultMat.cols; ++c)
@@ -19,7 +21,7 @@ inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, 
       double y = ymax - (ymax - ymin) / (stepsY - 1) * r;
       resultMat.at<float>(r, c) = f(vector<double>{x, y});
     }
-#pragma omp critical
+#  pragma omp critical
     {
       progress++;
       cout << (double)progress / resultMat.rows * 100 << "% done." << endl;
@@ -132,8 +134,6 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
     if (logLandscapeOpt)
       optimizedFuncLandscapeCLR = optimizedFuncLandscapeCLRlog;
 
-    Evo.logPoints = true; // needed for pretty pictures - main directed path
-
     vector<double> resultPat = zerovect(Evo.N), resultEvo = zerovect(Evo.N);
     if (optPat)
     {
@@ -212,3 +212,5 @@ void optimizeWithLandscapeDebug()
 
   cout << "> Done broski." << endl;
 }
+
+#endif

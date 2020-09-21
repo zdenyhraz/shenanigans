@@ -2,42 +2,101 @@
 #include "Evolution.h"
 #include "Plot/Plot1D.h"
 
-Evolution::Evolution(int N) : OptimizationAlgorithm(N), mNP(mINPm * N){};
+Evolution::Evolution(int N) : OptimizationAlgorithm(N) { mNP = N * mINPm; };
 
-std::vector<double> Evolution::optimize(const std::function<double(const std::vector<double> &)> &f)
+std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolution::optimize(const std::function<double(const std::vector<double> &)> &f)
 {
-  LOG_STARTEND("Evolution optimization started", "Evolution optimization ended");
-  Plot1D::Reset("evolution");
-  std::ofstream file("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
-  file << "Evolution started." << std::endl;
-  funEvals = 0;
-  success = false;
+  LOG_INFO("Evolution optimization started");
 
-  LOG_INFO("Checking objective function normality...");
-  if (!isfinite(f(0.5 * (lowerBounds + upperBounds))))
-  {
-    LOG_ERROR("Objective function is not normal!");
+  if (!InitializeOutputs())
     return {};
-  }
-  else
-    LOG_SUCC("Objective function is normal");
 
-  // establish population matrix, fitness vector and other internals
-  vector<double> boundsRange = upperBounds - lowerBounds;
-  vector<vector<double>> visitedPointsMainThisRun;
-  vector<vector<double>> visitedPointsThisRun;
-  double averageImprovement = 0;
-  vector<vector<double>> population(mNP, zerovect(N, 0.));
-  vector<queue<double>> histories(mNP);
+  if (!CheckObjectiveFunctionNormality(f))
+    return {};
+
+  // establish all internals
+  TerminationReason terminationReason = NotTerminated;
+  std::vector<std::queue<double>> populationHistory(mNP);
   bool historyConstant = false;
-  vector<double> fitness = zerovect(mNP, 0.);
-  vector<double> bestEntity = zerovect(N, 0.);
-  double bestFitness = Constants::Inf;
-  double fitness_prev = Constants::Inf;
-  double fitness_curr = Constants::Inf;
+  bool terminate = false;
+  int numberOfParents = GetNumberOfParents();
+  int functionEvaluations = 0;
+  auto parentIndices = zerovect2(mNP, numberOfParents, 0);
+  auto crossoverParameters = zerovect2(mNP, N, false);
+  double averageImprovement = 0;
+  double fitnessPrevious = Constants::Inf;
+  double fitnessCurrent = Constants::Inf;
+  auto population = InitializePopulation();
+  auto populationFitness = InitializeFitness(population, f);
+  auto [bestEntity, bestFitness] = InitializeBestEntity(population, populationFitness);
+  auto offspring = population;
+  auto offspringFitness = populationFitness;
+  UpdateFunctionEvaluations(functionEvaluations);
 
-  // initialize random starting population matrix within bounds
+  // run main evolution cycle
+  LOG_INFO("Running evolution...");
+  for (int generation = 1; generation < 1e10; generation++)
+  {
+#pragma omp parallel for
+    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
+    {
+      // crossover
+      CalculateDistinctParents(indexEntity, parentIndices[indexEntity]);
+      CalculateCrossoverParameters(crossoverParameters[indexEntity]);
+      // mutation
+      CalculateOffspring(population, bestEntity, parentIndices[indexEntity], crossoverParameters[indexEntity], indexEntity, offspring[indexEntity]);
+      CalculateOffspringFitness(offspring[indexEntity], f, offspringFitness[indexEntity]);
+      // selection
+      CalculateSelection(offspring[indexEntity], offspringFitness[indexEntity], population[indexEntity], populationFitness[indexEntity]);
+    }
+    UpdateFunctionEvaluations(functionEvaluations);
+    CalculateBestEntity(population, populationFitness, bestEntity, bestFitness);
+    UpdateOutputs(generation, bestEntity, bestFitness, averageImprovement, fitnessPrevious, fitnessCurrent);
+    UpdateHistories(populationFitness, populationHistory, averageImprovement, historyConstant);
+    std::tie(terminate, terminationReason) = CheckTerminationCriterions(bestFitness, generation, functionEvaluations, historyConstant);
+
+    if (terminate)
+      break;
+  }
+
+  if (mFileOutput)
+    mOutputFile << "Evolution ended.\n" << std::endl;
+
+  LOG_INFO("Evolution optimization ended");
+  return {bestEntity, terminationReason};
+}
+
+void Evolution::SetFileOutput(const std::string &path)
+{
+  mOutputFilePath = path;
+  mFileOutput = true;
+}
+
+bool Evolution::InitializeOutputs()
+{
+  try
+  {
+    if (mFileOutput)
+    {
+      mOutputFile.open(mOutputFilePath, std::ios::out);
+      mOutputFile << "Evolution started." << std::endl;
+    }
+
+    if (mPlotOutput)
+      Plot1D::Reset("Evolution");
+  }
+  catch (...)
+  {
+    return false;
+  }
+  return true;
+}
+
+std::vector<std::vector<double>> Evolution::InitializePopulation()
+{
   LOG_INFO("Creating initial population within bounds ... ");
+  std::vector<std::vector<double>> population(mNP, zerovect(N, 0.));
+  std::vector<double> boundsRange = upperBounds - lowerBounds;
   const double initialMinAvgDist = 0.5;
   double minAvgDist = initialMinAvgDist;
   for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
@@ -74,227 +133,235 @@ std::vector<double> Evolution::optimize(const std::function<double(const std::ve
     }
   }
   LOG_SUCC("Initial population created");
+  return population;
+}
 
-  // calculate initial fitness vector
+std::vector<double> Evolution::InitializeFitness(const std::vector<std::vector<double>> &population, const std::function<double(const std::vector<double> &)> &f)
+{
   LOG_INFO("Evaluating initial population...");
+  std::vector<double> populationFitness = zerovect(mNP, 0.);
+
 #pragma omp parallel for
   for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
-  {
-    fitness[indexEntity] = f(population[indexEntity]);
-    if (logPoints)
-    {
-#pragma omp critical
-      visitedPointsThisRun.push_back(population[indexEntity]);
-    }
-  }
-  funEvals += mNP;
-  LOG_SUCC("Initial population evaluated");
+    populationFitness[indexEntity] = f(population[indexEntity]);
 
-  // determine the best entity in the initial population
+  LOG_SUCC("Initial population evaluated");
+  return populationFitness;
+}
+
+std::pair<std::vector<double>, double> Evolution::InitializeBestEntity(const std::vector<std::vector<double>> &population, const std::vector<double> &populationFitness)
+{
+  std::vector<double> bestEntity = zerovect(N, 0.);
+  double bestFitness = Constants::Inf;
   for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
   {
-    if (fitness[indexEntity] <= bestFitness)
+    if (populationFitness[indexEntity] <= bestFitness)
     {
       bestEntity = population[indexEntity];
-      bestFitness = fitness[indexEntity];
+      bestFitness = populationFitness[indexEntity];
     }
   }
+
+  if (mFileOutput)
+    mOutputFile << "Init best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+
+  if (mPlotOutput)
+    Plot1D::plot(0, bestFitness, log(bestFitness), "Evolution", "generation", "populationFitness", "log populationFitness");
+
   LOG_INFO("Initial population best entity: {} ({:.3f})", bestEntity, bestFitness);
-  file << "Init best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
-  Plot1D::plot(0, bestFitness, log(bestFitness), "evolution", "generation", "fitness", "log fitness");
+  return {bestEntity, bestFitness};
+}
 
-  // run main evolution cycle
-  LOG_INFO("Running evolution...");
-  for (int generation = 1; generation < 1e8; generation++)
+bool Evolution::CheckObjectiveFunctionNormality(const std::function<double(const std::vector<double> &)> &f)
+{
+  LOG_INFO("Checking objective function normality...");
+  if (!isfinite(f(0.5 * (lowerBounds + upperBounds))))
   {
-#pragma omp parallel for
-    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
-    {
-      // create new potential entity
-      vector<double> newEntity = population[indexEntity];
-      double newFitness = 0.;
+    LOG_ERROR("Objective function is not normal!");
+    return false;
+  }
 
-      // select distinct parents different from the current entity
-      int numberOfParents;
-      // calculate the number of parents
+  LOG_SUCC("Objective function is normal");
+  return true;
+}
+
+void Evolution::CalculateDistinctParents(int entityIndex, std::vector<int> &parentIndices)
+{
+  for (auto &idx : parentIndices)
+  {
+    int idxTst = rand() % mNP;
+    while (!isDistinct(idxTst, parentIndices, entityIndex))
+      idxTst = rand() % mNP;
+    idx = idxTst;
+  }
+}
+
+void Evolution::CalculateCrossoverParameters(std::vector<bool> &crossoverParameters)
+{
+  crossoverParameters = zerovect(N, false);
+
+  switch (mCrossStrat)
+  {
+  case CrossoverStrategy::BIN:
+  {
+    int definite = rand() % N; // at least one param undergoes crossover
+    for (int indexParam = 0; indexParam < N; indexParam++)
+    {
+      double random = rand01();
+      if (random < mCR || indexParam == definite)
+        crossoverParameters[indexParam] = true;
+    }
+    return;
+  }
+  case CrossoverStrategy::EXP:
+  {
+    int L = 0;
+    do
+      L++;
+    while ((rand01() < mCR) && (L < N)); // at least one param undergoes crossover
+    int indexParam = rand() % N;
+    for (int i = 0; i < L; i++)
+    {
+      crossoverParameters[indexParam] = true;
+      indexParam++;
+      indexParam %= N;
+    }
+    return;
+  }
+  }
+}
+
+void Evolution::CalculateOffspring(const std::vector<std::vector<double>> &population, const std::vector<double> &bestEntity, const std::vector<int> &parentIndices, const std::vector<bool> &crossoverParameters, int indexEntity, std::vector<double> &offspring)
+{
+  offspring = population[indexEntity];
+  for (int indexParam = 0; indexParam < N; indexParam++)
+  {
+    if (crossoverParameters[indexParam])
+    {
       switch (mMutStrat)
       {
       case MutationStrategy::RAND1:
-        numberOfParents = 3;
+        offspring[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]);
         break;
       case MutationStrategy::BEST1:
-        numberOfParents = 2;
+        offspring[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]);
         break;
       case MutationStrategy::RAND2:
-        numberOfParents = 5;
+        offspring[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + mF * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]);
         break;
       case MutationStrategy::BEST2:
-        numberOfParents = 4;
+        offspring[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + mF * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]);
         break;
       }
-
-      vector<int> parentIndices(numberOfParents, 0);
-      for (auto &idx : parentIndices)
-      {
-        int idxTst;
-        do
-          idxTst = rand() % mNP;
-        while (!isDistinct(idxTst, parentIndices, indexEntity));
-        idx = idxTst;
-      }
-
-      // decide which parameters undergo crossover
-      vector<bool> paramIsCrossed(N, false);
-      switch (mCrossStrat)
-      {
-      case CrossoverStrategy::BIN:
-      {
-        int definite = rand() % N; // at least one param undergoes crossover
-        for (int indexParam = 0; indexParam < N; indexParam++)
-        {
-          double random = rand01();
-          if (random < mCR || indexParam == definite)
-            paramIsCrossed[indexParam] = true;
-        }
-        break;
-      }
-      case CrossoverStrategy::EXP:
-      {
-        int L = 0;
-        do
-          L++;
-        while ((rand01() < mCR) && (L < N)); // at least one param undergoes crossover
-        int indexParam = rand() % N;
-        for (int i = 0; i < L; i++)
-        {
-          paramIsCrossed[indexParam] = true;
-          indexParam++;
-          indexParam %= N;
-        }
-        break;
-      }
-      }
-
-      // perform the crossover
-      for (int indexParam = 0; indexParam < N; indexParam++)
-      {
-        if (paramIsCrossed[indexParam])
-        {
-          switch (mMutStrat)
-          {
-          case MutationStrategy::RAND1:
-            newEntity[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]);
-            break;
-          case MutationStrategy::BEST1:
-            newEntity[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]);
-            break;
-          case MutationStrategy::RAND2:
-            newEntity[indexParam] = population[parentIndices[0]][indexParam] + mF * (population[parentIndices[1]][indexParam] - population[parentIndices[2]][indexParam]) + mF * (population[parentIndices[3]][indexParam] - population[parentIndices[4]][indexParam]);
-            break;
-          case MutationStrategy::BEST2:
-            newEntity[indexParam] = bestEntity[indexParam] + mF * (population[parentIndices[0]][indexParam] - population[parentIndices[1]][indexParam]) + mF * (population[parentIndices[2]][indexParam] - population[parentIndices[3]][indexParam]);
-            break;
-          }
-        }
-        // check for boundaries, effectively clamp
-        newEntity[indexParam] = clampSmooth(newEntity[indexParam], population[indexEntity][indexParam], lowerBounds[indexParam], upperBounds[indexParam]);
-      }
-
-      // evaluate fitness of new entity
-      newFitness = f(newEntity);
-
-      if (logPoints)
-      {
-#pragma omp critical
-        visitedPointsThisRun.push_back(newEntity);
-      }
-
-      // select the more fit entity
-      if (newFitness <= fitness[indexEntity])
-      {
-        population[indexEntity] = newEntity;
-        fitness[indexEntity] = newFitness;
-      }
-
-    } // entity cycle end
-
-    funEvals += mNP;
-
-    // determine the best entity
-    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
-    {
-      if (fitness[indexEntity] <= bestFitness)
-      {
-        bestEntity = population[indexEntity];
-        bestFitness = fitness[indexEntity];
-        fitness_prev = fitness_curr;
-        fitness_curr = bestFitness;
-        LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitness_prev - fitness_curr) / fitness_prev * 100, averageImprovement * 100);
-        file << "Gen " + to_string(generation) + " best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
-        Plot1D::plot(generation, bestFitness, log(bestFitness), "evolution", "generation", "fitness", "log fitness");
-      }
     }
+    // check for boundaries, effectively clamp
+    offspring[indexParam] = clampSmooth(offspring[indexParam], population[indexEntity][indexParam], lowerBounds[indexParam], upperBounds[indexParam]);
+  }
+}
 
-    // fill history ques for all entities - termination criterion
-    historyConstant = true; // assume history is constant
-    averageImprovement = 0;
-    for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
-    {
-      if (histories[indexEntity].size() == mHistorySize)
-      {
-        histories[indexEntity].pop();                      // remove first element - keep que size constant
-        histories[indexEntity].push(fitness[indexEntity]); // insert at the end
-        if (mStopCrit == StoppingCriterion::ALLIMP)        // fitness improved less than x% for all entities
-          if (abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front()) > mHistoryImprovTresholdPercent / 100)
-            historyConstant = false;
-      }
-      else
-      {
-        histories[indexEntity].push(fitness[indexEntity]); // insert at the end
-        historyConstant = false;                           // too early to stop, go on
-      }
-      if (histories[indexEntity].size() > 2)
-        averageImprovement += abs(histories[indexEntity].front()) == 0 ? 0 : abs(histories[indexEntity].front() - histories[indexEntity].back()) / abs(histories[indexEntity].front());
-    }
-    averageImprovement /= mNP;
-    if (mStopCrit == StoppingCriterion::AVGIMP) // average fitness improved less than x%
-      if (100 * averageImprovement > mHistoryImprovTresholdPercent)
-        historyConstant = false;
+void Evolution::CalculateOffspringFitness(const std::vector<double> &offspring, const std::function<double(const std::vector<double> &)> &f, double &offspringFitness) { offspringFitness = f(offspring); }
 
-    // termination criterions
-    if (bestFitness < optimalFitness) // fitness goal reached
-    {
-      LOG_SUCC("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
-      terminationReason = "optimalFitness value reached, final fitness: " + to_string(bestFitness);
-      success = true;
-      break;
-    }
-    if (generation == maxGen) // maximum generation reached
-    {
-      LOG_SUCC("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
-      terminationReason = "maxGen value reached, final fitness: " + to_string(bestFitness);
-      success = false;
-      break;
-    }
-    if (funEvals >= maxFunEvals) // maximum function evaluations exhausted
-    {
-      LOG_SUCC("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
-      terminationReason = "maxFunEvals value reached, final fitness: " + to_string(bestFitness);
-      success = false;
-      break;
-    }
-    if (historyConstant) // no entity improved last (mHistorySize) generations
-    {
-      LOG_SUCC("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
-      terminationReason = "historyConstant value reached, final fitness: " + to_string(bestFitness);
-      success = false;
-      break;
-    }
-  } // generation cycle end
+void Evolution::CalculateSelection(const std::vector<double> &offspring, double offspringFitness, std::vector<double> &population, double &populationFitness)
+{
+  if (offspringFitness <= populationFitness)
+  {
+    population = offspring;
+    populationFitness = offspringFitness;
+  }
+}
 
-  if (logPoints)
-    visitedPoints.push_back(visitedPointsThisRun);
+void Evolution::UpdateFunctionEvaluations(int &functionEvaluations) { functionEvaluations += mNP; }
 
-  file << "Evolution ended.\n" << std::endl;
-  return bestEntity;
-} // optimize function end
+void Evolution::CalculateBestEntity(const std::vector<std::vector<double>> &population, const std::vector<double> &populationFitness, std::vector<double> &bestEntity, double &bestFitness)
+{
+  for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
+  {
+    if (populationFitness[indexEntity] <= bestFitness)
+    {
+      bestEntity = population[indexEntity];
+      bestFitness = populationFitness[indexEntity];
+    }
+  }
+}
+
+void Evolution::UpdateOutputs(int generation, const std::vector<double> &bestEntity, double bestFitness, double averageImprovement, double &fitnessPrevious, double &fitnessCurrent)
+{
+  if (mFileOutput)
+    mOutputFile << "Gen " + to_string(generation) + " best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+
+  if (mPlotOutput)
+    Plot1D::plot(generation, bestFitness, log(bestFitness), "Evolution", "generation", "populationFitness", "log populationFitness");
+
+  fitnessPrevious = fitnessCurrent;
+  fitnessCurrent = bestFitness;
+  LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", generation, bestEntity, bestFitness, (fitnessPrevious - fitnessCurrent) / fitnessPrevious * 100, averageImprovement * 100);
+}
+
+void Evolution::UpdateHistories(const std::vector<double> &populationFitness, std::vector<std::queue<double>> &populationHistory, double &averageImprovement, bool &historyConstant)
+{
+  // fill history ques for all entities - termination criterion
+  historyConstant = true; // assume history is constant
+  averageImprovement = 0;
+  for (int indexEntity = 0; indexEntity < mNP; indexEntity++)
+  {
+    if (populationHistory[indexEntity].size() == mHistorySize)
+    {
+      populationHistory[indexEntity].pop();                                // remove first element - keep que size constant
+      populationHistory[indexEntity].push(populationFitness[indexEntity]); // insert at the end
+      if (mStopCrit == StoppingCriterion::ALLIMP)                          // populationFitness improved less than x% for all entities
+        if (abs(populationHistory[indexEntity].front() - populationHistory[indexEntity].back()) / abs(populationHistory[indexEntity].front()) > mHistoryImprovTresholdPercent / 100)
+          historyConstant = false;
+    }
+    else
+    {
+      populationHistory[indexEntity].push(populationFitness[indexEntity]); // insert at the end
+      historyConstant = false;                                             // too early to stop, go on
+    }
+    if (populationHistory[indexEntity].size() > 2)
+      averageImprovement += abs(populationHistory[indexEntity].front()) == 0 ? 0 : abs(populationHistory[indexEntity].front() - populationHistory[indexEntity].back()) / abs(populationHistory[indexEntity].front());
+  }
+  averageImprovement /= mNP;
+  if (mStopCrit == StoppingCriterion::AVGIMP) // average populationFitness improved less than x%
+    if (100 * averageImprovement > mHistoryImprovTresholdPercent)
+      historyConstant = false;
+}
+
+std::pair<bool, OptimizationAlgorithm::TerminationReason> Evolution::CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant)
+{
+  if (bestFitness < optimalFitness) // populationFitness goal reached
+  {
+    LOG_SUCC("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
+    return {true, OptimalFitnessReached};
+  }
+  if (generation == maxGen) // maximum generation reached
+  {
+    LOG_SUCC("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
+    return {true, MaximumGenerationsReached};
+  }
+  if (functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
+  {
+    LOG_SUCC("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
+    return {true, MaximumFunctionEvaluationsReached};
+  }
+  if (historyConstant) // no entity improved last (mHistorySize) generations
+  {
+    LOG_SUCC("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
+    return {true, NoImprovementReached};
+  }
+  return {false, NotTerminated};
+}
+
+int Evolution::GetNumberOfParents()
+{
+  switch (mMutStrat)
+  {
+  case MutationStrategy::RAND1:
+    return 3;
+  case MutationStrategy::BEST1:
+    return 2;
+  case MutationStrategy::RAND2:
+    return 5;
+  case MutationStrategy::BEST2:
+    return 4;
+  }
+}
