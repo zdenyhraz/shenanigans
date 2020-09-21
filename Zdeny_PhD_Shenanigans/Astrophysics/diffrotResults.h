@@ -266,7 +266,7 @@ private:
   {
     int l, u;
 
-    for (int i = 0; i < xs.size() - 2; ++i)
+    for (int i = 0; i < xs.size() - 1; ++i)
     {
       if (xs[i] <= x && xs[i + 1] > x)
       {
