@@ -275,7 +275,7 @@ private:
         break;
       }
 
-      if (xs[i] >= x && xs[i + 1] < x)
+      if (xs[i] > x && xs[i + 1] <= x)
       {
         l = i + 1;
         u = i;
