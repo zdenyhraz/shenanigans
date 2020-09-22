@@ -20,7 +20,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   InitializeOutputs(population);
 
   bool terminate = false;
-  TerminationReason reason = NotTerminated;
+  auto reason = NotTerminated;
   int gen = 0;
 
   // run main evolution cycle
@@ -35,10 +35,11 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       population.UpdateCrossoverParameters(eid, N, mCrossStrat, mCR);
       population.UpdateOffspring(eid, N, mMutStrat, f, mF, lowerBounds, upperBounds);
     }
-    population.UpdateFunctionEvaluations(mNP);
     population.PerformSelection(mNP);
     population.UpdateBestEntity(mNP);
     population.UpdateFitnessHistories(mNP, mHistorySize, mStopCrit, mHistoryImprovTresholdPercent);
+    population.UpdateFunctionEvaluations(mNP);
+
     UpdateOutputs(gen, population);
     CheckTerminationCriterions(population, gen, terminate, reason);
 
