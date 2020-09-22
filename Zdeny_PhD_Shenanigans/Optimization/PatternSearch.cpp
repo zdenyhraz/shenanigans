@@ -2,10 +2,9 @@
 #include "PatternSearch.h"
 #include "Plot/Plot1D.h"
 
-std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> PatternSearch::optimize(const std::function<double(const std::vector<double> &)> &f)
+OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction f)
 {
-  // LOG_DEBUG    ">> Optimization started (pattern search)"  ;
-
+  LOG_INFO(" Optimization started (pattern search)");
   vector<double> boundsRange = upperBounds - lowerBounds;
   double initialStep = vectorMax(boundsRange) / 4;
   multistartCnt = 0;

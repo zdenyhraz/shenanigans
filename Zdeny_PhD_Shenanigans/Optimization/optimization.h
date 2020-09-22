@@ -15,9 +15,13 @@ public:
     NotTerminated
   };
 
+  using ObjectiveFunction = const std::function<double(const std::vector<double> &)> &;
+  using Optimum = std::vector<double>;
+  using OptimizationResult = std::tuple<Optimum, TerminationReason>;
+
   OptimizationAlgorithm(int N);
   virtual ~OptimizationAlgorithm();
-  virtual std::tuple<std::vector<double>, TerminationReason> optimize(const std::function<double(const std::vector<double> &)> &f) = 0;
+  virtual OptimizationResult Optimize(ObjectiveFunction f) = 0;
 
   int N = 1;                               // the problem dimension
   std::vector<double> lowerBounds;         // lower search space bounds
