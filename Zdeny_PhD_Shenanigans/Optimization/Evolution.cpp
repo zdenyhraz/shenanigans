@@ -192,7 +192,6 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
 {
   try
   {
-    LOG_INFO("Initializing population...");
     InitializePopulation(NP, N, f, LB, UB);
     InitializeOffspring(NP, N, f, nParents);
     InitializeBestEntity(NP, N);
@@ -201,7 +200,6 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
     currentBestFitness = Constants::Inf;
     improvement = 0;
     constantHistory = false;
-    LOG_SUCC("Population initialized");
     return true;
   }
   catch (...)
@@ -350,7 +348,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
 void Evolution::Population::InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents)
 {
-  LOG_INFO("Creating initial offspring within bounds...");
+  LOG_INFO("Creating initial offspring...");
   offspring = zerovect(NP, Offspring(N, nParents));
   for (int eid = 0; eid < NP; eid++)
   {
