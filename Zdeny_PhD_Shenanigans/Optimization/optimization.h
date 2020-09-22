@@ -24,8 +24,8 @@ public:
   virtual OptimizationResult Optimize(ObjectiveFunction f) = 0;
 
   int N = 1;                               // the problem dimension
-  std::vector<double> lowerBounds;         // lower search space bounds
-  std::vector<double> upperBounds;         // upper search space bounds
+  std::vector<double> mLB;                 // lower search space bounds
+  std::vector<double> mUB;                 // upper search space bounds
   double optimalFitness = -Constants::Inf; // satisfactory function value
   int maxFunEvals = Constants::IntInf;     // maximum # of function evaluations
   int maxGen = 1000;                       // maximum # of algorithm iterations

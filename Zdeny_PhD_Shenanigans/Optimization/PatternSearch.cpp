@@ -5,7 +5,7 @@
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction f)
 {
   LOG_INFO(" Optimization started (pattern search)");
-  vector<double> boundsRange = upperBounds - lowerBounds;
+  vector<double> boundsRange = mUB - mLB;
   double initialStep = vectorMax(boundsRange) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
@@ -15,7 +15,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
   vector<vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
   for (int run = 0; run < multistartMaxCnt; run++)
     for (int indexParam = 0; indexParam < N; indexParam++)
-      mainPointsInitial[run][indexParam] = randr(lowerBounds[indexParam], upperBounds[indexParam]); // idk dude
+      mainPointsInitial[run][indexParam] = randr(mLB[indexParam], mUB[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
@@ -53,7 +53,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
         {
           pattern[dim][pm] = mainPoint;
           pattern[dim][pm][dim] += pm == 0 ? step : -step;
-          pattern[dim][pm][dim] = clampSmooth(pattern[dim][pm][dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
+          pattern[dim][pm][dim] = clampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLB[dim], mUB[dim]);
 
           // evaluate vertices
           patternFitness[dim][pm] = f(pattern[dim][pm]);
@@ -73,7 +73,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
               {
                 vector<double> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
-                testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], lowerBounds[dim], upperBounds[dim]);
+                testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
                 testPointFitness = f(testPoint);
                 funEvalsThisRun++;
 

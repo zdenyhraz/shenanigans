@@ -89,7 +89,7 @@ private:
     void InitializeBestEntity(int NP, int N);
   };
 
-  bool CheckObjectiveFunctionNormality(const std::function<double(const std::vector<double> &)> &f);
+  bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
   int GetNumberOfParents();
   void InitializeOutputs(const Population &population);
   void UpdateOutputs(int generation, const Population &population);

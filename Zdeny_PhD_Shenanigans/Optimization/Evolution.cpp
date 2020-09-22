@@ -12,7 +12,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     return {};
 
   Population population;
-  if (!population.Initialize(mNP, N, f, lowerBounds, upperBounds, GetNumberOfParents()))
+  if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
   population.UpdateFunctionEvaluations(mNP);
@@ -33,7 +33,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     {
       population.UpdateDistinctParents(eid, mNP);
       population.UpdateCrossoverParameters(eid, N, mCrossStrat, mCR);
-      population.UpdateOffspring(eid, N, mMutStrat, f, mF, lowerBounds, upperBounds);
+      population.UpdateOffspring(eid, N, mMutStrat, f, mF, mLB, mUB);
     }
     population.PerformSelection(mNP);
     population.UpdateBestEntity(mNP);
@@ -82,12 +82,22 @@ void Evolution::InitializeOutputs(const Population &population)
   LOG_SUCC("Outputs initialized");
 }
 
-bool Evolution::CheckObjectiveFunctionNormality(const std::function<double(const std::vector<double> &)> &f)
+bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 {
   LOG_INFO("Checking objective function normality...");
-  if (!isfinite(f(0.5 * (lowerBounds + upperBounds))))
+  auto arg = 0.5 * (mLB + mUB);
+  auto result1 = f(arg);
+  auto result2 = f(arg);
+
+  if (!isfinite(result1))
   {
-    LOG_ERROR("Objective function is not normal");
+    LOG_ERROR("Objective function is not finite");
+    return false;
+  }
+
+  if (result1 != result2)
+  {
+    LOG_ERROR("Objective function is not consistent");
     return false;
   }
 
