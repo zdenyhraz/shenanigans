@@ -76,6 +76,7 @@ void Evolution::SetFileOutput(const std::string &path)
 
 bool Evolution::InitializeOutputs()
 {
+  LOG_INFO("Initializing outputs...");
   try
   {
     if (mFileOutput)
@@ -89,8 +90,10 @@ bool Evolution::InitializeOutputs()
   }
   catch (...)
   {
+    LOG_ERROR("Could not initialize outputs");
     return false;
   }
+  LOG_SUCC("Outputs initialized");
   return true;
 }
 
@@ -179,7 +182,7 @@ bool Evolution::CheckObjectiveFunctionNormality(const std::function<double(const
   LOG_INFO("Checking objective function normality...");
   if (!isfinite(f(0.5 * (lowerBounds + upperBounds))))
   {
-    LOG_ERROR("Objective function is not normal!");
+    LOG_ERROR("Objective function is not normal");
     return false;
   }
 
