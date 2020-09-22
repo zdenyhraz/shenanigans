@@ -76,8 +76,8 @@ void optimizeIPCParameters(const IPCsettings &settingsMaster, std::string pathIn
     Evolution Evo(4);
     Evo.mNP = 24;
     Evo.mMutStrat = Evolution::MutationStrategy::RAND1;
-    Evo.lowerBounds = vector<double>{0, 0, 3, -1};
-    Evo.upperBounds = vector<double>{10, 200, 19, 1};
+    Evo.mLB = vector<double>{0, 0, 3, -1};
+    Evo.mUB = vector<double>{10, 200, 19, 1};
     auto Result = Evo.Optimize(f);
     // listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
   }
@@ -106,8 +106,8 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, d
           Evo.mNP = 25;
           Evo.mMutStrat = Evolution::MutationStrategy::RAND1;
           Evo.optimalFitness = 0;
-          Evo.lowerBounds = vector<double>{0, 0, 3, -1};
-          Evo.upperBounds = vector<double>{20, 200, 19, 1};
+          Evo.mLB = vector<double>{0, 0, 3, -1};
+          Evo.mUB = vector<double>{20, 200, 19, 1};
           auto Result = Evo.Optimize(f);
           // listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
         }

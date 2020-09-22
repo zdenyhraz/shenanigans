@@ -60,8 +60,8 @@ void Zdeny_PhD_Shenanigans::debug()
     int N = 6;
     Evolution Evo(N);
     Evo.mNP = 10 * N;
-    Evo.lowerBounds = zerovect(N, (double)-N);
-    Evo.upperBounds = zerovect(N, (double)+N);
+    Evo.mLB = zerovect(N, (double)-N);
+    Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
     Evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
     Evo.SetPlotOutput(true);

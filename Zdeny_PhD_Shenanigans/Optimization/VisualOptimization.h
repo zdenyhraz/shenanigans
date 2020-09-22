@@ -95,14 +95,14 @@ cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points,
   return resultMat;
 }
 
-inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> lowerBounds, vector<double> upperBounds, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, cv::Mat *landscape)
+inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> mLB, vector<double> mUB, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, cv::Mat *landscape)
 {
   cv::Mat optimizedFuncLandscapeCLR = cv::Mat::zeros(steps[0], steps[1], CV_32F);
   cv::Point2i minloc, maxloc;
   vector<double> minlocArg(2, 0);
   double stretchFactorX, stretchFactorY;
   cout << "Drawing the function landscape... " << endl;
-  cv::Mat optimizedFuncLandscapeRAW = drawFunc2D(f, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1]);
+  cv::Mat optimizedFuncLandscapeRAW = drawFunc2D(f, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1]);
   if (landscape)
     *landscape = optimizedFuncLandscapeRAW;
   // optimizedFuncLandscapeCLR = applyColorMap(optimizedFuncLandscapeRAW, quantileB, quantileT);
@@ -114,8 +114,8 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
 
   double minim, maxim;
   minMaxLoc(optimizedFuncLandscapeRAW, &minim, &maxim, &minloc, &maxloc);
-  minlocArg[0] = lowerBounds[0] + (upperBounds[0] - lowerBounds[0]) / (steps[0] - 1) * minloc.x;
-  minlocArg[1] = upperBounds[1] - (upperBounds[1] - lowerBounds[1]) / (steps[1] - 1) * minloc.y;
+  minlocArg[0] = mLB[0] + (mUB[0] - mLB[0]) / (steps[0] - 1) * minloc.x;
+  minlocArg[1] = mUB[1] - (mUB[1] - mLB[1]) / (steps[1] - 1) * minloc.y;
 
   int stretchSize = 1001; // odd
   stretchFactorX = (double)stretchSize / optimizedFuncLandscapeRAW.cols;
@@ -159,13 +159,13 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
     // showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
     cv::Mat optimizedFuncLandscapeWithPathPAT = optimizedFuncLandscapeCLR, optimizedFuncLandscapeWithPathEVO = optimizedFuncLandscapeCLR;
     if (optPat)
-      optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
+      optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
     if (optEvo)
-      optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
+      optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 0);
     if (optPat)
-      optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
+      optimizedFuncLandscapeWithPathPAT = drawPath2D(optimizedFuncLandscapeWithPathPAT, Pat.visitedPoints, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
     if (optEvo)
-      optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, lowerBounds[0], upperBounds[0], lowerBounds[1], upperBounds[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
+      optimizedFuncLandscapeWithPathEVO = drawPath2D(optimizedFuncLandscapeWithPathEVO, Evo.visitedPoints, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1], stretchFactorX, stretchFactorY, 1);
 
     if (optPat)
       drawPoint2D(optimizedFuncLandscapeWithPathPAT, minloc, stretchFactorX, stretchFactorY, Scalar(0, 0, 255));
@@ -183,32 +183,32 @@ void optimizeWithLandscapeDebug()
 {
   // normal
   std::function<double(vector<double>)> f = OptimizationTestFunctions::Rosenbrock;
-  vector<double> lowerBounds{-4.5, -4.5};
-  vector<double> upperBounds{4.5, 4.5}; // odd
+  vector<double> mLB{-4.5, -4.5};
+  vector<double> mUB{4.5, 4.5}; // odd
   vector<int> steps{501, 501};          // odd
 
   /*
   //meta Evo
   std::function<double(vector<double>)> f = metaOptFuncEvo;
-  vector<double> lowerBounds{ 15, 0.7, 0.5, 0.5 };
-  vector<double> upperBounds{ 15, 0.7, 0.5, 0.5 };//odd
+  vector<double> mLB{ 15, 0.7, 0.5, 0.5 };
+  vector<double> mUB{ 15, 0.7, 0.5, 0.5 };//odd
   vector<int> steps{ (int)(2 * pmranges[0] + 1), (int)(2 * pmranges[0] + 1), (int)(2 * pmranges[0] + 1), 3 };//odd
   */
 
-  Evolution Evo(lowerBounds.size());
-  PatternSearch Pat(lowerBounds.size());
+  Evolution Evo(mLB.size());
+  PatternSearch Pat(mLB.size());
 
-  Evo.lowerBounds = lowerBounds;
-  Evo.upperBounds = upperBounds;
+  Evo.mLB = mLB;
+  Evo.mUB = mUB;
   Evo.optimalFitness = 1e-4;
   Evo.mNP = 50;
 
-  Pat.lowerBounds = lowerBounds;
-  Pat.upperBounds = upperBounds;
+  Pat.mLB = mLB;
+  Pat.mUB = mUB;
   Pat.optimalFitness = 1e-4;
   Pat.multistartMaxCnt = 3;
 
-  auto Result = drawFuncLandscapeAndOptimize2D(f, lowerBounds, upperBounds, steps, Evo, Pat, 1, 1, 1, 0, 1, nullptr);
+  auto Result = drawFuncLandscapeAndOptimize2D(f, mLB, mUB, steps, Evo, Pat, 1, 1, 1, 0, 1, nullptr);
 
   cout << "> Done broski." << endl;
 }

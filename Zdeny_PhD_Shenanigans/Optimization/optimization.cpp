@@ -3,8 +3,8 @@
 
 OptimizationAlgorithm::OptimizationAlgorithm(int N) : N(N)
 {
-  lowerBounds = zerovect(N, -1.);
-  upperBounds = zerovect(N, 1.);
+  mLB = zerovect(N, -1.);
+  mUB = zerovect(N, 1.);
 }
 
 OptimizationAlgorithm::~OptimizationAlgorithm() {}
