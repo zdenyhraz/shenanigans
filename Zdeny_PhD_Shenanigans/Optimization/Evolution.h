@@ -93,7 +93,7 @@ private:
   int GetNumberOfParents();
   void InitializeOutputs(const Population &population);
   void UpdateOutputs(int generation, const Population &population);
-  std::pair<bool, TerminationReason> CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant);
+  void CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason);
   std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
 
   bool mFileOutput = false;
