@@ -62,6 +62,8 @@ std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolut
   if (mFileOutput)
     mOutputFile << "Evolution ended.\n" << std::endl;
 
+  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(terminationReason));
+  LOG_INFO("Evolution result: {} ({})", bestEntity, bestFitness);
   LOG_INFO("Evolution optimization ended");
   return {bestEntity, terminationReason};
 }
@@ -329,25 +331,17 @@ void Evolution::UpdateHistories(const std::vector<double> &populationFitness, st
 std::pair<bool, OptimizationAlgorithm::TerminationReason> Evolution::CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant)
 {
   if (bestFitness < optimalFitness) // populationFitness goal reached
-  {
-    LOG_SUCC("OptimalFitness value reached, terminating - generation " + to_string(generation) + ".\n");
     return {true, OptimalFitnessReached};
-  }
+
   if (generation == maxGen) // maximum generation reached
-  {
-    LOG_SUCC("MaxGen value reached, terminating - generation " + to_string(generation) + ".\n");
     return {true, MaximumGenerationsReached};
-  }
+
   if (functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
-  {
-    LOG_SUCC("MaxFunEvals value reached, terminating - generation " + to_string(generation) + ".\n");
     return {true, MaximumFunctionEvaluationsReached};
-  }
+
   if (historyConstant) // no entity improved last (mHistorySize) generations
-  {
-    LOG_SUCC("historyConstant value reached, terminating - generation " + to_string(generation) + ".\n");
     return {true, NoImprovementReached};
-  }
+
   return {false, NotTerminated};
 }
 

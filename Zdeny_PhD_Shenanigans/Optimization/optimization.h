@@ -27,4 +27,5 @@ public:
   int maxGen = 1000;                                  // maximum # of algorithm iterations
 
 protected:
+  std::string GetTerminationReasonString(const TerminationReason &reason);
 };
