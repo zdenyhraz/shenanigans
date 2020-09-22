@@ -10,5 +10,5 @@ struct PatternSearch : public OptimizationAlgorithm
   double stepReducer = 0.5;
 
   PatternSearch(int N) : OptimizationAlgorithm(N){};
-  std::tuple<std::vector<double>, TerminationReason> optimize(const std::function<double(const std::vector<double> &)> &f) override;
+  OptimizationResult Optimize(ObjectiveFunction f) override;
 };

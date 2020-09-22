@@ -50,7 +50,7 @@ void Zdeny_PhD_Shenanigans::debug()
   if (1) // plot in optimization
   {
     auto f = [&](std::vector<double> args) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      // std::this_thread::sleep_for(std::chrono::milliseconds(1));
       double val = 0;
       for (int i = 0; i < args.size(); i++)
         val += sqr(args[i] - i - 1);
@@ -65,7 +65,7 @@ void Zdeny_PhD_Shenanigans::debug()
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
     Evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
     Evo.SetPlotOutput(true);
-    auto [result, shit] = Evo.optimize(f);
+    auto [result, shit] = Evo.Optimize(f);
   }
   if (0) // ipc bandpass & window
   {

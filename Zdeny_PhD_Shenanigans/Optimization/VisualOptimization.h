@@ -141,7 +141,7 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
     }
     if (optEvo)
     {
-      resultEvo = Evo.optimize(f);
+      resultEvo = Evo.Optimize(f);
     }
 
     // OUTPUT

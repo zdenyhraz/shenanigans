@@ -5,7 +5,7 @@ class Evolution : public OptimizationAlgorithm
 {
 public:
   Evolution(int N);
-  std::tuple<std::vector<double>, TerminationReason> optimize(const std::function<double(const std::vector<double> &)> &f) override;
+  OptimizationResult Optimize(ObjectiveFunction f) override;
   void SetFileOutput(const std::string &path);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
   void SetParameterNames(const std::vector<std::string> &ParameterNames) { mParameterNames = ParameterNames; };
@@ -33,34 +33,66 @@ public:
   int mNP = 4;
   double mF = 0.65;
   double mCR = 0.95;
-  double mINPm = 5.4;
   MutationStrategy mMutStrat = RAND1;
   CrossoverStrategy mCrossStrat = BIN;
   StoppingCriterion mStopCrit = AVGIMP;
-  int mDistincEntityMaxTrials = 10;
-  int mHistorySize = 10;
   double mHistoryImprovTresholdPercent = 1.0;
 
 private:
-  struct Population
+  struct Entity
   {
+    Entity();
+    Entity(int N);
+
+    std::vector<double> params;
+    double fitness;
+    std::queue<double> fitnessHistory;
   };
 
-  bool InitializeOutputs();
-  int GetNumberOfParents();
-  std::vector<std::vector<double>> InitializePopulation();
-  std::vector<double> InitializeFitness(const std::vector<std::vector<double>> &population, const std::function<double(const std::vector<double> &)> &f);
-  std::pair<std::vector<double>, double> InitializeBestEntity(const std::vector<std::vector<double>> &population, const std::vector<double> &populationFitness);
+  struct Offspring
+  {
+    Offspring();
+    Offspring(int N, int nParents);
+    void UpdateDistinctParents(int eid, int NP);
+    void UpdateCrossoverParameters(int N, CrossoverStrategy crossoverStrategy, double CR);
+
+    std::vector<double> params;
+    double fitness;
+    std::vector<int> parentIndices;
+    std::vector<bool> crossoverParameters;
+  };
+
+  struct Population
+  {
+    Population();
+    bool Initialize(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB, int nParents);
+    void UpdateDistinctParents(int eid, int NP);
+    void UpdateCrossoverParameters(int eid, int N, CrossoverStrategy crossoverStrategy, double CR);
+    void UpdateOffspring(int eid, int N, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB);
+    void PerformSelection(int NP);
+    void UpdateFunctionEvaluations(int NP);
+    void UpdateBestEntity(int NP);
+    void UpdateFitnessHistories(int NP, int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold);
+
+    std::vector<Entity> population;
+    std::vector<Offspring> offspring;
+    Entity bestEntity;
+    int functionEvaluations;
+    double previousBestFitness;
+    double currentBestFitness;
+    double improvement;
+    bool constantHistory;
+
+  private:
+    void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
+    void InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents);
+    void InitializeBestEntity(int NP, int N);
+  };
+
   bool CheckObjectiveFunctionNormality(const std::function<double(const std::vector<double> &)> &f);
-  void CalculateDistinctParents(int entityIndex, std::vector<int> &parentIndices);
-  void CalculateCrossoverParameters(std::vector<bool> &crossoverParameters);
-  void CalculateOffspring(const std::vector<std::vector<double>> &population, const std::vector<double> &bestEntity, const std::vector<int> &parentIndices, const std::vector<bool> &crossoverParameters, int indexEntity, std::vector<double> &offspring);
-  void CalculateOffspringFitness(const std::vector<double> &offspring, const std::function<double(const std::vector<double> &)> &f, double &offspringFitness);
-  void CalculateSelection(const std::vector<double> &offspring, double offspringFitness, std::vector<double> &population, double &populationFitness);
-  void UpdateFunctionEvaluations(int &functionEvaluations);
-  void CalculateBestEntity(const std::vector<std::vector<double>> &population, const std::vector<double> &populationFitness, std::vector<double> &bestEntity, double &bestFitness);
-  void UpdateOutputs(int generation, const std::vector<double> &bestEntity, double bestFitness, double averageImprovement, double &fitnessPrevious, double &fitnessCurrent);
-  void UpdateHistories(const std::vector<double> &populationFitness, std::vector<std::queue<double>> &populationHistory, double &averageImprovement, bool &historyConstant);
+  int GetNumberOfParents();
+  void InitializeOutputs(const Population &population);
+  void UpdateOutputs(int generation, const Population &population);
   std::pair<bool, TerminationReason> CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant);
   std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
 
@@ -69,4 +101,6 @@ private:
   std::string mOutputFilePath;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
+  double mINPm = 5.4;
+  int mHistorySize = 10;
 };

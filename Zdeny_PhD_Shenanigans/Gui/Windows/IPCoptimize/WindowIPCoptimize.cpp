@@ -18,7 +18,7 @@ void WindowIPCoptimize::optimize()
     Evo.mNP = 32;
     Evo.lowerBounds = zerovect(2, -100.);
     Evo.upperBounds = zerovect(2, +100.);
-    Evo.optimize([&](std::vector<double> arg) { return sin(sqr(arg[0]) - sqr(arg[1] - 3) + 6); });
+    Evo.Optimize([&](std::vector<double> arg) { return sin(sqr(arg[0]) - sqr(arg[1] - 3) + 6); });
   }
   optimizeIPCParameters(*globals->IPCset, ui.lineEdit->text().toStdString(), ui.lineEdit_2->text().toStdString(), ui.lineEdit_3->text().toDouble(), ui.lineEdit_4->text().toDouble(), ui.lineEdit_5->text().toInt());
   LOG_DEBUG("IPC parameter optimization completed, see the results at\n" + ui.lineEdit_2->text().toStdString());

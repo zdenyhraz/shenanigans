@@ -163,7 +163,7 @@ void WindowDiffrot::optimizeDiffrot()
     evo.lowerBounds = std::vector<double>{-10, -500, 5, -1, -1, 64, -1};
     evo.upperBounds = std::vector<double>{10, 500, 17, 1, 1, 512, 1};
     evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
-    auto [result, shit] = evo.optimize(f);
+    auto [result, shit] = evo.Optimize(f);
     LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
   }
 }
