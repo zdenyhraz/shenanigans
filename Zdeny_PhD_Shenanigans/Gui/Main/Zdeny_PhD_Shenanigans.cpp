@@ -53,7 +53,7 @@ void Zdeny_PhD_Shenanigans::debug()
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       double val = 0;
       for (int i = 0; i < args.size(); i++)
-        val += sqr(args[i] - i);
+        val += sqr(args[i] - i - 1);
       return val;
     };
 
@@ -64,8 +64,8 @@ void Zdeny_PhD_Shenanigans::debug()
     Evo.upperBounds = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
     Evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
+    Evo.SetPlotOutput(true);
     auto [result, shit] = Evo.optimize(f);
-    LOG_INFO("Evolution result = {}", result);
   }
   if (0) // ipc bandpass & window
   {
