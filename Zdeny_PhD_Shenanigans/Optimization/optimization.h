@@ -19,12 +19,12 @@ public:
   virtual ~OptimizationAlgorithm();
   virtual std::tuple<std::vector<double>, TerminationReason> optimize(const std::function<double(const std::vector<double> &)> &f) = 0;
 
-  int N = 1;                                          // the problem dimension
-  std::vector<double> lowerBounds = zerovect(N, -1.); // lower search space bounds
-  std::vector<double> upperBounds = zerovect(N, +1.); // upper search space bounds
-  double optimalFitness = 0;                          // satisfactory function value
-  int maxFunEvals = 1e10;                             // maximum # of function evaluations
-  int maxGen = 1000;                                  // maximum # of algorithm iterations
+  int N = 1;                               // the problem dimension
+  std::vector<double> lowerBounds;         // lower search space bounds
+  std::vector<double> upperBounds;         // upper search space bounds
+  double optimalFitness = -Constants::Inf; // satisfactory function value
+  int maxFunEvals = Constants::IntInf;     // maximum # of function evaluations
+  int maxGen = 1000;                       // maximum # of algorithm iterations
 
 protected:
   std::string GetTerminationReasonString(const TerminationReason &reason);
