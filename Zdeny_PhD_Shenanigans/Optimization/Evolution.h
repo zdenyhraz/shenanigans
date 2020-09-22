@@ -8,6 +8,7 @@ public:
   std::tuple<std::vector<double>, TerminationReason> optimize(const std::function<double(const std::vector<double> &)> &f) override;
   void SetFileOutput(const std::string &path);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
+  void SetParameterNames(const std::vector<std::string> &ParameterNames) { mParameterNames = ParameterNames; };
 
   enum MutationStrategy
   {
@@ -39,6 +40,7 @@ public:
   int mDistincEntityMaxTrials = 10;
   int mHistorySize = 10;
   double mHistoryImprovTresholdPercent = 1;
+  std::vector<std::string> mParameterNames;
   bool mFileOutput = false;
   bool mPlotOutput = true;
   std::string mOutputFilePath;
@@ -61,7 +63,5 @@ private:
   void UpdateOutputs(int generation, const std::vector<double> &bestEntity, double bestFitness, double averageImprovement, double &fitnessPrevious, double &fitnessCurrent);
   void UpdateHistories(const std::vector<double> &populationFitness, std::vector<std::queue<double>> &populationHistory, double &averageImprovement, bool &historyConstant);
   std::pair<bool, TerminationReason> CheckTerminationCriterions(double bestFitness, int generation, int functionEvaluations, bool historyConstant);
-  bool CheckAlreadyOptimizing();
-
-  bool mOptimizing = false;
+  std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
 };
