@@ -6,11 +6,7 @@ Evolution::Evolution(int N) : OptimizationAlgorithm(N) { mNP = N * mINPm; };
 
 std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolution::optimize(const std::function<double(const std::vector<double> &)> &f)
 {
-  mOptimizing = true;
   LOG_INFO("Evolution optimization started");
-
-  if (!CheckAlreadyOptimizing())
-    return {};
 
   if (!InitializeOutputs())
     return {};
@@ -67,7 +63,6 @@ std::tuple<std::vector<double>, OptimizationAlgorithm::TerminationReason> Evolut
     mOutputFile << "Evolution ended.\n" << std::endl;
 
   LOG_INFO("Evolution optimization ended");
-  mOptimizing = false;
   return {bestEntity, terminationReason};
 }
 
@@ -168,7 +163,7 @@ std::pair<std::vector<double>, double> Evolution::InitializeBestEntity(const std
   }
 
   if (mFileOutput)
-    mOutputFile << "Init best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+    mOutputFile << GetOutputFileString(0, bestEntity, bestFitness);
 
   if (mPlotOutput)
     Plot1D::plot(0, bestFitness, log(bestFitness), "Evolution", "generation", "populationFitness", "log populationFitness");
@@ -292,7 +287,7 @@ void Evolution::CalculateBestEntity(const std::vector<std::vector<double>> &popu
 void Evolution::UpdateOutputs(int generation, const std::vector<double> &bestEntity, double bestFitness, double averageImprovement, double &fitnessPrevious, double &fitnessCurrent)
 {
   if (mFileOutput)
-    mOutputFile << "Gen " + to_string(generation) + " best entity: " + to_string(bestEntity) + " (" + to_string(bestFitness) + ")" << std::endl;
+    mOutputFile << GetOutputFileString(generation, bestEntity, bestFitness);
 
   if (mPlotOutput)
     Plot1D::plot(generation, bestFitness, log(bestFitness), "Evolution", "generation", "populationFitness", "log populationFitness");
@@ -356,7 +351,31 @@ std::pair<bool, OptimizationAlgorithm::TerminationReason> Evolution::CheckTermin
   return {false, NotTerminated};
 }
 
-bool Evolution::CheckAlreadyOptimizing() { return !mOptimizing; }
+std::string Evolution::GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness)
+{
+  std::string value;
+  value += "Gen " + to_string(generation);
+  value += " best: [";
+  for (int i = 0; i < bestEntity.size(); ++i)
+  {
+    if (mParameterNames.size() > i)
+    {
+      if (i != bestEntity.size() - 1)
+        value += mParameterNames[i] + ": " + to_string(bestEntity[i]) + ", ";
+      else
+        value += mParameterNames[i] + ": " + to_string(bestEntity[i]) + "]";
+    }
+    else
+    {
+      if (i != bestEntity.size() - 1)
+        value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + ", ";
+      else
+        value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + "]";
+    }
+  }
+  value += " (Obj: " + to_string(bestFitness) + ")\n";
+  return value;
+}
 
 int Evolution::GetNumberOfParents()
 {

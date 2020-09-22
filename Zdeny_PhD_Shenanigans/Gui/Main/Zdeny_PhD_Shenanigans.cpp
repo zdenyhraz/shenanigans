@@ -47,15 +47,25 @@ void Zdeny_PhD_Shenanigans::debug()
   TIMER("Debug");
   LOG_INFO("Debug started");
 
-  if (0) // plot in optimization
+  if (1) // plot in optimization
   {
-    Evolution Evo(2);
-    Evo.mNP = 10;
     auto f = [&](std::vector<double> args) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      return abs(args[0] - args[1]);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      double val = 0;
+      for (int i = 0; i < args.size(); i++)
+        val += sqr(args[i] - i);
+      return val;
     };
-    auto result = Evo.optimize(f);
+
+    int N = 6;
+    Evolution Evo(N);
+    Evo.mNP = 10 * N;
+    Evo.lowerBounds = zerovect(N, (double)-N);
+    Evo.upperBounds = zerovect(N, (double)+N);
+    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
+    Evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
+    auto [result, shit] = Evo.optimize(f);
+    LOG_INFO("Evolution result = {}", result);
   }
   if (0) // ipc bandpass & window
   {
@@ -202,7 +212,7 @@ void Zdeny_PhD_Shenanigans::debug()
     LOG_DEBUG("C = \n{}", C);
     LOG_DEBUG("A + C = \n{}", A + C);
   }
-  if (1) // new ipc test
+  if (0) // new ipc test
   {
     Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
