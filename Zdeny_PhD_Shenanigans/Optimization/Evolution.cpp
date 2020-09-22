@@ -339,12 +339,13 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
       }
     }
   }
+  LOG_SUCC("Initial population created");
 
+  LOG_INFO("Evaluating initial population...");
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
     population[eid].fitness = f(population[eid].params);
-
-  LOG_SUCC("Initial population created");
+  LOG_SUCC("Initial population evaluated");
 }
 
 void Evolution::Population::InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents)
