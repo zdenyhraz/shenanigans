@@ -20,7 +20,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   InitializeOutputs(population);
 
   bool terminate = false;
-  TerminationReason terminationReason = NotTerminated;
+  TerminationReason reason = NotTerminated;
   int gen = 0;
 
   // run main evolution cycle
@@ -40,7 +40,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     population.UpdateBestEntity(mNP);
     population.UpdateFitnessHistories(mNP, mHistorySize, mStopCrit, mHistoryImprovTresholdPercent);
     UpdateOutputs(gen, population);
-    std::tie(terminate, terminationReason) = CheckTerminationCriterions(population.bestEntity.fitness, gen, population.functionEvaluations, population.constantHistory);
+    CheckTerminationCriterions(population, gen, terminate, reason);
 
     if (terminate)
       break;
@@ -49,10 +49,10 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (mFileOutput)
     mOutputFile << "Evolution ended.\n" << std::endl;
 
-  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(terminationReason));
+  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
   LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
   LOG_INFO("Evolution optimization ended");
-  return {population.bestEntity.params, terminationReason};
+  return {population.bestEntity.params, reason};
 }
 
 void Evolution::SetFileOutput(const std::string &path)
@@ -105,21 +105,32 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
   LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", gen, population.bestEntity.params, population.bestEntity.fitness, (population.previousBestFitness - population.currentBestFitness) / population.previousBestFitness * 100, population.improvement * 100);
 }
 
-std::pair<bool, OptimizationAlgorithm::TerminationReason> Evolution::CheckTerminationCriterions(double bestFitness, int gen, int functionEvaluations, bool constantHistory)
+void Evolution::CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason)
 {
-  if (bestFitness < optimalFitness) // populationFitness goal reached
-    return {true, OptimalFitnessReached};
+  if (population.bestEntity.fitness < optimalFitness) // populationFitness goal reached
+  {
+    terminate = true;
+    reason = OptimalFitnessReached;
+    return;
+  }
 
-  if (gen == maxGen) // maximum gen reached
-    return {true, MaximumGenerationsReached};
+  if (generation == maxGen) // maximum gen reached
+  {
+    terminate = true;
+    reason = MaximumGenerationsReached;
+  }
 
-  if (functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
-    return {true, MaximumFunctionEvaluationsReached};
+  if (population.functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
+  {
+    terminate = true;
+    reason = MaximumFunctionEvaluationsReached;
+  }
 
-  if (constantHistory) // no entity improved last (mHistorySize) generations
-    return {true, NoImprovementReached};
-
-  return {false, NotTerminated};
+  if (population.constantHistory) // no entity improved last (mHistorySize) generations
+  {
+    terminate = true;
+    reason = NoImprovementReached;
+  }
 }
 
 std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &bestEntity, double bestFitness)
