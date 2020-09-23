@@ -238,8 +238,8 @@ void Evolution::Population::UpdateOffspring(int eid, int N, MutationStrategy mut
     }
     // check for boundaries, effectively clamp
     newoffspring.params[pid] = clampSmooth(newoffspring.params[pid], population[eid].params[pid], LB[pid], UB[pid]);
-    newoffspring.fitness = f(newoffspring.params);
   }
+  newoffspring.fitness = f(newoffspring.params);
 }
 
 void Evolution::Population::PerformSelection(int NP)
@@ -340,6 +340,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
   LOG_SUCC("Initial population created");
 
   LOG_INFO("Evaluating initial population...");
+
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
     population[eid].fitness = f(population[eid].params);
