@@ -2,7 +2,7 @@
 #include "Evolution.h"
 #include "Plot/Plot1D.h"
 
-Evolution::Evolution(int N) : OptimizationAlgorithm(N) { mNP = N * mINPm; };
+Evolution::Evolution(int N, const std::string &optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(N * mINPm){};
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction f)
 {
