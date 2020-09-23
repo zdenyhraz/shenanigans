@@ -54,7 +54,7 @@ private:
     Offspring();
     Offspring(int N, int nParents);
     void UpdateDistinctParents(int eid, int NP);
-    void UpdateCrossoverParameters(int N, CrossoverStrategy crossoverStrategy, double CR);
+    void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR);
 
     std::vector<double> params;
     double fitness;
@@ -66,13 +66,14 @@ private:
   {
     Population();
     bool Initialize(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB, int nParents);
-    void UpdateDistinctParents(int eid, int NP);
-    void UpdateCrossoverParameters(int eid, int N, CrossoverStrategy crossoverStrategy, double CR);
-    void UpdateOffspring(int eid, int N, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB);
-    void PerformSelection(int NP);
-    void UpdateFunctionEvaluations(int NP);
-    void UpdateBestEntity(int NP);
-    void UpdateFitnessHistories(int NP, int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold);
+    void UpdateDistinctParents(int eid);
+    void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
+    void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB);
+    void PerformSelection();
+    void UpdatePopulationFunctionEvaluations();
+    void UpdateOffspringFunctionEvaluations();
+    void UpdateBestEntity();
+    void UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold);
 
     std::vector<Entity> population;
     std::vector<Offspring> offspring;
@@ -92,6 +93,7 @@ private:
   bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
   int GetNumberOfParents();
   void InitializeOutputs(const Population &population);
+  void UninitializeOutputs(const Population &population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population &population);
   void CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason);
   std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
