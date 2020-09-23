@@ -75,7 +75,7 @@ private:
     void UpdateBestEntity();
     void UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold);
 
-    std::vector<Entity> population;
+    std::vector<Entity> entities;
     std::vector<Offspring> offspring;
     Entity bestEntity;
     int functionEvaluations;
@@ -86,8 +86,8 @@ private:
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
-    void InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents);
     void InitializeBestEntity(int NP, int N);
+    void InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents);
   };
 
   bool CheckObjectiveFunctionNormality(ObjectiveFunction f);

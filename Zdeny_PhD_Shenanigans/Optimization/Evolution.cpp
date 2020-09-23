@@ -86,12 +86,16 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
     LOG_ERROR("Objective function is not finite");
     return false;
   }
+  else
+    LOG_DEBUG("Objective function is finite");
 
   if (result1 != result2)
   {
     LOG_ERROR("Objective function is not consistent");
     return false;
   }
+  else
+    LOG_DEBUG("Objective function is consistent");
 
   LOG_SUCC("Objective function is normal");
   return true;
@@ -195,8 +199,8 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   try
   {
     InitializePopulation(NP, N, f, LB, UB);
-    InitializeOffspring(NP, N, f, nParents);
     InitializeBestEntity(NP, N);
+    InitializeOffspring(NP, N, f, nParents);
     functionEvaluations = 0;
     previousBestFitness = Constants::Inf;
     currentBestFitness = Constants::Inf;
@@ -210,14 +214,14 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   }
 }
 
-void Evolution::Population::UpdateDistinctParents(int eid) { offspring[eid].UpdateDistinctParents(eid, population.size()); }
+void Evolution::Population::UpdateDistinctParents(int eid) { offspring[eid].UpdateDistinctParents(eid, entities.size()); }
 
 void Evolution::Population::UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR) { offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR); }
 
 void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB)
 {
   auto &newoffspring = offspring[eid];
-  newoffspring.params = population[eid].params;
+  newoffspring.params = entities[eid].params;
   for (int pid = 0; pid < newoffspring.params.size(); pid++)
   {
     if (newoffspring.crossoverParameters[pid])
@@ -225,46 +229,46 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
       switch (mutationStrategy)
       {
       case MutationStrategy::RAND1:
-        newoffspring.params[pid] = population[newoffspring.parentIndices[0]].params[pid] + F * (population[newoffspring.parentIndices[1]].params[pid] - population[newoffspring.parentIndices[2]].params[pid]);
+        newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] + F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]);
         break;
       case MutationStrategy::BEST1:
-        newoffspring.params[pid] = bestEntity.params[pid] + F * (population[newoffspring.parentIndices[0]].params[pid] - population[newoffspring.parentIndices[1]].params[pid]);
+        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]);
         break;
       case MutationStrategy::RAND2:
-        newoffspring.params[pid] = population[newoffspring.parentIndices[0]].params[pid] + F * (population[newoffspring.parentIndices[1]].params[pid] - population[newoffspring.parentIndices[2]].params[pid]) + F * (population[newoffspring.parentIndices[3]].params[pid] - population[newoffspring.parentIndices[4]].params[pid]);
+        newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] + F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]) + F * (entities[newoffspring.parentIndices[3]].params[pid] - entities[newoffspring.parentIndices[4]].params[pid]);
         break;
       case MutationStrategy::BEST2:
-        newoffspring.params[pid] = bestEntity.params[pid] + F * (population[newoffspring.parentIndices[0]].params[pid] - population[newoffspring.parentIndices[1]].params[pid]) + F * (population[newoffspring.parentIndices[2]].params[pid] - population[newoffspring.parentIndices[3]].params[pid]);
+        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) + F * (entities[newoffspring.parentIndices[2]].params[pid] - entities[newoffspring.parentIndices[3]].params[pid]);
         break;
       }
     }
     // check for boundaries, effectively clamp
-    newoffspring.params[pid] = clampSmooth(newoffspring.params[pid], population[eid].params[pid], LB[pid], UB[pid]);
+    newoffspring.params[pid] = clampSmooth(newoffspring.params[pid], entities[eid].params[pid], LB[pid], UB[pid]);
   }
   newoffspring.fitness = f(newoffspring.params);
 }
 
 void Evolution::Population::PerformSelection()
 {
-  for (int eid = 0; eid < population.size(); ++eid)
+  for (int eid = 0; eid < entities.size(); ++eid)
   {
-    if (offspring[eid].fitness <= population[eid].fitness)
+    if (offspring[eid].fitness <= entities[eid].fitness)
     {
-      population[eid].params = offspring[eid].params;
-      population[eid].fitness = offspring[eid].fitness;
+      entities[eid].params = offspring[eid].params;
+      entities[eid].fitness = offspring[eid].fitness;
     }
   }
 }
 
-void Evolution::Population::UpdatePopulationFunctionEvaluations() { functionEvaluations += population.size(); }
+void Evolution::Population::UpdatePopulationFunctionEvaluations() { functionEvaluations += entities.size(); }
 
 void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvaluations += offspring.size(); }
 
 void Evolution::Population::UpdateBestEntity()
 {
-  for (int eid = 0; eid < population.size(); ++eid)
-    if (population[eid].fitness <= bestEntity.fitness)
-      bestEntity = population[eid];
+  for (int eid = 0; eid < entities.size(); ++eid)
+    if (entities[eid].fitness <= bestEntity.fitness)
+      bestEntity = entities[eid];
 
   previousBestFitness = currentBestFitness;
   currentBestFitness = bestEntity.fitness;
@@ -275,25 +279,25 @@ void Evolution::Population::UpdateFitnessHistories(int nHistories, StoppingCrite
   // fill history ques for all entities - termination criterion
   constantHistory = true; // assume history is constant
   improvement = 0;
-  for (int eid = 0; eid < population.size(); ++eid)
+  for (int eid = 0; eid < entities.size(); ++eid)
   {
-    if (population[eid].fitnessHistory.size() == nHistories)
+    if (entities[eid].fitnessHistory.size() == nHistories)
     {
-      population[eid].fitnessHistory.pop();                         // remove first element - keep que size constant
-      population[eid].fitnessHistory.push(population[eid].fitness); // insert at the end
-      if (stoppingCriterion == StoppingCriterion::ALLIMP)           // populationFitness improved less than x% for all entities
-        if (abs(population[eid].fitnessHistory.front() - population[eid].fitnessHistory.back()) / abs(population[eid].fitnessHistory.front()) > improvThreshold / 100)
+      entities[eid].fitnessHistory.pop();                       // remove first element - keep que size constant
+      entities[eid].fitnessHistory.push(entities[eid].fitness); // insert at the end
+      if (stoppingCriterion == StoppingCriterion::ALLIMP)       // populationFitness improved less than x% for all entities
+        if (abs(entities[eid].fitnessHistory.front() - entities[eid].fitnessHistory.back()) / abs(entities[eid].fitnessHistory.front()) > improvThreshold / 100)
           constantHistory = false;
     }
     else
     {
-      population[eid].fitnessHistory.push(population[eid].fitness); // insert at the end
-      constantHistory = false;                                      // too early to stop, go on
+      entities[eid].fitnessHistory.push(entities[eid].fitness); // insert at the end
+      constantHistory = false;                                  // too early to stop, go on
     }
-    if (population[eid].fitnessHistory.size() > 2)
-      improvement += abs(population[eid].fitnessHistory.front()) == 0 ? 0 : abs(population[eid].fitnessHistory.front() - population[eid].fitnessHistory.back()) / abs(population[eid].fitnessHistory.front());
+    if (entities[eid].fitnessHistory.size() > 2)
+      improvement += abs(entities[eid].fitnessHistory.front()) == 0 ? 0 : abs(entities[eid].fitnessHistory.front() - entities[eid].fitnessHistory.back()) / abs(entities[eid].fitnessHistory.front());
   }
-  improvement /= population.size();
+  improvement /= entities.size();
   if (stoppingCriterion == StoppingCriterion::AVGIMP) // average populationFitness improved less than x%
     if (100 * improvement > improvThreshold)
       constantHistory = false;
@@ -302,7 +306,7 @@ void Evolution::Population::UpdateFitnessHistories(int nHistories, StoppingCrite
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB)
 {
   LOG_INFO("Creating initial population within bounds...");
-  population = zerovect(NP, Entity(N));
+  entities = zerovect(NP, Entity(N));
   std::vector<double> RB = UB - LB;
   const double initialMinAvgDist = 0.5;
   const int distincEntityMaxTrials = 10;
@@ -317,15 +321,15 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
       distinctEntity = true; // assume entity is distinct
 
       for (int pid = 0; pid < N; pid++) // generate initial entity
-        population[eid].params[pid] = randr(LB[pid], UB[pid]);
+        entities[eid].params[pid] = randr(LB[pid], UB[pid]);
 
       if (distincEntityMaxTrials < 1)
         break;
 
       for (int eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
-        double avgDist = averageVectorDistance(population[eid].params, population[eidx2].params, RB); // calculate how distinct the entity is to another entity
-        if (avgDist < minAvgDist)                                                                     // check if entity is distinct
+        double avgDist = averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
+        if (avgDist < minAvgDist)                                                                 // check if entity is distinct
         {
           distinctEntity = false;
           break; // needs to be distinct from all entities
@@ -347,7 +351,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
-    population[eid].fitness = f(population[eid].params);
+    entities[eid].fitness = f(entities[eid].params);
 
   UpdatePopulationFunctionEvaluations();
   LOG_SUCC("Initial population evaluated");
@@ -359,8 +363,8 @@ void Evolution::Population::InitializeOffspring(int NP, int N, ObjectiveFunction
   offspring = zerovect(NP, Offspring(N, nParents));
   for (int eid = 0; eid < NP; eid++)
   {
-    offspring[eid].params = population[eid].params;
-    offspring[eid].fitness = population[eid].fitness;
+    offspring[eid].params = entities[eid].params;
+    offspring[eid].fitness = entities[eid].fitness;
   }
   LOG_SUCC("Initial offspring created");
 }
@@ -370,8 +374,8 @@ void Evolution::Population::InitializeBestEntity(int NP, int N)
   LOG_INFO("Searching for best entity in the initial population...");
   bestEntity = Entity(N);
   for (int eid = 0; eid < NP; eid++)
-    if (population[eid].fitness <= bestEntity.fitness)
-      bestEntity = population[eid];
+    if (entities[eid].fitness <= bestEntity.fitness)
+      bestEntity = entities[eid];
 
   LOG_SUCC("Initial population best entity: {} ({:.3f})", bestEntity.params, bestEntity.fitness);
 }
