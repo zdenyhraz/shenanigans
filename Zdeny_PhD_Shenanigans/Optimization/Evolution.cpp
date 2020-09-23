@@ -15,30 +15,26 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
-  population.UpdateFunctionEvaluations(mNP);
-
   InitializeOutputs(population);
 
   bool terminate = false;
   auto reason = NotTerminated;
   int gen = 0;
 
-  // run main evolution cycle
-  LOG_INFO("Running evolution...");
   while (!terminate)
   {
     gen++;
 #pragma omp parallel for
     for (int eid = 0; eid < mNP; eid++)
     {
-      population.UpdateDistinctParents(eid, mNP);
-      population.UpdateCrossoverParameters(eid, N, mCrossStrat, mCR);
-      population.UpdateOffspring(eid, N, mMutStrat, f, mF, mLB, mUB);
+      population.UpdateDistinctParents(eid);
+      population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
+      population.UpdateOffspring(eid, mMutStrat, f, mF, mLB, mUB);
     }
-    population.PerformSelection(mNP);
-    population.UpdateBestEntity(mNP);
-    population.UpdateFitnessHistories(mNP, mHistorySize, mStopCrit, mHistoryImprovTresholdPercent);
-    population.UpdateFunctionEvaluations(mNP);
+    population.PerformSelection();
+    population.UpdateBestEntity();
+    population.UpdateFitnessHistories(mHistorySize, mStopCrit, mHistoryImprovTresholdPercent);
+    population.UpdateOffspringFunctionEvaluations();
 
     UpdateOutputs(gen, population);
     CheckTerminationCriterions(population, gen, terminate, reason);
@@ -47,12 +43,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       break;
   }
 
-  if (mFileOutput)
-    mOutputFile << "Evolution ended.\n" << std::endl;
-
-  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-  LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
-  LOG_INFO("Evolution optimization ended");
+  UninitializeOutputs(population, reason);
   return {population.bestEntity.params, reason};
 }
 
@@ -69,7 +60,7 @@ void Evolution::InitializeOutputs(const Population &population)
   if (mFileOutput)
   {
     mOutputFile.open(mOutputFilePath, std::ios::out);
-    mOutputFile << "Evolution started." << std::endl;
+    mOutputFile << "Running evolution..." << std::endl;
     mOutputFile << GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness);
   }
 
@@ -80,6 +71,7 @@ void Evolution::InitializeOutputs(const Population &population)
   }
 
   LOG_SUCC("Outputs initialized");
+  LOG_INFO("Running evolution...");
 }
 
 bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
@@ -114,6 +106,16 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
     Plot1D::plot(gen, population.bestEntity.fitness, log(population.bestEntity.fitness), "Evolution", "gen", "populationFitness", "log populationFitness");
 
   LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", gen, population.bestEntity.params, population.bestEntity.fitness, (population.previousBestFitness - population.currentBestFitness) / population.previousBestFitness * 100, population.improvement * 100);
+}
+
+void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
+{
+  if (mFileOutput)
+    mOutputFile << "Evolution optimization ended\n" << std::endl;
+
+  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
+  LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
+  LOG_INFO("Evolution optimization ended");
 }
 
 void Evolution::CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason)
@@ -208,15 +210,15 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   }
 }
 
-void Evolution::Population::UpdateDistinctParents(int eid, int NP) { offspring[eid].UpdateDistinctParents(eid, NP); }
+void Evolution::Population::UpdateDistinctParents(int eid) { offspring[eid].UpdateDistinctParents(eid, population.size()); }
 
-void Evolution::Population::UpdateCrossoverParameters(int eid, int N, CrossoverStrategy crossoverStrategy, double CR) { offspring[eid].UpdateCrossoverParameters(N, crossoverStrategy, CR); }
+void Evolution::Population::UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR) { offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR); }
 
-void Evolution::Population::UpdateOffspring(int eid, int N, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB)
+void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB)
 {
   auto &newoffspring = offspring[eid];
   newoffspring.params = population[eid].params;
-  for (int pid = 0; pid < N; pid++)
+  for (int pid = 0; pid < newoffspring.params.size(); pid++)
   {
     if (newoffspring.crossoverParameters[pid])
     {
@@ -242,9 +244,9 @@ void Evolution::Population::UpdateOffspring(int eid, int N, MutationStrategy mut
   newoffspring.fitness = f(newoffspring.params);
 }
 
-void Evolution::Population::PerformSelection(int NP)
+void Evolution::Population::PerformSelection()
 {
-  for (int eid = 0; eid < NP; ++eid)
+  for (int eid = 0; eid < population.size(); ++eid)
   {
     if (offspring[eid].fitness <= population[eid].fitness)
     {
@@ -254,11 +256,13 @@ void Evolution::Population::PerformSelection(int NP)
   }
 }
 
-void Evolution::Population::UpdateFunctionEvaluations(int NP) { functionEvaluations += NP; }
+void Evolution::Population::UpdatePopulationFunctionEvaluations() { functionEvaluations += population.size(); }
 
-void Evolution::Population::UpdateBestEntity(int NP)
+void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvaluations += offspring.size(); }
+
+void Evolution::Population::UpdateBestEntity()
 {
-  for (int eid = 0; eid < NP; ++eid)
+  for (int eid = 0; eid < population.size(); ++eid)
     if (population[eid].fitness <= bestEntity.fitness)
       bestEntity = population[eid];
 
@@ -266,12 +270,12 @@ void Evolution::Population::UpdateBestEntity(int NP)
   currentBestFitness = bestEntity.fitness;
 }
 
-void Evolution::Population::UpdateFitnessHistories(int NP, int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold)
+void Evolution::Population::UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold)
 {
   // fill history ques for all entities - termination criterion
   constantHistory = true; // assume history is constant
   improvement = 0;
-  for (int eid = 0; eid < NP; ++eid)
+  for (int eid = 0; eid < population.size(); ++eid)
   {
     if (population[eid].fitnessHistory.size() == nHistories)
     {
@@ -289,7 +293,7 @@ void Evolution::Population::UpdateFitnessHistories(int NP, int nHistories, Stopp
     if (population[eid].fitnessHistory.size() > 2)
       improvement += abs(population[eid].fitnessHistory.front()) == 0 ? 0 : abs(population[eid].fitnessHistory.front() - population[eid].fitnessHistory.back()) / abs(population[eid].fitnessHistory.front());
   }
-  improvement /= NP;
+  improvement /= population.size();
   if (stoppingCriterion == StoppingCriterion::AVGIMP) // average populationFitness improved less than x%
     if (100 * improvement > improvThreshold)
       constantHistory = false;
@@ -344,6 +348,8 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
     population[eid].fitness = f(population[eid].params);
+
+  UpdatePopulationFunctionEvaluations();
   LOG_SUCC("Initial population evaluated");
 }
 
@@ -399,16 +405,16 @@ void Evolution::Offspring::UpdateDistinctParents(int eid, int NP)
   }
 }
 
-void Evolution::Offspring::UpdateCrossoverParameters(int N, CrossoverStrategy crossoverStrategy, double CR)
+void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR)
 {
-  crossoverParameters = zerovect(N, false);
+  crossoverParameters = zerovect(params.size(), false);
 
   switch (crossoverStrategy)
   {
   case CrossoverStrategy::BIN:
   {
-    int definite = rand() % N; // at least one param undergoes crossover
-    for (int pid = 0; pid < N; pid++)
+    int definite = rand() % params.size(); // at least one param undergoes crossover
+    for (int pid = 0; pid < params.size(); pid++)
     {
       double random = rand01();
       if (random < CR || pid == definite)
@@ -421,13 +427,13 @@ void Evolution::Offspring::UpdateCrossoverParameters(int N, CrossoverStrategy cr
     int L = 0;
     do
       L++;
-    while ((rand01() < CR) && (L < N)); // at least one param undergoes crossover
-    int pid = rand() % N;
+    while ((rand01() < CR) && (L < params.size())); // at least one param undergoes crossover
+    int pid = rand() % params.size();
     for (int i = 0; i < L; i++)
     {
       crossoverParameters[pid] = true;
       pid++;
-      pid %= N;
+      pid %= params.size();
     }
     return;
   }
