@@ -65,7 +65,7 @@ bool Evolution::InitializeOutputs()
     if (mFileOutput)
     {
       mOutputFile.open(mOutputFilePath, std::ios::out);
-      mOutputFile << "Evolution optimization started" << std::endl;
+      mOutputFile << "Evolution optimization '" + mOptimizationName + "' started" << std::endl;
     }
 
     if (mPlotOutput)
@@ -124,7 +124,7 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
 {
   if (mFileOutput)
-    mOutputFile << "Evolution optimization ended\n" << std::endl;
+    mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
 
   LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
   LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
