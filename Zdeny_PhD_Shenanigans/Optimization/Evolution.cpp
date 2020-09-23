@@ -6,20 +6,22 @@ Evolution::Evolution(int N) : OptimizationAlgorithm(N) { mNP = N * mINPm; };
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction f)
 {
-  LOG_INFO("Evolution optimization started");
+  Population population;
+
+  if (!InitializeOutputs())
+    return {};
 
   if (!CheckObjectiveFunctionNormality(f))
     return {};
 
-  Population population;
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
-
-  InitializeOutputs(population);
 
   bool terminate = false;
   auto reason = NotTerminated;
   int gen = 0;
+  LOG_INFO("Running evolution...");
+  UpdateOutputs(gen, population);
 
   while (!terminate)
   {
@@ -53,25 +55,32 @@ void Evolution::SetFileOutput(const std::string &path)
   mFileOutput = true;
 }
 
-void Evolution::InitializeOutputs(const Population &population)
+bool Evolution::InitializeOutputs()
 {
-  LOG_INFO("Initializing outputs...");
-
-  if (mFileOutput)
+  try
   {
-    mOutputFile.open(mOutputFilePath, std::ios::out);
-    mOutputFile << "Running evolution..." << std::endl;
-    mOutputFile << GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness);
-  }
+    LOG_INFO("Evolution optimization started");
+    LOG_INFO("Initializing outputs...");
 
-  if (mPlotOutput)
+    if (mFileOutput)
+    {
+      mOutputFile.open(mOutputFilePath, std::ios::out);
+      mOutputFile << "Evolution optimization started" << std::endl;
+    }
+
+    if (mPlotOutput)
+    {
+      Plot1D::Reset("Evolution");
+    }
+
+    LOG_SUCC("Outputs initialized");
+    return true;
+  }
+  catch (...)
   {
-    Plot1D::Reset("Evolution");
-    Plot1D::plot(0, population.bestEntity.fitness, log(population.bestEntity.fitness), "Evolution", "gen", "populationFitness", "log populationFitness");
+    LOG_ERROR("Could not initialize outputs");
+    return false;
   }
-
-  LOG_SUCC("Outputs initialized");
-  LOG_INFO("Running evolution...");
 }
 
 bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
@@ -104,7 +113,7 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 void Evolution::UpdateOutputs(int gen, const Population &population)
 {
   if (mFileOutput)
-    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness);
+    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
 
   if (mPlotOutput)
     Plot1D::plot(gen, population.bestEntity.fitness, log(population.bestEntity.fitness), "Evolution", "gen", "populationFitness", "log populationFitness");
@@ -135,18 +144,21 @@ void Evolution::CheckTerminationCriterions(const Population &population, int gen
   {
     terminate = true;
     reason = MaximumGenerationsReached;
+    return;
   }
 
   if (population.functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
   {
     terminate = true;
     reason = MaximumFunctionEvaluationsReached;
+    return;
   }
 
   if (population.constantHistory) // no entity improved last (mHistorySize) generations
   {
     terminate = true;
     reason = NoImprovementReached;
+    return;
   }
 }
 
@@ -172,7 +184,7 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &b
         value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + "]";
     }
   }
-  value += " (Obj: " + to_string(bestFitness) + ")\n";
+  value += " (Obj: " + to_string(bestFitness) + ")";
   return value;
 }
 
