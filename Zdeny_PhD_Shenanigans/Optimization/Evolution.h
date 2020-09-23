@@ -9,6 +9,7 @@ public:
   void SetFileOutput(const std::string &path);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
   void SetParameterNames(const std::vector<std::string> &ParameterNames) { mParameterNames = ParameterNames; };
+  void SetOptimizationName(const std::string &optname) { mOptimizationName = optname; }
 
   enum MutationStrategy
   {
@@ -100,9 +101,10 @@ private:
 
   bool mFileOutput = false;
   bool mPlotOutput = true;
+  std::string mOptimizationName = "default";
+  double mINPm = 5.4;
+  int mHistorySize = 10;
   std::string mOutputFilePath;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
-  double mINPm = 5.4;
-  int mHistorySize = 10;
 };
