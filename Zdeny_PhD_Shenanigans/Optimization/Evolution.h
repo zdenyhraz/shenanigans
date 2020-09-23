@@ -4,7 +4,7 @@
 class Evolution : public OptimizationAlgorithm
 {
 public:
-  Evolution(int N);
+  Evolution(int N, const std::string &optname = "default");
   OptimizationResult Optimize(ObjectiveFunction f) override;
   void SetFileOutput(const std::string &path);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
@@ -101,9 +101,9 @@ private:
 
   bool mFileOutput = false;
   bool mPlotOutput = true;
-  std::string mOptimizationName = "default";
   double mINPm = 5.4;
   int mHistorySize = 10;
+  std::string mOptimizationName;
   std::string mOutputFilePath;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
