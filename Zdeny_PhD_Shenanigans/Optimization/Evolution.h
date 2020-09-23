@@ -92,7 +92,7 @@ private:
 
   bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
   int GetNumberOfParents();
-  void InitializeOutputs(const Population &population);
+  bool InitializeOutputs();
   void UninitializeOutputs(const Population &population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population &population);
   void CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason);
