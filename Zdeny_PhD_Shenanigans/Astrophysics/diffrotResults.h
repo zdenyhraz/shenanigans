@@ -78,6 +78,41 @@ public:
     return error / ycount / pcount;
   }
 
+  static double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
+  {
+    int l, u;
+
+    for (int i = 0; i < xs.size() - 1; ++i)
+    {
+      if (xs[i] <= x && xs[i + 1] > x)
+      {
+        l = i;
+        u = i + 1;
+        break;
+      }
+
+      if (xs[i] > x && xs[i + 1] <= x)
+      {
+        l = i + 1;
+        u = i;
+        break;
+      }
+    }
+
+    return ys[l] + (x - xs[l]) / (xs[u] - xs[l]) * (ys[u] - ys[l]);
+  }
+
+  static double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
+  {
+    const int ps = xs.size();
+    double mean = 0;
+
+    for (int p = 0; p < ps; ++p)
+      mean += Interpolate(xs[p], ys[p], x);
+
+    return mean / ps;
+  }
+
   void SetData2D(const std::vector<std::vector<double>> &thetas2D, const std::vector<std::vector<double>> &omegasX, const std::vector<std::vector<double>> &omegasY, const std::vector<std::vector<double>> &shiftsX, const std::vector<std::vector<double>> &shiftsY)
   {
     flip(matFromVector(omegasX, true), SourceFlowX, 1);
@@ -260,41 +295,6 @@ private:
     ShiftsYErrorsBot = ShiftsY - ShiftsYErrors;
     ShiftsXErrorsTop = ShiftsX + ShiftsXErrors;
     ShiftsYErrorsTop = ShiftsY + ShiftsYErrors;
-  }
-
-  double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
-  {
-    int l, u;
-
-    for (int i = 0; i < xs.size() - 1; ++i)
-    {
-      if (xs[i] <= x && xs[i + 1] > x)
-      {
-        l = i;
-        u = i + 1;
-        break;
-      }
-
-      if (xs[i] > x && xs[i + 1] <= x)
-      {
-        l = i + 1;
-        u = i;
-        break;
-      }
-    }
-
-    return ys[l] + (x - xs[l]) / (xs[u] - xs[l]) * (ys[u] - ys[l]);
-  }
-
-  double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
-  {
-    const int ps = xs.size();
-    double mean = 0;
-
-    for (int p = 0; p < ps; ++p)
-      mean += Interpolate(xs[p], ys[p], x);
-
-    return mean / ps;
   }
 
   void CalculateNS()
