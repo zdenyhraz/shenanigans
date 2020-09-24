@@ -17,11 +17,11 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
+  population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
   bool terminate = false;
   auto reason = NotTerminated;
   int gen = 0;
   LOG_INFO("Running evolution...");
-  population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
   UpdateOutputs(gen, population);
 
   while (!terminate)
