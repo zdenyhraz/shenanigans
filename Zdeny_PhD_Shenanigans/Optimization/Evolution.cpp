@@ -113,12 +113,12 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 void Evolution::UpdateOutputs(int gen, const Population &population)
 {
   if (mFileOutput)
-    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
+    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.currentBestFitness) << std::endl;
 
   if (mPlotOutput)
-    Plot1D::plot(gen, population.bestEntity.fitness, log(population.bestEntity.fitness), "Evolution", "gen", "populationFitness", "log populationFitness");
+    Plot1D::plot(gen, {population.currentBestFitness, population.averageFitness}, {log(population.currentBestFitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
 
-  LOG_SUCC("Gen {} best entity: {} ({:.5f}), CBI = {:.1f}%, AHI = {:.1f}%", gen, population.bestEntity.params, population.bestEntity.fitness, (population.previousBestFitness - population.currentBestFitness) / population.previousBestFitness * 100, population.improvement * 100);
+  LOG_SUCC("Gen {}: {} BEST: {:.5f}, AVG: {:.3f}, CBI = {:.1f}%, AHI = {:.1f}%", gen, population.bestEntity.params, population.currentBestFitness, population.averageFitness, (population.previousBestFitness - population.currentBestFitness) / population.previousBestFitness * 100, population.improvement * 100);
 }
 
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
@@ -213,14 +213,15 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
 {
   try
   {
-    InitializePopulation(NP, N, f, LB, UB);
-    InitializeBestEntity(NP, N);
-    InitializeOffspring(NP, N, f, nParents);
     functionEvaluations = 0;
     previousBestFitness = Constants::Inf;
     currentBestFitness = Constants::Inf;
+    averageFitness = Constants::Inf;
     improvement = 0;
     constantHistory = false;
+    InitializePopulation(NP, N, f, LB, UB);
+    InitializeBestEntity();
+    InitializeOffspring(nParents);
     return true;
   }
   catch (...)
@@ -281,12 +282,17 @@ void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvalu
 
 void Evolution::Population::UpdateBestEntity()
 {
+  averageFitness = 0;
   for (int eid = 0; eid < entities.size(); ++eid)
+  {
+    averageFitness += entities[eid].fitness;
     if (entities[eid].fitness <= bestEntity.fitness)
       bestEntity = entities[eid];
+  }
 
   previousBestFitness = currentBestFitness;
   currentBestFitness = bestEntity.fitness;
+  averageFitness /= entities.size();
 }
 
 void Evolution::Population::UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold)
@@ -372,11 +378,11 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
   LOG_SUCC("Initial population evaluated");
 }
 
-void Evolution::Population::InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents)
+void Evolution::Population::InitializeOffspring(int nParents)
 {
   LOG_INFO("Creating initial offspring...");
-  offspring = zerovect(NP, Offspring(N, nParents));
-  for (int eid = 0; eid < NP; eid++)
+  offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
+  for (int eid = 0; eid < entities.size(); eid++)
   {
     offspring[eid].params = entities[eid].params;
     offspring[eid].fitness = entities[eid].fitness;
@@ -384,14 +390,11 @@ void Evolution::Population::InitializeOffspring(int NP, int N, ObjectiveFunction
   LOG_SUCC("Initial offspring created");
 }
 
-void Evolution::Population::InitializeBestEntity(int NP, int N)
+void Evolution::Population::InitializeBestEntity()
 {
   LOG_INFO("Searching for best entity in the initial population...");
-  bestEntity = Entity(N);
-  for (int eid = 0; eid < NP; eid++)
-    if (entities[eid].fitness <= bestEntity.fitness)
-      bestEntity = entities[eid];
-
+  bestEntity = Entity(entities[0].params.size());
+  UpdateBestEntity();
   LOG_SUCC("Initial population best entity: {} ({:.3f})", bestEntity.params, bestEntity.fitness);
 }
 
