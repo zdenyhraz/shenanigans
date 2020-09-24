@@ -72,7 +72,7 @@ bool Evolution::InitializeOutputs()
     if (mPlotOutput)
     {
       Plot1D::Reset("Evolution");
-      Plot1D::Reset("EvolutionBAR");
+      Plot1D::Reset("EvolutionDIFF");
     }
 
     LOG_SUCC("Outputs initialized");
@@ -128,7 +128,7 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
   if (mPlotOutput)
   {
     Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
-    Plot1D::plot(gen, population.absoluteDifference, population.relativeDifference, "EvolutionBAR", "generation", "best/average fitness difference", "best/average fitness ratio", {QPen(Plot::black, 2), QPen(Plot::green, 2)});
+    Plot1D::plot(gen, population.absoluteDifference, population.relativeDifference, "EvolutionDIFF", "generation", "best-average absolute difference", "best-average relative difference", {QPen(Plot::black, 2), QPen(Plot::green, 2)});
   }
 
   LOG_SUCC("Gen {}: {} BEST: {:.2e}, RELD: {:.2f}, ABSD: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
@@ -234,6 +234,7 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   try
   {
     functionEvaluations = 0;
+    relativeDifferenceGenerationsOverThreshold = 0;
     InitializePopulation(NP, N, f, LB, UB);
     InitializeBestEntity();
     InitializeOffspring(nParents);
@@ -307,12 +308,12 @@ void Evolution::Population::UpdateBestEntity()
   averageFitness /= entities.size();
 }
 
-void Evolution::Population::UpdateTerminationCriterions(double bestToAverageFitnessRatioThreshold)
+void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenceThreshold)
 {
   absoluteDifference = averageFitness - bestEntity.fitness;
   relativeDifference = bestEntity.fitness / averageFitness;
 
-  if (relativeDifference > bestToAverageFitnessRatioThreshold)
+  if (relativeDifference > relativeDifferenceThreshold)
     relativeDifferenceGenerationsOverThreshold++;
   else
     relativeDifferenceGenerationsOverThreshold = 0;
