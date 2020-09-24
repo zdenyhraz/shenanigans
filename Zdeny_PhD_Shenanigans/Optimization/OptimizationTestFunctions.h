@@ -40,4 +40,12 @@ inline double Beale(const std::vector<double> &arg)
   double y = arg[1];
   return pow(1.5 - x + x * y, 2) + pow(2.25 - x + x * y * y, 2) + pow(2.625 - x + x * y * y * y, 2);
 }
+
+inline double Paraboloid(const std::vector<double> &arg)
+{
+  double val = 0;
+  for (int i = 0; i < arg.size(); i++)
+    val += sqr(arg[i] - i - 1);
+  return val;
+}
 }

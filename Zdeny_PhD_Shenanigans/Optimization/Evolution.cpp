@@ -168,7 +168,7 @@ void Evolution::CheckTerminationCriterions(const Population &population, int gen
     return;
   }
 
-  if (population.bestToAverageFitnessRatio > mBestToAverageFitnessRatioThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
+  if (generation > 20 && population.bestToAverageFitnessRatio > mBestToAverageFitnessRatioThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
   {
     terminate = true;
     reason = NoImprovementReachedRel;
