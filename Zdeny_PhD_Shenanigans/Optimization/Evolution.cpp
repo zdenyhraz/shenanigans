@@ -126,7 +126,7 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
   if (mPlotOutput)
   {
     Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
-    Plot1D::plot(gen, population.bestToAverageFitnessRatio, population.bestToAverageFitnessDifference, "EvolutionBAR", "generation", "best/average fitness ratio", "best/average fitness difference", {QPen(Plot::green, 2), QPen(Plot::black, 2)});
+    Plot1D::plot(gen, population.bestToAverageFitnessDifference, population.bestToAverageFitnessRatio, "EvolutionBAR", "generation", "best/average fitness difference", "best/average fitness ratio", {QPen(Plot::black, 2), QPen(Plot::green, 2)});
   }
 
   LOG_SUCC("Gen {}: {} BEST: {:.5f}, AVG: {:.3f}, CBI: {:.1f}%, BAR: {:.2f}, BAD: {}", gen, population.bestEntity.params, population.bestEntity.fitness, population.averageFitness, (population.previousBestFitness - population.bestEntity.fitness) / population.previousBestFitness * 100, population.bestToAverageFitnessRatio, population.bestToAverageFitnessDifference);
