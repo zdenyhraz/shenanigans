@@ -47,7 +47,7 @@ void Zdeny_PhD_Shenanigans::debug()
   TIMER("Debug");
   LOG_INFO("Debug started");
 
-  if (1) // plot in optimization
+  if (0) // plot in optimization
   {
     auto f = [&](std::vector<double> args) {
       // std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -271,6 +271,28 @@ void Zdeny_PhD_Shenanigans::debug()
   if (0) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
+  }
+  if (1) // 1D / 2D interp test
+  {
+    std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<double> ys{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+    LOG_INFO("Diffrot interp 1D a) {}", DiffrotResults::Interpolate(xs, ys, 1.0));
+    LOG_INFO("Diffrot interp 1D b) {}", DiffrotResults::Interpolate(xs, ys, 2.0));
+    LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1.5));
+    LOG_INFO("Diffrot interp 1D d) {}", DiffrotResults::Interpolate(xs, ys, 1.75));
+
+    LOG_NEWLINE;
+
+    std::vector<double> xs1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<double> ys1{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+    std::vector<double> xs2{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+    std::vector<double> ys2{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    std::vector<std::vector<double>> xss = {xs1, xs2};
+    std::vector<std::vector<double>> yss = {ys1, ys2};
+    LOG_INFO("Diffrot interp 2D a) {}", DiffrotResults::Interpolate(xss, yss, 1.0));
+    LOG_INFO("Diffrot interp 2D b) {}", DiffrotResults::Interpolate(xss, yss, 2.0));
+    LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
+    LOG_INFO("Diffrot interp 2D d) {}", DiffrotResults::Interpolate(xss, yss, 1.75));
   }
   LOG_INFO("Debug finished.");
 }
