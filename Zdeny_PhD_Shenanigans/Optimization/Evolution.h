@@ -93,7 +93,7 @@ private:
   bool mPlotOutput = true;
   double mINPm = 5.4;
   double mBestToAverageFitnessRatioThreshold = 0.75;
-  double mBestToAverageFitnessDifferenceThreshold = 1e-6;
+  double mBestToAverageFitnessDifferenceThreshold = 1e-8;
   std::string mOptimizationName;
   std::string mOutputFilePath;
   std::ofstream mOutputFile;
