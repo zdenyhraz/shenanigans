@@ -71,11 +71,10 @@ private:
     std::vector<Offspring> offspring;
     Entity bestEntity;
     int functionEvaluations;
-    double previousBestFitness;
     double averageFitness;
-    double bestToAverageFitnessDifference;
-    double bestToAverageFitnessRatio;
-    int bestToAverageFitnessRatioGenerationsOverThreshold;
+    double absoluteDifference;
+    double relativeDifference;
+    int relativeDifferenceGenerationsOverThreshold;
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
@@ -94,9 +93,9 @@ private:
   bool mFileOutput = false;
   bool mPlotOutput = true;
   double mINPm = 5.4;
-  double mBestToAverageFitnessDifferenceThreshold = 1e-8;
-  double mBestToAverageFitnessRatioThreshold = 0.75;
-  int mBestToAverageFitnessRatioGenerationsOverThresholdThreshold = 10;
+  double mAbsoluteDifferenceThreshold = 1e-8;
+  double mRelativeDifferenceThreshold = 0.75;
+  int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
   std::string mOptimizationName;
   std::string mOutputFilePath;
   std::ofstream mOutputFile;

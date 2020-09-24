@@ -17,7 +17,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
-  population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
+  population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   bool terminate = false;
   auto reason = NotTerminated;
   int gen = 0;
@@ -37,7 +37,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     population.PerformSelection();
     population.UpdateBestEntity();
     population.UpdateOffspringFunctionEvaluations();
-    population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
+    population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
 
     CheckTerminationCriterions(population, gen, terminate, reason);
     UpdateOutputs(gen, population);
@@ -128,10 +128,10 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
   if (mPlotOutput)
   {
     Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
-    Plot1D::plot(gen, population.bestToAverageFitnessDifference, population.bestToAverageFitnessRatio, "EvolutionBAR", "generation", "best/average fitness difference", "best/average fitness ratio", {QPen(Plot::black, 2), QPen(Plot::green, 2)});
+    Plot1D::plot(gen, population.absoluteDifference, population.relativeDifference, "EvolutionBAR", "generation", "best/average fitness difference", "best/average fitness ratio", {QPen(Plot::black, 2), QPen(Plot::green, 2)});
   }
 
-  LOG_SUCC("Gen {}: {} BEST: {:.5f}, AVG: {:.3f}, CBI: {:.1f}%, BAR: {:.2f}, BAD: {}", gen, population.bestEntity.params, population.bestEntity.fitness, population.averageFitness, (population.previousBestFitness - population.bestEntity.fitness) / population.previousBestFitness * 100, population.bestToAverageFitnessRatio, population.bestToAverageFitnessDifference);
+  LOG_SUCC("Gen {}: {} BEST: {:.2e}, RELD: {:.2f}, ABSD: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
 }
 
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
@@ -170,14 +170,14 @@ void Evolution::CheckTerminationCriterions(const Population &population, int gen
     return;
   }
 
-  if (population.bestToAverageFitnessRatioGenerationsOverThreshold > mBestToAverageFitnessRatioGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
+  if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
   {
     terminate = true;
     reason = NoImprovementReachedRel;
     return;
   }
 
-  if (population.bestToAverageFitnessDifference < mBestToAverageFitnessDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
+  if (population.absoluteDifference < mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
   {
     terminate = true;
     reason = NoImprovementReachedAbs;
@@ -234,7 +234,6 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   try
   {
     functionEvaluations = 0;
-    previousBestFitness = Constants::Inf;
     InitializePopulation(NP, N, f, LB, UB);
     InitializeBestEntity();
     InitializeOffspring(nParents);
@@ -298,7 +297,6 @@ void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvalu
 
 void Evolution::Population::UpdateBestEntity()
 {
-  previousBestFitness = bestEntity.fitness;
   averageFitness = 0;
   for (int eid = 0; eid < entities.size(); ++eid)
   {
@@ -311,13 +309,13 @@ void Evolution::Population::UpdateBestEntity()
 
 void Evolution::Population::UpdateTerminationCriterions(double bestToAverageFitnessRatioThreshold)
 {
-  bestToAverageFitnessDifference = averageFitness - bestEntity.fitness;
-  bestToAverageFitnessRatio = bestEntity.fitness / averageFitness;
+  absoluteDifference = averageFitness - bestEntity.fitness;
+  relativeDifference = bestEntity.fitness / averageFitness;
 
-  if (bestToAverageFitnessRatio > bestToAverageFitnessRatioThreshold)
-    bestToAverageFitnessRatioGenerationsOverThreshold++;
+  if (relativeDifference > bestToAverageFitnessRatioThreshold)
+    relativeDifferenceGenerationsOverThreshold++;
   else
-    bestToAverageFitnessRatioGenerationsOverThreshold = 0;
+    relativeDifferenceGenerationsOverThreshold = 0;
 }
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB)
