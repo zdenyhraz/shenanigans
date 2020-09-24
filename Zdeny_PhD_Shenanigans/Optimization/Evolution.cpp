@@ -21,6 +21,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   auto reason = NotTerminated;
   int gen = 0;
   LOG_INFO("Running evolution...");
+  population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
   UpdateOutputs(gen, population);
 
   while (!terminate)
@@ -36,9 +37,10 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     population.PerformSelection();
     population.UpdateBestEntity();
     population.UpdateOffspringFunctionEvaluations();
+    population.UpdateTerminationCriterions(mBestToAverageFitnessRatioThreshold);
 
-    UpdateOutputs(gen, population);
     CheckTerminationCriterions(population, gen, terminate, reason);
+    UpdateOutputs(gen, population);
 
     if (terminate)
       break;
@@ -168,7 +170,7 @@ void Evolution::CheckTerminationCriterions(const Population &population, int gen
     return;
   }
 
-  if (generation > 20 && population.bestToAverageFitnessRatio > mBestToAverageFitnessRatioThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
+  if (population.bestToAverageFitnessRatioGenerationsOverThreshold > mBestToAverageFitnessRatioGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
   {
     terminate = true;
     reason = NoImprovementReachedRel;
@@ -305,8 +307,17 @@ void Evolution::Population::UpdateBestEntity()
       bestEntity = entities[eid];
   }
   averageFitness /= entities.size();
-  bestToAverageFitnessRatio = bestEntity.fitness / averageFitness;
+}
+
+void Evolution::Population::UpdateTerminationCriterions(double bestToAverageFitnessRatioThreshold)
+{
   bestToAverageFitnessDifference = averageFitness - bestEntity.fitness;
+  bestToAverageFitnessRatio = bestEntity.fitness / averageFitness;
+
+  if (bestToAverageFitnessRatio > bestToAverageFitnessRatioThreshold)
+    bestToAverageFitnessRatioGenerationsOverThreshold++;
+  else
+    bestToAverageFitnessRatioGenerationsOverThreshold = 0;
 }
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB)
