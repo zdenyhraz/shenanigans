@@ -50,7 +50,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
   if (1) // plot in optimization
   {
-    auto f = OptimizationTestFunctions::Rosenbrock;
+    auto f = OptimizationTestFunctions::Ackley;
 
     int N = 2;
     Evolution Evo(N);
