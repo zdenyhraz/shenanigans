@@ -80,7 +80,7 @@ public:
 
   static double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
   {
-    int l, u;
+    int l = -1, u = -1;
 
     for (int i = 0; i < xs.size() - 1; ++i)
     {
