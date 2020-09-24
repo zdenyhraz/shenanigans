@@ -82,13 +82,14 @@ private:
     int functionEvaluations;
     double previousBestFitness;
     double currentBestFitness;
+    double averageFitness;
     double improvement;
     bool constantHistory;
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
-    void InitializeBestEntity(int NP, int N);
-    void InitializeOffspring(int NP, int N, ObjectiveFunction f, int nParents);
+    void InitializeBestEntity();
+    void InitializeOffspring(int nParents);
   };
 
   bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
