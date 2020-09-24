@@ -25,19 +25,11 @@ public:
     EXP
   };
 
-  enum StoppingCriterion
-  {
-    ALLIMP,
-    AVGIMP
-  };
-
   int mNP = 4;
   double mF = 0.65;
   double mCR = 0.95;
   MutationStrategy mMutStrat = RAND1;
   CrossoverStrategy mCrossStrat = BIN;
-  StoppingCriterion mStopCrit = AVGIMP;
-  double mHistoryImprovTresholdPercent = 1.0;
 
 private:
   struct Entity
@@ -47,7 +39,6 @@ private:
 
     std::vector<double> params;
     double fitness;
-    std::queue<double> fitnessHistory;
   };
 
   struct Offspring
@@ -74,17 +65,15 @@ private:
     void UpdatePopulationFunctionEvaluations();
     void UpdateOffspringFunctionEvaluations();
     void UpdateBestEntity();
-    void UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold);
 
     std::vector<Entity> entities;
     std::vector<Offspring> offspring;
     Entity bestEntity;
     int functionEvaluations;
     double previousBestFitness;
-    double currentBestFitness;
     double averageFitness;
-    double improvement;
-    bool constantHistory;
+    double bestToAverageFitnessRatio;
+    double bestToAverageFitnessDifference;
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
@@ -103,7 +92,8 @@ private:
   bool mFileOutput = false;
   bool mPlotOutput = true;
   double mINPm = 5.4;
-  int mHistorySize = 10;
+  double mBestToAverageFitnessRatioThreshold = 0.5;
+  double mBestToAverageFitnessDifferenceThreshold = 0.00001;
   std::string mOptimizationName;
   std::string mOutputFilePath;
   std::ofstream mOutputFile;

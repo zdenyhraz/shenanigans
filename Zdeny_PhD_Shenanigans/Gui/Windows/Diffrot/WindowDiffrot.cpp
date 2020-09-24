@@ -2,7 +2,7 @@
 #include "WindowDiffrot.h"
 #include "Astrophysics/diffrot.h"
 #include "Astrophysics/diffrotFileIO.h"
-#include "Optimization/optimization.h"
+#include "Optimization/Evolution.h"
 
 WindowDiffrot::WindowDiffrot(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
 {
@@ -159,7 +159,6 @@ void WindowDiffrot::optimizeDiffrot()
     Evolution evo(7);
     evo.mNP = 50;
     evo.mMutStrat = Evolution::RAND1;
-    evo.mHistoryImprovTresholdPercent = 1;
     evo.mLB = {-10, -500, 5, -1, -1, 64, -1};
     evo.mUB = {10, 500, 17, 1, 1, 512, 1};
     evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");

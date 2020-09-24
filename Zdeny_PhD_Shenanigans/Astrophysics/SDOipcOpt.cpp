@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SDOipcOpt.h"
+#include "Optimization/Evolution.h"
 
 double absoluteSubpixelRegistrationError(IPCsettings &set, const Mat &src, double noisestddev, double maxShift, double accuracy)
 {

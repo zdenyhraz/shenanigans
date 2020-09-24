@@ -35,7 +35,6 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     }
     population.PerformSelection();
     population.UpdateBestEntity();
-    population.UpdateFitnessHistories(mHistorySize, mStopCrit, mHistoryImprovTresholdPercent);
     population.UpdateOffspringFunctionEvaluations();
 
     UpdateOutputs(gen, population);
@@ -71,6 +70,7 @@ bool Evolution::InitializeOutputs()
     if (mPlotOutput)
     {
       Plot1D::Reset("Evolution");
+      Plot1D::Reset("EvolutionBAR");
     }
 
     LOG_SUCC("Outputs initialized");
@@ -87,10 +87,10 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 {
   LOG_INFO("Checking objective function normality...");
   auto arg = 0.5 * (mLB + mUB);
-  auto result1 = f(arg);
+  auto result = f(arg);
   auto result2 = f(arg);
 
-  if (!isfinite(result1))
+  if (!isfinite(result))
   {
     LOG_ERROR("Objective function is not finite");
     return false;
@@ -98,7 +98,15 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
   else
     LOG_DEBUG("Objective function is finite");
 
-  if (result1 != result2)
+  if (result < 0)
+  {
+    LOG_ERROR("Objective function is not positive");
+    return false;
+  }
+  else
+    LOG_DEBUG("Objective function is positive");
+
+  if (result != result2)
   {
     LOG_ERROR("Objective function is not consistent");
     return false;
@@ -113,12 +121,15 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 void Evolution::UpdateOutputs(int gen, const Population &population)
 {
   if (mFileOutput)
-    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.currentBestFitness) << std::endl;
+    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
 
   if (mPlotOutput)
-    Plot1D::plot(gen, {population.currentBestFitness, population.averageFitness}, {log(population.currentBestFitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
+  {
+    Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
+    Plot1D::plot(gen, population.bestToAverageFitnessRatio, population.bestToAverageFitnessDifference, "EvolutionBAR", "generation", "best/average fitness ratio", "best/average fitness difference", {QPen(Plot::green, 2), QPen(Plot::black, 2)});
+  }
 
-  LOG_SUCC("Gen {}: {} BEST: {:.5f}, AVG: {:.3f}, CBI = {:.1f}%, AHI = {:.1f}%", gen, population.bestEntity.params, population.currentBestFitness, population.averageFitness, (population.previousBestFitness - population.currentBestFitness) / population.previousBestFitness * 100, population.improvement * 100);
+  LOG_SUCC("Gen {}: {} BEST: {:.5f}, AVG: {:.3f}, CBI: {:.1f}%, BAR: {:.2f}, BAD: {}", gen, population.bestEntity.params, population.bestEntity.fitness, population.averageFitness, (population.previousBestFitness - population.bestEntity.fitness) / population.previousBestFitness * 100, population.bestToAverageFitnessRatio, population.bestToAverageFitnessDifference);
 }
 
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
@@ -157,10 +168,17 @@ void Evolution::CheckTerminationCriterions(const Population &population, int gen
     return;
   }
 
-  if (population.constantHistory) // no entity improved last (mHistorySize) generations
+  if (population.bestToAverageFitnessRatio > mBestToAverageFitnessRatioThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
   {
     terminate = true;
-    reason = NoImprovementReached;
+    reason = NoImprovementReachedRel;
+    return;
+  }
+
+  if (population.bestToAverageFitnessDifference < mBestToAverageFitnessDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
+  {
+    terminate = true;
+    reason = NoImprovementReachedAbs;
     return;
   }
 }
@@ -215,10 +233,6 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   {
     functionEvaluations = 0;
     previousBestFitness = Constants::Inf;
-    currentBestFitness = Constants::Inf;
-    averageFitness = Constants::Inf;
-    improvement = 0;
-    constantHistory = false;
     InitializePopulation(NP, N, f, LB, UB);
     InitializeBestEntity();
     InitializeOffspring(nParents);
@@ -282,6 +296,7 @@ void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvalu
 
 void Evolution::Population::UpdateBestEntity()
 {
+  previousBestFitness = bestEntity.fitness;
   averageFitness = 0;
   for (int eid = 0; eid < entities.size(); ++eid)
   {
@@ -289,39 +304,9 @@ void Evolution::Population::UpdateBestEntity()
     if (entities[eid].fitness <= bestEntity.fitness)
       bestEntity = entities[eid];
   }
-
-  previousBestFitness = currentBestFitness;
-  currentBestFitness = bestEntity.fitness;
   averageFitness /= entities.size();
-}
-
-void Evolution::Population::UpdateFitnessHistories(int nHistories, StoppingCriterion stoppingCriterion, double improvThreshold)
-{
-  // fill history ques for all entities - termination criterion
-  constantHistory = true; // assume history is constant
-  improvement = 0;
-  for (int eid = 0; eid < entities.size(); ++eid)
-  {
-    if (entities[eid].fitnessHistory.size() == nHistories)
-    {
-      entities[eid].fitnessHistory.pop();                       // remove first element - keep que size constant
-      entities[eid].fitnessHistory.push(entities[eid].fitness); // insert at the end
-      if (stoppingCriterion == StoppingCriterion::ALLIMP)       // populationFitness improved less than x% for all entities
-        if (abs(entities[eid].fitnessHistory.front() - entities[eid].fitnessHistory.back()) / abs(entities[eid].fitnessHistory.front()) > improvThreshold / 100)
-          constantHistory = false;
-    }
-    else
-    {
-      entities[eid].fitnessHistory.push(entities[eid].fitness); // insert at the end
-      constantHistory = false;                                  // too early to stop, go on
-    }
-    if (entities[eid].fitnessHistory.size() > 2)
-      improvement += abs(entities[eid].fitnessHistory.front()) == 0 ? 0 : abs(entities[eid].fitnessHistory.front() - entities[eid].fitnessHistory.back()) / abs(entities[eid].fitnessHistory.front());
-  }
-  improvement /= entities.size();
-  if (stoppingCriterion == StoppingCriterion::AVGIMP) // average populationFitness improved less than x%
-    if (100 * improvement > improvThreshold)
-      constantHistory = false;
+  bestToAverageFitnessRatio = bestEntity.fitness / averageFitness;
+  bestToAverageFitnessDifference = averageFitness - bestEntity.fitness;
 }
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB)

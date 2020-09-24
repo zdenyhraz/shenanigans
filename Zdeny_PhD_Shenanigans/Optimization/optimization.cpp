@@ -19,8 +19,10 @@ std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationR
     return "Maximum generations reached";
   case MaximumFunctionEvaluationsReached:
     return "Maximum function evaluations reached";
-  case NoImprovementReached:
-    return "No improvement reached";
+  case NoImprovementReachedRel:
+    return "No relative improvement reached";
+  case NoImprovementReachedAbs:
+    return "No absolute improvement reached";
   case NotTerminated:
     return "Not yet terminated";
   }
