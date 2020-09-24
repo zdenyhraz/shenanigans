@@ -65,7 +65,7 @@ private:
     void UpdatePopulationFunctionEvaluations();
     void UpdateOffspringFunctionEvaluations();
     void UpdateBestEntity();
-    void UpdateTerminationCriterions(double bestToAverageFitnessRatioThreshold);
+    void UpdateTerminationCriterions(double relativeDifferenceThreshold);
 
     std::vector<Entity> entities;
     std::vector<Offspring> offspring;
