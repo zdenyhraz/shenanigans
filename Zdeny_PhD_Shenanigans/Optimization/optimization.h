@@ -11,7 +11,8 @@ public:
     OptimalFitnessReached,
     MaximumGenerationsReached,
     MaximumFunctionEvaluationsReached,
-    NoImprovementReached,
+    NoImprovementReachedRel,
+    NoImprovementReachedAbs,
     NotTerminated
   };
 

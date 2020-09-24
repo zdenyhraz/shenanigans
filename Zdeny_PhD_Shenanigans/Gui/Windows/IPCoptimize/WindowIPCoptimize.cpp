@@ -2,6 +2,7 @@
 #include "Gui/Windows/IPCoptimize/WindowIPCoptimize.h"
 #include "Gui/Windows/IPCparameters/WindowIPCparameters.h"
 #include "Astrophysics/SDOipcOpt.h"
+#include "Optimization/Evolution.h"
 
 WindowIPCoptimize::WindowIPCoptimize(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
 {

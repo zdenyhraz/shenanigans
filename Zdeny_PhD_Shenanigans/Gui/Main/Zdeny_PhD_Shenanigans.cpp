@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
-#include "Optimization/optimization.h"
+#include "Optimization/Evolution.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
 #include "Fit/polyfit.h"
