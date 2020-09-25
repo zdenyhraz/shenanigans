@@ -37,7 +37,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
     time.advanceTime(drset.dPic * drset.dSec);
     loadFitsFuzzy(pic2, time, lag2);
 
-    if (pic1.params().succload && pic2.params().succload)
+    if (pic1.params().succload && pic2.params().succload && pic1.params().succParamCorrection && pic2.params().succParamCorrection)
     {
       if (drset.video)
       {
