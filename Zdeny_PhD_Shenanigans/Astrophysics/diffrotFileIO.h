@@ -34,12 +34,6 @@ void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filenam
   fs << "SourceOmegasX" << SourceOmegasX;
   fs << "SourceOmegasY" << SourceOmegasY;
 
-  Mat SourceFlowX;
-  Mat SourceFlowY;
-  dr->GetMats(SourceFlowX, SourceFlowY);
-  fs << "SourceFlowX" << SourceFlowX;
-  fs << "SourceFlowY" << SourceFlowY;
-
   int SourcePics;
   int SourceStride;
   dr->GetParams(SourcePics, SourceStride);
@@ -77,12 +71,6 @@ void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
   fs["SourceOmegasX"] >> SourceOmegasX;
   fs["SourceOmegasY"] >> SourceOmegasY;
   dr->SetVecs2DRaw(SourceThetas, SourceShiftsX, SourceShiftsY, SourceOmegasX, SourceOmegasY);
-
-  Mat SourceFlowX;
-  Mat SourceFlowY;
-  fs["SourceFlowX"] >> SourceFlowX;
-  fs["SourceFlowY"] >> SourceFlowY;
-  dr->SetMatsRaw(SourceFlowX, SourceFlowY);
 
   int SourcePics;
   int SourceStride;
