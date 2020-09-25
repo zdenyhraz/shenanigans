@@ -48,13 +48,13 @@ void Zdeny_PhD_Shenanigans::debug()
   TIMER("Debug");
   LOG_INFO("Debug started");
 
-  if (0) // plot in optimization
+  if (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
 
     int N = 2;
     Evolution Evo(N);
-    Evo.mNP = 4 * N;
+    Evo.mNP = 10;
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
@@ -263,7 +263,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
     LOG_INFO("shift = {}", shift);
   }
-  if (1) // loadfits test
+  if (0) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     LOG_NEWLINE;
