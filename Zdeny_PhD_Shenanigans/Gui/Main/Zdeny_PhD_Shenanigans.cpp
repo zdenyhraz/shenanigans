@@ -48,7 +48,7 @@ void Zdeny_PhD_Shenanigans::debug()
   TIMER("Debug");
   LOG_INFO("Debug started");
 
-  if (1) // plot in optimization
+  if (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
 
@@ -267,14 +267,25 @@ void Zdeny_PhD_Shenanigans::debug()
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
   }
-  if (0) // 1D / 2D interp test
+  if (1) // 1D / 2D interp test
   {
     std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<double> ys{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
-    LOG_INFO("Diffrot interp 1D a) {}", DiffrotResults::Interpolate(xs, ys, 1.0));
-    LOG_INFO("Diffrot interp 1D b) {}", DiffrotResults::Interpolate(xs, ys, 0.0));
-    LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1.5));
-    LOG_INFO("Diffrot interp 1D d) {}", DiffrotResults::Interpolate(xs, ys, 1.75));
+    std::vector<double> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    LOG_INFO("Diffrot interp 1D a) {}", DiffrotResults::Interpolate(xs, ys, -1.0));
+    LOG_INFO("Diffrot interp 1D b) {}", DiffrotResults::Interpolate(xs, ys, 10.0));
+    LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1));
+    LOG_INFO("Diffrot interp 1D d) {}", DiffrotResults::Interpolate(xs, ys, 1.5));
+
+    LOG_NEWLINE;
+
+    auto xsr = xs;
+    auto ysr = ys;
+    std::reverse(xsr.begin(), xsr.end());
+    std::reverse(ysr.begin(), ysr.end());
+    LOG_INFO("Diffrot interp 1Dr a) {}", DiffrotResults::Interpolate(xsr, ysr, -1.0));
+    LOG_INFO("Diffrot interp 1Dr b) {}", DiffrotResults::Interpolate(xsr, ysr, 10.0));
+    LOG_INFO("Diffrot interp 1Dr c) {}", DiffrotResults::Interpolate(xsr, ysr, 1));
+    LOG_INFO("Diffrot interp 1Dr d) {}", DiffrotResults::Interpolate(xsr, ysr, 1.5));
 
     LOG_NEWLINE;
 
@@ -285,7 +296,7 @@ void Zdeny_PhD_Shenanigans::debug()
     std::vector<std::vector<double>> xss = {xs1, xs2};
     std::vector<std::vector<double>> yss = {ys1, ys2};
     LOG_INFO("Diffrot interp 2D a) {}", DiffrotResults::Interpolate(xss, yss, 1.0));
-    LOG_INFO("Diffrot interp 2D b) {}", DiffrotResults::Interpolate(xss, yss, 0.0));
+    LOG_INFO("Diffrot interp 2D b) {}", DiffrotResults::Interpolate(xss, yss, -1.0));
     LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
     LOG_INFO("Diffrot interp 2D d) {}", DiffrotResults::Interpolate(xss, yss, 1.75));
   }
