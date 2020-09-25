@@ -235,7 +235,7 @@ private:
         minEnclosingCircle(contours[0], center, radius);
 
         // only save valid parameters
-        if (radius > 1900 && radius < 2000 && center.x > 2000 && center.x < 2100 && center.y > 2000 && center.y < 2100)
+        if (radius > 1900 && radius < 2000 && center.x > 2030 && center.x < 2070 && center.y > 2030 && center.y < 2070)
         {
           params.fitsMidX = center.x;
           params.fitsMidY = center.y;
