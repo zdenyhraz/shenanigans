@@ -137,6 +137,7 @@ void WindowDiffrot::optimizeDiffrot()
   LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
   FitsTime starttime = GetStartFitsTime();
 
+  try
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -169,7 +170,12 @@ void WindowDiffrot::optimizeDiffrot()
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
   }
+  catch (...)
+  {
+    LOG_FATAL("Evolution optimization somehow failed");
+  }
 
+  try
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = std::floor(args[5]);
@@ -201,7 +207,12 @@ void WindowDiffrot::optimizeDiffrot()
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
   }
+  catch (...)
+  {
+    LOG_FATAL("Evolution optimization somehow failed");
+  }
 
+  try
   {
     auto f = [&](const std::vector<double> &args) {
       int winsize = 256;
@@ -233,6 +244,10 @@ void WindowDiffrot::optimizeDiffrot()
       auto [result, shit] = evo.Optimize(f);
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
+  }
+  catch (...)
+  {
+    LOG_FATAL("Evolution optimization somehow failed");
   }
 }
 
