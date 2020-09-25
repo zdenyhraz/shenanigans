@@ -80,49 +80,32 @@ public:
 
   static double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
   {
-    int l = -1, u = -1;
-
-    for (int i = 0; i < xs.size() - 1; ++i)
+    if (xs.front() <= xs.back()) // ascending x
     {
-      if (xs[i] <= x && xs[i + 1] > x)
-      {
-        l = i;
-        u = i + 1;
-        break;
-      }
+      if (x <= xs.front())
+        return ys.front();
 
-      if (xs[i] > x && xs[i + 1] <= x)
-      {
-        l = i + 1;
-        u = i;
-        break;
-      }
+      if (x >= xs.back())
+        return ys.back();
+
+      for (int i = 0; i < xs.size() - 1; ++i)
+        if (xs[i] <= x && xs[i + 1] > x)
+          return ys[i] + (x - xs[i]) / (xs[i + 1] - xs[i]) * (ys[i + 1] - ys[i]);
     }
 
-    if (l == -1 || u == -1)
+    if (xs.front() > xs.back()) // descending x
     {
-      if (xs.front() <= xs.back())
-      {
-        if (x <= xs.front())
-          return ys.front();
+      if (x >= xs.front())
+        return ys.front();
 
-        if (x >= xs.back())
-          return ys.back();
-      }
+      if (x <= xs.back())
+        return ys.back();
 
-      if (xs.front() > xs.back())
-      {
-        if (x >= xs.front())
-          return ys.front();
-
-        if (x <= xs.back())
-          return ys.back();
-      }
-
-      throw;
+      for (int i = 0; i < xs.size() - 1; ++i)
+        if (xs[i] > x && xs[i + 1] <= x)
+          return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
-
-    return ys[l] + (x - xs[l]) / (xs[u] - xs[l]) * (ys[u] - ys[l]);
+    throw; // should never get here
   }
 
   static double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
