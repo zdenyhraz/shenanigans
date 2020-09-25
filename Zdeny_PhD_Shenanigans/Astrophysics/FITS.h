@@ -46,9 +46,9 @@ public:
 
   void reload(std::string path) { data = loadfits(path); }
 
-  Mat image() const { return std::get<0>(data); }
+  const Mat &image() const { return std::get<0>(data); }
 
-  FitsParams params() const { return std::get<1>(data); }
+  const FitsParams &params() const { return std::get<1>(data); }
 
 private:
   std::tuple<Mat, FitsParams> data;
