@@ -48,7 +48,7 @@ void Zdeny_PhD_Shenanigans::debug()
   TIMER("Debug");
   LOG_INFO("Debug started");
 
-  if (1) // plot in optimization
+  if (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
 
@@ -263,10 +263,25 @@ void Zdeny_PhD_Shenanigans::debug()
 
     LOG_INFO("shift = {}", shift);
   }
-  if (0) // loadfits test
+  if (1) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
+    LOG_NEWLINE;
+    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
+    LOG_NEWLINE;
+    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_07__CONT.fits");
+    LOG_NEWLINE;
+    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_52__CONT.fits");
+    LOG_NEWLINE;
+    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_02_02__13_16_08__CONT.fits");
   }
+  if (0) // loadfits test 2
+  {
+    LOG_NEWLINE;
+    auto pic = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
+    showimg(pic, "pic");
+  }
+
   if (0) // 1D / 2D sorted xs interp test
   {
     std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};

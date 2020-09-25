@@ -24,6 +24,7 @@ struct FitsParams
   double R = 0;
   double theta0 = 0;
   bool succload = false;
+  bool succParamCorrection = false;
 };
 
 inline void swapbytes(char *input, unsigned length)
@@ -62,7 +63,7 @@ private:
     }
     else
     {
-      // LOG_DEBUG( "<loadfits> Loading file '{}'...", path );
+      // LOG_DEBUG("<loadfits> Loading file '{}'...", path);
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];
@@ -133,8 +134,9 @@ private:
       warpAffine(mat, mat, getRotationMatrix2D(Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
       transpose(mat, mat);
       params.succload = true;
+      params.fitsMidX = 4096 - params.fitsMidX; // idk but works
 
-      if (0) // debug
+      if (0) // debug values
       {
         auto [mmin, mmax] = minMaxMat(mat);
         LOG_FATAL("min/max mat {}/{}", mmin, mmax);
@@ -142,6 +144,104 @@ private:
         cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
         circle(xd, Point(fitsMid, fitsMid), params.R, Scalar(0, 0, 65535), 5);
         showimg(xd, "xd");
+      }
+
+      if (0) // debug circles
+      {
+        Mat img = mat.clone();
+        Mat imgc;
+        normalize(img, img, 0, 255, NORM_MINMAX);
+        img.convertTo(img, CV_8U);
+        cvtColor(img, imgc, COLOR_GRAY2BGR);
+
+        // fits
+        {
+          Point2f center(params.fitsMidX, params.fitsMidY);
+          double radius = params.R;
+          Scalar color(0, 0, 65535);
+
+          // draw the circle center
+          circle(imgc, center, 1, color, -1);
+          // draw the circle outline
+          circle(imgc, center, radius, color, 1, LINE_AA);
+
+          // draw the image center
+          circle(imgc, Point2f(4096 / 2, 4096 / 2), 1, Scalar(65535, 0, 0), -1);
+
+          LOG_INFO("Fits center / radius: {} / {}", center, radius);
+        }
+
+        // hough
+        {
+          std::vector<Vec3f> circlesHough;
+          HoughCircles(img, circlesHough, HOUGH_GRADIENT, 0.2, img.rows, 200, 100, 1900, 2000);
+
+          Point2f center(circlesHough[0][0], circlesHough[0][1]);
+          double radius = circlesHough[0][2];
+          Scalar color(0, 65535, 0);
+
+          // draw the circle center
+          circle(imgc, center, 1, color, -1);
+          // draw the circle outline
+          circle(imgc, center, radius, color, 1, LINE_AA);
+
+          LOG_INFO("Hough center / radius: {} / {}", center, radius);
+        }
+
+        // min enclosing circle
+        {
+          Mat canny_output;
+          Canny(img, canny_output, 50, 200);
+
+          std::vector<std::vector<Point>> contours;
+          findContours(canny_output, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+          Point2f center;
+          float radius;
+          Scalar color(65535, 0, 65535);
+          minEnclosingCircle(contours[0], center, radius);
+
+          // draw the circle center
+          circle(imgc, center, 1, color, -1);
+          // draw the circle outline
+          circle(imgc, center, radius, color, 1, LINE_AA);
+
+          LOG_INFO("Canny enclosing center / radius: {} / {}", center, radius);
+        }
+
+        if (0) // show
+        {
+          showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + to_string(rand()));
+          showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + to_string(rand()));
+          showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + to_string(rand()));
+          showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + to_string(rand()));
+          showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + to_string(rand()));
+        }
+      }
+
+      if (1) // fits midX / midY / R correction by canny + find contours + enclosing circle
+      {
+        Mat img = mat.clone();
+        normalize(img, img, 0, 255, NORM_MINMAX);
+        img.convertTo(img, CV_8U);
+        Mat canny_output;
+        Canny(img, canny_output, 50, 200);
+
+        std::vector<std::vector<Point>> contours;
+        findContours(canny_output, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+        Point2f center;
+        float radius;
+        minEnclosingCircle(contours[0], center, radius);
+
+        // only save valid parameters
+        if (radius > 1900 && radius < 2000 && center.x > 2000 && center.x < 2100 && center.y > 2000 && center.y < 2100)
+        {
+          params.fitsMidX = center.x;
+          params.fitsMidY = center.y;
+          params.R = radius;
+          params.succParamCorrection = true;
+        }
       }
 
       return std::make_tuple(mat, params);
