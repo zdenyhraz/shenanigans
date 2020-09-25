@@ -98,9 +98,6 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
     }
   }
 
-  omegasXavg = meanVertical(omegasX2D);
-  omegasYavg = meanVertical(omegasY2D);
-
   DiffrotResults dr;
   dr.SetData2D(thetas2D, omegasX2D, omegasY2D, shiftsX2D, shiftsY2D);
   dr.SetParams(drset.pics, drset.sPic, drset.savepath);

@@ -27,16 +27,14 @@ public:
     if (!calculated)
       LOG_ERROR("Diffrot results not yet calculated!");
 
-    Reset();
-    CalculateMainInterp();
+    CalculateMainInterp1D();
+    CalculateMainInterp2D();
     CalculateMedianFilters(medianSize);
     CalculateAxisLimits();
     CalculatePredics();
     CalculateErrors();
     CalculateNS();
     CalculateFitCoeffs();
-
-    // ======================================================== PLOTS ========================================================
 
     // diffrot profiles
     Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasX, 2), OmegasX, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "west-east flow speed [deg/day]", {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 2), QPen(Plot::red, 2)}, saveDir + "1DXs" + to_string(SourceStride) + ".png");
@@ -64,7 +62,7 @@ public:
   double GetError()
   {
     // used for optimizing - closest profile to literature profiles
-    CalculateMainInterp();
+    CalculateMainInterp1D();
     CalculatePredics();
     double error = 0;
     size_t ycount = OmegasX.size();
@@ -105,6 +103,8 @@ public:
         if (xs[i] > x && xs[i + 1] <= x)
           return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
+
+    LOG_FATAL("Interpolation fault");
     throw; // should never get here
   }
 
@@ -121,8 +121,6 @@ public:
 
   void SetData2D(const std::vector<std::vector<double>> &thetas2D, const std::vector<std::vector<double>> &omegasX, const std::vector<std::vector<double>> &omegasY, const std::vector<std::vector<double>> &shiftsX, const std::vector<std::vector<double>> &shiftsY)
   {
-    flip(matFromVector(omegasX, true), SourceFlowX, 1);
-    flip(matFromVector(omegasY, true), SourceFlowY, 1);
     SourceThetas = thetas2D;
     SourceShiftsX = shiftsX;
     SourceShiftsY = shiftsY;
@@ -150,12 +148,6 @@ public:
     sourceOmegasY = SourceOmegasY;
   }
 
-  auto GetMats(Mat &sourceFlowX, Mat &sourceFlowY) const
-  {
-    sourceFlowX = SourceFlowX;
-    sourceFlowY = SourceFlowY;
-  }
-
   auto GetParams(int &sourcePics, int &sourceStride) const
   {
     sourcePics = SourcePics;
@@ -171,12 +163,6 @@ public:
     SourceOmegasY = sourceOmegasY;
   }
 
-  void SetMatsRaw(const Mat &sourceFlowX, const Mat &sourceFlowY)
-  {
-    SourceFlowX = sourceFlowX;
-    SourceFlowY = sourceFlowY;
-  }
-
   void SetParamsRaw(int sourcePics, int sourceStride)
   {
     SourcePics = sourcePics;
@@ -185,8 +171,6 @@ public:
 
 private:
   // source data
-  Mat SourceFlowX;
-  Mat SourceFlowY;
   int SourcePics;
   int SourceStride;
   std::vector<std::vector<double>> SourceThetas;
@@ -201,10 +185,10 @@ private:
   std::vector<double> ShiftsY;
   std::vector<double> OmegasX;
   std::vector<double> OmegasY;
-  bool Data2DSet = false;
-  bool ParamsSet = false;
   Mat FlowX;
   Mat FlowY;
+  bool Data2DSet = false;
+  bool ParamsSet = false;
   static constexpr double colRowRatio1 = 2;
   static constexpr double colRowRatio2 = 1.5;
   static constexpr int predicCnt = 2;
@@ -226,7 +210,7 @@ private:
   double StartTheta;
   double EndTheta;
 
-  void CalculateMainInterp()
+  void CalculateMainInterp1D()
   {
     int ps = SourceThetas.size();
     int ys = SourceThetas[0].size();
@@ -243,7 +227,7 @@ private:
         thetaRange = SourceThetas[p].front();
     double dth = 2. * thetaRange / (ys - 1);
 
-    // interpolate shifts and omegas based on equidisstant theta
+    // interpolate shifts and omegas based on equidistant theta
     for (int y = 0; y < ys; ++y)
     {
       Thetas[y] = thetaRange - y * dth;
@@ -254,11 +238,22 @@ private:
     }
   }
 
-  void Reset()
+  void CalculateMainInterp2D()
   {
-    FlowX = SourceFlowX.clone();
-    FlowY = SourceFlowY.clone();
-    resize(FlowY, FlowY, FlowX.size());
+    int ps = SourceThetas.size();
+    int ys = SourceThetas[0].size();
+
+    FlowX = Mat::zeros(ys, ps, CV_32F);
+    FlowY = Mat::zeros(ys, ps, CV_32F);
+
+    for (int y = 0; y < ys; ++y)
+    {
+      for (int p = 0; p < ps; ++p)
+      {
+        FlowX.at<float>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasX[p], Thetas[y]);
+        FlowY.at<float>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasY[p], Thetas[y]);
+      }
+    }
   }
 
   void UpdateCalculated() { calculated = Data2DSet && ParamsSet; }
