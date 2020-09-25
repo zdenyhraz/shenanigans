@@ -219,17 +219,22 @@ private:
         }
       }
 
-      if (1) // fits midX / midY / R correction by canny + find contours + enclosing circle
+      if (0) // fits midX / midY / R correction by canny + find contours + enclosing circle
       {
+        // 8-bit input
         Mat img = mat.clone();
         normalize(img, img, 0, 255, NORM_MINMAX);
         img.convertTo(img, CV_8U);
+
+        // canny
         Mat canny_output;
         Canny(img, canny_output, 50, 200);
 
+        // contours
         std::vector<std::vector<Point>> contours;
         findContours(canny_output, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
+        // circle
         Point2f center;
         float radius;
         minEnclosingCircle(contours[0], center, radius);
@@ -242,7 +247,11 @@ private:
           params.R = radius;
           params.succParamCorrection = true;
         }
+        else
+          LOG_ERROR("<loadfits> Subpixel parameter correction invalid - center / radius: {} / {}", center, radius);
       }
+      else
+        params.succParamCorrection = true;
 
       return std::make_tuple(mat, params);
     }
