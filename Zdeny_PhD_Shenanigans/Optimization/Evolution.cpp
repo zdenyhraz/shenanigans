@@ -128,7 +128,7 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
   if (mPlotOutput)
   {
     Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
-    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DashLine)});
+    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
   }
 
   LOG_SUCC("Gen {}: {} best: {:.2e}, reldif: {:.2f}, absdif: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
