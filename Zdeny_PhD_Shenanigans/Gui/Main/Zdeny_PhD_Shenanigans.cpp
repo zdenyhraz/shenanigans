@@ -54,7 +54,7 @@ void Zdeny_PhD_Shenanigans::debug()
 
     int N = 2;
     Evolution Evo(N);
-    Evo.mNP = 10;
+    Evo.mNP = 50. / 7 * N;
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
