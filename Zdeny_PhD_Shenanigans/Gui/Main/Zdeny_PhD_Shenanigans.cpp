@@ -267,7 +267,7 @@ void Zdeny_PhD_Shenanigans::debug()
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
   }
-  if (1) // 1D / 2D interp test
+  if (1) // 1D / 2D sorted xs interp test
   {
     std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<double> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
