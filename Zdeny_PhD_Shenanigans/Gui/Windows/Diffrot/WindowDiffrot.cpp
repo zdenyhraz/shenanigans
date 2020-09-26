@@ -155,7 +155,7 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 3;
+    const int runs = 2;
     for (int run = 0; run < runs; ++run)
     {
       Evolution evo(7);
@@ -192,7 +192,7 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 3;
+    const int runs = 2;
     for (int run = 0; run < runs; ++run)
     {
       Evolution evo(6);
@@ -230,7 +230,7 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 3;
+    const int runs = 2;
     for (int run = 0; run < runs; ++run)
     {
       Evolution evo(6);
