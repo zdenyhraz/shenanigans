@@ -6,7 +6,7 @@ class Evolution : public OptimizationAlgorithm
 public:
   Evolution(int N, const std::string &optname = "default");
   OptimizationResult Optimize(ObjectiveFunction f) override;
-  void SetFileOutput(const std::string &path);
+  void SetFileOutputDir(const std::string &dir);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
   void SetParameterNames(const std::vector<std::string> &ParameterNames) { mParameterNames = ParameterNames; };
   void SetOptimizationName(const std::string &optname) { mOptimizationName = optname; }
@@ -97,7 +97,7 @@ private:
   double mRelativeDifferenceThreshold = 0.75;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
   std::string mOptimizationName;
-  std::string mOutputFilePath;
+  std::string mOutputFileDir;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
 };

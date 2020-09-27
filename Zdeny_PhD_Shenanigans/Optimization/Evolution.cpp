@@ -50,9 +50,9 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   return {population.bestEntity.params, reason};
 }
 
-void Evolution::SetFileOutput(const std::string &path)
+void Evolution::SetFileOutputDir(const std::string &dir)
 {
-  mOutputFilePath = path;
+  mOutputFileDir = dir;
   mFileOutput = true;
 }
 
@@ -65,7 +65,7 @@ bool Evolution::InitializeOutputs()
 
     if (mFileOutput)
     {
-      mOutputFile.open(mOutputFilePath, std::ios::out);
+      mOutputFile.open(mOutputFileDir + mOptimizationName + ".txt", std::ios::out | std::ios::app);
       mOutputFile << "Evolution optimization '" + mOptimizationName + "' started" << std::endl;
     }
 
