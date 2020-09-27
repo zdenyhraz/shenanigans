@@ -58,8 +58,8 @@ void Zdeny_PhD_Shenanigans::debug()
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
-    Evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt.txt");
-    Evo.SetOptimizationName("debug");
+    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
+    Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
     auto [result, shit] = Evo.Optimize(f);
   }

@@ -155,7 +155,7 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 2;
+    const int runs = 0;
     for (int run = 0; run < runs; ++run)
     {
       Evolution evo(7);
@@ -163,46 +163,9 @@ void WindowDiffrot::optimizeDiffrot()
       evo.mMutStrat = Evolution::RAND1;
       evo.mLB = {-10, -500, 5, -1, -1, 64, -1};
       evo.mUB = {10, 500, 17, 1, 1, 512, 1};
-      evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt1.txt");
+      evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
       evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "INTERP"});
       evo.SetOptimizationName(std::string("diffrot full") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
-      auto [result, shit] = evo.Optimize(f);
-      LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
-    }
-  }
-  catch (...)
-  {
-    LOG_FATAL("Evolution optimization somehow failed");
-  }
-
-  try
-  {
-    auto f = [&](const std::vector<double> &args) {
-      int winsize = std::floor(args[5]);
-      int L2size = std::floor(args[2]);
-      winsize = winsize % 2 ? winsize + 1 : winsize;
-      L2size = L2size % 2 ? L2size : L2size + 1;
-      IterativePhaseCorrelation ipc_opt(winsize, winsize, abs(args[0]), abs(args[1]));
-      ipc_opt.SetL2size(L2size);
-      ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
-      ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
-      FitsTime time_opt = starttime;
-      DiffrotSettings drset_opt = drset;
-      drset_opt.speak = false;
-      return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
-    };
-
-    const int runs = 2;
-    for (int run = 0; run < runs; ++run)
-    {
-      Evolution evo(6);
-      evo.mNP = 50;
-      evo.mMutStrat = Evolution::RAND1;
-      evo.mLB = {-10, -500, 5, -1, -1, 64};
-      evo.mUB = {10, 500, 17, 1, 1, 512};
-      evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt2.txt");
-      evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE"});
-      evo.SetOptimizationName(std::string("diffrot no interp") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
       auto [result, shit] = evo.Optimize(f);
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
@@ -238,7 +201,7 @@ void WindowDiffrot::optimizeDiffrot()
       evo.mMutStrat = Evolution::RAND1;
       evo.mLB = {-10, -500, 5, -1, -1, -1};
       evo.mUB = {10, 500, 17, 1, 1, 1};
-      evo.SetFileOutput("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\opt3.txt");
+      evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
       evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "INTERP"});
       evo.SetOptimizationName(std::string("diffrot fix256") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
       auto [result, shit] = evo.Optimize(f);
