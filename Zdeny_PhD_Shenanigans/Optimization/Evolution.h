@@ -95,7 +95,7 @@ private:
   double mINPm = 5.4;
   double mAbsoluteDifferenceThreshold = 1e-8;
   double mRelativeDifferenceThreshold = 0.75;
-  int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
+  int mRelativeDifferenceGenerationsOverThresholdThreshold = 5;
   std::string mOptimizationName;
   std::string mOutputFileDir;
   std::ofstream mOutputFile;
