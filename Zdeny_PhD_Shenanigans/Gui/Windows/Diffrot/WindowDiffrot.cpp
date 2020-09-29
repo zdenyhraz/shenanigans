@@ -155,7 +155,7 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 0;
+    const int runs = 2;
     for (int run = 0; run < runs; ++run)
     {
       Evolution evo(7);
@@ -165,7 +165,7 @@ void WindowDiffrot::optimizeDiffrot()
       evo.mUB = {10, 500, 17, 1, 1, 512, 1};
       evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
       evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "INTERP"});
-      evo.SetOptimizationName(std::string("diffrot full") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
+      evo.SetOptimizationName(std::string("diffrot full new objfun") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
       auto [result, shit] = evo.Optimize(f);
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
