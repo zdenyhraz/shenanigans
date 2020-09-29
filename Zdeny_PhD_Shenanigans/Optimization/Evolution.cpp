@@ -117,15 +117,15 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
     }
     else
       LOG_DEBUG("Objective function is consistent");
+
+    LOG_SUCC("Objective function is normal");
+    return true;
   }
   catch (...)
   {
     LOG_ERROR("Objective function is not normal");
     return false;
   }
-
-  LOG_SUCC("Objective function is normal");
-  return true;
 }
 
 void Evolution::UpdateOutputs(int gen, const Population &population)
