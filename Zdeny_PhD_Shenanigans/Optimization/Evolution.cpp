@@ -250,6 +250,7 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
   }
   catch (...)
   {
+    LOG_ERROR("Could not initialize population");
     return false;
   }
 }
