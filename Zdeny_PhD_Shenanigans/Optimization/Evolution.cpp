@@ -88,33 +88,41 @@ bool Evolution::InitializeOutputs()
 bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 {
   LOG_INFO("Checking objective function normality...");
-  auto arg = 0.5 * (mLB + mUB);
-  auto result = f(arg);
-  auto result2 = f(arg);
-
-  if (!isfinite(result))
+  try
   {
-    LOG_ERROR("Objective function is not finite");
+    auto arg = 0.5 * (mLB + mUB);
+    auto result = f(arg);
+    auto result2 = f(arg);
+
+    if (!isfinite(result))
+    {
+      LOG_ERROR("Objective function is not finite");
+      return false;
+    }
+    else
+      LOG_DEBUG("Objective function is finite");
+
+    if (result < 0)
+    {
+      LOG_ERROR("Objective function is not positive");
+      return false;
+    }
+    else
+      LOG_DEBUG("Objective function is positive");
+
+    if (result != result2)
+    {
+      LOG_ERROR("Objective function is not consistent");
+      return false;
+    }
+    else
+      LOG_DEBUG("Objective function is consistent");
+  }
+  catch (...)
+  {
+    LOG_ERROR("Objective function is not normal");
     return false;
   }
-  else
-    LOG_DEBUG("Objective function is finite");
-
-  if (result < 0)
-  {
-    LOG_ERROR("Objective function is not positive");
-    return false;
-  }
-  else
-    LOG_DEBUG("Objective function is positive");
-
-  if (result != result2)
-  {
-    LOG_ERROR("Objective function is not consistent");
-    return false;
-  }
-  else
-    LOG_DEBUG("Objective function is consistent");
 
   LOG_SUCC("Objective function is normal");
   return true;
