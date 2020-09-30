@@ -66,16 +66,13 @@ public:
     CalculatePredics();
     double error = 0;
     size_t ycount = OmegasX.size();
-    size_t pcount = PredicXs.size();
-    const auto &curve = polyfit(Thetas, OmegasX, 2);
+    const auto mycurve = polyfit(Thetas, OmegasX, 2);
+    const auto targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
 
-    size_t y, p;
+    for (int y = 0; y < ycount; ++y)
+      error += std::pow(mycurve[y] - targetcurve[y], 2);
 
-    for (y = 0; y < ycount; ++y)
-      for (p = 0; p < pcount; ++p)
-        error += std::pow(curve[y] - PredicXs[p][y], 2);
-
-    return sqrt(error / ycount / pcount);
+    return sqrt(error / ycount);
   }
 
   static double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
