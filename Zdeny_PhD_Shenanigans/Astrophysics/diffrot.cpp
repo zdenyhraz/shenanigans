@@ -107,7 +107,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
 
 inline void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
 {
-#pragma omp parallel for
+  //#pragma omp parallel for
   for (int y = 0; y < drset.ys; y++)
   {
     Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());

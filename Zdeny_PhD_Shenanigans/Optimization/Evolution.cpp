@@ -144,15 +144,22 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
 
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
 {
-  if (mFileOutput)
+  try
   {
-    mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
-    mOutputFile.close();
-  }
+    if (mFileOutput)
+    {
+      mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
+      mOutputFile.close();
+    }
 
-  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-  LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
-  LOG_INFO("Evolution optimization ended");
+    LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
+    LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
+    LOG_INFO("Evolution optimization ended");
+  }
+  catch (...)
+  {
+    LOG_ERROR("Could not uninitialize outputs");
+  }
 }
 
 void Evolution::CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason)
