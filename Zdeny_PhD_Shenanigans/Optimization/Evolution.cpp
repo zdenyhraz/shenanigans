@@ -17,18 +17,17 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
-  population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   bool terminate = false;
   auto reason = NotTerminated;
   int gen = 0;
   LOG_INFO("Running evolution...");
+  population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   UpdateOutputs(gen, population);
 
   while (!terminate)
   {
-    gen++;
 #pragma omp parallel for
-    for (int eid = 0; eid < mNP; eid++)
+    for (int eid = 0; eid < mNP; ++eid)
     {
       population.UpdateDistinctParents(eid);
       population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
@@ -38,12 +37,10 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     population.UpdateBestEntity();
     population.UpdateOffspringFunctionEvaluations();
     population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
+    gen++;
 
     CheckTerminationCriterions(population, gen, terminate, reason);
     UpdateOutputs(gen, population);
-
-    if (terminate)
-      break;
   }
 
   UninitializeOutputs(population, reason);
@@ -130,16 +127,19 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
 
 void Evolution::UpdateOutputs(int gen, const Population &population)
 {
-  if (mFileOutput)
-    mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
-
-  if (mPlotOutput)
+  if (population.bestEntity.fitness < population.previousFitness)
   {
-    Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness), log(population.averageFitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)", "log(averageFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2), QPen(Plot::orange, 2)});
-    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
-  }
+    if (mFileOutput)
+      mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
 
-  LOG_SUCC("Gen {}: {} best: {:.2e}, reldif: {:.2f}, absdif: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
+    if (mPlotOutput)
+    {
+      Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
+      Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
+    }
+
+    LOG_SUCC("Gen {}: {} ({:.2e}), reldif: {:.2f}, absdif: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
+  }
 }
 
 void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
@@ -204,7 +204,7 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &b
 {
   std::string value;
   value += "Gen " + to_string(gen);
-  value += " best: [";
+  value += ": [";
   for (int i = 0; i < bestEntity.size(); ++i)
   {
     if (mParameterNames.size() > i)
@@ -222,7 +222,7 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &b
         value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + "]";
     }
   }
-  value += " (Obj: " + to_string(bestFitness) + ")";
+  value += " (" + to_string(bestFitness) + ")";
   return value;
 }
 
@@ -315,6 +315,7 @@ void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvalu
 void Evolution::Population::UpdateBestEntity()
 {
   averageFitness = 0;
+  previousFitness = bestEntity.fitness;
   for (int eid = 0; eid < entities.size(); ++eid)
   {
     averageFitness += entities[eid].fitness;
