@@ -41,7 +41,7 @@ public:
     Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasY, 3), OmegasY}, "diffrot profile Y", "solar latitude [deg]", "north-south flow speed [deg/day]", {"polyfit3", "average"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5)}, saveDir + "1DYs" + to_string(SourceStride) + ".png"); // rgb(119, 136, 153)
 
     // diffrot profiles NS
-    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "west-east flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5), QPen(Plot::green, 2), QPen(Plot::black, 2)}, saveDir + "1DNSXs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "west-east flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)", "Derek N", "Derek S"}, {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5), QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::blue, 2), QPen(Plot::red, 2)}, saveDir + "1DNSXs" + to_string(SourceStride) + ".png");
     Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasYavgN), sin2sin4fit(ThetasNS, OmegasYavgS), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]", "north-south flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South"}, {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5)}, saveDir + "1DNSYs" + to_string(SourceStride) + ".png");
 
     // shifts profiles
@@ -190,7 +190,7 @@ private:
   bool ParamsSet = false;
   static constexpr double colRowRatio1 = 2;
   static constexpr double colRowRatio2 = 1.5;
-  static constexpr int predicCnt = 2;
+  static constexpr int predicCnt = 4;
   std::vector<std::vector<double>> PredicXs;
   std::vector<double> ShiftsXErrors;
   std::vector<double> ShiftsYErrors;
@@ -284,6 +284,8 @@ private:
     {
       PredicXs[0][i] = predictDiffrotProfile(Thetas[i], 14.296, -1.847, -2.615); // Derek A. Lamb (2017)
       PredicXs[1][i] = predictDiffrotProfile(Thetas[i], 14.192, -1.70, -2.36);   // Howard et al. (1983)
+      PredicXs[2][i] = predictDiffrotProfile(Thetas[i], 14.299, -2.124, -2.382); // Derek A. Lamb (2017) N
+      PredicXs[3][i] = predictDiffrotProfile(Thetas[i], 14.292, -1.584, -2.938); // Derek A. Lamb (2017) S
     }
   }
 
@@ -316,6 +318,8 @@ private:
     ThetasNS = std::vector<double>(Thetas.begin(), Thetas.begin() + zeroidx + 1);
     PredicXsNS[0] = std::vector<double>(PredicXs[0].begin(), PredicXs[0].begin() + zeroidx + 1);
     PredicXsNS[1] = std::vector<double>(PredicXs[1].begin(), PredicXs[1].begin() + zeroidx + 1);
+    PredicXsNS[2] = std::vector<double>(PredicXs[2].begin(), PredicXs[2].begin() + zeroidx + 1);
+    PredicXsNS[3] = std::vector<double>(PredicXs[3].begin(), PredicXs[3].begin() + zeroidx + 1);
     OmegasXavgN = std::vector<double>(OmegasX.begin(), OmegasX.begin() + zeroidx + 1);
     OmegasYavgN = std::vector<double>(OmegasY.begin(), OmegasY.begin() + zeroidx + 1);
 
@@ -357,17 +361,17 @@ private:
     LOG_NEWLINE;
 
     // XY both
-    LogFitCoeffs("XcoeffsPoly2", polyfitCoeffs(toRadians(Thetas), OmegasX, 2));
-    LogFitCoeffs("YcoeffsPoly3", polyfitCoeffs(toRadians(Thetas), OmegasY, 3));
-    LogFitCoeffs("XcoeffsTrig", sin2sin4fitCoeffs(toRadians(Thetas), OmegasX));
+    LogFitCoeffs("XcoeffsPoly2", polyfitCoeffs(Thetas, OmegasX, 2));
+    LogFitCoeffs("YcoeffsPoly3", polyfitCoeffs(Thetas, OmegasY, 3));
+    LogFitCoeffs("XcoeffsTrig", sin2sin4fitCoeffs(Thetas, OmegasX));
 
     // X NS
-    LogFitCoeffs("XcoeffsTrigN", sin2sin4fitCoeffs(toRadians(ThetasNS), OmegasXavgN));
-    LogFitCoeffs("XcoeffsTrigS", sin2sin4fitCoeffs(toRadians(ThetasNS), OmegasXavgS));
+    LogFitCoeffs("XcoeffsTrigN", sin2sin4fitCoeffs(ThetasNS, OmegasXavgN));
+    LogFitCoeffs("XcoeffsTrigS", sin2sin4fitCoeffs(ThetasNS, OmegasXavgS));
 
     // Y NS
-    LogFitCoeffs("YcoeffsTrigN", sin2sin4fitCoeffs(toRadians(ThetasNS), OmegasYavgN));
-    LogFitCoeffs("YcoeffsTrigS", sin2sin4fitCoeffs(toRadians(ThetasNS), OmegasYavgS));
+    LogFitCoeffs("YcoeffsTrigN", sin2sin4fitCoeffs(ThetasNS, OmegasYavgN));
+    LogFitCoeffs("YcoeffsTrigS", sin2sin4fitCoeffs(ThetasNS, OmegasYavgS));
   }
 
   void LogFitCoeffs(const std::string &fitname, const std::vector<double> &coeffs)
