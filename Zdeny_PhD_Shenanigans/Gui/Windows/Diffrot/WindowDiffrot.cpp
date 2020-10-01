@@ -167,7 +167,7 @@ void WindowDiffrot::optimizeDiffrot()
       evo.mLB = {0.0001, 0.0001, 5, -1, -1, 64, 5, -1};
       evo.mUB = {5, 500, 17, 1, 1, 350, 51, 1};
       evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
-      evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "UC", "BICUBIC"});
+      evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "UC", "+BICUBIC"});
       evo.SetOptimizationName(std::string("diffrot full") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
       auto [result, shit] = evo.Optimize(f);
       LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
