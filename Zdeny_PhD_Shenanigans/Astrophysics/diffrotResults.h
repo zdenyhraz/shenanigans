@@ -66,11 +66,12 @@ public:
     CalculatePredics();
     double error = 0;
     size_t ycount = OmegasX.size();
-    const auto &mycurve = polyfit(Thetas, OmegasX, 2);
+    const auto &mycurve = OmegasX;
+    const auto &myfit = polyfit(Thetas, OmegasX, 2);
     const auto &targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
 
     for (int y = 0; y < ycount; ++y)
-      error += std::pow(mycurve[y] - targetcurve[y], 2);
+      error += 0.8 * std::pow(myfit[y] - targetcurve[y], 2) + 0.2 * std::pow(mycurve[y] - targetcurve[y], 2);
 
     return sqrt(error / ycount);
   }
