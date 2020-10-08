@@ -8,12 +8,13 @@ class OptimizationAlgorithm // the main parent optimizer class
 public:
   enum TerminationReason
   {
+    NotTerminated = 0,
     OptimalFitnessReached,
     MaximumGenerationsReached,
     MaximumFunctionEvaluationsReached,
     NoImprovementReachedRel,
     NoImprovementReachedAbs,
-    NotTerminated
+    UnexpectedErrorOccured,
   };
 
   using ObjectiveFunction = const std::function<double(const std::vector<double> &)> &;
