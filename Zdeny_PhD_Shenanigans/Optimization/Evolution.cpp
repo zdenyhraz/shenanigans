@@ -26,21 +26,29 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
 
   while (!terminate)
   {
-#pragma omp parallel for
-    for (int eid = 0; eid < mNP; ++eid)
+    try
     {
-      population.UpdateDistinctParents(eid);
-      population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
-      population.UpdateOffspring(eid, mMutStrat, f, mF, mLB, mUB);
-    }
-    population.PerformSelection();
-    population.UpdateBestEntity();
-    population.UpdateOffspringFunctionEvaluations();
-    population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
-    gen++;
+#pragma omp parallel for
+      for (int eid = 0; eid < mNP; ++eid)
+      {
+        population.UpdateDistinctParents(eid);
+        population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
+        population.UpdateOffspring(eid, mMutStrat, f, mF, mLB, mUB);
+      }
+      population.PerformSelection();
+      population.UpdateBestEntity();
+      population.UpdateOffspringFunctionEvaluations();
+      population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
+      gen++;
 
-    CheckTerminationCriterions(population, gen, terminate, reason);
-    UpdateOutputs(gen, population);
+      CheckTerminationCriterions(population, gen, terminate, reason);
+      UpdateOutputs(gen, population);
+    }
+    catch (...)
+    {
+      LOG_ERROR("Unexpected error happened during generation {}", gen);
+      terminate = true;
+    }
   }
 
   UninitializeOutputs(population, reason);
@@ -293,7 +301,15 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
     // check for boundaries, effectively clamp
     newoffspring.params[pid] = clampSmooth(newoffspring.params[pid], entities[eid].params[pid], LB[pid], UB[pid]);
   }
-  newoffspring.fitness = f(newoffspring.params);
+
+  try
+  {
+    newoffspring.fitness = f(newoffspring.params);
+  }
+  catch (...)
+  {
+    newoffspring.fitness = Inf;
+  }
 }
 
 void Evolution::Population::PerformSelection()
