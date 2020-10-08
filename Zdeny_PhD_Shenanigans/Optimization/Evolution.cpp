@@ -43,9 +43,9 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       treason = CheckTerminationCriterions(population, gen);
       UpdateOutputs(gen, population);
     }
-    catch (...)
+    catch (const std::exception &e)
     {
-      LOG_ERROR("Unexpected error occured during generation {}", gen);
+      LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
       treason = UnexpectedErrorOccured;
     }
   }
