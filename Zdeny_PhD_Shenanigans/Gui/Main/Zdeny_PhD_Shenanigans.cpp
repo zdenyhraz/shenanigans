@@ -314,6 +314,37 @@ void Zdeny_PhD_Shenanigans::debug()
     LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
     LOG_INFO("Diffrot interp 2D d) {}", DiffrotResults::Interpolate(xss, yss, 1.75));
   }
+  if (0) // try/catch performance test
+  {
+    int N = 1e7;
+    int iters = 10;
+    std::vector<double> vec(N);
+
+    for (int iter = 0; iter < iters; ++iter)
+    {
+      {
+        TIMER("Try/catch -");
+        for (auto &x : vec)
+          x = sin(rand01());
+      }
+
+      {
+        TIMER("Try/catch +");
+        for (auto &x : vec)
+        {
+          try
+          {
+            x = sin(rand01());
+          }
+          catch (...)
+          {
+            LOG_FATAL("Exception thrown");
+          }
+        }
+      }
+    }
+  }
+
   LOG_INFO("Debug finished.");
 }
 
