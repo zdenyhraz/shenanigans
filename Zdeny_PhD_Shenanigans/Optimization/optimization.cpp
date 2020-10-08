@@ -13,6 +13,8 @@ std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationR
 {
   switch (reason)
   {
+  case NotTerminated:
+    return "Not yet terminated";
   case OptimalFitnessReached:
     return "Optimal fitness reached";
   case MaximumGenerationsReached:
@@ -23,8 +25,8 @@ std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationR
     return "No relative improvement reached";
   case NoImprovementReachedAbs:
     return "No absolute improvement reached";
-  case NotTerminated:
-    return "Not yet terminated";
+  case UnexpectedErrorOccured:
+    return "Unexpected error occured";
   }
-  return "";
+  return "Unknown reason";
 };

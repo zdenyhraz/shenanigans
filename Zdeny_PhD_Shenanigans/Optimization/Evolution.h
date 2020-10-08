@@ -88,7 +88,7 @@ private:
   bool InitializeOutputs();
   void UninitializeOutputs(const Population &population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population &population);
-  void CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason);
+  TerminationReason CheckTerminationCriterions(const Population &population, int generation);
   std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
 
   bool mFileOutput = false;

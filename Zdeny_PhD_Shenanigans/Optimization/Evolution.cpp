@@ -17,14 +17,13 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
     return {};
 
-  bool terminate = false;
-  auto reason = NotTerminated;
   int gen = 0;
-  LOG_INFO("Running evolution...");
+  TerminationReason treason = NotTerminated;
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
+  LOG_INFO("Running evolution...");
   UpdateOutputs(gen, population);
 
-  while (!terminate)
+  while (!treason)
   {
     try
     {
@@ -41,18 +40,18 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
       gen++;
 
-      CheckTerminationCriterions(population, gen, terminate, reason);
+      treason = CheckTerminationCriterions(population, gen);
       UpdateOutputs(gen, population);
     }
     catch (...)
     {
-      LOG_ERROR("Unexpected error happened during generation {}", gen);
-      terminate = true;
+      LOG_ERROR("Unexpected error occured during generation {}", gen);
+      treason = UnexpectedErrorOccured;
     }
   }
 
-  UninitializeOutputs(population, reason);
-  return {population.bestEntity.params, reason};
+  UninitializeOutputs(population, treason);
+  return {population.bestEntity.params, treason};
 }
 
 void Evolution::SetFileOutputDir(const std::string &dir)
@@ -170,42 +169,24 @@ void Evolution::UninitializeOutputs(const Population &population, TerminationRea
   }
 }
 
-void Evolution::CheckTerminationCriterions(const Population &population, int generation, bool &terminate, TerminationReason &reason)
+Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population &population, int generation)
 {
-  if (population.bestEntity.fitness < optimalFitness) // populationFitness goal reached
-  {
-    terminate = true;
-    reason = OptimalFitnessReached;
-    return;
-  }
+  if (population.bestEntity.fitness <= optimalFitness) // populationFitness goal reached
+    return OptimalFitnessReached;
 
-  if (generation == maxGen) // maximum gen reached
-  {
-    terminate = true;
-    reason = MaximumGenerationsReached;
-    return;
-  }
+  if (generation >= maxGen) // maximum gen reached
+    return MaximumGenerationsReached;
 
   if (population.functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
-  {
-    terminate = true;
-    reason = MaximumFunctionEvaluationsReached;
-    return;
-  }
+    return MaximumFunctionEvaluationsReached;
 
   if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (relative)
-  {
-    terminate = true;
-    reason = NoImprovementReachedRel;
-    return;
-  }
+    return NoImprovementReachedRel;
 
   if (population.absoluteDifference < mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
-  {
-    terminate = true;
-    reason = NoImprovementReachedAbs;
-    return;
-  }
+    return NoImprovementReachedAbs;
+
+  return NotTerminated;
 }
 
 std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &bestEntity, double bestFitness)
