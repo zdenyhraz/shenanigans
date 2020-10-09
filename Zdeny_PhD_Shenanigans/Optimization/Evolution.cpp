@@ -82,9 +82,9 @@ bool Evolution::InitializeOutputs()
     LOG_SUCC("Outputs initialized");
     return true;
   }
-  catch (...)
+  catch (const std::exception &e)
   {
-    LOG_ERROR("Could not initialize outputs");
+    LOG_ERROR("Could not initialize outputs: {}", e.what());
     return false;
   }
 }
@@ -125,9 +125,9 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
     LOG_SUCC("Objective function is normal");
     return true;
   }
-  catch (...)
+  catch (const std::exception &e)
   {
-    LOG_ERROR("Objective function is not normal");
+    LOG_ERROR("Objective function is not normal: {}", e.what());
     return false;
   }
 }
@@ -163,9 +163,9 @@ void Evolution::UninitializeOutputs(const Population &population, TerminationRea
     LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
     LOG_INFO("Evolution optimization ended");
   }
-  catch (...)
+  catch (const std::exception &e)
   {
-    LOG_ERROR("Could not uninitialize outputs");
+    LOG_ERROR("Could not uninitialize outputs: {}", e.what());
   }
 }
 
@@ -244,9 +244,9 @@ bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const
     InitializeOffspring(nParents);
     return true;
   }
-  catch (...)
+  catch (const std::exception &e)
   {
-    LOG_ERROR("Could not initialize population");
+    LOG_ERROR("Could not initialize population: {}", e.what());
     return false;
   }
 }
@@ -287,8 +287,9 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   {
     newoffspring.fitness = f(newoffspring.params);
   }
-  catch (...)
+  catch (const std::exception &e)
   {
+    LOG_DEBUG("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
     newoffspring.fitness = Inf;
   }
 }
