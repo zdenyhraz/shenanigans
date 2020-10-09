@@ -3,7 +3,7 @@
 #include "Core/functionsBaseCV.h"
 #include "Log/logger.h"
 
-class OptimizationAlgorithm // the main parent optimizer class
+class OptimizationAlgorithm
 {
 public:
   enum TerminationReason
@@ -23,6 +23,7 @@ public:
 
   OptimizationAlgorithm(int N);
   virtual ~OptimizationAlgorithm();
+
   virtual OptimizationResult Optimize(ObjectiveFunction f) = 0;
 
   int N = 1;                               // the problem dimension
