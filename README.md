@@ -12,7 +12,6 @@ Frequency filtering:
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/freqfilters/filter4.PNG" width="100%">
 
 Visualization of different optimizer paths on a given objective function landscape:
-
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/optim/PATpaths2.PNG" width="49%">
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/optim/PATpaths3.PNG" width="49%">
 
