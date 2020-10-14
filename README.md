@@ -5,7 +5,9 @@ Semi-random PhD funky stuff (mainly astrophysics - Solar Dynamics Observatory im
 
 ![](https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/Zdeny_PhD_Shenanigans/Resources/gui.PNG "Shenanigans GUI")
 
-Also has a snake game I made with my girlfriend for some relaxation.
+![](https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/freqfilters/filter4.PNG "Solar Eclipse filtering")
+
+Also includes a highly relevant game of snake.
 
 ![](https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/Zdeny_PhD_Shenanigans/Resources/snake.png "snek")
 
