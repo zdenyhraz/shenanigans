@@ -9,5 +9,5 @@ Semi-random PhD funky stuff (mainly astrophysics - Solar Dynamics Observatory im
 
 Also includes a highly relevant game of snake.
 
-![](https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/Zdeny_PhD_Shenanigans/Resources/snake.png "snek")
+![](https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/random/121624669_342253033669990_6839406602167434009_n.png "snek")
 
