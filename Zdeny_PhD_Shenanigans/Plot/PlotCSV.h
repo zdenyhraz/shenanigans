@@ -11,6 +11,9 @@ public:
   {
     auto [data, labels] = ParseCSV(path);
 
+    if (labels.empty() || data.empty())
+      return;
+
     std::vector<double> x = data[0];
     std::vector<std::vector<double>> ys = {data.begin() + 1, data.end()};
     std::vector<std::string> ylabels = {labels.begin() + 1, labels.end()};
