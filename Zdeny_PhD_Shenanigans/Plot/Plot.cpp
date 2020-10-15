@@ -5,6 +5,7 @@
 std::map<std::string, WindowPlot *> Plot::plots;
 QFont Plot::fontTicks("Newyork", 13);  // 9
 QFont Plot::fontLabels("Newyork", 17); // 12
+double Plot::pt = 1.5;                 // pen thickness
 QColor Plot::blue(30, 80, 255);
 QColor Plot::red(220, 20, 60);
 QColor Plot::green(119, 182, 48);
@@ -12,8 +13,8 @@ QColor Plot::black(50, 50, 50);
 QColor Plot::orange(255, 165, 0);
 QColor Plot::cyan(64, 224, 208);
 QColor Plot::magenta(150, 0, 150);
-std::vector<QPen> Plot::defaultpens{QPen(blue, 2), QPen(red, 2), QPen(green, 2), QPen(black, 2), QPen(orange, 2), QPen(cyan, 2), QPen(magenta, 2)};
-QPen Plot::defaultpen(blue, 3);
+QPen Plot::defaultpen(blue, pt);
+std::vector<QPen> Plot::defaultpens{QPen(blue, pt), QPen(red, pt), QPen(green, pt), QPen(black, pt), QPen(orange, pt), QPen(cyan, pt), QPen(magenta, pt)};
 
 QPoint Plot::GetNewPlotPosition(WindowPlot *windowPlot)
 {
