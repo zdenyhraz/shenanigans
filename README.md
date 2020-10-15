@@ -1,11 +1,17 @@
 # Zdeny_PhD_Shenanigans
 Zdenek Hrazdira, 2019 / 2020 / 2021
 
-Semi-random PhD funky stuff (mainly astrophysics - Solar Dynamics Observatory image processing, image registration, also non-convex optimization, fractals) w/ Qt GUI, #uses OpenCV, STL, fftw, QCustomPlot, spdlog, OpenMP, cuda.
+Semi-random PhD funky stuff (mainly astrophysics - Solar Dynamics Observatory image processing, image registration, also non-convex optimization, fractals) w/ Qt GUI, #uses STL, OpenCV, OpenMP, fftw, QCustomPlot, spdlog, cuda.
 
-![](https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/Zdeny_PhD_Shenanigans/Resources/gui.PNG "Shenanigans GUI")
+### The GUI:
+<img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/Zdeny_PhD_Shenanigans/Resources/gui.PNG" width="100%">
 
-Also has a snake game I made with my girlfriend for some relaxation.
+### Frequency domain image filtering:
+<img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/freqfilters/filter4.PNG" width="100%">
 
-![](https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/Zdeny_PhD_Shenanigans/Resources/snake.png "snek")
+### Visualization of different optimizer paths on a given objective function landscape:
+<img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/optim/PATpaths2.PNG" width="49%"> <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/optim/PATpaths3.PNG" width="49%">
+
+### Also includes a highly relevant game of snake:
+<img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/random/121624669_342253033669990_6839406602167434009_n.png" width="49%"> <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/auxiliary/random/snake.png" width="49%">
 
