@@ -18,7 +18,7 @@ public:
     std::string xlabel = labels[0];
     std::string ylabel = plotname;
 
-    Plot1D::plot(x, ys, plotname, xlabel, ylabel, ylabels, Plot::defaultpens, "Resources/debugplot.png");
+    Plot1D::plot(x, ys, plotname, xlabel, ylabel, ylabels, Plot::defaultpens, "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plot.png");
   }
 
 private:
