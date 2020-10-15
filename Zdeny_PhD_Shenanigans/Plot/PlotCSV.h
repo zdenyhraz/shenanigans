@@ -1,7 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "qcustomplot.h"
-#include "Gui/Windows/Plot/WindowPlot.h"
 #include "Plot1D.h"
 
 class PlotCSV
