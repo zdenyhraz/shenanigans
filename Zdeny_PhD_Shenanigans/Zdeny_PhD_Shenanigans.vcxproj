@@ -165,6 +165,7 @@
     <ClInclude Include="Optimization\OptimizationTestFunctions.h" />
     <ClInclude Include="Optimization\PatternSearch.h" />
     <ClInclude Include="Optimization\VisualOptimization.h" />
+    <ClInclude Include="Plot\PlotCSV.h" />
     <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Utils\vectmat.h" />

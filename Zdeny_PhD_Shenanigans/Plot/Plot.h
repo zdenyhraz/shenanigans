@@ -8,6 +8,7 @@ public:
   static std::map<std::string, WindowPlot *> plots;
   static QFont fontTicks;
   static QFont fontLabels;
+  static double pt;
   static QPoint GetNewPlotPosition(WindowPlot *windowPlot);
   static std::vector<QPen> defaultpens;
   static QPen defaultpen;
