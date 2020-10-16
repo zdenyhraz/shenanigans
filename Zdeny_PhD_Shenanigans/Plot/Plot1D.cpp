@@ -116,6 +116,7 @@ void Plot1D::SetupGraph(WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, 
   windowPlot->ui.widget->yAxis2->setLabel(QString::fromStdString(y2label));
   windowPlot->ui.widget->legend->setVisible(ycnt > 1);
   windowPlot->ui.widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
+
   for (int i = 0; i < ycnt; i++)
   {
     if (i < y1cnt)
