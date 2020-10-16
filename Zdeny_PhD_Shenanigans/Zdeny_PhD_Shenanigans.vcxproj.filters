@@ -142,6 +142,9 @@
     <ClCompile Include="Optimization\GraphOptimization.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
+    <ClCompile Include="Plot\PlotCSV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
