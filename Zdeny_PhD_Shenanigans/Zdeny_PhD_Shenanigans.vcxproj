@@ -131,6 +131,7 @@
     <ClCompile Include="Plot\Plot.cpp" />
     <ClCompile Include="Plot\Plot1D.cpp" />
     <ClCompile Include="Plot\Plot2D.cpp" />
+    <ClCompile Include="Plot\PlotCSV.cpp" />
     <ClCompile Include="Plot\qcustomplot.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</PrecompiledHeaderFile>
