@@ -21,7 +21,7 @@ void Debug(Globals *globals)
   if (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
-    int N = 2; // ok what
+    int N = 2;
     Evolution Evo(N);
     Evo.mNP = 50. / 7 * N;
     Evo.mLB = zerovect(N, (double)-N);
