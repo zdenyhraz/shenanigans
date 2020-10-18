@@ -22,7 +22,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
   // init logger
   Logger::Init();
-  // log a welcome message
   LOG_SUCC("Welcome back, my friend.");
 
   // make signal to slot connections
