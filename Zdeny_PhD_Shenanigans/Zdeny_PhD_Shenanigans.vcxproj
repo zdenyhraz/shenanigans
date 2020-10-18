@@ -158,7 +158,7 @@
     <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Astrophysics\SwindFlow.h" />
     <ClInclude Include="Core\constants.h" />
-    <ClInclude Include="Debug\Debug.h" />
+    <ClInclude Include="DebugStuff\DebugStuff.h" />
     <ClInclude Include="Draw\combinepics.h" />
     <ClInclude Include="Draw\crop.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
