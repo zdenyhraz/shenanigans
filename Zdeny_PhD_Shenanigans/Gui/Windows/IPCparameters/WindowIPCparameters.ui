@@ -6,40 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>243</width>
-    <height>295</height>
+    <width>247</width>
+    <height>272</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>WindowIPCparameters</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>9</x>
-      <y>230</y>
-      <width>221</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Save and exit</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
@@ -232,42 +206,16 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>174</y>
-      <width>76</width>
-      <height>34</height>
+      <y>30</y>
+      <width>71</width>
+      <height>88</height>
      </rect>
     </property>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="checkBox_7">
-       <property name="text">
-        <string>cross correlate</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="checkBox_8">
-       <property name="text">
-        <string>logar</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>12</y>
-      <width>79</width>
-      <height>70</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
+    <layout class="QGridLayout" name="gridLayout_2">
      <item row="0" column="0">
       <widget class="QCheckBox" name="checkBox">
        <property name="text">
@@ -305,6 +253,39 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QCheckBox" name="checkBox_7">
+       <property name="text">
+        <string>cross correlate</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>180</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Save and exit</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -313,7 +294,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>243</width>
+     <width>247</width>
      <height>18</height>
     </rect>
    </property>

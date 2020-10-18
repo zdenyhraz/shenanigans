@@ -40,7 +40,6 @@ public:
   bool crossCorrel = 0;
   Speak speak = Errors;
   double minimalShift = 0;
-  bool logar = false;
   Mat bandpass;
   Mat window;
   bool save = false;
@@ -179,12 +178,6 @@ inline Point2f ipccore(Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &se
       auto minmax = minMaxMat(L3);
       LOG_DEBUG("L3 real min/max: {}/{}", std::get<0>(minmax), std::get<1>(minmax));
     }
-  }
-
-  if (set.logar)
-  {
-    normalize(L3, L3, 1, loglimit, NORM_MINMAX);
-    log(L3, L3);
   }
 
   L3 = quadrantswap(L3);

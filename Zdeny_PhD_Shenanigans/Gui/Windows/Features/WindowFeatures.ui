@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>287</height>
+    <width>317</width>
+    <height>275</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>173</x>
+      <x>168</x>
       <y>78</y>
       <width>141</width>
       <height>22</height>
@@ -72,7 +72,7 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>118</x>
       <y>80</y>
       <width>51</width>
       <height>16</height>
@@ -87,7 +87,7 @@
      <rect>
       <x>10</x>
       <y>11</y>
-      <width>311</width>
+      <width>301</width>
       <height>55</height>
      </rect>
     </property>
@@ -139,11 +139,17 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>120</y>
+      <x>189</x>
+      <y>110</y>
       <width>121</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>Match features</string>
@@ -153,7 +159,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>83</y>
+      <y>74</y>
       <width>101</width>
       <height>150</height>
      </rect>
@@ -279,7 +285,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>338</width>
+     <width>317</width>
      <height>18</height>
     </rect>
    </property>
