@@ -285,10 +285,10 @@
     <ClInclude Include="Optimization\GraphOptimization.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Debug\Debug.h">
+    <ClInclude Include="Plot\PlotCSV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Plot\PlotCSV.h">
+    <ClInclude Include="DebugStuff\DebugStuff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

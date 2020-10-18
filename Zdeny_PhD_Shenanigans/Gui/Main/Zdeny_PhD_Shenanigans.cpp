@@ -8,7 +8,7 @@
 #include "Fit/nnfit.h"
 #include "IPC/IPC.h"
 #include "IPC/IterativePhaseCorrelation.h"
-#include "Debug/Debug.h"
+#include "DebugStuff/DebugStuff.h"
 
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent), globals(std::make_unique<Globals>()), windowIPCparameters(std::make_unique<WindowIPCparameters>(this, globals.get())), windowIPCoptimize(std::make_unique<WindowIPCoptimize>(this, globals.get())), windowIPC2PicAlign(std::make_unique<WindowIPC2PicAlign>(this, globals.get())), windowDiffrot(std::make_unique<WindowDiffrot>(this, globals.get())), windowFeatures(std::make_unique<WindowFeatures>(this, globals.get()))
 {
