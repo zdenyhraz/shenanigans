@@ -23,7 +23,6 @@ void WindowIPCparameters::refreshIPCparameters(bool init)
   globals->IPCset->applyWindow = ui.checkBox_4->isChecked();
   globals->IPCset->interpolate = ui.checkBox_5->isChecked();
   globals->IPCset->crossCorrel = ui.checkBox_7->isChecked();
-  globals->IPCset->logar = ui.checkBox_8->isChecked();
 
   globals->IPC->SetSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
   globals->IPC->SetL2size(ui.lineEdit_2->text().toInt());
