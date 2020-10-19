@@ -18,7 +18,11 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // plot in optimization
+  if (1) // plot from csv file
+  {
+    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens.png");
+  }
+  if (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     int N = 2;
@@ -31,10 +35,6 @@ void Debug(Globals *globals)
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
     auto [result, shit] = Evo.Optimize(f);
-  }
-  if (0) // plot from csv file
-  {
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens.png");
   }
   if (0) // plot pen colors
   {
