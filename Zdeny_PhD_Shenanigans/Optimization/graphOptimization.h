@@ -53,7 +53,7 @@ struct Graph
           unsigned currentEdgeIndex = getTupleIndexWithIndex(nodes, edge);
           if ((currentNodeCost + edgeMatrix[currentNodeIndex][edge]) < std::get<1>(nodes[currentEdgeIndex])) // if a better path is found, save it
           {
-            if (0)
+            if constexpr (0)
               cout << "New path to " << edge << " via " << currentNodeIndex << " found! - previous cost: " << std::get<1>(nodes[currentEdgeIndex]) << ", new cost: " << currentNodeCost + edgeMatrix[currentNodeIndex][edge] << endl;
             nodes[currentEdgeIndex] = std::make_tuple(edge, currentNodeCost + edgeMatrix[currentNodeIndex][edge], currentNodeIndex);
           }

@@ -153,7 +153,7 @@ inline Point2f ipccore(Mat &&sourceimg1, Mat &&sourceimg2, const IPCsettings &se
   if (set.applyBandpass)
     CrossPower = bandpass(CrossPower, set.bandpass);
 
-  if (0) // CORRECT - complex magnitude - input can be real or complex whatever
+  if constexpr (0) // CORRECT - complex magnitude - input can be real or complex whatever
   {
     Mat L3complex;
     dft(CrossPower, L3complex, DFT_INVERSE + DFT_SCALE);

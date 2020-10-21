@@ -208,7 +208,7 @@ public:
 					bPrime += bPrime_;
 
 					Mat kost = cost(a.back(), trainingOutputs_[indexData], costFunction);
-					if (0)//debug
+					if constexpr (0)//debug
 					{
 						cout << endl;
 						cout << "<training epoch " << indexEpoch << "><data " << indexData << "> z" << indexData << " = " << z.back() << endl;
@@ -220,7 +220,7 @@ public:
 				}
 			}
 
-			if (0)//debug
+			if constexpr (0)//debug
 			{
 				for (int L = 0; L < layerCount; L++)
 				{
