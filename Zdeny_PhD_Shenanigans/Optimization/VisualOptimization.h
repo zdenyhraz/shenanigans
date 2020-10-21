@@ -129,7 +129,7 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
   // showEntity(minlocArg, f(minlocArg), "Result - BRUTE", true);
   cout << "done." << endl;
 
-  if (1)
+  if constexpr (1)
   {
     if (logLandscapeOpt)
       optimizedFuncLandscapeCLR = optimizedFuncLandscapeCLRlog;

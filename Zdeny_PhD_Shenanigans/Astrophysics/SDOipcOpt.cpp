@@ -38,7 +38,7 @@ double absoluteSubpixelRegistrationError(IPCsettings &set, const Mat &src, doubl
       }
       auto shift = phasecorrel(crop1, crop2, set);
       returnVal += abs(shift.x - shiftX);
-      if (0) // DEBUG
+      if constexpr (0) // DEBUG
       {
         showimg(crop1, "crop1");
         showimg(crop1, "crop2");
@@ -88,7 +88,7 @@ void optimizeIPCParameters(const IPCsettings &settingsMaster, std::string pathIn
 void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, double maxShift, double accuracy, unsigned runs)
 {
   std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
-  if (1) // OPT 4par
+  if constexpr (1) // OPT 4par
   {
     listing << "Running IPC parameter optimization (" << currentDateTime() << "), image size " << settingsMaster.getcols() << endl;
     listing << "wavelength,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << endl;
@@ -98,7 +98,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, d
       cout << "OPT .png load path: " << path << endl;
       Mat pic = imread(path, IMREAD_ANYDEPTH);
       showimg(pic, "objfun current source");
-      if (1) // optimize
+      if constexpr (1) // optimize
       {
         auto f = [&](const std::vector<double> &args) { return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy); };
         for (int iterOpt = 0; iterOpt < runs; iterOpt++)

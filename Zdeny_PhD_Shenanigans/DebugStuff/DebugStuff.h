@@ -18,12 +18,12 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // plot from csv file
+  if constexpr (1) // plot from csv file
   {
     PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
     PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
-  if (0) // plot in optimization
+  if constexpr (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     int N = 2;
@@ -37,7 +37,7 @@ void Debug(Globals *globals)
     Evo.SetPlotOutput(true);
     auto [result, shit] = Evo.Optimize(f);
   }
-  if (0) // plot pen colors
+  if constexpr (0) // plot pen colors
   {
     int ncurves = 30;
     int ndata = 100;
@@ -54,14 +54,14 @@ void Debug(Globals *globals)
 
     Plot1D::plot(x, ys, "pen colors");
   }
-  if (0) // ipc bandpass & window
+  if constexpr (0) // ipc bandpass & window
   {
     IPCsettings set = *globals->IPCset;
     set.setSize(1000, 1000);
     set.setBandpassParameters(5, 1);
     Plot2D::plot(set.bandpass, "x", "y", "z", 0, 1, 0, 1);
   }
-  if (0) // 2pic IPC
+  if constexpr (0) // 2pic IPC
   {
     std::string path1 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
     std::string path2 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
@@ -79,7 +79,7 @@ void Debug(Globals *globals)
 
     auto shifts = phasecorrel(img1, img2, set);
   }
-  if (0) // Plot1D + Plot2D test
+  if constexpr (0) // Plot1D + Plot2D test
   {
     // 1D
     int N = 1000;
@@ -114,7 +114,7 @@ void Debug(Globals *globals)
     Plot1D::plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
     Plot2D::plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
   }
-  if (0) // swind crop
+  if constexpr (0) // swind crop
   {
     std::string path = "D:\\MainOutput\\S-wind\\";
     int sizeX = 300;
@@ -127,7 +127,7 @@ void Debug(Globals *globals)
       saveimg(path + "cropped5//crop" + to_string(i) + ".PNG", pic);
     }
   }
-  if (0) // 2d poylfit
+  if constexpr (0) // 2d poylfit
   {
     int size = 100;
     int size2 = 1000;
@@ -169,7 +169,7 @@ void Debug(Globals *globals)
     showimg(orig, "original", true);
     showimg(pointiky, "trials");
   }
-  if (0) // blaze test
+  if constexpr (0) // blaze test
   {
     blaze::DynamicVector<double> a(3);                   // column vec - default
     blaze::DynamicVector<double, blaze::rowVector> b(3); // row vec
@@ -194,7 +194,7 @@ void Debug(Globals *globals)
     LOG_DEBUG("C = \n{}", C);
     LOG_DEBUG("A + C = \n{}", A + C);
   }
-  if (0) // new ipc test
+  if constexpr (0) // new ipc test
   {
     Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
@@ -238,7 +238,7 @@ void Debug(Globals *globals)
     LOG_INFO("shift2 = {}", shift2);
     LOG_INFO("shift2n = {}", shift2n);
   }
-  if (0) // ipc sign test
+  if constexpr (0) // ipc sign test
   {
     Mat img1 = loadImage("Resources\\test1.png");
     Mat img2 = loadImage("Resources\\test2.png");
@@ -249,7 +249,7 @@ void Debug(Globals *globals)
 
     LOG_INFO("shift = {}", shift);
   }
-  if (0) // loadfits test
+  if constexpr (0) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     LOG_NEWLINE;
@@ -261,13 +261,13 @@ void Debug(Globals *globals)
     LOG_NEWLINE;
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_02_02__13_16_08__CONT.fits");
   }
-  if (0) // loadfits test 2
+  if constexpr (0) // loadfits test 2
   {
     LOG_NEWLINE;
     auto pic = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
     showimg(pic, "pic");
   }
-  if (0) // 1D / 2D sorted xs interp test
+  if constexpr (0) // 1D / 2D sorted xs interp test
   {
     std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<double> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
@@ -300,7 +300,7 @@ void Debug(Globals *globals)
     LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
     LOG_INFO("Diffrot interp 2D d) {}", DiffrotResults::Interpolate(xss, yss, 1.75));
   }
-  if (0) // try/catch performance test
+  if constexpr (0) // try/catch performance test
   {
     int N = 1e7;
     int iters = 10;
@@ -330,7 +330,7 @@ void Debug(Globals *globals)
       }
     }
   }
-  if (0)
+  if constexpr (0)
   {
   }
 }

@@ -13,7 +13,7 @@ WindowIPCoptimize::WindowIPCoptimize(QWidget *parent, Globals *globals) : QMainW
 
 void WindowIPCoptimize::optimize()
 {
-  if (0) // dbg
+  if constexpr (0) // dbg
   {
     Evolution Evo(2);
     Evo.mNP = 32;

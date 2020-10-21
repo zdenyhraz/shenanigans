@@ -136,7 +136,7 @@ private:
       params.succload = true;
       params.fitsMidX = 4096 - params.fitsMidX; // idk but works
 
-      if (0) // debug values
+      if constexpr (0) // debug values
       {
         auto [mmin, mmax] = minMaxMat(mat);
         LOG_FATAL("min/max mat {}/{}", mmin, mmax);
@@ -146,7 +146,7 @@ private:
         showimg(xd, "xd");
       }
 
-      if (0) // debug circles
+      if constexpr (0) // debug circles
       {
         Mat img = mat.clone();
         Mat imgc;
@@ -209,7 +209,7 @@ private:
           LOG_INFO("Canny enclosing center / radius: {} / {}", center, radius);
         }
 
-        if (0) // show
+        if constexpr (0) // show
         {
           showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + to_string(rand()));
           showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + to_string(rand()));
@@ -219,7 +219,7 @@ private:
         }
       }
 
-      if (0) // fits midX / midY / R correction by canny + find contours + enclosing circle
+      if constexpr (0) // fits midX / midY / R correction by canny + find contours + enclosing circle
       {
         // 8-bit input
         Mat img = mat.clone();
