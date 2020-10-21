@@ -20,7 +20,8 @@ void Debug(Globals *globals)
 
   if (1) // plot from csv file
   {
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens.png");
+    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
+    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
   if (0) // plot in optimization
   {
