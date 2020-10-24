@@ -166,7 +166,8 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
       normalize(image1, image1, 0, 1, CV_MINMAX);
       normalize(image2, image2, 0, 1, CV_MINMAX);
 
-      if (noiseStdev > 0) // add noise
+      // add noise
+      if (noiseStdev > 0)
       {
         Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
         Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
@@ -212,9 +213,9 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   evo.mUB = {5, 500, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
 
+  // set the currently used parameters to the best parameters
   if (bestParams.size() == N)
   {
-    // set the currently used parameters to the best parameters
     SetBandpassParameters(bestParams[0], bestParams[1]);
     SetL2size(bestParams[2]);
     SetUpsampleCoeff(bestParams[3]);
