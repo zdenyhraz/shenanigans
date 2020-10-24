@@ -148,7 +148,6 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   imagePairs.reserve(images.size() * itersPerImage);
   for (const auto &image : images)
   {
-
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     for (int i = 0; i < itersPerImage; ++i)
     {
