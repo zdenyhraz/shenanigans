@@ -84,6 +84,7 @@ private:
   };
 
   bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
+  bool CheckBounds();
   int GetNumberOfParents();
   bool InitializeOutputs();
   void UninitializeOutputs(const Population &population, TerminationReason reason);
@@ -93,8 +94,7 @@ private:
 
   bool mFileOutput = false;
   bool mPlotOutput = true;
-  double mINPm = 5.4;
-  double mAbsoluteDifferenceThreshold = 1e-8;
+  double mAbsoluteDifferenceThreshold = 1e-10;
   double mRelativeDifferenceThreshold = 0.7;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 5;
   std::string mOptimizationName = "noname";

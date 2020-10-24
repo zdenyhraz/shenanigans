@@ -2,7 +2,7 @@
 #include "Evolution.h"
 #include "Plot/Plot1D.h"
 
-Evolution::Evolution(int N, const std::string &optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(N * mINPm){};
+Evolution::Evolution(int N, const std::string &optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(5.4 * N){};
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction f)
 {
@@ -12,6 +12,9 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
     return {};
 
   if (!CheckObjectiveFunctionNormality(f))
+    return {};
+
+  if (!CheckBounds())
     return {};
 
   if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
@@ -132,20 +135,48 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
   }
 }
 
+bool Evolution::CheckBounds()
+{
+  LOG_INFO("Checking objective function parameter bounds validity...");
+
+  if (mLB.size() != mUB.size())
+  {
+    LOG_ERROR("Parameter bound sizes do not match");
+    return false;
+  }
+
+  if (mLB.size() != N)
+  {
+    LOG_ERROR("Invalid lower parameter bound size: {} != {}", mLB.size(), N);
+    return false;
+  }
+
+  if (mUB.size() != N)
+  {
+    LOG_ERROR("Invalid upper parameter bound size: {} != {}", mUB.size(), N);
+    return false;
+  }
+
+  LOG_SUCC("Objective function parameter bounds are valid");
+  return true;
+}
+
 void Evolution::UpdateOutputs(int gen, const Population &population)
 {
   if (population.bestEntity.fitness < population.previousFitness)
   {
+    auto message = GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness);
+
     if (mFileOutput)
-      mOutputFile << GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
+      mOutputFile << message << std::endl;
 
-    if (mPlotOutput)
-    {
-      Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
-      Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
-    }
+    LOG_DEBUG("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
+  }
 
-    LOG_SUCC("Gen {}: {} ({:.2e}), reldif: {:.2f}, absdif: {:.2e}", gen, population.bestEntity.params, population.bestEntity.fitness, population.relativeDifference, population.absoluteDifference);
+  if (mPlotOutput)
+  {
+    Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)"}, {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
+    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation", "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"}, {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
   }
 }
 
@@ -160,7 +191,7 @@ void Evolution::UninitializeOutputs(const Population &population, TerminationRea
     }
 
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_INFO("Evolution result: {} ({})", population.bestEntity.params, population.bestEntity.fitness);
+    LOG_INFO("Evolution result: {} ({:.2e})", population.bestEntity.params, population.bestEntity.fitness);
     LOG_INFO("Evolution optimization ended");
   }
   catch (const std::exception &e)

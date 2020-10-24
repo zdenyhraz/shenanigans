@@ -10,16 +10,15 @@
 class IterativePhaseCorrelation
 {
 public:
-  IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH);
+  IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1, double bandpassH = 200);
   void SetSize(int rows, int cols = -1);
   void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
-  void SetUpsampleCoeff(int UpsampleCoeff) { mUpsampleCoeff = UpsampleCoeff; }
+  void SetUpsampleCoeff(int UpsampleCoeff) { mUpsampleCoeff = UpsampleCoeff % 2 ? UpsampleCoeff : UpsampleCoeff + 1; }
   void SetDivisionEpsilon(double DivisionEpsilon) { mDivisionEpsilon = DivisionEpsilon; }
   void SetMaxIterations(int MaxIterations) { mMaxIterations = MaxIterations; }
   void SetInterpolationType(InterpolationFlags InterpolationType) { mInterpolationType = InterpolationType; }
-  void SetInterpolationType() {}
   void SetApplyWindow(bool ApplyWindow) { mApplyWindow = ApplyWindow; }
   void SetApplyBandpass(bool ApplyBandpass) { mApplyBandpass = ApplyBandpass; }
   void SetSubpixelEstimation(bool SubpixelEstimation) { mSubpixelEstimation = SubpixelEstimation; }
@@ -38,8 +37,9 @@ public:
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
-  cv::Point2f Calculate(const Mat &image1, const Mat &image2) const;
-  cv::Point2f Calculate(Mat &&image1, Mat &&image2) const;
+  Point2f Calculate(const Mat &image1, const Mat &image2) const; // does not mangle the source images
+  Point2f Calculate(Mat &&image1, Mat &&image2) const;           // mangles the source images
+  void Optimize(const std::vector<Mat> &images, float maxShiftRatio = 0.25, int itersPerImage = 5);
 
 private:
   int mRows = 0;
