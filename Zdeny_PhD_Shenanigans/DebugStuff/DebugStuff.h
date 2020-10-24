@@ -22,10 +22,8 @@ void Debug(Globals *globals)
   {
     std::vector<Mat> images;
     images.push_back(loadImage("Resources/test.png"));
-    images.push_back(loadImage("Resources/test.png"));
-    images.push_back(loadImage("Resources/test.png"));
-    IterativePhaseCorrelation ipc(100, 100);
-    ipc.Optimize(images, 0.01, 11);
+    IterativePhaseCorrelation ipc(256, 256);
+    ipc.Optimize(images, 0.3, 0.01, 11);
   }
   if constexpr (0) // plot from csv file
   {

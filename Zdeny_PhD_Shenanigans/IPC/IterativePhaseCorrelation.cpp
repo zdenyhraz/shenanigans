@@ -103,7 +103,7 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
   return result;
 }
 
-void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float maxShiftRatio, int itersPerImage)
+void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float maxShiftRatio, float noiseStdev, int itersPerImage)
 {
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", images.size());
 
@@ -125,6 +125,12 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
     return;
   }
 
+  if (noiseStdev < 0)
+  {
+    LOG_ERROR("Could not optimize IPC parameters - noise stdev cannot be negative ({})", noiseStdev);
+    return;
+  }
+
   for (const auto &image : images)
   {
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
@@ -142,16 +148,35 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   imagePairs.reserve(images.size() * itersPerImage);
   for (const auto &image : images)
   {
-    Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
-    Mat image2;
+
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     for (int i = 0; i < itersPerImage; ++i)
     {
+      // create the shifted image pair
+      Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
+      Mat image2;
       float r = (float)i / (itersPerImage - 1);
       Point2f shift = r * maxShift;
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image, image2, T, image.size());
       image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
+
+      // convert both pictures to unit float
+      image1.convertTo(image1, CV_32F);
+      image2.convertTo(image2, CV_32F);
+      normalize(image1, image1, 0, 1, CV_MINMAX);
+      normalize(image2, image2, 0, 1, CV_MINMAX);
+
+      if (noiseStdev > 0) // add noise
+      {
+        Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
+        Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
+        randn(noise1, 0, noiseStdev);
+        randn(noise2, 0, noiseStdev);
+        image1 += noise1;
+        image2 += noise2;
+      }
+
       imagePairs.push_back({image1, image2, shift});
     }
   }
@@ -179,7 +204,8 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   };
 
   // get the best parameters via differential evolution
-  Evolution evo(8);
+  int N = 8;
+  Evolution evo(N);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BANDPASS", "L1RATIO"});
@@ -187,13 +213,21 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   evo.mUB = {5, 500, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
 
-  // set the currently used parameters to the best parameters
-  SetBandpassParameters(bestParams[0], bestParams[1]);
-  SetL2size(bestParams[2]);
-  SetUpsampleCoeff(bestParams[3]);
-  SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
-  SetApplyWindow(bestParams[5] > 0 ? true : false);
-  SetApplyBandpass(bestParams[6] > 0 ? true : false);
+  if (bestParams.size() == N)
+  {
+    // set the currently used parameters to the best parameters
+    SetBandpassParameters(bestParams[0], bestParams[1]);
+    SetL2size(bestParams[2]);
+    SetUpsampleCoeff(bestParams[3]);
+    SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
+    SetApplyWindow(bestParams[5] > 0 ? true : false);
+    SetApplyBandpass(bestParams[6] > 0 ? true : false);
+    LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
+  }
+  else
+  {
+    LOG_ERROR("Iterative Phase Correlation parameter optimization failed");
+  }
 }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
