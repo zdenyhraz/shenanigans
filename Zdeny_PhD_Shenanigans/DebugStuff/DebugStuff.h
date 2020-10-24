@@ -44,7 +44,7 @@ void Debug(Globals *globals)
     Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
-    auto [result, shit] = Evo.Optimize(f);
+    auto result = Evo.Optimize(f);
   }
   if constexpr (0) // plot pen colors
   {

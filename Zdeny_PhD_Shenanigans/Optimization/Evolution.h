@@ -96,7 +96,7 @@ private:
   bool mPlotOutput = true;
   double mAbsoluteDifferenceThreshold = 1e-10;
   double mRelativeDifferenceThreshold = 0.7;
-  int mRelativeDifferenceGenerationsOverThresholdThreshold = 5;
+  int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
   std::string mOptimizationName = "noname";
   std::string mOutputFileDir;
   std::ofstream mOutputFile;

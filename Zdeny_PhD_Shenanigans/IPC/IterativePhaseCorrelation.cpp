@@ -166,6 +166,7 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
     ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
     ipc.SetApplyWindow(params[5] > 0 ? true : false);
     ipc.SetApplyBandpass(params[6] > 0 ? true : false);
+    ipc.SetL1ratio(params[7]);
 
     // calculate average registration error
     double avgerror = 0;
@@ -178,13 +179,13 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   };
 
   // get the best parameters via differential evolution
-  Evolution evo(7);
+  Evolution evo(8);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BANDPASS"});
-  evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1};
-  evo.mUB = {5, 500, 21, 51, +1, +1, +1};
-  const auto [bestParams, reason] = evo.Optimize(f);
+  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BANDPASS", "L1RATIO"});
+  evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1, 0.1};
+  evo.mUB = {5, 500, 21, 51, +1, +1, +1, 0.9};
+  const auto bestParams = evo.Optimize(f);
 
   // set the currently used parameters to the best parameters
   SetBandpassParameters(bestParams[0], bestParams[1]);

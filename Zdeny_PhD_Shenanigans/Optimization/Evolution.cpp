@@ -54,7 +54,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   }
 
   UninitializeOutputs(population, treason);
-  return {population.bestEntity.params, treason};
+  return population.bestEntity.params;
 }
 
 void Evolution::SetFileOutputDir(const std::string &dir)
