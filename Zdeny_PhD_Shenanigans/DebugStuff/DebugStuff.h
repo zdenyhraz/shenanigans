@@ -18,12 +18,12 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if constexpr (1) // plot from csv file
+  if constexpr (0) // plot from csv file
   {
     PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
     PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
-  if constexpr (0) // plot in optimization
+  if constexpr (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     int N = 2;
