@@ -187,11 +187,12 @@ void Evolution::UninitializeOutputs(const Population &population, TerminationRea
     if (mFileOutput)
     {
       mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
+      mOutputFile << "Evolution result: " << GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
       mOutputFile.close();
     }
 
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_INFO("Evolution result: {} ({:.2e})", population.bestEntity.params, population.bestEntity.fitness);
+    LOG_INFO("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
     LOG_INFO("Evolution optimization ended");
   }
   catch (const std::exception &e)
@@ -223,8 +224,16 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
 std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &bestEntity, double bestFitness)
 {
   std::string value;
-  value += "Gen " + to_string(gen);
-  value += ": [";
+  if (gen >= 0)
+  {
+    value += "Gen " + to_string(gen);
+    value += ": [";
+  }
+  else
+  {
+    value += "[";
+  }
+
   for (int i = 0; i < bestEntity.size(); ++i)
   {
     if (mParameterNames.size() > i)
