@@ -208,7 +208,7 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
   Evolution evo(N);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BANDPASS", "L1RATIO"});
+  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BP", "L1RATIO"});
   evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1, 0.1};
   evo.mUB = {5, 500, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
