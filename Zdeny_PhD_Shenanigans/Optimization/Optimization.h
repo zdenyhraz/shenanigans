@@ -19,7 +19,7 @@ public:
 
   using ObjectiveFunction = const std::function<double(const std::vector<double> &)> &;
   using Optimum = std::vector<double>;
-  using OptimizationResult = std::tuple<Optimum, TerminationReason>;
+  using OptimizationResult = Optimum;
 
   OptimizationAlgorithm(int N);
   virtual ~OptimizationAlgorithm();
