@@ -27,7 +27,7 @@ public:
 
   int mNP = 4;
   double mF = 0.65;
-  double mCR = 0.95;
+  double mCR = 0.90;
   MutationStrategy mMutStrat = RAND1;
   CrossoverStrategy mCrossStrat = BIN;
 

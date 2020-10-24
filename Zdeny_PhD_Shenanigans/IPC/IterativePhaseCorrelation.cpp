@@ -107,7 +107,6 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
 {
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", images.size());
 
-  // perform basic argument sanity checks
   if (images.empty())
   {
     LOG_ERROR("Could not optimize IPC parameters - invalid input image vector (empty)");
@@ -128,7 +127,7 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
 
   for (const auto &image : images)
   {
-    const Point2f maxShift{maxShiftRatio * image.cols, maxShiftRatio * image.rows};
+    const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
     {
       LOG_ERROR("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols, mRows + maxShift.y, mCols + maxShift.x);
@@ -167,7 +166,6 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
     ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
     ipc.SetApplyWindow(params[5] > 0 ? true : false);
     ipc.SetApplyBandpass(params[6] > 0 ? true : false);
-    // ipc.SetL1ratio(params[7]);
 
     // calculate average registration error
     double avgerror = 0;
@@ -179,15 +177,16 @@ void IterativePhaseCorrelation::Optimize(const std::vector<Mat> &images, float m
     return avgerror / imagePairs.size();
   };
 
-  // get the best parameters
+  // get the best parameters via differential evolution
   Evolution evo(7);
   evo.mNP = 50;
+  evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BANDPASS"});
   evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1};
   evo.mUB = {5, 500, 21, 51, +1, +1, +1};
   const auto [bestParams, reason] = evo.Optimize(f);
 
-  // set the member parameters to the best parameters
+  // set the currently used parameters to the best parameters
   SetBandpassParameters(bestParams[0], bestParams[1]);
   SetL2size(bestParams[2]);
   SetUpsampleCoeff(bestParams[3]);

@@ -25,7 +25,7 @@ void Debug(Globals *globals)
     images.push_back(loadImage("Resources/test.png"));
     images.push_back(loadImage("Resources/test.png"));
     IterativePhaseCorrelation ipc(100, 100);
-    ipc.Optimize(images);
+    ipc.Optimize(images, 0.01, 11);
   }
   if constexpr (0) // plot from csv file
   {
