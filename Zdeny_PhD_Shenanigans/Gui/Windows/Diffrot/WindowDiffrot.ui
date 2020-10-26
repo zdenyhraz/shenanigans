@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>365</width>
-    <height>411</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>6</y>
+      <y>28</y>
       <width>351</width>
       <height>76</height>
      </rect>
@@ -234,7 +234,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>112</y>
       <width>351</width>
       <height>74</height>
      </rect>
@@ -302,7 +302,7 @@
     <property name="geometry">
      <rect>
       <x>13</x>
-      <y>177</y>
+      <y>199</y>
       <width>131</width>
       <height>187</height>
      </rect>
@@ -391,11 +391,11 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>155</x>
-      <y>176</y>
+      <y>198</y>
       <width>201</width>
       <height>129</height>
      </rect>
@@ -567,6 +567,26 @@
       </layout>
      </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>149</x>
+      <y>1</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>DIFFROT</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

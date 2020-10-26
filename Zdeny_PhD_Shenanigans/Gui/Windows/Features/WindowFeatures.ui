@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>317</width>
-    <height>275</height>
+    <height>290</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>168</x>
-      <y>78</y>
+      <y>93</y>
       <width>141</width>
       <height>22</height>
      </rect>
@@ -73,7 +73,7 @@
     <property name="geometry">
      <rect>
       <x>118</x>
-      <y>80</y>
+      <y>95</y>
       <width>51</width>
       <height>16</height>
      </rect>
@@ -86,7 +86,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>11</y>
+      <y>26</y>
       <width>301</width>
       <height>55</height>
      </rect>
@@ -140,7 +140,7 @@
     <property name="geometry">
      <rect>
       <x>189</x>
-      <y>110</y>
+      <y>125</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -159,7 +159,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>74</y>
+      <y>89</y>
       <width>101</width>
       <height>150</height>
      </rect>
@@ -278,6 +278,26 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>116</x>
+      <y>1</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>FEATURES</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
