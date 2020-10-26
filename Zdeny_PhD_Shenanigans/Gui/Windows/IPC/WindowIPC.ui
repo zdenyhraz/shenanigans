@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WindowIPCparameters</class>
- <widget class="QMainWindow" name="WindowIPCparameters">
+ <class>WindowIPC</class>
+ <widget class="QMainWindow" name="WindowIPC">
   <property name="geometry">
    <rect>
     <x>0</x>

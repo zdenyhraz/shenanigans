@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "WindowIPCparameters.h"
+#include "WindowIPC.h"
 
-WindowIPCparameters::WindowIPCparameters(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
+WindowIPC::WindowIPC(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
 {
   ui.setupUi(this);
   refreshIPCparameters(true);
@@ -9,7 +9,7 @@ WindowIPCparameters::WindowIPCparameters(QWidget *parent, Globals *globals) : QM
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(refreshIPCparameters()));
 }
 
-void WindowIPCparameters::refreshIPCparameters(bool init)
+void WindowIPC::refreshIPCparameters(bool init)
 {
   globals->IPCset->setSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
   globals->IPCset->L2size = ui.lineEdit_2->text().toInt();
@@ -39,7 +39,7 @@ void WindowIPCparameters::refreshIPCparameters(bool init)
     LOG_DEBUG("IPC parameter values updated");
 }
 
-void WindowIPCparameters::refreshIPCparametersAndExit()
+void WindowIPC::refreshIPCparametersAndExit()
 {
   refreshIPCparameters();
   hide();
