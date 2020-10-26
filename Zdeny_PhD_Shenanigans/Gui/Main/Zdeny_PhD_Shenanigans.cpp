@@ -33,18 +33,16 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   LOG_SUCC("Welcome back, my friend.");
 
   // make signal to slot connections
-  connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
-  connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
+  connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
-  connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPC()));
-  connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
+  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(showWindowIPC()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
-  connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
-  connect(ui.actionPlay, SIGNAL(triggered()), this, SLOT(playSnake()));
-  connect(ui.actionGenerate_land, SIGNAL(triggered()), this, SLOT(generateLand()));
+  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
+  connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(playSnake()));
+  connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(generateLand()));
   connect(ui.actionFits_downloader, SIGNAL(triggered()), this, SLOT(fitsDownloader()));
   connect(ui.actionFits_checker, SIGNAL(triggered()), this, SLOT(fitsDownloadChecker()));
-  connect(ui.actionFeature_match, SIGNAL(triggered()), this, SLOT(featureMatch()));
+  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(featureMatch()));
 }
 
 void Zdeny_PhD_Shenanigans::exit() { QApplication::exit(); }
