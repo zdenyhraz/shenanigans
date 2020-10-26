@@ -3,6 +3,7 @@
 #include "Gui/Windows/IPC/WindowIPC.h"
 #include "Gui/Windows/Diffrot/WindowDiffrot.h"
 #include "Gui/Windows/Features/WindowFeatures.h"
+#include "Gui/Windows/FITS/WindowFITS.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {
@@ -18,18 +19,18 @@ private:
   std::unique_ptr<WindowIPC> windowIPC;
   std::unique_ptr<WindowDiffrot> windowDiffrot;
   std::unique_ptr<WindowFeatures> windowFeatures;
+  std::unique_ptr<WindowFITS> windowFITS;
 
 private slots:
   void exit();
   void about();
-  void showWindowIPC();
+  void ShowWindowIPC();
   void CloseAll();
   void debug();
-  void showWindowDiffrot();
+  void ShowWindowDiffrot();
   void playSnake();
   void generateLand();
-  void fitsDownloader();
-  void fitsDownloadChecker();
   void closeEvent(QCloseEvent *event);
-  void featureMatch();
+  void ShowWindowFeatures();
+  void ShowWindowFITS();
 };
