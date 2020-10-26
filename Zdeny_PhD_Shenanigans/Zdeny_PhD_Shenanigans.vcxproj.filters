@@ -109,9 +109,6 @@
     <ClCompile Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="Gui\Windows\IPCparameters\WindowIPCparameters.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
@@ -308,9 +305,6 @@
     <QtMoc Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.h">
-      <Filter>WindowHeaders</Filter>
-    </QtMoc>
     <QtMoc Include="Gui\Windows\IPCparameters\WindowIPCparameters.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
@@ -332,9 +326,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\IPCparameters\WindowIPCparameters.ui">
