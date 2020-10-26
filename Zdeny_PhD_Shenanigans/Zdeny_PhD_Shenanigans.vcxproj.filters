@@ -106,9 +106,6 @@
     <ClCompile Include="Gui\Windows\Diffrot\WindowDiffrot.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.cpp">
-      <Filter>WindowCpps</Filter>
-    </ClCompile>
     <ClCompile Include="Gui\Windows\Plot\WindowPlot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -302,9 +299,6 @@
     <QtMoc Include="Gui\Windows\Diffrot\WindowDiffrot.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
-    <QtMoc Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.h">
-      <Filter>WindowHeaders</Filter>
-    </QtMoc>
     <QtMoc Include="Gui\Windows\Plot\WindowPlot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -323,9 +317,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\Diffrot\WindowDiffrot.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\Plot\WindowPlot.ui">

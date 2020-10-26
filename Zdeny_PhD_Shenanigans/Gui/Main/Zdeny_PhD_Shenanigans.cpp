@@ -17,7 +17,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
 
   // create windows
   windowIPC = std::make_unique<WindowIPC>(this, globals.get());
-  windowIPC2PicAlign = std::make_unique<WindowIPC2PicAlign>(this, globals.get());
   windowDiffrot = std::make_unique<WindowDiffrot>(this, globals.get());
   windowFeatures = std::make_unique<WindowFeatures>(this, globals.get());
 
@@ -38,7 +37,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
   connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPC()));
-  connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
   connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
   connect(ui.actiondiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
@@ -69,8 +67,6 @@ void Zdeny_PhD_Shenanigans::CloseAll()
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPC() { windowIPC->show(); }
-
-void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign() { windowIPC2PicAlign->show(); }
 
 void Zdeny_PhD_Shenanigans::showWindowDiffrot() { windowDiffrot->show(); }
 

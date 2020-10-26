@@ -1,7 +1,6 @@
 #pragma once
 #include "ui_Zdeny_PhD_Shenanigans.h"
 #include "Gui/Windows/IPC/WindowIPC.h"
-#include "Gui/Windows/IPC2PicAlign/WindowIPC2PicAlign.h"
 #include "Gui/Windows/Diffrot/WindowDiffrot.h"
 #include "Gui/Windows/Features/WindowFeatures.h"
 
@@ -16,9 +15,7 @@ private:
   Ui::Zdeny_PhD_ShenanigansClass ui;
   std::unique_ptr<Globals> globals;
 
-  // windows
   std::unique_ptr<WindowIPC> windowIPC;
-  std::unique_ptr<WindowIPC2PicAlign> windowIPC2PicAlign;
   std::unique_ptr<WindowDiffrot> windowDiffrot;
   std::unique_ptr<WindowFeatures> windowFeatures;
 
@@ -26,7 +23,6 @@ private slots:
   void exit();
   void about();
   void showWindowIPC();
-  void showWindowIPC2PicAlign();
   void CloseAll();
   void debug();
   void showWindowDiffrot();
