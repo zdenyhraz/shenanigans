@@ -151,8 +151,8 @@
     <addaction name="actionFITS_downloader"/>
     <addaction name="actionFITS_checker"/>
     <addaction name="actionFeatures"/>
-    <addaction name="actionSnake"/>
     <addaction name="actionProcedural"/>
+    <addaction name="actionSnake"/>
    </widget>
    <addaction name="menuProjects"/>
    <addaction name="menuAbout"/>
@@ -315,7 +315,7 @@
   </action>
   <action name="actionProcedural">
    <property name="text">
-    <string>Procedural</string>
+    <string>Procedural gen</string>
    </property>
   </action>
  </widget>
