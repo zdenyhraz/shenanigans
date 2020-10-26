@@ -155,7 +155,6 @@
      <string>IPC</string>
     </property>
     <addaction name="actionIPC_parameters"/>
-    <addaction name="actionIPC_2pic_align"/>
    </widget>
    <widget class="QMenu" name="menuAstrophysics">
     <property name="title">

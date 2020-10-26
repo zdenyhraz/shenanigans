@@ -17,4 +17,10 @@ private slots:
   void RefreshIPCparameters(bool init = false);
   void RefreshIPCparametersAndExit();
   void Optimize();
+  void align();
+  void alignXY();
+  void flowMap();
+  void features();
+  void linearFlow();
+  void constantFlow();
 };
