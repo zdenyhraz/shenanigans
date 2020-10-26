@@ -113,28 +113,7 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
 void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory,
     float maxShiftRatio, float noiseStdev, int itersPerImage)
 {
-  LOG_INFO("Loading training images from {}...", trainingImagesDirectory);
-  std::vector<Mat> images;
-  for (const auto &entry : std::filesystem::directory_iterator(trainingImagesDirectory))
-  {
-    std::string path = entry.path().string();
-
-    if (!IsImage(path))
-      continue;
-
-    images.push_back(loadImage(path));
-  }
-
-  LOG_INFO("Loading validation images from {}...", validationImagesDirectory);
-
-  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", images.size());
-
-  if (images.empty())
-  {
-    LOG_ERROR("Could not optimize IPC parameters - invalid input image vector (empty)");
-    return;
-  }
-
+  // arguments sanity checks
   if (itersPerImage < 1)
   {
     LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerImage);
@@ -153,7 +132,58 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     return;
   }
 
-  for (const auto &image : images)
+  // load training images
+  LOG_INFO("Loading training images from {}...", trainingImagesDirectory);
+  std::vector<Mat> trainingImages;
+  if (std::filesystem::is_directory(trainingImagesDirectory))
+  {
+    for (const auto &entry : std::filesystem::directory_iterator(trainingImagesDirectory))
+    {
+      std::string path = entry.path().string();
+
+      if (!IsImage(path))
+        continue;
+
+      trainingImages.push_back(loadImage(path));
+      LOG_DEBUG("Loaded training image {}", path);
+    }
+  }
+  else
+  {
+    LOG_ERROR("Could not optimize IPC parameters - trainign directory {} is not a valid directory", trainingImagesDirectory);
+    return;
+  }
+
+  // load validation images
+  LOG_INFO("Loading validation images from {}...", validationImagesDirectory);
+  std::vector<Mat> validationImages;
+  if (std::filesystem::is_directory(validationImagesDirectory))
+  {
+    for (const auto &entry : std::filesystem::directory_iterator(validationImagesDirectory))
+    {
+      std::string path = entry.path().string();
+
+      if (!IsImage(path))
+        continue;
+
+      validationImages.push_back(loadImage(path));
+      LOG_DEBUG("Loaded validation image {}", path);
+    }
+  }
+  else
+  {
+    LOG_ERROR("Optimizing IPC parameters without validation set - {} is not a valid directory", validationImagesDirectory);
+  }
+
+  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", trainingImages.size());
+
+  if (trainingImages.empty())
+  {
+    LOG_ERROR("Could not optimize IPC parameters - empty input image vector");
+    return;
+  }
+
+  for (const auto &image : trainingImages)
   {
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
@@ -168,8 +198,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   // shift each image n times up to max shift ratio
   // both images are roicropped in the middle but 2nd image is shifted beforehands
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
-  imagePairs.reserve(images.size() * itersPerImage);
-  for (const auto &image : images)
+  imagePairs.reserve(trainingImages.size() * itersPerImage);
+  for (const auto &image : trainingImages)
   {
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     for (int i = 0; i < itersPerImage; ++i)

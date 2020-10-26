@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>734</width>
-    <height>495</height>
+    <width>587</width>
+    <height>298</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -424,7 +424,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_10">
        <property name="text">
-        <string>&quot;xd&quot;</string>
+        <string>Resources</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -441,7 +441,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_11">
        <property name="text">
-        <string>&quot;xd&quot;</string>
+        <string>none</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -456,7 +456,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>734</width>
+     <width>587</width>
      <height>18</height>
     </rect>
    </property>
