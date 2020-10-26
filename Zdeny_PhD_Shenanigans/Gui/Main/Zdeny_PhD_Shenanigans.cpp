@@ -37,7 +37,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(exit()));
   connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
-  connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
+  connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPC()));
   connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
   connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
@@ -68,7 +68,7 @@ void Zdeny_PhD_Shenanigans::CloseAll()
   LOG_INFO("All image & plot windows closed");
 }
 
-void Zdeny_PhD_Shenanigans::showWindowIPCparameters() { windowIPC->show(); }
+void Zdeny_PhD_Shenanigans::showWindowIPC() { windowIPC->show(); }
 
 void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign() { windowIPC2PicAlign->show(); }
 

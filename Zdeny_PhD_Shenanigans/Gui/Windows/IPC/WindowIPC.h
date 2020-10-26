@@ -14,6 +14,7 @@ private:
   Globals *globals;
 
 private slots:
-  void refreshIPCparameters(bool init = false);
-  void refreshIPCparametersAndExit();
+  void RefreshIPCparameters(bool init = false);
+  void RefreshIPCparametersAndExit();
+  void Optimize();
 };
