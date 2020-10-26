@@ -1,11 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "Core/functionsBaseSTL.h"
-#include "Core/functionsBaseCV.h"
-#include "Fourier/fourier.h"
-#include "Astrophysics/FITS.h"
-#include "Filtering/filtering.h"
-#include "Log/logger.h"
 
 class IterativePhaseCorrelation
 {
@@ -39,7 +33,8 @@ public:
 
   Point2f Calculate(const Mat &image1, const Mat &image2) const; // does not mangle the source images
   Point2f Calculate(Mat &&image1, Mat &&image2) const;           // mangles the source images
-  void Optimize(const std::vector<Mat> &images, float maxShiftRatio = 0.25, float noiseStdev = 0.1, int itersPerImage = 5);
+  void Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory, float maxShiftRatio = 0.25,
+      float noiseStdev = 0.1, int itersPerImage = 5);
 
 private:
   int mRows = 0;

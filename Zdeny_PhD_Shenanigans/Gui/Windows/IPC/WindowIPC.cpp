@@ -35,6 +35,6 @@ void WindowIPC::RefreshIPCparametersAndExit()
 
 void WindowIPC::Optimize()
 {
-  // optimize ipc xdd
-  globals->IPC->Optimize(std::vector<Mat>{}, ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt());
+  globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(),
+      ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt());
 }
