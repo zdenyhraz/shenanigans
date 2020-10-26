@@ -22,15 +22,15 @@ private:
   std::unique_ptr<WindowFITS> windowFITS;
 
 private slots:
-  void exit();
-  void about();
-  void ShowWindowIPC();
-  void CloseAll();
-  void debug();
-  void ShowWindowDiffrot();
-  void playSnake();
-  void generateLand();
   void closeEvent(QCloseEvent *event);
+  void ShowWindowIPC();
+  void ShowWindowDiffrot();
   void ShowWindowFeatures();
   void ShowWindowFITS();
+  void exit();
+  void about();
+  void CloseAll();
+  void debug();
+  void playSnake();
+  void generateLand();
 };
