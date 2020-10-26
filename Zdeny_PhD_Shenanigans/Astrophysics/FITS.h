@@ -457,3 +457,20 @@ inline Mat loadImage(std::string path)
   }
   return result;
 }
+
+inline void fitsDownloaderImpl()
+{
+  std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
+  // generateFitsDownloadUrlSingles( 1, 2000, urlmain );
+  generateFitsDownloadUrlPairs(1, 25, 2500, urlmain);
+  LOG_INFO("Fits download urls created");
+}
+
+inline void fitsDownloadCheckerImpl()
+{
+  // std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
+  std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18982272-18982272";
+  std::string path = "D:\\SDOpics\\Calm2020stride25plus\\";
+  checkFitsDownloadUrlPairs(1, 25, 535, urlmain, path);
+  LOG_INFO("Fits download urls checked");
+}

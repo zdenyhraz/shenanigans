@@ -73,7 +73,6 @@ void Zdeny_PhD_Shenanigans::generateLand()
   LOG_INFO("Generating some land...");
   Mat mat = procedural(1000, 1000);
   showimg(colorlandscape(mat), "procedural nature");
-  // showimg(mat, "procedural mature", true);
   LOG_INFO("Finished generating some land. Do you like it?");
 }
 
@@ -84,22 +83,9 @@ void Zdeny_PhD_Shenanigans::playSnake()
   LOG_INFO("Finished playing snake. Did you enjoy it? *wink*");
 }
 
-void Zdeny_PhD_Shenanigans::fitsDownloader()
-{
-  std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
-  // generateFitsDownloadUrlSingles( 1, 2000, urlmain );
-  generateFitsDownloadUrlPairs(1, 25, 2500, urlmain);
-  LOG_INFO("Fits download urls created");
-}
+void Zdeny_PhD_Shenanigans::fitsDownloader() { fitsDownloaderImpl(); }
 
-void Zdeny_PhD_Shenanigans::fitsDownloadChecker()
-{
-  // std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18933122-18933122";
-  std::string urlmain = "http://netdrms01.nispdc.nso.edu/cgi-bin/netdrms/drms_export.cgi?series=hmi__Ic_45s;record=18982272-18982272";
-  std::string path = "D:\\SDOpics\\Calm2020stride25plus\\";
-  checkFitsDownloadUrlPairs(1, 25, 535, urlmain, path);
-  LOG_INFO("Fits download urls checked");
-}
+void Zdeny_PhD_Shenanigans::fitsDownloadChecker() { fitsDownloadCheckerImpl(); }
 
 void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent *event)
 {
