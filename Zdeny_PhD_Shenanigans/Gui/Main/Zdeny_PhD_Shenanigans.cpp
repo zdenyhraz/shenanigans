@@ -16,7 +16,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   globals = std::make_unique<Globals>();
 
   // create windows
-  windowIPCparameters = std::make_unique<WindowIPCparameters>(this, globals.get());
+  windowIPC = std::make_unique<WindowIPC>(this, globals.get());
   windowIPC2PicAlign = std::make_unique<WindowIPC2PicAlign>(this, globals.get());
   windowDiffrot = std::make_unique<WindowDiffrot>(this, globals.get());
   windowFeatures = std::make_unique<WindowFeatures>(this, globals.get());
@@ -68,13 +68,9 @@ void Zdeny_PhD_Shenanigans::CloseAll()
   LOG_INFO("All image & plot windows closed");
 }
 
-void Zdeny_PhD_Shenanigans::showWindowIPCparameters() { windowIPCparameters->show(); }
+void Zdeny_PhD_Shenanigans::showWindowIPCparameters() { windowIPC->show(); }
 
-void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign()
-{
-  windowIPCparameters->show();
-  windowIPC2PicAlign->show();
-}
+void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign() { windowIPC2PicAlign->show(); }
 
 void Zdeny_PhD_Shenanigans::showWindowDiffrot() { windowDiffrot->show(); }
 

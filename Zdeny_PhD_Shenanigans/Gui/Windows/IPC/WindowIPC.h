@@ -1,0 +1,19 @@
+#pragma once
+#include "ui_WindowIPC.h"
+#include "Core/globals.h"
+
+class WindowIPC : public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  WindowIPC(QWidget *parent, Globals *globals);
+
+private:
+  Ui::WindowIPC ui;
+  Globals *globals;
+
+private slots:
+  void refreshIPCparameters(bool init = false);
+  void refreshIPCparametersAndExit();
+};
