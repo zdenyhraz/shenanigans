@@ -109,7 +109,8 @@ void Zdeny_PhD_Shenanigans::fitsDownloadChecker()
 
 void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent *event)
 {
-  QMessageBox::StandardButton resBtn = QMessageBox::question(this, "hehe XD", "Are you sure u wanna exit?\n", QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+  QMessageBox::StandardButton resBtn = QMessageBox::question(
+      this, "hehe XD", "Are you sure u wanna exit?\n", QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
   if (resBtn != QMessageBox::Yes)
   {
     event->ignore();

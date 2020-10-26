@@ -42,15 +42,24 @@ inline double randr(double min_, double max_) { return min_ + rand01() * (max_ -
 
 inline double clamp(double x, double clampMin, double clampMax) { return min(max(x, clampMin), clampMax); }
 
-inline double clampSmooth(double x_new, double x_prev, double clampMin, double clampMax) { return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new; }
+inline double clampSmooth(double x_new, double x_prev, double clampMin, double clampMax)
+{
+  return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
+}
 
 template <typename T = double> inline auto zerovect(int N, T value = 0.) { return std::vector<T>(N, value); }
 
 template <typename T = double> inline auto zerovect2(int N, int M, T value = 0.) { return std::vector<std::vector<T>>(N, zerovect(M, value)); }
 
-template <typename T = double> inline auto zerovect3(int N, int M, int O, T value = 0.) { return std::vector<std::vector<std::vector<T>>>(N, zerovect2(M, O, value)); }
+template <typename T = double> inline auto zerovect3(int N, int M, int O, T value = 0.)
+{
+  return std::vector<std::vector<std::vector<T>>>(N, zerovect2(M, O, value));
+}
 
-template <typename T = double> inline auto zerovect4(int N, int M, int O, int P, T value = 0.) { return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value)); }
+template <typename T = double> inline auto zerovect4(int N, int M, int O, int P, T value = 0.)
+{
+  return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value));
+}
 
 template <typename T> inline std::string to_string(const std::vector<T> &vec)
 {
@@ -527,4 +536,11 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
     stdevs[i] = stdev(v);
   }
   return stdevs;
+}
+
+inline bool IsImage(const std::string &path)
+{
+  return (path.find(".png") != std::string::npos || path.find(".PNG") != std::string::npos || path.find(".jpg") != std::string::npos ||
+          path.find(".JPG") != std::string::npos || path.find(".jpeg") != std::string::npos || path.find(".JPEG") != std::string::npos ||
+          path.find(".fits") != std::string::npos || path.find(".FITS") != std::string::npos);
 }

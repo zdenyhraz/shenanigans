@@ -18,17 +18,17 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if constexpr (1) // ipc optimize test
+  if constexpr (0) // ipc optimize test
   {
-    std::vector<Mat> images;
-    images.push_back(loadImage("Resources/test.png"));
     IterativePhaseCorrelation ipc(256, 256);
-    ipc.Optimize(images, 0.3, 0.01, 11);
+    ipc.Optimize("Resources/", "Resources/", 0.3, 0.01, 11);
   }
   if constexpr (0) // plot from csv file
   {
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
+    PlotCSV::plot(
+        "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
+    PlotCSV::plot(
+        "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
   if constexpr (0) // plot in optimization
   {
@@ -118,7 +118,8 @@ void Debug(Globals *globals)
       for (int x = 0; x < Nx; x++)
         Z[y][x] = sin((double)x * y / Nx / Ny * 100) * rand();
 
-    Plot1D::plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
+    Plot1D::plot(
+        X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
     Plot2D::plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
   }
   if constexpr (0) // swind crop

@@ -3,7 +3,7 @@ AccessModifierOffset: '-2'
 AlignAfterOpenBracket: DontAlign
 BreakBeforeBraces: Allman
 BreakConstructorInitializersBeforeComma: 'false'
-ColumnLimit: '1000'
+ColumnLimit: '150'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 ConstructorInitializerIndentWidth: '0'
 IndentWidth: '2'
