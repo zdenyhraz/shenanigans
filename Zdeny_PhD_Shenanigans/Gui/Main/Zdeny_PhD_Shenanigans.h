@@ -25,7 +25,7 @@ private:
 private slots:
   void exit();
   void about();
-  void showWindowIPCparameters();
+  void showWindowIPC();
   void showWindowIPC2PicAlign();
   void CloseAll();
   void debug();
