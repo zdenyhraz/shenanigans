@@ -34,22 +34,22 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   LOG_SUCC("Welcome back, my friend.");
 
   // make signal to slot connections
-  connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+  connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(About()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
   connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
-  connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
+  connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(Debug()));
   connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
-  connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(playSnake()));
-  connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(generateLand()));
+  connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(Snake()));
+  connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(GenerateLand()));
   connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
   connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
 }
 
-void Zdeny_PhD_Shenanigans::exit() { QApplication::exit(); }
+void Zdeny_PhD_Shenanigans::Exit() { QApplication::exit(); }
 
-void Zdeny_PhD_Shenanigans::debug() { Debug::Debug(globals.get()); }
+void Zdeny_PhD_Shenanigans::Debug() { Debug::Debug(globals.get()); }
 
-void Zdeny_PhD_Shenanigans::about()
+void Zdeny_PhD_Shenanigans::About()
 {
   QMessageBox msgBox;
   msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n2018-2020");
@@ -68,7 +68,7 @@ void Zdeny_PhD_Shenanigans::ShowWindowIPC() { windowIPC->show(); }
 
 void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { windowDiffrot->show(); }
 
-void Zdeny_PhD_Shenanigans::generateLand()
+void Zdeny_PhD_Shenanigans::GenerateLand()
 {
   LOG_INFO("Generating some land...");
   Mat mat = procedural(1000, 1000);
@@ -76,14 +76,14 @@ void Zdeny_PhD_Shenanigans::generateLand()
   LOG_INFO("Finished generating some land. Do you like it?");
 }
 
-void Zdeny_PhD_Shenanigans::playSnake()
+void Zdeny_PhD_Shenanigans::Snake()
 {
   LOG_INFO("Started playing snake. (It is ok, everyone needs some rest.. :))");
   SnakeGame();
   LOG_INFO("Finished playing snake. Did you enjoy it? *wink*");
 }
 
-void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent *event)
+void Zdeny_PhD_Shenanigans::CloseEvent(QCloseEvent *event)
 {
   QMessageBox::StandardButton resBtn = QMessageBox::question(
       this, "hehe XD", "Are you sure u wanna exit?\n", QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
