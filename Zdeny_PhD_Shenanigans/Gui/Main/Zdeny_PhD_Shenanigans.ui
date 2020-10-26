@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>214</width>
+    <width>215</width>
     <height>271</height>
    </rect>
   </property>
@@ -132,62 +132,29 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>214</width>
+     <width>215</width>
      <height>18</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionLoad"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionExit"/>
-   </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>About</string>
     </property>
-    <addaction name="actionAbout_Zdeny_s_PhD_Shenanigans"/>
+    <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuImage_Registration">
+   <widget class="QMenu" name="menuProjects">
     <property name="title">
-     <string>IPC</string>
+     <string>Projects</string>
     </property>
-    <addaction name="actionIPC_parameters"/>
+    <addaction name="actionIPC"/>
+    <addaction name="actionDiffrot"/>
+    <addaction name="actionFITS_downloader"/>
+    <addaction name="actionFITS_checker"/>
+    <addaction name="actionFeatures"/>
+    <addaction name="actionSnake"/>
+    <addaction name="actionProcedural"/>
    </widget>
-   <widget class="QMenu" name="menuAstrophysics">
-    <property name="title">
-     <string>Astrophysics</string>
-    </property>
-    <addaction name="actiondiffrot"/>
-    <addaction name="actionFits_downloader"/>
-    <addaction name="actionFits_checker"/>
-   </widget>
-   <widget class="QMenu" name="menuSnake">
-    <property name="title">
-     <string>Snake</string>
-    </property>
-    <addaction name="actionPlay"/>
-   </widget>
-   <widget class="QMenu" name="menuProcedural">
-    <property name="title">
-     <string>Procedural</string>
-    </property>
-    <addaction name="actionGenerate_land"/>
-   </widget>
-   <widget class="QMenu" name="menuFeatures">
-    <property name="title">
-     <string>Features</string>
-    </property>
-    <addaction name="actionFeature_match"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuImage_Registration"/>
-   <addaction name="menuAstrophysics"/>
-   <addaction name="menuFeatures"/>
-   <addaction name="menuSnake"/>
-   <addaction name="menuProcedural"/>
+   <addaction name="menuProjects"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -201,7 +168,7 @@
     <string>New Window</string>
    </property>
   </action>
-  <action name="actionAbout_Zdeny_s_PhD_Shenanigans">
+  <action name="actionAbout">
    <property name="text">
     <string>About Zdeny's PhD Shenanigans</string>
    </property>
@@ -221,7 +188,7 @@
     <string>Load</string>
    </property>
   </action>
-  <action name="actionIPC_parameters">
+  <action name="actionIPC">
    <property name="text">
     <string>IPC</string>
    </property>
@@ -319,6 +286,36 @@
   <action name="actionFeature_match">
    <property name="text">
     <string>Feature match</string>
+   </property>
+  </action>
+  <action name="actionDiffrot">
+   <property name="text">
+    <string>Diffrot</string>
+   </property>
+  </action>
+  <action name="actionFITS_downloader">
+   <property name="text">
+    <string>FITS downloader</string>
+   </property>
+  </action>
+  <action name="actionFITS_checker">
+   <property name="text">
+    <string>FITS checker</string>
+   </property>
+  </action>
+  <action name="actionFeatures">
+   <property name="text">
+    <string>Features</string>
+   </property>
+  </action>
+  <action name="actionSnake">
+   <property name="text">
+    <string>Snake</string>
+   </property>
+  </action>
+  <action name="actionProcedural">
+   <property name="text">
+    <string>Procedural</string>
    </property>
   </action>
  </widget>
