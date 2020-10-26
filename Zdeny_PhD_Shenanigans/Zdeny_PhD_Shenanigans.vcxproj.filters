@@ -139,6 +139,9 @@
     <ClCompile Include="Gui\Windows\IPC\WindowIPC.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\Windows\FITS\WindowFITS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -311,6 +314,9 @@
     <QtMoc Include="Gui\Windows\IPC\WindowIPC.h">
       <Filter>WindowHeaders</Filter>
     </QtMoc>
+    <QtMoc Include="Gui\Windows\FITS\WindowFITS.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Gui\Main\Zdeny_PhD_Shenanigans.ui">
@@ -329,6 +335,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="Gui\Windows\IPC\WindowIPC.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Gui\Windows\FITS\WindowFITS.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

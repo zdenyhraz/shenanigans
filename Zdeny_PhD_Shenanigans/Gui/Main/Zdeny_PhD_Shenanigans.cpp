@@ -19,6 +19,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   windowIPC = std::make_unique<WindowIPC>(this, globals.get());
   windowDiffrot = std::make_unique<WindowDiffrot>(this, globals.get());
   windowFeatures = std::make_unique<WindowFeatures>(this, globals.get());
+  windowFITS = std::make_unique<WindowFITS>(this, globals.get());
 
   // setup Qt ui - meta compiled
   ui.setupUi(this);
@@ -35,14 +36,13 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   // make signal to slot connections
   connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
-  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(showWindowIPC()));
+  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
-  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(showWindowDiffrot()));
+  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
   connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(playSnake()));
   connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(generateLand()));
-  connect(ui.actionFits_downloader, SIGNAL(triggered()), this, SLOT(fitsDownloader()));
-  connect(ui.actionFits_checker, SIGNAL(triggered()), this, SLOT(fitsDownloadChecker()));
-  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(featureMatch()));
+  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
+  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
 }
 
 void Zdeny_PhD_Shenanigans::exit() { QApplication::exit(); }
@@ -64,9 +64,9 @@ void Zdeny_PhD_Shenanigans::CloseAll()
   LOG_INFO("All image & plot windows closed");
 }
 
-void Zdeny_PhD_Shenanigans::showWindowIPC() { windowIPC->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowIPC() { windowIPC->show(); }
 
-void Zdeny_PhD_Shenanigans::showWindowDiffrot() { windowDiffrot->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { windowDiffrot->show(); }
 
 void Zdeny_PhD_Shenanigans::generateLand()
 {
@@ -83,10 +83,6 @@ void Zdeny_PhD_Shenanigans::playSnake()
   LOG_INFO("Finished playing snake. Did you enjoy it? *wink*");
 }
 
-void Zdeny_PhD_Shenanigans::fitsDownloader() { fitsDownloaderImpl(); }
-
-void Zdeny_PhD_Shenanigans::fitsDownloadChecker() { fitsDownloadCheckerImpl(); }
-
 void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent *event)
 {
   QMessageBox::StandardButton resBtn = QMessageBox::question(
@@ -102,4 +98,6 @@ void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent *event)
   }
 }
 
-void Zdeny_PhD_Shenanigans::featureMatch() { windowFeatures->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowFeatures() { windowFeatures->show(); }
+
+void Zdeny_PhD_Shenanigans::ShowWindowFITS() { windowFITS->show(); }

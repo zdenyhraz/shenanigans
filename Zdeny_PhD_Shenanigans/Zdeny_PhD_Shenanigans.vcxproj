@@ -116,6 +116,7 @@
     <ClCompile Include="Fourier\fourier.cpp" />
     <ClCompile Include="Fractal\fractal.cpp" />
     <ClCompile Include="Astrophysics\SDOipcOpt.cpp" />
+    <ClCompile Include="Gui\Windows\FITS\WindowFITS.cpp" />
     <ClCompile Include="IPC\ipcAux.cpp" />
     <ClCompile Include="IPC\IterativePhaseCorrelation.cpp" />
     <ClCompile Include="Log\logger.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="DebugStuff\DebugStuff.h" />
     <ClInclude Include="Draw\combinepics.h" />
     <ClInclude Include="Draw\crop.h" />
+    <QtMoc Include="Gui\Windows\FITS\WindowFITS.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Optimization\Evolution.h" />
     <ClInclude Include="Optimization\OptimizationTestFunctions.h" />
@@ -210,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Gui\Windows\Diffrot\WindowDiffrot.ui" />
+    <QtUic Include="Gui\Windows\FITS\WindowFITS.ui" />
     <QtUic Include="Gui\Windows\IPC\WindowIPC.ui" />
     <QtUic Include="Gui\Windows\Plot\WindowPlot.ui" />
     <QtUic Include="Gui\Windows\Template\WindowTemplate.ui" />

@@ -148,8 +148,7 @@
     </property>
     <addaction name="actionIPC"/>
     <addaction name="actionDiffrot"/>
-    <addaction name="actionFITS_downloader"/>
-    <addaction name="actionFITS_checker"/>
+    <addaction name="actionFITS"/>
     <addaction name="actionFeatures"/>
     <addaction name="actionProcedural"/>
     <addaction name="actionSnake"/>
@@ -316,6 +315,11 @@
   <action name="actionProcedural">
    <property name="text">
     <string>Procedural gen</string>
+   </property>
+  </action>
+  <action name="actionFITS">
+   <property name="text">
+    <string>FITS</string>
    </property>
   </action>
  </widget>
