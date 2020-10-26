@@ -145,7 +145,6 @@
     </ClCompile>
     <ClCompile Include="Gui\Windows\Diffrot\WindowDiffrot.cpp" />
     <ClCompile Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.cpp" />
-    <ClCompile Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.cpp" />
     <ClCompile Include="Gui\Windows\IPCparameters\WindowIPCparameters.cpp" />
     <ClCompile Include="Gui\Windows\Plot\WindowPlot.cpp" />
     <ClCompile Include="Gui\Windows\Template\WindowTemplate.cpp" />
@@ -208,14 +207,12 @@
     <QtMoc Include="Gui\Windows\Diffrot\WindowDiffrot.h" />
     <QtMoc Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.h" />
     <QtMoc Include="Gui\Windows\Template\WindowTemplate.h" />
-    <QtMoc Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.h" />
     <QtMoc Include="Gui\Windows\IPCparameters\WindowIPCparameters.h" />
     <QtMoc Include="Gui\Main\Zdeny_PhD_Shenanigans.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Gui\Windows\Diffrot\WindowDiffrot.ui" />
     <QtUic Include="Gui\Windows\IPC2PicAlign\WindowIPC2PicAlign.ui" />
-    <QtUic Include="Gui\Windows\IPCoptimize\WindowIPCoptimize.ui" />
     <QtUic Include="Gui\Windows\IPCparameters\WindowIPCparameters.ui" />
     <QtUic Include="Gui\Windows\Plot\WindowPlot.ui" />
     <QtUic Include="Gui\Windows\Template\WindowTemplate.ui" />

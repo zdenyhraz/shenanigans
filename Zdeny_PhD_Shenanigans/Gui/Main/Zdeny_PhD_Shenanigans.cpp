@@ -10,8 +10,17 @@
 #include "IPC/IterativePhaseCorrelation.h"
 #include "DebugStuff/DebugStuff.h"
 
-Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent), globals(std::make_unique<Globals>()), windowIPCparameters(std::make_unique<WindowIPCparameters>(this, globals.get())), windowIPCoptimize(std::make_unique<WindowIPCoptimize>(this, globals.get())), windowIPC2PicAlign(std::make_unique<WindowIPC2PicAlign>(this, globals.get())), windowDiffrot(std::make_unique<WindowDiffrot>(this, globals.get())), windowFeatures(std::make_unique<WindowFeatures>(this, globals.get()))
+Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
 {
+  // create global data shared within windows
+  globals = std::make_unique<Globals>();
+
+  // create windows
+  windowIPCparameters = std::make_unique<WindowIPCparameters>(this, globals.get());
+  windowIPC2PicAlign = std::make_unique<WindowIPC2PicAlign>(this, globals.get());
+  windowDiffrot = std::make_unique<WindowDiffrot>(this, globals.get());
+  windowFeatures = std::make_unique<WindowFeatures>(this, globals.get());
+
   // setup Qt ui - meta compiled
   ui.setupUi(this);
 
@@ -29,7 +38,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.actionAbout_Zdeny_s_PhD_Shenanigans, SIGNAL(triggered()), this, SLOT(about()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
   connect(ui.actionIPC_parameters, SIGNAL(triggered()), this, SLOT(showWindowIPCparameters()));
-  connect(ui.actionIPC_optimize, SIGNAL(triggered()), this, SLOT(showWindowIPCoptimize()));
   connect(ui.actionIPC_2pic_align, SIGNAL(triggered()), this, SLOT(showWindowIPC2PicAlign()));
   connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(debug()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(debug()));
@@ -61,8 +69,6 @@ void Zdeny_PhD_Shenanigans::CloseAll()
 }
 
 void Zdeny_PhD_Shenanigans::showWindowIPCparameters() { windowIPCparameters->show(); }
-
-void Zdeny_PhD_Shenanigans::showWindowIPCoptimize() { windowIPCoptimize->show(); }
 
 void Zdeny_PhD_Shenanigans::showWindowIPC2PicAlign()
 {

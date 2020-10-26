@@ -19,4 +19,6 @@ void ExtractTrigramsFromStmToFile(const std::string &stmfilepath, const std::str
     LOG_ERROR("Could not open file {}", unkwordsfilepath);
     return;
   }
+
+  // etc...
 }
