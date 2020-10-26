@@ -133,7 +133,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
 
   // load training images
-  LOG_INFO("Loading training images from {}...", trainingImagesDirectory);
+  LOG_INFO("Loading training images from '{}'...", trainingImagesDirectory);
   std::vector<Mat> trainingImages;
   if (std::filesystem::is_directory(trainingImagesDirectory))
   {
@@ -150,12 +150,12 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
   else
   {
-    LOG_ERROR("Could not optimize IPC parameters - trainign directory {} is not a valid directory", trainingImagesDirectory);
+    LOG_ERROR("Could not optimize IPC parameters - trainign directory '{}' is not a valid directory", trainingImagesDirectory);
     return;
   }
 
   // load validation images
-  LOG_INFO("Loading validation images from {}...", validationImagesDirectory);
+  LOG_INFO("Loading validation images from '{}'...", validationImagesDirectory);
   std::vector<Mat> validationImages;
   if (std::filesystem::is_directory(validationImagesDirectory))
   {
@@ -167,12 +167,12 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
         continue;
 
       validationImages.push_back(loadImage(path));
-      LOG_DEBUG("Loaded validation image {}", path);
+      LOG_DEBUG("Loaded validation image '{}'", path);
     }
   }
   else
   {
-    LOG_ERROR("Optimizing IPC parameters without validation set - {} is not a valid directory", validationImagesDirectory);
+    LOG_ERROR("Optimizing IPC parameters without validation set - '{}' is not a valid directory", validationImagesDirectory);
   }
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", trainingImages.size());
