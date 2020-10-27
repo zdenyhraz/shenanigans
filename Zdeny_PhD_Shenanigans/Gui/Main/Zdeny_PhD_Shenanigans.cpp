@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
-#include "Optimization/Evolution.h"
-#include "Optimization/OptimizationTestFunctions.h"
+#include "Gui/Windows/IPC/WindowIPC.h"
+#include "Gui/Windows/Diffrot/WindowDiffrot.h"
+#include "Gui/Windows/Features/WindowFeatures.h"
+#include "Gui/Windows/FITS/WindowFITS.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
-#include "Fit/polyfit.h"
-#include "Fit/nnfit.h"
-#include "IPC/IPC.h"
-#include "IPC/IterativePhaseCorrelation.h"
 #include "DebugStuff/DebugStuff.h"
 
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
@@ -33,21 +31,24 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   Logger::Init();
   LOG_SUCC("Welcome back, my friend.");
 
-  // make signal to slot connections
+  // make signal - slot connections
+  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
+  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
+  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
+  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
+  connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(Debug()));
   connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(About()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
-  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
-  connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(Debug()));
-  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
   connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(Snake()));
   connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(GenerateLand()));
-  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
-  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
 }
 
 void Zdeny_PhD_Shenanigans::ShowWindowIPC() { mWindows["ipc"]->show(); }
+
 void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { mWindows["diffrot"]->show(); }
+
 void Zdeny_PhD_Shenanigans::ShowWindowFeatures() { mWindows["features"]->show(); }
+
 void Zdeny_PhD_Shenanigans::ShowWindowFITS() { mWindows["fits"]->show(); }
 
 void Zdeny_PhD_Shenanigans::Exit() { QApplication::exit(); }
