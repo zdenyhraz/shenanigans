@@ -16,10 +16,10 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   globals = std::make_unique<Globals>();
 
   // create windows
-  windowIPC = std::make_unique<WindowIPC>(this, globals.get());
-  windowDiffrot = std::make_unique<WindowDiffrot>(this, globals.get());
-  windowFeatures = std::make_unique<WindowFeatures>(this, globals.get());
-  windowFITS = std::make_unique<WindowFITS>(this, globals.get());
+  mWindows["ipc"] = std::make_unique<WindowIPC>(this, globals.get());
+  mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, globals.get());
+  mWindows["features"] = std::make_unique<WindowFeatures>(this, globals.get());
+  mWindows["fits"] = std::make_unique<WindowFITS>(this, globals.get());
 
   // setup Qt ui - meta compiled
   ui.setupUi(this);
@@ -45,6 +45,11 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
 }
 
+void Zdeny_PhD_Shenanigans::ShowWindowIPC() { mWindows["ipc"]->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { mWindows["diffrot"]->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowFeatures() { mWindows["features"]->show(); }
+void Zdeny_PhD_Shenanigans::ShowWindowFITS() { mWindows["fits"]->show(); }
+
 void Zdeny_PhD_Shenanigans::Exit() { QApplication::exit(); }
 
 void Zdeny_PhD_Shenanigans::Debug() { Debug::Debug(globals.get()); }
@@ -58,15 +63,19 @@ void Zdeny_PhD_Shenanigans::About()
 
 void Zdeny_PhD_Shenanigans::CloseAll()
 {
+  // close all opencv windows
   destroyAllWindows();
+
+  // close all qcustomplot windows
   Plot1D::CloseAll();
   Plot2D::CloseAll();
-  LOG_INFO("All image & plot windows closed");
+
+  // close all shenanigans windows
+  for (auto &window : mWindows)
+    window.second->close();
+
+  LOG_INFO("All windows closed");
 }
-
-void Zdeny_PhD_Shenanigans::ShowWindowIPC() { windowIPC->show(); }
-
-void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { windowDiffrot->show(); }
 
 void Zdeny_PhD_Shenanigans::GenerateLand()
 {
@@ -97,7 +106,3 @@ void Zdeny_PhD_Shenanigans::CloseEvent(QCloseEvent *event)
     CloseAll();
   }
 }
-
-void Zdeny_PhD_Shenanigans::ShowWindowFeatures() { windowFeatures->show(); }
-
-void Zdeny_PhD_Shenanigans::ShowWindowFITS() { windowFITS->show(); }
