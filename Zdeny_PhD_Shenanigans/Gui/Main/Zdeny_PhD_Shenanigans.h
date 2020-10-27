@@ -1,9 +1,6 @@
 #pragma once
 #include "ui_Zdeny_PhD_Shenanigans.h"
-#include "Gui/Windows/IPC/WindowIPC.h"
-#include "Gui/Windows/Diffrot/WindowDiffrot.h"
-#include "Gui/Windows/Features/WindowFeatures.h"
-#include "Gui/Windows/FITS/WindowFITS.h"
+#include "Core/globals.h"
 
 class Zdeny_PhD_Shenanigans : public QMainWindow
 {
