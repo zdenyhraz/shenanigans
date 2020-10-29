@@ -19,13 +19,22 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if constexpr (1) // histogram normalize
+  if constexpr (1) // histogram equalize
   {
     Mat img = imread("Resources/test.png", CV_LOAD_IMAGE_GRAYSCALE);
     normalize(img, img, 0, 255, CV_MINMAX);
     img.convertTo(img, CV_8UC1);
+    Mat heq;
 
-    Mat heq = EqualizeHistogram(img);
+    {
+      TIMER("my heq");
+      heq = EqualizeHistogram(img);
+    }
+
+    {
+      TIMER("cv heq");
+      equalizeHist(img, heq);
+    }
 
     ShowHistogram(img, "img histogram");
     ShowHistogram(heq, "heq histogram");

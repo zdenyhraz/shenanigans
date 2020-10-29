@@ -45,6 +45,7 @@ Mat EqualizeHistogram(const Mat &img)
   auto histogram = CalculateHistogram(img);
   auto cumhistogram = CalculateCummulativeHistogram(histogram);
 
+#pragma omp parallel for
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
       out.at<uchar>(r, c) = cumhistogram[img.at<uchar>(r, c)] * 255;
