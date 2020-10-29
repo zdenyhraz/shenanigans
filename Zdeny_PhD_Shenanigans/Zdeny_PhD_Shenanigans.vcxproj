@@ -168,6 +168,8 @@
     <ClInclude Include="Optimization\VisualOptimization.h" />
     <ClInclude Include="Phon\stmpref.h" />
     <ClInclude Include="Plot\PlotCSV.h" />
+    <ClInclude Include="UnitTests\IterativePhaseCorrelationTest.h" />
+    <ClInclude Include="UnitTests\UnitTests.h" />
     <ClInclude Include="Utils\export.h" />
     <ClInclude Include="Core\macros.h" />
     <ClInclude Include="Utils\vectmat.h" />
