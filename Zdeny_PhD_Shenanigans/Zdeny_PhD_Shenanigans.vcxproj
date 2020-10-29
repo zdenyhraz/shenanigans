@@ -161,6 +161,7 @@
     <ClInclude Include="Draw\combinepics.h" />
     <ClInclude Include="Draw\crop.h" />
     <QtMoc Include="Gui\Windows\FITS\WindowFITS.h" />
+    <ClInclude Include="Filtering\HistogramEqualization.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Optimization\Evolution.h" />
     <ClInclude Include="Optimization\OptimizationTestFunctions.h" />
