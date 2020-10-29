@@ -7,6 +7,7 @@
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
 #include "DebugStuff/DebugStuff.h"
+#include "UnitTests/UnitTests.h"
 
 Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(parent)
 {
@@ -41,6 +42,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
   connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(Snake()));
   connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(GenerateLand()));
+  connect(ui.actionUnitTests, SIGNAL(triggered()), this, SLOT(UnitTests()));
 }
 
 void Zdeny_PhD_Shenanigans::ShowWindowIPC() { mWindows["ipc"]->show(); }
@@ -85,6 +87,8 @@ void Zdeny_PhD_Shenanigans::GenerateLand()
   showimg(colorlandscape(mat), "procedural nature");
   LOG_INFO("Finished generating some land. Do you like it?");
 }
+
+void Zdeny_PhD_Shenanigans::UnitTests() { UnitTests::TestAll(); }
 
 void Zdeny_PhD_Shenanigans::Snake()
 {

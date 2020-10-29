@@ -27,4 +27,5 @@ private slots:
   void Debug();
   void Snake();
   void GenerateLand();
+  void UnitTests();
 };

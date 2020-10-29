@@ -152,6 +152,7 @@
     <addaction name="actionFITS"/>
     <addaction name="actionProcedural"/>
     <addaction name="actionSnake"/>
+    <addaction name="actionUnitTests"/>
    </widget>
    <addaction name="menuProjects"/>
    <addaction name="menuAbout"/>
@@ -320,6 +321,11 @@
   <action name="actionFITS">
    <property name="text">
     <string>FITS</string>
+   </property>
+  </action>
+  <action name="actionUnitTests">
+   <property name="text">
+    <string>Unit tests</string>
    </property>
   </action>
  </widget>
