@@ -24,14 +24,15 @@ void Debug(Globals *globals)
     Mat img = imread("Resources/test.png", CV_LOAD_IMAGE_GRAYSCALE);
     normalize(img, img, 0, 255, CV_MINMAX);
     img.convertTo(img, CV_8UC1);
-    Mat heq;
-
-    heq = EqualizeHistogram(img);
+    resize(img, img, Size(1000, 1000));
+    Mat heq = EqualizeHistogram(img);
+    Mat aheq = EqualizeHistogramAdaptive(img, 300);
 
     ShowHistogram(img, "img histogram");
     ShowHistogram(heq, "heq histogram");
+    ShowHistogram(aheq, "aheq histogram");
 
-    showimg(std::vector<Mat>{img, heq}, "hist eq");
+    showimg(std::vector<Mat>{img, heq, aheq}, "hist eq", false, 0, 1, 1000);
   }
   if constexpr (0) // ipc optimize test
   {
