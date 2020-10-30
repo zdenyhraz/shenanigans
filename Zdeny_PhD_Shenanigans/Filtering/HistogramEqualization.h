@@ -27,6 +27,20 @@ std::vector<double> CalculateCummulativeHistogram(const std::vector<size_t> &his
   return cumhistogram;
 }
 
+std::pair<std::vector<float>, float> CalculateCummulativeHistogram(const Mat &img)
+{
+  std::vector<float> hist(256, 0);
+
+  for (int r = 0; r < img.rows; ++r)
+    for (int c = 0; c < img.cols; ++c)
+      hist[img.at<uchar>(r, c)]++;
+
+  for (int i = 1; i < hist.size(); ++i)
+    hist[i] = hist[i - 1] + hist[i];
+
+  return {hist, hist.back()};
+}
+
 void ShowHistogram(const Mat &img, const std::string &plotname)
 {
   auto hist_ = CalculateHistogram(img);
@@ -42,13 +56,12 @@ void ShowHistogram(const Mat &img, const std::string &plotname)
 Mat EqualizeHistogram(const Mat &img)
 {
   Mat out = img.clone();
-  auto histogram = CalculateHistogram(img);
-  auto cumhistogram = CalculateCummulativeHistogram(histogram);
+  auto [cumhist, maxcum] = CalculateCummulativeHistogram(img);
 
 #pragma omp parallel for
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
-      out.at<uchar>(r, c) = cumhistogram[img.at<uchar>(r, c)] * 255;
+      out.at<uchar>(r, c) = static_cast<uchar>(cumhist[img.at<uchar>(r, c)] / maxcum * 255);
 
   return out;
 }
