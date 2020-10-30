@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-std::vector<float> CalculateHistogram(const Mat &img)
+inline std::vector<float> CalculateHistogram(const Mat &img)
 {
   std::vector<float> hist(256, 0);
   for (int r = 0; r < img.rows; ++r)
@@ -11,7 +11,7 @@ std::vector<float> CalculateHistogram(const Mat &img)
   return hist;
 }
 
-std::vector<float> CalculateCummulativeHistogram(const Mat &img)
+inline std::vector<float> CalculateCummulativeHistogram(const Mat &img)
 {
   std::vector<float> hist(256, 0);
 
@@ -43,10 +43,32 @@ Mat EqualizeHistogram(const Mat &img)
   Mat out = img.clone();
   auto chist = CalculateCummulativeHistogram(img);
 
-#pragma omp parallel for
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
       out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);
+
+  return out;
+}
+
+Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
+{
+  Mat out = img.clone();
+  std::vector<float> chist;
+  for (int r = 0; r < img.rows; ++r)
+  {
+    if (r % 5 == 0)
+      LOG_DEBUG("AHEQ progress {:.1f}%", (float)r / (img.rows - 1) * 100);
+
+#pragma omp parallel for
+    for (int c = 0; c < img.cols; ++c)
+    {
+      if (r > wsize / 2 && c > wsize / 2 && r < img.rows - wsize / 2 && c < img.cols - wsize / 2)
+      {
+        chist = CalculateCummulativeHistogram(roicrop(img, r, c, wsize, wsize));
+        out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);
+      }
+    }
+  }
 
   return out;
 }
