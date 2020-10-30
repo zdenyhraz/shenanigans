@@ -27,7 +27,7 @@ std::vector<double> CalculateCummulativeHistogram(const std::vector<size_t> &his
   return cumhistogram;
 }
 
-std::pair<std::vector<float>, float> CalculateCummulativeHistogram(const Mat &img)
+std::vector<float> CalculateCummulativeHistogram(const Mat &img)
 {
   std::vector<float> hist(256, 0);
 
@@ -38,15 +38,16 @@ std::pair<std::vector<float>, float> CalculateCummulativeHistogram(const Mat &im
   for (int i = 1; i < hist.size(); ++i)
     hist[i] = hist[i - 1] + hist[i];
 
-  return {hist, hist.back()};
+  return hist;
 }
 
 void ShowHistogram(const Mat &img, const std::string &plotname)
 {
   auto hist_ = CalculateHistogram(img);
-  auto chist = CalculateCummulativeHistogram(hist_);
+  auto chist_ = CalculateCummulativeHistogram(img);
 
   auto hist = std::vector<double>(hist_.begin(), hist_.end());
+  auto chist = std::vector<double>(chist_.begin(), chist_.end());
   std::vector<double> x(hist.size());
   std::iota(x.begin(), x.end(), 0);
 
@@ -56,12 +57,12 @@ void ShowHistogram(const Mat &img, const std::string &plotname)
 Mat EqualizeHistogram(const Mat &img)
 {
   Mat out = img.clone();
-  auto [cumhist, maxcum] = CalculateCummulativeHistogram(img);
+  auto cumhist = CalculateCummulativeHistogram(img);
 
 #pragma omp parallel for
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
-      out.at<uchar>(r, c) = static_cast<uchar>(cumhist[img.at<uchar>(r, c)] / maxcum * 255);
+      out.at<uchar>(r, c) = static_cast<uchar>(cumhist[img.at<uchar>(r, c)] / cumhist.back() * 255);
 
   return out;
 }
