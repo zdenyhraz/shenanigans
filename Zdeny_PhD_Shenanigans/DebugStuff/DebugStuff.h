@@ -26,15 +26,7 @@ void Debug(Globals *globals)
     img.convertTo(img, CV_8UC1);
     Mat heq;
 
-    {
-      TIMER("my heq");
-      heq = EqualizeHistogram(img);
-    }
-
-    {
-      TIMER("cv heq");
-      equalizeHist(img, heq);
-    }
+    heq = EqualizeHistogram(img);
 
     ShowHistogram(img, "img histogram");
     ShowHistogram(heq, "heq histogram");
