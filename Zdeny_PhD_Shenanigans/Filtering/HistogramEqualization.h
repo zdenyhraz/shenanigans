@@ -1,30 +1,14 @@
 #pragma once
 #include "stdafx.h"
 
-std::vector<size_t> CalculateHistogram(const Mat &img)
+std::vector<float> CalculateHistogram(const Mat &img)
 {
-  std::vector<size_t> histogram(256, 0);
+  std::vector<float> hist(256, 0);
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
-      histogram[img.at<uchar>(r, c)]++;
+      hist[img.at<uchar>(r, c)]++;
 
-  return histogram;
-}
-
-std::vector<double> CalculateCummulativeHistogram(const std::vector<size_t> &histogram)
-{
-  std::vector<double> cumhistogram(256, 0);
-  double cumval = 0;
-  for (int i = 0; i < histogram.size(); ++i)
-  {
-    cumval += histogram[i];
-    cumhistogram[i] = cumval;
-  }
-
-  for (auto &x : cumhistogram)
-    x /= cumval;
-
-  return cumhistogram;
+  return hist;
 }
 
 std::vector<float> CalculateCummulativeHistogram(const Mat &img)
@@ -57,12 +41,12 @@ void ShowHistogram(const Mat &img, const std::string &plotname)
 Mat EqualizeHistogram(const Mat &img)
 {
   Mat out = img.clone();
-  auto cumhist = CalculateCummulativeHistogram(img);
+  auto chist = CalculateCummulativeHistogram(img);
 
 #pragma omp parallel for
   for (int r = 0; r < img.rows; ++r)
     for (int c = 0; c < img.cols; ++c)
-      out.at<uchar>(r, c) = static_cast<uchar>(cumhist[img.at<uchar>(r, c)] / cumhist.back() * 255);
+      out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);
 
   return out;
 }
