@@ -96,12 +96,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>17</x>
       <y>81</y>
-      <width>91</width>
+      <width>94</width>
       <height>36</height>
      </rect>
     </property>
@@ -109,14 +109,14 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>image size</string>
+        <string>image size %</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>500</string>
+        <string>0.2</string>
        </property>
       </widget>
      </item>
@@ -135,6 +135,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>112</x>
+      <y>83</y>
+      <width>53</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>resize</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
