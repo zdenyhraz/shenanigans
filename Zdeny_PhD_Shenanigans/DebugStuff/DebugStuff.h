@@ -24,9 +24,9 @@ void Debug(Globals *globals)
     Mat img = imread("Resources/test.png", CV_LOAD_IMAGE_GRAYSCALE);
     normalize(img, img, 0, 255, CV_MINMAX);
     img.convertTo(img, CV_8UC1);
-    resize(img, img, Size(1000, 1000));
+    resize(img, img, Size(500, 500));
     Mat heq = EqualizeHistogram(img);
-    Mat aheq = EqualizeHistogramAdaptive(img, 300);
+    Mat aheq = EqualizeHistogramAdaptive(img, 201);
 
     ShowHistogram(img, "img histogram");
     ShowHistogram(heq, "heq histogram");

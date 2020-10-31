@@ -53,7 +53,6 @@ Mat EqualizeHistogram(const Mat &img)
 Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
 {
   Mat out = img.clone();
-  std::vector<float> chist;
   for (int r = 0; r < img.rows; ++r)
   {
     if (r % 5 == 0)
@@ -64,7 +63,7 @@ Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
     {
       if (r > wsize / 2 && c > wsize / 2 && r < img.rows - wsize / 2 && c < img.cols - wsize / 2)
       {
-        chist = CalculateCummulativeHistogram(roicrop(img, r, c, wsize, wsize));
+        auto chist = CalculateCummulativeHistogram(roicrop(img, r, c, wsize, wsize));
         out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);
       }
     }
