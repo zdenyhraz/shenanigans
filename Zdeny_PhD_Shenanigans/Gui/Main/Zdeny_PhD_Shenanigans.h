@@ -21,6 +21,7 @@ private slots:
   void ShowWindowDiffrot();
   void ShowWindowFeatures();
   void ShowWindowFITS();
+  void ShowWindowFiltering();
   void Exit();
   void About();
   void CloseAll();

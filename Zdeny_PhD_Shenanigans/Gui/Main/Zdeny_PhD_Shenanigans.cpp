@@ -4,6 +4,7 @@
 #include "Gui/Windows/Diffrot/WindowDiffrot.h"
 #include "Gui/Windows/Features/WindowFeatures.h"
 #include "Gui/Windows/FITS/WindowFITS.h"
+#include "Gui/Windows/Filtering/WindowFiltering.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
 #include "DebugStuff/DebugStuff.h"
@@ -19,6 +20,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, globals.get());
   mWindows["features"] = std::make_unique<WindowFeatures>(this, globals.get());
   mWindows["fits"] = std::make_unique<WindowFITS>(this, globals.get());
+  mWindows["filtering"] = std::make_unique<WindowFiltering>(this, globals.get());
 
   // setup Qt ui - meta compiled
   ui.setupUi(this);
@@ -37,6 +39,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget *parent) : QMainWindow(pare
   connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
   connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
   connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
+  connect(ui.actionFiltering, SIGNAL(triggered()), this, SLOT(ShowWindowFiltering()));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(Debug()));
   connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(About()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
@@ -52,6 +55,8 @@ void Zdeny_PhD_Shenanigans::ShowWindowDiffrot() { mWindows["diffrot"]->show(); }
 void Zdeny_PhD_Shenanigans::ShowWindowFeatures() { mWindows["features"]->show(); }
 
 void Zdeny_PhD_Shenanigans::ShowWindowFITS() { mWindows["fits"]->show(); }
+
+void Zdeny_PhD_Shenanigans::ShowWindowFiltering() { mWindows["filtering"]->show(); }
 
 void Zdeny_PhD_Shenanigans::Exit() { QApplication::exit(); }
 
