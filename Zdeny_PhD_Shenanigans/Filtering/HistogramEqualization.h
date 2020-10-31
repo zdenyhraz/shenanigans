@@ -53,6 +53,13 @@ inline Mat EqualizeHistogram(const Mat &img)
 inline Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
 {
   Mat out = img.clone();
+
+  if (wsize > img.cols / 2)
+  {
+    LOG_ERROR("Window size too large for AHEQ");
+    return out;
+  }
+
   for (int r = 0; r < img.rows; ++r)
   {
     if (r % 5 == 0)

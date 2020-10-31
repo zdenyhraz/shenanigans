@@ -11,9 +11,14 @@ WindowFiltering::WindowFiltering(QWidget *parent, Globals *globals) : QMainWindo
 void WindowFiltering::HistogramEqualize()
 {
   Mat img = imread(ui.lineEdit->text().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
   normalize(img, img, 0, 255, CV_MINMAX);
   img.convertTo(img, CV_8UC1);
-  cv::resize(img, img, Size(ui.lineEdit_2->text().toInt(), ui.lineEdit_2->text().toInt()));
+
+  if (ui.checkBox->isChecked())
+    cv::resize(img, img, Size(ui.lineEdit_2->text().toDouble() * img.cols, ui.lineEdit_2->text().toDouble() * img.rows));
+
+  LOG_DEBUG("Input image size [{},{}]", img.cols, img.rows);
   Mat heq = EqualizeHistogram(img);
   Mat aheq = EqualizeHistogramAdaptive(img, ui.lineEdit_3->text().toInt());
 
@@ -21,5 +26,5 @@ void WindowFiltering::HistogramEqualize()
   ShowHistogram(heq, "heq histogram");
   ShowHistogram(aheq, "aheq histogram");
 
-  showimg(std::vector<Mat>{img, heq, aheq}, "hist eq", false, 0, 1, 1000);
+  showimg(std::vector<Mat>{img, heq, aheq}, "hist eq", false, 0, 1, 1200);
 }
