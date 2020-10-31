@@ -148,6 +148,7 @@
     </property>
     <addaction name="actionIPC"/>
     <addaction name="actionDiffrot"/>
+    <addaction name="actionFiltering"/>
     <addaction name="actionFeatures"/>
     <addaction name="actionFITS"/>
     <addaction name="actionProcedural"/>
@@ -326,6 +327,11 @@
   <action name="actionUnitTests">
    <property name="text">
     <string>Unit tests</string>
+   </property>
+  </action>
+  <action name="actionFiltering">
+   <property name="text">
+    <string>Filtering</string>
    </property>
   </action>
  </widget>

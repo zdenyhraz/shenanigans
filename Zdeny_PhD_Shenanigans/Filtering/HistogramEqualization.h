@@ -25,7 +25,7 @@ inline std::vector<float> CalculateCummulativeHistogram(const Mat &img)
   return hist;
 }
 
-void ShowHistogram(const Mat &img, const std::string &plotname)
+inline void ShowHistogram(const Mat &img, const std::string &plotname)
 {
   auto hist_ = CalculateHistogram(img);
   auto chist_ = CalculateCummulativeHistogram(img);
@@ -38,7 +38,7 @@ void ShowHistogram(const Mat &img, const std::string &plotname)
   Plot1D::plot(x, hist, chist, plotname, "pixel value", "histogram", "cummulative histogram");
 }
 
-Mat EqualizeHistogram(const Mat &img)
+inline Mat EqualizeHistogram(const Mat &img)
 {
   Mat out = img.clone();
   auto chist = CalculateCummulativeHistogram(img);
@@ -50,7 +50,7 @@ Mat EqualizeHistogram(const Mat &img)
   return out;
 }
 
-Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
+inline Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
 {
   Mat out = img.clone();
   for (int r = 0; r < img.rows; ++r)
