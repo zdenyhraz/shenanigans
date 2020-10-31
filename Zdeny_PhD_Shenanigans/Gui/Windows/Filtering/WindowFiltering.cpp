@@ -13,7 +13,7 @@ void WindowFiltering::HistogramEqualize()
   Mat img = imread(ui.lineEdit->text().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
   normalize(img, img, 0, 255, CV_MINMAX);
   img.convertTo(img, CV_8UC1);
-  cv::resize(img, img, Size(500, 500));
+  cv::resize(img, img, Size(ui.lineEdit_2->text().toInt(), ui.lineEdit_2->text().toInt()));
   Mat heq = EqualizeHistogram(img);
   Mat aheq = EqualizeHistogramAdaptive(img, ui.lineEdit_3->text().toInt());
 
