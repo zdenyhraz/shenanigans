@@ -19,7 +19,35 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if constexpr (1) // histogram equalize
+  if constexpr (1) // cyclic image shift
+  {
+    Mat img = imread("C:\\Users\\Zdeny\\Downloads\\src.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    img.convertTo(img, CV_32F);
+
+    Mat ref = imread("C:\\Users\\Zdeny\\Downloads\\ref.tif", CV_LOAD_IMAGE_GRAYSCALE);
+    ref.convertTo(ref, CV_32F);
+
+    Mat out = img.clone();
+    int shiftX = 800;
+    int shiftY = 83;
+
+    auto MyModulo = [](int a, int b) { return a - a / b * b >= 0 ? a - a / b * b : a - a / b * b + b; };
+
+    for (int r = 0; r < img.rows; ++r)
+    {
+      for (int c = 0; c < img.cols; ++c)
+      {
+        int srcrow = MyModulo(r - shiftY, img.rows);
+        int srccol = MyModulo(c - shiftX, img.cols);
+        out.at<float>(r, c) = img.at<float>(srcrow, srccol);
+      }
+    }
+
+    showimg(std::vector<Mat>{img, out, ref}, "cyclic shift");
+    Plot2D::plot(abs(ref - out), "diff plot");
+    Plot2D::plot(img, "img plot");
+  }
+  if constexpr (0) // histogram equalize
   {
     Mat img = imread("Resources/test.png", CV_LOAD_IMAGE_GRAYSCALE);
     normalize(img, img, 0, 255, CV_MINMAX);
