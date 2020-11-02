@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>395</width>
-    <height>218</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,8 +37,8 @@
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>32</x>
-      <y>54</y>
+      <x>41</x>
+      <y>56</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -51,7 +51,7 @@
      </font>
     </property>
     <property name="text">
-     <string>HISTEQ</string>
+     <string>AHEQ</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">

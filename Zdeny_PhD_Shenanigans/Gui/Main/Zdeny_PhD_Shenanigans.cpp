@@ -97,9 +97,9 @@ void Zdeny_PhD_Shenanigans::UnitTests() { UnitTests::TestAll(); }
 
 void Zdeny_PhD_Shenanigans::Snake()
 {
-  LOG_INFO("Started playing snake. (It is ok, everyone needs some rest.. :))");
+  LOG_INFO("Started playing snake");
   SnakeGame();
-  LOG_INFO("Finished playing snake. Did you enjoy it? *wink*");
+  LOG_INFO("Finished playing snake - did you enjoy it? *wink*");
 }
 
 void Zdeny_PhD_Shenanigans::CloseEvent(QCloseEvent *event)
