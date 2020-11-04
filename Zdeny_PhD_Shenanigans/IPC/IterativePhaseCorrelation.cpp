@@ -299,10 +299,10 @@ void IterativePhaseCorrelation::UpdateBandpass()
 
   for (int r = 0; r < mRows; ++r)
     for (int c = 0; c < mCols; ++c)
-      mBandpass.at<float>(r, c) = exp(-std::pow(((float)c - mCols / 2) / (mCols / 2), 2) * std::pow(mBandpassL, 2) -
-                                      std::pow(((float)r - mRows / 2) / (mRows / 2), 2) * std::pow(mBandpassL, 2)) *
-                                  (1.0 - exp(-std::pow(((float)c - mCols / 2) / (mCols / 2), 2) / std::pow(mBandpassH, 2) -
-                                             std::pow(((float)r - mRows / 2) / (mRows / 2), 2) / std::pow(mBandpassH, 2)));
+      mBandpass.at<float>(r, c) =
+          exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))) *
+          (1.0 - exp(-std::pow(1.0 / mBandpassH, 2) *
+                     (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))));
 
   normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
   CalculateFrequencyBandpass();
