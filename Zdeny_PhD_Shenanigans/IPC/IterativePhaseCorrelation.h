@@ -35,6 +35,7 @@ public:
   Point2f Calculate(Mat &&image1, Mat &&image2) const;           // mangles the source images
   void Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory, float maxShiftRatio = 0.25,
       float noiseStdev = 0.1, int itersPerImage = 5);
+  void ShowDebugStuff() const;
 
 private:
   int mRows = 0;

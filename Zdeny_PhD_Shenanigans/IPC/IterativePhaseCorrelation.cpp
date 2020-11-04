@@ -283,6 +283,12 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
 }
 
+void IterativePhaseCorrelation::ShowDebugStuff() const
+{
+  Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows);
+  Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows);
+}
+
 void IterativePhaseCorrelation::UpdateWindow() { createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F); }
 
 void IterativePhaseCorrelation::UpdateBandpass()

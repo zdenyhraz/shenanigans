@@ -17,6 +17,7 @@ WindowIPC::WindowIPC(QWidget *parent, Globals *globals) : QMainWindow(parent), g
   connect(ui.pushButton_8, SIGNAL(clicked()), this, SLOT(features()));
   connect(ui.pushButton_5, SIGNAL(clicked()), this, SLOT(linearFlow()));
   connect(ui.pushButton_7, SIGNAL(clicked()), this, SLOT(constantFlow()));
+  connect(ui.pushButton_10, SIGNAL(clicked()), this, SLOT(ShowDebugStuff()));
 }
 
 void WindowIPC::RefreshIPCparameters(bool init)
@@ -176,4 +177,10 @@ void WindowIPC::constantFlow()
   LOG_DEBUG("yshifts min = " + to_string(vectorMin(yshifts)));
   LOG_DEBUG("yshifts max = " + to_string(vectorMax(yshifts)));
   LOG_DEBUG("Constant solar wind speed calculated");
+}
+
+void WindowIPC::ShowDebugStuff()
+{
+  RefreshIPCparameters();
+  globals->IPC->ShowDebugStuff();
 }
