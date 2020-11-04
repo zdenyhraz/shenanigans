@@ -46,10 +46,15 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
     return {0, 0};
 
   ConvertToUnitFloat(img1, img2);
-  ApplyWindow(img1, img2);
+
+  if (mApplyWindow)
+    ApplyWindow(img1, img2);
+
   auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
-  ApplyBandpass(crosspower);
+
+  if (mApplyBandpass)
+    ApplyBandpass(crosspower);
 
   Mat L3 = CalculateL3(crosspower);
   Point2f L3peak = GetPeak(L3);
@@ -263,7 +268,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BP", "L1RATIO"});
   evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1, 0.1};
-  evo.mUB = {5, 500, 21, 51, +1, +1, +1, 0.9};
+  evo.mUB = {5.0, 1.0, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
 
   // set the currently used parameters to the best parameters
@@ -333,9 +338,6 @@ inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2) 
 
 inline void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2) const
 {
-  if (!mApplyWindow)
-    return;
-
   multiply(img1, mWindow, img1);
   multiply(img2, mWindow, img2);
 }
@@ -374,13 +376,7 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft
   return CrossPower;
 }
 
-inline void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower) const
-{
-  if (!mApplyBandpass)
-    return;
-
-  multiply(crosspower, mFrequencyBandpass, crosspower);
-}
+inline void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower) const { multiply(crosspower, mFrequencyBandpass, crosspower); }
 
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
