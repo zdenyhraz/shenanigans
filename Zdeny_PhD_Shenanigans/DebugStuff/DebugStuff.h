@@ -19,7 +19,47 @@ void Debug(Globals *globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if constexpr (1) // cyclic image shift
+  if constexpr (1) // rectangular and gaussian abndpass equations
+  {
+    int rows = 1000;
+    int cols = 1000;
+
+    Mat bandpassR = Mat::zeros(rows, cols, CV_32F);
+    Mat bandpassG = Mat::zeros(rows, cols, CV_32F);
+    Mat gaussL = Mat::zeros(rows, cols, CV_32F);
+    Mat gaussH = Mat::zeros(rows, cols, CV_32F);
+
+    float fL = 0.3;
+    float fH = 0.8;
+
+    float sL = 1.0;
+    float sH = 0.01;
+
+    for (int r = 0; r < rows; ++r)
+    {
+      for (int c = 0; c < cols; ++c)
+      {
+        float R = sqrt(std::pow(((float)c - cols / 2) / (cols / 2), 2) + std::pow(((float)r - rows / 2) / (rows / 2), 2));
+        bandpassR.at<float>(r, c) = (fL <= R && R <= fH) ? 1 : 0;
+
+        gaussL.at<float>(r, c) = exp(
+            -std::pow(((float)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
+
+        gaussH.at<float>(r, c) = 1.0 - exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) / std::pow(sH, 2) -
+                                           std::pow(((float)r - rows / 2) / (rows / 2), 2) / std::pow(sH, 2));
+
+        bandpassG.at<float>(r, c) = gaussL.at<float>(r, c) * gaussH.at<float>(r, c);
+      }
+    }
+
+    // Plot2D::plot(bandpassR, "bandpassR");
+    Plot2D::plot(gaussL, "gaussL");
+    Plot2D::plot(gaussH, "gaussH");
+    Plot2D::plot(bandpassG, "bandpassG");
+
+    // Plot2D::plot(bandpassian(rows, cols, sL, sH), "bandpassian");
+  }
+  if constexpr (0) // cyclic image shift
   {
     Mat img = imread("C:\\Users\\Zdeny\\Downloads\\src.jpg", CV_LOAD_IMAGE_GRAYSCALE);
     img.convertTo(img, CV_32F);

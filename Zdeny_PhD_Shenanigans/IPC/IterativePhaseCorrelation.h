@@ -59,6 +59,8 @@ private:
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
 
+  void UpdateWindow();
+  void UpdateBandpass();
   bool IsValid(const Mat &img1, const Mat &img2) const;
   bool CheckSize(const Mat &img1, const Mat &img2) const;
   bool CheckChannels(const Mat &img1, const Mat &img2) const;
