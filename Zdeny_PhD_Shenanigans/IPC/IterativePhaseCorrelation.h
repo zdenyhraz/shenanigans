@@ -4,7 +4,7 @@
 class IterativePhaseCorrelation
 {
 public:
-  IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1, double bandpassH = 200);
+  IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
   void SetSize(int rows, int cols = -1);
   void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
@@ -40,8 +40,8 @@ public:
 private:
   int mRows = 0;
   int mCols = 0;
-  double mBandpassL = 1;
-  double mBandpassH = 200;
+  double mBandpassL = 1.0;
+  double mBandpassH = 0.01;
   int mL2size = 15;
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
