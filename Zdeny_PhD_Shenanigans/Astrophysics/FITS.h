@@ -444,17 +444,12 @@ void loadImageDebug(Mat &activeimg, double gamaa, bool colorr, double quanBot, d
 
 inline Mat loadImage(std::string path)
 {
-  Mat result;
   if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
-  {
-    result = FitsImage(path).image();
-  }
-  else
-  {
-    result = imread(path, IMREAD_ANYDEPTH);
-    result.convertTo(result, CV_16U);
-    normalize(result, result, 0, 65535, NORM_MINMAX);
-  }
+    return FitsImage(path).image();
+
+  Mat result = imread(path, IMREAD_GRAYSCALE | IMREAD_ANYDEPTH);
+  result.convertTo(result, CV_32F);
+  normalize(result, result, 0, 1, NORM_MINMAX);
   return result;
 }
 

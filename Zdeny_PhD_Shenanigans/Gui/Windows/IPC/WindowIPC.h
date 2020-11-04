@@ -23,4 +23,5 @@ private slots:
   void features();
   void linearFlow();
   void constantFlow();
+  void ShowDebugStuff();
 };
