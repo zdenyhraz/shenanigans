@@ -11,8 +11,8 @@
 IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH)
 : mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
 {
-  mWindow = edgemask(mRows, mCols);
-  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  UpdateWindow();
+  UpdateBandpass();
   CalculateFrequencyBandpass();
 }
 
@@ -20,7 +20,7 @@ void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double b
 {
   mBandpassL = bandpassL;
   mBandpassH = bandpassH;
-  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  UpdateBandpass();
   CalculateFrequencyBandpass();
 }
 
@@ -28,8 +28,8 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
 {
   mRows = rows;
   mCols = cols > 0 ? cols : rows;
-  mWindow = edgemask(mRows, mCols);
-  mBandpass = bandpassian(mRows, mCols, mBandpassL, mBandpassH);
+  UpdateWindow();
+  UpdateBandpass();
   CalculateFrequencyBandpass();
 }
 
@@ -281,6 +281,20 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   {
     LOG_ERROR("Iterative Phase Correlation parameter optimization failed");
   }
+}
+
+void IterativePhaseCorrelation::UpdateWindow() { createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F); }
+
+void IterativePhaseCorrelation::UpdateBandpass()
+{
+  mBandpass = Mat::ones(mRows, mCols, CV_32F);
+
+  for (int r = 0; r < mRows; ++r)
+    for (int c = 0; c < mCols; ++c)
+      mBandpass.at<float>(r, c) = exp(-std::pow(((float)c - mCols / 2) / (mCols / 2), 2) * std::pow(mBandpassL, 2) -
+                                      std::pow(((float)r - mRows / 2) / (mRows / 2), 2) * std::pow(mBandpassL, 2)) *
+                                  (1.0 - exp(-std::pow(((float)c - mCols / 2) / (mCols / 2), 2) / std::pow(mBandpassH, 2) -
+                                             std::pow(((float)r - mRows / 2) / (mRows / 2), 2) / std::pow(mBandpassH, 2)));
 }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const

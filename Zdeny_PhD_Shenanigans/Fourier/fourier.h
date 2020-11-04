@@ -70,17 +70,12 @@ inline Mat edgemask(int rows, int cols)
 
 inline Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
 {
-  Mat gaussian = Mat::ones(rows, cols, CV_32F);
-  float centerX = floor((float)cols / 2);
-  float centerY = floor((float)rows / 2);
-  int x, y;
-  for (y = 0; y < rows; y++)
-  {
-    for (x = 0; x < cols; x++)
-    {
-      gaussian.at<float>(y, x) = std::exp(-(std::pow(x - centerX, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(y - centerY, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
-    }
-  }
+  Mat gaussian = Mat::zeros(rows, cols, CV_32F);
+  for (int r = 0; r < rows; r++)
+    for (int c = 0; c < cols; c++)
+      gaussian.at<float>(r, c) = std::exp(-(std::pow(c - cols / 2, 2) / 2 / std::pow((double)cols / stdevXmult, 2) +
+                                            std::pow(r - rows / 2, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
+
   normalize(gaussian, gaussian, 0, 1, NORM_MINMAX);
   return gaussian;
 }
@@ -95,7 +90,7 @@ inline Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmult)
 
 inline Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
 {
-  Mat bandpassian = gaussian(rows, cols, stdevLmult, stdevLmult).mul(laplacian(rows, cols, stdevHmult, stdevHmult));
+  Mat bandpassian = gaussian(rows, cols, stdevLmult, stdevLmult).mul(laplacian(rows, cols, 1. / stdevHmult, 1. / stdevHmult));
   normalize(bandpassian, bandpassian, 0, 1, NORM_MINMAX);
   return bandpassian;
 }
@@ -125,7 +120,8 @@ inline Mat bandpass(const Mat &sourceimgDFTIn, const Mat &bandpassMat)
   return sourceimgDFT.mul(filter);
 }
 
-void showfourier(const Mat &DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
+void showfourier(
+    const Mat &DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
 
 Mat convolute(Mat sourceimg, Mat PSFimg);
 
