@@ -13,7 +13,6 @@ IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double 
 {
   UpdateWindow();
   UpdateBandpass();
-  CalculateFrequencyBandpass();
 }
 
 void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
@@ -21,7 +20,6 @@ void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double b
   mBandpassL = bandpassL;
   mBandpassH = bandpassH;
   UpdateBandpass();
-  CalculateFrequencyBandpass();
 }
 
 void IterativePhaseCorrelation::SetSize(int rows, int cols)
@@ -30,7 +28,6 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
   mCols = cols > 0 ? cols : rows;
   UpdateWindow();
   UpdateBandpass();
-  CalculateFrequencyBandpass();
 }
 
 Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &image2) const
@@ -177,7 +174,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
   else
   {
-    LOG_ERROR("Optimizing IPC parameters without validation set - '{}' is not a valid directory", validationImagesDirectory);
+    LOG_DEBUG("Optimizing IPC parameters without validation set - '{}' is not a valid directory", validationImagesDirectory);
   }
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", trainingImages.size());
@@ -306,6 +303,9 @@ void IterativePhaseCorrelation::UpdateBandpass()
                                       std::pow(((float)r - mRows / 2) / (mRows / 2), 2) * std::pow(mBandpassL, 2)) *
                                   (1.0 - exp(-std::pow(((float)c - mCols / 2) / (mCols / 2), 2) / std::pow(mBandpassH, 2) -
                                              std::pow(((float)r - mRows / 2) / (mRows / 2), 2) / std::pow(mBandpassH, 2)));
+
+  normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
+  CalculateFrequencyBandpass();
 }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
