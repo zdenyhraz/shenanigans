@@ -439,6 +439,7 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft
   pow(CrossPowerPlanes[1], 2, magnim);
   Mat normalizationdenominator = magnre + magnim;
   sqrt(normalizationdenominator, normalizationdenominator);
+  normalizationdenominator += std::numeric_limits<float>::epsilon();
   CrossPowerPlanes[0] /= normalizationdenominator;
   CrossPowerPlanes[1] /= normalizationdenominator;
 

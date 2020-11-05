@@ -19,7 +19,7 @@ inline Mat fourier(const Mat &sourceimgIn)
 
 inline Mat fourier(Mat &&sourceimg)
 {
-  Mat sourceimgcomplex[2] = {sourceimg, Mat::zeros(sourceimg.size(), CV_32F)};
+  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
   Mat sourceimgcomplexmerged;
   merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
   dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
