@@ -17,6 +17,14 @@ public:
     Hamming,
   };
 
+  enum class InterpolationType
+  {
+    NearestNeighbor,
+    Linear,
+    Cubic,
+    Lanczos,
+  };
+
   IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
 
   // setters
@@ -26,9 +34,10 @@ public:
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
   void SetUpsampleCoeff(int upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
   void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
-  void SetInterpolationType(InterpolationFlags interpolationType) { mInterpolationType = interpolationType; }
+  void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
+  void SetDebugDirectory(const std::string &dir) { mDebugDirectory = dir; }
 
   // getters
   int GetRows() const { return mRows; }
@@ -58,16 +67,13 @@ private:
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
-  InterpolationFlags mInterpolationType = INTER_LINEAR;
+  InterpolationType mInterpolationType = InterpolationType::Linear;
+  BandpassType mBandpassType = BandpassType::Gaussian;
+  WindowType mWindowType = WindowType::Hann;
+  std::string mDebugDirectory = "";
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
-  bool mSave = false;
-  string mSavedir = "";
-  cv::Size mSavesize = cv::Size(500, 500);
-  int mSavecntr = 0;
-  BandpassType mBandpassType = BandpassType::Gaussian;
-  WindowType mWindowType = WindowType::Hann;
 
   // internal methods
   void UpdateWindow();

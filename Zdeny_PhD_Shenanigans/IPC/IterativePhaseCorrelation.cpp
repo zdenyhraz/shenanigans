@@ -235,7 +235,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     ipc.SetBandpassParameters(params[0], params[1]);
     ipc.SetL2size(params[2]);
     ipc.SetUpsampleCoeff(params[3]);
-    ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
+    // ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
     // void SetBandpassType(BandpassType type) { mBandpassType = type; }
     // void SetWindowType(WindowType type) { mWindowType = type; }
     ipc.SetL1ratio(params[7]);
@@ -266,7 +266,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     SetBandpassParameters(bestParams[0], bestParams[1]);
     SetL2size(bestParams[2]);
     SetUpsampleCoeff(bestParams[3]);
-    SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
+    // SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
     // void SetBandpassType(BandpassType type) { mBandpassType = type; }
     // void SetWindowType(WindowType type) { mWindowType = type; }
     ShowDebugStuff();
@@ -518,7 +518,25 @@ inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2f &
 inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
 {
   Mat L2U;
-  resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, mInterpolationType);
+  switch (mInterpolationType)
+  {
+  case InterpolationType::NearestNeighbor:
+    resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
+    break;
+
+  case InterpolationType::Linear:
+    resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
+    break;
+
+  case InterpolationType::Cubic:
+    resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
+    break;
+
+  case InterpolationType::Lanczos:
+    resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_LANCZOS4);
+    break;
+  }
+
   return L2U;
 }
 
