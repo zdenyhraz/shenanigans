@@ -11,8 +11,7 @@
 IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH)
 : mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
 {
-  UpdateWindow();
-  UpdateBandpass();
+  SetSize(rows, cols);
 }
 
 void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
@@ -26,6 +25,10 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
 {
   mRows = rows;
   mCols = cols > 0 ? cols : rows;
+
+  LOG_ERROR_IF(mRows != getOptimalDFTSize(rows) || mCols != getOptimalDFTSize(cols),
+      "IPC does not have optimal size, consider resizing: [{}x{}] -> [{}x{}]", mCols, mRows, getOptimalDFTSize(cols), getOptimalDFTSize(rows));
+
   UpdateWindow();
   UpdateBandpass();
 }
