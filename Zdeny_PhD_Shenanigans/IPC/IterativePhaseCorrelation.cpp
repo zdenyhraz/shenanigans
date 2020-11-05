@@ -43,15 +43,10 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
     return {0, 0};
 
   ConvertToUnitFloat(img1, img2);
-
-  if (mApplyWindow)
-    ApplyWindow(img1, img2);
-
+  ApplyWindow(img1, img2);
   auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
-
-  if (mApplyBandpass)
-    ApplyBandpass(crosspower);
+  ApplyBandpass(crosspower);
 
   Mat L3 = CalculateL3(crosspower);
   Point2f L3peak = GetPeak(L3);
@@ -244,8 +239,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     ipc.SetL2size(params[2]);
     ipc.SetUpsampleCoeff(params[3]);
     ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
-    ipc.SetApplyWindow(params[5] > 0 ? true : false);
-    ipc.SetApplyBandpass(params[6] > 0 ? true : false);
+    // void SetBandpassType(BandpassType type) { mBandpassType = type; }
+    // void SetWindowType(WindowType type) { mWindowType = type; }
     ipc.SetL1ratio(params[7]);
 
     // calculate average registration error
@@ -263,7 +258,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   Evolution evo(N);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "HANN", "BP", "L1RATIO"});
+  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "WINDOW", "BANDPASS", "L1RATIO"});
   evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1, 0.1};
   evo.mUB = {5.0, 1.0, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
@@ -275,8 +270,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     SetL2size(bestParams[2]);
     SetUpsampleCoeff(bestParams[3]);
     SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
-    SetApplyWindow(bestParams[5] > 0 ? true : false);
-    SetApplyBandpass(bestParams[6] > 0 ? true : false);
+    // void SetBandpassType(BandpassType type) { mBandpassType = type; }
+    // void SetWindowType(WindowType type) { mWindowType = type; }
     ShowDebugStuff();
     LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
   }
@@ -310,7 +305,11 @@ inline void IterativePhaseCorrelation::UpdateWindow()
 {
   switch (mWindowType)
   {
-  case Hann:
+  case WindowType::Rectangular:
+    mWindow = Mat::ones(mRows, mCols, CV_32F);
+    break;
+
+  case WindowType::Hann:
     createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
     break;
   }
@@ -322,7 +321,7 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
 
   switch (mBandpassType)
   {
-  case Gaussian:
+  case BandpassType::Gaussian:
     if (mBandpassL > 0 && mBandpassH <= 0)
     {
       for (int r = 0; r < mRows; ++r)
@@ -346,7 +345,7 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
       normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
     break;
 
-  case Rectangular:
+  case BandpassType::Rectangular:
     for (int r = 0; r < mRows; ++r)
       for (int c = 0; c < mCols; ++c)
         mBandpass.at<float>(r, c) = BandpassREquation(r, c);
