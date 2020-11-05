@@ -42,69 +42,77 @@ Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &image
 
 inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) const
 {
-  if (!IsValid(img1, img2))
-    return {0, 0};
-
-  ConvertToUnitFloat(img1, img2);
-  ApplyWindow(img1, img2);
-  auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
-  auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
-  ApplyBandpass(crosspower);
-
-  Mat L3 = CalculateL3(crosspower);
-  Point2f L3peak = GetPeak(L3);
-  Point2f L3mid(L3.cols / 2, L3.rows / 2);
-  Point2f result = L3peak - L3mid;
-
-  int L2size = mL2size;
-  bool converged = false;
-  while (!converged)
+  try
   {
-    if (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size(L2size))
-        break;
+    if (!IsValid(img1, img2))
+      return {0, 0};
 
-    // L2
-    Mat L2 = CalculateL2(L3, L3peak, L2size);
-    Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    ConvertToUnitFloat(img1, img2);
+    ApplyWindow(img1, img2);
+    auto [dft1, dft2] = CalculateFourierTransforms(img1, img2);
+    auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
+    ApplyBandpass(crosspower);
 
-    // L2U
-    Mat L2U = CalculateL2U(L2);
-    Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-    Point2f L2Upeak = L2Umid;
+    Mat L3 = CalculateL3(crosspower);
+    Point2f L3peak = GetPeak(L3);
+    Point2f L3mid(L3.cols / 2, L3.rows / 2);
+    Point2f result = L3peak - L3mid;
 
-    // L1
-    int L1size = GetL1size(L2U);
-    Mat L1;
-    Point2f L1mid(L1size / 2, L1size / 2);
-    Point2f L1peak;
-
-    for (int iter = 0; iter < mMaxIterations; ++iter)
+    int L2size = mL2size;
+    bool converged = false;
+    while (!converged)
     {
-      L1 = CalculateL1(L2U, L2Upeak, L1size);
-      L1peak = GetPeakSubpixel(L1);
-      L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+      if (IsOutOfBounds(L3peak, L3, L2size))
+        if (!ReduceL2size(L2size))
+          break;
 
-      if (IsOutOfBounds(L2Upeak, L2U, L1size))
-        break;
+      // L2
+      Mat L2 = CalculateL2(L3, L3peak, L2size);
+      Point2f L2mid(L2.cols / 2, L2.rows / 2);
 
-      if (AccuracyReached(L1peak, L1mid))
+      // L2U
+      Mat L2U = CalculateL2U(L2);
+      Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+      Point2f L2Upeak = L2Umid;
+
+      // L1
+      int L1size = GetL1size(L2U);
+      Mat L1;
+      Point2f L1mid(L1size / 2, L1size / 2);
+      Point2f L1peak;
+
+      for (int iter = 0; iter < mMaxIterations; ++iter)
       {
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        converged = true;
+        L1peak = GetPeakSubpixel(L1);
+        L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+
+        if (IsOutOfBounds(L2Upeak, L2U, L1size))
+          break;
+
+        if (AccuracyReached(L1peak, L1mid))
+        {
+          L1 = CalculateL1(L2U, L2Upeak, L1size);
+          converged = true;
+          break;
+        }
+      }
+
+      if (converged)
+      {
+        result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
         break;
       }
+      else if (!ReduceL2size(L2size))
+        break;
     }
-
-    if (converged)
-    {
-      result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
-      break;
-    }
-    else if (!ReduceL2size(L2size))
-      break;
+    return result;
   }
-  return result;
+  catch (const std::exception &e)
+  {
+    LOG_ERROR("Unexpected error occured: {}", e.what());
+    return {0, 0};
+  }
 }
 
 void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory,
@@ -241,13 +249,17 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   const auto f = [&](const std::vector<double> &params) {
     // create ipc object with speficied parameters
     IterativePhaseCorrelation ipc(mRows, mCols);
-    ipc.SetBandpassParameters(params[0], params[1]);
-    ipc.SetL2size(params[2]);
-    ipc.SetUpsampleCoeff(params[3]);
-    // ipc.SetInterpolationType(params[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
-    // void SetBandpassType(BandpassType type) { mBandpassType = type; }
-    // void SetWindowType(WindowType type) { mWindowType = type; }
+    ipc.SetBandpassType(static_cast<BandpassType>((int)params[0]));
+    ipc.SetBandpassParameters(params[1], params[2]);
+    ipc.SetInterpolationType(static_cast<InterpolationType>((int)params[3]));
+    ipc.SetWindowType(static_cast<WindowType>((int)params[4]));
+    ipc.SetUpsampleCoeff(params[5]);
+    ipc.SetL2size(params[6]);
     ipc.SetL1ratio(params[7]);
+
+    // L1 smaller than 3, shit
+    if (std::floor(ipc.GetL1ratio() * ipc.GetL2size() * ipc.GetUpsampleCoeff()) < 3)
+      return std::numeric_limits<double>::max();
 
     // calculate average registration error
     double avgerror = 0;
@@ -264,20 +276,33 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   Evolution evo(N);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPL", "BPH", "L2", "UC", "INTERP", "WINDOW", "BANDPASS", "L1RATIO"});
-  evo.mLB = {0.0001, 0.0001, 3, 5, -1, -1, -1, 0.1};
-  evo.mUB = {5.0, 1.0, 21, 51, +1, +1, +1, 0.9};
+  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L2size", "L1ratio"});
+
+  evo.mLB = {0, -1, -1, 0, 0, 11, 5., 0.1};
+  evo.mUB = {2, 3., 1., 3, 2, 51, 21, 0.7};
+
   const auto bestParams = evo.Optimize(f);
 
   // set the currently used parameters to the best parameters and show the resulting bandpass, window, etc.
   if (bestParams.size() == N)
   {
-    SetBandpassParameters(bestParams[0], bestParams[1]);
-    SetL2size(bestParams[2]);
-    SetUpsampleCoeff(bestParams[3]);
-    // SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
-    // void SetBandpassType(BandpassType type) { mBandpassType = type; }
-    // void SetWindowType(WindowType type) { mWindowType = type; }
+    SetBandpassType(static_cast<BandpassType>((int)bestParams[0]));
+    SetBandpassParameters(bestParams[1], bestParams[2]);
+    SetInterpolationType(static_cast<InterpolationType>((int)bestParams[3]));
+    SetWindowType(static_cast<WindowType>((int)bestParams[4]));
+    SetUpsampleCoeff(bestParams[5]);
+    SetL2size(bestParams[6]);
+    SetL1ratio(bestParams[7]);
+
+    LOG_SUCC("Optimal IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0])));
+    LOG_SUCC("Optimal IPC BandpassL: {}", bestParams[1]);
+    LOG_SUCC("Optimal IPC BandpassH: {}", bestParams[2]);
+    LOG_SUCC("Optimal IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
+    LOG_SUCC("Optimal IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
+    LOG_SUCC("Optimal IPC UpsampleCoeff: {}", bestParams[5]);
+    LOG_SUCC("Optimal IPC L2size: {}", bestParams[6]);
+    LOG_SUCC("Optimal IPC L1ratio: {}", bestParams[7]);
+
     ShowDebugStuff();
     LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
   }
@@ -524,6 +549,7 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
 
 inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const
 {
+
   return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
 }
 
@@ -542,10 +568,6 @@ inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
 
   case InterpolationType::Cubic:
     resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
-    break;
-
-  case InterpolationType::Lanczos:
-    resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, INTER_LANCZOS4);
     break;
   }
 

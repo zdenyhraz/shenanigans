@@ -10,20 +10,56 @@ public:
     Gaussian,
   };
 
+  const char *BandpassType2String(BandpassType type)
+  {
+    switch (type)
+    {
+    case BandpassType::Rectangular:
+      return "Rectangular";
+    case BandpassType::Gaussian:
+      return "Gaussian";
+    }
+    return "Unknown";
+  }
+
   enum class WindowType
   {
     Rectangular,
     Hann,
-    Hamming,
   };
+
+  const char *WindowType2String(WindowType type)
+  {
+    switch (type)
+    {
+    case WindowType::Rectangular:
+      return "Rectangular";
+    case WindowType::Hann:
+      return "Hann";
+    }
+    return "Unknown";
+  }
 
   enum class InterpolationType
   {
     NearestNeighbor,
     Linear,
     Cubic,
-    Lanczos,
   };
+
+  const char *InterpolationType2String(InterpolationType type)
+  {
+    switch (type)
+    {
+    case InterpolationType::NearestNeighbor:
+      return "NearestNeighbor";
+    case InterpolationType::Linear:
+      return "Linear";
+    case InterpolationType::Cubic:
+      return "Cubic";
+    }
+    return "Unknown";
+  }
 
   IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
 
@@ -46,7 +82,7 @@ public:
   double GetBandpassL() const { return mBandpassL; }
   double GetBandpassH() const { return mBandpassH; }
   int GetL2size() const { return mL2size; }
-  int GetL1ratio() const { return mL1ratio; }
+  double GetL1ratio() const { return mL1ratio; }
   int GetUpsampleCoeff() const { return mUpsampleCoeff; }
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
