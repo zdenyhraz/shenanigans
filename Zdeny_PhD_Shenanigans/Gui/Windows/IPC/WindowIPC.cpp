@@ -27,8 +27,6 @@ void WindowIPC::RefreshIPCparameters(bool init)
   globals->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
   globals->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
-  // globals->IPC->SetApplyBandpass(ui.checkBox_3->isChecked());
-  // globals->IPC->SetApplyWindow(ui.checkBox_4->isChecked());
 
   if (!init)
     LOG_DEBUG("IPC parameter values updated");
@@ -99,8 +97,8 @@ void WindowIPC::alignXY()
   img1 = roicrop(img1, ui.lineEdit_18->text().toDouble() * img1.cols, ui.lineEdit_19->text().toDouble() * img1.rows, sizeX, sizeY);
   img2 = roicrop(img2, ui.lineEdit_18->text().toDouble() * img2.cols, ui.lineEdit_19->text().toDouble() * img2.rows, sizeX, sizeY);
 
-  IPCsettings set = *globals->IPCset; // copy
-  set.speak = IPCsettings::All;       // show
+  IPCsettings set = *globals->IPCset;
+  set.speak = IPCsettings::All;
 
   showimg(img1, "img1");
   showimg(img2, "img2");

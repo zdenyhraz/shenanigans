@@ -165,7 +165,7 @@ void WindowDiffrot::optimizeDiffrot()
       ipc_opt.SetUpsampleCoeff(upsampleCoeff);
       // ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
       // ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
-      ipc_opt.SetInterpolationType(args[7] > 0 ? INTER_CUBIC : INTER_LINEAR);
+      // ipc_opt.SetInterpolationType(args[7] > 0 ? INTER_CUBIC : INTER_LINEAR);
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
       drset_opt.speak = false;
