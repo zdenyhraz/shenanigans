@@ -25,7 +25,6 @@ public:
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
   void SetUpsampleCoeff(int upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
-  void SetDivisionEpsilon(double divisionEpsilon) { mDivisionEpsilon = divisionEpsilon; }
   void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationFlags interpolationType) { mInterpolationType = interpolationType; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
@@ -58,7 +57,6 @@ private:
   int mL2size = 15;
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
-  double mDivisionEpsilon = 0;
   int mMaxIterations = 20;
   InterpolationFlags mInterpolationType = INTER_LINEAR;
   Mat mBandpass;
