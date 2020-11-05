@@ -53,9 +53,6 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   Point2f result = L3peak - L3mid;
 
-  if (!mSubpixelEstimation)
-    return result;
-
   int L2size = mL2size;
   bool converged = false;
   while (!converged)
@@ -432,16 +429,13 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft
   CrossPowerPlanes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]); // pointwise multiplications real
   CrossPowerPlanes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]); // imag
 
-  if (!mCrossCorrelate)
-  {
-    Mat magnre, magnim;
-    pow(CrossPowerPlanes[0], 2, magnre);
-    pow(CrossPowerPlanes[1], 2, magnim);
-    Mat normalizationdenominator = magnre + magnim;
-    sqrt(normalizationdenominator, normalizationdenominator);
-    CrossPowerPlanes[0] /= (normalizationdenominator + mDivisionEpsilon);
-    CrossPowerPlanes[1] /= (normalizationdenominator + mDivisionEpsilon);
-  }
+  Mat magnre, magnim;
+  pow(CrossPowerPlanes[0], 2, magnre);
+  pow(CrossPowerPlanes[1], 2, magnim);
+  Mat normalizationdenominator = magnre + magnim;
+  sqrt(normalizationdenominator, normalizationdenominator);
+  CrossPowerPlanes[0] /= (normalizationdenominator + mDivisionEpsilon);
+  CrossPowerPlanes[1] /= (normalizationdenominator + mDivisionEpsilon);
 
   Mat CrossPower;
   merge(CrossPowerPlanes, 2, CrossPower);

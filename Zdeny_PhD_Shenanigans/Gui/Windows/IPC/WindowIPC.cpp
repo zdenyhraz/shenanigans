@@ -28,10 +28,8 @@ void WindowIPC::RefreshIPCparameters(bool init)
   globals->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
   globals->IPC->SetDivisionEpsilon(ui.lineEdit_7->text().toDouble());
-  globals->IPC->SetSubpixelEstimation(ui.checkBox->isChecked());
   // globals->IPC->SetApplyBandpass(ui.checkBox_3->isChecked());
   // globals->IPC->SetApplyWindow(ui.checkBox_4->isChecked());
-  globals->IPC->SetCrossCorrelate(ui.checkBox_7->isChecked());
 
   if (!init)
     LOG_DEBUG("IPC parameter values updated");
