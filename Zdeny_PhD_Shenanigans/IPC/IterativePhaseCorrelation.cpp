@@ -306,33 +306,52 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows);
 }
 
-inline void IterativePhaseCorrelation::UpdateWindow() { createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F); }
+inline void IterativePhaseCorrelation::UpdateWindow()
+{
+  switch (mWindowType)
+  {
+  case Hann:
+    createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
+    break;
+  }
+}
 
 inline void IterativePhaseCorrelation::UpdateBandpass()
 {
   mBandpass = Mat::ones(mRows, mCols, CV_32F);
 
-  if (mBandpassL > 0 && mBandpassH <= 0)
+  switch (mBandpassType)
   {
-    for (int r = 0; r < mRows; ++r)
-      for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) = BandpassLEquation(r, c);
-  }
-  else if (mBandpassL <= 0 && mBandpassH > 0)
-  {
-    for (int r = 0; r < mRows; ++r)
-      for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) = BandpassHEquation(r, c);
-  }
-  else if (mBandpassL > 0 && mBandpassH > 0)
-  {
-    for (int r = 0; r < mRows; ++r)
-      for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) = BandpassEquation(r, c);
-  }
+  case Gaussian:
+    if (mBandpassL > 0 && mBandpassH <= 0)
+    {
+      for (int r = 0; r < mRows; ++r)
+        for (int c = 0; c < mCols; ++c)
+          mBandpass.at<float>(r, c) = BandpassLEquation(r, c);
+    }
+    else if (mBandpassL <= 0 && mBandpassH > 0)
+    {
+      for (int r = 0; r < mRows; ++r)
+        for (int c = 0; c < mCols; ++c)
+          mBandpass.at<float>(r, c) = BandpassHEquation(r, c);
+    }
+    else if (mBandpassL > 0 && mBandpassH > 0)
+    {
+      for (int r = 0; r < mRows; ++r)
+        for (int c = 0; c < mCols; ++c)
+          mBandpass.at<float>(r, c) = BandpassGEquation(r, c);
+    }
 
-  if (mBandpassL > 0 || mBandpassH > 0)
-    normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
+    if (mBandpassL > 0 || mBandpassH > 0)
+      normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
+    break;
+
+  case Rectangular:
+    for (int r = 0; r < mRows; ++r)
+      for (int c = 0; c < mCols; ++c)
+        mBandpass.at<float>(r, c) = BandpassREquation(r, c);
+    break;
+  }
 
   CalculateFrequencyBandpass();
 }
@@ -348,7 +367,19 @@ inline float IterativePhaseCorrelation::BandpassHEquation(int row, int col) cons
                    (std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2)));
 }
 
-inline float IterativePhaseCorrelation::BandpassEquation(int row, int col) const { return BandpassLEquation(row, col) * BandpassHEquation(row, col); }
+inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const
+{
+  return BandpassLEquation(row, col) * BandpassHEquation(row, col);
+}
+
+float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
+{
+  if (mBandpassL >= mBandpassH)
+    return 1;
+
+  float R = sqrt(std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2));
+  return (mBandpassL <= R && R <= mBandpassH) ? 1 : 0;
+}
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
 {

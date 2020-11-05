@@ -4,6 +4,18 @@
 class IterativePhaseCorrelation
 {
 public:
+  enum BandpassType
+  {
+    Gaussian,
+    Rectangular
+  };
+
+  enum WindowType
+  {
+    Hann,
+    Hamming
+  };
+
   IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
   void SetSize(int rows, int cols = -1);
   void SetBandpassParameters(double bandpassL, double bandpassH);
@@ -59,12 +71,15 @@ private:
   string mSavedir = "";
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
+  BandpassType mBandpassType = Rectangular;
+  WindowType mWindowType = Hann;
 
   void UpdateWindow();
   void UpdateBandpass();
   float BandpassLEquation(int row, int col) const;
   float BandpassHEquation(int row, int col) const;
-  float BandpassEquation(int row, int col) const;
+  float BandpassGEquation(int row, int col) const;
+  float BandpassREquation(int row, int col) const;
   bool IsValid(const Mat &img1, const Mat &img2) const;
   bool CheckSize(const Mat &img1, const Mat &img2) const;
   bool CheckChannels(const Mat &img1, const Mat &img2) const;
