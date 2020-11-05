@@ -21,14 +21,16 @@ public:
   void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
-  void SetUpsampleCoeff(int UpsampleCoeff) { mUpsampleCoeff = UpsampleCoeff % 2 ? UpsampleCoeff : UpsampleCoeff + 1; }
-  void SetDivisionEpsilon(double DivisionEpsilon) { mDivisionEpsilon = DivisionEpsilon; }
-  void SetMaxIterations(int MaxIterations) { mMaxIterations = MaxIterations; }
-  void SetInterpolationType(InterpolationFlags InterpolationType) { mInterpolationType = InterpolationType; }
-  void SetApplyWindow(bool ApplyWindow) { mApplyWindow = ApplyWindow; }
-  void SetApplyBandpass(bool ApplyBandpass) { mApplyBandpass = ApplyBandpass; }
-  void SetSubpixelEstimation(bool SubpixelEstimation) { mSubpixelEstimation = SubpixelEstimation; }
-  void SetCrossCorrelate(bool CrossCorrelate) { mCrossCorrelate = CrossCorrelate; }
+  void SetUpsampleCoeff(int upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
+  void SetDivisionEpsilon(double divisionEpsilon) { mDivisionEpsilon = divisionEpsilon; }
+  void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
+  void SetInterpolationType(InterpolationFlags interpolationType) { mInterpolationType = interpolationType; }
+  void SetApplyWindow(bool applyWindow) { mApplyWindow = applyWindow; }
+  void SetApplyBandpass(bool applyBandpass) { mApplyBandpass = applyBandpass; }
+  void SetSubpixelEstimation(bool subpixelEstimation) { mSubpixelEstimation = subpixelEstimation; }
+  void SetCrossCorrelate(bool crossCorrelate) { mCrossCorrelate = crossCorrelate; }
+  void SetBandpassType(BandpassType type) { mBandpassType = type; }
+  void SetWindowType(WindowType type) { mWindowType = type; }
 
   int GetRows() const { return mRows; }
   int GetCols() const { return mCols; }
@@ -71,7 +73,7 @@ private:
   string mSavedir = "";
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
-  BandpassType mBandpassType = Rectangular;
+  BandpassType mBandpassType = Gaussian;
   WindowType mWindowType = Hann;
 
   void UpdateWindow();
