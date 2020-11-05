@@ -268,7 +268,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   evo.mUB = {5.0, 1.0, 21, 51, +1, +1, +1, 0.9};
   const auto bestParams = evo.Optimize(f);
 
-  // set the currently used parameters to the best parameters
+  // set the currently used parameters to the best parameters and show the resulting bandpass, window, etc.
   if (bestParams.size() == N)
   {
     SetBandpassParameters(bestParams[0], bestParams[1]);
@@ -277,6 +277,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     SetInterpolationType(bestParams[4] > 0 ? INTER_CUBIC : INTER_LINEAR);
     SetApplyWindow(bestParams[5] > 0 ? true : false);
     SetApplyBandpass(bestParams[6] > 0 ? true : false);
+    ShowDebugStuff();
     LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
   }
   else
@@ -287,6 +288,20 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
+  std::vector<double> x(mCols);
+  std::vector<double> bandpass1D(mCols);
+  std::vector<double> window1D(mCols);
+
+  for (int c = 0; c < mCols; ++c)
+  {
+    x[c] = c + 1;
+    bandpass1D[c] = mBandpass.at<float>(mRows / 2, c);
+    window1D[c] = mWindow.at<float>(mRows / 2, c);
+  }
+
+  Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass");
+  Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window");
+
   Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows);
   Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows);
 }
