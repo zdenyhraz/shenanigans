@@ -52,8 +52,8 @@ public:
   Mat GetBandpass() const { return mBandpass; }
 
   // main calc methods
-  Point2f Calculate(const Mat &image1, const Mat &image2) const; // does not mangle the source images
-  Point2f Calculate(Mat &&image1, Mat &&image2) const;           // mangles the source images
+  Point2f Calculate(const Mat &image1, const Mat &image2) const;
+  Point2f Calculate(Mat &&image1, Mat &&image2) const;
   void Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory, float maxShiftRatio = 0.25,
       float noiseStdev = 0.1, int itersPerImage = 5);
   void ShowDebugStuff() const;
