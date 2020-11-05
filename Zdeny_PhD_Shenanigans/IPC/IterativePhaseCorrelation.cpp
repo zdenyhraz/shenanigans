@@ -296,7 +296,6 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
 
   Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
   Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
-
   LOG_INFO("IPC debug stuff shown");
 }
 
@@ -394,7 +393,8 @@ inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2)
 
 inline bool IterativePhaseCorrelation::CheckSize(const Mat &img1, const Mat &img2) const
 {
-  return img1.rows == mRows && img1.cols == mCols && img2.rows == mRows && img2.cols == mCols;
+  cv::Size ipcsize(mCols, mRows);
+  return img1.size() == img2.size() && img1.size() == ipcsize && img2.size() == ipcsize;
 }
 
 inline bool IterativePhaseCorrelation::CheckChannels(const Mat &img1, const Mat &img2) const { return img1.channels() == 1 && img2.channels() == 1; }
