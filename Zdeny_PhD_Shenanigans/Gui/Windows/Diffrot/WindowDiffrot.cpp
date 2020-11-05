@@ -29,7 +29,8 @@ void WindowDiffrot::calculateDiffrot()
 
 void WindowDiffrot::showResults()
 {
-  drres.ShowResults(ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
+  drres.ShowResults(
+      ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
   LOG_SUCC("Differential rotation profile shown.");
 }
 
@@ -95,10 +96,18 @@ void WindowDiffrot::checkDiskShifts()
 
     if (pic1.params().succload && pic2.params().succload)
     {
-      shiftsN.push_back(phasecorrel(roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set).y);
-      shiftsS.push_back(phasecorrel(roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set).y);
-      shiftsW.push_back(phasecorrel(roicrop(pic1.image(), edgeW, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeW, center, set.getcols(), set.getrows()), set).x);
-      shiftsE.push_back(phasecorrel(roicrop(pic1.image(), edgeE, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeE, center, set.getcols(), set.getrows()), set).x);
+      shiftsN.push_back(phasecorrel(
+          roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set)
+                            .y);
+      shiftsS.push_back(phasecorrel(
+          roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set)
+                            .y);
+      shiftsW.push_back(phasecorrel(
+          roicrop(pic1.image(), edgeW, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeW, center, set.getcols(), set.getrows()), set)
+                            .x);
+      shiftsE.push_back(phasecorrel(
+          roicrop(pic1.image(), edgeE, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeE, center, set.getcols(), set.getrows()), set)
+                            .x);
       shiftsFX.push_back(pic2.params().fitsMidX - pic1.params().fitsMidX);
       shiftsFY.push_back(pic2.params().fitsMidY - pic1.params().fitsMidY);
     }
@@ -120,11 +129,16 @@ void WindowDiffrot::checkDiskShifts()
   std::vector<double> iotam(shiftsFX.size());
   std::iota(iotam.begin(), iotam.end(), 0);
   iotam = (double)(ui.lineEdit_7->text().toDouble() - 1) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / (iotam.size() - 1) * iotam;
-  Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]", std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
-  Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]", std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
+  Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]",
+      std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
+  Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]",
+      std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
 }
 
-void WindowDiffrot::saveDiffrot() { SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, globals->IPC.get()); }
+void WindowDiffrot::saveDiffrot()
+{
+  SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, globals->IPC.get());
+}
 
 void WindowDiffrot::loadDiffrot()
 {
@@ -149,8 +163,8 @@ void WindowDiffrot::optimizeDiffrot()
       IterativePhaseCorrelation ipc_opt(winsize, winsize, args[0], args[1]);
       ipc_opt.SetL2size(L2size);
       ipc_opt.SetUpsampleCoeff(upsampleCoeff);
-      ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
-      ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
+      // ipc_opt.SetApplyBandpass(args[3] > 0 ? true : false);
+      // ipc_opt.SetApplyWindow(args[4] > 0 ? true : false);
       ipc_opt.SetInterpolationType(args[7] > 0 ? INTER_CUBIC : INTER_LINEAR);
       FitsTime time_opt = starttime;
       DiffrotSettings drset_opt = drset;
@@ -258,5 +272,6 @@ void WindowDiffrot::movingPeak()
 FitsTime WindowDiffrot::GetStartFitsTime()
 {
   UpdateDrset();
-  return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+  return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(),
+      ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 }

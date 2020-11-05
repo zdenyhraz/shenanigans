@@ -4,19 +4,22 @@
 class IterativePhaseCorrelation
 {
 public:
-  enum BandpassType
+  enum class BandpassType
   {
+    Rectangular,
     Gaussian,
-    Rectangular
   };
 
-  enum WindowType
+  enum class WindowType
   {
+    Rectangular,
     Hann,
-    Hamming
+    Hamming,
   };
 
   IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
+
+  // setters
   void SetSize(int rows, int cols = -1);
   void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
@@ -25,13 +28,12 @@ public:
   void SetDivisionEpsilon(double divisionEpsilon) { mDivisionEpsilon = divisionEpsilon; }
   void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationFlags interpolationType) { mInterpolationType = interpolationType; }
-  void SetApplyWindow(bool applyWindow) { mApplyWindow = applyWindow; }
-  void SetApplyBandpass(bool applyBandpass) { mApplyBandpass = applyBandpass; }
   void SetSubpixelEstimation(bool subpixelEstimation) { mSubpixelEstimation = subpixelEstimation; }
   void SetCrossCorrelate(bool crossCorrelate) { mCrossCorrelate = crossCorrelate; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
 
+  // getters
   int GetRows() const { return mRows; }
   int GetCols() const { return mCols; }
   int GetSize() const { return mRows; }
@@ -40,11 +42,10 @@ public:
   int GetL2size() const { return mL2size; }
   int GetL1ratio() const { return mL1ratio; }
   int GetUpsampleCoeff() const { return mUpsampleCoeff; }
-  bool GetApplyWindow() const { return mApplyWindow; }
-  bool GetApplyBandpass() const { return mApplyBandpass; }
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
+  // main calc methods
   Point2f Calculate(const Mat &image1, const Mat &image2) const; // does not mangle the source images
   Point2f Calculate(Mat &&image1, Mat &&image2) const;           // mangles the source images
   void Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory, float maxShiftRatio = 0.25,
@@ -62,8 +63,6 @@ private:
   double mDivisionEpsilon = 0;
   int mMaxIterations = 20;
   InterpolationFlags mInterpolationType = INTER_LINEAR;
-  bool mApplyWindow = true;
-  bool mApplyBandpass = true;
   bool mSubpixelEstimation = true;
   bool mCrossCorrelate = false;
   Mat mBandpass;
@@ -73,9 +72,10 @@ private:
   string mSavedir = "";
   cv::Size mSavesize = cv::Size(500, 500);
   int mSavecntr = 0;
-  BandpassType mBandpassType = Gaussian;
-  WindowType mWindowType = Hann;
+  BandpassType mBandpassType = BandpassType::Gaussian;
+  WindowType mWindowType = WindowType::Hann;
 
+  // internal methods
   void UpdateWindow();
   void UpdateBandpass();
   float BandpassLEquation(int row, int col) const;
