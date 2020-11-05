@@ -297,14 +297,34 @@ void IterativePhaseCorrelation::UpdateBandpass()
 {
   mBandpass = Mat::ones(mRows, mCols, CV_32F);
 
-  for (int r = 0; r < mRows; ++r)
-    for (int c = 0; c < mCols; ++c)
-      mBandpass.at<float>(r, c) =
-          exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))) *
-          (1.0 - exp(-std::pow(1.0 / mBandpassH, 2) *
-                     (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))));
+  if (mBandpassL > 0 && mBandpassH <= 0)
+  {
+    for (int r = 0; r < mRows; ++r)
+      for (int c = 0; c < mCols; ++c)
+        mBandpass.at<float>(r, c) =
+            exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2)));
+  }
+  else if (mBandpassL <= 0 && mBandpassH > 0)
+  {
+    for (int r = 0; r < mRows; ++r)
+      for (int c = 0; c < mCols; ++c)
+        mBandpass.at<float>(r, c) =
+            1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
+                      (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2)));
+  }
+  else if (mBandpassL > 0 && mBandpassH > 0)
+  {
+    for (int r = 0; r < mRows; ++r)
+      for (int c = 0; c < mCols; ++c)
+        mBandpass.at<float>(r, c) =
+            exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))) *
+            (1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
+                       (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))));
+  }
 
-  normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
+  if (mBandpassL > 0 || mBandpassH > 0)
+    normalize(mBandpass, mBandpass, 0.0, 1.0, NORM_MINMAX);
+
   CalculateFrequencyBandpass();
 }
 
