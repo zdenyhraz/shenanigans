@@ -70,7 +70,7 @@ private:
   InterpolationType mInterpolationType = InterpolationType::Linear;
   BandpassType mBandpassType = BandpassType::Gaussian;
   WindowType mWindowType = WindowType::Hann;
-  std::string mDebugDirectory = "";
+  std::string mDebugDirectory = "Debug";
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;

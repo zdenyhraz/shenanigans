@@ -291,11 +291,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     window1D[c] = mWindow.at<float>(mRows / 2, c);
   }
 
-  Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass");
-  Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window");
+  Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
+  Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
 
-  Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows);
-  Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows);
+  Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
+  Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
 
   LOG_INFO("IPC debug stuff shown");
 }
