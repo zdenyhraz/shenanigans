@@ -291,9 +291,9 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows);
 }
 
-void IterativePhaseCorrelation::UpdateWindow() { createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F); }
+inline void IterativePhaseCorrelation::UpdateWindow() { createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F); }
 
-void IterativePhaseCorrelation::UpdateBandpass()
+inline void IterativePhaseCorrelation::UpdateBandpass()
 {
   mBandpass = Mat::ones(mRows, mCols, CV_32F);
 
@@ -301,25 +301,19 @@ void IterativePhaseCorrelation::UpdateBandpass()
   {
     for (int r = 0; r < mRows; ++r)
       for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) =
-            exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2)));
+        mBandpass.at<float>(r, c) = BandpassLEquation(r, c);
   }
   else if (mBandpassL <= 0 && mBandpassH > 0)
   {
     for (int r = 0; r < mRows; ++r)
       for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) =
-            1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
-                      (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2)));
+        mBandpass.at<float>(r, c) = BandpassHEquation(r, c);
   }
   else if (mBandpassL > 0 && mBandpassH > 0)
   {
     for (int r = 0; r < mRows; ++r)
       for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) =
-            exp(-std::pow(mBandpassL, 2) * (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))) *
-            (1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
-                       (std::pow(((float)c - mCols / 2) / (mCols / 2), 2) + std::pow(((float)r - mRows / 2) / (mRows / 2), 2))));
+        mBandpass.at<float>(r, c) = BandpassEquation(r, c);
   }
 
   if (mBandpassL > 0 || mBandpassH > 0)
@@ -327,6 +321,19 @@ void IterativePhaseCorrelation::UpdateBandpass()
 
   CalculateFrequencyBandpass();
 }
+
+inline float IterativePhaseCorrelation::BandpassLEquation(int row, int col) const
+{
+  return exp(-std::pow(mBandpassL, 2) * (std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2)));
+}
+
+inline float IterativePhaseCorrelation::BandpassHEquation(int row, int col) const
+{
+  return 1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
+                   (std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2)));
+}
+
+inline float IterativePhaseCorrelation::BandpassEquation(int row, int col) const { return BandpassLEquation(row, col) * BandpassHEquation(row, col); }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
 {

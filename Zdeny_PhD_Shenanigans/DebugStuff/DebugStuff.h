@@ -29,7 +29,7 @@ void Debug(Globals *globals)
     Mat gaussL = Mat::zeros(rows, cols, CV_32F);
     Mat gaussH = Mat::zeros(rows, cols, CV_32F);
 
-    float fL = 0.3;
+    float fL = 0.2;
     float fH = 0.8;
 
     float sL = 1.0;
@@ -52,7 +52,7 @@ void Debug(Globals *globals)
       }
     }
 
-    // Plot2D::plot(bandpassR, "bandpassR");
+    Plot2D::plot(bandpassR, "bandpassR");
     Plot2D::plot(gaussL, "gaussL");
     Plot2D::plot(gaussH, "gaussH");
     Plot2D::plot(bandpassG, "bandpassG");

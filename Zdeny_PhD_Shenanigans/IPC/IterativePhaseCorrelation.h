@@ -62,6 +62,9 @@ private:
 
   void UpdateWindow();
   void UpdateBandpass();
+  float BandpassLEquation(int row, int col) const;
+  float BandpassHEquation(int row, int col) const;
+  float BandpassEquation(int row, int col) const;
   bool IsValid(const Mat &img1, const Mat &img2) const;
   bool CheckSize(const Mat &img1, const Mat &img2) const;
   bool CheckChannels(const Mat &img1, const Mat &img2) const;
