@@ -180,7 +180,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     LOG_DEBUG("Optimizing IPC parameters without validation set - '{}' is not a valid directory", validationImagesDirectory);
   }
 
-  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images...", trainingImages.size());
+  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images with {} calculations per direction...",
+      trainingImages.size(), itersPerImage);
 
   if (trainingImages.empty())
   {
@@ -294,14 +295,15 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     SetL2size(bestParams[6]);
     SetL1ratio(bestParams[7]);
 
-    LOG_SUCC("Optimal IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0])));
-    LOG_SUCC("Optimal IPC BandpassL: {}", bestParams[1]);
-    LOG_SUCC("Optimal IPC BandpassH: {}", bestParams[2]);
-    LOG_SUCC("Optimal IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
-    LOG_SUCC("Optimal IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
-    LOG_SUCC("Optimal IPC UpsampleCoeff: {}", bestParams[5]);
-    LOG_SUCC("Optimal IPC L2size: {}", bestParams[6]);
-    LOG_SUCC("Optimal IPC L1ratio: {}", bestParams[7]);
+    LOG_INFO("Final IPC px accuracy: {}", f(bestParams));
+    LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0])));
+    LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
+    LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
+    LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
+    LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
+    LOG_INFO("Final IPC UpsampleCoeff: {}", bestParams[5]);
+    LOG_INFO("Final IPC L2size: {}", bestParams[6]);
+    LOG_INFO("Final IPC L1ratio: {}", bestParams[7]);
 
     ShowDebugStuff();
     LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
@@ -378,9 +380,12 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
     break;
 
   case BandpassType::Rectangular:
-    for (int r = 0; r < mRows; ++r)
-      for (int c = 0; c < mCols; ++c)
-        mBandpass.at<float>(r, c) = BandpassREquation(r, c);
+    if (mBandpassH > 0 && mBandpassL < mBandpassH)
+    {
+      for (int r = 0; r < mRows; ++r)
+        for (int c = 0; c < mCols; ++c)
+          mBandpass.at<float>(r, c) = BandpassREquation(r, c);
+    }
     break;
   }
 
@@ -405,9 +410,6 @@ inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) cons
 
 float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
-  if (mBandpassL >= mBandpassH)
-    return 1;
-
   float R = sqrt(std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2));
   return (mBandpassL <= R && R <= mBandpassH) ? 1 : 0;
 }
