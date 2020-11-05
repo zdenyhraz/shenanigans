@@ -198,14 +198,20 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   imagePairs.reserve(trainingImages.size() * itersPerImage);
   for (const auto &image : trainingImages)
   {
-    const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
-    for (int i = 0; i < itersPerImage; ++i)
+    const std::vector<Point2f> maxShiftTargets{
+        Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows), Point2f(0 * mCols, maxShiftRatio * mRows), Point2f(maxShiftRatio * mCols, 0 * mRows)};
+
+    for (int i = 0; i < maxShiftTargets.size() * itersPerImage; ++i)
     {
       // create the shifted image pair
       Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
       Mat image2;
-      float r = (float)i / (itersPerImage - 1);
-      Point2f shift = r * maxShift;
+
+      // calculate artificial shift
+      float r = ((float)i - i % maxShiftTargets.size()) / (maxShiftTargets.size() * itersPerImage - maxShiftTargets.size());
+      Point2f shift = r * maxShiftTargets[i % maxShiftTargets.size()];
+
+      // perform artificial shift
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image, image2, T, image.size());
       image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
