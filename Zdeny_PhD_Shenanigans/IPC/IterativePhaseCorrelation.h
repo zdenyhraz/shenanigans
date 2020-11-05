@@ -28,8 +28,6 @@ public:
   void SetDivisionEpsilon(double divisionEpsilon) { mDivisionEpsilon = divisionEpsilon; }
   void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationFlags interpolationType) { mInterpolationType = interpolationType; }
-  void SetSubpixelEstimation(bool subpixelEstimation) { mSubpixelEstimation = subpixelEstimation; }
-  void SetCrossCorrelate(bool crossCorrelate) { mCrossCorrelate = crossCorrelate; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
 
@@ -63,8 +61,6 @@ private:
   double mDivisionEpsilon = 0;
   int mMaxIterations = 20;
   InterpolationFlags mInterpolationType = INTER_LINEAR;
-  bool mSubpixelEstimation = true;
-  bool mCrossCorrelate = false;
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
