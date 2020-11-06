@@ -62,9 +62,14 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
     bool converged = false;
     while (!converged)
     {
-      if (IsOutOfBounds(L3peak, L3, L2size))
+      // reduce the L2size as long as the L2 is out of bounds
+      while (IsOutOfBounds(L3peak, L3, L2size))
         if (!ReduceL2size(L2size))
           break;
+
+      // L2size cannot be reduced anymore and is still out of bounds - stop
+      if (IsOutOfBounds(L3peak, L3, L2size))
+        break;
 
       // L2
       Mat L2 = CalculateL2(L3, L3peak, L2size);
@@ -110,7 +115,9 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
   }
   catch (const std::exception &e)
   {
-    LOG_ERROR("Unexpected error occured: {}", e.what());
+    LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
+        mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
+    throw 0;
     return {0, 0};
   }
 }
@@ -258,7 +265,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     ipc.SetL2size(params[6]);
     ipc.SetL1ratio(params[7]);
 
-    // L1 smaller than 3, shit
+    // L1 smaller than 3px, bad
     if (std::floor(ipc.GetL1ratio() * ipc.GetL2size() * ipc.GetUpsampleCoeff()) < 3)
       return std::numeric_limits<double>::max();
 
@@ -279,8 +286,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L2size", "L1ratio"});
 
-  evo.mLB = {0, -1, -1, 0, 0, 11, 5., 0.1};
-  evo.mUB = {2, 3., 1., 3, 2, 51, 21, 0.7};
+  evo.mLB = {0, -1, -1., 0, 0, 11, 5., 0.1};
+  evo.mUB = {2, 3., 1.5, 3, 2, 51, 21, 0.5};
 
   const auto bestParams = evo.Optimize(f);
 
@@ -551,7 +558,6 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
 
 inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const
 {
-
   return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
 }
 
