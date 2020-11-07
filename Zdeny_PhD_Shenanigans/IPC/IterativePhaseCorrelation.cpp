@@ -335,10 +335,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   }
 
   Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
-  Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
-
   Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
-  Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
+
+  // Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
+  // Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
   LOG_INFO("IPC debug stuff shown");
 }
 
@@ -387,7 +387,7 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
     break;
 
   case BandpassType::Rectangular:
-    if (mBandpassH > 0 && mBandpassL < mBandpassH)
+    if (mBandpassL > 0 && mBandpassH < mBandpassL)
     {
       for (int r = 0; r < mRows; ++r)
         for (int c = 0; c < mCols; ++c)
@@ -417,8 +417,8 @@ inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) cons
 
 float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
-  float R = sqrt(std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2));
-  return (mBandpassL <= R && R <= mBandpassH) ? 1 : 0;
+  float R = sqrt((std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2)) / (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2)));
+  return (mBandpassH <= R && R <= mBandpassL) ? 1 : 0;
 }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const

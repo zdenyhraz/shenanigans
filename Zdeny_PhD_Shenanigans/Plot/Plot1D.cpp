@@ -36,7 +36,9 @@ void Plot1D::Reset(std::string name)
   }
 }
 
-void Plot1D::plotcore(const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath)
+void Plot1D::plotcore(const std::vector<double> &x, const std::vector<std::vector<double>> &y1s, const std::vector<std::vector<double>> &y2s,
+    std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names,
+    std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath)
 {
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
@@ -60,7 +62,9 @@ void Plot1D::plotcore(const std::vector<double> &x, const std::vector<std::vecto
     windowPlot->ui.widget->savePng(QString::fromStdString(savepath), 0, 0, 3, -1);
 }
 
-void Plot1D::plotcore(double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath)
+void Plot1D::plotcore(double x, const std::vector<double> &y1s, const std::vector<double> &y2s, std::string name, std::string xlabel,
+    std::string y1label, std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens,
+    std::string savepath)
 {
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
@@ -84,7 +88,8 @@ void Plot1D::plotcore(double x, const std::vector<double> &y1s, const std::vecto
     windowPlot->ui.widget->savePng(QString::fromStdString(savepath), 0, 0, 3, -1);
 }
 
-WindowPlot *Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens)
+WindowPlot *Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label,
+    std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens)
 {
   WindowPlot *windowPlot;
   auto idx = Plot::plots.find(name);
@@ -102,7 +107,8 @@ WindowPlot *Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cn
   return windowPlot;
 }
 
-void Plot1D::SetupGraph(WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens)
+void Plot1D::SetupGraph(WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label,
+    std::vector<std::string> &y1names, std::vector<std::string> &y2names, std::vector<QPen> pens)
 {
   windowPlot->ui.widget->xAxis->setTickLabelFont(Plot::fontTicks);
   windowPlot->ui.widget->yAxis->setTickLabelFont(Plot::fontTicks);
@@ -116,6 +122,13 @@ void Plot1D::SetupGraph(WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, 
   windowPlot->ui.widget->yAxis2->setLabel(QString::fromStdString(y2label));
   windowPlot->ui.widget->legend->setVisible(ycnt > 1);
   windowPlot->ui.widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
+
+  // logarithmic scape options
+  // windowPlot->ui.widget->yAxis->setScaleType(QCPAxis::stLogarithmic);
+  // windowPlot->ui.widget->yAxis->setNumberPrecision(0);
+  // windowPlot->ui.widget->yAxis->setNumberFormat("eb"); // e = exponential, b = beautiful decimal powers
+  // QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+  // windowPlot->ui.widget->yAxis->setTicker(logTicker);
 
   for (int i = 0; i < ycnt; i++)
   {
@@ -139,7 +152,8 @@ void Plot1D::SetupGraph(WindowPlot *windowPlot, int ycnt, int y1cnt, int y2cnt, 
     if (i < pens.size())
       windowPlot->ui.widget->graph(i)->setPen(pens[i]);
     else
-      windowPlot->ui.widget->graph(i)->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      windowPlot->ui.widget->graph(i)->setPen(
+          QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
   }
 
   if (y2cnt > 0)
