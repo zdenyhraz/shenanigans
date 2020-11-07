@@ -21,4 +21,13 @@ public:
   static QColor cyan;
   static QColor magenta;
   static QColor green;
+
+  // matlab plot colors
+  static QColor matlabBlue;
+  static QColor matlabOrange;
+  static QColor matlabYellow;
+  static QColor matlabMagenta;
+  static QColor matlabGreen;
+  static QColor matlabCyan;
+  static QColor matlabRed;
 };
