@@ -104,7 +104,7 @@ private:
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
   InterpolationType mInterpolationType = InterpolationType::Linear;
-  BandpassType mBandpassType = BandpassType::Rectangular;
+  BandpassType mBandpassType = BandpassType::Gaussian;
   WindowType mWindowType = WindowType::Hann;
   std::string mDebugDirectory = "Debug";
   Mat mBandpass;

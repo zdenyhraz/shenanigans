@@ -330,8 +330,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   for (int c = 0; c < mCols; ++c)
   {
     x[c] = c + 1;
-    bandpass1D[c] = mBandpass.at<float>(mRows / 2, c);
-    window1D[c] = mWindow.at<float>(mRows / 2, c);
+    bandpass1D[c] = mBandpass.at<float>(c, c);
+    window1D[c] = mWindow.at<float>(c, c);
   }
 
   Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
