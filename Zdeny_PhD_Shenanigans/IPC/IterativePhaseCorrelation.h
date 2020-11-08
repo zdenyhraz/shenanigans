@@ -118,8 +118,8 @@ private:
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
-  InterpolationType mInterpolationType = InterpolationType::Linear;
   BandpassType mBandpassType = BandpassType::Gaussian;
+  InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
   std::string mDebugDirectory = "Debug";
   Mat mBandpass;
