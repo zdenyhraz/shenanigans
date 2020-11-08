@@ -12,10 +12,7 @@ using namespace cv;
 inline Mat roicrop(const Mat &sourceimgIn, int x, int y, int w, int h)
 {
   if (x < 0 || y < 0 || x - w / 2 < 0 || y - h / 2 < 0 || x + w / 2 > sourceimgIn.cols || y + h / 2 > sourceimgIn.rows)
-  {
-    LOG_ERROR("Roicrop out of bounds - image: [{}x{}], crop: [{}x{}], cropmid: [{},{}]", sourceimgIn.cols, sourceimgIn.rows, w, h, x, y);
     throw std::runtime_error("roicrop out of bounds");
-  }
 
   Rect roi = Rect(x - w / 2, y - h / 2, w, h);
   Mat crop = sourceimgIn(roi);
