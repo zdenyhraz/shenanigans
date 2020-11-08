@@ -232,9 +232,9 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &b
 {
   std::string value;
   if (gen >= 0)
-    value += "Gen " + to_string(gen) + " (" + to_string(bestFitness) + "): [";
+    value += "Gen " + to_string(gen) + " (" + to_string(bestFitness) + ") [";
   else
-    value += "(" + to_string(bestFitness) + "): [";
+    value += "(" + to_string(bestFitness) + ") [";
 
   for (int i = 0; i < bestEntity.size(); ++i)
   {
@@ -457,7 +457,7 @@ void Evolution::Population::InitializeBestEntity()
   LOG_INFO("Searching for best entity in the initial population...");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  LOG_SUCC("Initial population best entity: {} ({:.3f})", bestEntity.params, bestEntity.fitness);
+  LOG_SUCC("Initial population best entity: ({:.3f}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity() {}
