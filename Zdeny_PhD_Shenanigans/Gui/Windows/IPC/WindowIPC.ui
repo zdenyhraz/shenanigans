@@ -463,7 +463,7 @@
      <item row="1" column="3">
       <widget class="QLineEdit" name="lineEdit_5">
        <property name="text">
-        <string>0.1</string>
+        <string>0.0</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -483,7 +483,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>9</string>
+        <string>11</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
