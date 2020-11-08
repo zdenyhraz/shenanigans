@@ -6,24 +6,20 @@
 using namespace std;
 using namespace cv;
 
-inline Mat fourier(const Mat &sourceimgIn)
+inline Mat fourier(Mat &&sourceimg)
 {
-  Mat sourceimg = sourceimgIn.clone();
-  sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
-  Mat sourceimgcomplex[2] = {sourceimg, Mat::zeros(sourceimg.size(), CV_32F)};
+  sourceimg.convertTo(sourceimg, CV_32F);
+  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
   Mat sourceimgcomplexmerged;
   merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
   dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
   return sourceimgcomplexmerged;
 }
 
-inline Mat fourier(Mat &&sourceimg)
+inline Mat fourier(const Mat &sourceimgIn)
 {
-  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
-  Mat sourceimgcomplexmerged;
-  merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
-  dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
-  return sourceimgcomplexmerged;
+  Mat sourceimg = sourceimgIn.clone();
+  return fourier(std::move(sourceimg));
 }
 
 inline Mat fourierinv(const Mat &realIn, const Mat &imagIn)
