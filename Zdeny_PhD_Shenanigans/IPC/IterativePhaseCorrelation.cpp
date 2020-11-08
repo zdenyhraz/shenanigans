@@ -120,7 +120,6 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
   {
     LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
         mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
-    throw 0;
     return {0, 0};
   }
 }
