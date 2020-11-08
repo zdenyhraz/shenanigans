@@ -190,7 +190,7 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
         for (int c = 0; c < mCols; ++c)
           mBandpass.at<float>(r, c) = HighpassEquation(r, c);
     }
-    else if (mBandpassL < mBandpassH && mBandpassL > 0 && mBandpassH < 1)
+    else if (mBandpassL > 0 && mBandpassH < 1)
     {
       for (int r = 0; r < mRows; ++r)
         for (int c = 0; c < mCols; ++c)
@@ -598,8 +598,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L2size", "L1ratio"});
 
-  evo.mLB = {0, -1, -1., 0, 0, 11, 5., 0.1};
-  evo.mUB = {2, 3., 1.5, 3, 2, 51, 21, 0.5};
+  evo.mLB = {0, -.5, 0.5, 0, 0, 11, 5., 0.1};
+  evo.mUB = {2, 0.5, 1.5, 3, 2, 51, 21, 0.5};
 
   const auto bestParams = evo.Optimize(f);
 
@@ -615,7 +615,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     SetL1ratio(bestParams[7]);
 
     LOG_INFO("Final IPC px accuracy: {}", f(bestParams));
-    LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0])));
+    LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
     LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
     LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
     LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
