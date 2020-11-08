@@ -61,7 +61,7 @@ public:
     return "Unknown";
   }
 
-  IterativePhaseCorrelation(int rows, int cols, double bandpassL = 1.0, double bandpassH = 0.01);
+  IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
 
   // setters
   void SetSize(int rows, int cols = -1);
