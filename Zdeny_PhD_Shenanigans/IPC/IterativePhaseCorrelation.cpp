@@ -228,7 +228,7 @@ inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) cons
 
 inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
-  double r = sqrt(std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2));
+  double r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
 }
 
