@@ -10,14 +10,21 @@ public:
     Gaussian,
   };
 
-  const char *BandpassType2String(BandpassType type)
+  const char *BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
   {
     switch (type)
     {
     case BandpassType::Rectangular:
       return "Rectangular";
     case BandpassType::Gaussian:
-      return "Gaussian";
+      if (mBandpassL <= 0 && mBandpassH < 1)
+        return "Gaussian low pass";
+      else if (mBandpassL > 0 && mBandpassH >= 1)
+        return "Gaussian high pass";
+      else if (mBandpassL > 0 && mBandpassH < 1)
+        return "Gausian band pass";
+      else if (mBandpassL <= 0 && mBandpassH >= 1)
+        return "Gaussian all pass";
     }
     return "Unknown";
   }
