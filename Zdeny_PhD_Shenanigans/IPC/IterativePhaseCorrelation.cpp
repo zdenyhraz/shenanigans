@@ -214,14 +214,14 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
 
 inline float IterativePhaseCorrelation::LowpassEquation(int row, int col) const
 {
-  return exp(-(std::pow(col - mCols / 2, 2)) / (2. * std::pow(mBandpassH, 2) * std::pow(mCols / 2, 2)) -
-             (std::pow(row - mRows / 2, 2)) / (2. * std::pow(mBandpassH, 2) * std::pow(mRows / 2, 2)));
+  return exp(-1.0 / (2. * std::pow(mBandpassH, 2)) *
+             ((std::pow(col - mCols / 2, 2)) / std::pow(mCols / 2, 2) + (std::pow(row - mRows / 2, 2)) / std::pow(mRows / 2, 2)));
 }
 
 inline float IterativePhaseCorrelation::HighpassEquation(int row, int col) const
 {
-  return 1.0 - exp(-(std::pow(col - mCols / 2, 2)) / (2. * std::pow(mBandpassL, 2) * std::pow(mCols / 2, 2)) -
-                   (std::pow(row - mRows / 2, 2)) / (2. * std::pow(mBandpassL, 2) * std::pow(mRows / 2, 2)));
+  return 1.0 - exp(-1.0 / (2. * std::pow(mBandpassL, 2)) *
+                   ((std::pow(col - mCols / 2, 2)) / std::pow(mCols / 2, 2) + (std::pow(row - mRows / 2, 2)) / std::pow(mRows / 2, 2)));
 }
 
 inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
