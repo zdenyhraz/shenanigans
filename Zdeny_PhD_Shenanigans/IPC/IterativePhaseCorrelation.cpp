@@ -214,33 +214,21 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
 
 inline float IterativePhaseCorrelation::LowpassEquation(int row, int col) const
 {
-  double R2 = std::pow(mBandpassH, 2) * (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
-  double r2 = std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2);
-  return exp(-r2 / (2.0 * R2));
+  return exp(-(std::pow(col - mCols / 2, 2)) / (2. * std::pow(mBandpassH, 2) * std::pow(mCols / 2, 2)) -
+             (std::pow(row - mRows / 2, 2)) / (2. * std::pow(mBandpassH, 2) * std::pow(mRows / 2, 2)));
 }
 
 inline float IterativePhaseCorrelation::HighpassEquation(int row, int col) const
 {
-  double R2 = std::pow(mBandpassL, 2) * (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
-  double r2 = std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2);
-  return 1.0 - exp(-r2 / (2.0 * R2));
+  return 1.0 - exp(-(std::pow(col - mCols / 2, 2)) / (2. * std::pow(mBandpassL, 2) * std::pow(mCols / 2, 2)) -
+                   (std::pow(row - mRows / 2, 2)) / (2. * std::pow(mBandpassL, 2) * std::pow(mRows / 2, 2)));
 }
 
-inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const
-{
-  /*double RM = sqrt(std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
-  double R = sqrt(std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2));
-  double R0 = mBandpassL * RM;
-  double W = mBandpassH * RM * R;
-  return exp(-std::pow((R * R - R0 * R0) / W, 2));*/
-
-  return LowpassEquation(row, col) * HighpassEquation(row, col);
-}
+inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
 
 inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
-  double R = sqrt(std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
-  double r = sqrt(std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2)) / R;
+  double r = sqrt(std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2));
   return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
 }
 
