@@ -130,20 +130,30 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   std::vector<double> x(mCols);
   std::vector<double> bandpass1D(mCols);
   std::vector<double> window1D(mCols);
+  std::vector<double> bandpassDFT1D(mCols);
+
+  Mat bandpassDFT2D = GetFourierLogMagnitude(mBandpass);
 
   for (int c = 0; c < mCols; ++c)
   {
     x[c] = c + 1;
     bandpass1D[c] = mBandpass.at<float>(c, c);
     window1D[c] = mWindow.at<float>(c, c);
+    bandpassDFT1D[c] = bandpassDFT2D.at<float>(c, c);
   }
 
+  // show 1D & 2D bandpass
   Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
-  Plot2D::plot(mBandpass, "IPC bandpass", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
-  showfourier(fourier(mBandpass), true, false, "IPC bandpass DFT");
+  Plot2D::plot(mBandpass, "IPC bandpass 2D", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
+
+  // show 1D & 2D bandpass DFT
+  Plot1D::plot(x, bandpassDFT1D, "IPC bandpass log DFT 1D", "x", "IPC bandpass log DFT", Plot::defaultpen, mDebugDirectory + "/bandpassDFT1D.png");
+  Plot2D::plot(
+      bandpassDFT2D, "IPC bandpass log DFT 2D", "fx", "fy", "IPC bandpass log DFT", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpassDFT2D.png");
 
   // Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
   // Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
+
   LOG_INFO("IPC debug stuff shown");
 }
 
@@ -217,7 +227,16 @@ inline float IterativePhaseCorrelation::HighpassEquation(int row, int col) const
   return 1.0 - exp(-r2 / (2.0 * R2));
 }
 
-inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
+inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const
+{
+  /*double RM = sqrt(std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
+  double R = sqrt(std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2));
+  double R0 = mBandpassL * RM;
+  double W = mBandpassH * RM * R;
+  return exp(-std::pow((R * R - R0 * R0) / W, 2));*/
+
+  return LowpassEquation(row, col) * HighpassEquation(row, col);
+}
 
 inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
