@@ -598,8 +598,8 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L2size", "L1ratio"});
 
-  evo.mLB = {0, -.5, 0.5, 0, 0, 11, 5., 0.1};
-  evo.mUB = {2, 0.5, 1.5, 3, 2, 51, 21, 0.5};
+  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 5., 0.1};
+  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 21, 0.5};
 
   const auto bestParams = evo.Optimize(f);
 

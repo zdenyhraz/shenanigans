@@ -15,7 +15,15 @@ public:
     switch (type)
     {
     case BandpassType::Rectangular:
-      return "Rectangular";
+      if (mBandpassL <= 0 && mBandpassH < 1)
+        return "Rectangular low pass";
+      else if (mBandpassL > 0 && mBandpassH >= 1)
+        return "Rectangular high pass";
+      else if (mBandpassL > 0 && mBandpassH < 1)
+        return "Rectangular band pass";
+      else if (mBandpassL <= 0 && mBandpassH >= 1)
+        return "Rectangular all pass";
+
     case BandpassType::Gaussian:
       if (mBandpassL <= 0 && mBandpassH < 1)
         return "Gaussian low pass";
