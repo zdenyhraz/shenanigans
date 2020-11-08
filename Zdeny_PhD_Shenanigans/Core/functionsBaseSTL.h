@@ -40,7 +40,7 @@ inline double rand11() { return 2.0 * rand01() - 1.0; }
 
 inline double randr(double min_, double max_) { return min_ + rand01() * (max_ - min_); }
 
-inline double clamp(double x, double clampMin, double clampMax) { return min(max(x, clampMin), clampMax); }
+inline double clamp(double x, double clampMin, double clampMax) { return std::min(std::max(x, clampMin), clampMax); }
 
 inline double clampSmooth(double x_new, double x_prev, double clampMin, double clampMax)
 {

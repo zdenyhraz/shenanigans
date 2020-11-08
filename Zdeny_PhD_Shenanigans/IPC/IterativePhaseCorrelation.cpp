@@ -9,15 +9,15 @@
 #include "Optimization/Evolution.h"
 
 IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH)
-: mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
+: mRows(rows), mCols(cols), mBandpassL(clamp(bandpassL, 0, 1)), mBandpassH(clamp(bandpassH, 0, 1))
 {
   SetSize(rows, cols);
 }
 
 void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
 {
-  mBandpassL = bandpassL;
-  mBandpassH = bandpassH;
+  mBandpassL = clamp(bandpassL, 0, 1);
+  mBandpassH = clamp(bandpassH, 0, 1);
   UpdateBandpass();
 }
 
@@ -367,13 +367,13 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
     {
       for (int r = 0; r < mRows; ++r)
         for (int c = 0; c < mCols; ++c)
-          mBandpass.at<float>(r, c) = BandpassLEquation(r, c);
+          mBandpass.at<float>(r, c) = LowpassEquation(r, c);
     }
     else if (mBandpassL <= 0 && mBandpassH > 0)
     {
       for (int r = 0; r < mRows; ++r)
         for (int c = 0; c < mCols; ++c)
-          mBandpass.at<float>(r, c) = BandpassHEquation(r, c);
+          mBandpass.at<float>(r, c) = HighpassEquation(r, c);
     }
     else if (mBandpassL > 0 && mBandpassH > 0)
     {
@@ -387,7 +387,7 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
     break;
 
   case BandpassType::Rectangular:
-    if (mBandpassL > 0 && mBandpassH < mBandpassL)
+    if (mBandpassL < mBandpassH)
     {
       for (int r = 0; r < mRows; ++r)
         for (int c = 0; c < mCols; ++c)
@@ -399,26 +399,27 @@ inline void IterativePhaseCorrelation::UpdateBandpass()
   CalculateFrequencyBandpass();
 }
 
-inline float IterativePhaseCorrelation::BandpassLEquation(int row, int col) const
+inline float IterativePhaseCorrelation::LowpassEquation(int row, int col) const
 {
-  return exp(-std::pow(mBandpassL, 2) * (std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2)));
+  double R2 = std::pow(mBandpassH, 2) * (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
+  double r2 = std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2);
+  return exp(-r2 / (2.0 * R2));
 }
 
-inline float IterativePhaseCorrelation::BandpassHEquation(int row, int col) const
+inline float IterativePhaseCorrelation::HighpassEquation(int row, int col) const
 {
-  return 1.0 - exp(-1.0 / std::pow(mBandpassH, 2) *
-                   (std::pow(((float)col - mCols / 2) / (mCols / 2), 2) + std::pow(((float)row - mRows / 2) / (mRows / 2), 2)));
+  double R2 = std::pow(mBandpassL, 2) * (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
+  double r2 = std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2);
+  return 1.0 - exp(-r2 / (2.0 * R2));
 }
 
-inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const
-{
-  return BandpassLEquation(row, col) * BandpassHEquation(row, col);
-}
+inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
 
-float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
+inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
-  float R = sqrt((std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2)) / (std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2)));
-  return (mBandpassH <= R && R <= mBandpassL) ? 1 : 0;
+  double R = sqrt(std::pow(mCols / 2, 2) + std::pow(mRows / 2, 2));
+  double r = sqrt(std::pow(col - mCols / 2, 2) + std::pow(row - mRows / 2, 2)) / R;
+  return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
 }
 
 inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
