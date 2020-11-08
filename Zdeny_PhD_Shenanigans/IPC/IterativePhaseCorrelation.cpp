@@ -351,6 +351,10 @@ inline Point2f IterativePhaseCorrelation::GetPeak(const Mat &mat) const
 {
   Point2i peak;
   minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
+
+  if (peak.x < 0 || peak.y < 0 || peak.x >= mat.cols || peak.y >= mat.rows)
+    return Point2f(0, 0);
+
   return peak;
 }
 
@@ -419,7 +423,7 @@ inline Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f 
 
 inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) const
 {
-  return ((peak.x - size / 2) < 0) || ((peak.y - size / 2) < 0) || ((peak.x + size / 2) >= mat.cols) || ((peak.y + size / 2) >= mat.rows);
+  return peak.x - size / 2 < 0 || peak.y - size / 2 < 0 || peak.x + size / 2 >= mat.cols || peak.y + size / 2 >= mat.rows;
 }
 
 inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) const
