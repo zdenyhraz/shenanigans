@@ -126,3 +126,17 @@ Mat deconvolute(Mat sourceimg, Mat PSFimg);
 Mat deconvoluteWiener(const Mat &sourceimg, const Mat &PSFimg);
 
 Mat frequencyFilter(const Mat &sourceimg, const Mat &mask);
+
+inline Mat GetFourierLogMagnitude(const Mat &sourceimg)
+{
+  Mat DFT = fourier(sourceimg);
+  Mat DFTc = quadrantswap(DFT);
+  Mat planes[2];
+  split(DFTc, planes);
+  Mat DFTlm;
+  magnitude(planes[0], planes[1], DFTlm);
+  DFTlm += Scalar::all(1);
+  log(DFTlm, DFTlm);
+  normalize(DFTlm, DFTlm, 0, 1, NORM_MINMAX);
+  return DFTlm;
+}
