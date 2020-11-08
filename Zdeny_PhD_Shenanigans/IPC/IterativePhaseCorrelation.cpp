@@ -9,15 +9,15 @@
 #include "Optimization/Evolution.h"
 
 IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double bandpassL, double bandpassH)
-: mRows(rows), mCols(cols), mBandpassL(clamp(bandpassL, 0, 1)), mBandpassH(clamp(bandpassH, 0, 1))
+: mRows(rows), mCols(cols), mBandpassL(bandpassL), mBandpassH(bandpassH)
 {
   SetSize(rows, cols);
 }
 
 void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
 {
-  mBandpassL = clamp(bandpassL, 0, 1);
-  mBandpassH = clamp(bandpassH, 0, 1);
+  mBandpassL = bandpassL;
+  mBandpassH = bandpassH;
   UpdateBandpass();
 }
 
