@@ -32,12 +32,7 @@ void WindowIPC::RefreshIPCparameters(bool init)
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
 
   if (!init)
-  {
-    LOG_FATAL(
-        "Bandpass: {} / Interpolation: {} / Window: {}", ui.comboBox->currentIndex(), ui.comboBox_2->currentIndex(), ui.comboBox_3->currentIndex());
-
     LOG_DEBUG("IPC parameter values updated");
-  }
 }
 
 void WindowIPC::RefreshIPCparametersAndExit()
