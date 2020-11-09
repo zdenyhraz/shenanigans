@@ -6,36 +6,6 @@
 using namespace std;
 using namespace cv;
 
-inline Mat fourier(Mat &&sourceimg)
-{
-  sourceimg.convertTo(sourceimg, CV_32F);
-  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
-  Mat sourceimgcomplexmerged;
-  merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
-  dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
-  return sourceimgcomplexmerged;
-}
-
-inline Mat fourier(const Mat &sourceimgIn)
-{
-  Mat sourceimg = sourceimgIn.clone();
-  return fourier(std::move(sourceimg));
-}
-
-inline Mat fourierinv(const Mat &realIn, const Mat &imagIn)
-{
-  Mat real = realIn.clone();
-  Mat imag = imagIn.clone();
-  Mat invDFT;
-  Mat DFTcomplex[2] = {real, imag};
-  Mat DFTcomplexmerged;
-  merge(DFTcomplex, 2, DFTcomplexmerged);
-  dft(DFTcomplexmerged, invDFT, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
-  normalize(invDFT, invDFT, 0, 65535, NORM_MINMAX);
-  invDFT.convertTo(invDFT, CV_16UC1);
-  return invDFT;
-}
-
 inline Mat quadrantswap(const Mat &sourceimgDFT)
 {
   Mat centeredDFT = sourceimgDFT.clone();
@@ -55,6 +25,49 @@ inline Mat quadrantswap(const Mat &sourceimgDFT)
   q3.copyTo(q2);
   temp.copyTo(q3);
   return centeredDFT;
+}
+
+inline Mat fourier(Mat &&sourceimg)
+{
+  sourceimg.convertTo(sourceimg, CV_32F);
+  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
+  Mat sourceimgcomplexmerged;
+  merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
+  dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
+  return sourceimgcomplexmerged;
+}
+
+inline Mat ifourier(Mat &&sourceimg)
+{
+  Mat out;
+  dft(sourceimg, out, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+  return out;
+}
+
+inline Mat fourier(const Mat &sourceimgIn)
+{
+  Mat sourceimg = sourceimgIn.clone();
+  return fourier(std::move(sourceimg));
+}
+
+inline Mat ifourier(const Mat &sourceimgIn)
+{
+  Mat sourceimg = sourceimgIn.clone();
+  return ifourier(std::move(sourceimg));
+}
+
+inline Mat fourierinv(const Mat &realIn, const Mat &imagIn)
+{
+  Mat real = realIn.clone();
+  Mat imag = imagIn.clone();
+  Mat invDFT;
+  Mat DFTcomplex[2] = {real, imag};
+  Mat DFTcomplexmerged;
+  merge(DFTcomplex, 2, DFTcomplexmerged);
+  dft(DFTcomplexmerged, invDFT, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
+  normalize(invDFT, invDFT, 0, 65535, NORM_MINMAX);
+  invDFT.convertTo(invDFT, CV_16UC1);
+  return invDFT;
 }
 
 inline Mat edgemask(int rows, int cols)
@@ -139,4 +152,15 @@ inline Mat GetFourierLogMagnitude(const Mat &sourceimg)
   log(DFTlm, DFTlm);
   normalize(DFTlm, DFTlm, 0, 1, NORM_MINMAX);
   return DFTlm;
+}
+
+inline Mat GetInverseFourierLogMagnitude(const Mat &sourceimg)
+{
+  Mat iDFT = ifourier(sourceimg);
+  Mat iDFTlm;
+  magnitude(Mat::zeros(iDFT.size(), CV_32F), iDFT, iDFTlm);
+  iDFTlm += Scalar::all(1);
+  log(iDFTlm, iDFTlm);
+  normalize(iDFTlm, iDFTlm, 0, 1, NORM_MINMAX);
+  return iDFTlm;
 }

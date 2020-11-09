@@ -143,7 +143,8 @@ private:
   void ApplyBandpass(Mat &crosspower) const;
   void CalculateFrequencyBandpass();
   Mat CalculateL3(const Mat &crosspower) const;
-  void SwapQuadrants(Mat &mat) const;
+  static void FftShift(Mat &mat);
+  static void IFftShift(Mat &mat);
   Point2f GetPeak(const Mat &mat) const;
   Point2f GetPeakSubpixel(const Mat &mat) const;
   Mat CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const;

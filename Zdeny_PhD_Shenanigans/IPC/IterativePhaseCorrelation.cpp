@@ -129,26 +129,18 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   std::vector<double> x(mCols);
   std::vector<double> bandpass1D(mCols);
   std::vector<double> window1D(mCols);
-  std::vector<double> bandpassDFT1D(mCols);
-
-  Mat bandpassDFT2D = GetFourierLogMagnitude(mBandpass);
 
   for (int c = 0; c < mCols; ++c)
   {
+    int rowidx = mRows / 2;
     x[c] = c + 1;
-    bandpass1D[c] = mBandpass.at<float>(c, c);
-    window1D[c] = mWindow.at<float>(c, c);
-    bandpassDFT1D[c] = bandpassDFT2D.at<float>(c, c);
+    bandpass1D[c] = mBandpass.at<float>(rowidx, c);
+    window1D[c] = mWindow.at<float>(rowidx, c);
   }
 
   // show 1D & 2D bandpass
   Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
   Plot2D::plot(mBandpass, "IPC bandpass 2D", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
-
-  // show 1D & 2D bandpass DFT
-  Plot1D::plot(x, bandpassDFT1D, "IPC bandpass log DFT 1D", "x", "IPC bandpass log DFT", Plot::defaultpen, mDebugDirectory + "/bandpassDFT1D.png");
-  Plot2D::plot(
-      bandpassDFT2D, "IPC bandpass log DFT 2D", "fx", "fy", "IPC bandpass log DFT", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpassDFT2D.png");
 
   // Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
   // Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
@@ -311,28 +303,45 @@ inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 inline Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower) const
 {
   Mat L3;
-  dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT); // real only (assume pure real input)
-  SwapQuadrants(L3);
+  dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+  FftShift(L3);
   return L3;
 }
 
-inline void IterativePhaseCorrelation::SwapQuadrants(Mat &mat) const
+inline void IterativePhaseCorrelation::FftShift(Mat &mat)
 {
   int centerX = mat.cols / 2;
   int centerY = mat.rows / 2;
-  Mat q1(mat, Rect(0, 0, centerX, centerY));
-  Mat q2(mat, Rect(centerX, 0, centerX, centerY));
-  Mat q3(mat, Rect(0, centerY, centerX, centerY));
-  Mat q4(mat, Rect(centerX, centerY, centerX, centerY));
-  Mat temp;
+  Mat q0(mat, Rect(0, 0, centerX, centerY));
+  Mat q1(mat, Rect(centerX, 0, centerX, centerY));
+  Mat q2(mat, Rect(0, centerY, centerX, centerY));
+  Mat q3(mat, Rect(centerX, centerY, centerX, centerY));
 
-  q1.copyTo(temp);
-  q4.copyTo(q1);
-  temp.copyTo(q4);
+  Mat tmp;
+  q0.copyTo(tmp);
+  q3.copyTo(q0);
+  tmp.copyTo(q3);
+  q1.copyTo(tmp);
+  q2.copyTo(q1);
+  tmp.copyTo(q2);
+}
 
-  q2.copyTo(temp);
-  q3.copyTo(q2);
-  temp.copyTo(q3);
+inline void IterativePhaseCorrelation::IFftShift(Mat &mat)
+{
+  int centerX = mat.cols / 2;
+  int centerY = mat.rows / 2;
+  Mat q0(mat, Rect(0, 0, centerX, centerY));
+  Mat q1(mat, Rect(centerX, 0, centerX, centerY));
+  Mat q2(mat, Rect(0, centerY, centerX, centerY));
+  Mat q3(mat, Rect(centerX, centerY, centerX, centerY));
+
+  Mat tmp;
+  q3.copyTo(tmp);
+  q0.copyTo(q3);
+  tmp.copyTo(q0);
+  q2.copyTo(tmp);
+  q1.copyTo(q2);
+  tmp.copyTo(q1);
 }
 
 inline Point2f IterativePhaseCorrelation::GetPeak(const Mat &mat) const
