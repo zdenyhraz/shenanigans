@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>335</height>
+    <width>486</width>
+    <height>331</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>209</x>
       <y>0</y>
-      <width>218</width>
+      <width>271</width>
       <height>121</height>
      </rect>
     </property>
@@ -339,6 +339,9 @@
        </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="comboBox">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
          <item>
           <property name="text">
            <string>Rectangular</string>
@@ -360,6 +363,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QComboBox" name="comboBox_2">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
          <item>
           <property name="text">
            <string>Nearest neighbor</string>
@@ -386,6 +392,9 @@
        </item>
        <item row="2" column="1">
         <widget class="QComboBox" name="comboBox_3">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
          <item>
           <property name="text">
            <string>Rectangular</string>
@@ -559,7 +568,7 @@
        <item row="0" column="2">
         <widget class="QPushButton" name="pushButton_6">
          <property name="text">
-          <string>Align XY and show</string>
+          <string>Align XY</string>
          </property>
         </widget>
        </item>
@@ -580,7 +589,7 @@
        <item row="1" column="2">
         <widget class="QPushButton" name="pushButton_9">
          <property name="text">
-          <string>Align RSXY and show</string>
+          <string>Align RSXY</string>
          </property>
         </widget>
        </item>
@@ -594,7 +603,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>491</width>
+     <width>486</width>
      <height>18</height>
     </rect>
    </property>
