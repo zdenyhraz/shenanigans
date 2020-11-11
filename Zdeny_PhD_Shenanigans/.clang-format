@@ -12,7 +12,6 @@ Standard: Cpp11
 PointerAlignment: Left
 AllowShortFunctionsOnASingleLine: InlineOnly
 SpaceBeforeParens: ControlStatements
-SpacesInParentheses: false
 FixNamespaceComments: false
 SortIncludes: false
 ...
