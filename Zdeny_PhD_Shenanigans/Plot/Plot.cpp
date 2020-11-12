@@ -6,6 +6,7 @@ std::map<std::string, WindowPlot*> Plot::plots;
 
 QFont Plot::fontTicks("Newyork", 17);
 QFont Plot::fontLabels("Newyork", 17);
+QFont Plot::fontLegend("Newyork", 17);
 
 double Plot::pt = 3.0;
 

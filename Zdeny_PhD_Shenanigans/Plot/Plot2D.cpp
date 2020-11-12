@@ -64,9 +64,9 @@ void Plot2D::SetupGraph(WindowPlot* windowPlot, std::string xlabel, std::string 
   // configure axis rect
   windowPlot->ui.widget->axisRect()->setupFullAxesBox(true);
   // give the axes some labels
-  windowPlot->ui.widget->xAxis->setLabel(QString::fromStdString(xlabel));
+  // windowPlot->ui.widget->xAxis->setLabel(QString::fromStdString(xlabel));
   // give the axes some labels
-  windowPlot->ui.widget->yAxis->setLabel(QString::fromStdString(ylabel));
+  // windowPlot->ui.widget->yAxis->setLabel(QString::fromStdString(ylabel));
   // set up the QCPColorMap
   windowPlot->colorMap = new QCPColorMap(windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis);
   // allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
