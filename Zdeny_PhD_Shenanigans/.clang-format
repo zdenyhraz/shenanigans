@@ -1,17 +1,17 @@
 ---
-AccessModifierOffset: -2
-BreakBeforeBraces: Allman
-ColumnLimit: 150
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
 Language: Cpp
+Standard: Cpp11
+BreakBeforeBraces: Allman
+ColumnLimit: 150
+PointerAlignment: Left
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard: Cpp11
-PointerAlignment: Left
-AllowShortFunctionsOnASingleLine: InlineOnly
 SpaceBeforeParens: ControlStatements
+AccessModifierOffset: -2
+AllowShortFunctionsOnASingleLine: InlineOnly
 FixNamespaceComments: false
 SortIncludes: false
 ...
