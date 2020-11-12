@@ -27,7 +27,8 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
   mCols = cols > 0 ? cols : rows;
 
   LOG_ERROR_IF(mRows != getOptimalDFTSize(rows) || mCols != getOptimalDFTSize(cols),
-      "IPC does not have optimal size, consider resizing: [{}x{}] -> [{}x{}]", mCols, mRows, getOptimalDFTSize(cols), getOptimalDFTSize(rows));
+               "IPC does not have optimal size, consider resizing: [{}x{}] -> [{}x{}]", mCols, mRows, getOptimalDFTSize(cols),
+               getOptimalDFTSize(rows));
 
   if (mWindow.rows != mRows || mWindow.cols != mCols)
     UpdateWindow();
@@ -36,14 +37,14 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
     UpdateBandpass();
 }
 
-Point2f IterativePhaseCorrelation::Calculate(const Mat &image1, const Mat &image2) const
+Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image2) const
 {
   Mat img1 = image1.clone();
   Mat img2 = image2.clone();
   return Calculate(std::move(img1), std::move(img2));
 }
 
-inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) const
+inline Point2f IterativePhaseCorrelation::Calculate(Mat&& img1, Mat&& img2) const
 {
   try
   {
@@ -116,10 +117,10 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat &&img1, Mat &&img2) cons
     }
     return result;
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
-        mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
+              mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
     return {0, 0};
   }
 }
@@ -216,7 +217,10 @@ inline float IterativePhaseCorrelation::HighpassEquation(int row, int col) const
                    (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
 }
 
-inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
+inline float IterativePhaseCorrelation::BandpassGEquation(int row, int col) const
+{
+  return LowpassEquation(row, col) * HighpassEquation(row, col);
+}
 
 inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) const
 {
@@ -224,7 +228,7 @@ inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) cons
   return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
 }
 
-inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2) const
+inline bool IterativePhaseCorrelation::IsValid(const Mat& img1, const Mat& img2) const
 {
   // size must be equal for matching bandpass / window
   if (!CheckSize(img1, img2))
@@ -237,15 +241,18 @@ inline bool IterativePhaseCorrelation::IsValid(const Mat &img1, const Mat &img2)
   return true;
 }
 
-inline bool IterativePhaseCorrelation::CheckSize(const Mat &img1, const Mat &img2) const
+inline bool IterativePhaseCorrelation::CheckSize(const Mat& img1, const Mat& img2) const
 {
   cv::Size ipcsize(mCols, mRows);
   return img1.size() == img2.size() && img1.size() == ipcsize && img2.size() == ipcsize;
 }
 
-inline bool IterativePhaseCorrelation::CheckChannels(const Mat &img1, const Mat &img2) const { return img1.channels() == 1 && img2.channels() == 1; }
+inline bool IterativePhaseCorrelation::CheckChannels(const Mat& img1, const Mat& img2) const
+{
+  return img1.channels() == 1 && img2.channels() == 1;
+}
 
-inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2) const
+inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& img1, Mat& img2) const
 {
   img1.convertTo(img1, CV_32F);
   img2.convertTo(img2, CV_32F);
@@ -253,18 +260,18 @@ inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat &img1, Mat &img2) 
   normalize(img2, img2, 0, 1, CV_MINMAX);
 }
 
-inline void IterativePhaseCorrelation::ApplyWindow(Mat &img1, Mat &img2) const
+inline void IterativePhaseCorrelation::ApplyWindow(Mat& img1, Mat& img2) const
 {
   multiply(img1, mWindow, img1);
   multiply(img2, mWindow, img2);
 }
 
-inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat &img1, Mat &img2) const
+inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat& img1, Mat& img2) const
 {
   return std::make_pair(fourier(std::move(img1)), fourier(std::move(img2)));
 }
 
-inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2) const
+inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const
 {
   Mat planes1[2];
   Mat planes2[2];
@@ -291,7 +298,10 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat &dft
   return CrossPower;
 }
 
-inline void IterativePhaseCorrelation::ApplyBandpass(Mat &crosspower) const { multiply(crosspower, mFrequencyBandpass, crosspower); }
+inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
+{
+  multiply(crosspower, mFrequencyBandpass, crosspower);
+}
 
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
@@ -300,7 +310,7 @@ inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
   merge(bandpassFplanes, 2, mFrequencyBandpass);
 }
 
-inline Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower) const
+inline Mat IterativePhaseCorrelation::CalculateL3(const Mat& crosspower) const
 {
   Mat L3;
   dft(crosspower, L3, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
@@ -308,7 +318,7 @@ inline Mat IterativePhaseCorrelation::CalculateL3(const Mat &crosspower) const
   return L3;
 }
 
-inline void IterativePhaseCorrelation::FftShift(Mat &mat)
+inline void IterativePhaseCorrelation::FftShift(Mat& mat)
 {
   int centerX = mat.cols / 2;
   int centerY = mat.rows / 2;
@@ -326,7 +336,7 @@ inline void IterativePhaseCorrelation::FftShift(Mat &mat)
   tmp.copyTo(q2);
 }
 
-inline void IterativePhaseCorrelation::IFftShift(Mat &mat)
+inline void IterativePhaseCorrelation::IFftShift(Mat& mat)
 {
   int centerX = mat.cols / 2;
   int centerY = mat.rows / 2;
@@ -344,7 +354,7 @@ inline void IterativePhaseCorrelation::IFftShift(Mat &mat)
   tmp.copyTo(q1);
 }
 
-inline Point2f IterativePhaseCorrelation::GetPeak(const Mat &mat) const
+inline Point2f IterativePhaseCorrelation::GetPeak(const Mat& mat) const
 {
   Point2i peak;
   minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
@@ -355,7 +365,7 @@ inline Point2f IterativePhaseCorrelation::GetPeak(const Mat &mat) const
   return peak;
 }
 
-inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
+inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat& mat) const
 {
   double M = 0;
   double My = 0;
@@ -380,12 +390,12 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat &mat) const
     return result;
 }
 
-inline Mat IterativePhaseCorrelation::CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const
+inline Mat IterativePhaseCorrelation::CalculateL2(const Mat& L3, const Point2f& L3peak, int L2size) const
 {
   return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
 }
 
-inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
+inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat& L2) const
 {
   Mat L2U;
   switch (mInterpolationType)
@@ -406,36 +416,36 @@ inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat &L2) const
   return L2U;
 }
 
-inline int IterativePhaseCorrelation::GetL1size(const Mat &L2U) const
+inline int IterativePhaseCorrelation::GetL1size(const Mat& L2U) const
 {
   int L1size = std::floor(mL1ratio * L2U.cols);
   L1size = L1size % 2 ? L1size : L1size + 1;
   return L1size;
 }
 
-inline Mat IterativePhaseCorrelation::CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) const
+inline Mat IterativePhaseCorrelation::CalculateL1(const Mat& L2U, const Point2f& L2Upeak, int L1size) const
 {
   return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 }
 
-inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) const
+inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f& peak, const Mat& mat, int size) const
 {
   return peak.x - size / 2 < 0 || peak.y - size / 2 < 0 || peak.x + size / 2 >= mat.cols || peak.y + size / 2 >= mat.rows;
 }
 
-inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) const
+inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const
 {
   return (abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5);
 }
 
-inline bool IterativePhaseCorrelation::ReduceL2size(int &L2size) const
+inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
   L2size -= 2;
   return L2size >= 3;
 }
 
-void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory,
-    float maxShiftRatio, float noiseStdev, int itersPerImage)
+void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory,
+                                         float maxShiftRatio, float noiseStdev, int itersPerImage)
 {
   // arguments sanity checks
   if (itersPerImage < 1)
@@ -461,7 +471,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   std::vector<Mat> trainingImages;
   if (std::filesystem::is_directory(trainingImagesDirectory))
   {
-    for (const auto &entry : std::filesystem::directory_iterator(trainingImagesDirectory))
+    for (const auto& entry : std::filesystem::directory_iterator(trainingImagesDirectory))
     {
       std::string path = entry.path().string();
 
@@ -483,7 +493,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   std::vector<Mat> validationImages;
   if (std::filesystem::is_directory(validationImagesDirectory))
   {
-    for (const auto &entry : std::filesystem::directory_iterator(validationImagesDirectory))
+    for (const auto& entry : std::filesystem::directory_iterator(validationImagesDirectory))
     {
       std::string path = entry.path().string();
 
@@ -500,7 +510,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images with {} calculations per direction...",
-      trainingImages.size(), itersPerImage);
+           trainingImages.size(), itersPerImage);
 
   if (trainingImages.empty())
   {
@@ -508,13 +518,13 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
     return;
   }
 
-  for (const auto &image : trainingImages)
+  for (const auto& image : trainingImages)
   {
     const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
     {
       LOG_ERROR("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
-          image.rows, image.cols, mRows + maxShift.y, mCols + maxShift.x);
+                image.rows, image.cols, mRows + maxShift.y, mCols + maxShift.x);
       return;
     }
   }
@@ -524,10 +534,10 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   // both images are roicropped in the middle but 2nd image is shifted beforehands
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
   imagePairs.reserve(trainingImages.size() * itersPerImage);
-  for (const auto &image : trainingImages)
+  for (const auto& image : trainingImages)
   {
-    const std::vector<Point2f> maxShiftTargets{
-        Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows), Point2f(0 * mCols, maxShiftRatio * mRows), Point2f(maxShiftRatio * mCols, 0 * mRows)};
+    const std::vector<Point2f> maxShiftTargets{Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows), Point2f(0 * mCols, maxShiftRatio * mRows),
+                                               Point2f(maxShiftRatio * mCols, 0 * mRows)};
 
     for (int i = 0; i < maxShiftTargets.size() * itersPerImage; ++i)
     {
@@ -566,7 +576,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
   }
 
   // the average registration error objective function
-  const auto f = [&](const std::vector<double> &params) {
+  const auto f = [&](const std::vector<double>& params) {
     // create ipc object with speficied parameters
     IterativePhaseCorrelation ipc(mRows, mCols);
     ipc.SetBandpassType(static_cast<BandpassType>((int)params[0]));
@@ -583,7 +593,7 @@ void IterativePhaseCorrelation::Optimize(const std::string &trainingImagesDirect
 
     // calculate average registration error
     double avgerror = 0;
-    for (const auto &[image1, image2, shift] : imagePairs)
+    for (const auto& [image1, image2, shift] : imagePairs)
     {
       const auto error = ipc.Calculate(image1, image2) - shift;
       avgerror += sqrt(error.x * error.x + error.y * error.y);
