@@ -139,12 +139,40 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     window1D[c] = mWindow.at<float>(rowidx, c);
   }
 
-  // show 1D & 2D bandpass
-  Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
-  Plot2D::plot(mBandpass, "IPC bandpass 2D", "x", "y", "IPC bandpass", 1, mCols, 1, mRows, 0, mDebugDirectory + "/bandpass2D.png");
+  Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
+  Mat w;
+  createHanningWindow(w, img.size(), CV_32F);
+  Mat imgw;
+  multiply(img, w, imgw);
+  Mat w0 = w.clone();
+  Mat r0 = Mat::ones(w.size(), CV_32F);
+  copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
+  copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
+  Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::defaultpens,
+               mDebugDirectory + "/windowLeakage1D.png");
+  Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(GetFourierLogMagnitude(r0)), GetMidRow(GetFourierLogMagnitude(w0))}, "w1", "fx", "window log DFT",
+               {"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/windowLeakageDFT1D.png");
+  Plot2D::plot(GetFourierLogMagnitude(r0), "w2", "fx", "fy", "window log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/windowLeakageR.png");
+  Plot2D::plot(GetFourierLogMagnitude(w0), "w3", "fx", "fy", "window log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/windowLeakageH.png");
+
+  /*Plot1D::plot(GetIota(w.cols, 1), {GetMidRow(GetFourierLogMagnitude(img)), GetMidRow(GetFourierLogMagnitude(imgw))}, "DFT1D", "fx", "log DFT",
+               {"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/windowLeakage.png");
+  Plot1D::plot(GetIota(w.cols, 1), GetMidRow(w), "window1D", "x", "window", Plot::defaultpen, mDebugDirectory + "/windowWindow1D.png");
+  Plot2D::plot(img, "image", "x", "y", "image", 0, 1, 0, 1, 0, mDebugDirectory + "/windowImage.png");
+  Plot2D::plot(w, "window", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/windowWindow.png");
+  Plot2D::plot(imgw, "windowed image", "x", "y", "windowed image", 0, 1, 0, 1, 0, mDebugDirectory + "/windowImageW.png");
+  Plot2D::plot(GetFourierLogMagnitude(img), "image log DFT", "fx", "fy", "image log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/windowImageF.png");
+  Plot2D::plot(GetFourierLogMagnitude(imgw), "windowed image log DFT", "fx", "fy", "windowed image log DFT", 0, 1, 0, 1, 0,
+               mDebugDirectory + "/windowImageWF.png");*/
+
+  // bandpass
+  // Plot1D::plot(x, bandpass1D, "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
+  // Plot2D::plot(mBandpass, "IPC bandpass 2D", "x", "y", "IPC bandpass", 0, 1, 0, 1, 0, mDebugDirectory + "/bandpass2D.png");
+
+  // window
   // Plot1D::plot(x, window1D, "IPC window 1D", "x", "IPC window", Plot::defaultpen, mDebugDirectory + "/window1D.png");
-  // Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 1, mCols, 1, mRows, 0, mDebugDirectory + "/window2D.png");
+  // Plot2D::plot(mWindow, "IPC window", "x", "y", "IPC window", 0, 1, 0, 1, 0, mDebugDirectory + "/window2D.png");
 
   LOG_INFO("IPC debug stuff shown");
 }

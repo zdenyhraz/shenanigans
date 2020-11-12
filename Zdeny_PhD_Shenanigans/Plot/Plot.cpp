@@ -2,7 +2,7 @@
 #include "Plot.h"
 #include "Gui/Windows/Plot/WindowPlot.h"
 
-std::map<std::string, WindowPlot *> Plot::plots;
+std::map<std::string, WindowPlot*> Plot::plots;
 
 QFont Plot::fontTicks("Newyork", 17);
 QFont Plot::fontLabels("Newyork", 17);
@@ -28,20 +28,15 @@ QColor Plot::matlabRed(161.925, 19.890, 46.920);
 QPen Plot::defaultpen(matlabBlue, pt);
 
 std::vector<QPen> Plot::defaultpens{
-    QPen(blue, pt),
-    QPen(orange, pt),
-    QPen(green, pt),
-    QPen(magenta, pt),
-    QPen(red, pt),
-    QPen(black, pt),
-    QPen(cyan, pt),
+    QPen(matlabBlue, pt), QPen(matlabOrange, pt), QPen(matlabGreen, pt), QPen(matlabMagenta, pt),
+    QPen(matlabRed, pt),  QPen(black, pt),        QPen(matlabCyan, pt),
 };
 
-QPoint Plot::GetNewPlotPosition(WindowPlot *windowPlot)
+QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
 {
   int w = 0;
   int h = 0;
-  for (auto &plot : plots)
+  for (auto& plot : plots)
   {
     if (w + plot.second->width() > QApplication::desktop()->width())
     {

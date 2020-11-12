@@ -26,30 +26,48 @@ class Timer // benchmarking struct
   std::string name;
   tp stp;
 
-  static constexpr auto tse(const tp &tmp) { return std::chrono::time_point_cast<dur>(tmp).time_since_epoch().count(); }
+  static constexpr auto tse(const tp& tmp) { return std::chrono::time_point_cast<dur>(tmp).time_since_epoch().count(); }
 
 public:
-  Timer(const std::string &name) : name(name), stp(clock::now()) {}
+  Timer(const std::string& name) : name(name), stp(clock::now()) {}
 
   ~Timer() { LOG_INFO("<< {} >> took {} ms", name, tse(clock::now()) - tse(stp)); }
 };
 
-inline double rand01() { return (double)rand() / RAND_MAX; }
+inline double rand01()
+{
+  return (double)rand() / RAND_MAX;
+}
 
-inline double rand11() { return 2.0 * rand01() - 1.0; }
+inline double rand11()
+{
+  return 2.0 * rand01() - 1.0;
+}
 
-inline double randr(double min_, double max_) { return min_ + rand01() * (max_ - min_); }
+inline double randr(double min_, double max_)
+{
+  return min_ + rand01() * (max_ - min_);
+}
 
-inline double clamp(double x, double clampMin, double clampMax) { return std::min(std::max(x, clampMin), clampMax); }
+inline double clamp(double x, double clampMin, double clampMax)
+{
+  return std::min(std::max(x, clampMin), clampMax);
+}
 
 inline double clampSmooth(double x_new, double x_prev, double clampMin, double clampMax)
 {
   return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
 }
 
-template <typename T = double> inline auto zerovect(int N, T value = 0.) { return std::vector<T>(N, value); }
+template <typename T = double> inline auto zerovect(int N, T value = 0.)
+{
+  return std::vector<T>(N, value);
+}
 
-template <typename T = double> inline auto zerovect2(int N, int M, T value = 0.) { return std::vector<std::vector<T>>(N, zerovect(M, value)); }
+template <typename T = double> inline auto zerovect2(int N, int M, T value = 0.)
+{
+  return std::vector<std::vector<T>>(N, zerovect(M, value));
+}
 
 template <typename T = double> inline auto zerovect3(int N, int M, int O, T value = 0.)
 {
@@ -61,7 +79,7 @@ template <typename T = double> inline auto zerovect4(int N, int M, int O, int P,
   return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value));
 }
 
-template <typename T> inline std::string to_string(const std::vector<T> &vec)
+template <typename T> inline std::string to_string(const std::vector<T>& vec)
 {
   std::stringstream out;
   out << "[";
@@ -75,7 +93,7 @@ template <typename T> inline std::string to_string(const std::vector<T> &vec)
   return out.str();
 }
 
-template <typename T> inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &vec)
+template <typename T> inline std::ostream& operator<<(std::ostream& out, const std::vector<T>& vec)
 {
   out << "[";
   for (int i = 0; i < vec.size(); i++)
@@ -88,7 +106,7 @@ template <typename T> inline std::ostream &operator<<(std::ostream &out, const s
   return out;
 }
 
-template <typename T> inline std::ostream &operator<<(std::ostream &out, const std::vector<std::vector<T>> &vec)
+template <typename T> inline std::ostream& operator<<(std::ostream& out, const std::vector<std::vector<T>>& vec)
 {
   for (int r = 0; r < vec.size(); r++)
   {
@@ -104,53 +122,56 @@ template <typename T> inline std::ostream &operator<<(std::ostream &out, const s
   return out;
 }
 
-inline std::ostream &operator<<(std::ostream &out, const std::vector<std::string> &vec)
+inline std::ostream& operator<<(std::ostream& out, const std::vector<std::string>& vec)
 {
   for (int i = 0; i < vec.size(); i++)
     out << vec[i] << "\n";
   return out;
 }
 
-template <typename T> inline constexpr T sqr(T x) { return x * x; }
+template <typename T> inline constexpr T sqr(T x)
+{
+  return x * x;
+}
 
-template <typename T> inline double mean(const std::vector<T> &vec)
+template <typename T> inline double mean(const std::vector<T>& vec)
 {
   double mean = 0;
-  for (auto &x : vec)
+  for (auto& x : vec)
     mean += x;
   return mean / vec.size();
 }
 
-template <typename T> inline double mean(const std::vector<std::vector<T>> &vec)
+template <typename T> inline double mean(const std::vector<std::vector<T>>& vec)
 {
   double mean = 0;
-  for (auto &row : vec)
-    for (auto &x : row)
+  for (auto& row : vec)
+    for (auto& x : row)
       mean += x;
   return mean / vec.size() / vec[0].size();
 }
 
-template <typename T> inline double stdev(const std::vector<T> &vec)
+template <typename T> inline double stdev(const std::vector<T>& vec)
 {
   double m = mean(vec);
   double stdev = 0;
-  for (auto &x : vec)
+  for (auto& x : vec)
     stdev += sqr(x - m);
   stdev /= vec.size();
   return sqrt(stdev);
 }
 
-template <typename T> inline double stdevs(const std::vector<T> &vec)
+template <typename T> inline double stdevs(const std::vector<T>& vec)
 {
   double m = mean(vec);
   double stdev = 0;
-  for (auto &x : vec)
+  for (auto& x : vec)
     stdev += sqr(x - m);
   stdev /= (vec.size() - 1);
   return sqrt(stdev);
 }
 
-template <typename T> inline std::vector<T> operator+(const std::vector<T> &vec1, const std::vector<T> &vec2)
+template <typename T> inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
   for (int i = 0; i < vec1.size(); i++)
@@ -158,7 +179,7 @@ template <typename T> inline std::vector<T> operator+(const std::vector<T> &vec1
   return result;
 }
 
-template <typename T> inline std::vector<T> operator-(const std::vector<T> &vec1, const std::vector<T> &vec2)
+template <typename T> inline std::vector<T> operator-(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
   for (int i = 0; i < vec1.size(); i++)
@@ -166,21 +187,21 @@ template <typename T> inline std::vector<T> operator-(const std::vector<T> &vec1
   return result;
 }
 
-template <typename T> inline std::vector<T> &operator+=(std::vector<T> &vec1, const std::vector<T> &vec2)
+template <typename T> inline std::vector<T>& operator+=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   for (int i = 0; i < vec1.size(); i++)
     vec1[i] += vec2[i];
   return vec1;
 }
 
-template <typename T> inline std::vector<T> &operator-=(std::vector<T> &vec1, const std::vector<T> &vec2)
+template <typename T> inline std::vector<T>& operator-=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   for (int i = 0; i < vec1.size(); i++)
     vec1[i] -= vec2[i];
   return vec1;
 }
 
-template <typename T> inline std::vector<T> operator*(double val, const std::vector<T> &vec)
+template <typename T> inline std::vector<T> operator*(double val, const std::vector<T>& vec)
 {
   std::vector<T> result = vec;
   for (int i = 0; i < vec.size(); i++)
@@ -188,7 +209,7 @@ template <typename T> inline std::vector<T> operator*(double val, const std::vec
   return result;
 }
 
-template <typename T> inline std::vector<T> abs(const std::vector<T> &vec)
+template <typename T> inline std::vector<T> abs(const std::vector<T>& vec)
 {
   auto result = vec;
   for (int i = 0; i < vec.size(); i++)
@@ -196,14 +217,14 @@ template <typename T> inline std::vector<T> abs(const std::vector<T> &vec)
   return result;
 }
 
-template <typename T> inline double median(const std::vector<T> &vec)
+template <typename T> inline double median(const std::vector<T>& vec)
 {
   auto result = vec;
   std::sort(result.begin(), result.end());
   return result[result.size() / 2];
 }
 
-inline bool vectorLess(std::vector<double> &left, std::vector<double> &right)
+inline bool vectorLess(std::vector<double>& left, std::vector<double>& right)
 {
   double L = 0, R = 0;
   for (int i = 0; i < left.size(); i++)
@@ -214,7 +235,7 @@ inline bool vectorLess(std::vector<double> &left, std::vector<double> &right)
   return L < R;
 }
 
-template <typename T> inline T vectorMax(const std::vector<T> &input)
+template <typename T> inline T vectorMax(const std::vector<T>& input)
 {
   T vectmax = input[0];
   for (int i = 0; i < input.size(); i++)
@@ -225,7 +246,7 @@ template <typename T> inline T vectorMax(const std::vector<T> &input)
   return vectmax;
 }
 
-template <typename T> inline T vectorMin(const std::vector<T> &input)
+template <typename T> inline T vectorMin(const std::vector<T>& input)
 {
   T vectmin = input[0];
   for (int i = 0; i < input.size(); i++)
@@ -236,7 +257,7 @@ template <typename T> inline T vectorMin(const std::vector<T> &input)
   return vectmin;
 }
 
-template <typename T> inline T arrayMax(T *input, unsigned size)
+template <typename T> inline T arrayMax(T* input, unsigned size)
 {
   T arrmax = input[0];
   for (int i = 0; i < size; i++)
@@ -247,7 +268,7 @@ template <typename T> inline T arrayMax(T *input, unsigned size)
   return arrmax;
 }
 
-template <typename T> inline T arrayMin(T *input, unsigned size)
+template <typename T> inline T arrayMin(T* input, unsigned size)
 {
   T arrmin = input[0];
   for (int i = 0; i < size; i++)
@@ -280,13 +301,22 @@ inline std::string currentTime()
   return buf;
 }
 
-inline double speedTest(double x) { return pow(asin(x * x) + floor(x) * (x - 123.4) + 3.14 * cos(atan(1. / x)), 0.123456); }
+inline double speedTest(double x)
+{
+  return pow(asin(x * x) + floor(x) * (x - 123.4) + 3.14 * cos(atan(1. / x)), 0.123456);
+}
 
-inline double gaussian1D(double x, double amp, double mu, double sigma) { return amp * exp(-0.5 * pow((x - mu) / sigma, 2)); }
+inline double gaussian1D(double x, double amp, double mu, double sigma)
+{
+  return amp * exp(-0.5 * pow((x - mu) / sigma, 2));
+}
 
-constexpr int factorial(int n) { return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n; }
+constexpr int factorial(int n)
+{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+}
 
-inline void linreg(int n, const std::vector<double> &x, const std::vector<double> &y, double &k, double &q)
+inline void linreg(int n, const std::vector<double>& x, const std::vector<double>& y, double& k, double& q)
 {
   double sumx = 0.;  /* sum of x                      */
   double sumx2 = 0.; /* sum of x**2                   */
@@ -317,14 +347,14 @@ inline void linreg(int n, const std::vector<double> &x, const std::vector<double
   }
 }
 
-inline double linregPosition(int n, const std::vector<double> &x, const std::vector<double> &y, double x_)
+inline double linregPosition(int n, const std::vector<double>& x, const std::vector<double>& y, double x_)
 {
   double k, q;
   linreg(n, x, y, k, q);
   return k * x_ + q;
 }
 
-inline double averageVectorDistance(std::vector<double> &vec1, std::vector<double> &vec2, std::vector<double> &boundsRange)
+inline double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange)
 {
   double result = 0;
   for (int i = 0; i < vec1.size(); i++)
@@ -334,10 +364,10 @@ inline double averageVectorDistance(std::vector<double> &vec1, std::vector<doubl
   return result;
 }
 
-inline bool isDistinct(int inpindex, std::vector<int> &indices, int currindex)
+inline bool isDistinct(int inpindex, std::vector<int>& indices, int currindex)
 {
   bool isdist = true;
-  for (auto &idx : indices)
+  for (auto& idx : indices)
   {
     if (inpindex == idx || inpindex == currindex)
       isdist = false;
@@ -345,15 +375,15 @@ inline bool isDistinct(int inpindex, std::vector<int> &indices, int currindex)
   return isdist;
 }
 
-inline void exportToMATLAB(const std::vector<double> &Ydata, double xmin, double xmax, std::string path)
+inline void exportToMATLAB(const std::vector<double>& Ydata, double xmin, double xmax, std::string path)
 {
   std::ofstream listing(path, std::ios::out | std::ios::trunc);
   listing << xmin << "," << xmax << endl;
-  for (auto &y : Ydata)
+  for (auto& y : Ydata)
     listing << y << endl;
 }
 
-inline void exportToMATLAB(const std::vector<std::vector<double>> &Zdata, double xmin, double xmax, double ymin, double ymax, std::string path)
+inline void exportToMATLAB(const std::vector<std::vector<double>>& Zdata, double xmin, double xmax, double ymin, double ymax, std::string path)
 {
   std::ofstream listing(path, std::ios::out | std::ios::trunc);
   listing << xmin << "," << xmax << "," << ymin << "," << ymax << endl;
@@ -362,7 +392,10 @@ inline void exportToMATLAB(const std::vector<std::vector<double>> &Zdata, double
       listing << Zdata[r][c] << endl;
 }
 
-inline void makeDir(std::string path, std::string dirname) { std::experimental::filesystem::create_directory(path + "//" + dirname); }
+inline void makeDir(std::string path, std::string dirname)
+{
+  std::experimental::filesystem::create_directory(path + "//" + dirname);
+}
 
 inline std::vector<double> iota(int first, int size)
 {
@@ -372,11 +405,17 @@ inline std::vector<double> iota(int first, int size)
   return vec;
 }
 
-inline std::string operator+(const std::string &str, const int val) { return str + to_string(val); }
+inline std::string operator+(const std::string& str, const int val)
+{
+  return str + to_string(val);
+}
 
-inline std::string operator+(const int val, const std::string &str) { return to_string(val) + str; }
+inline std::string operator+(const int val, const std::string& str)
+{
+  return to_string(val) + str;
+}
 
-inline void filterMedian(std::vector<double> &vec, int size)
+inline void filterMedian(std::vector<double>& vec, int size)
 {
   std::vector<double> vecMedian = vec;
   std::vector<double> med;
@@ -402,7 +441,7 @@ inline void filterMedian(std::vector<double> &vec, int size)
   vec = vecMedian;
 }
 
-inline void filterMovavg(std::vector<double> &vec, int size)
+inline void filterMovavg(std::vector<double>& vec, int size)
 {
   std::vector<double> vecMovavg = vec;
   double movavg;
@@ -430,11 +469,17 @@ inline void filterMovavg(std::vector<double> &vec, int size)
   vec = vecMovavg;
 }
 
-inline double toDegrees(double rad) { return rad * Constants::Rad; }
+inline double toDegrees(double rad)
+{
+  return rad * Constants::Rad;
+}
 
-inline double toRadians(double deg) { return deg / Constants::Rad; }
+inline double toRadians(double deg)
+{
+  return deg / Constants::Rad;
+}
 
-inline std::vector<double> toDegrees(const std::vector<double> &vecrad)
+inline std::vector<double> toDegrees(const std::vector<double>& vecrad)
 {
   auto vecdeg = vecrad;
   for (int i = 0; i < vecrad.size(); i++)
@@ -444,7 +489,7 @@ inline std::vector<double> toDegrees(const std::vector<double> &vecrad)
   return vecdeg;
 }
 
-inline std::vector<double> toRadians(const std::vector<double> &vecdeg)
+inline std::vector<double> toRadians(const std::vector<double>& vecdeg)
 {
   auto vecrad = vecdeg;
   for (int i = 0; i < vecdeg.size(); i++)
@@ -460,21 +505,21 @@ inline std::string to_stringp(double val, int prec)
   return vals.substr(0, vals.find(".") + prec + 1);
 }
 
-inline std::vector<double> removeQuantileOutliers(const std::vector<double> &vec, double quanB, double quanT)
+inline std::vector<double> removeQuantileOutliers(const std::vector<double>& vec, double quanB, double quanT)
 {
   auto out = vec;
   std::sort(out.begin(), out.end());
   return std::vector<double>(out.begin() + (int)(quanB * (out.size() - 1)), out.begin() + (int)(quanT * (out.size() - 1)));
 }
 
-inline double getQuantile(const std::vector<double> &vec, double quan)
+inline double getQuantile(const std::vector<double>& vec, double quan)
 {
   std::vector<double> out = vec;
   std::sort(out.begin(), out.end());
   return out[(int)(quan * (out.size() - 1))];
 }
 
-inline double getQuantile(const std::vector<std::vector<double>> &vec, double quan)
+inline double getQuantile(const std::vector<std::vector<double>>& vec, double quan)
 {
   std::vector<double> out;
   out.reserve(vec.size() * vec[0].size());
@@ -489,7 +534,7 @@ inline double getQuantile(const std::vector<std::vector<double>> &vec, double qu
   return out[(int)(quan * (out.size() - 1))];
 }
 
-inline std::vector<double> getStandardErrorsOfTheMeanHorizontal(const std::vector<std::vector<double>> &vec)
+inline std::vector<double> getStandardErrorsOfTheMeanHorizontal(const std::vector<std::vector<double>>& vec)
 {
   std::vector<double> errors(vec.size());
 
@@ -504,7 +549,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanHorizontal(const std::vecto
   return errors;
 }
 
-inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<std::vector<double>> &vec)
+inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<std::vector<double>>& vec)
 {
   std::vector<double> errors(vec[0].size());
 
@@ -523,7 +568,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<
   return errors;
 }
 
-inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::vector<double>> &vec)
+inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::vector<double>>& vec)
 {
   std::vector<double> stdevs(vec[0].size());
 
@@ -538,9 +583,17 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
   return stdevs;
 }
 
-inline bool IsImage(const std::string &path)
+inline bool IsImage(const std::string& path)
 {
   return (path.find(".png") != std::string::npos || path.find(".PNG") != std::string::npos || path.find(".jpg") != std::string::npos ||
           path.find(".JPG") != std::string::npos || path.find(".jpeg") != std::string::npos || path.find(".JPEG") != std::string::npos ||
           path.find(".fits") != std::string::npos || path.find(".FITS") != std::string::npos);
+}
+
+inline std::vector<double> GetIota(int length, double maximum)
+{
+  std::vector<double> out(length);
+  for (int i = 0; i < length; ++i)
+    out[i] = (double)i / (length - 1) * maximum;
+  return out;
 }
