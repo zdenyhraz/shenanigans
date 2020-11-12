@@ -10,7 +10,7 @@ public:
     Gaussian,
   };
 
-  const char *BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
+  const char* BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
   {
     switch (type)
     {
@@ -43,7 +43,7 @@ public:
     Hann,
   };
 
-  const char *WindowType2String(WindowType type)
+  const char* WindowType2String(WindowType type)
   {
     switch (type)
     {
@@ -62,7 +62,7 @@ public:
     Cubic,
   };
 
-  const char *InterpolationType2String(InterpolationType type)
+  const char* InterpolationType2String(InterpolationType type)
   {
     switch (type)
     {
@@ -88,7 +88,7 @@ public:
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
-  void SetDebugDirectory(const std::string &dir) { mDebugDirectory = dir; }
+  void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
 
   // getters
   int GetRows() const { return mRows; }
@@ -103,10 +103,10 @@ public:
   Mat GetBandpass() const { return mBandpass; }
 
   // main calc methods
-  Point2f Calculate(const Mat &image1, const Mat &image2) const;
-  Point2f Calculate(Mat &&image1, Mat &&image2) const;
-  void Optimize(const std::string &trainingImagesDirectory, const std::string &validationImagesDirectory, float maxShiftRatio = 0.25,
-      float noiseStdev = 0.1, int itersPerImage = 5);
+  Point2f Calculate(const Mat& image1, const Mat& image2) const;
+  Point2f Calculate(Mat&& image1, Mat&& image2) const;
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25,
+                float noiseStdev = 0.1, int itersPerImage = 5);
   void ShowDebugStuff() const;
 
 private:
@@ -133,25 +133,25 @@ private:
   float HighpassEquation(int row, int col) const;
   float BandpassGEquation(int row, int col) const;
   float BandpassREquation(int row, int col) const;
-  bool IsValid(const Mat &img1, const Mat &img2) const;
-  bool CheckSize(const Mat &img1, const Mat &img2) const;
-  bool CheckChannels(const Mat &img1, const Mat &img2) const;
-  void ConvertToUnitFloat(Mat &img1, Mat &img2) const;
-  void ApplyWindow(Mat &img1, Mat &img2) const;
-  std::pair<Mat, Mat> CalculateFourierTransforms(Mat &img1, Mat &img2) const;
-  Mat CalculateCrossPowerSpectrum(const Mat &dft1, const Mat &dft2) const;
-  void ApplyBandpass(Mat &crosspower) const;
+  bool IsValid(const Mat& img1, const Mat& img2) const;
+  bool CheckSize(const Mat& img1, const Mat& img2) const;
+  bool CheckChannels(const Mat& img1, const Mat& img2) const;
+  void ConvertToUnitFloat(Mat& img1, Mat& img2) const;
+  void ApplyWindow(Mat& img1, Mat& img2) const;
+  std::pair<Mat, Mat> CalculateFourierTransforms(Mat& img1, Mat& img2) const;
+  Mat CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const;
+  void ApplyBandpass(Mat& crosspower) const;
   void CalculateFrequencyBandpass();
-  Mat CalculateL3(const Mat &crosspower) const;
-  static void FftShift(Mat &mat);
-  static void IFftShift(Mat &mat);
-  Point2f GetPeak(const Mat &mat) const;
-  Point2f GetPeakSubpixel(const Mat &mat) const;
-  Mat CalculateL2(const Mat &L3, const Point2f &L3peak, int L2size) const;
-  Mat CalculateL2U(const Mat &L2) const;
-  int GetL1size(const Mat &L2U) const;
-  Mat CalculateL1(const Mat &L2U, const Point2f &L2Upeak, int L1size) const;
-  bool IsOutOfBounds(const Point2f &peak, const Mat &mat, int size) const;
-  bool AccuracyReached(const Point2f &L1peak, const Point2f &L1mid) const;
-  bool ReduceL2size(int &L2size) const;
+  Mat CalculateL3(const Mat& crosspower) const;
+  static void FftShift(Mat& mat);
+  static void IFftShift(Mat& mat);
+  Point2f GetPeak(const Mat& mat) const;
+  Point2f GetPeakSubpixel(const Mat& mat) const;
+  Mat CalculateL2(const Mat& L3, const Point2f& L3peak, int L2size) const;
+  Mat CalculateL2U(const Mat& L2) const;
+  int GetL1size(const Mat& L2U) const;
+  Mat CalculateL1(const Mat& L2U, const Point2f& L2Upeak, int L1size) const;
+  bool IsOutOfBounds(const Point2f& peak, const Mat& mat, int size) const;
+  bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
+  bool ReduceL2size(int& L2size) const;
 };
