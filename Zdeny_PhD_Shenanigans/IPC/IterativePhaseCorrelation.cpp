@@ -127,34 +127,70 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat&& img1, Mat&& img2) cons
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  // bandpass calc
+  const bool debugBandpass = true;
+  const bool debugWindow = false;
 
   // window calc
-  Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
-  Mat w, imgw;
-  createHanningWindow(w, img.size(), CV_32F);
-  multiply(img, w, imgw);
-  Mat w0 = w.clone();
-  Mat r0 = Mat::ones(w.size(), CV_32F);
-  copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
-  copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
+  if (debugWindow)
+  {
+    Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
+    Mat w, imgw;
+    createHanningWindow(w, img.size(), CV_32F);
+    multiply(img, w, imgw);
+    Mat w0 = w.clone();
+    Mat r0 = Mat::ones(w.size(), CV_32F);
+    copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
+    copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
-  // clang-format off
-  // window plots
-  Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindows.png");
-  Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(GetFourierLogMagnitude(r0)), GetMidRow(GetFourierLogMagnitude(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindowsDFT.png");
-  Plot2D::plot(GetFourierLogMagnitude(r0), "w2", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
-  Plot2D::plot(GetFourierLogMagnitude(w0), "w3", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
-  Plot2D::plot(img, "w4", "x", "y", "image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImage.png");
-  Plot2D::plot(w, "w5", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
-  Plot2D::plot(imgw, "w6", "x", "y", "windowed image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindow.png");
-  Plot2D::plot(GetFourierLogMagnitude(img), "w7", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
-  Plot2D::plot(GetFourierLogMagnitude(imgw), "w8", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
-  
-  // bandpass plots
-  Plot1D::plot(GetIota(mBandpass.cols, 1), GetMidRow(mBandpass), "IPC bandpass 1D", "x", "IPC bandpass", Plot::defaultpen, mDebugDirectory + "/bandpass1D.png");
-  Plot2D::plot(mBandpass, "IPC bandpass 2D", "x", "y", "IPC bandpass", 0, 1, 0, 1, 0, mDebugDirectory + "/bandpass2D.png");
-  // clang-format on
+    // clang-format off
+	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindows.png");
+	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(GetFourierLogMagnitude(r0)), GetMidRow(GetFourierLogMagnitude(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindowsDFT.png");
+	Plot2D::plot(GetFourierLogMagnitude(r0), "w2", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
+	Plot2D::plot(GetFourierLogMagnitude(w0), "w3", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
+	Plot2D::plot(img, "w4", "x", "y", "image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImage.png");
+	Plot2D::plot(w, "w5", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
+	Plot2D::plot(imgw, "w6", "x", "y", "windowed image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindow.png");
+	Plot2D::plot(GetFourierLogMagnitude(img), "w7", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
+	Plot2D::plot(GetFourierLogMagnitude(imgw), "w8", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
+    // clang-format on
+  }
+
+  // bandpass calc
+  if (debugBandpass)
+  {
+    Mat bpR = Mat::zeros(mRows, mCols, CV_32F);
+    Mat bpG = Mat::zeros(mRows, mCols, CV_32F);
+    for (int r = 0; r < mRows; ++r)
+    {
+      for (int c = 0; c < mCols; ++c)
+      {
+        bpR.at<float>(r, c) = BandpassREquation(r, c);
+
+        if (mBandpassL <= 0 && mBandpassH < 1)
+          bpG.at<float>(r, c) = LowpassEquation(r, c);
+        else if (mBandpassL > 0 && mBandpassH >= 1)
+          bpG.at<float>(r, c) = HighpassEquation(r, c);
+        else if (mBandpassL > 0 && mBandpassH < 1)
+          bpG.at<float>(r, c) = BandpassGEquation(r, c);
+      }
+    }
+
+    if (mBandpassL > 0 && mBandpassH < 1)
+      normalize(bpG, bpG, 0.0, 1.0, NORM_MINMAX);
+
+    Mat bpR0, bpG0;
+    copyMakeBorder(bpR, bpR0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
+    copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
+
+    // clang-format off
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"Rect","Gauss"}, Plot::defaultpens, mDebugDirectory + "/1DBandpass.png");
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(GetInverseFourierLogMagnitude(bpR0)), GetMidRow(GetInverseFourierLogMagnitude(bpG0))}, "b1", "fx", "log IDFT", {"Rect","Gauss"}, Plot::defaultpens, mDebugDirectory + "/1DBandpassIDFT.png");
+    Plot2D::plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png");
+    Plot2D::plot(bpG, "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png");
+	Plot2D::plot(GetInverseFourierLogMagnitude(bpR0), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
+	Plot2D::plot(GetInverseFourierLogMagnitude(bpG0), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
+    // clang-format on
+  }
 
   LOG_INFO("IPC debug stuff shown");
 }
@@ -316,7 +352,7 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
   Mat bandpassF = quadrantswap(mBandpass);
-  Mat bandpassFplanes[2] = {bandpassF, bandpassF};
+  Mat bandpassFplanes[2] = {bandpassF, Mat::zeros(bandpassF.size(), CV_32F)};
   merge(bandpassFplanes, 2, mFrequencyBandpass);
 }
 
