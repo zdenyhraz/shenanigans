@@ -384,7 +384,7 @@ inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  bool debugBandpass = true;
+  bool debugBandpass = false;
   bool debugWindow = false;
 
   if (debugWindow)
@@ -445,6 +445,46 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
 	Plot2D::plot(Fourier::ifftlogmagn(bpR0), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
 	Plot2D::plot(Fourier::ifftlogmagn(bpG0), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
     // clang-format on
+  }
+
+  if (1)
+  {
+    Mat img = roicrop(loadImage("Resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+    Mat fftR = Fourier::fft(img);
+    Mat fftG = Fourier::fft(img);
+    Mat filterR = Mat::zeros(img.size(), CV_32F);
+    Mat filterG = Mat::zeros(img.size(), CV_32F);
+
+    for (int r = 0; r < mRows; ++r)
+    {
+      for (int c = 0; c < mCols; ++c)
+      {
+        filterR.at<float>(r, c) = BandpassREquation(r, c);
+
+        if (mBandpassL <= 0 && mBandpassH < 1)
+          filterG.at<float>(r, c) = LowpassEquation(r, c);
+        else if (mBandpassL > 0 && mBandpassH >= 1)
+          filterG.at<float>(r, c) = HighpassEquation(r, c);
+        else if (mBandpassL > 0 && mBandpassH < 1)
+          filterG.at<float>(r, c) = BandpassGEquation(r, c);
+      }
+    }
+
+    Fourier::ifftshift(filterR);
+    Fourier::ifftshift(filterG);
+
+    Mat filterRc = Fourier::dupchansc(filterR);
+    Mat filterGc = Fourier::dupchansc(filterG);
+
+    multiply(fftR, filterRc, fftR);
+    multiply(fftG, filterGc, fftG);
+
+    Mat imgfR = Fourier::ifft(fftR);
+    Mat imgfG = Fourier::ifft(fftG);
+
+    Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
+    Plot2D::plot(imgfR, "Rect", "x", "y", "¨Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
+    Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
   }
 
   LOG_INFO("IPC debug stuff shown");
