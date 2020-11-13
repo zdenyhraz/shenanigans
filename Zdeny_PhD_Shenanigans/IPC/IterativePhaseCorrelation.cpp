@@ -352,7 +352,7 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
   Mat bandpassF = quadrantswap(mBandpass);
-  Mat bandpassFplanes[2] = {bandpassF, Mat::zeros(bandpassF.size(), CV_32F)};
+  Mat bandpassFplanes[2] = {bandpassF, bandpassF};
   merge(bandpassFplanes, 2, mFrequencyBandpass);
 }
 
