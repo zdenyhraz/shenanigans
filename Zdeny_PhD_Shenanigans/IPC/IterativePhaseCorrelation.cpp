@@ -386,7 +386,7 @@ inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  bool debugBandpass = false;
+  bool debugBandpass = true;
   bool debugWindow = false;
 
   if (debugWindow)
