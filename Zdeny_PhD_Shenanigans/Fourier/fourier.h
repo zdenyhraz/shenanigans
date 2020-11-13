@@ -3,18 +3,117 @@
 #include "Core/functionsBaseCV.h"
 #include "Core/constants.h"
 
-using namespace std;
-using namespace cv;
+namespace Fourier
+{
+inline Mat fft(Mat&& img)
+{
+  if (img.type() != CV_32F)
+    img.convertTo(img, CV_32F);
+
+  Mat imgcp[] = {img, Mat::zeros(img.size(), CV_32F)};
+  Mat fft;
+  merge(imgcp, 2, fft);
+  dft(fft, fft);
+  return fft;
+}
+
+inline Mat ifft(Mat&& fft)
+{
+  dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+  return fft;
+}
+
+inline Mat fft(const Mat& img)
+{
+  return fft(img.clone());
+}
+
+inline Mat ifft(const Mat& fft)
+{
+  return ifft(fft.clone());
+}
+
+inline void fftshift(Mat& mat)
+{
+  int cx = mat.cols / 2;
+  int cy = mat.rows / 2;
+  Mat q0(mat, Rect(0, 0, cx, cy));
+  Mat q1(mat, Rect(cx, 0, cx, cy));
+  Mat q2(mat, Rect(0, cy, cx, cy));
+  Mat q3(mat, Rect(cx, cy, cx, cy));
+
+  Mat tmp;
+  q0.copyTo(tmp);
+  q3.copyTo(q0);
+  tmp.copyTo(q3);
+  q1.copyTo(tmp);
+  q2.copyTo(q1);
+  tmp.copyTo(q2);
+}
+
+inline void ifftshift(Mat& mat)
+{
+  int cx = mat.cols / 2;
+  int cy = mat.rows / 2;
+  Mat q0(mat, Rect(0, 0, cx, cy));
+  Mat q1(mat, Rect(cx, 0, cx, cy));
+  Mat q2(mat, Rect(0, cy, cx, cy));
+  Mat q3(mat, Rect(cx, cy, cx, cy));
+
+  Mat tmp;
+  q3.copyTo(tmp);
+  q0.copyTo(q3);
+  tmp.copyTo(q0);
+  q2.copyTo(tmp);
+  q1.copyTo(q2);
+  tmp.copyTo(q1);
+}
+
+inline Mat logmagn(const Mat& img)
+{
+  Mat mag;
+  if (img.channels() > 1)
+  {
+    Mat planes[2];
+    split(img, planes);
+    magnitude(planes[0], planes[1], mag);
+  }
+  else
+  {
+    mag = img.clone();
+  }
+  mag += Scalar::all(1);
+  log(mag, mag);
+  normalize(mag, mag, 0, 1, NORM_MINMAX);
+  return mag;
+}
+
+inline Mat fftlogmagn(const Mat& img)
+{
+  Mat out = fft(img);
+  fftshift(out);
+  return logmagn(out);
+}
+
+inline Mat ifftlogmagn(const Mat& img)
+{
+  Mat out = ifft(img);
+  fftshift(out);
+  return logmagn(out);
+}
+}
+
+// ------------------------------------------------ legacy code ------------------------------------------------
 
 inline Mat quadrantswap(const Mat& sourceimgDFT)
 {
   Mat centeredDFT = sourceimgDFT.clone();
-  int centerX = centeredDFT.cols / 2;
-  int centerY = centeredDFT.rows / 2;
-  Mat q1(centeredDFT, Rect(0, 0, centerX, centerY));
-  Mat q2(centeredDFT, Rect(centerX, 0, centerX, centerY));
-  Mat q3(centeredDFT, Rect(0, centerY, centerX, centerY));
-  Mat q4(centeredDFT, Rect(centerX, centerY, centerX, centerY));
+  int cx = centeredDFT.cols / 2;
+  int cy = centeredDFT.rows / 2;
+  Mat q1(centeredDFT, Rect(0, 0, cx, cy));
+  Mat q2(centeredDFT, Rect(cx, 0, cx, cy));
+  Mat q3(centeredDFT, Rect(0, cy, cx, cy));
+  Mat q4(centeredDFT, Rect(cx, cy, cx, cy));
   Mat temp;
 
   q1.copyTo(temp);
@@ -27,33 +126,33 @@ inline Mat quadrantswap(const Mat& sourceimgDFT)
   return centeredDFT;
 }
 
-inline Mat fourier(Mat&& sourceimg)
+inline Mat fourier(Mat&& img)
 {
-  sourceimg.convertTo(sourceimg, CV_32F);
-  Mat sourceimgcomplex[2] = {Mat_<float>(sourceimg), Mat::zeros(sourceimg.size(), CV_32F)};
+  img.convertTo(img, CV_32F);
+  Mat sourceimgcomplex[2] = {Mat_<float>(img), Mat::zeros(img.size(), CV_32F)};
   Mat sourceimgcomplexmerged;
   merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
   dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
   return sourceimgcomplexmerged;
 }
 
-inline Mat ifourier(Mat&& sourceimg)
+inline Mat ifourier(Mat&& img)
 {
   Mat out;
-  dft(sourceimg, out, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
+  dft(img, out, DFT_INVERSE + DFT_SCALE + DFT_REAL_OUTPUT);
   return out;
 }
 
 inline Mat fourier(const Mat& sourceimgIn)
 {
-  Mat sourceimg = sourceimgIn.clone();
-  return fourier(std::move(sourceimg));
+  Mat img = sourceimgIn.clone();
+  return fourier(std::move(img));
 }
 
 inline Mat ifourier(const Mat& sourceimgIn)
 {
-  Mat sourceimg = sourceimgIn.clone();
-  return ifourier(std::move(sourceimg));
+  Mat img = sourceimgIn.clone();
+  return ifourier(std::move(img));
 }
 
 inline Mat fourierinv(const Mat& realIn, const Mat& imagIn)
@@ -132,45 +231,10 @@ inline Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
 void showfourier(const Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn",
                  std::string phasewindowname = "FFTphase");
 
-Mat convolute(Mat sourceimg, Mat PSFimg);
+Mat convolute(Mat img, Mat PSFimg);
 
-Mat deconvolute(Mat sourceimg, Mat PSFimg);
+Mat deconvolute(Mat img, Mat PSFimg);
 
-Mat deconvoluteWiener(const Mat& sourceimg, const Mat& PSFimg);
+Mat deconvoluteWiener(const Mat& img, const Mat& PSFimg);
 
-Mat frequencyFilter(const Mat& sourceimg, const Mat& mask);
-
-inline Mat GetFourierLogMagnitude(const Mat& sourceimg)
-{
-  Mat DFT = fourier(sourceimg);
-  Mat DFTc = quadrantswap(DFT);
-  Mat planes[2];
-  split(DFTc, planes);
-  Mat DFTlm;
-  magnitude(planes[0], planes[1], DFTlm);
-  DFTlm += Scalar::all(1);
-  log(DFTlm, DFTlm);
-  normalize(DFTlm, DFTlm, 0, 1, NORM_MINMAX);
-  return DFTlm;
-}
-
-inline Mat GetInverseFourierLogMagnitude(const Mat& sourceimg)
-{
-  Mat iDFT;
-  if (sourceimg.channels() == 2)
-  {
-    iDFT = ifourier(sourceimg);
-  }
-  else
-  {
-    Mat DFT;
-    Mat bandpassFplanes[2] = {sourceimg, Mat::zeros(sourceimg.size(), CV_32F)};
-    merge(bandpassFplanes, 2, DFT);
-    iDFT = ifourier(std::move(DFT));
-  }
-  Mat iDFTc = quadrantswap(iDFT);
-  iDFTc += Scalar::all(1);
-  log(iDFTc, iDFTc);
-  normalize(iDFTc, iDFTc, 0, 1, NORM_MINMAX);
-  return iDFTc;
-}
+Mat frequencyFilter(const Mat& img, const Mat& mask);
