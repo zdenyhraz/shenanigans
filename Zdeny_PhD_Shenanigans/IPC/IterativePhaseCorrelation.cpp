@@ -281,10 +281,8 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
 
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 {
-  Mat bandpassF = mBandpass.clone();
-  Fourier::ifftshift(bandpassF);
-  Mat bandpassFplanes[2] = {bandpassF, bandpassF};
-  merge(bandpassFplanes, 2, mFrequencyBandpass);
+  mFrequencyBandpass = Fourier::dupchansc(mBandpass);
+  Fourier::ifftshift(mFrequencyBandpass);
 }
 
 inline Mat IterativePhaseCorrelation::CalculateL3(Mat&& crosspower) const

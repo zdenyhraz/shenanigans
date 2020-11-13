@@ -17,9 +17,12 @@ inline Mat fft(Mat&& img)
   return fft;
 }
 
-inline Mat ifft(Mat&& fft)
+inline Mat ifft(Mat&& fft, bool conjsym = true)
 {
-  dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+  if (conjsym)
+    dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+  else
+    dft(fft, fft, DFT_INVERSE | DFT_SCALE);
   return fft;
 }
 
@@ -69,7 +72,23 @@ inline void ifftshift(Mat& mat)
   tmp.copyTo(q1);
 }
 
-inline Mat logmagn(const Mat& img)
+inline Mat dupchansc(const Mat& img)
+{
+  Mat out;
+  Mat planes[] = {img, img};
+  merge(planes, 2, out);
+  return out;
+}
+
+inline Mat dupchansz(const Mat& img)
+{
+  Mat out;
+  Mat planes[] = {img, Mat::zeros(img.size(), CV_32F)};
+  merge(planes, 2, out);
+  return out;
+}
+
+inline Mat logmagn(const Mat& img, int logs = 1)
 {
   Mat mag;
   if (img.channels() > 1)
@@ -82,9 +101,12 @@ inline Mat logmagn(const Mat& img)
   {
     mag = img.clone();
   }
-  mag += Scalar::all(1);
-  log(mag, mag);
-  normalize(mag, mag, 0, 1, NORM_MINMAX);
+  for (int logit = 0; logit < logs; ++logit)
+  {
+    mag += Scalar::all(1);
+    log(mag, mag);
+    normalize(mag, mag, 0, 1, NORM_MINMAX);
+  }
   return mag;
 }
 
@@ -97,9 +119,9 @@ inline Mat fftlogmagn(const Mat& img)
 
 inline Mat ifftlogmagn(const Mat& img)
 {
-  Mat out = ifft(img);
+  Mat out = ifft(dupchansz(img), false);
   fftshift(out);
-  return logmagn(out);
+  return logmagn(out, 10);
 }
 }
 
