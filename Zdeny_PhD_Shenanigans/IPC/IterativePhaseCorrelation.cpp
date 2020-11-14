@@ -482,6 +482,9 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Mat imgfR = Fourier::ifft(fftR);
     Mat imgfG = Fourier::ifft(fftG);
 
+    normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
+    normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
+
     Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
     Plot2D::plot(imgfR, "Rect", "x", "y", "¨Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
