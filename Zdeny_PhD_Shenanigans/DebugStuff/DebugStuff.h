@@ -21,21 +21,32 @@ void Debug(Globals* globals)
 
   if (1) // regex test
   {
-    const std::string str("001:UNTIL=002:NUM=003:USED=004:APP=STT:jjjjjjjj:asdasdasdasdasdIS_KOKOT[=TRUE];IS_PICA[=FOLS];IS_PKOKOTICA[=FKOKOTOLS];");
+    std::string str("001:UNTIL=002:NUM=003:USED=004:APP=STT:jjjjjjjj:asdasdasdasdasdIS_KOKOT[=TRUE];IS_PICA[=FOLS];IS_PKOKOTICA[=FKOKOTOLS];");
 
-    const std::regex paramsRegex(R"(([0-9]+):UNTIL=([0-9]+):NUM=([0-9]+):USED=([0-9]+):APP=[A-Za-z]+:.{8}:.+)");
+    std::regex paramsRegex(R"(([0-9]+):UNTIL=([0-9]+):NUM=([0-9]+):USED=([0-9]+):APP=[A-Za-z]+:.{8}:.+)");
     LOG_FATAL("Input string: {}, params regex: {}", str, std::regex_match(str, paramsRegex));
     std::smatch paramsPieces;
     if (std::regex_match(str, paramsPieces, paramsRegex))
       for (size_t i = 0; i < paramsPieces.size(); ++i)
         LOG_FATAL("paramsPieces[{}]: {}", i, paramsPieces[i].str());
 
-    const std::regex flagsRegex(R"(.+IS_([A-Za-z]+)\[=([A-Za-z]+)\];)");
+    std::regex flagsRegex(R"(.+IS_([A-Za-z]+)\[=([A-Za-z]+)\];)");
     LOG_FATAL("Input string: {}, flags regex: {}", str, std::regex_match(str, flagsRegex));
     std::smatch flagsPieces;
     if (std::regex_match(str, flagsPieces, flagsRegex))
       for (size_t i = 0; i < flagsPieces.size(); ++i)
         LOG_FATAL("flagsPieces[{}]: {}", i, flagsPieces[i].str());
+
+    std::regex e(R"(IS_([A-Za-z]+)\[=([A-Za-z]+)\];)");
+    int submatches[] = {1, 2};
+    std::regex_token_iterator<std::string::iterator> rend;
+    std::regex_token_iterator<std::string::iterator> flagit(str.begin(), str.end(), e, submatches);
+    while (flagit != rend)
+    {
+      std::string flagname = *flagit++;
+      std::string flagvalue = *flagit++;
+      LOG_INFO("{} / {}", flagname, flagvalue);
+    }
   }
   if (0) // rectangular and gaussian abndpass equations
   {
