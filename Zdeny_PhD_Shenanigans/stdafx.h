@@ -26,6 +26,7 @@
 #include <tuple>
 #include <thread>
 #include <memory>
+#include <regex>
 // OpenMP
 #include <omp.h>
 // OpenCV
