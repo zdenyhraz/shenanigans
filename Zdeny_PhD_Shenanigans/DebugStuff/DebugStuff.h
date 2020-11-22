@@ -21,16 +21,30 @@ void Debug(Globals* globals)
 
   if (1) // 2pic IPC
   {
-    Mat img1 = loadImage("Resources/test.png");
-    Mat img2 = loadImage("Resources/test.png");
+    Point2f rawshift(0.157 * globals->IPC->GetCols(), -0.135 * globals->IPC->GetRows());
+    Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, globals->IPC->GetCols(), globals->IPC->GetRows());
+    Mat img2 =
+        roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, globals->IPC->GetCols(), globals->IPC->GetRows());
 
-    double shiftX = 110.35;
-    double shiftY = -70.76;
-    Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
-    warpAffine(img2, img2, T, cv::Size(img2.cols, img2.rows));
+    double noiseStdev = 0.03;
+    Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
+    Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
+    randn(noise1, 0, noiseStdev);
+    randn(noise2, 0, noiseStdev);
+    img1 += noise1;
+    img2 += noise2;
 
-    globals->IPC->SetSize(img1.rows, img2.rows);
-    auto shift = globals->IPC->Calculate(img1, img2);
+    Mat img1med, img2med;
+    medianBlur(img1, img1med, 5);
+    medianBlur(img2, img2med, 5);
+
+    globals->IPC->SetDebugMode(true);
+    auto ipcshift = globals->IPC->Calculate(img1, img2);
+    globals->IPC->SetDebugMode(false);
+
+    LOG_INFO("Input raw shift = {}", rawshift);
+    LOG_INFO("Resulting shift = {}", ipcshift);
+    LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
   }
   if (0) // regex test
   {

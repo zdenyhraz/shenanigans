@@ -90,6 +90,7 @@ public:
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
+  void SetDebugMode(bool mode) { mDebugMode = mode; }
   void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
 
   // getters
@@ -120,6 +121,7 @@ private:
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
+  bool mDebugMode = false;
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;

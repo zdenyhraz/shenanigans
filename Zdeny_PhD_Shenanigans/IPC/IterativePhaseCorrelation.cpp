@@ -50,90 +50,103 @@ Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image
 }
 
 inline Point2f IterativePhaseCorrelation::Calculate(Mat&& img1, Mat&& img2) const
+try
 {
-  try
+  if (!IsValid(img1, img2))
+    return {0, 0};
+
+  ConvertToUnitFloat(img1, img2);
+  ApplyWindow(img1, img2);
+
+  if (mDebugMode)
   {
-    if (!IsValid(img1, img2))
-      return {0, 0};
+    Plot2D::plot(img1, "img1");
+    Plot2D::plot(img2, "img2");
+  }
 
-    ConvertToUnitFloat(img1, img2);
-    ApplyWindow(img1, img2);
-    // Plot2D::plot(img1, "img1");
-    // Plot2D::plot(img2, "img2");
-    auto [dft1, dft2] = CalculateFourierTransforms(std::move(img1), std::move(img2));
-    auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
-    ApplyBandpass(crosspower);
+  auto [dft1, dft2] = CalculateFourierTransforms(std::move(img1), std::move(img2));
+  auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
+  ApplyBandpass(crosspower);
 
-    Mat L3 = CalculateL3(std::move(crosspower));
-    // Plot2D::plot(L3, "L3");
-    Point2f L3peak = GetPeak(L3);
-    Point2f L3mid(L3.cols / 2, L3.rows / 2);
-    Point2f result = L3peak - L3mid;
+  Mat L3 = CalculateL3(std::move(crosspower));
+  Point2f L3peak = GetPeak(L3);
+  Point2f L3mid(L3.cols / 2, L3.rows / 2);
+  Point2f result = L3peak - L3mid;
+  int L2size = mL2size;
+  bool converged = false;
 
-    int L2size = mL2size;
-    bool converged = false;
-    while (!converged)
-    {
-      // reduce the L2size as long as the L2 is out of bounds
-      while (IsOutOfBounds(L3peak, L3, L2size))
-        if (!ReduceL2size(L2size))
-          break;
+  if (mDebugMode)
+  {
+    Plot2D::plot(L3, "L3");
+    Plot2D::plot(Fourier::logmagn(L3, 1), "L3log");
+  }
 
-      // L2size cannot be reduced anymore and is still out of bounds - stop
-      if (IsOutOfBounds(L3peak, L3, L2size))
+  while (!converged)
+  {
+    // reduce the L2size as long as the L2 is out of bounds
+    while (IsOutOfBounds(L3peak, L3, L2size))
+      if (!ReduceL2size(L2size))
         break;
 
-      // L2
-      Mat L2 = CalculateL2(L3, L3peak, L2size);
-      // Plot2D::plot(L2, "L2");
-      Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    // L2size cannot be reduced anymore and is still out of bounds - stop
+    if (IsOutOfBounds(L3peak, L3, L2size))
+      break;
 
-      // L2U
-      Mat L2U = CalculateL2U(L2);
-      // Plot2D::plot(L2U, "L2U");
-      Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-      Point2f L2Upeak = L2Umid;
+    // L2
+    Mat L2 = CalculateL2(L3, L3peak, L2size);
+    Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    if (mDebugMode)
+      Plot2D::plot(L2, "L2");
 
-      // L1
-      int L1size = GetL1size(L2U);
-      Mat L1;
-      Point2f L1mid(L1size / 2, L1size / 2);
-      Point2f L1peak;
+    // L2U
+    Mat L2U = CalculateL2U(L2);
+    Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+    Point2f L2Upeak = L2Umid;
+    if (mDebugMode)
+      Plot2D::plot(L2U, "L2U");
 
-      for (int iter = 0; iter < mMaxIterations; ++iter)
+    // L1
+    int L1size = GetL1size(L2U);
+    Mat L1;
+    Point2f L1mid(L1size / 2, L1size / 2);
+    Point2f L1peak;
+
+    for (int iter = 0; iter < mMaxIterations; ++iter)
+    {
+      L1 = CalculateL1(L2U, L2Upeak, L1size);
+      L1peak = GetPeakSubpixel(L1);
+      L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+
+      if (IsOutOfBounds(L2Upeak, L2U, L1size))
+        break;
+
+      if (AccuracyReached(L1peak, L1mid))
       {
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        L1peak = GetPeakSubpixel(L1);
-        L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
 
-        if (IsOutOfBounds(L2Upeak, L2U, L1size))
-          break;
+        if (mDebugMode)
+          Plot2D::plot(L1, "L1");
 
-        if (AccuracyReached(L1peak, L1mid))
-        {
-          L1 = CalculateL1(L2U, L2Upeak, L1size);
-          // Plot2D::plot(L1, "L1");
-          converged = true;
-          break;
-        }
-      }
-
-      if (converged)
-      {
-        result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
+        converged = true;
         break;
       }
-      else if (!ReduceL2size(L2size))
-        break;
     }
-    return result;
+
+    if (converged)
+    {
+      result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
+      break;
+    }
+    else if (!ReduceL2size(L2size))
+      break;
   }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
-              mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
-    return {0, 0};
-  }
+  return result;
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
+            mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
+  return {0, 0};
 }
 
 inline void IterativePhaseCorrelation::UpdateWindow()
@@ -230,7 +243,7 @@ inline bool IterativePhaseCorrelation::IsValid(const Mat& img1, const Mat& img2)
 
 inline bool IterativePhaseCorrelation::CheckSize(const Mat& img1, const Mat& img2) const
 {
-  cv::Size ipcsize(mCols, mRows);
+  Size ipcsize(mCols, mRows);
   return img1.size() == img2.size() && img1.size() == ipcsize && img2.size() == ipcsize;
 }
 
