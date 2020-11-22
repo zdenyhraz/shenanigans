@@ -14,6 +14,12 @@ IterativePhaseCorrelation::IterativePhaseCorrelation(int rows, int cols, double 
   SetBandpassParameters(bandpassL, bandpassH);
 }
 
+IterativePhaseCorrelation::IterativePhaseCorrelation(const Mat& img, double bandpassL, double bandpassH)
+{
+  SetSize(img.size());
+  SetBandpassParameters(bandpassL, bandpassH);
+}
+
 void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double bandpassH)
 {
   mBandpassL = clamp(bandpassL, -Constants::Inf, 1); // L from [-inf, 1]
@@ -31,6 +37,11 @@ void IterativePhaseCorrelation::SetSize(int rows, int cols)
 
   if (mBandpass.rows != mRows || mBandpass.cols != mCols)
     UpdateBandpass();
+}
+
+void IterativePhaseCorrelation::SetSize(Size size)
+{
+  SetSize(size.height, size.width);
 }
 
 Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image2) const

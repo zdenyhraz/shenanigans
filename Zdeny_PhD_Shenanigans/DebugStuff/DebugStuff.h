@@ -19,7 +19,20 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // regex test
+  if (1) // 2pic IPC
+  {
+    Mat img1 = loadImage("Resources/test.png");
+    Mat img2 = loadImage("Resources/test.png");
+
+    double shiftX = 110.35;
+    double shiftY = -70.76;
+    Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
+    warpAffine(img2, img2, T, cv::Size(img2.cols, img2.rows));
+
+    globals->IPC->SetSize(img1.rows, img2.rows);
+    auto shift = globals->IPC->Calculate(img1, img2);
+  }
+  if (0) // regex test
   {
     std::string str("001:UNTIL=002:NUM=003:USED=004:APP=STT:jjjjjjjj:asdasdasdasdasdIS_KOKOT[=TRUE];IS_PICA[=FOLS];IS_PKOKOTICA[=FKOKOTOLS];");
 
