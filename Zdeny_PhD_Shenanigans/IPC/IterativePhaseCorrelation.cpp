@@ -418,10 +418,8 @@ inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  bool debugBandpass = false;
-  bool debugWindow = false;
-
-  if (debugWindow)
+  // window
+  if (0)
   {
     Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
     Mat w, imgw;
@@ -445,7 +443,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // clang-format on
   }
 
-  if (debugBandpass)
+  // bandpass
+  if (0)
   {
     Mat bpR = Mat::zeros(mRows, mCols, CV_32F);
     Mat bpG = Mat::zeros(mRows, mCols, CV_32F);
@@ -481,7 +480,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // clang-format on
   }
 
-  if (1)
+  // bandpass ringing
+  if (0)
   {
     Mat img = roicrop(loadImage("Resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     Mat fftR = Fourier::fft(img);
@@ -522,6 +522,34 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
     Plot2D::plot(imgfR, "Rect", "x", "y", "¨Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
+  }
+
+  // subregions
+  if (1)
+  {
+    Point2f rawshift(0.157 * mCols, -0.135 * mRows);
+    Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
+    Mat img2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
+
+    double noiseStdev = 0.03;
+    Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
+    Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
+    randn(noise1, 0, noiseStdev);
+    randn(noise2, 0, noiseStdev);
+    img1 += noise1;
+    img2 += noise2;
+
+    Mat img1med, img2med;
+    medianBlur(img1, img1med, 5);
+    medianBlur(img2, img2med, 5);
+
+    SetDebugMode(true);
+    auto ipcshift = Calculate(img1, img2);
+    SetDebugMode(false);
+
+    LOG_INFO("Input raw shift = {}", rawshift);
+    LOG_INFO("Resulting shift = {}", ipcshift);
+    LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
   }
 
   LOG_INFO("IPC debug stuff shown");
