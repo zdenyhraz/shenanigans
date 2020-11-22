@@ -19,33 +19,6 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // 2pic IPC
-  {
-    Point2f rawshift(0.157 * globals->IPC->GetCols(), -0.135 * globals->IPC->GetRows());
-    Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, globals->IPC->GetCols(), globals->IPC->GetRows());
-    Mat img2 =
-        roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, globals->IPC->GetCols(), globals->IPC->GetRows());
-
-    double noiseStdev = 0.03;
-    Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
-    Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
-    randn(noise1, 0, noiseStdev);
-    randn(noise2, 0, noiseStdev);
-    img1 += noise1;
-    img2 += noise2;
-
-    Mat img1med, img2med;
-    medianBlur(img1, img1med, 5);
-    medianBlur(img2, img2med, 5);
-
-    globals->IPC->SetDebugMode(true);
-    auto ipcshift = globals->IPC->Calculate(img1, img2);
-    globals->IPC->SetDebugMode(false);
-
-    LOG_INFO("Input raw shift = {}", rawshift);
-    LOG_INFO("Resulting shift = {}", ipcshift);
-    LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
-  }
   if (0) // regex test
   {
     std::string str("001:UNTIL=002:NUM=003:USED=004:APP=STT:jjjjjjjj:asdasdasdasdasdIS_KOKOT[=TRUE];IS_PICA[=FOLS];IS_PKOKOTICA[=FKOKOTOLS];");
