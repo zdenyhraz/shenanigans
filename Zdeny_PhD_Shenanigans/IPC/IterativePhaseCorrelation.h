@@ -77,9 +77,11 @@ public:
   }
 
   IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
+  IterativePhaseCorrelation(const Mat& img, double bandpassL = 1.0, double bandpassH = 0.01);
 
   // setters
   void SetSize(int rows, int cols = -1);
+  void SetSize(Size size);
   void SetBandpassParameters(double bandpassL, double bandpassH);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
