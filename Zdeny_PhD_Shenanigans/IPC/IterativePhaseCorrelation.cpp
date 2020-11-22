@@ -53,7 +53,10 @@ inline Point2f IterativePhaseCorrelation::Calculate(Mat&& img1, Mat&& img2) cons
 try
 {
   if (!IsValid(img1, img2))
+  {
+    LOG_ERROR("Input images are not valid");
     return {0, 0};
+  }
 
   ConvertToUnitFloat(img1, img2);
   ApplyWindow(img1, img2);
