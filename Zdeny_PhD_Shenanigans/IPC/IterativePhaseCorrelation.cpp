@@ -76,7 +76,7 @@ try
   bool converged = false;
 
   if (mDebugMode)
-    Plot2D::plot(L3, "L3");
+    Plot2D::plot(L3, "L3", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L3.png");
 
   while (!converged)
   {
@@ -93,14 +93,27 @@ try
     Mat L2 = CalculateL2(L3, L3peak, L2size);
     Point2f L2mid(L2.cols / 2, L2.rows / 2);
     if (mDebugMode)
-      Plot2D::plot(L2, "L2");
+      Plot2D::plot(L2, "L2", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2.png");
 
     // L2U
     Mat L2U = CalculateL2U(L2);
     Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
     Point2f L2Upeak = L2Umid;
     if (mDebugMode)
-      Plot2D::plot(L2U, "L2U");
+    {
+      Plot2D::plot(L2U, "L2U", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2U.png");
+
+      if (0)
+      {
+        Mat nearest, linear, cubic, lanczos;
+        resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
+        resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
+        resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
+        Plot2D::plot(nearest, "L2Un", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UN.png");
+        Plot2D::plot(linear, "L2Ul", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UL.png");
+        Plot2D::plot(cubic, "L2Uc", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UC.png");
+      }
+    }
 
     // L1
     int L1size = GetL1size(L2U);
@@ -122,7 +135,7 @@ try
         L1 = CalculateL1(L2U, L2Upeak, L1size);
 
         if (mDebugMode)
-          Plot2D::plot(L1, "L1");
+          Plot2D::plot(L1, "L1", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1.png");
 
         converged = true;
         break;
