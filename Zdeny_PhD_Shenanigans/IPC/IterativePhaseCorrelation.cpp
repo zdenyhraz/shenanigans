@@ -76,10 +76,7 @@ try
   bool converged = false;
 
   if (mDebugMode)
-  {
     Plot2D::plot(L3, "L3");
-    Plot2D::plot(Fourier::logmagn(L3, 1), "L3log");
-  }
 
   while (!converged)
   {
