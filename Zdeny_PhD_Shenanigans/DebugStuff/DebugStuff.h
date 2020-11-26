@@ -19,6 +19,16 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
+  if (1) // kirkl test
+  {
+    for (int i = 5; i < 21; i += 2)
+    {
+      Mat kirklik;
+      resize(kirkl(i), kirklik, Size(999, 999), 0, 0, INTER_NEAREST);
+      Plot2D::plot(kirklik, std::string("kirkl") + i);
+    }
+    Plot2D::plot(kirkl(999), std::string("kirkl999"));
+  }
   if (0) // regex test
   {
     std::string str("001:UNTIL=002:NUM=003:USED=004:APP=STT:jjjjjjjj:asdasdasdasdasdIS_KOKOT[=TRUE];IS_PICA[=FOLS];IS_PKOKOTICA[=FKOKOTOLS];");
