@@ -706,7 +706,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
       for (int i = 0; i < itersPerDirection; ++i)
       {
         // both images are roicropped in the middle but 2nd image is shifted beforehands
-        Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
+        Mat image1 = roicrop(image, image.cols * 0.4, image.rows * 0.6, mCols, mRows);
         Mat image2;
 
         // calculate artificial shift
