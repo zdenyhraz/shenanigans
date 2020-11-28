@@ -74,14 +74,14 @@ try
   Mat L3 = CalculateL3(std::move(crosspower));
   Point2f L3peak = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
+  if (mDebugMode)
+    Plot2D::plot(L3, "L3", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L3.png");
+
   Point2f result = L3peak - L3mid;
   int L2size = mL2size;
   double L1ratio = mL1ratio;
 
-  if (mDebugMode)
-    Plot2D::plot(L3, "L3", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L3.png");
-
-  // reduce the L2size as long as the L2 is out of bounds, return pixel estimation accuracy if it cannot be reduced anymore
+  // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
   while (IsOutOfBounds(L3peak, L3, L2size))
     if (!ReduceL2size(L2size))
       return result;
@@ -405,14 +405,14 @@ inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, co
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
   L2size -= 2;
-  LOG_ERROR("Reducing L2size to {}", L2size);
+  LOG_ERROR_IF(mDebugMode, "Reducing L2size to {}", L2size);
   return L2size >= 3;
 }
 
 void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 {
-  LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
   L1ratio -= 0.05;
+  LOG_ERROR_IF(mDebugMode, "Reducing L1ratio to {:.2f}", L1ratio);
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -523,10 +523,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
   }
 
-  // subregions
+  // 2 pic
   if (1)
   {
-    Point2f rawshift(0.157 * mCols, -0.135 * mRows);
+    Point2f rawshift(0.1573361 * mCols, -0.1352196 * mRows);
     Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
     Mat img2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
 
@@ -693,8 +693,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
     ipc.SetInterpolationType(static_cast<InterpolationType>((int)params[3]));
     ipc.SetWindowType(static_cast<WindowType>((int)params[4]));
     ipc.SetUpsampleCoeff(params[5]);
-    ipc.SetL2size(params[6]);
-    ipc.SetL1ratio(params[7]);
+    ipc.SetL1ratio(params[6]);
 
     // L1 smaller than 3px, bad
     if (std::floor(ipc.GetL1ratio() * ipc.GetL2size() * ipc.GetUpsampleCoeff()) < 3)
@@ -711,43 +710,34 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   };
 
   // get the best parameters via differential evolution
-  int N = 8;
+  int N = 7;
   Evolution evo(N);
   evo.mNP = 50;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L2size", "L1ratio"});
-
-  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 5., 0.1};
-  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 21, 0.5};
+  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
+  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
+  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
 
   const auto bestParams = evo.Optimize(f);
 
   // set the currently used parameters to the best parameters and show the resulting bandpass, window, etc.
-  if (bestParams.size() == N)
-  {
-    SetBandpassType(static_cast<BandpassType>((int)bestParams[0]));
-    SetBandpassParameters(bestParams[1], bestParams[2]);
-    SetInterpolationType(static_cast<InterpolationType>((int)bestParams[3]));
-    SetWindowType(static_cast<WindowType>((int)bestParams[4]));
-    SetUpsampleCoeff(bestParams[5]);
-    SetL2size(bestParams[6]);
-    SetL1ratio(bestParams[7]);
 
-    LOG_INFO("Final IPC px accuracy: {}", f(bestParams));
-    LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
-    LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
-    LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
-    LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
-    LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
-    LOG_INFO("Final IPC UpsampleCoeff: {}", bestParams[5]);
-    LOG_INFO("Final IPC L2size: {}", bestParams[6]);
-    LOG_INFO("Final IPC L1ratio: {}", bestParams[7]);
+  SetBandpassType(static_cast<BandpassType>((int)bestParams[0]));
+  SetBandpassParameters(bestParams[1], bestParams[2]);
+  SetInterpolationType(static_cast<InterpolationType>((int)bestParams[3]));
+  SetWindowType(static_cast<WindowType>((int)bestParams[4]));
+  SetUpsampleCoeff(bestParams[5]);
+  SetL1ratio(bestParams[6]);
 
-    ShowDebugStuff();
-    LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
-  }
-  else
-  {
-    LOG_ERROR("Iterative Phase Correlation parameter optimization failed");
-  }
+  LOG_INFO("Final IPC px accuracy: {}", f(bestParams));
+  LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
+  LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
+  LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
+  LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
+  LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
+  LOG_INFO("Final IPC UpsampleCoeff: {}", bestParams[5]);
+  LOG_INFO("Final IPC L1ratio: {}", bestParams[6]);
+
+  ShowDebugStuff();
+  LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
 }
