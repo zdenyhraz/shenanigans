@@ -19,7 +19,22 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // kirkl test
+  if (1) // plot in optimization
+  {
+    auto f = OptimizationTestFunctions::Ackley;
+    auto g = OptimizationTestFunctions::Himmelblau;
+    int N = 2;
+    Evolution Evo(N);
+    Evo.mNP = 50. / 7 * N;
+    Evo.mLB = zerovect(N, (double)-N);
+    Evo.mUB = zerovect(N, (double)+N);
+    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
+    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
+    Evo.SetOptimizationName("debug opt");
+    Evo.SetPlotOutput(true);
+    auto result = Evo.Optimize(f, g);
+  }
+  if (0) // kirkl test
   {
     for (int i = 5; i < 21; i += 2)
     {
@@ -152,20 +167,6 @@ void Debug(Globals* globals)
                   "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
     PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv",
                   "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
-  }
-  if (0) // plot in optimization
-  {
-    auto f = OptimizationTestFunctions::Ackley;
-    int N = 2;
-    Evolution Evo(N);
-    Evo.mNP = 50. / 7 * N;
-    Evo.mLB = zerovect(N, (double)-N);
-    Evo.mUB = zerovect(N, (double)+N);
-    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
-    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
-    Evo.SetOptimizationName("debug opt");
-    Evo.SetPlotOutput(true);
-    auto result = Evo.Optimize(f);
   }
   if (0) // plot pen colors
   {
