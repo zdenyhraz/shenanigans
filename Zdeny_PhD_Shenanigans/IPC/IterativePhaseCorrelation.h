@@ -10,7 +10,7 @@ public:
     Gaussian,
   };
 
-  const char* BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
+  std::string BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
   {
     switch (type)
     {
@@ -43,7 +43,7 @@ public:
     Hann,
   };
 
-  const char* WindowType2String(WindowType type)
+  std::string WindowType2String(WindowType type)
   {
     switch (type)
     {
@@ -62,7 +62,7 @@ public:
     Cubic,
   };
 
-  const char* InterpolationType2String(InterpolationType type)
+  std::string InterpolationType2String(InterpolationType type)
   {
     switch (type)
     {
@@ -79,7 +79,6 @@ public:
   IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
   IterativePhaseCorrelation(const Mat& img, double bandpassL = 1.0, double bandpassH = 0.01);
 
-  // setters
   void SetSize(int rows, int cols = -1);
   void SetSize(Size size);
   void SetBandpassParameters(double bandpassL, double bandpassH);
@@ -93,7 +92,6 @@ public:
   void SetDebugMode(bool mode) const { mDebugMode = mode; }
   void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
 
-  // getters
   int GetRows() const { return mRows; }
   int GetCols() const { return mCols; }
   int GetSize() const { return mRows; }
@@ -105,7 +103,6 @@ public:
   Mat GetWindow() const { return mWindow; }
   Mat GetBandpass() const { return mBandpass; }
 
-  // main calc methods
   Point2f Calculate(const Mat& image1, const Mat& image2) const;
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25,
@@ -132,7 +129,6 @@ private:
   Mat mFrequencyBandpass;
   Mat mWindow;
 
-  // internal methods
   void UpdateWindow();
   void UpdateBandpass();
   float LowpassEquation(int row, int col) const;

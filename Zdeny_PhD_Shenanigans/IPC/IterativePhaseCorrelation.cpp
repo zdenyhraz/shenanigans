@@ -122,6 +122,8 @@ try
     int L1size = GetL1size(L2U, L1ratio);
     Point2f L1mid(L1size / 2, L1size / 2);
     Point2f L1peak = L1mid;
+    if (mDebugMode)
+      Plot2D::plot(CalculateL1(L2U, L2Upeak, L1size), "L1B", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1B.png");
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
     {
@@ -135,7 +137,7 @@ try
       if (AccuracyReached(L1peak, L1mid))
       {
         if (mDebugMode)
-          Plot2D::plot(L1, "L1", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1.png");
+          Plot2D::plot(L1, "L1A", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1A.png");
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
       }
@@ -525,11 +527,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   // 2 pic
   if (1)
   {
-    Point2f rawshift(0.1573361 * mCols, -0.1352196 * mRows);
+    Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
     Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
     Mat img2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
 
-    if (0)
+    if (1)
     {
       double noiseStdev = 0.03;
       Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);

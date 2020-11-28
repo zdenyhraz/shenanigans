@@ -4,12 +4,13 @@
 class Evolution : public OptimizationAlgorithm
 {
 public:
-  Evolution(int N, const std::string &optname = "noname");
-  OptimizationResult Optimize(ObjectiveFunction f) override;
-  void SetFileOutputDir(const std::string &dir);
+  Evolution(int N, const std::string& optname = "noname");
+  OptimizationResult Optimize(
+      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
+  void SetFileOutputDir(const std::string& dir);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
-  void SetParameterNames(const std::vector<std::string> &ParameterNames) { mParameterNames = ParameterNames; };
-  void SetOptimizationName(const std::string &optname) { mOptimizationName = optname; }
+  void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
+  void SetOptimizationName(const std::string& optname) { mOptimizationName = optname; }
 
   enum MutationStrategy
   {
@@ -57,11 +58,11 @@ private:
   struct Population
   {
     Population();
-    bool Initialize(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB, int nParents);
+    bool Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents);
     void UpdateDistinctParents(int eid);
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
-    void UpdateOffspring(
-        int eid, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB);
+    void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB,
+                         const std::vector<double>& UB);
     void PerformSelection();
     void UpdatePopulationFunctionEvaluations();
     void UpdateOffspringFunctionEvaluations();
@@ -79,19 +80,19 @@ private:
     int relativeDifferenceGenerationsOverThreshold;
 
   private:
-    void InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB);
+    void InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);
     void InitializeBestEntity();
     void InitializeOffspring(int nParents);
   };
 
-  bool CheckObjectiveFunctionNormality(ObjectiveFunction f);
+  bool CheckObjectiveFunctionNormality(ObjectiveFunction obj);
   bool CheckBounds();
   int GetNumberOfParents();
   bool InitializeOutputs();
-  void UninitializeOutputs(const Population &population, TerminationReason reason);
-  void UpdateOutputs(int generation, const Population &population);
-  TerminationReason CheckTerminationCriterions(const Population &population, int generation);
-  std::string GetOutputFileString(int generation, const std::vector<double> &bestEntity, double bestFitness);
+  void UninitializeOutputs(const Population& population, TerminationReason reason);
+  void UpdateOutputs(int generation, const Population& population, ValidationFunction valid);
+  TerminationReason CheckTerminationCriterions(const Population& population, int generation);
+  std::string GetOutputFileString(int generation, const std::vector<double>& bestEntity, double bestFitness);
 
   bool mFileOutput = false;
   bool mPlotOutput = true;

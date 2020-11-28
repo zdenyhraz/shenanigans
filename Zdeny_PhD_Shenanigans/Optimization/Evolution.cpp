@@ -2,29 +2,29 @@
 #include "Evolution.h"
 #include "Plot/Plot1D.h"
 
-Evolution::Evolution(int N, const std::string &optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(5.4 * N){};
+Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(5.4 * N){};
 
-OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction f)
+OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   Population population;
 
   if (!InitializeOutputs())
     return {};
 
-  if (!CheckObjectiveFunctionNormality(f))
+  if (!CheckObjectiveFunctionNormality(obj))
     return {};
 
   if (!CheckBounds())
     return {};
 
-  if (!population.Initialize(mNP, N, f, mLB, mUB, GetNumberOfParents()))
+  if (!population.Initialize(mNP, N, obj, mLB, mUB, GetNumberOfParents()))
     return {};
 
   int gen = 0;
   TerminationReason treason = NotTerminated;
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   LOG_INFO("Running evolution...");
-  UpdateOutputs(gen, population);
+  UpdateOutputs(gen, population, valid);
 
   while (!treason)
   {
@@ -35,7 +35,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       {
         population.UpdateDistinctParents(eid);
         population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
-        population.UpdateOffspring(eid, mMutStrat, f, mF, mLB, mUB);
+        population.UpdateOffspring(eid, mMutStrat, obj, mF, mLB, mUB);
       }
       population.PerformSelection();
       population.UpdateBestEntity();
@@ -44,9 +44,9 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       gen++;
 
       treason = CheckTerminationCriterions(population, gen);
-      UpdateOutputs(gen, population);
+      UpdateOutputs(gen, population, valid);
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
       LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
       treason = UnexpectedErrorOccured;
@@ -57,7 +57,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
   return population.bestEntity.params;
 }
 
-void Evolution::SetFileOutputDir(const std::string &dir)
+void Evolution::SetFileOutputDir(const std::string& dir)
 {
   mOutputFileDir = dir;
   mFileOutput = true;
@@ -85,21 +85,21 @@ bool Evolution::InitializeOutputs()
     LOG_SUCC("Outputs initialized");
     return true;
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_ERROR("Could not initialize outputs: {}", e.what());
     return false;
   }
 }
 
-bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
+bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 {
   LOG_INFO("Checking objective function normality...");
   try
   {
     auto arg = 0.5 * (mLB + mUB);
-    auto result = f(arg);
-    auto result2 = f(arg);
+    auto result = obj(arg);
+    auto result2 = obj(arg);
 
     if (!isfinite(result))
     {
@@ -128,7 +128,7 @@ bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction f)
     LOG_SUCC("Objective function is normal");
     return true;
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_ERROR("Objective function is not normal: {}", e.what());
     return false;
@@ -161,7 +161,7 @@ bool Evolution::CheckBounds()
   return true;
 }
 
-void Evolution::UpdateOutputs(int gen, const Population &population)
+void Evolution::UpdateOutputs(int gen, const Population& population, ValidationFunction valid)
 {
   if (population.bestEntity.fitness < population.previousFitness)
   {
@@ -175,16 +175,16 @@ void Evolution::UpdateOutputs(int gen, const Population &population)
 
   if (mPlotOutput)
   {
-    Plot1D::plot(gen, {population.bestEntity.fitness, population.averageFitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation",
-        "fitness", "log(fitness)", {"bestFitness", "averageFitness"}, {"log(bestFitness)"},
-        {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
+    Plot1D::plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {log(population.bestEntity.fitness)}, "Evolution",
+                 "generation", "fitness", "log(fitness)", {"bestFitness", "validFitness"}, {"log(bestFitness)"},
+                 {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
     Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation",
-        "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"},
-        {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
+                 "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"},
+                 {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
   }
 }
 
-void Evolution::UninitializeOutputs(const Population &population, TerminationReason reason)
+void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)
 {
   try
   {
@@ -199,13 +199,13 @@ void Evolution::UninitializeOutputs(const Population &population, TerminationRea
     LOG_INFO("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
     LOG_INFO("Evolution optimization ended");
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_ERROR("Could not uninitialize outputs: {}", e.what());
   }
 }
 
-Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population &population, int generation)
+Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, int generation)
 {
   if (population.bestEntity.fitness <= optimalFitness) // populationFitness goal reached
     return OptimalFitnessReached;
@@ -228,7 +228,7 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   return NotTerminated;
 }
 
-std::string Evolution::GetOutputFileString(int gen, const std::vector<double> &bestEntity, double bestFitness)
+std::string Evolution::GetOutputFileString(int gen, const std::vector<double>& bestEntity, double bestFitness)
 {
   std::string value;
   if (gen >= 0)
@@ -272,37 +272,43 @@ int Evolution::GetNumberOfParents()
   return 3;
 }
 
-Evolution::Population::Population() {}
+Evolution::Population::Population()
+{
+}
 
-bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB, int nParents)
+bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB,
+                                       int nParents)
 {
   try
   {
     functionEvaluations = 0;
     relativeDifferenceGenerationsOverThreshold = 0;
-    InitializePopulation(NP, N, f, LB, UB);
+    InitializePopulation(NP, N, obj, LB, UB);
     InitializeBestEntity();
     InitializeOffspring(nParents);
     return true;
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_ERROR("Could not initialize population: {}", e.what());
     return false;
   }
 }
 
-void Evolution::Population::UpdateDistinctParents(int eid) { offspring[eid].UpdateDistinctParents(eid, entities.size()); }
+void Evolution::Population::UpdateDistinctParents(int eid)
+{
+  offspring[eid].UpdateDistinctParents(eid, entities.size());
+}
 
 void Evolution::Population::UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR)
 {
   offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR);
 }
 
-void Evolution::Population::UpdateOffspring(
-    int eid, MutationStrategy mutationStrategy, ObjectiveFunction f, double F, const std::vector<double> &LB, const std::vector<double> &UB)
+void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F,
+                                            const std::vector<double>& LB, const std::vector<double>& UB)
 {
-  auto &newoffspring = offspring[eid];
+  auto& newoffspring = offspring[eid];
   newoffspring.params = entities[eid].params;
   for (int pid = 0; pid < newoffspring.params.size(); pid++)
   {
@@ -336,9 +342,9 @@ void Evolution::Population::UpdateOffspring(
 
   try
   {
-    newoffspring.fitness = f(newoffspring.params);
+    newoffspring.fitness = obj(newoffspring.params);
   }
-  catch (const std::exception &e)
+  catch (const std::exception& e)
   {
     LOG_DEBUG("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
     newoffspring.fitness = Inf;
@@ -357,9 +363,15 @@ void Evolution::Population::PerformSelection()
   }
 }
 
-void Evolution::Population::UpdatePopulationFunctionEvaluations() { functionEvaluations += entities.size(); }
+void Evolution::Population::UpdatePopulationFunctionEvaluations()
+{
+  functionEvaluations += entities.size();
+}
 
-void Evolution::Population::UpdateOffspringFunctionEvaluations() { functionEvaluations += offspring.size(); }
+void Evolution::Population::UpdateOffspringFunctionEvaluations()
+{
+  functionEvaluations += offspring.size();
+}
 
 void Evolution::Population::UpdateBestEntity()
 {
@@ -385,7 +397,7 @@ void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenc
     relativeDifferenceGenerationsOverThreshold = 0;
 }
 
-void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction f, const std::vector<double> &LB, const std::vector<double> &UB)
+void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB)
 {
   LOG_INFO("Creating initial population within bounds...");
   entities = zerovect(NP, Entity(N));
@@ -434,7 +446,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
-    entities[eid].fitness = f(entities[eid].params);
+    entities[eid].fitness = obj(entities[eid].params);
 
   UpdatePopulationFunctionEvaluations();
   LOG_SUCC("Initial population evaluated");
@@ -460,7 +472,9 @@ void Evolution::Population::InitializeBestEntity()
   LOG_SUCC("Initial population best entity: ({:.3f}) {}", bestEntity.fitness, bestEntity.params);
 }
 
-Evolution::Entity::Entity() {}
+Evolution::Entity::Entity()
+{
+}
 
 Evolution::Entity::Entity(int N)
 {
@@ -468,7 +482,9 @@ Evolution::Entity::Entity(int N)
   fitness = Constants::Inf;
 }
 
-Evolution::Offspring::Offspring() {}
+Evolution::Offspring::Offspring()
+{
+}
 
 Evolution::Offspring::Offspring(int N, int nParents)
 {
@@ -480,7 +496,7 @@ Evolution::Offspring::Offspring(int N, int nParents)
 
 void Evolution::Offspring::UpdateDistinctParents(int eid, int NP)
 {
-  for (auto &idx : parentIndices)
+  for (auto& idx : parentIndices)
   {
     int idxTst = rand() % NP;
     while (!isDistinct(idxTst, parentIndices, eid))
