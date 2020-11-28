@@ -151,9 +151,10 @@ private:
   Point2f GetPeakSubpixel(const Mat& mat) const;
   Mat CalculateL2(const Mat& L3, const Point2f& L3peak, int L2size) const;
   Mat CalculateL2U(const Mat& L2) const;
-  int GetL1size(const Mat& L2U) const;
+  int GetL1size(const Mat& L2U, double L1ratio) const;
   Mat CalculateL1(const Mat& L2U, const Point2f& L2Upeak, int L1size) const;
   bool IsOutOfBounds(const Point2f& peak, const Mat& mat, int size) const;
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
+  void ReduceL1ratio(double& L1ratio) const;
 };
