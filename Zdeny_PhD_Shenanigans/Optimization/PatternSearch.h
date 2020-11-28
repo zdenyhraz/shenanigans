@@ -10,5 +10,5 @@ struct PatternSearch : public OptimizationAlgorithm
   double stepReducer = 0.5;
 
   PatternSearch(int N) : OptimizationAlgorithm(N){};
-  OptimizationResult Optimize(ObjectiveFunction f) override;
+  OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid) override;
 };

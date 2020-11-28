@@ -2,7 +2,7 @@
 #include "PatternSearch.h"
 #include "Plot/Plot1D.h"
 
-OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction f)
+OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
   vector<double> boundsRange = mUB - mLB;
@@ -30,7 +30,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
     // initialize vectors
     double step = initialStep;
     vector<double> mainPoint = mainPointsInitial[run];
-    double mainPointFitness = f(mainPoint);
+    double mainPointFitness = obj(mainPoint);
     vector<vector<vector<double>>> pattern;                                                    // N-2-N (N pairs of N-dimensional points)
     vector<vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
@@ -56,7 +56,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
           pattern[dim][pm][dim] = clampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLB[dim], mUB[dim]);
 
           // evaluate vertices
-          patternFitness[dim][pm] = f(pattern[dim][pm]);
+          patternFitness[dim][pm] = obj(pattern[dim][pm]);
           funEvalsThisRun++;
 
           // select best pattern vertex and replace
@@ -74,7 +74,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
                 vector<double> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
                 testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
-                testPointFitness = f(testPoint);
+                testPointFitness = obj(testPoint);
                 funEvalsThisRun++;
 
                 if (testPointFitness < mainPointFitness)
