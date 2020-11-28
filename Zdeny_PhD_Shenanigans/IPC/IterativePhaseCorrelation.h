@@ -109,7 +109,7 @@ public:
   Point2f Calculate(const Mat& image1, const Mat& image2) const;
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25,
-                float noiseStdev = 0.1, int itersPerImage = 5);
+                float noiseStdev = 0.1, int itersPerDirection = 5);
   void ShowDebugStuff() const;
 
 private:
@@ -118,7 +118,9 @@ private:
   double mBandpassL = 0.0;
   double mBandpassH = 0.6;
   int mL2size = 11;
+  int mL2sizeStep = 2;
   double mL1ratio = 0.35;
+  double mL1ratioStep = 0.05;
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
   mutable bool mDebugMode = false;
