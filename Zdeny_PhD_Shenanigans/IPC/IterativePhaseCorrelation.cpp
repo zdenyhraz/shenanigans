@@ -76,53 +76,52 @@ try
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   Point2f result = L3peak - L3mid;
   int L2size = mL2size;
-  bool converged = false;
+  double L1ratio = mL1ratio;
 
   if (mDebugMode)
     Plot2D::plot(L3, "L3", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L3.png");
 
-  while (!converged)
+  // reduce the L2size as long as the L2 is out of bounds, return pixel estimation accuracy if it cannot be reduced anymore
+  while (IsOutOfBounds(L3peak, L3, L2size))
+    if (!ReduceL2size(L2size))
+      return result;
+
+  // L2
+  Mat L2 = CalculateL2(L3, L3peak, L2size);
+  Point2f L2mid(L2.cols / 2, L2.rows / 2);
+  if (mDebugMode)
+    Plot2D::plot(L2, "L2", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2.png");
+
+  // L2U
+  Mat L2U = CalculateL2U(L2);
+  Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+  Point2f L2Upeak = L2Umid;
+  if (mDebugMode)
   {
-    // reduce the L2size as long as the L2 is out of bounds
-    while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size(L2size))
-        break;
+    Plot2D::plot(L2U, "L2U", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2U.png");
 
-    // L2size cannot be reduced anymore and is still out of bounds - stop
-    if (IsOutOfBounds(L3peak, L3, L2size))
-      break;
-
-    // L2
-    Mat L2 = CalculateL2(L3, L3peak, L2size);
-    Point2f L2mid(L2.cols / 2, L2.rows / 2);
-    if (mDebugMode)
-      Plot2D::plot(L2, "L2", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2.png");
-
-    // L2U
-    Mat L2U = CalculateL2U(L2);
-    Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-    Point2f L2Upeak = L2Umid;
-    if (mDebugMode)
+    if (0)
     {
-      Plot2D::plot(L2U, "L2U", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2U.png");
-
-      if (0)
-      {
-        Mat nearest, linear, cubic, lanczos;
-        resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
-        resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
-        resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
-        Plot2D::plot(nearest, "L2Un", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UN.png");
-        Plot2D::plot(linear, "L2Ul", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UL.png");
-        Plot2D::plot(cubic, "L2Uc", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UC.png");
-      }
+      Mat nearest, linear, cubic, lanczos;
+      resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
+      resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
+      resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
+      Plot2D::plot(nearest, "L2Un", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UN.png");
+      Plot2D::plot(linear, "L2Ul", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UL.png");
+      Plot2D::plot(cubic, "L2Uc", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2UC.png");
     }
+  }
+
+  while (1)
+  {
+    // reset L2U peak position
+    L2Upeak = L2Umid;
 
     // L1
-    int L1size = GetL1size(L2U);
     Mat L1;
+    int L1size = GetL1size(L2U, L1ratio);
     Point2f L1mid(L1size / 2, L1size / 2);
-    Point2f L1peak;
+    Point2f L1peak = L1mid;
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
     {
@@ -136,29 +135,20 @@ try
       if (AccuracyReached(L1peak, L1mid))
       {
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-
         if (mDebugMode)
           Plot2D::plot(L1, "L1", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1.png");
 
-        converged = true;
-        break;
+        return L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
       }
     }
 
-    if (converged)
-    {
-      result = L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
-      break;
-    }
-    else if (!ReduceL2size(L2size))
-      break;
+    // maximum iterations reached - reduce L1 size by reducing L1ratio
+    ReduceL1ratio(L1ratio);
   }
-  return result;
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Unexpected error occurred with L3 {}, L2 {}, L2U {}, L1 {}: {}", Point(mCols, mRows), Point(mL2size, mL2size),
-            mUpsampleCoeff * Point(mL2size, mL2size), mL1ratio * mUpsampleCoeff * Point(mL2size, mL2size), e.what());
+  LOG_ERROR("Unexpected error occurred: {}", e.what());
   return {0, 0};
 }
 
@@ -391,9 +381,9 @@ inline Mat IterativePhaseCorrelation::CalculateL2U(const Mat& L2) const
   return L2U;
 }
 
-inline int IterativePhaseCorrelation::GetL1size(const Mat& L2U) const
+inline int IterativePhaseCorrelation::GetL1size(const Mat& L2U, double L1ratio) const
 {
-  int L1size = std::floor(mL1ratio * L2U.cols);
+  int L1size = std::floor(L1ratio * L2U.cols);
   L1size = L1size % 2 ? L1size : L1size + 1;
   return L1size;
 }
@@ -416,7 +406,14 @@ inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, co
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
   L2size -= 2;
+  LOG_ERROR("Reducing L2size to {}", L2size);
   return L2size >= 3;
+}
+
+void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
+{
+  LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
+  L1ratio -= 0.05;
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
