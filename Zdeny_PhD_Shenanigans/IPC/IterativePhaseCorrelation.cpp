@@ -334,11 +334,10 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat& mat) const
   double M = 0;
   double My = 0;
   double Mx = 0;
-  int r, c;
 
-  for (r = 0; r < mat.rows; ++r)
+  for (int r = 0; r < mat.rows; ++r)
   {
-    for (c = 0; c < mat.cols; ++c)
+    for (int c = 0; c < mat.cols; ++c)
     {
       M += mat.at<float>(r, c);
       My += mat.at<float>(r, c) * r;
