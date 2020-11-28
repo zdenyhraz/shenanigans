@@ -80,6 +80,7 @@ bool Evolution::InitializeOutputs()
     {
       Plot1D::Reset("Evolution");
       Plot1D::Reset("EvolutionDIiff");
+      Plot1D::Reset("EvolutionValid");
     }
 
     LOG_SUCC("Outputs initialized");
@@ -175,12 +176,13 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 
   if (mPlotOutput)
   {
-    Plot1D::plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {log(population.bestEntity.fitness)}, "Evolution",
-                 "generation", "fitness", "log(fitness)", {"bestFitness", "validFitness"}, {"log(bestFitness)"},
-                 {QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::magenta, 2)});
+    Plot1D::plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log(fitness)",
+                 {"bestFitness"}, {"log(bestFitness)"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
     Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation",
                  "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"},
-                 {QPen(Plot::black, 2), QPen(Plot::green, 2), QPen(Plot::red, 1, Qt::DotLine)});
+                 {QPen(Plot::black, 2), QPen(Plot::matlabGreen, 2), QPen(Plot::matlabRed, 1, Qt::DotLine)});
+    Plot1D::plot(gen, {population.bestEntity.fitness}, {valid(population.bestEntity.params)}, "EvolutionValid", "generation", "fitness", "fitness",
+                 {"obj"}, {"valid"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
   }
 }
 
