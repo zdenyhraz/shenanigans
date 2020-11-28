@@ -137,7 +137,7 @@ try
         if (mDebugMode)
           Plot2D::plot(L1, "L1", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1.png");
 
-        return L3peak - L3mid + (L2Upeak - L2Umid + GetPeakSubpixel(L1) - L1mid) / mUpsampleCoeff;
+        return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
       }
     }
 
