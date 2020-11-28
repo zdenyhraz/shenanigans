@@ -112,7 +112,7 @@ try
     }
   }
 
-  while (1)
+  while (true)
   {
     // reset L2U peak position
     L2Upeak = L2Umid;
@@ -404,14 +404,14 @@ inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, co
 
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
-  L2size -= 2;
+  L2size -= mL2sizeStep;
   LOG_ERROR_IF(mDebugMode, "Reducing L2size to {}", L2size);
   return L2size >= 3;
 }
 
 void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 {
-  L1ratio -= 0.05;
+  L1ratio -= mL1ratioStep;
   LOG_ERROR_IF(mDebugMode, "Reducing L1ratio to {:.2f}", L1ratio);
 }
 
@@ -727,11 +727,9 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
   evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
-
   const auto bestParams = evo.Optimize(f);
 
-  // set the currently used parameters to the best parameters and show the resulting bandpass, window, etc.
-
+  // set the currently used parameters to the best parameters
   SetBandpassType(static_cast<BandpassType>((int)bestParams[0]));
   SetBandpassParameters(bestParams[1], bestParams[2]);
   SetInterpolationType(static_cast<InterpolationType>((int)bestParams[3]));
@@ -739,6 +737,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   SetUpsampleCoeff(bestParams[5]);
   SetL1ratio(bestParams[6]);
 
+  // pretty print the best parameters
   LOG_INFO("Final IPC px accuracy: {}", f(bestParams));
   LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
   LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
@@ -748,6 +747,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   LOG_INFO("Final IPC UpsampleCoeff: {}", bestParams[5]);
   LOG_INFO("Final IPC L1ratio: {}", bestParams[6]);
 
+  // show the resulting bandpass, window, etc.
   ShowDebugStuff();
   LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
 }
