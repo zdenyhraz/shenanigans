@@ -134,7 +134,6 @@ try
 
       if (AccuracyReached(L1peak, L1mid))
       {
-        L1 = CalculateL1(L2U, L2Upeak, L1size);
         if (mDebugMode)
           Plot2D::plot(L1, "L1", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1.png");
 
@@ -400,7 +399,7 @@ inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f& peak, const 
 
 inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const
 {
-  return (abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5);
+  return abs(L1peak.x - L1mid.x) < 0.5 && abs(L1peak.y - L1mid.y) < 0.5;
 }
 
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
@@ -531,17 +530,16 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
     Mat img2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
 
-    double noiseStdev = 0.03;
-    Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
-    Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
-    randn(noise1, 0, noiseStdev);
-    randn(noise2, 0, noiseStdev);
-    img1 += noise1;
-    img2 += noise2;
-
-    Mat img1med, img2med;
-    medianBlur(img1, img1med, 5);
-    medianBlur(img2, img2med, 5);
+    if (0)
+    {
+      double noiseStdev = 0.03;
+      Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
+      Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
+      randn(noise1, 0, noiseStdev);
+      randn(noise2, 0, noiseStdev);
+      img1 += noise1;
+      img2 += noise2;
+    }
 
     SetDebugMode(true);
     auto ipcshift = Calculate(img1, img2);
