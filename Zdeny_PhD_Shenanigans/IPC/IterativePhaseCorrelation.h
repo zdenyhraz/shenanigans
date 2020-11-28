@@ -115,9 +115,9 @@ public:
 private:
   int mRows = 0;
   int mCols = 0;
-  double mBandpassL = 1.0;
-  double mBandpassH = 0.01;
-  int mL2size = 15;
+  double mBandpassL = 0.0;
+  double mBandpassH = 0.6;
+  int mL2size = 11;
   double mL1ratio = 0.35;
   int mUpsampleCoeff = 51;
   int mMaxIterations = 20;
