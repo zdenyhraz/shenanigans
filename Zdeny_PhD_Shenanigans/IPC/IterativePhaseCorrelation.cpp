@@ -554,12 +554,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
 }
 
 void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory,
-                                         float maxShiftRatio, float noiseStdev, int itersPerImage)
+                                         float maxShiftRatio, float noiseStdev, int itersPerDirection)
 {
-  // arguments sanity checks
-  if (itersPerImage < 1)
+  if (itersPerDirection < 1)
   {
-    LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerImage);
+    LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerDirection);
     return;
   }
 
@@ -619,7 +618,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   }
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {} images with {} calculations per direction...",
-           trainingImages.size(), itersPerImage);
+           trainingImages.size(), itersPerDirection);
 
   if (trainingImages.empty())
   {
@@ -629,7 +628,7 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
 
   for (const auto& image : trainingImages)
   {
-    const Point2f maxShift{maxShiftRatio * mCols, maxShiftRatio * mRows};
+    const Point2f maxShift(maxShiftRatio * mCols, maxShiftRatio * mRows);
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
     {
       LOG_ERROR("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
@@ -638,49 +637,60 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
     }
   }
 
+  // 8 compass shift directions (N, E, S, W, NE, SE, SW, NW)
+  std::vector<Point2f> maxShiftDirections;
+  maxShiftDirections.reserve(8);
+  maxShiftDirections.emplace_back(Point2f(0, maxShiftRatio * mRows));
+  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, 0));
+  maxShiftDirections.emplace_back(Point2f(0, -maxShiftRatio * mRows));
+  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, 0));
+  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows));
+  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, -maxShiftRatio * mRows));
+  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, -maxShiftRatio * mRows));
+  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, maxShiftRatio * mRows));
+
   // prepare the shifted image pairs
-  // shift each image n times up to max shift ratio
-  // both images are roicropped in the middle but 2nd image is shifted beforehands
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
-  imagePairs.reserve(trainingImages.size() * itersPerImage);
+  imagePairs.reserve(trainingImages.size() * maxShiftDirections.size() * itersPerDirection);
+
   for (const auto& image : trainingImages)
   {
-    const std::vector<Point2f> maxShiftTargets{Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows), Point2f(0 * mCols, maxShiftRatio * mRows),
-                                               Point2f(maxShiftRatio * mCols, 0 * mRows)};
-
-    for (int i = 0; i < maxShiftTargets.size() * itersPerImage; ++i)
+    for (const auto& maxShiftDirection : maxShiftDirections)
     {
-      // create the shifted image pair
-      Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
-      Mat image2;
-
-      // calculate artificial shift
-      float r = ((float)i - i % maxShiftTargets.size()) / (maxShiftTargets.size() * itersPerImage - maxShiftTargets.size());
-      Point2f shift = r * maxShiftTargets[i % maxShiftTargets.size()];
-
-      // perform artificial shift
-      Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-      warpAffine(image, image2, T, image.size());
-      image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
-
-      // convert both pictures to unit float
-      image1.convertTo(image1, CV_32F);
-      image2.convertTo(image2, CV_32F);
-      normalize(image1, image1, 0, 1, CV_MINMAX);
-      normalize(image2, image2, 0, 1, CV_MINMAX);
-
-      // add noise
-      if (noiseStdev > 0)
+      for (int i = 0; i < itersPerDirection; ++i)
       {
-        Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-        Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
-        randn(noise1, 0, noiseStdev);
-        randn(noise2, 0, noiseStdev);
-        image1 += noise1;
-        image2 += noise2;
-      }
+        // both images are roicropped in the middle but 2nd image is shifted beforehands
+        Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
+        Mat image2;
 
-      imagePairs.push_back({image1, image2, shift});
+        // calculate artificial shift
+        Point2f shift = ((double)i / (itersPerDirection - 1)) * maxShiftDirection;
+
+        // perform the artificial shift
+        Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+        warpAffine(image, image2, T, image.size());
+        image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
+
+        // convert both pictures to unit float
+        image1.convertTo(image1, CV_32F);
+        image2.convertTo(image2, CV_32F);
+        normalize(image1, image1, 0, 1, CV_MINMAX);
+        normalize(image2, image2, 0, 1, CV_MINMAX);
+
+        // add noise
+        if (noiseStdev > 0)
+        {
+          Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
+          Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
+          randn(noise1, 0, noiseStdev);
+          randn(noise2, 0, noiseStdev);
+          image1 += noise1;
+          image2 += noise2;
+        }
+
+        // add to the vector
+        imagePairs.push_back({image1, image2, shift});
+      }
     }
   }
 
