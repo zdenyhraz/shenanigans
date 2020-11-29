@@ -444,7 +444,7 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   }
 
   // bandpass
-  if (0)
+  if (1)
   {
     Mat bpR = Mat::zeros(mRows, mCols, CV_32F);
     Mat bpG = Mat::zeros(mRows, mCols, CV_32F);
@@ -475,12 +475,12 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"Rect","Gauss"}, Plot::defaultpens, mDebugDirectory + "/1DBandpassIDFT.png");
     Plot2D::plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png");
     Plot2D::plot(bpG, "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png");
-	Plot2D::plot(Fourier::ifftlogmagn(bpR0), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
-	Plot2D::plot(Fourier::ifftlogmagn(bpG0), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
+	Plot2D::plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
+	Plot2D::plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
     // clang-format on
   }
 
-  // bandpass ringing
+  // bandpass image ringing
   if (0)
   {
     Mat img = roicrop(loadImage("Resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
@@ -519,13 +519,13 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
 
-    Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
-    Plot2D::plot(imgfR, "Rect", "x", "y", "¨Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
+    // Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
+    Plot2D::plot(imgfR, "Rect", "x", "y", "Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
   }
 
   // 2 pic
-  if (1)
+  if (0)
   {
     Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
     Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
