@@ -23,7 +23,7 @@ void Debug(Globals* globals)
   if (1) // non maxima suppression
   {
     Mat img = loadImage("Resources/test.png");
-    float scale = 0.5;
+    float scale = 1.0;
     resize(img, img, Size(scale * img.cols, scale * img.rows));
     NonMaximaSuppresion(img);
   }

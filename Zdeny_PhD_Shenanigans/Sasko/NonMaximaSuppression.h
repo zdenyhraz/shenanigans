@@ -30,13 +30,23 @@ std::tuple<int, int, int, int> GetTwoPairs(float angle, int r, int c, const std:
   {
     float d = abs(sin(angle) * relativePoint.x - cos(angle) * relativePoint.y);
 
+    // the closest point on the line
+    Point2f closest;
+    closest.x = -cos(angle) * (-cos(angle) * relativePoint.x - sin(angle) * relativePoint.y);
+    closest.y = sin(angle) * (cos(angle) * relativePoint.x + sin(angle) * relativePoint.y);
+
+    float dangle;
+    dangle = atan2(relativePoint.y, relativePoint.x);                         // from the origin
+    dangle = atan2(closest.y - relativePoint.y, closest.x - relativePoint.x); // from the closest point on the line
+    dangle = dangle >= 0 ? dangle : dangle + Constants::TwoPi;
+
     if (d <= mind)
     {
-      if (d == mind && angle < mindangle)
+      if (d == mind && dangle < mindangle)
         continue;
 
       mind = d;
-      mindangle = angle;
+      mindangle = dangle;
 
       r1 = r + relativePoint.y;
       c1 = c + relativePoint.x;
