@@ -23,5 +23,3 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 ### Visualization of different optimizer paths on a given objective function landscape
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/optim/PATpaths2.PNG" width="49%"> <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/optim/PATpaths3.PNG" width="49%">
 
-### Also includes a highly relevant game of snake
-<img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/random/121624669_342253033669990_6839406602167434009_n.png" width="49%"> <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/random/snake.png" width="49%">
