@@ -110,18 +110,18 @@ inline Mat logmagn(const Mat& img, int logs = 1)
   return mag;
 }
 
-inline Mat fftlogmagn(const Mat& img)
+inline Mat fftlogmagn(const Mat& img, int logs = 1)
 {
   Mat out = fft(img);
   fftshift(out);
-  return logmagn(out);
+  return logmagn(out, logs);
 }
 
-inline Mat ifftlogmagn(const Mat& img)
+inline Mat ifftlogmagn(const Mat& img, int logs = 1)
 {
   Mat out = ifft(dupchansz(img), false);
   fftshift(out);
-  return logmagn(out, 10);
+  return logmagn(out, logs);
 }
 }
 
