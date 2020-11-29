@@ -11,6 +11,7 @@
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
+#include "Sasko/NonMaximaSuppression.h"
 
 namespace Debug
 {
@@ -19,7 +20,14 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // plot in optimization
+  if (1) // non maxima suppression
+  {
+    Mat img = loadImage("Resources/test.png");
+    float scale = 0.5;
+    resize(img, img, Size(scale * img.cols, scale * img.rows));
+    NonMaximaSuppresion(img);
+  }
+  if (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     auto g = OptimizationTestFunctions::Himmelblau;
