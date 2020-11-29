@@ -14,7 +14,7 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/random/aheq.PNG" width="100%">
 
 ### Convolution theorem aware frequency domain image filtering
-<img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassRingRIDFT.png?raw=true" width="33%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageR.png?raw=true" width="33%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageG.png?raw=true" width="33%">
+<img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassRingRIDFT.png?raw=true" width="32%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageR.png?raw=true" width="32%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageG.png?raw=true" width="32%">
 
 ### Visualization of different optimizer paths on a given objective function landscape
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/optim/PATpaths2.PNG" width="49%"> <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/articles/optim/PATpaths3.PNG" width="49%">
