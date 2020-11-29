@@ -177,12 +177,12 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
   if (mPlotOutput)
   {
     Plot1D::plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log(fitness)",
-                 {"bestFitness"}, {"log(bestFitness)"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
+                 {"bestFitness"}, {"log(bestFitness)"}, Plot::defaultpens);
     Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation",
                  "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"},
-                 {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2), QPen(Plot::matlabRed, 1, Qt::DotLine)});
+                 {Plot::defaultpens[0], Plot::defaultpens[1], QPen(Plot::matlabRed, 1, Qt::DotLine)});
     Plot1D::plot(gen, {population.bestEntity.fitness}, {valid(population.bestEntity.params)}, "EvolutionValid", "generation", "obj fitness",
-                 "valid fitness", {"obj"}, {"valid"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
+                 "valid fitness", {"obj"}, {"valid"}, Plot::defaultpens);
   }
 }
 
