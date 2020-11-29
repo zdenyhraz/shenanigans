@@ -95,7 +95,7 @@ try
   // L2U
   Mat L2U = CalculateL2U(L2);
   Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-  Point2f L2Upeak = L2Umid;
+  Point2f L2Upeak;
   if (mDebugMode)
   {
     Plot2D::plot(L2U, "L2U", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2U.png");
@@ -121,7 +121,7 @@ try
     Mat L1;
     int L1size = GetL1size(L2U, L1ratio);
     Point2f L1mid(L1size / 2, L1size / 2);
-    Point2f L1peak = L1mid;
+    Point2f L1peak;
     if (mDebugMode)
       Plot2D::plot(CalculateL1(L2U, L2Upeak, L1size), "L1B", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1B.png");
 
@@ -809,7 +809,8 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
   SetL1ratio(bestParams[6]);
 
   // pretty print the best parameters
-  LOG_INFO("Final IPC px accuracy: {}", obj(bestParams));
+  LOG_INFO("Final IPC px training accuracy: {}", obj(bestParams));
+  LOG_INFO("Final IPC px validation accuracy: {}", valid(bestParams));
   LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
   LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
   LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
