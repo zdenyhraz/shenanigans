@@ -16,7 +16,7 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 ### Convolution theorem aware frequency domain image filtering
 <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassRingRIDFT.png?raw=true" width="32%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageR.png?raw=true" width="32%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/bandpass/2DBandpassImageG.png?raw=true" width="32%">
 
-### Modeling of the windowing effect on the fourier transform
+### Modeling of the windowing effect on the Discrete Fourier transform
 <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/window/1DWindows.png?raw=true" width="47%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/window/1DWindowsDFT.png?raw=true" width="47%">
 <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/window/2DWindowDFTR.png?raw=true" width="32%"> <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/window/2DImageDFT.png?raw=true" width="32%">  <img src="https://github.com/zdenyhraz/Zdeny_PhD_Shenanigans/blob/master/articles/dissertation/window/2DImageWindowDFT.png?raw=true" width="32%"> 
 
