@@ -180,9 +180,9 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
                  {"bestFitness"}, {"log(bestFitness)"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
     Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation",
                  "best-average absolute difference", "best-average relative difference", {"absdif"}, {"reldif", "reldif thr"},
-                 {QPen(Plot::black, 2), QPen(Plot::matlabGreen, 2), QPen(Plot::matlabRed, 1, Qt::DotLine)});
-    Plot1D::plot(gen, {population.bestEntity.fitness}, {valid(population.bestEntity.params)}, "EvolutionValid", "generation", "fitness", "fitness",
-                 {"obj"}, {"valid"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
+                 {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2), QPen(Plot::matlabRed, 1, Qt::DotLine)});
+    Plot1D::plot(gen, {population.bestEntity.fitness}, {valid(population.bestEntity.params)}, "EvolutionValid", "generation", "obj fitness",
+                 "valid fitness", {"obj"}, {"valid"}, {QPen(Plot::matlabGreen, 2), QPen(Plot::matlabMagenta, 2)});
   }
 }
 
