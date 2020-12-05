@@ -557,20 +557,11 @@ void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirect
 try
 {
   if (itersPerImage < 1)
-  {
-    LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerImage);
-    return;
-  }
+    throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
   if (maxShiftRatio >= 1)
-  {
-    LOG_ERROR("Could not optimize IPC parameters - invalid max shift ratio ({})", maxShiftRatio);
-    return;
-  }
+    throw std::runtime_error(fmt::format("Invalid max shift ratio ({})", maxShiftRatio));
   if (noiseStdev < 0)
-  {
-    LOG_ERROR("Could not optimize IPC parameters - noise stdev cannot be negative ({})", noiseStdev);
-    return;
-  }
+    throw std::runtime_error(fmt::format("Noise stdev cannot be negative ({})", noiseStdev));
 
   auto trainingImages = LoadImages(trainingImagesDirectory);
   auto validationImages = LoadImages(validationImagesDirectory);
@@ -579,10 +570,7 @@ try
   auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
 
   if (trainingImagePairs.empty())
-  {
-    LOG_ERROR("Could not optimize IPC parameters - empty image pair vector");
-    return;
-  }
+    throw std::runtime_error(fmt::format("Empty training image pairs vector"));
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
@@ -595,9 +583,15 @@ try
 
   LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
 }
+catch (const std::exception& e)
+{
+  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
+  return;
+}
 catch (...)
 {
-  LOG_SUCC("Unexpected error occured during Iterative Phase Correlation parameter optimization");
+  LOG_ERROR("An unexpected error occured during Iterative Phase Correlation parameter optimization");
+  return;
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -606,10 +600,7 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
   std::vector<Mat> trainingImages;
 
   if (!std::filesystem::is_directory(imagesDirectory))
-  {
-    LOG_ERROR("Directory '{}' is not a valid directory", imagesDirectory);
-    throw 0;
-  }
+    throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
 
   for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
   {
@@ -630,11 +621,8 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
   {
     const Point2f maxShift(maxShiftRatio * mCols, maxShiftRatio * mRows);
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
-    {
-      LOG_ERROR("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols, mRows + maxShift.y,
-                mCols + maxShift.x);
-      throw 0;
-    }
+      throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
+                                           mRows + maxShift.y, mCols + maxShift.x));
   }
 
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
