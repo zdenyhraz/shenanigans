@@ -595,17 +595,20 @@ catch (...)
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
 {
   LOG_INFO("Loading images from '{}'...", imagesDirectory);
-  std::vector<Mat> trainingImages;
 
   if (!std::filesystem::is_directory(imagesDirectory))
     throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
 
+  std::vector<Mat> trainingImages;
   for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
   {
     std::string path = entry.path().string();
 
     if (!IsImage(path))
+    {
+      LOG_DEBUG("Directory contains a non-image file {}", path);
       continue;
+    }
 
     trainingImages.push_back(loadImage(path));
     LOG_DEBUG("Loaded image {}", path);

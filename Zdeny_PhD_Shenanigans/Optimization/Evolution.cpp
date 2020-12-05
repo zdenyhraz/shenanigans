@@ -6,27 +6,18 @@ Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
-  Population population;
-
-  if (!InitializeOutputs())
-    return {};
-
-  if (!CheckObjectiveFunctionNormality(obj))
-    return {};
-
-  if (!CheckBounds())
-    return {};
-
-  if (!population.Initialize(mNP, N, obj, mLB, mUB, GetNumberOfParents()))
-    return {};
+  InitializeOutputs();
+  CheckBounds();
+  CheckObjectiveFunctionNormality(obj);
 
   int gen = 0;
+  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents());
   TerminationReason treason = NotTerminated;
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   LOG_INFO("Running evolution...");
   UpdateOutputs(gen, population, valid);
 
-  while (!treason)
+  while (treason == NotTerminated)
   {
     try
     {
@@ -63,103 +54,75 @@ void Evolution::SetFileOutputDir(const std::string& dir)
   mFileOutput = true;
 }
 
-bool Evolution::InitializeOutputs()
+void Evolution::InitializeOutputs()
+try
 {
-  try
+  LOG_INFO("Evolution optimization started");
+  LOG_INFO("Initializing outputs...");
+
+  if (mFileOutput)
   {
-    LOG_INFO("Evolution optimization started");
-    LOG_INFO("Initializing outputs...");
-
-    if (mFileOutput)
-    {
-      mOutputFile.open(mOutputFileDir + mOptimizationName + ".txt", std::ios::out | std::ios::app);
-      mOutputFile << "Evolution optimization '" + mOptimizationName + "' started" << std::endl;
-    }
-
-    if (mPlotOutput)
-    {
-      Plot1D::Reset("Evolution");
-      Plot1D::Reset("EvolutionDiff");
-      Plot1D::Reset("EvolutionValid");
-    }
-
-    LOG_SUCC("Outputs initialized");
-    return true;
+    mOutputFile.open(mOutputFileDir + mOptimizationName + ".txt", std::ios::out | std::ios::app);
+    mOutputFile << "Evolution optimization '" + mOptimizationName + "' started" << std::endl;
   }
-  catch (const std::exception& e)
+
+  if (mPlotOutput)
   {
-    LOG_ERROR("Could not initialize outputs: {}", e.what());
-    return false;
+    Plot1D::Reset("Evolution");
+    Plot1D::Reset("EvolutionDiff");
+    Plot1D::Reset("EvolutionValid");
   }
+
+  LOG_SUCC("Outputs initialized");
+}
+catch (const std::exception& e)
+{
+  throw std::runtime_error(fmt::format("Could not initialize outputs: {}", e.what()));
 }
 
-bool Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
+void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
+try
 {
   LOG_INFO("Checking objective function normality...");
-  try
-  {
-    auto arg = 0.5 * (mLB + mUB);
-    auto result = obj(arg);
-    auto result2 = obj(arg);
 
-    if (!isfinite(result))
-    {
-      LOG_ERROR("Objective function is not finite");
-      return false;
-    }
-    else
-      LOG_DEBUG("Objective function is finite");
+  auto arg = 0.5 * (mLB + mUB);
+  auto result = obj(arg);
+  auto result2 = obj(arg);
 
-    if (result < 0)
-    {
-      LOG_ERROR("Objective function is not positive");
-      return false;
-    }
-    else
-      LOG_DEBUG("Objective function is positive");
+  if (!isfinite(result))
+    throw std::runtime_error(fmt::format("Objective function is not finite"));
+  else
+    LOG_DEBUG("Objective function is finite");
 
-    if (result != result2)
-    {
-      LOG_ERROR("Objective function is not consistent");
-      return false;
-    }
-    else
-      LOG_DEBUG("Objective function is consistent");
+  if (result < 0)
+    throw std::runtime_error(fmt::format("Objective function is not positive"));
+  else
+    LOG_DEBUG("Objective function is positive");
 
-    LOG_SUCC("Objective function is normal");
-    return true;
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("Objective function is not normal: {}", e.what());
-    return false;
-  }
+  if (result != result2)
+    throw std::runtime_error(fmt::format("Objective function is not consistent"));
+  else
+    LOG_DEBUG("Objective function is consistent");
+
+  LOG_SUCC("Objective function is normal");
+}
+catch (const std::exception& e)
+{
+  throw std::runtime_error(fmt::format("Objective function is not normal: {}", e.what()));
 }
 
-bool Evolution::CheckBounds()
+void Evolution::CheckBounds()
 {
   LOG_INFO("Checking objective function parameter bounds validity...");
 
   if (mLB.size() != mUB.size())
-  {
-    LOG_ERROR("Parameter bound sizes do not match");
-    return false;
-  }
-
+    throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
   if (mLB.size() != N)
-  {
-    LOG_ERROR("Invalid lower parameter bound size: {} != {}", mLB.size(), N);
-    return false;
-  }
-
+    throw std::runtime_error(fmt::format("Invalid lower parameter bound size: {} != {}", mLB.size(), N));
   if (mUB.size() != N)
-  {
-    LOG_ERROR("Invalid upper parameter bound size: {} != {}", mUB.size(), N);
-    return false;
-  }
+    throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUB.size(), N));
 
   LOG_SUCC("Objective function parameter bounds are valid");
-  return true;
 }
 
 void Evolution::UpdateOutputs(int gen, const Population& population, ValidationFunction valid)
@@ -184,24 +147,22 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 }
 
 void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)
+try
 {
-  try
+  if (mFileOutput)
   {
-    if (mFileOutput)
-    {
-      mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
-      mOutputFile << "Evolution result: " << GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
-      mOutputFile.close();
-    }
+    mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
+    mOutputFile << "Evolution result: " << GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
+    mOutputFile.close();
+  }
 
-    LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_INFO("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
-    LOG_INFO("Evolution optimization ended");
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("Could not uninitialize outputs: {}", e.what());
-  }
+  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
+  LOG_INFO("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
+  LOG_INFO("Evolution optimization ended");
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Could not uninitialize outputs: {}", e.what());
 }
 
 Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, int generation)
@@ -269,26 +230,18 @@ int Evolution::GetNumberOfParents()
   return 3;
 }
 
-Evolution::Population::Population()
+Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents)
+try
 {
+  functionEvaluations = 0;
+  relativeDifferenceGenerationsOverThreshold = 0;
+  InitializePopulation(NP, N, obj, LB, UB);
+  InitializeBestEntity();
+  InitializeOffspring(nParents);
 }
-
-bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents)
+catch (const std::exception& e)
 {
-  try
-  {
-    functionEvaluations = 0;
-    relativeDifferenceGenerationsOverThreshold = 0;
-    InitializePopulation(NP, N, obj, LB, UB);
-    InitializeBestEntity();
-    InitializeOffspring(nParents);
-    return true;
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("Could not initialize population: {}", e.what());
-    return false;
-  }
+  throw std::runtime_error(fmt::format("Could not initialize population: {}", e.what()));
 }
 
 void Evolution::Population::UpdateDistinctParents(int eid)
