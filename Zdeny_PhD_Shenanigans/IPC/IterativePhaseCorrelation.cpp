@@ -552,12 +552,12 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   LOG_INFO("IPC debug stuff shown");
 }
 
-void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerDirection)
+void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerImage)
 try
 {
-  if (itersPerDirection < 1)
+  if (itersPerImage < 1)
   {
-    LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerDirection);
+    LOG_ERROR("Could not optimize IPC parameters - invalid iters per image ({})", itersPerImage);
     return;
   }
   if (maxShiftRatio >= 1)
@@ -574,8 +574,8 @@ try
   auto trainingImages = LoadImages(trainingImagesDirectory);
   auto validationImages = LoadImages(validationImagesDirectory);
 
-  auto trainingImagePairs = CreateTrainingImagePairs(trainingImages, maxShiftRatio, itersPerDirection, noiseStdev);
-  auto validationImagePairs = CreateValidationImagePairs(validationImages, maxShiftRatio, itersPerDirection, noiseStdev);
+  auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
+  auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, itersPerImage, noiseStdev);
 
   if (trainingImagePairs.empty())
   {
@@ -624,94 +624,33 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
   return trainingImages;
 }
 
-std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateTrainingImagePairs(const std::vector<Mat>& trainingImages, double maxShiftRatio, int itersPerDirection,
-                                                                                               double noiseStdev) const
+std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const
 {
-  for (const auto& image : trainingImages)
+  for (const auto& image : images)
   {
     const Point2f maxShift(maxShiftRatio * mCols, maxShiftRatio * mRows);
     if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
     {
       LOG_ERROR("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols, mRows + maxShift.y,
                 mCols + maxShift.x);
-      throw std::runtime_error("");
+      throw 0;
     }
   }
 
-  // 8 compass shift directions (N, E, S, W, NE, SE, SW, NW)
-  std::vector<Point2f> maxShiftDirections;
-  maxShiftDirections.reserve(8);
-  maxShiftDirections.emplace_back(Point2f(0, maxShiftRatio * mRows));
-  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, 0));
-  maxShiftDirections.emplace_back(Point2f(0, -maxShiftRatio * mRows));
-  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, 0));
-  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, maxShiftRatio * mRows));
-  maxShiftDirections.emplace_back(Point2f(maxShiftRatio * mCols, -maxShiftRatio * mRows));
-  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, -maxShiftRatio * mRows));
-  maxShiftDirections.emplace_back(Point2f(-maxShiftRatio * mCols, maxShiftRatio * mRows));
-
   // prepare the shifted image pairs
-  std::vector<std::tuple<Mat, Mat, Point2f>> trainingImagePairs;
-  trainingImagePairs.reserve(trainingImages.size() * maxShiftDirections.size() * itersPerDirection);
+  std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
+  imagePairs.reserve(images.size() * itersPerImage);
 
-  for (const auto& image : trainingImages)
+  for (const auto& image : images)
   {
-    for (const auto& maxShiftDirection : maxShiftDirections)
-    {
-      for (int i = 0; i < itersPerDirection; ++i)
-      {
-        // both images are roicropped in the middle but 2nd image is shifted beforehands
-        Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
-        Mat image2;
-
-        // calculate artificial shift
-        Point2f shift = ((double)i / (itersPerDirection - 1)) * maxShiftDirection;
-
-        // perform the artificial shift
-        Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-        warpAffine(image, image2, T, image.size());
-        image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
-
-        // convert both pictures to unit float
-        image1.convertTo(image1, CV_32F);
-        image2.convertTo(image2, CV_32F);
-        normalize(image1, image1, 0, 1, CV_MINMAX);
-        normalize(image2, image2, 0, 1, CV_MINMAX);
-
-        // add noise
-        if (noiseStdev > 0)
-        {
-          Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-          Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
-          randn(noise1, 0, noiseStdev);
-          randn(noise2, 0, noiseStdev);
-          image1 += noise1;
-          image2 += noise2;
-        }
-
-        // add to the vector
-        trainingImagePairs.push_back({image1, image2, shift});
-      }
-    }
-  }
-}
-
-std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateValidationImagePairs(const std::vector<Mat>& validationImages, double maxShiftRatio, int itersPerDirection,
-                                                                                                 double noiseStdev) const
-{
-  // prepare the shifted image pairs
-  std::vector<std::tuple<Mat, Mat, Point2f>> validationImagePairs;
-  validationImagePairs.reserve(validationImages.size() * itersPerDirection);
-
-  for (const auto& image : validationImages)
-  {
-    for (int i = 0; i < itersPerDirection; ++i)
+    for (int i = 0; i < itersPerImage; ++i)
     {
       // both images are roicropped in the middle but 2nd image is shifted beforehands
       Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
       Mat image2;
 
       // calculate artificial shift
+      // Point2f shift = ((double)i / (itersPerImage - 1)) * maxShiftDirection;
       Point2f shift(rand11() * maxShiftRatio * mCols, rand11() * maxShiftRatio * mRows);
 
       // perform the artificial shift
@@ -737,16 +676,15 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateVali
       }
 
       // add to the vector
-      validationImagePairs.push_back({image1, image2, shift});
+      imagePairs.push_back({image1, image2, shift});
     }
   }
+  return imagePairs;
 }
 
 const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
 {
-  // the average registration error objective function
-  const auto obj = [&](const std::vector<double>& params) {
-    // create ipc object with speficied parameters
+  return [&](const std::vector<double>& params) {
     IterativePhaseCorrelation ipc(mRows, mCols);
     ipc.SetBandpassType(static_cast<BandpassType>((int)params[BandpassTypeParameter]));
     ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
@@ -755,11 +693,9 @@ const std::function<double(const std::vector<double>&)> IterativePhaseCorrelatio
     ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
     ipc.SetL1ratio(params[L1ratioParameter]);
 
-    // L1 smaller than 3px, bad
-    if (std::floor(ipc.GetL1ratio() * ipc.GetL2size() * ipc.GetUpsampleCoeff()) < 3)
+    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<double>::max();
 
-    // calculate average registration error
     double avgerror = 0;
     for (const auto& [image1, image2, shift] : imagePairs)
     {
@@ -768,15 +704,13 @@ const std::function<double(const std::vector<double>&)> IterativePhaseCorrelatio
     }
     return avgerror / imagePairs.size();
   };
-  return obj;
 }
 
 std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj,
                                                                           const std::function<double(const std::vector<double>&)>& valid) const
 {
-  int N = 7;
-  Evolution evo(N);
-  evo.mNP = 50;
+  Evolution evo(ParameterCount);
+  evo.mNP = ParameterCount * 7;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
@@ -801,4 +735,57 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(std::vector<double> optim
   LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
   LOG_INFO("Final IPC UpsampleCoeff: {}", optimalParameters[UpsampleCoeffParameter]);
   LOG_INFO("Final IPC L1ratio: {}", optimalParameters[L1ratioParameter]);
+}
+
+std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, double bandpassL, double bandpassH)
+{
+  switch (type)
+  {
+  case BandpassType::Rectangular:
+    if (mBandpassL <= 0 && mBandpassH < 1)
+      return "Rectangular low pass";
+    else if (mBandpassL > 0 && mBandpassH >= 1)
+      return "Rectangular high pass";
+    else if (mBandpassL > 0 && mBandpassH < 1)
+      return "Rectangular band pass";
+    else if (mBandpassL <= 0 && mBandpassH >= 1)
+      return "Rectangular all pass";
+
+  case BandpassType::Gaussian:
+    if (mBandpassL <= 0 && mBandpassH < 1)
+      return "Gaussian low pass";
+    else if (mBandpassL > 0 && mBandpassH >= 1)
+      return "Gaussian high pass";
+    else if (mBandpassL > 0 && mBandpassH < 1)
+      return "Gausian band pass";
+    else if (mBandpassL <= 0 && mBandpassH >= 1)
+      return "Gaussian all pass";
+  }
+  return "Unknown";
+}
+
+std::string IterativePhaseCorrelation::WindowType2String(WindowType type)
+{
+  switch (type)
+  {
+  case WindowType::Rectangular:
+    return "Rectangular";
+  case WindowType::Hann:
+    return "Hann";
+  }
+  return "Unknown";
+}
+
+std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationType type)
+{
+  switch (type)
+  {
+  case InterpolationType::NearestNeighbor:
+    return "NearestNeighbor";
+  case InterpolationType::Linear:
+    return "Linear";
+  case InterpolationType::Cubic:
+    return "Cubic";
+  }
+  return "Unknown";
 }
