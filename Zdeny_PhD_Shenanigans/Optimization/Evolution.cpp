@@ -461,7 +461,7 @@ void Evolution::Population::InitializeBestEntity()
   LOG_INFO("Searching for best entity in the initial population...");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  LOG_SUCC("Initial population best entity: ({:.3f}) {}", bestEntity.fitness, bestEntity.params);
+  LOG_SUCC("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity()
