@@ -79,7 +79,7 @@ bool Evolution::InitializeOutputs()
     if (mPlotOutput)
     {
       Plot1D::Reset("Evolution");
-      Plot1D::Reset("EvolutionDIiff");
+      Plot1D::Reset("EvolutionDiff");
       Plot1D::Reset("EvolutionValid");
     }
 
@@ -176,13 +176,10 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 
   if (mPlotOutput)
   {
-    Plot1D::plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "fitness", "log fitness",
-                 {"best"}, {"log best"}, Plot::defaultpens);
-    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDIiff", "generation",
-                 "best-average absolute difference", "best-average relative difference", {"absdiff"}, {"reldiff", "reldiff max"},
-                 {Plot::defaultpens[0], Plot::defaultpens[1], QPen(Plot::matlabRed, 1, Qt::DotLine)});
-    Plot1D::plot(gen, {population.bestEntity.fitness}, {valid(population.bestEntity.params)}, "EvolutionValid", "generation", "obj fitness",
-                 "valid fitness", {"obj"}, {"valid"}, Plot::defaultpens);
+    Plot1D::plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "error", "log error", {"best"}, {"log best"}, Plot::defaultpens);
+    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDiff", "generation", "best-average absolute difference",
+                 "best-average relative difference", {"absdiff"}, {"reldiff", "reldiff max"}, {Plot::defaultpens[0], Plot::defaultpens[1], QPen(Plot::matlabRed, 1, Qt::DotLine)});
+    Plot1D::plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))}, "EvolutionValid", "generation", "error", {"obj", "valid"}, Plot::defaultpens);
   }
 }
 
@@ -218,13 +215,11 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   if (population.functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
     return MaximumFunctionEvaluationsReached;
 
-  if (population.relativeDifferenceGenerationsOverThreshold >
-      mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no
-                                                            // improvement (relative)
+  if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no
+                                                                                                                    // improvement (relative)
     return NoImprovementReachedRel;
 
-  if (population.absoluteDifference <
-      mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
+  if (population.absoluteDifference < mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
     return NoImprovementReachedAbs;
 
   return NotTerminated;
@@ -278,8 +273,7 @@ Evolution::Population::Population()
 {
 }
 
-bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB,
-                                       int nParents)
+bool Evolution::Population::Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents)
 {
   try
   {
@@ -307,8 +301,7 @@ void Evolution::Population::UpdateCrossoverParameters(int eid, CrossoverStrategy
   offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR);
 }
 
-void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F,
-                                            const std::vector<double>& LB, const std::vector<double>& UB)
+void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB)
 {
   auto& newoffspring = offspring[eid];
   newoffspring.params = entities[eid].params;
@@ -319,12 +312,11 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
       switch (mutationStrategy)
       {
       case MutationStrategy::RAND1:
-        newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] +
-                                   F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]);
+        newoffspring.params[pid] =
+            entities[newoffspring.parentIndices[0]].params[pid] + F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]);
         break;
       case MutationStrategy::BEST1:
-        newoffspring.params[pid] =
-            bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]);
+        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]);
         break;
       case MutationStrategy::RAND2:
         newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] +
@@ -332,8 +324,7 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
                                    F * (entities[newoffspring.parentIndices[3]].params[pid] - entities[newoffspring.parentIndices[4]].params[pid]);
         break;
       case MutationStrategy::BEST2:
-        newoffspring.params[pid] = bestEntity.params[pid] +
-                                   F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) +
+        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) +
                                    F * (entities[newoffspring.parentIndices[2]].params[pid] - entities[newoffspring.parentIndices[3]].params[pid]);
         break;
       }
@@ -424,9 +415,8 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
       for (int eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
-        double avgDist =
-            averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
-        if (avgDist < minAvgDist)                                                    // check if entity is distinct
+        double avgDist = averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
+        if (avgDist < minAvgDist)                                                                 // check if entity is distinct
         {
           distinctEntity = false;
           break; // needs to be distinct from all entities

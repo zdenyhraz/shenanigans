@@ -10,50 +10,11 @@ public:
     Gaussian,
   };
 
-  std::string BandpassType2String(BandpassType type, float bandpassL, float bandpassH)
-  {
-    switch (type)
-    {
-    case BandpassType::Rectangular:
-      if (mBandpassL <= 0 && mBandpassH < 1)
-        return "Rectangular low pass";
-      else if (mBandpassL > 0 && mBandpassH >= 1)
-        return "Rectangular high pass";
-      else if (mBandpassL > 0 && mBandpassH < 1)
-        return "Rectangular band pass";
-      else if (mBandpassL <= 0 && mBandpassH >= 1)
-        return "Rectangular all pass";
-
-    case BandpassType::Gaussian:
-      if (mBandpassL <= 0 && mBandpassH < 1)
-        return "Gaussian low pass";
-      else if (mBandpassL > 0 && mBandpassH >= 1)
-        return "Gaussian high pass";
-      else if (mBandpassL > 0 && mBandpassH < 1)
-        return "Gausian band pass";
-      else if (mBandpassL <= 0 && mBandpassH >= 1)
-        return "Gaussian all pass";
-    }
-    return "Unknown";
-  }
-
   enum class WindowType
   {
     Rectangular,
     Hann,
   };
-
-  std::string WindowType2String(WindowType type)
-  {
-    switch (type)
-    {
-    case WindowType::Rectangular:
-      return "Rectangular";
-    case WindowType::Hann:
-      return "Hann";
-    }
-    return "Unknown";
-  }
 
   enum class InterpolationType
   {
@@ -61,20 +22,6 @@ public:
     Linear,
     Cubic,
   };
-
-  std::string InterpolationType2String(InterpolationType type)
-  {
-    switch (type)
-    {
-    case InterpolationType::NearestNeighbor:
-      return "NearestNeighbor";
-    case InterpolationType::Linear:
-      return "Linear";
-    case InterpolationType::Cubic:
-      return "Cubic";
-    }
-    return "Unknown";
-  }
 
   IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
   IterativePhaseCorrelation(const Mat& img, double bandpassL = 1.0, double bandpassH = 0.01);
@@ -107,7 +54,7 @@ public:
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
 
   void ShowDebugStuff() const;
-  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.1, int itersPerDirection = 5);
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.1, int itersPerImage = 5);
 
 private:
   int mRows = 0;
@@ -164,13 +111,16 @@ private:
     InterpolationTypeParameter,
     WindowTypeParameter,
     UpsampleCoeffParameter,
-    L1ratioParameter
+    L1ratioParameter,
+    ParameterCount
   };
 
   std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
-  std::vector<std::tuple<Mat, Mat, Point2f>> CreateTrainingImagePairs(const std::vector<Mat>& trainingImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
-  std::vector<std::tuple<Mat, Mat, Point2f>> CreateValidationImagePairs(const std::vector<Mat>& validationImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
+  std::vector<std::tuple<Mat, Mat, Point2f>> CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const;
   const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid) const;
   void ApplyOptimalParameters(std::vector<double> optimalParameters);
+  std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH);
+  std::string WindowType2String(WindowType type);
+  std::string InterpolationType2String(InterpolationType type);
 };
