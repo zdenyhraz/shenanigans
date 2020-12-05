@@ -105,9 +105,9 @@ public:
 
   Point2f Calculate(const Mat& image1, const Mat& image2) const;
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
-  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25,
-                float noiseStdev = 0.1, int itersPerDirection = 5);
+
   void ShowDebugStuff() const;
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.1, int itersPerDirection = 5);
 
 private:
   int mRows = 0;
@@ -155,4 +155,10 @@ private:
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;
+
+  // optimization
+  std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
+  std::vector<std::tuple<Mat, Mat, Point2f>> CreateTrainingImagePairs(const std::vector<Mat>& trainingImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
+  std::vector<std::tuple<Mat, Mat, Point2f>> CreateValidationImagePairs(const std::vector<Mat>& validationImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
+  const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs);
 };

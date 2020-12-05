@@ -74,13 +74,13 @@ Mat NonMaximaSuppresion(const Mat& img)
   if (relativePoints.size() != sqr(size) - 1)
     throw;
 
-  for (int r = 0; r < out.rows; ++r)
+  for (int r = 1; r < out.rows - 1; ++r)
   {
-    for (int c = 0; c < out.cols; ++c)
+    for (int c = 1; c < out.cols - 1; ++c)
     {
       auto [r1, c1, r2, c2] = GetTwoPairs(gradA.at<float>(r, c), r, c, relativePoints);
 
-      if ((gradM.at<float>(r1, c1) < gradM.at<float>(r, c)) && (gradM.at<float>(r2, c2) < gradM.at<float>(r, c)))
+      if (gradM.at<float>(r1, c1) < gradM.at<float>(r, c) && gradM.at<float>(r2, c2) < gradM.at<float>(r, c))
         out.at<float>(r, c) = gradM.at<float>(r, c);
     }
   }
