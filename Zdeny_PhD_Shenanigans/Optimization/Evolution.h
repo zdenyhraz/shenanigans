@@ -57,8 +57,7 @@ private:
 
   struct Population
   {
-    Population();
-    bool Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents);
+    Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents);
     void UpdateDistinctParents(int eid);
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
     void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
@@ -84,10 +83,10 @@ private:
     void InitializeOffspring(int nParents);
   };
 
-  bool CheckObjectiveFunctionNormality(ObjectiveFunction obj);
-  bool CheckBounds();
+  void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
+  void CheckBounds();
   int GetNumberOfParents();
-  bool InitializeOutputs();
+  void InitializeOutputs();
   void UninitializeOutputs(const Population& population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population& population, ValidationFunction valid);
   TerminationReason CheckTerminationCriterions(const Population& population, int generation);
