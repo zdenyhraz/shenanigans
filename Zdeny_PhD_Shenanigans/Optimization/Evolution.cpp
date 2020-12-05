@@ -229,25 +229,25 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double>& b
 {
   std::string value;
   if (gen >= 0)
-    value += "Gen " + to_string(gen) + " (" + to_string(bestFitness) + ") [";
+    value += fmt::format("Gen {} ({:.2e}) [", gen, bestFitness);
   else
-    value += "(" + to_string(bestFitness) + ") [";
+    value += fmt::format("({:.2e}) [", bestFitness);
 
   for (int i = 0; i < bestEntity.size(); ++i)
   {
     if (mParameterNames.size() > i)
     {
-      if (i != bestEntity.size() - 1)
-        value += mParameterNames[i] + ": " + to_string(bestEntity[i]) + ", ";
+      if (i < bestEntity.size() - 1)
+        value += fmt::format("{}: {:.2f}, ", mParameterNames[i], bestEntity[i]);
       else
-        value += mParameterNames[i] + ": " + to_string(bestEntity[i]) + "]";
+        value += fmt::format("{}: {:.2f}]", mParameterNames[i], bestEntity[i]);
     }
     else
     {
-      if (i != bestEntity.size() - 1)
-        value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + ", ";
+      if (i < bestEntity.size() - 1)
+        value += fmt::format("param{}: {:.2f}, ", i, bestEntity[i]);
       else
-        value += "param" + to_string(i) + ": " + to_string(bestEntity[i]) + "]";
+        value += fmt::format("param{}: {:.2f}]", i, bestEntity[i]);
     }
   }
   return value;
