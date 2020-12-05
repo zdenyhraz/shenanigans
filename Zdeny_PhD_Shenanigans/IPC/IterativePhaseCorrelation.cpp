@@ -633,7 +633,6 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
     for (int i = 0; i < itersPerImage; ++i)
     {
       Mat image1, image2;
-
       Point2f shift(rand11() * maxShiftRatio * mCols, rand11() * maxShiftRatio * mRows);
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image, image2, T, image.size());
@@ -652,15 +651,15 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
 
 void IterativePhaseCorrelation::AddNoise(Mat& image1, Mat& image2, double noiseStdev) const
 {
-  if (noiseStdev > 0)
-  {
-    Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-    Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
-    randn(noise1, 0, noiseStdev);
-    randn(noise2, 0, noiseStdev);
-    image1 += noise1;
-    image2 += noise2;
-  }
+  if (noiseStdev <= 0)
+    return;
+
+  Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
+  Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
+  randn(noise1, 0, noiseStdev);
+  randn(noise2, 0, noiseStdev);
+  image1 += noise1;
+  image2 += noise2;
 }
 
 const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
