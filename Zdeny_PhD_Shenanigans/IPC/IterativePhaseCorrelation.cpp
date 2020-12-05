@@ -588,42 +588,16 @@ try
 
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
+  const auto optimalParameters = CalculateOptimalParameters(obj, valid);
 
-  // get the best parameters via differential evolution
-  int N = 7;
-  Evolution evo(N);
-  evo.mNP = 50;
-  evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
-  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
-  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
-  const auto bestParams = evo.Optimize(obj, valid);
-
-  // set the currently used parameters to the best parameters
-  SetBandpassType(static_cast<BandpassType>((int)bestParams[0]));
-  SetBandpassParameters(bestParams[1], bestParams[2]);
-  SetInterpolationType(static_cast<InterpolationType>((int)bestParams[3]));
-  SetWindowType(static_cast<WindowType>((int)bestParams[4]));
-  SetUpsampleCoeff(bestParams[5]);
-  SetL1ratio(bestParams[6]);
-
-  // pretty print the best parameters
-  LOG_INFO("Final IPC px training accuracy: {}", obj(bestParams));
-  LOG_INFO("Final IPC px validation accuracy: {}", valid(bestParams));
-  LOG_INFO("Final IPC BandpassType: {}", BandpassType2String(static_cast<BandpassType>((int)bestParams[0]), bestParams[1], bestParams[2]));
-  LOG_INFO("Final IPC BandpassL: {}", bestParams[1]);
-  LOG_INFO("Final IPC BandpassH: {}", bestParams[2]);
-  LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)bestParams[3])));
-  LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)bestParams[4])));
-  LOG_INFO("Final IPC UpsampleCoeff: {}", bestParams[5]);
-  LOG_INFO("Final IPC L1ratio: {}", bestParams[6]);
-
-  // show the resulting bandpass, window, etc.
+  ApplyOptimalParameters(optimalParameters);
   // ShowDebugStuff();
+
   LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
 }
 catch (...)
 {
+  LOG_SUCC("Unexpected error occured during Iterative Phase Correlation parameter optimization");
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -768,18 +742,18 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateVali
   }
 }
 
-const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs)
+const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
 {
   // the average registration error objective function
   const auto obj = [&](const std::vector<double>& params) {
     // create ipc object with speficied parameters
     IterativePhaseCorrelation ipc(mRows, mCols);
-    ipc.SetBandpassType(static_cast<BandpassType>((int)params[0]));
-    ipc.SetBandpassParameters(params[1], params[2]);
-    ipc.SetInterpolationType(static_cast<InterpolationType>((int)params[3]));
-    ipc.SetWindowType(static_cast<WindowType>((int)params[4]));
-    ipc.SetUpsampleCoeff(params[5]);
-    ipc.SetL1ratio(params[6]);
+    ipc.SetBandpassType(static_cast<BandpassType>((int)params[BandpassTypeParameter]));
+    ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
+    ipc.SetInterpolationType(static_cast<InterpolationType>((int)params[InterpolationTypeParameter]));
+    ipc.SetWindowType(static_cast<WindowType>((int)params[WindowTypeParameter]));
+    ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
+    ipc.SetL1ratio(params[L1ratioParameter]);
 
     // L1 smaller than 3px, bad
     if (std::floor(ipc.GetL1ratio() * ipc.GetL2size() * ipc.GetUpsampleCoeff()) < 3)
@@ -795,4 +769,36 @@ const std::function<double(const std::vector<double>&)> IterativePhaseCorrelatio
     return avgerror / imagePairs.size();
   };
   return obj;
+}
+
+std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj,
+                                                                          const std::function<double(const std::vector<double>&)>& valid) const
+{
+  int N = 7;
+  Evolution evo(N);
+  evo.mNP = 50;
+  evo.mMutStrat = Evolution::RAND1;
+  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
+  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
+  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
+  return evo.Optimize(obj, valid);
+}
+
+void IterativePhaseCorrelation::ApplyOptimalParameters(std::vector<double> optimalParameters)
+{
+  SetBandpassType(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]));
+  SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
+  SetInterpolationType(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter]));
+  SetWindowType(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter]));
+  SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
+  SetL1ratio(optimalParameters[L1ratioParameter]);
+
+  LOG_INFO("Final IPC BandpassType: {}",
+           BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
+  LOG_INFO("Final IPC BandpassL: {}", optimalParameters[BandpassLParameter]);
+  LOG_INFO("Final IPC BandpassH: {}", optimalParameters[BandpassHParameter]);
+  LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
+  LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
+  LOG_INFO("Final IPC UpsampleCoeff: {}", optimalParameters[UpsampleCoeffParameter]);
+  LOG_INFO("Final IPC L1ratio: {}", optimalParameters[L1ratioParameter]);
 }

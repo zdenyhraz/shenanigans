@@ -156,9 +156,21 @@ private:
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;
 
-  // optimization
+  enum OptimizedParameters
+  {
+    BandpassTypeParameter,
+    BandpassLParameter,
+    BandpassHParameter,
+    InterpolationTypeParameter,
+    WindowTypeParameter,
+    UpsampleCoeffParameter,
+    L1ratioParameter
+  };
+
   std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateTrainingImagePairs(const std::vector<Mat>& trainingImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateValidationImagePairs(const std::vector<Mat>& validationImages, double maxShiftRatio, int itersPerDirection, double noiseStdev) const;
-  const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs);
+  const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
+  std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid) const;
+  void ApplyOptimalParameters(std::vector<double> optimalParameters);
 };
