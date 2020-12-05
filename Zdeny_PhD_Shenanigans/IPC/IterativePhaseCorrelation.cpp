@@ -586,12 +586,10 @@ try
 catch (const std::exception& e)
 {
   LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
-  return;
 }
 catch (...)
 {
   LOG_ERROR("An unexpected error occured during Iterative Phase Correlation parameter optimization");
-  return;
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
