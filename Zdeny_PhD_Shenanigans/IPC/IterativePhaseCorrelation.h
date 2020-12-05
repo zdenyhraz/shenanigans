@@ -54,7 +54,8 @@ public:
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
 
   void ShowDebugStuff() const;
-  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.1, int itersPerImage = 5);
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.01, int itersPerImage = 100,
+                double validationRatio = 0.2);
 
 private:
   int mRows = 0;
@@ -82,12 +83,12 @@ private:
   float HighpassEquation(int row, int col) const;
   float BandpassGEquation(int row, int col) const;
   float BandpassREquation(int row, int col) const;
-  bool IsValid(const Mat& img1, const Mat& img2) const;
-  bool CheckSize(const Mat& img1, const Mat& img2) const;
-  bool CheckChannels(const Mat& img1, const Mat& img2) const;
-  void ConvertToUnitFloat(Mat& img1, Mat& img2) const;
-  void ApplyWindow(Mat& img1, Mat& img2) const;
-  std::pair<Mat, Mat> CalculateFourierTransforms(Mat&& img1, Mat&& img2) const;
+  bool IsValid(const Mat& image1, const Mat& image2) const;
+  bool CheckSize(const Mat& image1, const Mat& image2) const;
+  bool CheckChannels(const Mat& image1, const Mat& image2) const;
+  void ConvertToUnitFloat(Mat& image1, Mat& image2) const;
+  void ApplyWindow(Mat& image1, Mat& image2) const;
+  std::pair<Mat, Mat> CalculateFourierTransforms(Mat&& image1, Mat&& image2) const;
   Mat CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const;
   void ApplyBandpass(Mat& crosspower) const;
   void CalculateFrequencyBandpass();
@@ -117,10 +118,11 @@ private:
 
   std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const;
+  void AddNoise(Mat& image1, Mat& image2, double noiseStdev) const;
   const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid) const;
   void ApplyOptimalParameters(std::vector<double> optimalParameters);
-  std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH);
-  std::string WindowType2String(WindowType type);
-  std::string InterpolationType2String(InterpolationType type);
+  std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
+  std::string WindowType2String(WindowType type) const;
+  std::string InterpolationType2String(InterpolationType type) const;
 };

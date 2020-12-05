@@ -19,6 +19,11 @@ inline Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)
   return crop.clone();
 }
 
+inline Mat roicropmid(const Mat& sourceimgIn, int w, int h)
+{
+  return roicrop(sourceimgIn, sourceimgIn.cols / 2, sourceimgIn.rows / 2, w, h);
+}
+
 inline double magnitude(const Point2f& pt)
 {
   return sqrt(sqr(pt.x) + sqr(pt.y));

@@ -4,7 +4,7 @@
 #include "Plot/Plot2D.h"
 #include "IPC/ipcAux.h"
 
-WindowIPC::WindowIPC(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
+WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
   ui.setupUi(this);
   RefreshIPCparameters(true);
@@ -43,8 +43,8 @@ void WindowIPC::RefreshIPCparametersAndExit()
 
 void WindowIPC::Optimize()
 {
-  globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(),
-      ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt());
+  globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
+                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble());
 }
 
 void WindowIPC::align()
@@ -69,11 +69,7 @@ void WindowIPC::align()
     double shiftX = 0;
     double shiftY = 0;
     Point2f center((float)img1.cols / 2, (float)img1.rows / 2);
-    cout << "Artificial parameters:" << endl
-         << "Angle: " << angle << endl
-         << "Scale: " << scale << endl
-         << "ShiftX: " << shiftX << endl
-         << "ShiftY: " << shiftY << endl;
+    cout << "Artificial parameters:" << endl << "Angle: " << angle << endl << "Scale: " << scale << endl << "ShiftX: " << shiftX << endl << "ShiftY: " << shiftY << endl;
     Mat R = getRotationMatrix2D(center, angle, scale);
     Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
     warpAffine(img2, img2, T, cv::Size(img1.cols, img1.rows));
@@ -148,8 +144,7 @@ void WindowIPC::features()
 void WindowIPC::linearFlow()
 {
   LOG_DEBUG("Starting linear solar wind speed calculation...");
-  auto xyi = calculateLinearSwindFlow(
-      *globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
+  auto xyi = calculateLinearSwindFlow(*globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
   auto xshifts = std::get<0>(xyi);
   auto yshifts = std::get<1>(xyi);
   auto indices = std::get<2>(xyi);
@@ -164,8 +159,7 @@ void WindowIPC::linearFlow()
 void WindowIPC::constantFlow()
 {
   LOG_DEBUG("Starting constant solar wind speed calculation...");
-  auto xyi = calculateConstantSwindFlow(
-      *globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
+  auto xyi = calculateConstantSwindFlow(*globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
   auto xshifts = std::get<0>(xyi);
   auto yshifts = std::get<1>(xyi);
   auto indices = std::get<2>(xyi);

@@ -61,8 +61,7 @@ private:
     bool Initialize(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents);
     void UpdateDistinctParents(int eid);
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
-    void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB,
-                         const std::vector<double>& UB);
+    void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
     void PerformSelection();
     void UpdatePopulationFunctionEvaluations();
     void UpdateOffspringFunctionEvaluations();
@@ -97,7 +96,7 @@ private:
   bool mFileOutput = false;
   bool mPlotOutput = true;
   double mAbsoluteDifferenceThreshold = 1e-10;
-  double mRelativeDifferenceThreshold = 0.8;
+  double mRelativeDifferenceThreshold = 0.9;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
   std::string mOptimizationName = "noname";
   std::string mOutputFileDir;

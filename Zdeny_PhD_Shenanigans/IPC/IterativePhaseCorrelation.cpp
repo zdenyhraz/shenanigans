@@ -49,25 +49,25 @@ Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image
   return Calculate(image1.clone(), image2.clone());
 }
 
-inline Point2f IterativePhaseCorrelation::Calculate(Mat&& img1, Mat&& img2) const
+inline Point2f IterativePhaseCorrelation::Calculate(Mat&& image1, Mat&& image2) const
 try
 {
-  if (!IsValid(img1, img2))
+  if (!IsValid(image1, image2))
   {
     LOG_ERROR("Input images are not valid");
     return {0, 0};
   }
 
-  ConvertToUnitFloat(img1, img2);
-  ApplyWindow(img1, img2);
+  ConvertToUnitFloat(image1, image2);
+  ApplyWindow(image1, image2);
 
   if (mDebugMode)
   {
-    Plot2D::plot(img1, "img1");
-    Plot2D::plot(img2, "img2");
+    Plot2D::plot(image1, "image1");
+    Plot2D::plot(image2, "image2");
   }
 
-  auto [dft1, dft2] = CalculateFourierTransforms(std::move(img1), std::move(img2));
+  auto [dft1, dft2] = CalculateFourierTransforms(std::move(image1), std::move(image2));
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
   ApplyBandpass(crosspower);
 
@@ -230,47 +230,47 @@ inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) cons
   return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
 }
 
-inline bool IterativePhaseCorrelation::IsValid(const Mat& img1, const Mat& img2) const
+inline bool IterativePhaseCorrelation::IsValid(const Mat& image1, const Mat& image2) const
 {
   // size must be equal for matching bandpass / window
-  if (!CheckSize(img1, img2))
+  if (!CheckSize(image1, image2))
     return false;
 
   // only grayscale images are supported
-  if (!CheckChannels(img1, img2))
+  if (!CheckChannels(image1, image2))
     return false;
 
   return true;
 }
 
-inline bool IterativePhaseCorrelation::CheckSize(const Mat& img1, const Mat& img2) const
+inline bool IterativePhaseCorrelation::CheckSize(const Mat& image1, const Mat& image2) const
 {
   Size ipcsize(mCols, mRows);
-  return img1.size() == img2.size() && img1.size() == ipcsize && img2.size() == ipcsize;
+  return image1.size() == image2.size() && image1.size() == ipcsize && image2.size() == ipcsize;
 }
 
-inline bool IterativePhaseCorrelation::CheckChannels(const Mat& img1, const Mat& img2) const
+inline bool IterativePhaseCorrelation::CheckChannels(const Mat& image1, const Mat& image2) const
 {
-  return img1.channels() == 1 && img2.channels() == 1;
+  return image1.channels() == 1 && image2.channels() == 1;
 }
 
-inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& img1, Mat& img2) const
+inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image1, Mat& image2) const
 {
-  img1.convertTo(img1, CV_32F);
-  img2.convertTo(img2, CV_32F);
-  normalize(img1, img1, 0, 1, CV_MINMAX);
-  normalize(img2, img2, 0, 1, CV_MINMAX);
+  image1.convertTo(image1, CV_32F);
+  image2.convertTo(image2, CV_32F);
+  normalize(image1, image1, 0, 1, CV_MINMAX);
+  normalize(image2, image2, 0, 1, CV_MINMAX);
 }
 
-inline void IterativePhaseCorrelation::ApplyWindow(Mat& img1, Mat& img2) const
+inline void IterativePhaseCorrelation::ApplyWindow(Mat& image1, Mat& image2) const
 {
-  multiply(img1, mWindow, img1);
-  multiply(img2, mWindow, img2);
+  multiply(image1, mWindow, image1);
+  multiply(image2, mWindow, image2);
 }
 
-inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat&& img1, Mat&& img2) const
+inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat&& image1, Mat&& image2) const
 {
-  return {Fourier::fft(std::move(img1)), Fourier::fft(std::move(img2))};
+  return {Fourier::fft(std::move(image1)), Fourier::fft(std::move(image2))};
 }
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const
@@ -526,22 +526,22 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   if (0)
   {
     Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
-    Mat img1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
-    Mat img2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
+    Mat image1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
+    Mat image2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
 
     if (1)
     {
       double noiseStdev = 0.03;
-      Mat noise1 = Mat::zeros(img1.rows, img1.cols, CV_32F);
-      Mat noise2 = Mat::zeros(img2.rows, img2.cols, CV_32F);
+      Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
+      Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
       randn(noise1, 0, noiseStdev);
       randn(noise2, 0, noiseStdev);
-      img1 += noise1;
-      img2 += noise2;
+      image1 += noise1;
+      image2 += noise2;
     }
 
     SetDebugMode(true);
-    auto ipcshift = Calculate(img1, img2);
+    auto ipcshift = Calculate(image1, image2);
     SetDebugMode(false);
 
     LOG_INFO("Input raw shift = {}", rawshift);
@@ -552,7 +552,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   LOG_INFO("IPC debug stuff shown");
 }
 
-void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerImage)
+void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerImage,
+                                         double validationRatio)
 try
 {
   if (itersPerImage < 1)
@@ -575,7 +576,7 @@ try
   auto validationImages = LoadImages(validationImagesDirectory);
 
   auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
-  auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, itersPerImage, noiseStdev);
+  auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
 
   if (trainingImagePairs.empty())
   {
@@ -591,7 +592,6 @@ try
   const auto optimalParameters = CalculateOptimalParameters(obj, valid);
 
   ApplyOptimalParameters(optimalParameters);
-  // ShowDebugStuff();
 
   LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
 }
@@ -608,7 +608,7 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
   if (!std::filesystem::is_directory(imagesDirectory))
   {
     LOG_ERROR("Directory '{}' is not a valid directory", imagesDirectory);
-    return trainingImages;
+    throw 0;
   }
 
   for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
@@ -637,7 +637,6 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
     }
   }
 
-  // prepare the shifted image pairs
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
   imagePairs.reserve(images.size() * itersPerImage);
 
@@ -645,41 +644,35 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
   {
     for (int i = 0; i < itersPerImage; ++i)
     {
-      // both images are roicropped in the middle but 2nd image is shifted beforehands
-      Mat image1 = roicrop(image, image.cols / 2, image.rows / 2, mCols, mRows);
-      Mat image2;
+      Mat image1, image2;
 
-      // calculate artificial shift
-      // Point2f shift = ((double)i / (itersPerImage - 1)) * maxShiftDirection;
       Point2f shift(rand11() * maxShiftRatio * mCols, rand11() * maxShiftRatio * mRows);
-
-      // perform the artificial shift
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image, image2, T, image.size());
-      image2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
 
-      // convert both pictures to unit float
-      image1.convertTo(image1, CV_32F);
-      image2.convertTo(image2, CV_32F);
-      normalize(image1, image1, 0, 1, CV_MINMAX);
-      normalize(image2, image2, 0, 1, CV_MINMAX);
+      image1 = roicropmid(image, mCols, mRows);
+      image2 = roicropmid(image2, mCols, mRows);
 
-      // add noise
-      if (noiseStdev > 0)
-      {
-        Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-        Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
-        randn(noise1, 0, noiseStdev);
-        randn(noise2, 0, noiseStdev);
-        image1 += noise1;
-        image2 += noise2;
-      }
+      ConvertToUnitFloat(image1, image2);
+      AddNoise(image1, image2, noiseStdev);
 
-      // add to the vector
       imagePairs.push_back({image1, image2, shift});
     }
   }
   return imagePairs;
+}
+
+void IterativePhaseCorrelation::AddNoise(Mat& image1, Mat& image2, double noiseStdev) const
+{
+  if (noiseStdev > 0)
+  {
+    Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
+    Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
+    randn(noise1, 0, noiseStdev);
+    randn(noise2, 0, noiseStdev);
+    image1 += noise1;
+    image2 += noise2;
+  }
 }
 
 const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
@@ -737,7 +730,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(std::vector<double> optim
   LOG_INFO("Final IPC L1ratio: {}", optimalParameters[L1ratioParameter]);
 }
 
-std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, double bandpassL, double bandpassH)
+std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const
 {
   switch (type)
   {
@@ -764,7 +757,7 @@ std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, do
   return "Unknown";
 }
 
-std::string IterativePhaseCorrelation::WindowType2String(WindowType type)
+std::string IterativePhaseCorrelation::WindowType2String(WindowType type) const
 {
   switch (type)
   {
@@ -776,7 +769,7 @@ std::string IterativePhaseCorrelation::WindowType2String(WindowType type)
   return "Unknown";
 }
 
-std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationType type)
+std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationType type) const
 {
   switch (type)
   {
