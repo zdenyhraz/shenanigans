@@ -77,7 +77,7 @@ private:
   Mat mFrequencyBandpass;
   Mat mWindow;
   mutable std::unique_ptr<Plot::Plot2D> mImagePlot;
-  mutable std::unique_ptr<Plot::Plot2D> mSubregionPlot;
+  mutable std::unique_ptr<Plot::Plot2D> mColormapPlot;
 
   void UpdateWindow();
   void UpdateBandpass();

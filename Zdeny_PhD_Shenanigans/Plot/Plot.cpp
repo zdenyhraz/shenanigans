@@ -326,7 +326,7 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
   if (!mInitialized || newplot)
     Initialize(z[0].size(), z.size());
 
-  WindowPlot* windowPlot = plots[mName];
+  WindowPlot* windowPlot = plots[GetName()];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
@@ -345,7 +345,7 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
 
 void Plot::Plot2D::Initialize(int xcnt, int ycnt)
 {
-  auto idx = plots.find(fmt::format("{}:{}", mName, mCounter));
+  auto idx = plots.find(GetName());
   if (idx != plots.end())
   {
     Reset();
@@ -354,9 +354,9 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
-  auto windowPlot = new WindowPlot(mName, colRowRatio, OnClose);
+  auto windowPlot = new WindowPlot(GetName(), colRowRatio, OnClose);
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
-  plots[mName] = windowPlot;
+  plots[GetName()] = windowPlot;
   auto& plot = windowPlot->ui.widget;
   auto& colorMap = windowPlot->colorMap;
   auto& colorScale = windowPlot->colorScale;
@@ -393,13 +393,18 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   mInitialized = true;
 }
 
+std::string Plot::Plot2D::GetName()
+{
+  return fmt::format("{}:{}", mName, mCounter);
+}
+
 void Plot::Plot2D::Reset()
 {
-  auto idx = plots.find(mName);
+  auto idx = plots.find(GetName());
   if (idx == plots.end())
     return;
 
-  LOG_DEBUG("Resetting plot {}", mName);
+  LOG_DEBUG("Resetting plot {}", GetName());
   WindowPlot* windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
   plot->graph(0)->data().clear();
