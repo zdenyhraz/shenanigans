@@ -5,7 +5,7 @@
 class Plot
 {
 public:
-  static QPoint GetNewPlotPosition(WindowPlot* windowPlot);
+  static QPoint GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name);
   static std::function<void(std::string)> OnClose;
   static void CloseAll();
 
