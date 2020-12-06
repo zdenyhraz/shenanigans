@@ -20,14 +20,7 @@ void Debug(Globals* globals)
   TIMER("Debug");
   LOG_STARTEND("Debug started", "Debug finished");
 
-  if (1) // non maxima suppression
-  {
-    Mat img = loadImage("Resources/test.png");
-    float scale = 1.0;
-    resize(img, img, Size(scale * img.cols, scale * img.rows));
-    NonMaximaSuppresion(img);
-  }
-  if (0) // plot in optimization
+  if (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     auto g = OptimizationTestFunctions::Himmelblau;
@@ -41,6 +34,13 @@ void Debug(Globals* globals)
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
     auto result = Evo.Optimize(f, g);
+  }
+  if (0) // non maxima suppression
+  {
+    Mat img = loadImage("Resources/test.png");
+    float scale = 1.0;
+    resize(img, img, Size(scale * img.cols, scale * img.rows));
+    NonMaximaSuppresion(img);
   }
   if (0) // kirkl test
   {
@@ -104,11 +104,9 @@ void Debug(Globals* globals)
         float R = sqrt(std::pow(((float)c - cols / 2) / (cols / 2), 2) + std::pow(((float)r - rows / 2) / (rows / 2), 2));
         bandpassR.at<float>(r, c) = (fL <= R && R <= fH) ? 1 : 0;
 
-        gaussL.at<float>(r, c) = exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) -
-                                     std::pow(((float)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
+        gaussL.at<float>(r, c) = exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
 
-        gaussH.at<float>(r, c) = 1.0 - exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) / std::pow(sH, 2) -
-                                           std::pow(((float)r - rows / 2) / (rows / 2), 2) / std::pow(sH, 2));
+        gaussH.at<float>(r, c) = 1.0 - exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) / std::pow(sH, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) / std::pow(sH, 2));
 
         bandpassG.at<float>(r, c) = gaussL.at<float>(r, c) * gaussH.at<float>(r, c);
       }
@@ -171,10 +169,8 @@ void Debug(Globals* globals)
   }
   if (0) // plot from csv file
   {
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv",
-                  "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv",
-                  "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
+    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
+    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
   if (0) // plot pen colors
   {
@@ -250,8 +246,7 @@ void Debug(Globals* globals)
       for (int x = 0; x < Nx; x++)
         Z[y][x] = sin((double)x * y / Nx / Ny * 100) * rand();
 
-    Plot1D::plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"},
-                 std::vector<std::string>{"y2a", "y2b"});
+    Plot1D::plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
     Plot2D::plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
   }
   if (0) // swind crop
