@@ -6,6 +6,8 @@ class Plot
 {
 public:
   static QPoint GetNewPlotPosition(WindowPlot* windowPlot);
+  static std::function<void(std::string)> OnClose;
+  static void CloseAll();
 
   static std::map<std::string, WindowPlot*> plots;
   static std::vector<QPen> pens;
@@ -61,15 +63,17 @@ public:
     bool mY2Log = false;
 
   private:
+    bool mInitialized = false;
     void PlotCoreReplot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
     void PlotCoreAdd(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
+    void Initialize(int ycnt, int y1cnt, int y2cnt);
   };
 
   class Plot2D
   {
   public:
     void Plot();
-
+    // TODO
   private:
   };
 };

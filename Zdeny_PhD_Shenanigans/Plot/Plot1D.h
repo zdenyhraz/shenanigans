@@ -9,8 +9,6 @@ using namespace Constants;
 class Plot1D
 {
 public:
-  static void CloseAll();
-
   static void Reset(std::string name);
 
   // x - y add data
@@ -88,8 +86,6 @@ public:
                        std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring, std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring);
 
 private:
-  static std::function<void(std::string)> OnClose;
-
   static void SetupGraph(WindowPlot* windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string>& y1names,
                          std::vector<std::string>& y2names, std::vector<QPen> pens);
 
