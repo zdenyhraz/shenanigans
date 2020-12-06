@@ -76,24 +76,24 @@ Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
 {
 }
 
-void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y)
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot)
 {
-  PlotCore(x, {y}, {});
+  PlotCore(x, {y}, {}, newplot);
 }
 
-void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys)
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot)
 {
-  PlotCore(x, ys, {});
+  PlotCore(x, ys, {}, newplot);
 }
 
-void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2)
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot)
 {
-  PlotCore(x, {y1}, {y2});
+  PlotCore(x, {y1}, {y2}, newplot);
 }
 
-void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
 {
-  PlotCore(x, y1s, y2s);
+  PlotCore(x, y1s, y2s, newplot);
 }
 
 void Plot::Plot1D::Plot(double x, double y)
@@ -116,16 +116,19 @@ void Plot::Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vec
   PlotCore(x, y1s, y2s);
 }
 
-void Plot::Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
+void Plot::Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
 {
+  if (newplot)
+    mCounter++;
+
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  if (!mInitialized)
+  if (!mInitialized || newplot)
     Initialize(ycnt, y1cnt, y2cnt);
 
-  WindowPlot* windowPlot = plots[mName];
+  WindowPlot* windowPlot = plots[GetName()];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -153,7 +156,7 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
   if (!mInitialized)
     Initialize(ycnt, y1cnt, y2cnt);
 
-  WindowPlot* windowPlot = plots[mName];
+  WindowPlot* windowPlot = plots[GetName()];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -176,7 +179,7 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
 
 void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
-  auto idx = plots.find(mName);
+  auto idx = plots.find(GetName());
   if (idx != plots.end())
   {
     Reset();
@@ -184,9 +187,9 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     return;
   }
 
-  auto windowPlot = new WindowPlot(mName, 1.3, OnClose);
+  auto windowPlot = new WindowPlot(GetName(), 1.3, OnClose);
   windowPlot->move(GetNewPlotPosition(windowPlot));
-  plots[mName] = windowPlot;
+  plots[GetName()] = windowPlot;
   auto& plot = windowPlot->ui.widget;
 
   plot->xAxis->setTickLabelFont(fontTicks);
@@ -281,13 +284,18 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
   mInitialized = true;
 }
 
+std::string Plot::Plot1D::GetName()
+{
+  return mCounter > 0 ? fmt::format("{}:{}", mName, mCounter) : mName;
+}
+
 void Plot::Plot1D::Reset()
 {
-  auto idx = plots.find(mName);
+  auto idx = plots.find(GetName());
   if (idx == plots.end())
     return;
 
-  LOG_DEBUG("Resetting plot {}", mName);
+  LOG_DEBUG("Resetting plot {}", GetName());
   WindowPlot* windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
 
