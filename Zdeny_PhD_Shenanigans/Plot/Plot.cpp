@@ -19,9 +19,7 @@ QColor Plot::green(118.830, 171.870, 47.940);
 QColor Plot::cyan(76.755, 189.975, 237.915);
 QColor Plot::red(161.925, 19.890, 46.920);
 
-QPen Plot::defaultpen(blue, pt);
-
-std::vector<QPen> Plot::defaultpens{
+std::vector<QPen> Plot::pens{
     QPen(blue, pt), QPen(orange, pt), QPen(green, pt), QPen(magenta, pt), QPen(red, pt), QPen(black, pt), QPen(cyan, pt),
 };
 

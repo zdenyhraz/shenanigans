@@ -5,14 +5,14 @@
 class Plot
 {
 public:
+  static QPoint GetNewPlotPosition(WindowPlot* windowPlot);
+
   static std::map<std::string, WindowPlot*> plots;
   static QFont fontTicks;
   static QFont fontLabels;
   static QFont fontLegend;
   static double pt;
-  static QPoint GetNewPlotPosition(WindowPlot* windowPlot);
-  static std::vector<QPen> defaultpens;
-  static QPen defaultpen;
+  static std::vector<QPen> pens;
 
   // matlab plot colors
   static QColor black;

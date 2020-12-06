@@ -266,7 +266,7 @@ void WindowDiffrot::movingPeak()
 
   destroyAllWindows();
 
-  Plot1D::plot(dts, shiftsX, "shiftsX", "time step [min]", "west-east image shift [px]", {}, Plot::defaultpens, ipcset.savedir + "plot.png");
+  Plot1D::plot(dts, shiftsX, "shiftsX", "time step [min]", "west-east image shift [px]", {}, Plot::pens, ipcset.savedir + "plot.png");
 }
 
 FitsTime WindowDiffrot::GetStartFitsTime()

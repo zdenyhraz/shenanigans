@@ -13,7 +13,7 @@ void PlotCSV::plot(const std::string &path, const std::string &savepath)
   std::string plotname = std::string("csv plot ") + to_string(counter);
   std::string ylabel = "";
 
-  Plot1D::plot(x, ys, plotname, xlabel, ylabel, ylabels, Plot::defaultpens, savepath);
+  Plot1D::plot(x, ys, plotname, xlabel, ylabel, ylabels, Plot::pens, savepath);
   counter++;
 }
 
