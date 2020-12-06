@@ -89,11 +89,8 @@ try
       mPlotObj = std::make_unique<Plot::Plot1D>("EvolutionObj");
       mPlotObj->mXlabel = "generation";
       mPlotObj->mY1label = "error";
-      mPlotObj->mY2label = "log error";
-      mPlotObj->mY1names = {"best"};
-      mPlotObj->mY2names = {"log best"};
+      mPlotObj->mY1names = {"obj", "valid"};
     }
-
     if (mPlotDiff)
     {
       mPlotDiff->Reset();
@@ -107,18 +104,6 @@ try
       mPlotDiff->mY1names = {"absdiff"};
       mPlotDiff->mY2names = {"reldiff", "reldiff max"};
       mPlotDiff->mPens = {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)};
-    }
-
-    if (mPlotValid)
-    {
-      mPlotValid->Reset();
-    }
-    else
-    {
-      mPlotValid = std::make_unique<Plot::Plot1D>("EvolutionValid");
-      mPlotValid->mXlabel = "generation";
-      mPlotValid->mY1label = "error";
-      mPlotValid->mY1names = {"obj", "valid"};
     }
   }
 
@@ -188,9 +173,8 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 
   if (mPlotOutput)
   {
-    mPlotObj->Plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)});
+    mPlotObj->Plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
     mPlotDiff->Plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold});
-    mPlotValid->Plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
   }
 }
 
