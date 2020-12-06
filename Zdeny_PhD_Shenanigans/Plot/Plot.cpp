@@ -27,6 +27,7 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
 {
   int w = 0;
   int h = 0;
+
   for (auto& plot : plots)
   {
     if (w + plot.second->width() > QApplication::desktop()->width())
@@ -125,7 +126,7 @@ void Plot::Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std:
     Initialize(ycnt, y1cnt, y2cnt);
 
   WindowPlot* windowPlot = plots[mName];
-  auto plot = windowPlot->ui.widget;
+  auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
   {
@@ -153,7 +154,7 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
     Initialize(ycnt, y1cnt, y2cnt);
 
   WindowPlot* windowPlot = plots[mName];
-  auto plot = windowPlot->ui.widget;
+  auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
   {
@@ -186,7 +187,7 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
   auto windowPlot = new WindowPlot(mName, 1.3, OnClose);
   windowPlot->move(GetNewPlotPosition(windowPlot));
   plots[mName] = windowPlot;
-  auto plot = windowPlot->ui.widget;
+  auto& plot = windowPlot->ui.widget;
 
   plot->xAxis->setTickLabelFont(fontTicks);
   plot->yAxis->setTickLabelFont(fontTicks);
@@ -288,7 +289,7 @@ void Plot::Plot1D::Reset()
 
   LOG_DEBUG("Resetting plot {}", mName);
   WindowPlot* windowPlot = idx->second;
-  auto plot = windowPlot->ui.widget;
+  auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < plot->graphCount(); i++)
     plot->graph(i)->data().data()->clear();
@@ -302,25 +303,28 @@ Plot::Plot2D::Plot2D(const std::string& name) : mName(name)
 {
 }
 
-void Plot::Plot2D::Plot(const Mat& z)
+void Plot::Plot2D::Plot(const Mat& z, bool newplot)
 {
   std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
   for (int r = 0; r < z.rows; r++)
     for (int c = 0; c < z.cols; c++)
       zv[r][c] = z.at<float>(r, c);
 
-  PlotCore(zv);
+  PlotCore(zv, newplot);
 }
 
-void Plot::Plot2D::Plot(const std::vector<std::vector<double>>& z)
+void Plot::Plot2D::Plot(const std::vector<std::vector<double>>& z, bool newplot)
 {
-  PlotCore(z);
+  PlotCore(z, newplot);
 }
 
-void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
+void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newplot)
 {
-  if (!mInitialized)
-    Initialize(z[0].size(), z.size());
+  if (newplot)
+    mCounter++;
+
+  if (!mInitialized || newplot)
+    Initialize(z[0].size(), z.size(), newplot);
 
   WindowPlot* windowPlot = plots[mName];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
@@ -339,24 +343,23 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot::Plot2D::Initialize(int xcnt, int ycnt)
+void Plot::Plot2D::Initialize(int xcnt, int ycnt, bool newplot)
 {
-  auto idx = plots.find(mName);
+  auto idx = newplot ? plots.find(fmt::format("{}:{}", mName, mCounter)) : plots.find(mName);
   if (idx != plots.end())
   {
-    auto windowPlot = idx->second;
-    windowPlot->ui.widget->graph(0)->data().clear();
+    Reset();
     mInitialized = true;
     return;
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
-  auto windowPlot = new WindowPlot(mName, colRowRatio, Plot::OnClose);
+  auto windowPlot = new WindowPlot(mName, colRowRatio, OnClose);
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
   plots[mName] = windowPlot;
-  auto plot = windowPlot->ui.widget;
-  auto colorMap = windowPlot->colorMap;
-  auto colorScale = windowPlot->colorScale;
+  auto& plot = windowPlot->ui.widget;
+  auto& colorMap = windowPlot->colorMap;
+  auto& colorScale = windowPlot->colorScale;
 
   plot->addGraph();
   plot->axisRect()->setupFullAxesBox(true);
@@ -384,6 +387,20 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   plot->yAxis->setLabelFont(Plot::fontLabels);
   plot->yAxis->setRangeReversed(false);
   colorScale->axis()->setLabelFont(Plot::fontLabels);
+
   windowPlot->show();
   QCoreApplication::processEvents();
+  mInitialized = true;
+}
+
+void Plot::Plot2D::Reset()
+{
+  auto idx = plots.find(mName);
+  if (idx == plots.end())
+    return;
+
+  LOG_DEBUG("Resetting plot {}", mName);
+  WindowPlot* windowPlot = idx->second;
+  auto& plot = windowPlot->ui.widget;
+  plot->graph(0)->data().clear();
 }
