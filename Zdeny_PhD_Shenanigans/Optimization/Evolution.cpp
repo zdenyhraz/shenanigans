@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Evolution.h"
-#include "Plot/Plot1D.h"
+#include "Plot/Plot.h"
 
 Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(7 * N){};
 
@@ -80,9 +80,46 @@ try
 
   if (mPlotOutput)
   {
-    Plot1D::Reset("Evolution");
-    Plot1D::Reset("EvolutionDiff");
-    Plot1D::Reset("EvolutionValid");
+    if (mPlotObj)
+    {
+      mPlotObj->Reset();
+    }
+    else
+    {
+      mPlotObj = std::make_unique<Plot::Plot1D>("EvolutionObj");
+      mPlotObj->mXlabel = "generation";
+      mPlotObj->mY1label = "error";
+      mPlotObj->mY2label = "log error";
+      mPlotObj->mY1names = {"best"};
+      mPlotObj->mY2names = {"log best"};
+    }
+
+    if (mPlotDiff)
+    {
+      mPlotDiff->Reset();
+    }
+    else
+    {
+      mPlotDiff = std::make_unique<Plot::Plot1D>("EvolutionDiff");
+      mPlotDiff->mXlabel = "generation";
+      mPlotDiff->mY1label = "best-average absolute difference";
+      mPlotDiff->mY2label = "best-average relative difference";
+      mPlotDiff->mY1names = {"absdiff"};
+      mPlotDiff->mY2names = {"reldiff", "reldiff max"};
+      mPlotDiff->mPens = {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)};
+    }
+
+    if (mPlotValid)
+    {
+      mPlotValid->Reset();
+    }
+    else
+    {
+      mPlotValid = std::make_unique<Plot::Plot1D>("EvolutionValid");
+      mPlotValid->mXlabel = "generation";
+      mPlotValid->mY1label = "error";
+      mPlotValid->mY1names = {"obj", "valid"};
+    }
   }
 
   LOG_SUCC("Outputs initialized");
@@ -151,10 +188,9 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 
   if (mPlotOutput)
   {
-    Plot1D::plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)}, "Evolution", "generation", "error", "log error", {"best"}, {"log best"}, Plot::pens);
-    Plot1D::plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold}, "EvolutionDiff", "generation", "best-average absolute difference",
-                 "best-average relative difference", {"absdiff"}, {"reldiff", "reldiff max"}, {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)});
-    Plot1D::plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))}, "EvolutionValid", "generation", "error", {"obj", "valid"}, Plot::pens);
+    mPlotObj->Plot(gen, {population.bestEntity.fitness}, {log(population.bestEntity.fitness)});
+    mPlotDiff->Plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold});
+    mPlotValid->Plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
   }
 }
 

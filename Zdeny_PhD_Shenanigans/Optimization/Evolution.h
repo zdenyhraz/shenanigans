@@ -101,4 +101,7 @@ private:
   std::string mOutputFileDir;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
+  std::unique_ptr<Plot::Plot1D> mPlotObj;
+  std::unique_ptr<Plot::Plot1D> mPlotDiff;
+  std::unique_ptr<Plot::Plot1D> mPlotValid;
 };

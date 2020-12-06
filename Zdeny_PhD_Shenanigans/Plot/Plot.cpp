@@ -241,8 +241,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
         windowPlot->ui.widget->graph(i)->setName(QString::fromStdString("y2_" + to_string(i - y1cnt + 1)));
     }
 
-    if (i < pens.size())
-      windowPlot->ui.widget->graph(i)->setPen(pens[i]);
+    if (i < mPens.size())
+      windowPlot->ui.widget->graph(i)->setPen(mPens[i]);
     else
       windowPlot->ui.widget->graph(i)->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
   }

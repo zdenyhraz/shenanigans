@@ -49,6 +49,8 @@ public:
     void Plot(double x, double y1, double y2);
     void Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
 
+    void Reset();
+
     std::string mName = "plot";
     std::string mXlabel = "x";
     std::string mY1label = "y";
@@ -66,7 +68,6 @@ public:
     void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
     void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
     void Initialize(int ycnt, int y1cnt, int y2cnt);
-    void Reset();
 
     bool mInitialized = false;
   };
