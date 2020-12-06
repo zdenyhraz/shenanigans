@@ -76,8 +76,28 @@ public:
   class Plot2D
   {
   public:
-    void Plot();
-    // TODO
+    Plot2D(const std::string& name);
+
+    void Plot(const Mat& z);
+    void Plot(const std::vector<std::vector<double>>& z);
+
+    std::string mName = "plot";
+    std::string mXlabel = "x";
+    std::string mYlabel = "y";
+    std::string mZlabel = "z";
+    double mXmin = 0;
+    double mXmax = 1;
+    double mYmin = 0;
+    double mYmax = 1;
+    double mColRowRatio = 0;
+    std::string mSavepath = {};
+    bool mShowAxisLabels = false;
+    QCPColorGradient mColormapType = QCPColorGradient::gpJet;
+
   private:
+    void PlotCore(const std::vector<std::vector<double>>& z);
+    void Initialize(int xcnt, int ycnt);
+
+    bool mInitialized = false;
   };
 };
