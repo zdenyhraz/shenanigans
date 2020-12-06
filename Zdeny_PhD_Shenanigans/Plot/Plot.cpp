@@ -244,7 +244,13 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     if (i < mPens.size())
       windowPlot->ui.widget->graph(i)->setPen(mPens[i]);
     else
-      windowPlot->ui.widget->graph(i)->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      windowPlot->ui.widget->graph(i)->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+    if (mScatter)
+    {
+      windowPlot->ui.widget->graph(i)->setLineStyle(QCPGraph::lsNone);
+      windowPlot->ui.widget->graph(i)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    }
   }
 
   if (y2cnt > 0)

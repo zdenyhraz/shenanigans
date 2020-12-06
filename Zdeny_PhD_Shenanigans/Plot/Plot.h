@@ -63,6 +63,7 @@ public:
     LegendPosition mLegendPosition = LegendPosition::TopRight;
     bool mY1Log = false;
     bool mY2Log = false;
+    bool mScatter = false;
 
   private:
     void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
