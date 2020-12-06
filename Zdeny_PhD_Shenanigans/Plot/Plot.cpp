@@ -297,3 +297,93 @@ void Plot::Plot1D::Reset()
   plot->replot();
   windowPlot->show();
 }
+
+Plot::Plot2D::Plot2D(const std::string& name) : mName(name)
+{
+}
+
+void Plot::Plot2D::Plot(const Mat& z)
+{
+  std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
+  for (int r = 0; r < z.rows; r++)
+    for (int c = 0; c < z.cols; c++)
+      zv[r][c] = z.at<float>(r, c);
+
+  PlotCore(zv);
+}
+
+void Plot::Plot2D::Plot(const std::vector<std::vector<double>>& z)
+{
+  PlotCore(z);
+}
+
+void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
+{
+  if (!mInitialized)
+    Initialize(z[0].size(), z.size());
+
+  WindowPlot* windowPlot = plots[mName];
+  windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
+  windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
+  for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
+    for (int yIndex = 0; yIndex < z.size(); ++yIndex)
+      windowPlot->colorMap->data()->setCell(xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex]);
+
+  windowPlot->ui.widget->rescaleAxes();
+  windowPlot->colorMap->rescaleDataRange(true);
+  windowPlot->colorScale->rescaleDataRange(false);
+  windowPlot->ui.widget->replot();
+  windowPlot->show();
+
+  if (mSavepath.length() > 0)
+    windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
+}
+
+void Plot::Plot2D::Initialize(int xcnt, int ycnt)
+{
+  auto idx = plots.find(mName);
+  if (idx != plots.end())
+  {
+    auto windowPlot = idx->second;
+    windowPlot->ui.widget->graph(0)->data().clear();
+    mInitialized = true;
+    return;
+  }
+
+  double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
+  auto windowPlot = new WindowPlot(mName, colRowRatio, Plot::OnClose);
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
+  plots[mName] = windowPlot;
+  auto plot = windowPlot->ui.widget;
+  auto colorMap = windowPlot->colorMap;
+  auto colorScale = windowPlot->colorScale;
+
+  plot->addGraph();
+  plot->axisRect()->setupFullAxesBox(true);
+  colorMap = new QCPColorMap(plot->xAxis, plot->yAxis);
+  plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+  colorScale = new QCPColorScale(plot);
+  plot->plotLayout()->addElement(0, 1, colorScale);
+  colorScale->setType(QCPAxis::atRight);
+  colorMap->setColorScale(colorScale);
+  if (mShowAxisLabels)
+  {
+    plot->xAxis->setLabel(QString::fromStdString(mXlabel));
+    plot->yAxis->setLabel(QString::fromStdString(mYlabel));
+    colorScale->axis()->setLabel(QString::fromStdString(mZlabel));
+  }
+  colorMap->setGradient(mColormapType);
+  windowPlot->marginGroup = new QCPMarginGroup(plot);
+  plot->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
+  colorMap->setInterpolate(true);
+  plot->xAxis->setTickLabelFont(Plot::fontTicks);
+  plot->yAxis->setTickLabelFont(Plot::fontTicks);
+  colorScale->axis()->setTickLabelFont(Plot::fontTicks);
+  plot->xAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis->setRangeReversed(false);
+  colorScale->axis()->setLabelFont(Plot::fontLabels);
+  windowPlot->show();
+  QCoreApplication::processEvents();
+}
