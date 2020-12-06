@@ -107,6 +107,7 @@ try
       mPlotDiff->mY1names = {"absdiff"};
       mPlotDiff->mY2names = {"reldiff", "reldiff max"};
       mPlotDiff->mPens = {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)};
+      mPlotDiff->mScatter = true;
     }
 
     if (mPlotValid)
