@@ -52,3 +52,47 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
 
   return QPoint(w, h);
 }
+
+Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
+{
+}
+
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y)
+{
+}
+
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys)
+{
+}
+
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2)
+{
+}
+
+void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
+{
+}
+
+void Plot::Plot1D::Plot(double x, double y)
+{
+}
+
+void Plot::Plot1D::Plot(double x, const std::vector<double>& ys)
+{
+}
+
+void Plot::Plot1D::Plot(double x, double y1, double y2)
+{
+}
+
+void Plot::Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
+{
+}
+
+void Plot::Plot1D::PlotCoreReplot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
+{
+}
+
+void Plot::Plot1D::PlotCoreAdd(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
+{
+}
