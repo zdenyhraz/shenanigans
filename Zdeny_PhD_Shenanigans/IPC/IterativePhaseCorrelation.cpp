@@ -429,8 +429,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
     // clang-format off
-	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindows.png");
-	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::defaultpens, mDebugDirectory + "/1DWindowsDFT.png");
+	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
+	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindowsDFT.png");
 	Plot2D::plot(Fourier::fftlogmagn(r0), "w2", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
 	Plot2D::plot(Fourier::fftlogmagn(w0), "w3", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
 	Plot2D::plot(img, "w4", "x", "y", "image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImage.png");
@@ -469,8 +469,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
     // clang-format off
-    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"Rect","Gauss"}, Plot::defaultpens, mDebugDirectory + "/1DBandpass.png");
-    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"Rect","Gauss"}, Plot::defaultpens, mDebugDirectory + "/1DBandpassIDFT.png");
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"Rect","Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"Rect","Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpassIDFT.png");
     Plot2D::plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png");
     Plot2D::plot(bpG, "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png");
 	Plot2D::plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
