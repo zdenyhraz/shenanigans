@@ -54,20 +54,20 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
 }
 
 std::function<void(std::string)> Plot::OnClose = [](std::string name) {
-  auto idx = Plot::plots.find(name);
-  if (idx != Plot::plots.end())
+  auto idx = plots.find(name);
+  if (idx != plots.end())
   {
     delete idx->second;
-    Plot::plots.erase(idx);
+    plots.erase(idx);
   }
 };
 
 void Plot::CloseAll()
 {
-  for (auto& plt : Plot::plots)
+  for (auto& plt : plots)
   {
     delete plt.second;
-    Plot::plots.erase(plt.first);
+    plots.erase(plt.first);
   }
 }
 
@@ -77,45 +77,45 @@ Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y)
 {
-  PlotCoreReplot(x, {y}, {});
+  PlotCore(x, {y}, {});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys)
 {
-  PlotCoreReplot(x, ys, {});
+  PlotCore(x, ys, {});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2)
 {
-  PlotCoreReplot(x, {y1}, {y2});
+  PlotCore(x, {y1}, {y2});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
 {
-  PlotCoreReplot(x, y1s, y2s);
+  PlotCore(x, y1s, y2s);
 }
 
 void Plot::Plot1D::Plot(double x, double y)
 {
-  PlotCoreAdd(x, {y}, {});
+  PlotCore(x, {y}, {});
 }
 
 void Plot::Plot1D::Plot(double x, const std::vector<double>& ys)
 {
-  PlotCoreAdd(x, ys, {});
+  PlotCore(x, ys, {});
 }
 
 void Plot::Plot1D::Plot(double x, double y1, double y2)
 {
-  PlotCoreAdd(x, {y1}, {y2});
+  PlotCore(x, {y1}, {y2});
 }
 
 void Plot::Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
 {
-  PlotCoreAdd(x, y1s, y2s);
+  PlotCore(x, y1s, y2s);
 }
 
-void Plot::Plot1D::PlotCoreReplot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
+void Plot::Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
 {
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
@@ -124,7 +124,7 @@ void Plot::Plot1D::PlotCoreReplot(const std::vector<double>& x, const std::vecto
   if (!mInitialized)
     Initialize(ycnt, y1cnt, y2cnt);
 
-  WindowPlot* windowPlot = Plot::plots[mName];
+  WindowPlot* windowPlot = plots[mName];
 
   for (int i = 0; i < ycnt; i++)
   {
@@ -138,32 +138,55 @@ void Plot::Plot1D::PlotCoreReplot(const std::vector<double>& x, const std::vecto
   windowPlot->ui.widget->replot();
   windowPlot->show();
 
-  if (mSavepath != std::string{})
+  if (mSavepath.length() > 0)
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot::Plot1D::PlotCoreAdd(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
+void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
 {
+  int y1cnt = y1s.size();
+  int y2cnt = y2s.size();
+  int ycnt = y1cnt + y2cnt;
+
+  if (!mInitialized)
+    Initialize(ycnt, y1cnt, y2cnt);
+
+  WindowPlot* windowPlot = plots[mName];
+
+  for (int i = 0; i < ycnt; i++)
+  {
+    if (i < y1cnt)
+      windowPlot->ui.widget->graph(i)->addData(x, y1s[i]);
+    else
+      windowPlot->ui.widget->graph(i)->addData(x, y2s[i - y1cnt]);
+  }
+
+  windowPlot->ui.widget->rescaleAxes();
+  windowPlot->ui.widget->replot();
+  windowPlot->show();
+
+  if (mSavepath.length() > 0)
+    windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
 void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
   WindowPlot* windowPlot = new WindowPlot(mName, 1.3, OnClose);
-  windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
-  Plot::plots[mName] = windowPlot;
+  windowPlot->move(GetNewPlotPosition(windowPlot));
+  plots[mName] = windowPlot;
 
-  windowPlot->ui.widget->xAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->yAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->yAxis2->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->xAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis2->setLabelFont(Plot::fontLabels);
+  windowPlot->ui.widget->xAxis->setTickLabelFont(fontTicks);
+  windowPlot->ui.widget->yAxis->setTickLabelFont(fontTicks);
+  windowPlot->ui.widget->yAxis2->setTickLabelFont(fontTicks);
+  windowPlot->ui.widget->xAxis->setLabelFont(fontLabels);
+  windowPlot->ui.widget->yAxis->setLabelFont(fontLabels);
+  windowPlot->ui.widget->yAxis2->setLabelFont(fontLabels);
   windowPlot->ui.widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
   windowPlot->ui.widget->xAxis->setLabel(QString::fromStdString(mXlabel));
   windowPlot->ui.widget->yAxis->setLabel(QString::fromStdString(mY1label));
   windowPlot->ui.widget->yAxis2->setLabel(QString::fromStdString(mY2label));
   windowPlot->ui.widget->legend->setVisible(mLegend && ycnt > 1);
-  windowPlot->ui.widget->legend->setFont(Plot::fontLegend);
+  windowPlot->ui.widget->legend->setFont(fontLegend);
 
   switch (mLegendPosition)
   {
@@ -230,4 +253,20 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
   windowPlot->show();
   QCoreApplication::processEvents();
   mInitialized = true;
+}
+
+void Plot::Plot1D::Reset()
+{
+  auto idx = plots.find(mName);
+  if (idx != plots.end())
+  {
+    LOG_DEBUG("Reseting 1Dplot '{}'", mName);
+    WindowPlot* windowPlot = idx->second;
+    for (int i = 0; i < windowPlot->ui.widget->graphCount(); i++)
+      windowPlot->ui.widget->graph(i)->data().data()->clear();
+
+    windowPlot->ui.widget->rescaleAxes();
+    windowPlot->ui.widget->replot();
+    windowPlot->show();
+  }
 }

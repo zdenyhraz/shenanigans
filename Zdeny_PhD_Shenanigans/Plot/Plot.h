@@ -63,10 +63,12 @@ public:
     bool mY2Log = false;
 
   private:
-    bool mInitialized = false;
-    void PlotCoreReplot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
-    void PlotCoreAdd(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
+    void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
+    void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
     void Initialize(int ycnt, int y1cnt, int y2cnt);
+    void Reset();
+
+    bool mInitialized = false;
   };
 
   class Plot2D
