@@ -2,26 +2,8 @@
 #include "Plot2D.h"
 #include "Plot1D.h"
 
-std::function<void(std::string)> Plot2D::OnClose = [](std::string name) {
-  auto idx = Plot::plots.find(name);
-  if (idx != Plot::plots.end())
-  {
-    delete idx->second;
-    Plot::plots.erase(idx);
-  }
-};
-
-void Plot2D::CloseAll()
-{
-  for (auto& plt : Plot::plots)
-  {
-    delete plt.second;
-    Plot::plots.erase(plt.first);
-  }
-}
-
-void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel,
-                      double xmin, double xmax, double ymin, double ymax, double colRowRatio, std::string savepath)
+void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax,
+                      double colRowRatio, std::string savepath)
 {
   WindowPlot* windowPlot;
   auto idx = Plot::plots.find(name);
@@ -35,7 +17,7 @@ void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string nam
     if (colRowRatio == 0)
       colRowRatio = (double)z[0].size() / z.size();
 
-    windowPlot = new WindowPlot(name, colRowRatio, OnClose);
+    windowPlot = new WindowPlot(name, colRowRatio, Plot::OnClose);
     windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
     Plot::plots[name] = windowPlot;
     SetupGraph(windowPlot, xlabel, ylabel, zlabel);
