@@ -175,7 +175,15 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
 
 void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
-  WindowPlot* windowPlot = new WindowPlot(mName, 1.3, OnClose);
+  auto idx = plots.find(mName);
+  if (idx != plots.end())
+  {
+    Reset();
+    mInitialized = true;
+    return;
+  }
+
+  auto windowPlot = new WindowPlot(mName, 1.3, OnClose);
   windowPlot->move(GetNewPlotPosition(windowPlot));
   plots[mName] = windowPlot;
   auto plot = windowPlot->ui.widget;
@@ -234,6 +242,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     if (i < y1cnt)
     {
       plot->addGraph(plot->xAxis, plot->yAxis);
+      graph = plot->graph(i);
+
       if (mY1names.size() > i)
         graph->setName(QString::fromStdString(mY1names[i]));
       else
@@ -242,6 +252,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     else
     {
       plot->addGraph(plot->xAxis, plot->yAxis2);
+      graph = plot->graph(i);
+
       if (mY2names.size() > i - y1cnt)
         graph->setName(QString::fromStdString(mY2names[i - y1cnt]));
       else
@@ -271,17 +283,17 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 void Plot::Plot1D::Reset()
 {
   auto idx = plots.find(mName);
-  if (idx != plots.end())
-  {
-    LOG_DEBUG("Reseting 1Dplot '{}'", mName);
-    WindowPlot* windowPlot = idx->second;
-    auto plot = windowPlot->ui.widget;
+  if (idx == plots.end())
+    return;
 
-    for (int i = 0; i < plot->graphCount(); i++)
-      plot->graph(i)->data().data()->clear();
+  LOG_DEBUG("Resetting plot {}", mName);
+  WindowPlot* windowPlot = idx->second;
+  auto plot = windowPlot->ui.widget;
 
-    plot->rescaleAxes();
-    plot->replot();
-    windowPlot->show();
-  }
+  for (int i = 0; i < plot->graphCount(); i++)
+    plot->graph(i)->data().data()->clear();
+
+  plot->rescaleAxes();
+  plot->replot();
+  windowPlot->show();
 }
