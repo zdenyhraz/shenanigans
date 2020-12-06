@@ -39,10 +39,10 @@ public:
   public:
     Plot1D(const std::string& name);
 
-    void Plot(const std::vector<double>& x, const std::vector<double>& y);
-    void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys);
-    void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2);
-    void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
+    void Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot = true);
+    void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot = true);
+    void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot = true);
+    void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot = true);
 
     void Plot(double x, double y);
     void Plot(double x, const std::vector<double>& ys);
@@ -64,11 +64,13 @@ public:
     bool mY1Log = false;
     bool mY2Log = false;
     bool mScatter = false;
+    size_t mCounter = 0;
 
   private:
-    void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s);
+    void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot);
     void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
     void Initialize(int ycnt, int y1cnt, int y2cnt);
+    std::string GetName();
 
     bool mInitialized = false;
   };
