@@ -81,7 +81,7 @@ WindowPlot* Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cn
   {
     Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
     windowPlot = Plot::plots[name].get();
-    windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
+    windowPlot->move(Plot::GetNewPlotPosition(windowPlot, name));
     SetupGraph(windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens);
   }
   return windowPlot;

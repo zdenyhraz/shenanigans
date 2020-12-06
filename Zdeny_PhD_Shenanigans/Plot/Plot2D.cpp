@@ -19,7 +19,7 @@ void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string nam
 
     Plot::plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, Plot::OnClose);
     windowPlot = Plot::plots[name].get();
-    windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
+    windowPlot->move(Plot::GetNewPlotPosition(windowPlot, name));
     SetupGraph(windowPlot, xlabel, ylabel, zlabel);
   }
 

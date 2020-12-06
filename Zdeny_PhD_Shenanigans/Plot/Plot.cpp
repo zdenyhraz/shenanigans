@@ -23,13 +23,18 @@ std::vector<QPen> Plot::pens{
     QPen(blue, pt), QPen(orange, pt), QPen(green, pt), QPen(magenta, pt), QPen(red, pt), QPen(black, pt), QPen(cyan, pt),
 };
 
-QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
+QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
 {
   int w = 0;
   int h = 0;
+  std::string plotNames;
 
-  for (const auto& [name, plot] : plots)
+  for (const auto& [plotname, plot] : plots)
   {
+    if (plotname == name)
+      continue;
+
+    plotNames += fmt::format("{}, ", plotname);
     if (w + plot->width() > QApplication::desktop()->width())
     {
       w = plot->width();
@@ -51,7 +56,7 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
       h = 0;
   }
 
-  LOG_DEBUG("New plot position = [{},{}], new plot is in {}. place", w, h, plots.size() + 1);
+  LOG_DEBUG("New plot position = [{},{}], plot is in {}. place ({})", w, h, plots.size() + 1, plotNames);
   return QPoint(w, h);
 }
 
@@ -183,9 +188,10 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     return;
   }
 
+  LOG_DEBUG("Initializing plot {}", name);
   plots[name] = std::make_unique<WindowPlot>(name, 1.3, OnClose);
   auto& windowPlot = plots[name];
-  windowPlot->move(GetNewPlotPosition(windowPlot.get()));
+  windowPlot->move(GetNewPlotPosition(windowPlot.get(), name));
   auto& plot = windowPlot->ui.widget;
 
   plot->xAxis->setTickLabelFont(fontTicks);
@@ -362,7 +368,7 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
   plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, OnClose);
   auto& windowPlot = plots[name];
-  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get()));
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
 
   auto& plot = windowPlot->ui.widget;
   auto& colorMap = windowPlot->colorMap;
