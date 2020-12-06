@@ -51,6 +51,7 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
       h = 0;
   }
 
+  LOG_DEBUG("New plot position = [{},{}], new plot is in {}. place", w, h, plots.size() + 1);
   return QPoint(w, h);
 }
 
@@ -173,7 +174,8 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
 
 void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
-  auto idx = plots.find(GetName());
+  auto name = GetName();
+  auto idx = plots.find(name);
   if (idx != plots.end())
   {
     Reset();
@@ -181,8 +183,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     return;
   }
 
-  plots[GetName()] = std::make_unique<WindowPlot>(GetName(), 1.3, OnClose);
-  auto& windowPlot = plots[GetName()];
+  plots[name] = std::make_unique<WindowPlot>(name, 1.3, OnClose);
+  auto& windowPlot = plots[name];
   windowPlot->move(GetNewPlotPosition(windowPlot.get()));
   auto& plot = windowPlot->ui.widget;
 
@@ -285,11 +287,12 @@ std::string Plot::Plot1D::GetName()
 
 void Plot::Plot1D::Reset()
 {
-  auto idx = plots.find(GetName());
+  auto name = GetName();
+  auto idx = plots.find(name);
   if (idx == plots.end())
     return;
 
-  LOG_DEBUG("Resetting plot {}", GetName());
+  LOG_DEBUG("Resetting plot {}", name);
   auto& windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
 
@@ -347,7 +350,8 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
 
 void Plot::Plot2D::Initialize(int xcnt, int ycnt)
 {
-  auto idx = plots.find(GetName());
+  auto name = GetName();
+  auto idx = plots.find(name);
   if (idx != plots.end())
   {
     Reset();
@@ -356,8 +360,8 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
-  plots[GetName()] = std::make_unique<WindowPlot>(GetName(), colRowRatio, OnClose);
-  auto& windowPlot = plots[GetName()];
+  plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, OnClose);
+  auto& windowPlot = plots[name];
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get()));
 
   auto& plot = windowPlot->ui.widget;
@@ -403,11 +407,12 @@ std::string Plot::Plot2D::GetName()
 
 void Plot::Plot2D::Reset()
 {
-  auto idx = plots.find(GetName());
+  auto name = GetName();
+  auto idx = plots.find(name);
   if (idx == plots.end())
     return;
 
-  LOG_DEBUG("Resetting plot {}", GetName());
+  LOG_DEBUG("Resetting plot {}", name);
   auto& windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
   plot->graph(0)->data().clear();
