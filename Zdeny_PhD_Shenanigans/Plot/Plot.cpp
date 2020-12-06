@@ -268,7 +268,7 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     if (mScatter)
     {
       graph->setLineStyle(QCPGraph::lsNone);
-      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, pt));
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, pt));
     }
   }
 
