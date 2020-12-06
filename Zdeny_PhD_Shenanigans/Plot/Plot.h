@@ -78,8 +78,8 @@ public:
   public:
     Plot2D(const std::string& name);
 
-    void Plot(const Mat& z);
-    void Plot(const std::vector<std::vector<double>>& z);
+    void Plot(const Mat& z, bool newplot = true);
+    void Plot(const std::vector<std::vector<double>>& z, bool newplot = true);
 
     std::string mName = "plot";
     std::string mXlabel = "x";
@@ -93,10 +93,12 @@ public:
     std::string mSavepath = {};
     bool mShowAxisLabels = false;
     QCPColorGradient mColormapType = QCPColorGradient::gpJet;
+    size_t mCounter = 0;
 
   private:
-    void PlotCore(const std::vector<std::vector<double>>& z);
-    void Initialize(int xcnt, int ycnt);
+    void PlotCore(const std::vector<std::vector<double>>& z, bool newplot);
+    void Initialize(int xcnt, int ycnt, bool newplot);
+    void Reset();
 
     bool mInitialized = false;
   };

@@ -63,8 +63,19 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::plot(image1, "image1");
-    Plot2D::plot(image2, "image2");
+    if (!mImagePlot)
+    {
+      mImagePlot = std::make_unique<Plot::Plot2D>("IPC image");
+      mImagePlot->mColormapType = QCPColorGradient::gpGrayscale;
+    }
+    if (!mSubregionPlot)
+    {
+      mSubregionPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
+      mSubregionPlot->mColormapType = QCPColorGradient::gpJet;
+    }
+
+    mImagePlot->Plot(image1);
+    mImagePlot->Plot(image2);
   }
 
   auto [dft1, dft2] = CalculateFourierTransforms(std::move(image1), std::move(image2));
@@ -75,7 +86,10 @@ try
   Point2f L3peak = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   if (mDebugMode)
-    Plot2D::plot(L3, "L3", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L3.png");
+  {
+    mSubregionPlot->mSavepath = mDebugDirectory + "/L3.png";
+    mSubregionPlot->Plot(L3);
+  }
 
   Point2f result = L3peak - L3mid;
   int L2size = mL2size;
@@ -90,7 +104,10 @@ try
   Mat L2 = CalculateL2(L3, L3peak, L2size);
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
-    Plot2D::plot(L2, "L2", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2.png");
+  {
+    mSubregionPlot->mSavepath = mDebugDirectory + "/L2.png";
+    mSubregionPlot->Plot(L2);
+  }
 
   // L2U
   Mat L2U = CalculateL2U(L2);
@@ -98,7 +115,8 @@ try
   Point2f L2Upeak;
   if (mDebugMode)
   {
-    Plot2D::plot(L2U, "L2U", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L2U.png");
+    mSubregionPlot->mSavepath = mDebugDirectory + "/L2U.png";
+    mSubregionPlot->Plot(L2U);
 
     if (0)
     {
@@ -123,7 +141,10 @@ try
     Point2f L1mid(L1size / 2, L1size / 2);
     Point2f L1peak;
     if (mDebugMode)
-      Plot2D::plot(CalculateL1(L2U, L2Upeak, L1size), "L1B", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1B.png");
+    {
+      mSubregionPlot->mSavepath = mDebugDirectory + "/L1B.png";
+      mSubregionPlot->Plot(CalculateL1(L2U, L2Upeak, L1size));
+    }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
     {
@@ -137,7 +158,10 @@ try
       if (AccuracyReached(L1peak, L1mid))
       {
         if (mDebugMode)
-          Plot2D::plot(L1, "L1A", "x", "y", "z", 0, 1, 0, 1, 0, mDebugDirectory + "/L1A.png");
+        {
+          mSubregionPlot->mSavepath = mDebugDirectory + "/L1A.png";
+          mSubregionPlot->Plot(L1);
+        }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
       }
@@ -442,7 +466,7 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   }
 
   // bandpass
-  if (1)
+  if (0)
   {
     Mat bpR = Mat::zeros(mRows, mCols, CV_32F);
     Mat bpG = Mat::zeros(mRows, mCols, CV_32F);
@@ -523,7 +547,7 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   }
 
   // 2 pic
-  if (0)
+  if (1)
   {
     Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
     Mat image1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
