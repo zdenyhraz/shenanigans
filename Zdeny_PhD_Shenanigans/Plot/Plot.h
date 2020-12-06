@@ -14,21 +14,13 @@ public:
   static std::vector<QPen> defaultpens;
   static QPen defaultpen;
 
-  // plot colors
-  static QColor blue;
+  // matlab plot colors
   static QColor black;
-  static QColor red;
+  static QColor blue;
   static QColor orange;
-  static QColor cyan;
+  static QColor yellow;
   static QColor magenta;
   static QColor green;
-
-  // matlab plot colors
-  static QColor matlabBlue;
-  static QColor matlabOrange;
-  static QColor matlabYellow;
-  static QColor matlabMagenta;
-  static QColor matlabGreen;
-  static QColor matlabCyan;
-  static QColor matlabRed;
+  static QColor cyan;
+  static QColor red;
 };
