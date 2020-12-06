@@ -59,34 +59,42 @@ Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y)
 {
+  PlotCoreReplot(x, {y}, {});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys)
 {
+  PlotCoreReplot(x, ys, {});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2)
 {
+  PlotCoreReplot(x, {y1}, {y2});
 }
 
 void Plot::Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
 {
+  PlotCoreReplot(x, y1s, y2s);
 }
 
 void Plot::Plot1D::Plot(double x, double y)
 {
+  PlotCoreAdd(x, {y}, {});
 }
 
 void Plot::Plot1D::Plot(double x, const std::vector<double>& ys)
 {
+  PlotCoreAdd(x, ys, {});
 }
 
 void Plot::Plot1D::Plot(double x, double y1, double y2)
 {
+  PlotCoreAdd(x, {y1}, {y2});
 }
 
 void Plot::Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
 {
+  PlotCoreAdd(x, y1s, y2s);
 }
 
 void Plot::Plot1D::PlotCoreReplot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
