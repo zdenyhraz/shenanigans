@@ -105,6 +105,7 @@ private:
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;
+  void InitializePlots() const;
 
   enum OptimizedParameters
   {
