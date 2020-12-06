@@ -27,14 +27,12 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
 {
   int w = 0;
   int h = 0;
-  std::string plotNames;
 
   for (const auto& [plotname, plot] : plots)
   {
     if (plotname == name)
       continue;
 
-    plotNames += fmt::format("{}, ", plotname);
     if (w + plot->width() > QApplication::desktop()->width())
     {
       w = plot->width();
@@ -56,7 +54,7 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
       h = 0;
   }
 
-  LOG_DEBUG("New plot position = [{},{}], plot is in {}. place ({})", w, h, plots.size() + 1, plotNames);
+  LOG_DEBUG("New plot position = [{},{}], plot is in {}. place", w, h, plots.size());
   return QPoint(w, h);
 }
 
