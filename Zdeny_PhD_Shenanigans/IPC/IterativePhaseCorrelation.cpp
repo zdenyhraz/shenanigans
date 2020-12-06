@@ -77,8 +77,8 @@ try
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   if (mDebugMode)
   {
-    mSubregionPlot->mSavepath = mDebugDirectory + "/L3.png";
-    mSubregionPlot->Plot(L3);
+    mColormapPlot->mSavepath = mDebugDirectory + "/L3.png";
+    mColormapPlot->Plot(L3);
   }
 
   Point2f result = L3peak - L3mid;
@@ -95,8 +95,8 @@ try
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
   {
-    mSubregionPlot->mSavepath = mDebugDirectory + "/L2.png";
-    mSubregionPlot->Plot(L2);
+    mColormapPlot->mSavepath = mDebugDirectory + "/L2.png";
+    mColormapPlot->Plot(L2);
   }
 
   // L2U
@@ -105,8 +105,8 @@ try
   Point2f L2Upeak;
   if (mDebugMode)
   {
-    mSubregionPlot->mSavepath = mDebugDirectory + "/L2U.png";
-    mSubregionPlot->Plot(L2U);
+    mColormapPlot->mSavepath = mDebugDirectory + "/L2U.png";
+    mColormapPlot->Plot(L2U);
 
     if (0)
     {
@@ -132,8 +132,8 @@ try
     Point2f L1peak;
     if (mDebugMode)
     {
-      mSubregionPlot->mSavepath = mDebugDirectory + "/L1B.png";
-      mSubregionPlot->Plot(CalculateL1(L2U, L2Upeak, L1size));
+      mColormapPlot->mSavepath = mDebugDirectory + "/L1B.png";
+      mColormapPlot->Plot(CalculateL1(L2U, L2Upeak, L1size));
     }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -149,8 +149,8 @@ try
       {
         if (mDebugMode)
         {
-          mSubregionPlot->mSavepath = mDebugDirectory + "/L1A.png";
-          mSubregionPlot->Plot(L1);
+          mColormapPlot->mSavepath = mDebugDirectory + "/L1A.png";
+          mColormapPlot->Plot(L1);
         }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
@@ -436,10 +436,10 @@ void IterativePhaseCorrelation::InitializePlots() const
     mImagePlot->mColormapType = QCPColorGradient::gpGrayscale;
   }
 
-  if (!mSubregionPlot)
+  if (!mColormapPlot)
   {
-    mSubregionPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
-    mSubregionPlot->mColormapType = QCPColorGradient::gpJet;
+    mColormapPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
+    mColormapPlot->mColormapType = QCPColorGradient::gpJet;
   }
 }
 

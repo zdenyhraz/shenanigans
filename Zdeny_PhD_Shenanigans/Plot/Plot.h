@@ -99,6 +99,7 @@ public:
     void PlotCore(const std::vector<std::vector<double>>& z, bool newplot);
     void Initialize(int xcnt, int ycnt);
     void Reset();
+    std::string GetName();
 
     bool mInitialized = false;
   };
