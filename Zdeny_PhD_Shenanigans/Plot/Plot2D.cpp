@@ -9,7 +9,7 @@ void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string nam
   auto idx = Plot::plots.find(name);
   if (idx != Plot::plots.end())
   {
-    windowPlot = idx->second;
+    windowPlot = idx->second.get();
     windowPlot->ui.widget->graph(0)->data().clear();
   }
   else
@@ -17,9 +17,9 @@ void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string nam
     if (colRowRatio == 0)
       colRowRatio = (double)z[0].size() / z.size();
 
-    windowPlot = new WindowPlot(name, colRowRatio, Plot::OnClose);
+    Plot::plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, Plot::OnClose);
+    windowPlot = Plot::plots[name].get();
     windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
-    Plot::plots[name] = windowPlot;
     SetupGraph(windowPlot, xlabel, ylabel, zlabel);
   }
 
