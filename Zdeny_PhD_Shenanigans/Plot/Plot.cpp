@@ -2,7 +2,7 @@
 #include "Plot.h"
 #include "Gui/Windows/Plot/WindowPlot.h"
 
-std::map<std::string, WindowPlot*> Plot::plots;
+std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
 
 QFont Plot::fontTicks("Newyork", 17);
 QFont Plot::fontLabels("Newyork", 17);
@@ -57,19 +57,13 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
 std::function<void(std::string)> Plot::OnClose = [](std::string name) {
   auto idx = plots.find(name);
   if (idx != plots.end())
-  {
-    delete idx->second;
     plots.erase(idx);
-  }
 };
 
 void Plot::CloseAll()
 {
   for (auto& plt : plots)
-  {
-    delete plt.second;
     plots.erase(plt.first);
-  }
 }
 
 Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
@@ -128,7 +122,7 @@ void Plot::Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std:
   if (!mInitialized || newplot)
     Initialize(ycnt, y1cnt, y2cnt);
 
-  WindowPlot* windowPlot = plots[GetName()];
+  auto& windowPlot = plots[GetName()];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -156,7 +150,7 @@ void Plot::Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std:
   if (!mInitialized)
     Initialize(ycnt, y1cnt, y2cnt);
 
-  WindowPlot* windowPlot = plots[GetName()];
+  auto& windowPlot = plots[GetName()];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -187,9 +181,9 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     return;
   }
 
-  auto windowPlot = new WindowPlot(GetName(), 1.3, OnClose);
-  windowPlot->move(GetNewPlotPosition(windowPlot));
-  plots[GetName()] = windowPlot;
+  plots[GetName()] = std::make_unique<WindowPlot>(GetName(), 1.3, OnClose);
+  auto& windowPlot = plots[GetName()];
+  windowPlot->move(GetNewPlotPosition(windowPlot.get()));
   auto& plot = windowPlot->ui.widget;
 
   plot->xAxis->setTickLabelFont(fontTicks);
@@ -296,7 +290,7 @@ void Plot::Plot1D::Reset()
     return;
 
   LOG_DEBUG("Resetting plot {}", GetName());
-  WindowPlot* windowPlot = idx->second;
+  auto& windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < plot->graphCount(); i++)
@@ -334,7 +328,7 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
   if (!mInitialized || newplot)
     Initialize(z[0].size(), z.size());
 
-  WindowPlot* windowPlot = plots[GetName()];
+  auto& windowPlot = plots[GetName()];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
@@ -362,9 +356,10 @@ void Plot::Plot2D::Initialize(int xcnt, int ycnt)
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
-  auto windowPlot = new WindowPlot(GetName(), colRowRatio, OnClose);
-  windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
-  plots[GetName()] = windowPlot;
+  plots[GetName()] = std::make_unique<WindowPlot>(GetName(), colRowRatio, OnClose);
+  auto& windowPlot = plots[GetName()];
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get()));
+
   auto& plot = windowPlot->ui.widget;
   auto& colorMap = windowPlot->colorMap;
   auto& colorScale = windowPlot->colorScale;
@@ -413,7 +408,7 @@ void Plot::Plot2D::Reset()
     return;
 
   LOG_DEBUG("Resetting plot {}", GetName());
-  WindowPlot* windowPlot = idx->second;
+  auto& windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
   plot->graph(0)->data().clear();
 }

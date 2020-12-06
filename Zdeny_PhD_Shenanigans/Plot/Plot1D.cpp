@@ -8,7 +8,7 @@ void Plot1D::Reset(std::string name)
   if (idx != Plot::plots.end())
   {
     LOG_DEBUG("Reseting 1Dplot '{}'", name);
-    WindowPlot* windowPlot = idx->second;
+    WindowPlot* windowPlot = idx->second.get();
     for (int i = 0; i < windowPlot->ui.widget->graphCount(); i++)
       windowPlot->ui.widget->graph(i)->data().data()->clear();
 
@@ -75,13 +75,13 @@ WindowPlot* Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cn
   auto idx = Plot::plots.find(name);
   if (idx != Plot::plots.end())
   {
-    windowPlot = idx->second;
+    windowPlot = idx->second.get();
   }
   else
   {
-    windowPlot = new WindowPlot(name, 1.3, Plot::OnClose);
+    Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
+    windowPlot = Plot::plots[name].get();
     windowPlot->move(Plot::GetNewPlotPosition(windowPlot));
-    Plot::plots[name] = windowPlot;
     SetupGraph(windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens);
   }
   return windowPlot;

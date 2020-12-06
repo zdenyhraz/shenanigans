@@ -9,7 +9,7 @@ public:
   static std::function<void(std::string)> OnClose;
   static void CloseAll();
 
-  static std::map<std::string, WindowPlot*> plots;
+  static std::map<std::string, std::unique_ptr<WindowPlot>> plots;
   static std::vector<QPen> pens;
   static double pt;
 
