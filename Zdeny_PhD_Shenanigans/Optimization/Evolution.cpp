@@ -6,21 +6,29 @@ Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
-  InitializeOutputs();
-  CheckBounds();
-  CheckObjectiveFunctionNormality(obj);
+  try
+  {
+    InitializeOutputs();
+    CheckBounds();
+    CheckObjectiveFunctionNormality(obj);
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR("Could not run evolution optimization: {}", e.what());
+  }
 
   int gen = 0;
   Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents());
-  TerminationReason treason = NotTerminated;
+  TerminationReason termReason = NotTerminated;
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   LOG_INFO("Running evolution...");
   UpdateOutputs(gen, population, valid);
 
-  while (treason == NotTerminated)
+  try
   {
-    try
+    while (termReason == NotTerminated)
     {
+      gen++;
 #pragma omp parallel for
       for (int eid = 0; eid < mNP; ++eid)
       {
@@ -32,24 +40,23 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       population.UpdateBestEntity();
       population.UpdateOffspringFunctionEvaluations();
       population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
-      gen++;
 
-      treason = CheckTerminationCriterions(population, gen);
+      termReason = CheckTerminationCriterions(population, gen);
       UpdateOutputs(gen, population, valid);
     }
-    catch (const std::exception& e)
-    {
-      LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
-      treason = UnexpectedErrorOccured;
-    }
-    catch (...)
-    {
-      LOG_ERROR("Unexpected error occured during generation {}", gen);
-      treason = UnexpectedErrorOccured;
-    }
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
+    termReason = UnexpectedErrorOccured;
+  }
+  catch (...)
+  {
+    LOG_ERROR("Unexpected error occured during generation {}", gen);
+    termReason = UnexpectedErrorOccured;
   }
 
-  UninitializeOutputs(population, treason);
+  UninitializeOutputs(population, termReason);
   return population.bestEntity.params;
 }
 
@@ -298,6 +305,11 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   catch (const std::exception& e)
   {
     LOG_DEBUG("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
+    newoffspring.fitness = Inf;
+  }
+  catch (...)
+  {
+    LOG_DEBUG("Could not evaluate new offspring with params {}", newoffspring.params);
     newoffspring.fitness = Inf;
   }
 }
