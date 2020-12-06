@@ -63,17 +63,7 @@ try
 
   if (mDebugMode)
   {
-    if (!mImagePlot)
-    {
-      mImagePlot = std::make_unique<Plot::Plot2D>("IPC image");
-      mImagePlot->mColormapType = QCPColorGradient::gpGrayscale;
-    }
-    if (!mSubregionPlot)
-    {
-      mSubregionPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
-      mSubregionPlot->mColormapType = QCPColorGradient::gpJet;
-    }
-
+    InitializePlots();
     mImagePlot->Plot(image1);
     mImagePlot->Plot(image2);
   }
@@ -438,8 +428,25 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
   LOG_ERROR_IF(mDebugMode, "Reducing L1ratio to {:.2f}", L1ratio);
 }
 
+void IterativePhaseCorrelation::InitializePlots() const
+{
+  if (!mImagePlot)
+  {
+    mImagePlot = std::make_unique<Plot::Plot2D>("IPC image");
+    mImagePlot->mColormapType = QCPColorGradient::gpGrayscale;
+  }
+
+  if (!mSubregionPlot)
+  {
+    mSubregionPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
+    mSubregionPlot->mColormapType = QCPColorGradient::gpJet;
+  }
+}
+
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
+  InitializePlots();
+
   // window
   if (0)
   {

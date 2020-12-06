@@ -28,18 +28,18 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot)
   int w = 0;
   int h = 0;
 
-  for (auto& plot : plots)
+  for (const auto& [name, plot] : plots)
   {
-    if (w + plot.second->width() > QApplication::desktop()->width())
+    if (w + plot->width() > QApplication::desktop()->width())
     {
-      w = plot.second->width();
-      h += plot.second->height() + 25;
+      w = plot->width();
+      h += plot->height() + 25;
       if (h > QApplication::desktop()->height())
         h = 0;
     }
     else
     {
-      w += plot.second->width();
+      w += plot->width();
     }
   }
 
@@ -324,7 +324,7 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
     mCounter++;
 
   if (!mInitialized || newplot)
-    Initialize(z[0].size(), z.size(), newplot);
+    Initialize(z[0].size(), z.size());
 
   WindowPlot* windowPlot = plots[mName];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
@@ -343,9 +343,9 @@ void Plot::Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newp
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot::Plot2D::Initialize(int xcnt, int ycnt, bool newplot)
+void Plot::Plot2D::Initialize(int xcnt, int ycnt)
 {
-  auto idx = newplot ? plots.find(fmt::format("{}:{}", mName, mCounter)) : plots.find(mName);
+  auto idx = plots.find(fmt::format("{}:{}", mName, mCounter));
   if (idx != plots.end())
   {
     Reset();
