@@ -42,6 +42,11 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
       LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
       treason = UnexpectedErrorOccured;
     }
+    catch (...)
+    {
+      LOG_ERROR("Unexpected error occured during generation {}", gen);
+      treason = UnexpectedErrorOccured;
+    }
   }
 
   UninitializeOutputs(population, treason);
