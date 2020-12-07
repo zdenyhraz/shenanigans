@@ -448,7 +448,7 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   InitializePlots();
 
   // window
-  if (0)
+  if (1)
   {
     Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
     Mat w, imgw;
@@ -462,11 +462,16 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // clang-format off
 	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
 	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindowsDFT.png");
+
+	mImagePlot->mSavepath=mDebugDirectory + "/2DImage.png";
+	mImagePlot->Plot(img);
+
+	mImagePlot->mSavepath=mDebugDirectory + "/2DImageWindow.png";
+	mImagePlot->Plot(imgw);
+
 	Plot2D::plot(Fourier::fftlogmagn(r0), "w2", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
 	Plot2D::plot(Fourier::fftlogmagn(w0), "w3", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
-	Plot2D::plot(img, "w4", "x", "y", "image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImage.png");
 	Plot2D::plot(w, "w5", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
-	Plot2D::plot(imgw, "w6", "x", "y", "windowed image", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindow.png");
 	Plot2D::plot(Fourier::fftlogmagn(img), "w7", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
 	Plot2D::plot(Fourier::fftlogmagn(imgw), "w8", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
     // clang-format on
@@ -548,13 +553,15 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
 
-    // Plot2D::plot(img, "img", "x", "y", "img", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImage.png");
-    Plot2D::plot(imgfR, "Rect", "x", "y", "Rect", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageR.png");
-    Plot2D::plot(imgfG, "Gauss", "x", "y", "Gauss", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassImageG.png");
+    mImagePlot->mSavepath = mDebugDirectory + "/2DBandpassImageR.png";
+    mImagePlot->Plot(imgfR);
+
+    mImagePlot->mSavepath = mDebugDirectory + "/2DBandpassImageG.png";
+    mImagePlot->Plot(imgfG);
   }
 
   // 2 pic
-  if (1)
+  if (0)
   {
     Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
     Mat image1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
