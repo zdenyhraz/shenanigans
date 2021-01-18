@@ -123,6 +123,7 @@ inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point
 inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, const std::vector<std::vector<DMatch>>& matches_all, const std::vector<std::vector<KeyPoint>>& kp1_all,
                                                              const std::vector<std::vector<KeyPoint>>& kp2_all, const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data)
 {
+  LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
   cvtColor(img, out, COLOR_GRAY2BGR);
   resize(out, out, Size(scale * out.cols, scale * out.rows));
@@ -150,10 +151,10 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, con
       if (spd > maxspd)
         continue;
 
-      if (dir < 0.50 * 360)
+      if (dir > -90)
         continue;
 
-      if (dir > 0.75 * 360)
+      if (dir < -180)
         continue;
 
       auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
@@ -183,6 +184,8 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, con
 
 inline void featureMatch(const FeatureMatchData& data)
 {
+  LOG_FUNCTION("FeatureMatch");
+
   Mat img_base = imread(data.path + "0.PNG", IMREAD_GRAYSCALE);
   Mat img_base_ups;
   resize(img_base, img_base_ups, Size(scale * img_base.cols, scale * img_base.rows));
@@ -252,7 +255,6 @@ inline void featureMatch(const FeatureMatchData& data)
   }
 
   // draw arrows
-  LOG_DEBUG("Drawing arrows...");
   auto mats = DrawFeatureMatchArrows(img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data);
   showimg(std::get<0>(mats), "Match arrows", false, 0, 1, 1200);
   showimg(std::get<1>(mats), "Match points", false, 0, 1);
