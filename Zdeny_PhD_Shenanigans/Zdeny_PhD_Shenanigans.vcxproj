@@ -76,6 +76,7 @@
       <AdditionalIncludeDirectories>C:\include\spdlog\include;E:\opencv\opencv\install\include;.\;C:\include\blaze\include;C:\include\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,6 +101,7 @@
       <AdditionalIncludeDirectories>C:\include\spdlog\include;E:\opencv\opencv\install\include;.\;C:\include\blaze\include;C:\include\fmt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
