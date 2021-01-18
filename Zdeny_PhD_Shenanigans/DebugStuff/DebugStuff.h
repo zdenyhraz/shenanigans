@@ -17,11 +17,11 @@ namespace Debug
 {
 void Debug(Globals* globals)
 {
-  TIMER("Debug");
-  LOG_STARTEND("Debug started", "Debug finished");
+  LOG_FUNCTION("Debug");
 
   if (1) // plot in optimization
   {
+    LOG_TRACE("Trace log color is boring");
     auto f = OptimizationTestFunctions::Ackley;
     auto g = OptimizationTestFunctions::Himmelblau;
     int N = 2;

@@ -30,8 +30,7 @@ class Timer // benchmarking struct
 
 public:
   Timer(const std::string& name) : name(name), stp(clock::now()) {}
-
-  ~Timer() { LOG_INFO("<< {} >> took {} ms", name, tse(clock::now()) - tse(stp)); }
+  ~Timer() { LOG_INFO("{} took {} ms", name, tse(clock::now()) - tse(stp)); }
 };
 
 inline double rand01()
@@ -585,9 +584,8 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
 
 inline bool IsImage(const std::string& path)
 {
-  return (path.find(".png") != std::string::npos || path.find(".PNG") != std::string::npos || path.find(".jpg") != std::string::npos ||
-          path.find(".JPG") != std::string::npos || path.find(".jpeg") != std::string::npos || path.find(".JPEG") != std::string::npos ||
-          path.find(".fits") != std::string::npos || path.find(".FITS") != std::string::npos);
+  return (path.find(".png") != std::string::npos || path.find(".PNG") != std::string::npos || path.find(".jpg") != std::string::npos || path.find(".JPG") != std::string::npos ||
+          path.find(".jpeg") != std::string::npos || path.find(".JPEG") != std::string::npos || path.find(".fits") != std::string::npos || path.find(".FITS") != std::string::npos);
 }
 
 inline std::vector<double> GetIota(int length, double maximum)
