@@ -11,9 +11,9 @@ static constexpr int piccnt = 10;                   // number of pics
 static constexpr double scale = 10;                 // scale for visualization
 static constexpr double kmpp = 696010. / 378.3;     // kilometers per pixel
 static constexpr double dt = 11.88;                 // dt temporally adjacent pics
-static constexpr double arrow_scale = 2;            // size of the arrow
+static constexpr double arrow_scale = 5;            // size of the arrow
 static constexpr double ratio_thresh = 0.7;         // Lowe's ratio test
-static constexpr double text_scale = scale / 4;     // text scale
+static constexpr double text_scale = scale / 3;     // text scale
 static constexpr double text_thickness = scale / 4; // text thickness
 
 enum FeatureType
@@ -87,7 +87,7 @@ inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return xfeatures2d::SURF::create(data.thresh);
+    return xfeatures2d::SURF::create(std::min(data.thresh, 500.));
   case FeatureType::BRISK:
     return BRISK::create();
   case FeatureType::ORB:
@@ -200,7 +200,7 @@ inline void featureMatch(const FeatureMatchData& data)
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
 
-    LOG_DEBUG("Matching images {} - {}", path1, path2);
+    LOG_INFO("Matching images {} - {}", path1, path2);
 
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
