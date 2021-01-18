@@ -28,7 +28,6 @@
   if (c)                                                                                                                                                                                               \
   Logger::Get()->info(c, a) else Logger::Get()->error(c, b)
 
-#define LOG_STARTEND(s, e) std::unique_ptr<LOG_STARTEND_IMPL> log_startend_impl = std::make_unique<LOG_STARTEND_IMPL>(s, e)
 #define LOG_FUNCTION(fun) std::unique_ptr<LOG_FUNCTION_IMPL> log_function_impl = std::make_unique<LOG_FUNCTION_IMPL>(fun)
 
 class Logger
