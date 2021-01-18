@@ -9,7 +9,7 @@ WindowFeatures::WindowFeatures(QWidget* parent, Globals* globals) : QMainWindow(
 
 void WindowFeatures::FeatureMatch()
 {
-  LOG_INFO("Matching features...");
+  LOG_FUNCTION("FeatureMatch");
 
   FeatureMatchData data;
   data.path1 = ui.lineEdit->text().toStdString();
@@ -27,6 +27,4 @@ void WindowFeatures::FeatureMatch()
   data.pathout = ui.lineEdit_12->text().toStdString();
 
   featureMatch(data);
-
-  LOG_INFO("Finished matching features");
 }

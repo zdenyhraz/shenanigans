@@ -237,8 +237,8 @@ inline void featureMatch(const FeatureMatchData& data)
     {
       shifts[i] = GetFeatureMatchShift(matches[i], keypoints1, keypoints2);
       speeds[i] = magnitude(shifts[i]) * kmpp / dt;
-      LOG_DEBUG("Calculated feature shift[{}] =[{},{}], magn={}, wmagn={}, descdist={}, spd={} km/s", i, shifts[i].x, shifts[i].y, magnitude(shifts[i]), data.magnitudeweight * magnitude(shifts[i]),
-                matches[i].distance, speeds[i]);
+      LOG_DEBUG_IF(0, "Calculated feature shift[{}] =[{},{}], magn={}, wmagn={}, descdist={}, spd={} km/s", i, shifts[i].x, shifts[i].y, magnitude(shifts[i]),
+                   data.magnitudeweight * magnitude(shifts[i]), matches[i].distance, speeds[i]);
     }
     speeds_all[pic] = speeds;
 
