@@ -201,9 +201,7 @@ inline void featureMatch(const FeatureMatchData& data)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-
-    LOG_INFO("Matching images {} - {}", path1, path2);
-
+    LOG_INFO("Matching images {} - {} ({} - {})", pic, pic + 1, path1, path2);
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
@@ -250,6 +248,7 @@ inline void featureMatch(const FeatureMatchData& data)
     if (0)
     {
       // draw matches
+      LOG_FUNCTION("DrawMatches");
       Mat img_matches;
       drawMatches(img1, keypoints1, img2, keypoints2, matches, img_matches, Scalar(0, 255, 255), Scalar(0, 255, 0), std::vector<char>(), DrawMatchesFlags::DEFAULT);
       showimg(img_matches, "Good matches");
@@ -257,8 +256,8 @@ inline void featureMatch(const FeatureMatchData& data)
   }
 
   // draw arrows
-  auto mats = DrawFeatureMatchArrows(img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data);
-  showimg(std::get<0>(mats), "Match arrows", false, 0, 1, 1200);
-  showimg(std::get<1>(mats), "Match points", false, 0, 1);
-  showimg(std::get<2>(mats), "Velocity surface Mwnn", true);
+  const auto& [arrows, points, speedsurface, directionsurface] = DrawFeatureMatchArrows(img_base, matches_all, keypoints1_all, keypoints2_all, speeds_all, data);
+  showimg(arrows, "Match arrows", false, 0, 1, 1200);
+  showimg(points, "Match points", false, 0, 1);
+  showimg(speedsurface, "Velocity surface Mwnn", true);
 }
