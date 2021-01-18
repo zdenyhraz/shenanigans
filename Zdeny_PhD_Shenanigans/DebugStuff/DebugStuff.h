@@ -21,7 +21,6 @@ void Debug(Globals* globals)
 
   if (1) // plot in optimization
   {
-    LOG_TRACE("Trace log color is boring");
     auto f = OptimizationTestFunctions::Ackley;
     auto g = OptimizationTestFunctions::Himmelblau;
     int N = 2;

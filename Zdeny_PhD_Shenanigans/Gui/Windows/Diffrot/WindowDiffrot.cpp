@@ -4,7 +4,7 @@
 #include "Astrophysics/diffrotFileIO.h"
 #include "Optimization/Evolution.h"
 
-WindowDiffrot::WindowDiffrot(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
+WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(calculateDiffrot()));
@@ -20,7 +20,7 @@ WindowDiffrot::WindowDiffrot(QWidget *parent, Globals *globals) : QMainWindow(pa
 
 void WindowDiffrot::calculateDiffrot()
 {
-  LOG_STARTEND("Calculating diffrot profile...", "Differential rotation profile calculated.");
+  LOG_FUNCTION("CalculateDiffrot");
   FitsTime time = GetStartFitsTime();
   drres = calculateDiffrotProfile(*globals->IPC, time, drset);
   showResults();
@@ -29,8 +29,7 @@ void WindowDiffrot::calculateDiffrot()
 
 void WindowDiffrot::showResults()
 {
-  drres.ShowResults(
-      ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
+  drres.ShowResults(ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
   LOG_SUCC("Differential rotation profile shown.");
 }
 
@@ -96,18 +95,10 @@ void WindowDiffrot::checkDiskShifts()
 
     if (pic1.params().succload && pic2.params().succload)
     {
-      shiftsN.push_back(phasecorrel(
-          roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set)
-                            .y);
-      shiftsS.push_back(phasecorrel(
-          roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set)
-                            .y);
-      shiftsW.push_back(phasecorrel(
-          roicrop(pic1.image(), edgeW, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeW, center, set.getcols(), set.getrows()), set)
-                            .x);
-      shiftsE.push_back(phasecorrel(
-          roicrop(pic1.image(), edgeE, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeE, center, set.getcols(), set.getrows()), set)
-                            .x);
+      shiftsN.push_back(phasecorrel(roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set).y);
+      shiftsS.push_back(phasecorrel(roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set).y);
+      shiftsW.push_back(phasecorrel(roicrop(pic1.image(), edgeW, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeW, center, set.getcols(), set.getrows()), set).x);
+      shiftsE.push_back(phasecorrel(roicrop(pic1.image(), edgeE, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeE, center, set.getcols(), set.getrows()), set).x);
       shiftsFX.push_back(pic2.params().fitsMidX - pic1.params().fitsMidX);
       shiftsFY.push_back(pic2.params().fitsMidY - pic1.params().fitsMidY);
     }
@@ -130,9 +121,9 @@ void WindowDiffrot::checkDiskShifts()
   std::iota(iotam.begin(), iotam.end(), 0);
   iotam = (double)(ui.lineEdit_7->text().toDouble() - 1) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / (iotam.size() - 1) * iotam;
   Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]",
-      std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
+               std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
   Plot1D::plot(iotam, std::vector<std::vector<double>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]",
-      std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
+               std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
 }
 
 void WindowDiffrot::saveDiffrot()
@@ -148,12 +139,12 @@ void WindowDiffrot::loadDiffrot()
 
 void WindowDiffrot::optimizeDiffrot()
 {
-  LOG_STARTEND("Optimizing diffrot...", "Diffrot optimized");
+  LOG_FUNCTION("OptimizeDiffrot");
   FitsTime starttime = GetStartFitsTime();
 
   try
   {
-    auto f = [&](const std::vector<double> &args) {
+    auto f = [&](const std::vector<double>& args) {
       int winsize = std::floor(args[5]);
       int L2size = std::floor(args[2]);
       int upsampleCoeff = std::floor(args[6]);
@@ -213,7 +204,7 @@ void WindowDiffrot::UpdateDrset()
 
 void WindowDiffrot::video()
 {
-  LOG_STARTEND("Creating diffrot video...", "Diffrot video created.");
+  LOG_FUNCTION("Video");
   FitsTime time = GetStartFitsTime();
 
   drset.video = true;
@@ -223,7 +214,7 @@ void WindowDiffrot::video()
 
 void WindowDiffrot::movingPeak()
 {
-  LOG_STARTEND("Creating moving diffrot peak images...", "Moving diffrot peak images created.");
+  LOG_FUNCTION("MovingPeak");
   FitsTime starttime = GetStartFitsTime();
   IPCsettings ipcset = *globals->IPCset;
   ipcset.save = true;
@@ -272,6 +263,6 @@ void WindowDiffrot::movingPeak()
 FitsTime WindowDiffrot::GetStartFitsTime()
 {
   UpdateDrset();
-  return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(),
-      ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(), ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+  return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(),
+                  ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 }

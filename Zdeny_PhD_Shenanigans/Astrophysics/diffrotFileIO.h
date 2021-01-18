@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "diffrotResults.h"
 
-void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filename, DiffrotResults *dr, IterativePhaseCorrelation *ipc)
+void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filename, DiffrotResults* dr, IterativePhaseCorrelation* ipc)
 {
-  LOG_STARTEND("Saving diffrot results ...", "Diffrot results saved");
+  LOG_FUNCTION("SaveDiffrotResultsToFile");
 
   std::string path = dir + filename + ".diffrot";
 
@@ -48,9 +48,9 @@ void SaveDiffrotResultsToFile(const std::string &dir, const std::string &filenam
   fs << "WindowSize" << ipc->GetSize();
 }
 
-void LoadDiffrotResultsFromFile(const std::string &path, DiffrotResults *dr)
+void LoadDiffrotResultsFromFile(const std::string& path, DiffrotResults* dr)
 {
-  LOG_STARTEND("Loading diffrot results ...", "Diffrot results loaded");
+  LOG_FUNCTION("LoadDiffrotResultsFromFile");
 
   if (!std::filesystem::exists(path))
   {
