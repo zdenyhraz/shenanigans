@@ -272,8 +272,8 @@ inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image1, Mat& imag
 {
   image1.convertTo(image1, CV_32F);
   image2.convertTo(image2, CV_32F);
-  normalize(image1, image1, 0, 1, CV_MINMAX);
-  normalize(image2, image2, 0, 1, CV_MINMAX);
+  normalize(image1, image1, 0, 1, NORM_MINMAX);
+  normalize(image2, image2, 0, 1, NORM_MINMAX);
 }
 
 inline void IterativePhaseCorrelation::ApplyWindow(Mat& image1, Mat& image2) const

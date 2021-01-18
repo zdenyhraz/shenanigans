@@ -127,10 +127,10 @@ void Debug(Globals* globals)
   }
   if (0) // cyclic image shift
   {
-    Mat img = imread("C:\\Users\\Zdeny\\Downloads\\src.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    Mat img = imread("C:\\Users\\Zdeny\\Downloads\\src.jpg", IMREAD_GRAYSCALE);
     img.convertTo(img, CV_32F);
 
-    Mat ref = imread("C:\\Users\\Zdeny\\Downloads\\ref.tif", CV_LOAD_IMAGE_GRAYSCALE);
+    Mat ref = imread("C:\\Users\\Zdeny\\Downloads\\ref.tif", IMREAD_GRAYSCALE);
     ref.convertTo(ref, CV_32F);
 
     Mat out = img.clone();
@@ -155,8 +155,8 @@ void Debug(Globals* globals)
   }
   if (0) // histogram equalize
   {
-    Mat img = imread("Resources/test.png", CV_LOAD_IMAGE_GRAYSCALE);
-    normalize(img, img, 0, 255, CV_MINMAX);
+    Mat img = imread("Resources/test.png", IMREAD_GRAYSCALE);
+    normalize(img, img, 0, 255, NORM_MINMAX);
     img.convertTo(img, CV_8UC1);
     resize(img, img, Size(500, 500));
     Mat heq = EqualizeHistogram(img);

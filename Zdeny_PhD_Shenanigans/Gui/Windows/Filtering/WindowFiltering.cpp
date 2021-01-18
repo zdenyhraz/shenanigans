@@ -2,7 +2,7 @@
 #include "WindowFiltering.h"
 #include "Filtering/HistogramEqualization.h"
 
-WindowFiltering::WindowFiltering(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
+WindowFiltering::WindowFiltering(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(HistogramEqualize()));
@@ -10,9 +10,9 @@ WindowFiltering::WindowFiltering(QWidget *parent, Globals *globals) : QMainWindo
 
 void WindowFiltering::HistogramEqualize()
 {
-  Mat img = imread(ui.lineEdit->text().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+  Mat img = imread(ui.lineEdit->text().toStdString(), IMREAD_GRAYSCALE);
 
-  normalize(img, img, 0, 255, CV_MINMAX);
+  normalize(img, img, 0, 255, NORM_MINMAX);
   img.convertTo(img, CV_8UC1);
 
   if (ui.checkBox->isChecked())
