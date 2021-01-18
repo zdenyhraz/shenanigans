@@ -22,7 +22,6 @@ void Debug(Globals* globals)
   if (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
-    auto g = OptimizationTestFunctions::Himmelblau;
     int N = 2;
     Evolution Evo(N);
     Evo.mNP = 50. / 7 * N;
@@ -32,7 +31,7 @@ void Debug(Globals* globals)
     Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
-    auto result = Evo.Optimize(f, g);
+    auto result = Evo.Optimize(f);
   }
   if (0) // non maxima suppression
   {
