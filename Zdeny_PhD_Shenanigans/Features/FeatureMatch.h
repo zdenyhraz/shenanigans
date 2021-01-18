@@ -130,8 +130,10 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, con
 
   Mat outPt = Mat::zeros(out.rows, out.cols, CV_8UC3);
 
-  double minspd = getQuantile(speeds_all, data.quanB);
-  double maxspd = getQuantile(speeds_all, data.quanT);
+  static constexpr double kMinSpeed = 300;
+  static constexpr double kMaxSpeed = 1000;
+  double minspd = std::max(getQuantile(speeds_all, data.quanB), kMinSpeed);
+  double maxspd = std::min(getQuantile(speeds_all, data.quanT), kMaxSpeed);
 
   std::vector<Point2f> points;
   std::vector<double> speeds;
@@ -139,11 +141,11 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, con
 
   for (int pic = 0; pic < piccnt - 1; pic++)
   {
-    for (auto& match : matches_all[pic])
+    for (const auto& match : matches_all[pic])
     {
-      auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-      double spd = magnitude(shift) * kmpp / dt;
-      double dir = toDegrees(atan2(-shift.y, shift.x));
+      const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
+      const double spd = magnitude(shift) * kmpp / dt;
+      const double dir = toDegrees(atan2(-shift.y, shift.x));
 
       if (spd < minspd)
         continue;
@@ -215,7 +217,7 @@ inline void featureMatch(const FeatureMatchData& data)
     keypoints2_all[pic] = keypoints2;
 
     // matching descriptor vectors
-    Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create((DescriptorMatcher::MatcherType)GetFeatureTypeMatcher(data));
+    auto matcher = DescriptorMatcher::create((DescriptorMatcher::MatcherType)GetFeatureTypeMatcher(data));
     std::vector<std::vector<DMatch>> knn_matches;
     matcher->knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
