@@ -28,7 +28,7 @@
   if (c)                                                                                                                                                                                               \
   Logger::Get()->info(c, a) else Logger::Get()->error(c, b)
 
-#define LOG_FUNCTION(fun) std::unique_ptr<LOG_FUNCTION_IMPL> log_function_impl = std::make_unique<LOG_FUNCTION_IMPL>(fun)
+#define LOG_FUNCTION(fun) LOG_FUNCTION_IMPL log_function_impl(fun)
 
 class Logger
 {
