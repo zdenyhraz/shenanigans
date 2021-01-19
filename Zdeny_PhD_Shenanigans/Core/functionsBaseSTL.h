@@ -523,12 +523,8 @@ inline double getQuantile(const std::vector<std::vector<double>>& vec, double qu
   std::vector<double> out;
   out.reserve(vec.size() * vec[0].size());
   for (int i = 0; i < vec.size(); i++)
-  {
     for (double x : vec[i])
-    {
       out.push_back(x);
-    }
-  }
   std::sort(out.begin(), out.end());
   return out[(int)(quan * (out.size() - 1))];
 }
