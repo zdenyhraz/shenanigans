@@ -134,7 +134,6 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
   double minspd = std::max(getQuantile(speeds_all, 0), data.minSpeed);
   double maxspd = std::min(getQuantile(speeds_all, 1), data.maxSpeed);
-
   size_t drawcounter = 0;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
@@ -144,8 +143,11 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     if (overlap)
       continue;
 
-    // if (img.at<>())
-    // continue;
+    if (img.at<uchar>(kp1_all[pic][match.queryIdx].pt) < 10)
+    {
+      LOG_DEBUG("Skipping match {}: black region", idx);
+      continue;
+    }
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
     const double spd = magnitude(shift) * kmpp / dt;
@@ -153,13 +155,13 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (spd < data.minSpeed || spd > data.maxSpeed)
     {
-      LOG_ERROR("Skipping match {}: speed {} km/s off limits", idx, spd);
+      LOG_DEBUG("Skipping match {}: speed {} km/s off limits", idx, spd);
       continue;
     }
 
     if (dir < -160 || dir > -110)
     {
-      LOG_ERROR("Skipping match {}: direction {} deg off limits", idx, dir);
+      LOG_DEBUG("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
     }
 
