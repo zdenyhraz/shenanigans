@@ -121,7 +121,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop0.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop1.PNG</string>
        </property>
       </widget>
      </item>
@@ -135,7 +135,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop1.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop2.PNG</string>
        </property>
       </widget>
      </item>
