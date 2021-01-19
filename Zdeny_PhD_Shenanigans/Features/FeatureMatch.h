@@ -159,7 +159,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
       continue;
     }
 
-    if (dir < -160 || dir > -110)
+    if (dir < -170 || dir > -100)
     {
       LOG_DEBUG("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
@@ -190,7 +190,7 @@ inline void featureMatch(const FeatureMatchData& data)
 {
   LOG_FUNCTION("FeatureMatch");
 
-  Mat img_base = imread(data.path + "1.PNG", IMREAD_GRAYSCALE);
+  Mat img_base = imread(data.path + "5.PNG", IMREAD_GRAYSCALE);
   std::vector<std::vector<DMatch>> matches_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints1_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints2_all(piccnt - 1);
