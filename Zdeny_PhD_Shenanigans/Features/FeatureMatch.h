@@ -12,10 +12,12 @@ static constexpr double scale = 10;             // scale for visualization
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
 static constexpr double dt = 11.88;             // dt temporally adjacent pics
 
-static constexpr double arrow_scale = 8;               // size of the arrow
-static constexpr double arrow_thickness = scale / 1.0; // arrow thickness
-static constexpr double text_scale = scale / 2;        // text scale
-static constexpr double text_thickness = scale / 1.5;  // text thickness
+static constexpr double arrow_scale = 8;
+static constexpr double arrow_thickness = 0.0035;
+static constexpr double text_scale = 5;
+static constexpr double text_thickness = arrow_thickness * 0.6;
+static constexpr double text_xoffset = -0.0025;
+static constexpr double text_yoffset = -10 * text_xoffset;
 
 enum FeatureType
 {
@@ -150,7 +152,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     if (spd < minspd || spd > maxspd)
       continue;
 
-    if (dir < -180 || dir > -90)
+    if (dir < -160 || dir > -110)
       continue;
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
@@ -158,13 +160,13 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     Point2f arrEnd = scale * pts.first + arrow_scale * (scale * pts.second - scale * pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
     Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2);
-    textpos.x -= scale * 1;
-    textpos.y += scale * 7;
-    arrowedLine(out, arrStart, arrEnd, color, arrow_thickness, LINE_AA, 0, 0.15);
-    putText(out, to_stringp(spd, 1), textpos, 1, text_scale, color, text_thickness, LINE_AA);
+    textpos.x += text_xoffset * out.cols;
+    textpos.y += text_yoffset * out.cols;
+    arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.15);
+    putText(out, to_stringp(spd, 1), textpos, 1, text_scale, color, text_thickness * out.cols, LINE_AA);
 
     if (data.drawOverlapCircles)
-      circle(out, arrStart, scale * data.overlapdistance, Scalar(0, 255, 255), text_thickness, LINE_AA);
+      circle(out, arrStart, scale * data.overlapdistance, Scalar(0, 255, 255), text_thickness * out.cols, LINE_AA);
   }
 
   return out;
@@ -185,7 +187,7 @@ inline void featureMatch(const FeatureMatchData& data)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    LOG_INFO("Matching images {} - {} ({} - {})", pic, pic + 1, path1, path2);
+    LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
