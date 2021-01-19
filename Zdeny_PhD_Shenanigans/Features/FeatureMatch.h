@@ -44,7 +44,7 @@ struct FeatureMatchData
   int degree;
   int proxpts;
   double proxcoeff;
-  int overlapdistance;
+  double overlapdistance;
   bool drawOverlapCircles = false;
 };
 
@@ -122,25 +122,22 @@ inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point
   LOG_INFO("Feature data exported to {}", pth);
 }
 
-inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<size_t, size_t, DMatch, bool>>& matches_all,
-                                                             const std::vector<std::vector<KeyPoint>>& kp1_all, const std::vector<std::vector<KeyPoint>>& kp2_all,
-                                                             const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data)
+inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<size_t, size_t, DMatch, bool>>& matches_all, const std::vector<std::vector<KeyPoint>>& kp1_all,
+                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data)
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
   cvtColor(img, out, COLOR_GRAY2BGR);
-  resize(out, out, Size(scale * out.cols, scale * out.rows));
-
-  Mat outPt = Mat::zeros(out.rows, out.cols, CV_8UC3);
+  resize(out, out, Size(scale * out.cols, scale * out.rows), 0, 0, INTER_LANCZOS4);
 
   static constexpr double kMinSpeed = 300;
   static constexpr double kMaxSpeed = 1000;
   double minspd = std::max(getQuantile(speeds_all, data.quanB), kMinSpeed);
   double maxspd = std::min(getQuantile(speeds_all, data.quanT), kMaxSpeed);
 
-  std::vector<Point2f> points;
-  std::vector<double> speeds;
-  std::vector<double> directions;
+  // std::vector<Point2f> points;
+  // std::vector<double> speeds;
+  // std::vector<double> directions;
 
   for (const auto& [idx, pic, match, overlap] : matches_all)
   {
@@ -167,37 +164,28 @@ inline std::tuple<Mat, Mat, Mat, Mat> DrawFeatureMatchArrows(const Mat& img, con
     Point2f arrStart = scale * pts.first;
     Point2f arrEnd = scale * pts.first + arrow_scale * (scale * pts.second - scale * pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
-    Scalar clr = colorMapJet(spd, minspd, maxspd);
+    Scalar color = colorMapJet(spd, minspd, maxspd);
     textpos.x += scale * 2;
     textpos.y += scale * 4;
-    arrowedLine(out, arrStart, arrEnd, clr, scale / 2, LINE_AA);
-    putText(out, to_stringp(spd, 1), textpos, 1, text_scale, clr, text_thickness, LINE_AA);
-
-    drawPoint(outPt, arrStart, clr, scale, scale / 2);
+    arrowedLine(out, arrStart, arrEnd, color, scale / 2, LINE_AA);
+    putText(out, to_stringp(spd, 1), textpos, 1, text_scale, color, text_thickness, LINE_AA);
 
     if (data.drawOverlapCircles)
       circle(out, arrStart, scale * data.overlapdistance, Scalar(0, 255, 255), text_thickness, LINE_AA);
 
-    points.push_back(pts.first);
-    speeds.push_back(spd);
-    directions.push_back(dir);
+    // points.push_back(pts.first);
+    // speeds.push_back(spd);
+    // directions.push_back(dir);
   }
 
-  // exportFeaturesToCsv(data.pathout, points, speeds, directions);
-
-  Mat outSwnn = wnnfit(points, speeds, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff);
-  Mat outDwnn = wnnfit(points, directions, 0, img.cols - 1, 0, img.rows - 1, img.cols, img.rows, data.proxpts, data.proxcoeff);
-
-  return std::make_tuple(out, outPt, outSwnn, outDwnn);
+  return out;
 }
 
 inline void featureMatch(const FeatureMatchData& data)
 {
   LOG_FUNCTION("FeatureMatch");
 
-  Mat img_base = imread(data.path + "0.PNG", IMREAD_GRAYSCALE);
-  Mat img_base_ups;
-  resize(img_base, img_base_ups, Size(scale * img_base.cols, scale * img_base.rows));
+  Mat img_base = imread(data.path + "5.PNG", IMREAD_GRAYSCALE);
   std::vector<std::vector<DMatch>> matches_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints1_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints2_all(piccnt - 1);
@@ -298,12 +286,12 @@ inline void featureMatch(const FeatureMatchData& data)
 
       for (auto& [otheridx, otherpic, othermatch, otheroverlap] : matches_all_serialized)
       {
-        // not filtering faster matches
-        if (otheridx <= idx)
-          continue;
-
         // not filtering already filtered matches
         if (otheroverlap)
+          continue;
+
+        // not filtering faster matches
+        if (otheridx <= idx)
           continue;
 
         const auto shift = keypoints1_all[pic][match.queryIdx].pt - keypoints1_all[otherpic][othermatch.queryIdx].pt;
@@ -313,10 +301,6 @@ inline void featureMatch(const FeatureMatchData& data)
     }
   }
 
-  const auto& [arrows, points, speedsurface, directionsurface] = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data);
-
+  const auto arrows = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data);
   showimg(arrows, "Match arrows", false, 0, 1, 1200);
-
-  // showimg(points, "Match points", false, 0, 1);
-  // showimg(speedsurface, "Velocity surface Mwnn", true);
 }

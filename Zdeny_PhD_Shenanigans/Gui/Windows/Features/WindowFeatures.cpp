@@ -25,7 +25,7 @@ void WindowFeatures::FeatureMatch()
   data.proxpts = ui.lineEdit_10->text().toInt();
   data.proxcoeff = ui.lineEdit_11->text().toDouble();
   data.pathout = ui.lineEdit_12->text().toStdString();
-  data.overlapdistance = ui.lineEdit_13->text().toInt();
+  data.overlapdistance = ui.lineEdit_13->text().toDouble();
   data.drawOverlapCircles = ui.checkBox->isChecked();
 
   featureMatch(data);
