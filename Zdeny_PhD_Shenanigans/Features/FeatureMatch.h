@@ -7,14 +7,16 @@
 #include "Draw/combinepics.h"
 #include "Utils/export.h"
 
-static constexpr int piccnt = 10;                   // number of pics
-static constexpr double scale = 10;                 // scale for visualization
-static constexpr double kmpp = 696010. / 378.3;     // kilometers per pixel
-static constexpr double dt = 11.88;                 // dt temporally adjacent pics
-static constexpr double arrow_scale = 5;            // size of the arrow
-static constexpr double ratio_thresh = 0.7;         // Lowe's ratio test
-static constexpr double text_scale = scale / 3;     // text scale
-static constexpr double text_thickness = scale / 4; // text thickness
+static constexpr int piccnt = 10;               // number of pics
+static constexpr double scale = 10;             // scale for visualization
+static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
+static constexpr double dt = 11.88;             // dt temporally adjacent pics
+
+static constexpr double arrow_scale = 8;               // size of the arrow
+static constexpr double arrow_thickness = scale / 1.0; // arrow thickness
+static constexpr double ratio_thresh = 0.7;            // Lowe's ratio test
+static constexpr double text_scale = scale / 2;        // text scale
+static constexpr double text_thickness = scale / 1.5;  // text thickness
 
 enum FeatureType
 {
@@ -139,8 +141,10 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   // std::vector<double> speeds;
   // std::vector<double> directions;
 
-  for (const auto& [idx, pic, match, overlap] : matches_all)
+  for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
+    const auto& [idx, pic, match, overlap] = *it;
+
     if (overlap)
       continue;
 
@@ -164,10 +168,10 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     Point2f arrStart = scale * pts.first;
     Point2f arrEnd = scale * pts.first + arrow_scale * (scale * pts.second - scale * pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
-    Scalar color = colorMapJet(spd, minspd, maxspd);
-    textpos.x += scale * 2;
-    textpos.y += scale * 4;
-    arrowedLine(out, arrStart, arrEnd, color, scale / 2, LINE_AA);
+    Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2);
+    textpos.x -= scale * 1;
+    textpos.y += scale * 7;
+    arrowedLine(out, arrStart, arrEnd, color, arrow_thickness, LINE_AA, 0, 0.15);
     putText(out, to_stringp(spd, 1), textpos, 1, text_scale, color, text_thickness, LINE_AA);
 
     if (data.drawOverlapCircles)
@@ -274,7 +278,7 @@ inline void featureMatch(const FeatureMatchData& data)
       idx = newidx++;
   }
 
-  if (1)
+  if (data.overlapdistance > 0)
   {
     LOG_FUNCTION("Filter overlapping matches");
 
