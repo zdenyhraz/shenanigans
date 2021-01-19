@@ -137,10 +137,6 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   double minspd = std::max(getQuantile(speeds_all, data.quanB), kMinSpeed);
   double maxspd = std::min(getQuantile(speeds_all, data.quanT), kMaxSpeed);
 
-  // std::vector<Point2f> points;
-  // std::vector<double> speeds;
-  // std::vector<double> directions;
-
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
     const auto& [idx, pic, match, overlap] = *it;
@@ -152,16 +148,10 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     const double spd = magnitude(shift) * kmpp / dt;
     const double dir = toDegrees(atan2(-shift.y, shift.x));
 
-    if (spd < minspd)
+    if (spd < minspd || spd > maxspd)
       continue;
 
-    if (spd > maxspd)
-      continue;
-
-    if (dir > -90)
-      continue;
-
-    if (dir < -180)
+    if (dir < -180 || dir > -90)
       continue;
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
@@ -176,10 +166,6 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (data.drawOverlapCircles)
       circle(out, arrStart, scale * data.overlapdistance, Scalar(0, 255, 255), text_thickness, LINE_AA);
-
-    // points.push_back(pts.first);
-    // speeds.push_back(spd);
-    // directions.push_back(dir);
   }
 
   return out;
