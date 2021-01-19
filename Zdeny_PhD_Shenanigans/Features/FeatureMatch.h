@@ -7,7 +7,7 @@
 #include "Draw/combinepics.h"
 #include "Utils/export.h"
 
-static constexpr int piccnt = 10;               // number of pics
+static constexpr int piccnt = 8;                // number of pics
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
 static constexpr double dt = 11.88;             // dt temporally adjacent pics
 
@@ -190,14 +190,14 @@ inline void featureMatch(const FeatureMatchData& data)
 {
   LOG_FUNCTION("FeatureMatch");
 
-  Mat img_base = imread(data.path + "5.PNG", IMREAD_GRAYSCALE);
+  Mat img_base = imread(data.path + "1.PNG", IMREAD_GRAYSCALE);
   std::vector<std::vector<DMatch>> matches_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints1_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints2_all(piccnt - 1);
   std::vector<std::vector<double>> speeds_all(piccnt - 1);
 
 #pragma omp parallel for
-  for (int pic = 0; pic < piccnt - 1; pic++)
+  for (int pic = 1; pic < piccnt - 1; pic++)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
