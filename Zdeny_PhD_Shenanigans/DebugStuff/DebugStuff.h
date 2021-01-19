@@ -257,15 +257,16 @@ void Debug(Globals* globals)
   }
   if (0) // swind crop
   {
-    std::string path = "D:\\MainOutput\\S-wind\\";
-    int sizeX = 300;
-    int sizeY = 200;
+    std::string path = "E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\";
+    double scale = 0.8;
+    int sizeX = 1500;
+    int sizeY = 1000;
 
     for (int i = 0; i < 10; i++)
     {
       auto pic = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-      pic = roicrop(pic, 0.365 * pic.cols, 0.72 * pic.rows, sizeX, sizeY);
-      saveimg(path + "cropped5//crop" + to_string(i) + ".PNG", pic);
+      pic = roicrop(pic, 0.33 * pic.cols, 0.65 * pic.rows, sizeX, sizeY);
+      saveimg(path + "cropped\\crop" + to_string(i) + ".PNG", pic);
     }
   }
   if (0) // 2d poylfit

@@ -8,16 +8,15 @@
 #include "Utils/export.h"
 
 static constexpr int piccnt = 10;               // number of pics
-static constexpr double scale = 10;             // scale for visualization
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
 static constexpr double dt = 11.88;             // dt temporally adjacent pics
 
-static constexpr double arrow_scale = 8;
-static constexpr double arrow_thickness = 0.0035;
-static constexpr double text_scale = 5;
-static constexpr double text_thickness = arrow_thickness * 0.6;
+static constexpr double arrow_scale = 12;
+static constexpr double arrow_thickness = 0.0015;
+static constexpr double text_scale = 0.001;
+static constexpr double text_thickness = arrow_thickness * 1.0;
 static constexpr double text_xoffset = -0.0025;
-static constexpr double text_yoffset = -10 * text_xoffset;
+static constexpr double text_yoffset = -7 * text_xoffset;
 
 enum FeatureType
 {
@@ -37,8 +36,8 @@ struct FeatureMatchData
   FeatureType ftype;
   double thresh;
   int matchcnt;
-  double quanB;
-  double quanT;
+  double minSpeed;
+  double maxSpeed;
   std::string path1;
   std::string path2;
   std::string path;
@@ -49,6 +48,7 @@ struct FeatureMatchData
   double overlapdistance;
   bool drawOverlapCircles = false;
   double ratioThreshold = 0.7;
+  double upscale = 1;
 };
 
 inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
@@ -131,12 +131,11 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
   cvtColor(img, out, COLOR_GRAY2BGR);
-  resize(out, out, Size(scale * out.cols, scale * out.rows), 0, 0, INTER_LANCZOS4);
+  resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
+  double minspd = std::max(getQuantile(speeds_all, 0), data.minSpeed);
+  double maxspd = std::min(getQuantile(speeds_all, 1), data.maxSpeed);
 
-  static constexpr double kMinSpeed = 300;
-  static constexpr double kMaxSpeed = 1000;
-  double minspd = std::max(getQuantile(speeds_all, data.quanB), kMinSpeed);
-  double maxspd = std::min(getQuantile(speeds_all, data.quanT), kMaxSpeed);
+  size_t drawcounter = 0;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -145,29 +144,42 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     if (overlap)
       continue;
 
+    // if (img.at<>())
+    // continue;
+
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
     const double spd = magnitude(shift) * kmpp / dt;
     const double dir = toDegrees(atan2(-shift.y, shift.x));
 
-    if (spd < minspd || spd > maxspd)
+    if (spd < data.minSpeed || spd > data.maxSpeed)
+    {
+      LOG_ERROR("Skipping match {}: speed {} km/s off limits", idx, spd);
       continue;
+    }
 
     if (dir < -160 || dir > -110)
+    {
+      LOG_ERROR("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
+    }
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
-    Point2f arrStart = scale * pts.first;
-    Point2f arrEnd = scale * pts.first + arrow_scale * (scale * pts.second - scale * pts.first);
+    Point2f arrStart = data.upscale * pts.first;
+    Point2f arrEnd = data.upscale * pts.first + arrow_scale * out.cols / maxspd * (pts.second - pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
     Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2);
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
-    arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.15);
-    putText(out, to_stringp(spd, 1), textpos, 1, text_scale, color, text_thickness * out.cols, LINE_AA);
+    arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.1);
+    putText(out, fmt::format("{:.0f}({})", spd, drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
 
     if (data.drawOverlapCircles)
-      circle(out, arrStart, scale * data.overlapdistance, Scalar(0, 255, 255), text_thickness * out.cols, LINE_AA);
+      circle(out, arrStart, data.upscale * data.overlapdistance, Scalar(0, 255, 255), text_thickness * out.cols, LINE_AA);
+
+    drawcounter++;
   }
+
+  LOG_INFO("Drew {} out of {} matches", drawcounter, matches_all.size());
 
   return out;
 }

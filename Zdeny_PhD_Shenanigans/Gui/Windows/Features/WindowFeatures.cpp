@@ -18,8 +18,8 @@ void WindowFeatures::FeatureMatch()
   data.ftype = (FeatureType)ui.comboBox->currentIndex();
   data.thresh = ui.lineEdit_4->text().toDouble();
   data.matchcnt = ui.lineEdit_3->text().toInt();
-  data.quanB = ui.lineEdit_6->text().toDouble();
-  data.quanT = ui.lineEdit_7->text().toDouble();
+  data.minSpeed = ui.lineEdit_6->text().toDouble();
+  data.maxSpeed = ui.lineEdit_7->text().toDouble();
   data.degree = ui.lineEdit_9->text().toInt();
   data.proxpts = ui.lineEdit_10->text().toInt();
   data.proxcoeff = ui.lineEdit_11->text().toDouble();
@@ -27,6 +27,7 @@ void WindowFeatures::FeatureMatch()
   data.overlapdistance = ui.lineEdit_13->text().toDouble();
   data.drawOverlapCircles = ui.checkBox->isChecked();
   data.ratioThreshold = ui.lineEdit_14->text().toDouble();
+  data.upscale = ui.lineEdit_15->text().toDouble();
 
   featureMatch(data);
 }

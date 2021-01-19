@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>288</height>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,7 +121,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop0.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop0.PNG</string>
        </property>
       </widget>
      </item>
@@ -135,7 +135,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop1.PNG</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop1.PNG</string>
        </property>
       </widget>
      </item>
@@ -149,7 +149,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_8">
        <property name="text">
-        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped5\\crop</string>
+        <string>E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\cropped\\crop</string>
        </property>
       </widget>
      </item>
@@ -239,9 +239,9 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>7</x>
-      <y>96</y>
-      <width>111</width>
+      <x>8</x>
+      <y>99</y>
+      <width>104</width>
       <height>131</height>
      </rect>
     </property>
@@ -253,10 +253,52 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit_3">
+       <property name="text">
+        <string>1000</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>f. threshold</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_4">
        <property name="text">
-        <string>0</string>
+        <string>100</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>min speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="lineEdit_6">
+       <property name="text">
+        <string>400</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>max speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="lineEdit_7">
+       <property name="text">
+        <string>900</string>
        </property>
       </widget>
      </item>
@@ -274,27 +316,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>f. threshold</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>spd quantileB</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_6">
-       <property name="text">
-        <string>0.2</string>
-       </property>
-      </widget>
-     </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_15">
        <property name="text">
@@ -309,24 +330,17 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_3">
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_16">
        <property name="text">
-        <string>100</string>
+        <string>upscale</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="lineEdit_7">
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="lineEdit_15">
        <property name="text">
-        <string>0.95</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>spd quantileT</string>
+        <string>1.0</string>
        </property>
       </widget>
      </item>
