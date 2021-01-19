@@ -14,7 +14,6 @@ static constexpr double dt = 11.88;             // dt temporally adjacent pics
 
 static constexpr double arrow_scale = 8;               // size of the arrow
 static constexpr double arrow_thickness = scale / 1.0; // arrow thickness
-static constexpr double ratio_thresh = 0.7;            // Lowe's ratio test
 static constexpr double text_scale = scale / 2;        // text scale
 static constexpr double text_thickness = scale / 1.5;  // text thickness
 
@@ -48,6 +47,7 @@ struct FeatureMatchData
   double proxcoeff;
   double overlapdistance;
   bool drawOverlapCircles = false;
+  double ratioThreshold = 0.7;
 };
 
 inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
@@ -207,14 +207,11 @@ inline void featureMatch(const FeatureMatchData& data)
     // filter matches using the Lowe's ratio test
     std::vector<DMatch> matches;
     for (size_t i = 0; i < knn_matches.size(); i++)
-      if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
+      if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
         matches.push_back(knn_matches[i][0]);
 
-    // get first best fits (& largest shifts)
-    std::sort(matches.begin(), matches.end(), [&](const DMatch& a, const DMatch& b) {
-      return (-data.magnitudeweight * magnitude(GetFeatureMatchShift(a, keypoints1, keypoints2)) + a.distance) <
-             (-data.magnitudeweight * magnitude(GetFeatureMatchShift(b, keypoints1, keypoints2)) + b.distance);
-    });
+    // get first best fits
+    std::sort(matches.begin(), matches.end(), [&](const DMatch& a, const DMatch& b) { return a.distance < b.distance; });
     matches = std::vector<DMatch>(matches.begin(), matches.begin() + min(data.matchcnt, (int)matches.size()));
     matches_all[pic] = matches;
 
