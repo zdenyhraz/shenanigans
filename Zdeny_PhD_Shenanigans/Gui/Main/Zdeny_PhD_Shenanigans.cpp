@@ -32,8 +32,9 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
 
   // set the logging text browser
   QtLogger::SetTextBrowser(ui.textBrowser);
+  QtLogger::SetLogLevel(QtLogger::LogLevel::Trace);
 
-  LOG_SUCCESS("Welcome back, my friend.");
+  LOG_INFO("Welcome back, my friend.");
 
   // make signal - slot connections
   connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
