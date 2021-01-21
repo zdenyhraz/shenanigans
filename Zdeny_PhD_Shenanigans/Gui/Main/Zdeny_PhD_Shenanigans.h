@@ -17,11 +17,7 @@ private:
 
 private slots:
   void closeEvent(QCloseEvent* event);
-  void ShowWindowIPC();
-  void ShowWindowDiffrot();
-  void ShowWindowFeatures();
-  void ShowWindowFITS();
-  void ShowWindowFiltering();
+  void ShowWindow(const std::string& window);
   void Exit();
   void About();
   void CloseAll();
