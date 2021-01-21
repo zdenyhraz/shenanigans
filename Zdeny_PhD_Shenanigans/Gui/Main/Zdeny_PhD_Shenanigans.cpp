@@ -101,8 +101,8 @@ void Zdeny_PhD_Shenanigans::CloseAll()
   Plot::CloseAll();
 
   // close all shenanigans windows
-  for (auto& window : mWindows)
-    window.second->close();
+  for (auto& [windowname, window] : mWindows)
+    window->close();
 
   LOG_INFO("All windows closed");
 }
