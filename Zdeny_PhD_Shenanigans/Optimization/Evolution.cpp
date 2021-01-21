@@ -107,7 +107,7 @@ try
     }
   }
 
-  LOG_SUCC("Outputs initialized");
+  LOG_SUCCESS("Outputs initialized");
 }
 catch (const std::exception& e)
 {
@@ -138,7 +138,7 @@ try
   else
     LOG_DEBUG("Objective function is consistent");
 
-  LOG_SUCC("Objective function is normal");
+  LOG_SUCCESS("Objective function is normal");
 }
 catch (const std::exception& e)
 {
@@ -156,7 +156,7 @@ void Evolution::CheckBounds()
   if (mUB.size() != N)
     throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUB.size(), N));
 
-  LOG_SUCC("Objective function parameter bounds are valid");
+  LOG_SUCCESS("Objective function parameter bounds are valid");
 }
 
 void Evolution::UpdateOutputs(int gen, const Population& population, ValidationFunction valid)
@@ -422,7 +422,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
       }
     }
   }
-  LOG_SUCC("Initial population created");
+  LOG_SUCCESS("Initial population created");
 
   LOG_INFO("Evaluating initial population...");
 
@@ -431,7 +431,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
     entities[eid].fitness = obj(entities[eid].params);
 
   UpdatePopulationFunctionEvaluations();
-  LOG_SUCC("Initial population evaluated");
+  LOG_SUCCESS("Initial population evaluated");
 }
 
 void Evolution::Population::InitializeOffspring(int nParents)
@@ -443,7 +443,7 @@ void Evolution::Population::InitializeOffspring(int nParents)
     offspring[eid].params = entities[eid].params;
     offspring[eid].fitness = entities[eid].fitness;
   }
-  LOG_SUCC("Initial offspring created");
+  LOG_SUCCESS("Initial offspring created");
 }
 
 void Evolution::Population::InitializeBestEntity()
@@ -451,7 +451,7 @@ void Evolution::Population::InitializeBestEntity()
   LOG_INFO("Searching for best entity in the initial population...");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  LOG_SUCC("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
+  LOG_SUCCESS("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity()

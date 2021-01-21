@@ -165,6 +165,7 @@
     <QtMoc Include="Gui\Windows\Filtering\WindowFiltering.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Log\LogFunction.h" />
+    <ClInclude Include="Log\QtLogger.h" />
     <ClInclude Include="Log\SpdLogger.h" />
     <ClInclude Include="Optimization\Evolution.h" />
     <ClInclude Include="Optimization\OptimizationTestFunctions.h" />

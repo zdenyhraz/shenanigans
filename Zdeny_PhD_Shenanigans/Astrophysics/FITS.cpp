@@ -170,7 +170,7 @@ void checkFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain, s
 		}
 		else
 		{
-			LOG_SUCC( "File '{}' ok", path1 );
+			LOG_SUCCESS( "File '{}' ok", path1 );
 		}
 
 		ifstream stream2( path2, ios::binary | ios::in );
@@ -181,7 +181,7 @@ void checkFitsDownloadUrlPairs( int delta, int step, int pics, string urlmain, s
 		}
 		else
 		{
-			LOG_SUCC( "File '{}' ok", path2 );
+			LOG_SUCCESS( "File '{}' ok", path2 );
 		}
 
 		number += step - delta;
