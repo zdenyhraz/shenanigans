@@ -10,4 +10,3 @@ using Logger = QtLogger;
 #define LOG_SUCCESS(...) Logger::Success(__VA_ARGS__)
 #define LOG_WARNING(...) Logger::Warning(__VA_ARGS__)
 #define LOG_ERROR(...) Logger::Error(__VA_ARGS__)
-#define LOG_FATAL(...) Logger::Fatal(__VA_ARGS__)
