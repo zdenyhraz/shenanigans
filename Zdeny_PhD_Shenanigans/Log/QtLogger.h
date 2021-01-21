@@ -31,7 +31,7 @@ private:
     mColors[LogLevel::Debug] = QColor(51, 153, 255);
     mColors[LogLevel::Info] = QColor(179, 91, 255);
     mColors[LogLevel::Success] = QColor(0, 204, 0);
-    mColors[LogLevel::Warning] = QColor(243, 154, 20);
+    mColors[LogLevel::Warning] = QColor(255, 154, 20);
     mColors[LogLevel::Error] = QColor(225, 0, 0);
   }
 

@@ -6,6 +6,8 @@ Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
+  LOG_FUNCTION("Evolution optimization");
+
   try
   {
     InitializeOutputs();
@@ -75,7 +77,7 @@ try
   if (mFileOutput)
   {
     mOutputFile.open(mOutputFileDir + mOptimizationName + ".txt", std::ios::out | std::ios::app);
-    mOutputFile << "Evolution optimization '" + mOptimizationName + "' started" << std::endl;
+    fmt::print(mOutputFile, "Evolution optimization '{}' started\n", mOptimizationName);
   }
 
   if (mPlotOutput)
@@ -163,10 +165,10 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 {
   if (population.bestEntity.fitness < population.previousFitness)
   {
-    auto message = GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness);
+    const auto message = GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness);
 
     if (mFileOutput)
-      mOutputFile << message << std::endl;
+      fmt::print(mOutputFile, "{}\n", message);
 
     LOG_DEBUG("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
   }
@@ -183,14 +185,13 @@ try
 {
   if (mFileOutput)
   {
-    mOutputFile << "Evolution optimization '" + mOptimizationName + "' ended\n" << std::endl;
-    mOutputFile << "Evolution result: " << GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness) << std::endl;
+    fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mOptimizationName);
+    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
     mOutputFile.close();
   }
 
   LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-  LOG_INFO("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
-  LOG_INFO("Evolution optimization ended");
+  LOG_SUCCESS("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
 }
 catch (const std::exception& e)
 {
