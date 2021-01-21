@@ -57,7 +57,7 @@ private:
       return;
 
     mTextBrowser->setTextColor(mColors[logLevel]);
-    mTextBrowser->append(fmt::format("[{}]  {}", GetCurrentTime(), fmt::format(fmt, args...)).c_str());
+    mTextBrowser->append(fmt::format("[{}] {}", GetCurrentTime(), fmt::format(fmt, args...)).c_str());
     QCoreApplication::processEvents();
   }
 

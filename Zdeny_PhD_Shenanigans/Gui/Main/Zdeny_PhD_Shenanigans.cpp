@@ -88,7 +88,7 @@ void Zdeny_PhD_Shenanigans::Debug()
 void Zdeny_PhD_Shenanigans::About()
 {
   QMessageBox msgBox;
-  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n2018-2020");
+  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n© 2018-2020");
   msgBox.exec();
 }
 
