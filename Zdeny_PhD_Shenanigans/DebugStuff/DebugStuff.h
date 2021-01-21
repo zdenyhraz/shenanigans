@@ -29,12 +29,12 @@ void Debug(Globals* globals)
     LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
     LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
   }
-  if (0) // plot in optimization
+  if (1) // plot in optimization
   {
-    auto f = OptimizationTestFunctions::Ackley;
+    auto f = OptimizationTestFunctions::Rosenbrock;
     int N = 2;
     Evolution Evo(N);
-    Evo.mNP = 50. / 7 * N;
+    Evo.mNP = 3 * N;
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
