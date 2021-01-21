@@ -50,7 +50,6 @@
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"
 #include "Core/constants.h"
-#include "Core/macros.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Plot/Plot1D.h"

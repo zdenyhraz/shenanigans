@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "Gui/Main/Zdeny_PhD_Shenanigans.h"
 
+//#define ATTACH_CONSOLE
+
 #ifdef ATTACH_CONSOLE
-#  include <windows.h>
-#  include <stdio.h>
+#include <windows.h>
+#include <stdio.h>
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifdef ATTACH_CONSOLE
   // detach from the current console window

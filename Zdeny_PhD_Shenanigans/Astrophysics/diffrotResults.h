@@ -124,7 +124,7 @@ public:
           return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
 
-    LOG_FATAL("Interpolation fault");
+    LOG_ERROR("Interpolation fault");
     throw; // should never get here
   }
 

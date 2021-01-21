@@ -3,6 +3,9 @@
 #include "Core/functionsBaseCV.h"
 #include "Core/constants.h"
 
+//#define FOURIER_WITH_FFTW//optional use of the fftw library
+//#define FOURIER_WITH_CUDA//optional use of the cuda library
+
 namespace Fourier
 {
 inline Mat fft(Mat&& img)
@@ -203,8 +206,7 @@ inline Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
   Mat gaussian = Mat::zeros(rows, cols, CV_32F);
   for (int r = 0; r < rows; r++)
     for (int c = 0; c < cols; c++)
-      gaussian.at<float>(r, c) = std::exp(-(std::pow(c - cols / 2, 2) / 2 / std::pow((double)cols / stdevXmult, 2) +
-                                            std::pow(r - rows / 2, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
+      gaussian.at<float>(r, c) = std::exp(-(std::pow(c - cols / 2, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(r - rows / 2, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
 
   normalize(gaussian, gaussian, 0, 1, NORM_MINMAX);
   return gaussian;
@@ -250,8 +252,7 @@ inline Mat bandpass(const Mat& sourceimgDFTIn, const Mat& bandpassMat)
   return sourceimgDFT.mul(filter);
 }
 
-void showfourier(const Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn",
-                 std::string phasewindowname = "FFTphase");
+void showfourier(const Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
 
 Mat convolute(Mat img, Mat PSFimg);
 

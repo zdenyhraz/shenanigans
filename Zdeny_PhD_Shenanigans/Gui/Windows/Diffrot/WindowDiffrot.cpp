@@ -180,7 +180,7 @@ void WindowDiffrot::optimizeDiffrot()
   }
   catch (...)
   {
-    LOG_FATAL("Evolution optimization somehow failed");
+    LOG_ERROR("Evolution optimization somehow failed");
   }
 }
 

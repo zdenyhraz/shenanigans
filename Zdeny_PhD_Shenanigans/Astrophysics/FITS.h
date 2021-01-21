@@ -27,7 +27,7 @@ struct FitsParams
   bool succParamCorrection = false;
 };
 
-inline void swapbytes(char *input, unsigned length)
+inline void swapbytes(char* input, unsigned length)
 {
   for (int i = 0; i < length; i += 2)
   {
@@ -46,9 +46,9 @@ public:
 
   void reload(std::string path) { data = loadfits(path); }
 
-  const Mat &image() const { return std::get<0>(data); }
+  const Mat& image() const { return std::get<0>(data); }
 
-  const FitsParams &params() const { return std::get<1>(data); }
+  const FitsParams& params() const { return std::get<1>(data); }
 
 private:
   std::tuple<Mat, FitsParams> data;
@@ -128,8 +128,8 @@ private:
 
       // opencv integration
       Mat mat(fitsSize, fitsSize, CV_16UC1);
-      streamIN.read((char *)mat.data, fitsSize2 * 2);
-      swapbytes((char *)mat.data, fitsSize2 * 2);
+      streamIN.read((char*)mat.data, fitsSize2 * 2);
+      swapbytes((char*)mat.data, fitsSize2 * 2);
       normalize(mat, mat, 0, 65535, NORM_MINMAX);
       warpAffine(mat, mat, getRotationMatrix2D(Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
       transpose(mat, mat);
@@ -139,7 +139,7 @@ private:
       if constexpr (0) // debug values
       {
         auto [mmin, mmax] = minMaxMat(mat);
-        LOG_FATAL("min/max mat {}/{}", mmin, mmax);
+        LOG_INFO("min/max mat {}/{}", mmin, mmax);
         Mat xd = mat.clone();
         cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
         circle(xd, Point(fitsMid, fitsMid), params.R, Scalar(0, 0, 65535), 5);
@@ -432,7 +432,7 @@ public:
   }
 };
 
-Mat loadfits(std::string path, FitsParams &params);
+Mat loadfits(std::string path, FitsParams& params);
 
 void generateFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain);
 
@@ -440,7 +440,7 @@ void generateFitsDownloadUrlSingles(int delta, int pics, string urlmain);
 
 void checkFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain, string pathMasterIn);
 
-void loadImageDebug(Mat &activeimg, double gamaa, bool colorr, double quanBot, double quanTop);
+void loadImageDebug(Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop);
 
 inline Mat loadImage(std::string path)
 {
