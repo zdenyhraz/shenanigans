@@ -3,7 +3,7 @@
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 
-DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, FitsTime &time, const DiffrotSettings &drset)
+DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, FitsTime& time, const DiffrotSettings& drset)
 {
   int dy = drset.vFov / (drset.ys - 1);
   std::vector<std::vector<double>> thetas2D;
@@ -54,14 +54,16 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
       if (drset.pred)
       {
         predShift = predictDiffrotShift(drset.dPic, drset.dSec, R);
-        LOG_DEBUG_IF(drset.speak, "Predicted shift used = {}", predShift);
+        if (drset.speak)
+          LOG_DEBUG("Predicted shift used = {}", predShift);
       }
 
       calculateOmegas(pic1, pic2, shiftsX, shiftsY, thetas, omegasX, omegasY, ipc, drset, R, theta0, dy, lag1, lag2, predShift);
 
       if (pic < 10)
       {
-        LOG_SUCC_IF(drset.speak, "{} / {} estimating initial profile", pic + 1, drset.pics);
+        if (drset.speak)
+          LOG_SUCC("{} / {} estimating initial profile", pic + 1, drset.pics);
         thetas2D.emplace_back(thetas);
         shiftsX2D.emplace_back(shiftsX);
         shiftsY2D.emplace_back(shiftsY);
@@ -87,10 +89,11 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
           omegasY2D.emplace_back(omegasY);
 
           // log progress
-          LOG_SUCC_IF(drset.speak, "{}/{} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
+          if (drset.speak)
+            LOG_SUCC("{}/{} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
         }
-        else
-          LOG_ERROR_IF(drset.speak, "Abnormal profile detected, diff X = {:.2f}, diff Y = {:.2f}, skipping", diffX, diffY);
+        else if (drset.speak)
+          LOG_ERROR("Abnormal profile detected, diff X = {:.2f}, diff Y = {:.2f}, skipping", diffX, diffY);
       }
 
       omegasXavg = meanVertical(omegasX2D);
@@ -105,7 +108,8 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, Fit
   return dr;
 }
 
-inline void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
+inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& shiftsY, std::vector<double>& thetas, std::vector<double>& omegasX,
+                            std::vector<double>& omegasY, const IterativePhaseCorrelation& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
 {
 #pragma omp parallel for
   for (int y = 0; y < drset.ys; y++)
@@ -130,7 +134,8 @@ inline void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::v
   }
 
   if (lag1 != 0 || lag2 != 0)
-    LOG_DEBUG_IF(drset.speak, "Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2);
+    if (drset.speak)
+      LOG_DEBUG("Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2);
 
   const double dt = (double)(drset.dPic * drset.dSec + lag2 - lag1);
   for (int y = 0; y < drset.ys; y++)
@@ -142,7 +147,7 @@ inline void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::v
   }
 }
 
-void loadFitsFuzzy(FitsImage &pic, FitsTime &time, int &lag)
+void loadFitsFuzzy(FitsImage& pic, FitsTime& time, int& lag)
 {
   pic.reload(time.path());
 

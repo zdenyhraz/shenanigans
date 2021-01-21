@@ -121,6 +121,7 @@
     <ClCompile Include="IPC\ipcAux.cpp" />
     <ClCompile Include="IPC\IterativePhaseCorrelation.cpp" />
     <ClCompile Include="Log\logger.cpp" />
+    <ClCompile Include="Log\SpdLogger.cpp" />
     <ClCompile Include="Optimization\Evolution.cpp" />
     <ClCompile Include="Optimization\GraphOptimization.cpp" />
     <ClCompile Include="InverseMap\inverseMapping.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Filtering\HistogramEqualization.h" />
     <QtMoc Include="Gui\Windows\Filtering\WindowFiltering.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
+    <ClInclude Include="Log\SpdLogger.h" />
     <ClInclude Include="Optimization\Evolution.h" />
     <ClInclude Include="Optimization\OptimizationTestFunctions.h" />
     <ClInclude Include="Optimization\PatternSearch.h" />

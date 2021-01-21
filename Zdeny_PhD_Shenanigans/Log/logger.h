@@ -1,62 +1,15 @@
 #pragma once
-#define LOG_TRACE(...) Logger::Get()->trace(__VA_ARGS__)
-#define LOG_DEBUG(...) Logger::Get()->debug(__VA_ARGS__)
-#define LOG_SUCC(...) Logger::Get()->info(__VA_ARGS__)
-#define LOG_INFO(...) Logger::Get()->warn(__VA_ARGS__)
-#define LOG_ERROR(...) Logger::Get()->error(__VA_ARGS__)
-#define LOG_FATAL(...) Logger::Get()->critical(__VA_ARGS__)
+#include "SpdLogger.h"
 
-#define LOG_NEWLINE Logger::Get()->debug("")
+#define LOG_TRACE(...) SpdLogger::Get()->trace(__VA_ARGS__)
+#define LOG_DEBUG(...) SpdLogger::Get()->debug(__VA_ARGS__)
+#define LOG_SUCC(...) SpdLogger::Get()->info(__VA_ARGS__)
+#define LOG_INFO(...) SpdLogger::Get()->warn(__VA_ARGS__)
+#define LOG_ERROR(...) SpdLogger::Get()->error(__VA_ARGS__)
+#define LOG_FATAL(...) SpdLogger::Get()->critical(__VA_ARGS__)
 
-#define LOG_DEBUG_IF(c, ...)                                                                                                                                                                           \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->debug(__VA_ARGS__)
-#define LOG_SUCC_IF(c, ...)                                                                                                                                                                            \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->info(__VA_ARGS__)
-#define LOG_INFO_IF(c, ...)                                                                                                                                                                            \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->warn(__VA_ARGS__)
-#define LOG_ERROR_IF(c, ...)                                                                                                                                                                           \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->error(__VA_ARGS__)
-#define LOG_FATAL_IF(c, ...)                                                                                                                                                                           \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->critical(__VA_ARGS__)
-
-#define LOG_IFELSE(c, a, b)                                                                                                                                                                            \
-  if (c)                                                                                                                                                                                               \
-  Logger::Get()->info(c, a) else Logger::Get()->error(c, b)
-
+#define LOG_NEWLINE SpdLogger::Get()->debug("")
 #define LOG_FUNCTION(fun) LOG_FUNCTION_IMPL log_function_impl(fun)
-
-class Logger
-{
-public:
-  Logger()
-  {
-    spdlogger = spdlog::stdout_color_mt("console");
-    spdlogger->set_pattern("[%T] %^%v%$");
-    spdlogger->set_level(spdlog::level::trace);
-  }
-
-  inline static std::shared_ptr<spdlog::logger>& Get() { return spdlogger; }
-  inline static void Init() { logger = std::make_unique<Logger>(); }
-
-private:
-  static std::shared_ptr<spdlog::logger> spdlogger;
-  static std::unique_ptr<Logger> logger;
-};
-
-class LOG_STARTEND_IMPL
-{
-public:
-  LOG_STARTEND_IMPL(const std::string& startMsg, const std::string& endMsg) : EndMsg(endMsg) { LOG_DEBUG(startMsg); }
-  ~LOG_STARTEND_IMPL() { LOG_DEBUG(EndMsg); }
-
-private:
-  std::string EndMsg;
-};
 
 class LOG_FUNCTION_IMPL
 {
