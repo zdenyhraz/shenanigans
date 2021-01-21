@@ -3,6 +3,7 @@
 
 class QtLogger
 {
+public:
   enum class LogLevel
   {
     Trace,
@@ -13,8 +14,8 @@ class QtLogger
     Error
   };
 
-public:
-  static void SetTextBrowser(QTextBrowser* textBrowser) { Get().SetTextBrowserInternal(textBrowser); }
+  static void SetTextBrowser(QTextBrowser* textBrowser) { Get().mTextBrowser = textBrowser; }
+  static void SetLogLevel(LogLevel logLevel) { Get().mLogLevel = logLevel; }
 
   template <typename... Args> static void Trace(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Trace, fmt, args...); }
   template <typename... Args> static void Debug(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Debug, fmt, args...); }
@@ -29,7 +30,7 @@ private:
     mColors[LogLevel::Trace] = QColor(180, 180, 180);
     mColors[LogLevel::Debug] = QColor(51, 153, 255);
     mColors[LogLevel::Info] = QColor(179, 91, 255);
-    mColors[LogLevel::Success] = QColor(0, 209, 56);
+    mColors[LogLevel::Success] = QColor(0, 204, 0);
     mColors[LogLevel::Warning] = QColor(243, 154, 20);
     mColors[LogLevel::Error] = QColor(225, 0, 0);
   }
@@ -40,13 +41,12 @@ private:
     return logger;
   }
 
-  bool CanLog() { return mTextBrowser != nullptr; }
+  bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr && logLevel >= mLogLevel; }
   std::string GetTime() { return "11:23:05"; }
-  void SetTextBrowserInternal(QTextBrowser* textBrowser) { mTextBrowser = textBrowser; }
 
   template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
-    if (!CanLog())
+    if (!ShouldLog(logLevel))
       return;
 
     mTextBrowser->setTextColor(mColors[logLevel]);
@@ -55,6 +55,6 @@ private:
   }
 
   QTextBrowser* mTextBrowser = nullptr;
-
+  LogLevel mLogLevel = LogLevel::Debug;
   std::unordered_map<LogLevel, QColor> mColors;
 };
