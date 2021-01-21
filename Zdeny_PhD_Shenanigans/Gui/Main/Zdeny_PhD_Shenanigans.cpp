@@ -74,13 +74,9 @@ void Zdeny_PhD_Shenanigans::About()
 
 void Zdeny_PhD_Shenanigans::CloseAll()
 {
-  // close all opencv windows
   destroyAllWindows();
-
-  // close all qcustomplot windows
   Plot::CloseAll();
 
-  // close all shenanigans windows
   for (auto& [windowname, window] : mWindows)
     window->close();
 
@@ -89,10 +85,9 @@ void Zdeny_PhD_Shenanigans::CloseAll()
 
 void Zdeny_PhD_Shenanigans::GenerateLand()
 {
-  LOG_INFO("Generating some land...");
+  LOG_FUNCTION("Generate land");
   Mat mat = procedural(1000, 1000);
   showimg(colorlandscape(mat), "procedural nature");
-  LOG_INFO("Finished generating some land. Do you like it?");
 }
 
 void Zdeny_PhD_Shenanigans::UnitTests()
@@ -102,9 +97,8 @@ void Zdeny_PhD_Shenanigans::UnitTests()
 
 void Zdeny_PhD_Shenanigans::Snake()
 {
-  LOG_INFO("Started playing snake");
+  LOG_FUNCTION("Play snake");
   SnakeGame();
-  LOG_INFO("Finished playing snake - did you enjoy it? *wink*");
 }
 
 void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent* event)
