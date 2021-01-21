@@ -20,7 +20,7 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // Qt logging
+  if (1) // logging
   {
     LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
     LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
