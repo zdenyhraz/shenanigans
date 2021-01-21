@@ -42,7 +42,14 @@ private:
   }
 
   bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr && logLevel >= mLogLevel; }
-  std::string GetTime() { return "11:23:05"; }
+
+  static std::string GetCurrentTime()
+  {
+    time_t now = time(0);
+    char buf[sizeof "12:34:56"];
+    strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&now));
+    return buf;
+  }
 
   template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
@@ -50,7 +57,7 @@ private:
       return;
 
     mTextBrowser->setTextColor(mColors[logLevel]);
-    mTextBrowser->append(fmt::format("[{}] {}", GetTime(), fmt::format(fmt, args...)).c_str());
+    mTextBrowser->append(fmt::format("[{}] {}", GetCurrentTime(), fmt::format(fmt, args...)).c_str());
     QCoreApplication::processEvents();
   }
 
