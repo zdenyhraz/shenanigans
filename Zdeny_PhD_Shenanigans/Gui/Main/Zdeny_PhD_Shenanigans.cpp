@@ -37,11 +37,11 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
   LOG_INFO("Welcome back, my friend.");
 
   // make signal - slot connections
-  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
-  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
-  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
-  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
-  connect(ui.actionFiltering, SIGNAL(triggered()), this, SLOT(ShowWindowFiltering()));
+  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindow("ipc")));
+  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindow("diffrot")));
+  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindow("features")));
+  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindow("fits")));
+  connect(ui.actionFiltering, SIGNAL(triggered()), this, SLOT(ShowWindow("filtering")));
   connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(Debug()));
   connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(About()));
   connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
@@ -50,29 +50,9 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
   connect(ui.actionUnitTests, SIGNAL(triggered()), this, SLOT(UnitTests()));
 }
 
-void Zdeny_PhD_Shenanigans::ShowWindowIPC()
+void Zdeny_PhD_Shenanigans::ShowWindow(const std::string& window)
 {
-  mWindows["ipc"]->show();
-}
-
-void Zdeny_PhD_Shenanigans::ShowWindowDiffrot()
-{
-  mWindows["diffrot"]->show();
-}
-
-void Zdeny_PhD_Shenanigans::ShowWindowFeatures()
-{
-  mWindows["features"]->show();
-}
-
-void Zdeny_PhD_Shenanigans::ShowWindowFITS()
-{
-  mWindows["fits"]->show();
-}
-
-void Zdeny_PhD_Shenanigans::ShowWindowFiltering()
-{
-  mWindows["filtering"]->show();
+  mWindows[window]->show();
 }
 
 void Zdeny_PhD_Shenanigans::Exit()
