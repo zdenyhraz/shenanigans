@@ -54,7 +54,7 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
       h = 0;
   }
 
-  LOG_DEBUG("New plot position = [{},{}], plot is in {}. place", w, h, plots.size());
+  LOG_TRACE("New plot position = [{},{}], plot is in {}. place", w, h, plots.size());
   return QPoint(w, h);
 }
 
