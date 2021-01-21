@@ -30,8 +30,6 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
   ui.label_2->setPixmap(pm);
   ui.label_2->setScaledContents(true);
 
-  // init logger
-  SpdLogger::Init();
   LOG_SUCC("Welcome back, my friend.");
 
   // make signal - slot connections

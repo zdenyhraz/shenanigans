@@ -6,7 +6,10 @@
 #include "Plot/Plot2D.h"
 #include "stdafx.h"
 
-inline double predictDiffrotProfile(double theta, double A, double B, double C = 0) { return (A + B * pow(sin(theta), 2) + C * pow(sin(theta), 4)); }
+inline double predictDiffrotProfile(double theta, double A, double B, double C = 0)
+{
+  return (A + B * pow(sin(theta), 2) + C * pow(sin(theta), 4));
+}
 
 inline int predictDiffrotShift(int dPic, int dSec, double R)
 {
@@ -37,24 +40,41 @@ public:
     CalculateFitCoeffs();
 
     // diffrot profiles
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasX, 2), OmegasX, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "west-east flow speed [deg/day]", {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 2), QPen(Plot::red, 2)}, saveDir + "1DXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasY, 3), OmegasY}, "diffrot profile Y", "solar latitude [deg]", "north-south flow speed [deg/day]", {"polyfit3", "average"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5)}, saveDir + "1DYs" + to_string(SourceStride) + ".png"); // rgb(119, 136, 153)
+    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasX, 2), OmegasX, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "west-east flow speed [deg/day]",
+                 {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 2), QPen(Plot::red, 2)},
+                 saveDir + "1DXs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasY, 3), OmegasY}, "diffrot profile Y", "solar latitude [deg]", "north-south flow speed [deg/day]", {"polyfit3", "average"},
+                 {QPen(Plot::black, 3), QPen(Plot::green, 1.5)}, saveDir + "1DYs" + to_string(SourceStride) + ".png"); // rgb(119, 136, 153)
 
     // diffrot profiles NS
-    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X", "absolute solar latitude [deg]", "west-east flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)", "Derek N", "Derek S"}, {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5), QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::blue, 2), QPen(Plot::red, 2)}, saveDir + "1DNSXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasYavgN), sin2sin4fit(ThetasNS, OmegasYavgS), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]", "north-south flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South"}, {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5)}, saveDir + "1DNSYs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X",
+                 "absolute solar latitude [deg]", "west-east flow speed [deg/day]",
+                 {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)", "Derek N", "Derek S"},
+                 {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5), QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::blue, 2), QPen(Plot::red, 2)},
+                 saveDir + "1DNSXs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasYavgN), sin2sin4fit(ThetasNS, OmegasYavgS), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]",
+                 "north-south flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South"},
+                 {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5)}, saveDir + "1DNSYs" + to_string(SourceStride) + ".png");
 
     // shifts profiles
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsX, 2), ShiftsX, ShiftsXErrorsBot, ShiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "west-east image shift [px]", {"polyfit2", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)}, saveDir + "1DsXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsY, 3), ShiftsY, ShiftsYErrorsBot, ShiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "north-south image shift [px]", {"polyfit3", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)}, saveDir + "1DsYs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsX, 2), ShiftsX, ShiftsXErrorsBot, ShiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "west-east image shift [px]",
+                 {"polyfit2", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)},
+                 saveDir + "1DsXs" + to_string(SourceStride) + ".png");
+    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsY, 3), ShiftsY, ShiftsYErrorsBot, ShiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "north-south image shift [px]",
+                 {"polyfit3", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)},
+                 saveDir + "1DsYs" + to_string(SourceStride) + ".png");
 
     // flows ratio1
-    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta), toDegrees(EndTheta), colRowRatio1, saveDir + "2DXm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
-    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta), toDegrees(EndTheta), colRowRatio1, saveDir + "2DYm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
+    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+                 toDegrees(EndTheta), colRowRatio1, saveDir + "2DXm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
+    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+                 toDegrees(EndTheta), colRowRatio1, saveDir + "2DYm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
 
     // flows ratio2
-    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X r", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta), toDegrees(EndTheta), colRowRatio2, saveDir + "2DXm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
-    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta), toDegrees(EndTheta), colRowRatio2, saveDir + "2DYm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
+    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X r", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+                 toDegrees(EndTheta), colRowRatio2, saveDir + "2DXm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
+    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+                 toDegrees(EndTheta), colRowRatio2, saveDir + "2DYm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
 
     LOG_INFO("Predic error = {}", GetError());
   }
@@ -66,9 +86,9 @@ public:
     CalculatePredics();
     double error = 0;
     size_t ycount = OmegasX.size();
-    const auto &mycurve = OmegasX;
-    const auto &myfit = polyfit(Thetas, OmegasX, 2);
-    const auto &targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
+    const auto& mycurve = OmegasX;
+    const auto& myfit = polyfit(Thetas, OmegasX, 2);
+    const auto& targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
 
     for (int y = 0; y < ycount; ++y)
       error += 0.8 * std::pow(myfit[y] - targetcurve[y], 2) + 0.2 * std::pow(mycurve[y] - targetcurve[y], 2);
@@ -76,7 +96,7 @@ public:
     return sqrt(error / ycount);
   }
 
-  static double Interpolate(const std::vector<double> &xs, const std::vector<double> &ys, double x)
+  static double Interpolate(const std::vector<double>& xs, const std::vector<double>& ys, double x)
   {
     if (xs.front() <= xs.back()) // ascending x
     {
@@ -108,7 +128,7 @@ public:
     throw; // should never get here
   }
 
-  static double Interpolate(const std::vector<std::vector<double>> &xs, const std::vector<std::vector<double>> &ys, double x)
+  static double Interpolate(const std::vector<std::vector<double>>& xs, const std::vector<std::vector<double>>& ys, double x)
   {
     const int ps = xs.size();
     double mean = 0;
@@ -119,7 +139,8 @@ public:
     return mean / ps;
   }
 
-  void SetData2D(const std::vector<std::vector<double>> &thetas2D, const std::vector<std::vector<double>> &omegasX, const std::vector<std::vector<double>> &omegasY, const std::vector<std::vector<double>> &shiftsX, const std::vector<std::vector<double>> &shiftsY)
+  void SetData2D(const std::vector<std::vector<double>>& thetas2D, const std::vector<std::vector<double>>& omegasX, const std::vector<std::vector<double>>& omegasY,
+                 const std::vector<std::vector<double>>& shiftsX, const std::vector<std::vector<double>>& shiftsY)
   {
     SourceThetas = thetas2D;
     SourceShiftsX = shiftsX;
@@ -139,7 +160,8 @@ public:
     UpdateCalculated();
   }
 
-  auto GetVecs2D(std::vector<std::vector<double>> &sourceThetas, std::vector<std::vector<double>> &sourceShiftsX, std::vector<std::vector<double>> &sourceShiftsY, std::vector<std::vector<double>> &sourceOmegasX, std::vector<std::vector<double>> &sourceOmegasY) const
+  auto GetVecs2D(std::vector<std::vector<double>>& sourceThetas, std::vector<std::vector<double>>& sourceShiftsX, std::vector<std::vector<double>>& sourceShiftsY,
+                 std::vector<std::vector<double>>& sourceOmegasX, std::vector<std::vector<double>>& sourceOmegasY) const
   {
     sourceThetas = SourceThetas;
     sourceShiftsX = SourceShiftsX;
@@ -148,13 +170,14 @@ public:
     sourceOmegasY = SourceOmegasY;
   }
 
-  auto GetParams(int &sourcePics, int &sourceStride) const
+  auto GetParams(int& sourcePics, int& sourceStride) const
   {
     sourcePics = SourcePics;
     sourceStride = SourceStride;
   }
 
-  void SetVecs2DRaw(const std::vector<std::vector<double>> &sourceThetas, const std::vector<std::vector<double>> &sourceShiftsX, const std::vector<std::vector<double>> &sourceShiftsY, const std::vector<std::vector<double>> &sourceOmegasX, const std::vector<std::vector<double>> &sourceOmegasY)
+  void SetVecs2DRaw(const std::vector<std::vector<double>>& sourceThetas, const std::vector<std::vector<double>>& sourceShiftsX, const std::vector<std::vector<double>>& sourceShiftsY,
+                    const std::vector<std::vector<double>>& sourceOmegasX, const std::vector<std::vector<double>>& sourceOmegasY)
   {
     SourceThetas = sourceThetas;
     SourceShiftsX = sourceShiftsX;
@@ -359,8 +382,6 @@ private:
 
   void CalculateFitCoeffs()
   {
-    LOG_NEWLINE;
-
     // XY both
     LogFitCoeffs("XcoeffsPoly2", polyfitCoeffs(Thetas, OmegasX, 2));
     LogFitCoeffs("YcoeffsPoly3", polyfitCoeffs(Thetas, OmegasY, 3));
@@ -375,11 +396,9 @@ private:
     LogFitCoeffs("YcoeffsTrigS", sin2sin4fitCoeffs(ThetasNS, OmegasYavgS));
   }
 
-  void LogFitCoeffs(const std::string &fitname, const std::vector<double> &coeffs)
+  void LogFitCoeffs(const std::string& fitname, const std::vector<double>& coeffs)
   {
     for (int i = 0; i < coeffs.size(); i++)
       LOG_DEBUG("{} fit coefficient {} = {:.2f}", fitname, (char)('A' + i), coeffs[i]);
-
-    LOG_NEWLINE;
   }
 };

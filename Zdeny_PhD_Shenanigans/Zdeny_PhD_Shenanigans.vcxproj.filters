@@ -82,9 +82,6 @@
     <ClCompile Include="Astrophysics\diffrot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IPC\ipcAux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -145,9 +142,6 @@
     <ClCompile Include="Gui\Windows\Filtering\WindowFiltering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\SpdLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -181,9 +175,6 @@
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
     <ClInclude Include="Core\macros.h">
-      <Filter>Header Files\Global Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Log\logger.h">
       <Filter>Header Files\Global Headers</Filter>
     </ClInclude>
     <ClInclude Include="InverseMap\inverseMapping.h">
@@ -310,6 +301,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Log\SpdLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\Logger.h">
+      <Filter>Header Files\Global Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\LogFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
