@@ -47,7 +47,8 @@
 // fmt
 #include <fmt/format.h>
 // custom
-#include "Log/logger.h"
+#include "Log/Logger.h"
+#include "Log/LogFunction.h"
 #include "Core/constants.h"
 #include "Core/macros.h"
 #include "Core/functionsBaseSTL.h"

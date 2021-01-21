@@ -385,18 +385,13 @@ void Debug(Globals* globals)
   if (0) // loadfits test
   {
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
-    LOG_NEWLINE;
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
-    LOG_NEWLINE;
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_07__CONT.fits");
-    LOG_NEWLINE;
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_52__CONT.fits");
-    LOG_NEWLINE;
     loadImage("D:\\SDOpics\\Calm2020stride25\\2020_02_02__13_16_08__CONT.fits");
   }
   if (0) // loadfits test 2
   {
-    LOG_NEWLINE;
     auto pic = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
     showimg(pic, "pic");
   }
@@ -409,8 +404,6 @@ void Debug(Globals* globals)
     LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1));
     LOG_INFO("Diffrot interp 1D d) {}", DiffrotResults::Interpolate(xs, ys, 1.5));
 
-    LOG_NEWLINE;
-
     auto xsr = xs;
     auto ysr = ys;
     std::reverse(xsr.begin(), xsr.end());
@@ -419,8 +412,6 @@ void Debug(Globals* globals)
     LOG_INFO("Diffrot interp 1Dr b) {}", DiffrotResults::Interpolate(xsr, ysr, 10.0));
     LOG_INFO("Diffrot interp 1Dr c) {}", DiffrotResults::Interpolate(xsr, ysr, 1));
     LOG_INFO("Diffrot interp 1Dr d) {}", DiffrotResults::Interpolate(xsr, ysr, 1.5));
-
-    LOG_NEWLINE;
 
     std::vector<double> xs1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<double> ys1{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
