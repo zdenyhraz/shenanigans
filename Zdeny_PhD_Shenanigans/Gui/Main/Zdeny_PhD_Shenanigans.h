@@ -7,7 +7,7 @@ class Zdeny_PhD_Shenanigans : public QMainWindow
   Q_OBJECT
 
 public:
-  Zdeny_PhD_Shenanigans(QWidget *parent = Q_NULLPTR);
+  Zdeny_PhD_Shenanigans(QWidget* parent = Q_NULLPTR);
 
 private:
   Ui::Zdeny_PhD_ShenanigansClass ui;
@@ -16,7 +16,7 @@ private:
   std::unordered_map<std::string, std::unique_ptr<QMainWindow>> mWindows;
 
 private slots:
-  void CloseEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent* event);
   void ShowWindowIPC();
   void ShowWindowDiffrot();
   void ShowWindowFeatures();

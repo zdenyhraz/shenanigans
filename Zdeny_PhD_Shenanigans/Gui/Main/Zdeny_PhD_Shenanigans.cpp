@@ -88,7 +88,7 @@ void Zdeny_PhD_Shenanigans::Debug()
 void Zdeny_PhD_Shenanigans::About()
 {
   QMessageBox msgBox;
-  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira\n© 2018-2020");
+  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\n© Zdenek Hrazdira");
   msgBox.exec();
 }
 
@@ -127,9 +127,9 @@ void Zdeny_PhD_Shenanigans::Snake()
   LOG_INFO("Finished playing snake - did you enjoy it? *wink*");
 }
 
-void Zdeny_PhD_Shenanigans::CloseEvent(QCloseEvent* event)
+void Zdeny_PhD_Shenanigans::closeEvent(QCloseEvent* event)
 {
-  QMessageBox::StandardButton resBtn = QMessageBox::question(this, "hehe XD", "Are you sure u wanna exit?\n", QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+  QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Quit", "Are you sure you want to quit?    ", QMessageBox::Cancel | QMessageBox::Yes, QMessageBox::Yes);
   if (resBtn != QMessageBox::Yes)
   {
     event->ignore();
@@ -138,5 +138,6 @@ void Zdeny_PhD_Shenanigans::CloseEvent(QCloseEvent* event)
   {
     event->accept();
     CloseAll();
+    LOG_SUCCESS("Good bye.");
   }
 }
