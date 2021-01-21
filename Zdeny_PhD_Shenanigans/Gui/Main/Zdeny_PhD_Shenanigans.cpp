@@ -31,7 +31,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
   ui.label_2->setScaledContents(true);
 
   // init logger
-  Logger::Init();
+  SpdLogger::Init();
   LOG_SUCC("Welcome back, my friend.");
 
   // make signal - slot connections
@@ -80,6 +80,17 @@ void Zdeny_PhD_Shenanigans::Exit()
 
 void Zdeny_PhD_Shenanigans::Debug()
 {
+  ui.textBrowser->setTextColor(QColor(255, 0, 0));
+  ui.textBrowser->append("red");
+
+  ui.textBrowser->setTextColor(QColor(0, 255, 0));
+  ui.textBrowser->append("green");
+
+  ui.textBrowser->setTextColor(QColor(0, 0, 255));
+  ui.textBrowser->append("blue");
+
+  QCoreApplication::processEvents();
+
   Debug::Debug(globals.get());
 }
 

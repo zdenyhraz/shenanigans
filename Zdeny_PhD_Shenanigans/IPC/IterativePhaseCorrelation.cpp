@@ -418,14 +418,16 @@ inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, co
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
   L2size -= mL2sizeStep;
-  LOG_ERROR_IF(mDebugMode, "Reducing L2size to {}", L2size);
+  if (mDebugMode)
+    LOG_ERROR("Reducing L2size to {}", L2size);
   return L2size >= 3;
 }
 
 void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 {
   L1ratio -= mL1ratioStep;
-  LOG_ERROR_IF(mDebugMode, "Reducing L1ratio to {:.2f}", L1ratio);
+  if (mDebugMode)
+    LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
 }
 
 void IterativePhaseCorrelation::InitializePlots() const
