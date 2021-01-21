@@ -20,21 +20,19 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // logging
-  {
-    LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
-    LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
-    LOG_INFO("Info boiiii xdxd {} a {} a {}", 1, 2, 3);
-    LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
-    LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
-    LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
-  }
+  LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
+  LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
+  LOG_INFO("Info boiiii xdxd {} a {} a {}", 1, 2, 3);
+  LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
+  LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
+  LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
+
   if (1) // plot in optimization
   {
-    auto f = OptimizationTestFunctions::Rosenbrock;
-    int N = 2;
+    auto f = OptimizationTestFunctions::Paraboloid;
+    int N = 3;
     Evolution Evo(N);
-    Evo.mNP = 3 * N;
+    Evo.mNP = 10 * N;
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
     Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
