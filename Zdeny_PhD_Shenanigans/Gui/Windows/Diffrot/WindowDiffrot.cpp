@@ -30,7 +30,7 @@ void WindowDiffrot::calculateDiffrot()
 void WindowDiffrot::showResults()
 {
   drres.ShowResults(ui.lineEdit_20->text().toDouble(), ui.lineEdit_16->text().toDouble(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
-  LOG_SUCC("Differential rotation profile shown.");
+  LOG_SUCCESS("Differential rotation profile shown.");
 }
 
 void WindowDiffrot::showIPC()
@@ -175,7 +175,7 @@ void WindowDiffrot::optimizeDiffrot()
       evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "UC", "+BICUBIC"});
       evo.SetOptimizationName(std::string("diffrot full") + " p" + to_string(drset.pics) + " s" + to_string(drset.sPic) + " y" + to_string(drset.ys));
       auto result = evo.Optimize(f);
-      LOG_SUCC("Evolution run {}/{} result = {}", run + 1, runs, result);
+      LOG_SUCCESS("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
   }
   catch (...)

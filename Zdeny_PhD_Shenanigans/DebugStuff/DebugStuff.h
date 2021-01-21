@@ -12,6 +12,7 @@
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
 #include "Sasko/NonMaximaSuppression.h"
+#include "Log/QtLogger.h"
 
 namespace Debug
 {
@@ -19,7 +20,12 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // plot in optimization
+  if (1) // Qt logging
+  {
+    QtLogger::Get().Trace("{} kundovin jak {} kokotu a {} pizdy", 8, 6, 4);
+    QtLogger::Get().Trace("{} kundovin jak {} kokotu a {} pizdy a jeste {} krocani", 12, 3, 45, 4);
+  }
+  if (0) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Ackley;
     int N = 2;

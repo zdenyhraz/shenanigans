@@ -621,7 +621,7 @@ try
 
   ApplyOptimalParameters(optimalParameters);
 
-  LOG_SUCC("Iterative Phase Correlation parameter optimization successful");
+  LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
 {

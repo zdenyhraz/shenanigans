@@ -63,7 +63,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, Fit
       if (pic < 10)
       {
         if (drset.speak)
-          LOG_SUCC("{} / {} estimating initial profile", pic + 1, drset.pics);
+          LOG_SUCCESS("{} / {} estimating initial profile", pic + 1, drset.pics);
         thetas2D.emplace_back(thetas);
         shiftsX2D.emplace_back(shiftsX);
         shiftsY2D.emplace_back(shiftsY);
@@ -90,7 +90,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, Fit
 
           // log progress
           if (drset.speak)
-            LOG_SUCC("{}/{} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
+            LOG_SUCCESS("{}/{} ... diff X/Y = {:.2f}/{:.2f}, adding", pic + 1, drset.pics, diffX, diffY);
         }
         else if (drset.speak)
           LOG_ERROR("Abnormal profile detected, diff X = {:.2f}, diff Y = {:.2f}, skipping", diffX, diffY);
