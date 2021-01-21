@@ -22,8 +22,13 @@ void Debug(Globals* globals)
 
   if (1) // Qt logging
   {
-    QtLogger::Get().Trace("{} kundovin jak {} kokotu a {} pizdy", 8, 6, 4);
-    QtLogger::Get().Trace("{} kundovin jak {} kokotu a {} pizdy a jeste {} krocani", 12, 3, 45, 4);
+    LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_INFO("Info boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_FATAL("Fatal boiiii xdxd {} a {} a {}", 1, 2, 3);
   }
   if (0) // plot in optimization
   {

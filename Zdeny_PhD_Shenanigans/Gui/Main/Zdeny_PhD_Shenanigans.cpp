@@ -31,7 +31,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
   ui.label_2->setScaledContents(true);
 
   // set the logging text browser
-  QtLogger::Get().SetTextBrowser(ui.textBrowser);
+  QtLogger::SetTextBrowser(ui.textBrowser);
 
   LOG_SUCCESS("Welcome back, my friend.");
 
