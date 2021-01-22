@@ -32,7 +32,7 @@ Zdeny_PhD_Shenanigans::Zdeny_PhD_Shenanigans(QWidget* parent) : QMainWindow(pare
 
   // set the logging text browser
   QtLogger::SetTextBrowser(ui.textBrowser);
-  QtLogger::SetLogLevel(QtLogger::LogLevel::Trace);
+  QtLogger::SetLogLevel(QtLogger::LogLevel::Debug);
 
   LOG_INFO("Welcome back, my friend.");
 

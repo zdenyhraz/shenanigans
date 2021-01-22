@@ -49,6 +49,8 @@ struct FeatureMatchData
   bool drawOverlapCircles = false;
   double ratioThreshold = 0.7;
   double upscale = 1;
+  bool surfExtended = false;
+  bool surfUpright = false;
 };
 
 inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
@@ -92,7 +94,7 @@ inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return xfeatures2d::SURF::create(std::min(data.thresh, 500.));
+    return xfeatures2d::SURF::create(std::min(data.thresh, 500.), 4, 3, data.surfExtended, data.surfUpright);
   case FeatureType::BRISK:
     return BRISK::create();
   case FeatureType::ORB:
@@ -131,7 +133,10 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
   cvtColor(img, out, COLOR_GRAY2BGR);
-  resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
+
+  if (data.upscale != 1)
+    resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
+
   double minspd = std::max(getQuantile(speeds_all, 0), data.minSpeed);
   double maxspd = std::min(getQuantile(speeds_all, 1), data.maxSpeed);
   size_t drawcounter = 0;
@@ -153,15 +158,21 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     const double spd = magnitude(shift) * kmpp / dt;
     const double dir = toDegrees(atan2(-shift.y, shift.x));
 
-    if (spd < data.minSpeed || spd > data.maxSpeed)
+    if (spd < data.minSpeed)
     {
-      LOG_WARNING("Skipping match {}: speed {} km/s off limits", idx, spd);
+      LOG_TRACE("Skipping match {}: speed {} km/s too slow", idx, spd);
+      continue;
+    }
+
+    if (spd > data.maxSpeed)
+    {
+      LOG_WARNING("Skipping match {}: speed {} km/s too fast", idx, spd);
       continue;
     }
 
     if (dir < -170 || dir > -100)
     {
-      LOG_WARNING("Skipping match {}: direction {} deg off limits", idx, dir);
+      LOG_TRACE("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
     }
 
@@ -201,7 +212,7 @@ inline void featureMatch(const FeatureMatchData& data)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    // LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
+    LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
