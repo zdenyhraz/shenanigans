@@ -9,7 +9,7 @@
 
 static constexpr int piccnt = 8;                // number of pics
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
-static constexpr double dt = 11.88;             // dt temporally adjacent pics
+static constexpr double dt = 11.8;              // dt temporally adjacent pics
 
 static constexpr double arrow_scale = 12;
 static constexpr double arrow_thickness = 0.0015;
@@ -212,7 +212,7 @@ inline void featureMatch(const FeatureMatchData& data)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
+    LOG_FUNCTION(fmt::format("Matching images {} - {} @ {}", pic, pic + 1, data.path));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
