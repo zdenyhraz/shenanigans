@@ -65,28 +65,10 @@ inline std::pair<Point2f, Point2f> GetFeatureMatchPoints(const DMatch& match, co
 
 inline int GetFeatureTypeMatcher(const FeatureMatchData& data)
 {
-  switch (data.ftype)
-  {
-  case FeatureType::SURF:
+  if (data.ftype == FeatureType::SURF)
     return DescriptorMatcher::MatcherType::BRUTEFORCE;
-  case FeatureType::BRISK:
+  else
     return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::ORB:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::MSER:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::FAST:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::AGAST:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::GFTT:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::KAZE:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  case FeatureType::AKAZE:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
-  }
-  return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
 }
 
 inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
@@ -150,7 +132,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (img.at<uchar>(kp1_all[pic][match.queryIdx].pt) < 10)
     {
-      LOG_WARNING("Skipping match {}: black region", idx);
+      LOG_TRACE("Skipping match {}: black region", idx);
       continue;
     }
 
