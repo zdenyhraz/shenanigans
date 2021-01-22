@@ -155,13 +155,13 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (spd < data.minSpeed || spd > data.maxSpeed)
     {
-      LOG_DEBUG("Skipping match {}: speed {} km/s off limits", idx, spd);
+      LOG_WARNING("Skipping match {}: speed {} km/s off limits", idx, spd);
       continue;
     }
 
     if (dir < -170 || dir > -100)
     {
-      LOG_DEBUG("Skipping match {}: direction {} deg off limits", idx, dir);
+      LOG_WARNING("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
     }
 
@@ -201,7 +201,7 @@ inline void featureMatch(const FeatureMatchData& data)
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
+    // LOG_FUNCTION(fmt::format("Matching images {} - {}: {} - {}", pic, pic + 1, path1, path2));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
