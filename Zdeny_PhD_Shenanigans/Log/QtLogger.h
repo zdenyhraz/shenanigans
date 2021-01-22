@@ -53,6 +53,7 @@ private:
 
   template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
+    std::scoped_lock lock(mMutex);
     if (!ShouldLog(logLevel))
       return;
 
@@ -64,4 +65,5 @@ private:
   QTextBrowser* mTextBrowser = nullptr;
   LogLevel mLogLevel = LogLevel::Debug;
   std::unordered_map<LogLevel, QColor> mColors;
+  std::mutex mMutex;
 };
