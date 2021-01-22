@@ -145,7 +145,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (img.at<uchar>(kp1_all[pic][match.queryIdx].pt) < 10)
     {
-      LOG_DEBUG("Skipping match {}: black region", idx);
+      LOG_WARNING("Skipping match {}: black region", idx);
       continue;
     }
 
