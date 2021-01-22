@@ -28,6 +28,8 @@ void WindowFeatures::FeatureMatch()
   data.drawOverlapCircles = ui.checkBox->isChecked();
   data.ratioThreshold = ui.lineEdit_14->text().toDouble();
   data.upscale = ui.lineEdit_15->text().toDouble();
+  data.surfExtended = ui.checkBox_2->isChecked();
+  data.surfUpright = ui.checkBox_3->isChecked();
 
   featureMatch(data);
 }

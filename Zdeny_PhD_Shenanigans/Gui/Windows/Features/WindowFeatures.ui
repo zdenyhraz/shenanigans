@@ -223,19 +223,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>170</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>draw overlap</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
@@ -341,6 +328,39 @@
       <widget class="QLineEdit" name="lineEdit_15">
        <property name="text">
         <string>1.0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>170</y>
+      <width>69</width>
+      <height>52</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>draw overlap</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="text">
+        <string>surf extended</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="checkBox_3">
+       <property name="text">
+        <string>surf upright</string>
        </property>
       </widget>
      </item>
