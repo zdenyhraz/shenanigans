@@ -44,7 +44,7 @@ void WindowIPC::RefreshIPCparametersAndExit()
 void WindowIPC::Optimize()
 {
   globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
-                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble());
+                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
 }
 
 void WindowIPC::align()

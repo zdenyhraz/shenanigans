@@ -5,19 +5,14 @@
 Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(7 * N){};
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
+try
 {
   LOG_FUNCTION("Evolution optimization");
 
-  try
-  {
-    InitializeOutputs();
-    CheckBounds();
-    CheckObjectiveFunctionNormality(obj);
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("Could not run evolution optimization: {}", e.what());
-  }
+  InitializeOutputs();
+  CheckBounds();
+  CheckObjectiveFunctionNormality(obj);
+  CheckValidationFunctionNormality(valid);
 
   int gen = 0;
   Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents());
@@ -60,6 +55,16 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
 
   UninitializeOutputs(population, termReason);
   return population.bestEntity.params;
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Evolution optimization error: {}", e.what());
+  return OptimizationResult();
+}
+catch (...)
+{
+  LOG_ERROR("Unexpected evolution optimization error");
+  return OptimizationResult();
 }
 
 void Evolution::SetFileOutputDir(const std::string& dir)
@@ -121,30 +126,61 @@ try
 {
   LOG_INFO("Checking objective function normality...");
 
-  auto arg = 0.5 * (mLB + mUB);
-  auto result = obj(arg);
-  auto result2 = obj(arg);
+  const auto arg = 0.5 * (mLB + mUB);
+  const auto result1 = obj(arg);
+  const auto result2 = obj(arg);
 
-  if (!isfinite(result))
+  if (result1 != result2)
+    throw std::runtime_error(fmt::format("Objective function is not consistent"));
+  else
+    LOG_DEBUG("Objective function is consistent");
+
+  if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Objective function is not finite"));
   else
     LOG_DEBUG("Objective function is finite");
 
-  if (result < 0)
+  if (result1 < 0)
     throw std::runtime_error(fmt::format("Objective function is not positive"));
   else
     LOG_DEBUG("Objective function is positive");
-
-  if (result != result2)
-    throw std::runtime_error(fmt::format("Objective function is not consistent"));
-  else
-    LOG_DEBUG("Objective function is consistent");
 
   LOG_SUCCESS("Objective function is normal");
 }
 catch (const std::exception& e)
 {
   throw std::runtime_error(fmt::format("Objective function is not normal: {}", e.what()));
+}
+
+void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
+try
+{
+  LOG_INFO("Checking validation function normality...");
+
+  const auto arg = 0.5 * (mLB + mUB);
+  const auto result1 = valid(arg);
+  const auto result2 = valid(arg);
+
+  if (result1 != result2)
+    throw std::runtime_error(fmt::format("Validation function is not consistent"));
+  else
+    LOG_DEBUG("Validation function is consistent");
+
+  if (!isfinite(result1))
+    throw std::runtime_error(fmt::format("Validation function is not finite"));
+  else
+    LOG_DEBUG("Validation function is finite");
+
+  if (result1 < 0)
+    throw std::runtime_error(fmt::format("Validation function is not positive"));
+  else
+    LOG_DEBUG("Validation function is positive");
+
+  LOG_SUCCESS("Validation function is normal");
+}
+catch (const std::exception& e)
+{
+  throw std::runtime_error(fmt::format("Validation function is not normal: {}", e.what()));
 }
 
 void Evolution::CheckBounds()
