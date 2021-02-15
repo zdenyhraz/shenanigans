@@ -449,6 +449,7 @@ void IterativePhaseCorrelation::InitializePlots() const
   {
     mShiftHistogramPlot = std::make_unique<Plot::Plot1D>("IPC shift histogram");
     mShiftHistogramPlot->mXlabel = "shift";
+    mShiftHistogramPlot->mY1label = "count";
     mShiftHistogramPlot->mY1names = {"artificial", "calculated"};
   }
 }
@@ -621,9 +622,6 @@ try
 
   if (trainingImagePairs.empty())
     throw std::runtime_error(fmt::format("Empty training image pairs vector"));
-
-  ShowImagePairsShiftHistogram(trainingImagePairs, maxShiftRatio);
-  return; // dbg
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
@@ -845,8 +843,7 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
 
 void IterativePhaseCorrelation::ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const
 {
-  static constexpr int averageCountsPerBin = 15;
-  const int histogramBinCount = imagePairs.size() / averageCountsPerBin % 2 ? imagePairs.size() / averageCountsPerBin : imagePairs.size() / averageCountsPerBin + 1;
+  const int histogramBinCount = 21;
   std::vector<double> x(histogramBinCount, 0);
   std::vector<double> yArtificial(histogramBinCount, 0);
   std::vector<double> yCalculated(histogramBinCount, 0);

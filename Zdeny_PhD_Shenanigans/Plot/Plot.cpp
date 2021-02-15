@@ -224,8 +224,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
   if (mY1Log)
   {
     plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
-    plot->yAxis->setNumberPrecision(0);
-    plot->yAxis->setNumberFormat("eb");
+    plot->yAxis->setNumberPrecision(1);
+    // plot->yAxis->setNumberFormat("eb");
     QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
     plot->yAxis->setTicker(logTicker);
   }
@@ -233,8 +233,8 @@ void Plot::Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
   if (mY2Log)
   {
     plot->yAxis2->setScaleType(QCPAxis::stLogarithmic);
-    plot->yAxis2->setNumberPrecision(0);
-    plot->yAxis2->setNumberFormat("eb");
+    plot->yAxis2->setNumberPrecision(1);
+    // plot->yAxis2->setNumberFormat("eb");
     QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
     plot->yAxis2->setTicker(logTicker);
   }
