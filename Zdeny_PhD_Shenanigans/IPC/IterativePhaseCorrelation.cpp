@@ -444,6 +444,11 @@ void IterativePhaseCorrelation::InitializePlots() const
     mColormapPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
     mColormapPlot->mColormapType = QCPColorGradient::gpJet;
   }
+
+  if (!mShiftHistogramPlot)
+  {
+    mShiftHistogramPlot = std::make_unique<Plot::Plot1D>("IPC shift histogram");
+  }
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -604,6 +609,8 @@ try
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
+  InitializePlots();
+
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto validationImages = LoadImages(validationImagesDirectory);
 
@@ -613,8 +620,7 @@ try
   if (trainingImagePairs.empty())
     throw std::runtime_error(fmt::format("Empty training image pairs vector"));
 
-  if (mDebugMode)
-    ShowImagePairsShiftHistogram(trainingImagePairs);
+  ShowImagePairsArtificialShiftHistogram(trainingImagePairs, maxShiftRatio);
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
@@ -833,6 +839,30 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   return "Unknown";
 }
 
-void IterativePhaseCorrelation::ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
+void IterativePhaseCorrelation::ShowImagePairsArtificialShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const
 {
+  const auto comp = [&](const std::tuple<Mat, Mat, Point2f>& left, const std::tuple<Mat, Mat, Point2f>& right) {
+    const auto& [img1L, img2L, shiftL] = left;
+    const auto& [img1R, img2R, shiftR] = right;
+    return shiftL.x < shiftR.x;
+  };
+
+  const auto& [minimg1, minimg2, minShift] = *std::min_element(imagePairs.begin(), imagePairs.end(), comp);
+  const auto& [maximg1, maximg2, maxShift] = *std::max_element(imagePairs.begin(), imagePairs.end(), comp);
+  LOG_DEBUG("Min/max artificial shift X: {}/{}", minShift.x, maxShift.x);
+
+  static constexpr int histogramBinCount = 11;
+  std::vector<double> x(histogramBinCount);
+  std::vector<double> y(histogramBinCount);
+
+  for (int i = 0; i < histogramBinCount; ++i)
+    x[i] = -maxShiftRatio + i * 2 * maxShiftRatio / (histogramBinCount - 1);
+
+  for (const auto& [image1, image2, shift] : imagePairs)
+  {
+    double ratio;
+    y[rand() % histogramBinCount] = shift.y;
+  }
+
+  mShiftHistogramPlot->Plot(x, y);
 }

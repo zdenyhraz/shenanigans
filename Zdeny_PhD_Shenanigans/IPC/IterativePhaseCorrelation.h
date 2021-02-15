@@ -78,6 +78,7 @@ private:
   Mat mWindow;
   mutable std::unique_ptr<Plot::Plot2D> mImagePlot;
   mutable std::unique_ptr<Plot::Plot2D> mColormapPlot;
+  mutable std::unique_ptr<Plot::Plot1D> mShiftHistogramPlot;
 
   void UpdateWindow();
   void UpdateBandpass();
@@ -129,5 +130,5 @@ private:
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
-  void ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
+  void ShowImagePairsArtificialShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const;
 };
