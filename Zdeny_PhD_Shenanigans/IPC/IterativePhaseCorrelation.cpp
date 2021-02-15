@@ -448,6 +448,8 @@ void IterativePhaseCorrelation::InitializePlots() const
   if (!mShiftHistogramPlot)
   {
     mShiftHistogramPlot = std::make_unique<Plot::Plot1D>("IPC shift histogram");
+    mShiftHistogramPlot->mXlabel = "shift";
+    mShiftHistogramPlot->mY1names = {"artificial", "calculated"};
   }
 }
 
@@ -620,7 +622,7 @@ try
   if (trainingImagePairs.empty())
     throw std::runtime_error(fmt::format("Empty training image pairs vector"));
 
-  ShowImagePairsArtificialShiftHistogram(trainingImagePairs, maxShiftRatio);
+  ShowImagePairsShiftHistogram(trainingImagePairs, maxShiftRatio);
   return; // dbg
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
@@ -633,6 +635,7 @@ try
 
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   ApplyOptimalParameters(optimalParameters);
+  ShowImagePairsShiftHistogram(trainingImagePairs, maxShiftRatio);
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
@@ -840,17 +843,23 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   return "Unknown";
 }
 
-void IterativePhaseCorrelation::ShowImagePairsArtificialShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const
+void IterativePhaseCorrelation::ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const
 {
-  static constexpr int histogramBinCount = 11;
+  static constexpr int averageCountsPerBin = 15;
+  const int histogramBinCount = imagePairs.size() / averageCountsPerBin % 2 ? imagePairs.size() / averageCountsPerBin : imagePairs.size() / averageCountsPerBin + 1;
   std::vector<double> x(histogramBinCount, 0);
-  std::vector<double> y(histogramBinCount, 0);
+  std::vector<double> yArtificial(histogramBinCount, 0);
+  std::vector<double> yCalculated(histogramBinCount, 0);
 
   for (int i = 0; i < histogramBinCount; ++i)
-    x[i] = -maxShiftRatio + i * 2 * maxShiftRatio / (histogramBinCount - 1);
+    x[i] = -maxShiftRatio * mCols + i * 2 * maxShiftRatio * mCols / (histogramBinCount - 1);
 
   for (const auto& [image1, image2, shift] : imagePairs)
-    y[histogramBinCount / 2 + std::round(shift.x / mCols / maxShiftRatio * histogramBinCount / 2.5)]++;
+  {
+    yArtificial[clamp(histogramBinCount / 2 + std::round(shift.x / mCols / maxShiftRatio * histogramBinCount / 2.0), 0, histogramBinCount - 1)]++;
+    yCalculated[clamp(histogramBinCount / 2 + std::round(Calculate(image1, image2).x / mCols / maxShiftRatio * histogramBinCount / 2.0), 0, histogramBinCount - 1)]++;
+  }
 
-  mShiftHistogramPlot->Plot(x, y);
+  LOG_DEBUG("Automatic histogram number of bins: {}", histogramBinCount);
+  mShiftHistogramPlot->Plot(x, {yArtificial, yCalculated}, false);
 }
