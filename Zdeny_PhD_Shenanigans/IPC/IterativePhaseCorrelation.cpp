@@ -621,6 +621,7 @@ try
     throw std::runtime_error(fmt::format("Empty training image pairs vector"));
 
   ShowImagePairsArtificialShiftHistogram(trainingImagePairs, maxShiftRatio);
+  return; // dbg
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
@@ -841,28 +842,15 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
 
 void IterativePhaseCorrelation::ShowImagePairsArtificialShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs, double maxShiftRatio) const
 {
-  const auto comp = [&](const std::tuple<Mat, Mat, Point2f>& left, const std::tuple<Mat, Mat, Point2f>& right) {
-    const auto& [img1L, img2L, shiftL] = left;
-    const auto& [img1R, img2R, shiftR] = right;
-    return shiftL.x < shiftR.x;
-  };
-
-  const auto& [minimg1, minimg2, minShift] = *std::min_element(imagePairs.begin(), imagePairs.end(), comp);
-  const auto& [maximg1, maximg2, maxShift] = *std::max_element(imagePairs.begin(), imagePairs.end(), comp);
-  LOG_DEBUG("Min/max artificial shift X: {}/{}", minShift.x, maxShift.x);
-
   static constexpr int histogramBinCount = 11;
-  std::vector<double> x(histogramBinCount);
-  std::vector<double> y(histogramBinCount);
+  std::vector<double> x(histogramBinCount, 0);
+  std::vector<double> y(histogramBinCount, 0);
 
   for (int i = 0; i < histogramBinCount; ++i)
     x[i] = -maxShiftRatio + i * 2 * maxShiftRatio / (histogramBinCount - 1);
 
   for (const auto& [image1, image2, shift] : imagePairs)
-  {
-    double ratio;
-    y[rand() % histogramBinCount] = shift.y;
-  }
+    y[histogramBinCount / 2 + std::round(shift.x / mCols / maxShiftRatio * histogramBinCount / 2.5)]++;
 
   mShiftHistogramPlot->Plot(x, y);
 }
