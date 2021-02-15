@@ -88,9 +88,9 @@ private:
   bool IsValid(const Mat& image1, const Mat& image2) const;
   bool CheckSize(const Mat& image1, const Mat& image2) const;
   bool CheckChannels(const Mat& image1, const Mat& image2) const;
-  void ConvertToUnitFloat(Mat& image1, Mat& image2) const;
-  void ApplyWindow(Mat& image1, Mat& image2) const;
-  std::pair<Mat, Mat> CalculateFourierTransforms(Mat&& image1, Mat&& image2) const;
+  void ConvertToUnitFloat(Mat& image) const;
+  void ApplyWindow(Mat& image) const;
+  Mat CalculateFourierTransform(Mat&& image) const;
   Mat CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const;
   void ApplyBandpass(Mat& crosspower) const;
   void CalculateFrequencyBandpass();
@@ -121,7 +121,7 @@ private:
 
   std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const;
-  void AddNoise(Mat& image1, Mat& image2, double noiseStdev) const;
+  void AddNoise(Mat& image, double noiseStdev) const;
   const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid) const;
   void ApplyOptimalParameters(std::vector<double> optimalParameters);
