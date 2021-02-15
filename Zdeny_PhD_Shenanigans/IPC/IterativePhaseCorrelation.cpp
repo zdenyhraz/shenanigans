@@ -58,8 +58,11 @@ try
     return {0, 0};
   }
 
-  ConvertToUnitFloat(image1, image2);
-  ApplyWindow(image1, image2);
+  ConvertToUnitFloat(image1);
+  ConvertToUnitFloat(image2);
+
+  ApplyWindow(image1);
+  ApplyWindow(image2);
 
   if (mDebugMode)
   {
@@ -68,7 +71,8 @@ try
     mImagePlot->Plot(image2);
   }
 
-  auto [dft1, dft2] = CalculateFourierTransforms(std::move(image1), std::move(image2));
+  auto dft1 = CalculateFourierTransform(std::move(image1));
+  auto dft2 = CalculateFourierTransform(std::move(image2));
   auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
   ApplyBandpass(crosspower);
 
@@ -268,23 +272,20 @@ inline bool IterativePhaseCorrelation::CheckChannels(const Mat& image1, const Ma
   return image1.channels() == 1 && image2.channels() == 1;
 }
 
-inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image1, Mat& image2) const
+inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image) const
 {
-  image1.convertTo(image1, CV_32F);
-  image2.convertTo(image2, CV_32F);
-  normalize(image1, image1, 0, 1, CV_MINMAX);
-  normalize(image2, image2, 0, 1, CV_MINMAX);
+  image.convertTo(image, CV_32F);
+  normalize(image, image, 0, 1, CV_MINMAX);
 }
 
-inline void IterativePhaseCorrelation::ApplyWindow(Mat& image1, Mat& image2) const
+inline void IterativePhaseCorrelation::ApplyWindow(Mat& image) const
 {
-  multiply(image1, mWindow, image1);
-  multiply(image2, mWindow, image2);
+  multiply(image, mWindow, image);
 }
 
-inline std::pair<Mat, Mat> IterativePhaseCorrelation::CalculateFourierTransforms(Mat&& image1, Mat&& image2) const
+inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) const
 {
-  return {Fourier::fft(std::move(image1)), Fourier::fft(std::move(image2))};
+  return Fourier::fft(std::move(image));
 }
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const
@@ -598,10 +599,10 @@ try
 {
   if (itersPerImage < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
-  if (maxShiftRatio >= 1)
+  if (maxShiftRatio <= 0 || maxShiftRatio >= 1)
     throw std::runtime_error(fmt::format("Invalid max shift ratio ({})", maxShiftRatio));
   if (noiseStdev < 0)
-    throw std::runtime_error(fmt::format("Noise stdev cannot be negative ({})", noiseStdev));
+    throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
   auto trainingImages = LoadImages(trainingImagesDirectory);
   auto validationImages = LoadImages(validationImagesDirectory);
@@ -615,10 +616,12 @@ try
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
 
+  LOG_INFO("Each objective function evaluation will calculate {}/{} IPC shifts", trainingImagePairs.size(), validationImagePairs.size());
+
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
-  const auto optimalParameters = CalculateOptimalParameters(obj, valid);
 
+  const auto optimalParameters = CalculateOptimalParameters(obj, valid);
   ApplyOptimalParameters(optimalParameters);
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
@@ -673,34 +676,43 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
   {
     for (int i = 0; i < itersPerImage; ++i)
     {
-      Mat image1, image2;
+      // random shift from a random point
       Point2f shift(rand11() * maxShiftRatio * mCols, rand11() * maxShiftRatio * mRows);
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-      warpAffine(image, image2, T, image.size());
+      Mat imageS;
+      warpAffine(image, imageS, T, image.size());
 
-      image1 = roicropmid(image, mCols, mRows);
-      image2 = roicropmid(image2, mCols, mRows);
+      Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
+      Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
+      Mat image2 = roicrop(imageS, point.x, point.y, mCols, mRows);
 
-      ConvertToUnitFloat(image1, image2);
-      AddNoise(image1, image2, noiseStdev);
+      ConvertToUnitFloat(image1);
+      ConvertToUnitFloat(image2);
+
+      AddNoise(image1, noiseStdev);
+      AddNoise(image2, noiseStdev);
 
       imagePairs.push_back({image1, image2, shift});
+
+      if (mDebugMode)
+      {
+        Mat hcct;
+        hconcat(image1, image2, hcct);
+        showimg(hcct, fmt::format("IPC optimization pair {}", i));
+      }
     }
   }
   return imagePairs;
 }
 
-void IterativePhaseCorrelation::AddNoise(Mat& image1, Mat& image2, double noiseStdev) const
+void IterativePhaseCorrelation::AddNoise(Mat& image, double noiseStdev) const
 {
   if (noiseStdev <= 0)
     return;
 
-  Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-  Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
-  randn(noise1, 0, noiseStdev);
-  randn(noise2, 0, noiseStdev);
-  image1 += noise1;
-  image2 += noise2;
+  Mat noise = Mat::zeros(image.rows, image.cols, CV_32F);
+  randn(noise, 0, noiseStdev);
+  image += noise;
 }
 
 const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
