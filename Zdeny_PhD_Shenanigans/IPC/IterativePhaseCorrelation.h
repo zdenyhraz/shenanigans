@@ -129,4 +129,5 @@ private:
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
+  void ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
 };
