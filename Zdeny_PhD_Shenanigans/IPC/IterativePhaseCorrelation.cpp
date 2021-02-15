@@ -604,14 +604,17 @@ try
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
-  auto trainingImages = LoadImages(trainingImagesDirectory);
-  auto validationImages = LoadImages(validationImagesDirectory);
+  const auto trainingImages = LoadImages(trainingImagesDirectory);
+  const auto validationImages = LoadImages(validationImagesDirectory);
 
-  auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
-  auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
+  const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
+  const auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
 
   if (trainingImagePairs.empty())
     throw std::runtime_error(fmt::format("Empty training image pairs vector"));
+
+  if (mDebugMode)
+    ShowImagePairsShiftHistogram(trainingImagePairs);
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
@@ -642,10 +645,10 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
   if (!std::filesystem::is_directory(imagesDirectory))
     throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
 
-  std::vector<Mat> trainingImages;
+  std::vector<Mat> images;
   for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
   {
-    std::string path = entry.path().string();
+    const std::string path = entry.path().string();
 
     if (!IsImage(path))
     {
@@ -653,10 +656,14 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
       continue;
     }
 
-    trainingImages.push_back(loadImage(path));
+    // crop the input image - good for solar images, omits the black borders
+    static constexpr float cropFocusRatio = 0.5;
+    auto image = loadImage(path);
+    image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
+    images.push_back(image);
     LOG_DEBUG("Loaded image {}", path);
   }
-  return trainingImages;
+  return images;
 }
 
 std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const
@@ -824,4 +831,8 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
     return "Cubic";
   }
   return "Unknown";
+}
+
+void IterativePhaseCorrelation::ShowImagePairsShiftHistogram(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
+{
 }
