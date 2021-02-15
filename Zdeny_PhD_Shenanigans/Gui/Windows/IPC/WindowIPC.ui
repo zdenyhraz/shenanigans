@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>492</width>
-    <height>364</height>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -314,26 +314,12 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>148</y>
+      <y>170</y>
       <width>271</width>
       <height>163</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_10">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_22">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>2 PIC</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0">
@@ -469,15 +455,29 @@
        </item>
       </layout>
      </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_22">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>2 PIC</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>1</y>
-      <width>271</width>
-      <height>140</height>
+      <x>211</x>
+      <y>3</y>
+      <width>231</width>
+      <height>159</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_8">
@@ -492,6 +492,19 @@
        </property>
        <property name="text">
         <string>OPTIMIZE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Optimize</string>
        </property>
       </widget>
      </item>
@@ -533,7 +546,7 @@
        </item>
       </layout>
      </item>
-     <item row="2" column="0">
+     <item row="2" column="0" colspan="2">
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="0">
         <widget class="QLabel" name="label_14">
@@ -603,14 +616,24 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>population size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_21">
+         <property name="text">
+          <string>50</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
       </layout>
-     </item>
-     <item row="2" column="1">
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>Optimize</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </widget>

@@ -594,7 +594,7 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
 }
 
 void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerImage,
-                                         double validationRatio)
+                                         double validationRatio, int populationSize)
 try
 {
   if (itersPerImage < 1)
@@ -616,12 +616,12 @@ try
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
            trainingImagePairs.size(), validationImagePairs.size());
 
-  LOG_INFO("Each objective function evaluation will calculate {}/{} IPC shifts", trainingImagePairs.size(), validationImagePairs.size());
+  LOG_INFO("Each generation, {} {}x{} IPC shifts will be calculated", populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
 
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
 
-  const auto optimalParameters = CalculateOptimalParameters(obj, valid);
+  const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   ApplyOptimalParameters(optimalParameters);
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
@@ -739,11 +739,11 @@ const std::function<double(const std::vector<double>&)> IterativePhaseCorrelatio
   };
 }
 
-std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj,
-                                                                          const std::function<double(const std::vector<double>&)>& valid) const
+std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid,
+                                                                          int populationSize) const
 {
   Evolution evo(ParameterCount);
-  evo.mNP = ParameterCount * 7;
+  evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
@@ -751,8 +751,11 @@ std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const 
   return evo.Optimize(obj, valid);
 }
 
-void IterativePhaseCorrelation::ApplyOptimalParameters(std::vector<double> optimalParameters)
+void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<double>& optimalParameters)
 {
+  if (optimalParameters.size() != ParameterCount)
+    throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
+
   SetBandpassType(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]));
   SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
   SetInterpolationType(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter]));

@@ -285,7 +285,7 @@
   </action>
   <action name="actionIPC">
    <property name="text">
-    <string>IPC</string>
+    <string>Iterative Phase Correlation</string>
    </property>
   </action>
   <action name="actionMandelbrot">
@@ -385,7 +385,7 @@
   </action>
   <action name="actionDiffrot">
    <property name="text">
-    <string>Diffrot</string>
+    <string>Differential rotation</string>
    </property>
   </action>
   <action name="actionFITS_downloader">
@@ -400,22 +400,22 @@
   </action>
   <action name="actionFeatures">
    <property name="text">
-    <string>Features</string>
+    <string>Feature matching</string>
    </property>
   </action>
   <action name="actionSnake">
    <property name="text">
-    <string>Snake</string>
+    <string>Snake game</string>
    </property>
   </action>
   <action name="actionProcedural">
    <property name="text">
-    <string>Procedural gen</string>
+    <string>Procedural generation</string>
    </property>
   </action>
   <action name="actionFITS">
    <property name="text">
-    <string>FITS</string>
+    <string>FITS images</string>
    </property>
   </action>
   <action name="actionUnitTests">

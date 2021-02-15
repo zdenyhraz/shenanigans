@@ -84,6 +84,7 @@ private:
   };
 
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
+  void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
   int GetNumberOfParents();
   void InitializeOutputs();

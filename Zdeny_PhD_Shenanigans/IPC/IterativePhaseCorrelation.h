@@ -55,7 +55,7 @@ public:
 
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.01, int itersPerImage = 100,
-                double validationRatio = 0.2);
+                double validationRatio = 0.2, int populationSize = ParameterCount * 7);
 
 private:
   int mRows = 0;
@@ -116,15 +116,16 @@ private:
     WindowTypeParameter,
     UpsampleCoeffParameter,
     L1ratioParameter,
-    ParameterCount
+    ParameterCount // last
   };
 
   std::vector<Mat> LoadImages(const std::string& imagesDirectory) const;
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const;
   void AddNoise(Mat& image, double noiseStdev) const;
   const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
-  std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid) const;
-  void ApplyOptimalParameters(std::vector<double> optimalParameters);
+  std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid,
+                                                 int populationSize) const;
+  void ApplyOptimalParameters(const std::vector<double>& optimalParameters);
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
