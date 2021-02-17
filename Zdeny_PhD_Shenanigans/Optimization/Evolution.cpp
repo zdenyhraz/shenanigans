@@ -208,7 +208,7 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
     if (mFileOutput)
       fmt::print(mOutputFile, "{}\n", message);
 
-    LOG_INFO("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
+    LOG_DEBUG("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
   }
 
   if (mPlotOutput)
