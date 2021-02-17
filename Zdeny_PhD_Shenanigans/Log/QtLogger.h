@@ -29,7 +29,7 @@ private:
   {
     mColors[LogLevel::Trace] = QColor(150, 150, 150);
     mColors[LogLevel::Debug] = QColor(51, 153, 255);
-    mColors[LogLevel::Info] = QColor(255, 255, 0);
+    mColors[LogLevel::Info] = QColor(205, 255, 0);
     mColors[LogLevel::Success] = QColor(0, 204, 0);
     mColors[LogLevel::Warning] = QColor(255, 154, 20);
     mColors[LogLevel::Error] = QColor(225, 0, 0);
