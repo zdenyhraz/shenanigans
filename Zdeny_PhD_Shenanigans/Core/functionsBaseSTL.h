@@ -595,3 +595,11 @@ inline std::vector<double> GetIota(int length, double maximum)
     out[i] = (double)i / (length - 1) * maximum;
   return out;
 }
+
+inline std::vector<double> Slice(const std::vector<double>& vec, size_t begin, size_t end)
+{
+  if (begin > vec.size() - 1 || end > vec.size() - 1 || begin >= end)
+    return {};
+
+  return std::vector<double>(vec.begin() + begin, vec.begin() + end);
+}
