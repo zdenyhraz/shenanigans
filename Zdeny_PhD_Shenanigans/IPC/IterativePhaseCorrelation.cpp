@@ -450,7 +450,7 @@ void IterativePhaseCorrelation::InitializePlots() const
     mFractionalShiftHistogramPlot = std::make_unique<Plot::Plot1D>("IPC fractional shift histogram");
     mFractionalShiftHistogramPlot->mXlabel = "fractional shift";
     mFractionalShiftHistogramPlot->mY1label = "count";
-    mFractionalShiftHistogramPlot->mY1names = {"reference", "calculated before optimization", "calculated after optimization"};
+    mFractionalShiftHistogramPlot->mY1names = {"reference", "before", "after"};
   }
 
   if (!mShiftPlot)
@@ -458,7 +458,9 @@ void IterativePhaseCorrelation::InitializePlots() const
     mShiftPlot = std::make_unique<Plot::Plot1D>("IPC shift");
     mShiftPlot->mXlabel = "reference shift";
     mShiftPlot->mY1label = "calculated shift";
-    mShiftPlot->mY1names = {"calculated before optimization", "calculated after optimization"};
+    mShiftPlot->mY1names = {"reference", "before", "after"};
+    mShiftPlot->mPens = {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)};
+    mShiftPlot->mLegendPosition = Plot::LegendPosition::BotRight;
   }
 }
 
@@ -621,7 +623,6 @@ try
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
   InitializePlots();
-
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto validationImages = LoadImages(validationImagesDirectory);
 
@@ -631,23 +632,26 @@ try
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
   const auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
 
+  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPC shifts will be calculated",
+           trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols,
+           mRows);
+
+  // before
   const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
-  const auto calculatedShiftsBeforeOptimization = GetCalculatedShifts(trainingImagePairs);
+  const auto shiftsBefore = GetShifts(trainingImagePairs);
+  const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
 
-  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs ", trainingImages.size(), validationImages.size(),
-           trainingImagePairs.size(), validationImagePairs.size());
-
-  LOG_INFO("Each generation, {} {}x{} IPC shifts will be calculated", populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
-
+  // opt
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
-
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   ApplyOptimalParameters(optimalParameters);
 
-  const auto calculatedShiftsAfterOptimization = GetCalculatedShifts(trainingImagePairs);
-
-  ShowOptimizationPlots(referenceShifts, calculatedShiftsBeforeOptimization, calculatedShiftsAfterOptimization);
+  // after
+  const auto shiftsAfter = GetShifts(trainingImagePairs);
+  const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
+  LOG_INFO("Average pixel accuracy improvement: {} -> {} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
+  ShowOptimizationPlots(referenceShifts, shiftsBefore, shiftsAfter);
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
@@ -855,50 +859,46 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   return "Unknown";
 }
 
-void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>& referenceShifts, const std::vector<Point2f>& calculatedShiftsBeforeOptimization,
-                                                      const std::vector<Point2f>& calculatedShiftsAfterOptimization) const
+void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsBefore, const std::vector<Point2f>& shiftsAfter) const
 {
+  std::vector<double> shiftsXReference;
+  std::vector<double> shiftsXBefore;
+  std::vector<double> shiftsXAfter;
   const int histogramBinCount = 11;
-  std::vector<double> xHistogram(histogramBinCount, 0);
-  std::vector<double> yHistogramReference(histogramBinCount, 0);
-  std::vector<double> yHistogramCalculatedBeforeOptimization(histogramBinCount, 0);
-  std::vector<double> yHistogramCalculatedAfterOptimization(histogramBinCount, 0);
-
-  std::vector<double> xShiftReference;
-  std::vector<double> yShiftCalculatedBeforeOptimization;
-  std::vector<double> yShiftCalculatedAfterOptimization;
+  std::vector<double> histogram(histogramBinCount, 0);
+  std::vector<double> histogramReference(histogramBinCount, 0);
+  std::vector<double> histogramBefore(histogramBinCount, 0);
+  std::vector<double> histogramAfter(histogramBinCount, 0);
 
   for (int i = 0; i < histogramBinCount; ++i)
-    xHistogram[i] = (double)i / (histogramBinCount - 1);
+    histogram[i] = (double)i / (histogramBinCount - 1);
 
-  for (const auto& referenceShift : referenceShifts)
+  for (const auto& referenceShift : shiftsReference)
   {
-    xShiftReference.push_back(referenceShift.x);
-    yHistogramReference[std::round(GetFractionalPart(referenceShift.x) * (histogramBinCount - 1))]++;
+    shiftsXReference.push_back(referenceShift.x);
+    histogramReference[std::round(GetFractionalPart(referenceShift.x) * (histogramBinCount - 1))]++;
   }
 
-  for (const auto& calculatedShiftBeforeOptimization : calculatedShiftsBeforeOptimization)
+  for (const auto& shiftBefore : shiftsBefore)
   {
-    yShiftCalculatedBeforeOptimization.push_back(calculatedShiftBeforeOptimization.x);
-    yHistogramCalculatedBeforeOptimization[std::round(GetFractionalPart(calculatedShiftBeforeOptimization.x) * (histogramBinCount - 1))]++;
+    shiftsXBefore.push_back(shiftBefore.x);
+    histogramBefore[std::round(GetFractionalPart(shiftBefore.x) * (histogramBinCount - 1))]++;
   }
 
-  for (const auto& calculatedShiftAfterOptimization : calculatedShiftsAfterOptimization)
+  for (const auto& shiftAfter : shiftsAfter)
   {
-    yShiftCalculatedAfterOptimization.push_back(calculatedShiftAfterOptimization.x);
-    yHistogramCalculatedBeforeOptimization[std::round(GetFractionalPart(calculatedShiftAfterOptimization.x) * (histogramBinCount - 1))]++;
+    shiftsXAfter.push_back(shiftAfter.x);
+    histogramAfter[std::round(GetFractionalPart(shiftAfter.x) * (histogramBinCount - 1))]++;
   }
 
   // slice because 0 & 1 bins are just half-full
-  mFractionalShiftHistogramPlot->Plot(Slice(xHistogram, 1, histogramBinCount - 1),
-                                      {Slice(yHistogramReference, 1, histogramBinCount - 1), Slice(yHistogramCalculatedBeforeOptimization, 1, histogramBinCount - 1),
-                                       Slice(yHistogramCalculatedAfterOptimization, 1, histogramBinCount - 1)},
-                                      false);
+  mFractionalShiftHistogramPlot->Plot(Slice(histogram, 1, histogramBinCount - 1),
+                                      {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
 
-  mShiftPlot->Plot(xShiftReference, {yShiftCalculatedBeforeOptimization, yShiftCalculatedAfterOptimization}, false);
+  mShiftPlot->Plot(shiftsXReference, {shiftsXReference, shiftsXBefore, shiftsXAfter}, false);
 }
 
-std::vector<Point2f> IterativePhaseCorrelation::GetCalculatedShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
+std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
 {
   std::vector<Point2f> out;
   out.reserve(imagePairs.size());
@@ -918,6 +918,20 @@ std::vector<Point2f> IterativePhaseCorrelation::GetReferenceShifts(const std::ve
     out.push_back(referenceShift);
 
   return out;
+}
+
+double IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shifts) const
+{
+  if (shiftsReference.size() != shifts.size())
+    throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
+
+  double avgerror = 0;
+  for (int i = 0; i < shifts.size(); ++i)
+  {
+    const auto error = shifts[i] - shiftsReference[i];
+    avgerror += sqrt(error.x * error.x + error.y * error.y);
+  }
+  return avgerror / shifts.size();
 }
 
 double IterativePhaseCorrelation::GetFractionalPart(double x)
