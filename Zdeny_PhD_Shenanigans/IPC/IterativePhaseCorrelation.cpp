@@ -650,7 +650,7 @@ try
   // after
   const auto shiftsAfter = GetShifts(trainingImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-  LOG_INFO("Average pixel accuracy improvement: {} -> {} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
+  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
   ShowOptimizationPlots(referenceShifts, shiftsBefore, shiftsAfter);
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
@@ -661,7 +661,7 @@ catch (const std::exception& e)
 }
 catch (...)
 {
-  LOG_ERROR("An unexpected error occured during Iterative Phase Correlation parameter optimization");
+  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization");
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -778,7 +778,7 @@ std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const 
   Evolution evo(ParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BandpassType", "BandpassL", "BandpassH", "InterpolationType", "WindowType", "UpsampleCoeff", "L1ratio"});
+  evo.SetParameterNames({"BPT", "BPL", "BPH", "ITPT", "WINT", "UC", "L1R"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
   evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
   return evo.Optimize(obj, valid);
