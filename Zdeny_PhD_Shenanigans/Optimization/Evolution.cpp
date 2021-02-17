@@ -8,6 +8,7 @@ OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction 
 try
 {
   LOG_FUNCTION("Evolution optimization");
+  LOG_INFO("Running evolution...");
 
   InitializeOutputs();
   CheckBounds();
@@ -18,7 +19,6 @@ try
   Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents());
   TerminationReason termReason = NotTerminated;
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
-  LOG_INFO("Running evolution...");
   UpdateOutputs(gen, population, valid);
 
   try
@@ -76,8 +76,7 @@ void Evolution::SetFileOutputDir(const std::string& dir)
 void Evolution::InitializeOutputs()
 try
 {
-  LOG_INFO("Evolution optimization started");
-  LOG_INFO("Initializing outputs...");
+  LOG_FUNCTION("Output initialization");
 
   if (mFileOutput)
   {
@@ -115,8 +114,6 @@ try
       mPlotDiff->mY2Log = false;
     }
   }
-
-  LOG_SUCCESS("Outputs initialized");
 }
 catch (const std::exception& e)
 {
@@ -126,7 +123,7 @@ catch (const std::exception& e)
 void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 try
 {
-  LOG_INFO("Checking objective function normality...");
+  LOG_FUNCTION("Objective function normality check");
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = obj(arg);
@@ -135,19 +132,17 @@ try
   if (result1 != result2)
     throw std::runtime_error(fmt::format("Objective function is not consistent"));
   else
-    LOG_DEBUG("Objective function is consistent");
+    LOG_TRACE("Objective function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Objective function is not finite"));
   else
-    LOG_DEBUG("Objective function is finite");
+    LOG_TRACE("Objective function is finite");
 
   if (result1 < 0)
     throw std::runtime_error(fmt::format("Objective function is not positive"));
   else
-    LOG_DEBUG("Objective function is positive");
-
-  LOG_SUCCESS("Objective function is normal");
+    LOG_TRACE("Objective function is positive");
 }
 catch (const std::exception& e)
 {
@@ -157,7 +152,7 @@ catch (const std::exception& e)
 void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
 try
 {
-  LOG_INFO("Checking validation function normality...");
+  LOG_FUNCTION("Validation function normality check");
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = valid(arg);
@@ -166,19 +161,17 @@ try
   if (result1 != result2)
     throw std::runtime_error(fmt::format("Validation function is not consistent"));
   else
-    LOG_DEBUG("Validation function is consistent");
+    LOG_TRACE("Validation function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Validation function is not finite"));
   else
-    LOG_DEBUG("Validation function is finite");
+    LOG_TRACE("Validation function is finite");
 
   if (result1 < 0)
     throw std::runtime_error(fmt::format("Validation function is not positive"));
   else
-    LOG_DEBUG("Validation function is positive");
-
-  LOG_SUCCESS("Validation function is normal");
+    LOG_TRACE("Validation function is positive");
 }
 catch (const std::exception& e)
 {
@@ -187,7 +180,7 @@ catch (const std::exception& e)
 
 void Evolution::CheckBounds()
 {
-  LOG_INFO("Checking objective function parameter bounds validity...");
+  LOG_FUNCTION("Objective function parameter bounds check");
 
   if (mLB.size() != mUB.size())
     throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
@@ -195,8 +188,6 @@ void Evolution::CheckBounds()
     throw std::runtime_error(fmt::format("Invalid lower parameter bound size: {} != {}", mLB.size(), N));
   if (mUB.size() != N)
     throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUB.size(), N));
-
-  LOG_SUCCESS("Objective function parameter bounds are valid");
 }
 
 void Evolution::UpdateOutputs(int gen, const Population& population, ValidationFunction valid)
@@ -363,12 +354,12 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   }
   catch (const std::exception& e)
   {
-    LOG_DEBUG("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
+    LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
     newoffspring.fitness = Inf;
   }
   catch (...)
   {
-    LOG_DEBUG("Could not evaluate new offspring with params {}", newoffspring.params);
+    LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
     newoffspring.fitness = Inf;
   }
 }
@@ -421,7 +412,7 @@ void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenc
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB)
 {
-  LOG_INFO("Creating initial population within bounds...");
+  LOG_FUNCTION("Population initialization");
   entities = zerovect(NP, Entity(N));
   std::vector<double> RB = UB - LB;
   const double initialMinAvgDist = 0.5;
@@ -461,50 +452,37 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
       }
     }
   }
-  LOG_SUCCESS("Initial population created");
-
-  LOG_INFO("Evaluating initial population...");
 
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
     entities[eid].fitness = obj(entities[eid].params);
 
   UpdatePopulationFunctionEvaluations();
-  LOG_SUCCESS("Initial population evaluated");
 }
 
 void Evolution::Population::InitializeOffspring(int nParents)
 {
-  LOG_INFO("Creating initial offspring...");
+  LOG_FUNCTION("Offspring initialization");
   offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
   for (int eid = 0; eid < entities.size(); eid++)
   {
     offspring[eid].params = entities[eid].params;
     offspring[eid].fitness = entities[eid].fitness;
   }
-  LOG_SUCCESS("Initial offspring created");
 }
 
 void Evolution::Population::InitializeBestEntity()
 {
-  LOG_INFO("Searching for best entity in the initial population...");
+  LOG_FUNCTION("Best entity search");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  LOG_SUCCESS("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
-}
-
-Evolution::Entity::Entity()
-{
+  LOG_INFO("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity(int N)
 {
   params.resize(N);
   fitness = Constants::Inf;
-}
-
-Evolution::Offspring::Offspring()
-{
 }
 
 Evolution::Offspring::Offspring(int N, int nParents)

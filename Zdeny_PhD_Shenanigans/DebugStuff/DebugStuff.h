@@ -20,13 +20,6 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
-  LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
-  LOG_INFO("Info boiiii xdxd {} a {} a {}", 1, 2, 3);
-  LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
-  LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
-  LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
-
   if (1) // plot in optimization
   {
     auto f = OptimizationTestFunctions::Paraboloid;
@@ -40,6 +33,15 @@ void Debug(Globals* globals)
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
     auto result = Evo.Optimize(f);
+  }
+  if (0) // log levels
+  {
+    LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_INFO("Info boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
+    LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
   }
   if (0) // non maxima suppression
   {

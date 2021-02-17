@@ -35,7 +35,7 @@ public:
 private:
   struct Entity
   {
-    Entity();
+    Entity() = default;
     Entity(int N);
 
     std::vector<double> params;
@@ -44,7 +44,7 @@ private:
 
   struct Offspring
   {
-    Offspring();
+    Offspring() = default;
     Offspring(int N, int nParents);
     void UpdateDistinctParents(int eid, int NP);
     void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR);
