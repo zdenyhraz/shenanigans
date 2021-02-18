@@ -86,33 +86,19 @@ try
 
   if (mPlotOutput)
   {
-    if (mPlotObj)
-    {
-      mPlotObj->Reset();
-    }
-    else
-    {
-      mPlotObj = std::make_unique<Plot::Plot1D>("EvolutionObj");
-      mPlotObj->mXlabel = "generation";
-      mPlotObj->mY1label = "error";
-      mPlotObj->mY1names = {"obj", "valid"};
-    }
-    if (mPlotDiff)
-    {
-      mPlotDiff->Reset();
-    }
-    else
-    {
-      mPlotDiff = std::make_unique<Plot::Plot1D>("EvolutionDiff");
-      mPlotDiff->mXlabel = "generation";
-      mPlotDiff->mY1label = "best-average absolute difference";
-      mPlotDiff->mY2label = "best-average relative difference";
-      mPlotDiff->mY1names = {"absdiff"};
-      mPlotDiff->mY2names = {"reldiff", "reldiff max"};
-      mPlotDiff->mPens = {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)};
-      mPlotDiff->mY1Log = true;
-      mPlotDiff->mY2Log = false;
-    }
+    Plot1D::Reset("EvolutionObj");
+    Plot1D::SetXlabel("EvolutionObj", "generation");
+    Plot1D::SetYlabel("EvolutionObj", "error");
+    Plot1D::SetYnames("EvolutionObj", {"obj", "valid"});
+
+    Plot1D::Reset("EvolutionDiff");
+    Plot1D::SetXlabel("EvolutionDiff", "generation");
+    Plot1D::SetYlabel("EvolutionDiff", "best-average absolute difference");
+    Plot1D::SetY2label("EvolutionDiff", "best-average relative difference");
+    Plot1D::SetYnames("EvolutionDiff", {"absdiff"});
+    Plot1D::SetY2names("EvolutionDiff", {"reldiff", "reldiff max"});
+    Plot1D::SetPens("EvolutionDiff", {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)});
+    Plot1D::SetYLogarithmic("EvolutionDiff", true);
   }
 }
 catch (const std::exception& e)
@@ -204,8 +190,8 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
 
   if (mPlotOutput)
   {
-    mPlotObj->Plot(gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
-    mPlotDiff->Plot(gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold});
+    Plot1D::Plot("EvolutionObj", gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
+    Plot1D::Plot("EvolutionDiff", gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold});
   }
 }
 
@@ -355,12 +341,12 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   catch (const std::exception& e)
   {
     LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
-    newoffspring.fitness = Inf;
+    newoffspring.fitness = Constants::Inf;
   }
   catch (...)
   {
     LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
-    newoffspring.fitness = Inf;
+    newoffspring.fitness = Constants::Inf;
   }
 }
 

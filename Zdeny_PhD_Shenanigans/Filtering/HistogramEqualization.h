@@ -35,7 +35,7 @@ inline void ShowHistogram(const Mat &img, const std::string &plotname)
   std::vector<double> x(hist.size());
   std::iota(x.begin(), x.end(), 0);
 
-  Plot1D::plot(x, hist, chist, plotname, "pixel value", "histogram", "cummulative histogram");
+  Plot1D::Plot(x, hist, chist, plotname, "pixel value", "histogram", "cummulative histogram");
 }
 
 inline Mat EqualizeHistogram(const Mat &img)
