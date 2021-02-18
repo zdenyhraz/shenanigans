@@ -76,10 +76,6 @@ private:
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
-  mutable std::unique_ptr<Plot::Plot2D> mImagePlot;
-  mutable std::unique_ptr<Plot::Plot2D> mColormapPlot;
-  mutable std::unique_ptr<Plot::Plot1D> mFractionalShiftHistogramPlot;
-  mutable std::unique_ptr<Plot::Plot1D> mShiftPlot;
 
   void UpdateWindow();
   void UpdateBandpass();

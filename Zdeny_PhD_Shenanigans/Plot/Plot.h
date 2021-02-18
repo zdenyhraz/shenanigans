@@ -5,27 +5,6 @@
 class Plot
 {
 public:
-  static QPoint GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name);
-  static std::function<void(std::string)> OnClose;
-  static void CloseAll();
-
-  static std::map<std::string, std::unique_ptr<WindowPlot>> plots;
-  static std::vector<QPen> pens;
-  static double pt;
-
-  static QFont fontTicks;
-  static QFont fontLabels;
-  static QFont fontLegend;
-
-  static QColor black;
-  static QColor blue;
-  static QColor orange;
-  static QColor yellow;
-  static QColor magenta;
-  static QColor green;
-  static QColor cyan;
-  static QColor red;
-
   enum class LegendPosition
   {
     TopRight,
@@ -105,4 +84,29 @@ public:
 
     bool mInitialized = false;
   };
+
+  static QPoint GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name);
+  static std::function<void(std::string)> OnClose;
+  static void CloseAll();
+  static Plot1D& GetPlot1D(const std::string& name);
+  static Plot2D& GetPlot2D(const std::string& name);
+
+  static std::map<std::string, std::unique_ptr<WindowPlot>> plots;
+  static std::vector<QPen> pens;
+  static QFont fontTicks;
+  static QFont fontLabels;
+  static QFont fontLegend;
+  static double pt;
+  static QColor black;
+  static QColor blue;
+  static QColor orange;
+  static QColor yellow;
+  static QColor magenta;
+  static QColor green;
+  static QColor cyan;
+  static QColor red;
+
+private:
+  static std::unordered_map<std::string, Plot1D> mPlots1D;
+  static std::unordered_map<std::string, Plot2D> mPlots2D;
 };
