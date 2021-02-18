@@ -1,30 +1,45 @@
-#include "stdafx.h"
 #include "Plot2D.h"
-#include "Plot1D.h"
 
-void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string name, std::string xlabel, std::string ylabel, std::string zlabel, double xmin, double xmax, double ymin, double ymax,
-                      double colRowRatio, std::string savepath)
+std::unordered_map<std::string, Plot2D> Plot2D::mPlots;
+
+Plot2D& Plot2D::GetPlot(const std::string& name)
 {
-  WindowPlot* windowPlot;
-  auto idx = Plot::plots.find(name);
-  if (idx != Plot::plots.end())
-  {
-    windowPlot = idx->second.get();
-    windowPlot->ui.widget->graph(0)->data().clear();
-  }
-  else
-  {
-    if (colRowRatio == 0)
-      colRowRatio = (double)z[0].size() / z.size();
+  if (mPlots.count(name) == 0)
+    mPlots.emplace(name, Plot2D(name));
 
-    Plot::plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, Plot::OnClose);
-    windowPlot = Plot::plots[name].get();
-    windowPlot->move(Plot::GetNewPlotPosition(windowPlot, name));
-    SetupGraph(windowPlot, xlabel, ylabel, zlabel);
-  }
+  return mPlots.at(name);
+}
 
+Plot2D::Plot2D(const std::string& name) : mName(name)
+{
+}
+
+void Plot2D::Plot(const Mat& z, bool newplot)
+{
+  std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
+  for (int r = 0; r < z.rows; r++)
+    for (int c = 0; c < z.cols; c++)
+      zv[r][c] = z.at<float>(r, c);
+
+  PlotCore(zv, newplot);
+}
+
+void Plot2D::Plot(const std::vector<std::vector<double>>& z, bool newplot)
+{
+  PlotCore(z, newplot);
+}
+
+void Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newplot)
+{
+  if (newplot)
+    mCounter++;
+
+  if (!mInitialized || newplot)
+    Initialize(z[0].size(), z.size());
+
+  auto& windowPlot = Plot::plots[GetName()];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
-  windowPlot->colorMap->data()->setRange(QCPRange(xmin, xmax), QCPRange(ymin, ymax));
+  windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
     for (int yIndex = 0; yIndex < z.size(); ++yIndex)
       windowPlot->colorMap->data()->setCell(xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex]);
@@ -35,51 +50,76 @@ void Plot2D::plotcore(const std::vector<std::vector<double>>& z, std::string nam
   windowPlot->ui.widget->replot();
   windowPlot->show();
 
-  if (savepath != "")
-    windowPlot->ui.widget->savePng(QString::fromStdString(savepath), 0, 0, 3, -1);
+  if (mSavepath.length() > 0)
+    windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot2D::SetupGraph(WindowPlot* windowPlot, std::string xlabel, std::string ylabel, std::string zlabel)
+void Plot2D::Initialize(int xcnt, int ycnt)
 {
-  // create graph
-  windowPlot->ui.widget->addGraph();
-  // configure axis rect
-  windowPlot->ui.widget->axisRect()->setupFullAxesBox(true);
-  // give the axes some labels
-  // windowPlot->ui.widget->xAxis->setLabel(QString::fromStdString(xlabel));
-  // give the axes some labels
-  // windowPlot->ui.widget->yAxis->setLabel(QString::fromStdString(ylabel));
-  // set up the QCPColorMap
-  windowPlot->colorMap = new QCPColorMap(windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis);
-  // allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking
-  windowPlot->ui.widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-  // add a color scale
-  windowPlot->colorScale = new QCPColorScale(windowPlot->ui.widget);
-  // add it to the right of the main axis rect
-  windowPlot->ui.widget->plotLayout()->addElement(0, 1, windowPlot->colorScale);
-  // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-  windowPlot->colorScale->setType(QCPAxis::atRight);
-  // associate the color map with the color scale
-  windowPlot->colorMap->setColorScale(windowPlot->colorScale);
-  // add the z value name
-  // windowPlot->colorScale->axis()->setLabel( QString::fromStdString( zlabel ) );
-  // set the color gradient of the color map to one of the presets
-  windowPlot->colorMap->setGradient(QCPColorGradient::gpJet);
-  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up)
-  windowPlot->marginGroup = new QCPMarginGroup(windowPlot->ui.widget);
-  // align plot
-  windowPlot->ui.widget->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
-  // align colorbar
-  windowPlot->colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
-  // interpolate bro
-  windowPlot->colorMap->setInterpolate(true);
-  windowPlot->ui.widget->xAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->yAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->colorScale->axis()->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->xAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis->setRangeReversed(false);
-  windowPlot->colorScale->axis()->setLabelFont(Plot::fontLabels);
+  auto name = GetName();
+  auto idx = Plot::plots.find(name);
+  if (idx != Plot::plots.end())
+  {
+    Reset();
+    mInitialized = true;
+    return;
+  }
+
+  double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
+  Plot::plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, Plot::OnClose);
+  auto& windowPlot = Plot::plots[name];
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
+
+  auto& plot = windowPlot->ui.widget;
+  auto& colorMap = windowPlot->colorMap;
+  auto& colorScale = windowPlot->colorScale;
+
+  plot->addGraph();
+  plot->axisRect()->setupFullAxesBox(true);
+  colorMap = new QCPColorMap(plot->xAxis, plot->yAxis);
+  plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+  colorScale = new QCPColorScale(plot);
+  plot->plotLayout()->addElement(0, 1, colorScale);
+  colorScale->setType(QCPAxis::atRight);
+  colorMap->setColorScale(colorScale);
+  if (mShowAxisLabels)
+  {
+    plot->xAxis->setLabel(QString::fromStdString(mXlabel));
+    plot->yAxis->setLabel(QString::fromStdString(mYlabel));
+    colorScale->axis()->setLabel(QString::fromStdString(mZlabel));
+  }
+  colorMap->setGradient(mColormapType);
+  windowPlot->marginGroup = new QCPMarginGroup(plot);
+  plot->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, windowPlot->marginGroup);
+  colorMap->setInterpolate(true);
+  plot->xAxis->setTickLabelFont(Plot::fontTicks);
+  plot->yAxis->setTickLabelFont(Plot::fontTicks);
+  colorScale->axis()->setTickLabelFont(Plot::fontTicks);
+  plot->xAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis->setRangeReversed(false);
+  colorScale->axis()->setLabelFont(Plot::fontLabels);
+
   windowPlot->show();
   QCoreApplication::processEvents();
+  mInitialized = true;
+}
+
+std::string Plot2D::GetName()
+{
+  return fmt::format("{}:{}", mName, mCounter);
+}
+
+void Plot2D::Reset()
+{
+  auto name = GetName();
+  auto idx = Plot::plots.find(name);
+  if (idx == Plot::plots.end())
+    return;
+
+  LOG_DEBUG("Resetting plot {}", name);
+  auto& windowPlot = idx->second;
+  auto& plot = windowPlot->ui.widget;
+  plot->graph(0)->data().clear();
 }

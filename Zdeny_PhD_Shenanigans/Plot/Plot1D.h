@@ -1,94 +1,73 @@
 #pragma once
-#include "stdafx.h"
-#include "qcustomplot.h"
-#include "Gui/Windows/Plot/WindowPlot.h"
 #include "Plot.h"
-
-using namespace Constants;
 
 class Plot1D
 {
 public:
-  static void Reset(std::string name);
-
-  // x - y add data
-  static void plot(double x, double y, std::string name, std::string xlabel = "x", std::string ylabel = "y", QPen pen = Plot::pens[0], std::string savepath = emptystring)
+  enum class LegendPosition
   {
-    return plotcore(x, std::vector<double>{y}, emptyvect, name, xlabel, ylabel, emptystring, emptyvectstring, emptyvectstring, {pen}, savepath);
-  }
+    TopRight,
+    BotRight,
+    BotLeft,
+    TopLeft
+  };
 
-  // x - y1/y2 add data
-  static void plot(double x, double y1, double y2, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y2", std::vector<QPen> pens = Plot::pens,
-                   std::string savepath = emptystring)
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y, bool newplot = true) { GetPlot(name).Plot(x, y, newplot); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot = true) { GetPlot(name).Plot(x, ys, newplot); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot = true) { GetPlot(name).Plot(x, y1, y2, newplot); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot = true)
   {
-    return plotcore(x, std::vector<double>{y1}, std::vector<double>{y2}, name, xlabel, y1label, y2label, std::vector<std::string>{y1label}, std::vector<std::string>{y2label}, pens, savepath);
+    GetPlot(name).Plot(x, y1s, y2s, newplot);
   }
-
-  // x - ys add data
-  static void plot(double x, const std::vector<double>& ys, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::vector<std::string> ynames = emptyvectstring,
-                   std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    return plotcore(x, ys, emptyvect, name, xlabel, ylabel, emptystring, ynames, emptyvectstring, pens, savepath);
-  }
-
-  // x - y1s/y2s add data
-  static void plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y2",
-                   std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring, std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    return plotcore(x, y1s, y2s, name, xlabel, y1label, y2label, y1names, y2names, pens, savepath);
-  }
-
-  // iota - y replot data
-  static void plot(const std::vector<double>& y, std::string name, std::string xlabel = "x", std::string ylabel = "y", std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    std::vector<double> x(y.size());
-    std::iota(x.begin(), x.end(), 0);
-    return plotcore(x, std::vector<std::vector<double>>{y}, emptyvect2, name, xlabel, ylabel, emptystring, emptyvectstring, emptyvectstring, pens, savepath);
-  }
-
-  // x - y replot data
-  static void plot(const std::vector<double>& x, const std::vector<double>& y, std::string name, std::string xlabel = "x", std::string ylabel = "y", QPen pen = Plot::pens[0],
-                   std::string savepath = emptystring)
-  {
-    return plotcore(x, std::vector<std::vector<double>>{y}, emptyvect2, name, xlabel, ylabel, emptystring, emptyvectstring, emptyvectstring, {pen}, savepath);
-  }
-
-  // x - y1/y2 replot data
-  static void plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, std::string name, std::string xlabel = "x", std::string y1label = "y1",
-                   std::string y2label = "y1", std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    return plotcore(x, std::vector<std::vector<double>>{y1}, std::vector<std::vector<double>>{y2}, name, xlabel, y1label, y2label, std::vector<std::string>{y1label}, std::vector<std::string>{y2label},
-                    pens, savepath);
-  }
-
-  // x - ys replot data
-  static void plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, std::string name, std::string xlabel = "x", std::string ylabel = "y",
-                   std::vector<std::string> ynames = emptyvectstring, std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    return plotcore(x, ys, emptyvect2, name, xlabel, ylabel, emptystring, ynames, emptyvectstring, pens, savepath);
-  }
-
-  // x - ys1/ys2 replot data
-  static void plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, std::string name, std::string xlabel = "x",
-                   std::string y1label = "y1", std::string y2label = "y2", std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring,
-                   std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring)
-  {
-    return plotcore(x, y1s, y2s, name, xlabel, y1label, y2label, y1names, y2names, pens, savepath);
-  }
-
-  // replot data core
-  static void plotcore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, std::string name, std::string xlabel = "x",
-                       std::string y1label = "y1", std::string y2label = "y2", std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring,
-                       std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring);
-
-  // add data core
-  static void plotcore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s, std::string name, std::string xlabel = "x", std::string y1label = "y1", std::string y2label = "y2",
-                       std::vector<std::string> y1names = emptyvectstring, std::vector<std::string> y2names = emptyvectstring, std::vector<QPen> pens = Plot::pens, std::string savepath = emptystring);
+  static void Plot(const std::string& name, double x, double y) { GetPlot(name).Plot(x, y); }
+  static void Plot(const std::string& name, double x, const std::vector<double>& ys) { GetPlot(name).Plot(x, ys); }
+  static void Plot(const std::string& name, double x, double y1, double y2) { GetPlot(name).Plot(x, y1, y2); }
+  static void Plot(const std::string& name, double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot(name).Plot(x, y1s, y2s); }
+  static void Reset(const std::string& name) { GetPlot(name).Reset(); }
+  static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
+  static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
+  static void SetY2label(const std::string& name, const std::string& y2label) { GetPlot(name).mY2label = y2label; }
+  static void SetYnames(const std::string& name, const std::vector<std::string>& ynames) { GetPlot(name).mYnames = ynames; }
+  static void SetY2names(const std::string& name, const std::vector<std::string>& y2names) { GetPlot(name).mY2names = y2names; }
+  static void SetPens(const std::string& name, const std::vector<QPen>& pens) { GetPlot(name).mPens = pens; }
+  static void SetSavePath(const std::string& name, const std::string& savePath) { GetPlot(name).mSavepath = savePath; }
+  static void SetLegendVisible(const std::string& name, bool legendVisible) { GetPlot(name).mLegendVisible = legendVisible; }
+  static void SetLegendPosition(const std::string& name, LegendPosition legendPosition) { GetPlot(name).mLegendPosition = legendPosition; }
+  static void SetYLogarithmic(const std::string& name, bool yLogarithmic) { GetPlot(name).mYLogarithmic = yLogarithmic; }
+  static void SetY2Logarithmic(const std::string& name, bool y2Logarithmic) { GetPlot(name).mY2Logarithmic = y2Logarithmic; }
+  static void SetScatterStyle(const std::string& name, bool scatterStype) { GetPlot(name).mScatterStyle = scatterStype; }
 
 private:
-  static void SetupGraph(WindowPlot* windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string>& y1names,
-                         std::vector<std::string>& y2names, std::vector<QPen> pens);
+  Plot1D(const std::string& name);
+  void Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot);
+  void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot);
+  void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot);
+  void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot);
+  void Plot(double x, double y);
+  void Plot(double x, const std::vector<double>& ys);
+  void Plot(double x, double y1, double y2);
+  void Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
+  void Reset();
+  void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot);
+  void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
+  void Initialize(int ycnt, int y1cnt, int y2cnt);
+  std::string GetName();
+  static Plot1D& GetPlot(const std::string& name);
 
-  static WindowPlot* RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string>& y1names,
-                                  std::vector<std::string>& y2names, std::vector<QPen> pens);
+  static std::unordered_map<std::string, Plot1D> mPlots;
+  std::string mName = "plot";
+  std::string mXlabel = "x";
+  std::string mYlabel = "y";
+  std::string mY2label = "y2";
+  std::vector<std::string> mYnames = {};
+  std::vector<std::string> mY2names = {};
+  std::vector<QPen> mPens = Plot::pens;
+  std::string mSavepath = {};
+  bool mLegendVisible = true;
+  LegendPosition mLegendPosition = LegendPosition::TopRight;
+  bool mYLogarithmic = false;
+  bool mY2Logarithmic = false;
+  bool mScatterStyle = false;
+  size_t mCounter = 0;
+  bool mInitialized = false;
 };
