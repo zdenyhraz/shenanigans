@@ -1,4 +1,5 @@
 #include "Plot1D.h"
+#include "stdafx.h"
 
 std::unordered_map<std::string, Plot1D> Plot1D::mPlots;
 std::string Plot1D::mLastAccessedPlot = "Plot1D";

@@ -85,10 +85,10 @@ Mat NonMaximaSuppresion(const Mat& img)
     }
   }
 
-  Plot2D::Plot(img, "img");
-  Plot2D::Plot(gradM, "gradM");
-  Plot2D::Plot(gradA, "gradA");
-  Plot2D::Plot(out, "out");
+  // Plot2D::Plot(img, "img");
+  // Plot2D::Plot(gradM, "gradM");
+  // Plot2D::Plot(gradA, "gradA");
+  // Plot2D::Plot(out, "out");
 
   return out;
 }

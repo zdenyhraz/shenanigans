@@ -56,9 +56,9 @@ void Debug(Globals* globals)
     {
       Mat kirklik;
       resize(kirkl(i), kirklik, Size(999, 999), 0, 0, INTER_NEAREST);
-      Plot2D::Plot(kirklik, std::string("kirkl") + i);
+      // Plot2D::Plot(kirklik, std::string("kirkl") + i);
     }
-    Plot2D::Plot(kirkl(999), std::string("kirkl999"));
+    // Plot2D::Plot(kirkl(999), std::string("kirkl999"));
   }
   if (0) // regex test
   {
@@ -120,10 +120,10 @@ void Debug(Globals* globals)
       }
     }
 
-    Plot2D::Plot(bandpassR, "bandpassR");
-    Plot2D::Plot(gaussL, "gaussL");
-    Plot2D::Plot(gaussH, "gaussH");
-    Plot2D::Plot(bandpassG, "bandpassG");
+    // Plot2D::Plot(bandpassR, "bandpassR");
+    // Plot2D::Plot(gaussL, "gaussL");
+    // Plot2D::Plot(gaussH, "gaussH");
+    // Plot2D::Plot(bandpassG, "bandpassG");
 
     // Plot2D::Plot(bandpassian(rows, cols, sL, sH), "bandpassian");
   }
@@ -152,8 +152,8 @@ void Debug(Globals* globals)
     }
 
     showimg(std::vector<Mat>{img, out, ref}, "cyclic shift");
-    Plot2D::Plot(abs(ref - out), "diff plot");
-    Plot2D::Plot(img, "img plot");
+    // Plot2D::Plot(abs(ref - out), "diff plot");
+    // Plot2D::Plot(img, "img plot");
   }
   if (0) // histogram equalize
   {
@@ -195,14 +195,14 @@ void Debug(Globals* globals)
       for (int d = 0; d < ndata; d++)
         ys[c][d] = sin((double)d / ndata * Constants::TwoPi + (double)c / ncurves * Constants::Pi);
 
-    Plot1D::Plot(x, ys, "pen colors");
+    // Plot1D::Plot(x, ys, "pen colors");
   }
   if (0) // ipc bandpass & window
   {
     IPCsettings set = *globals->IPCset;
     set.setSize(1000, 1000);
     set.setBandpassParameters(5, 1);
-    Plot2D::Plot(set.bandpass, "x", "y", "z", 0, 1, 0, 1);
+    // Plot2D::Plot(set.bandpass, "x", "y", "z", 0, 1, 0, 1);
   }
   if (0) // 2pic IPC
   {
@@ -254,8 +254,8 @@ void Debug(Globals* globals)
       for (int x = 0; x < Nx; x++)
         Z[y][x] = sin((double)x * y / Nx / Ny * 100) * rand();
 
-    Plot1D::Plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
-    Plot2D::Plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
+    // Plot1D::Plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
+    // Plot2D::Plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
   }
   if (0) // swind crop
   {

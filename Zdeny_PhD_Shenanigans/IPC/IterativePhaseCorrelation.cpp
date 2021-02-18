@@ -455,6 +455,14 @@ void IterativePhaseCorrelation::InitializePlots() const
   Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::SetScatterStyle(true);
+
+  Plot1D::Reset("IPCshifterror");
+  Plot1D::SetXlabel("reference shift");
+  Plot1D::SetYlabel("pixel error");
+  Plot1D::SetYnames({"reference", "before", "after"});
+  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+  Plot1D::SetScatterStyle(true);
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -854,6 +862,9 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   std::vector<double> shiftsXReference;
   std::vector<double> shiftsXBefore;
   std::vector<double> shiftsXAfter;
+  std::vector<double> shiftsXErrorReference;
+  std::vector<double> shiftsXErrorBefore;
+  std::vector<double> shiftsXErrorAfter;
   const int histogramBinCount = 11;
   std::vector<double> histogram(histogramBinCount, 0);
   std::vector<double> histogramReference(histogramBinCount, 0);
@@ -863,22 +874,26 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   for (int i = 0; i < histogramBinCount; ++i)
     histogram[i] = (double)i / (histogramBinCount - 1);
 
-  for (const auto& referenceShift : shiftsReference)
+  for (int i = 0; i < shiftsReference.size(); ++i)
   {
+    const auto& referenceShift = shiftsReference[i];
+    const auto& shiftBefore = shiftsBefore[i];
+
     shiftsXReference.push_back(referenceShift.x);
     histogramReference[std::round(GetFractionalPart(referenceShift.x) * (histogramBinCount - 1))]++;
-  }
+    shiftsXErrorReference.push_back(0.0);
 
-  for (const auto& shiftBefore : shiftsBefore)
-  {
     shiftsXBefore.push_back(shiftBefore.x);
     histogramBefore[std::round(GetFractionalPart(shiftBefore.x) * (histogramBinCount - 1))]++;
-  }
+    shiftsXErrorBefore.push_back(shiftBefore.x - referenceShift.x);
 
-  for (const auto& shiftAfter : shiftsAfter)
-  {
-    shiftsXAfter.push_back(shiftAfter.x);
-    histogramAfter[std::round(GetFractionalPart(shiftAfter.x) * (histogramBinCount - 1))]++;
+    if (i < shiftsAfter.size())
+    {
+      const auto& shiftAfter = shiftsAfter[i];
+      shiftsXAfter.push_back(shiftAfter.x);
+      histogramAfter[std::round(GetFractionalPart(shiftAfter.x) * (histogramBinCount - 1))]++;
+      shiftsXErrorAfter.push_back(shiftAfter.x - referenceShift.x);
+    }
   }
 
   // slice because 0 & 1 bins are just half-full
@@ -886,6 +901,8 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
                {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
 
   Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXBefore, shiftsXAfter}, false);
+
+  Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXErrorReference, shiftsXErrorBefore, shiftsXErrorAfter}, false);
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
