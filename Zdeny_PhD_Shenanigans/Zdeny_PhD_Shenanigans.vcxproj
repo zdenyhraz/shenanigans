@@ -172,6 +172,8 @@
     <ClInclude Include="Optimization\PatternSearch.h" />
     <ClInclude Include="Optimization\VisualOptimization.h" />
     <ClInclude Include="Phon\stmpref.h" />
+    <ClInclude Include="Plot\Plot1D.h" />
+    <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Plot\PlotCSV.h" />
     <ClInclude Include="Sasko\NonMaximaSuppression.h" />
     <ClInclude Include="UnitTests\IterativePhaseCorrelationTest.h" />
@@ -204,8 +206,6 @@
     <QtMoc Include="Gui\Windows\Plot\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\Plot.h" />
-    <ClInclude Include="Plot\Plot1D.h" />
-    <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="Snake\game.h" />

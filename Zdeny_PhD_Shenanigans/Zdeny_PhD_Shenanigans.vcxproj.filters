@@ -85,12 +85,6 @@
     <ClCompile Include="IPC\ipcAux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Plot\Plot2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Plot\Plot1D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Plot\Plot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -130,9 +124,6 @@
     <ClCompile Include="Optimization\GraphOptimization.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
-    <ClCompile Include="Plot\PlotCSV.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Gui\Windows\IPC\WindowIPC.cpp">
       <Filter>WindowCpps</Filter>
     </ClCompile>
@@ -140,6 +131,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Gui\Windows\Filtering\WindowFiltering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot\Plot1D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot\Plot2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plot\PlotCSV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -204,13 +204,7 @@
     <ClInclude Include="Astrophysics\diffrotResults.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Plot\Plot2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Plot\Plot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Plot\Plot1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Astrophysics\SwindFlow.h">
@@ -276,9 +270,6 @@
     <ClInclude Include="Optimization\GraphOptimization.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Plot\PlotCSV.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DebugStuff\DebugStuff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -307,6 +298,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Log\QtLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\Plot1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\Plot2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot\PlotCSV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
