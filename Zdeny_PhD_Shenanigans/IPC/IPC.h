@@ -211,8 +211,8 @@ inline Point2f ipccore(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& se
       auto L3vzs = applyQuantileColorMap(L3vz);
       // ipcsaveimg("ipc_L3.png", L3vs, set);
       ipcsaveimg("ipc_L3_interp_zoom.png", L3vzs, set);
-      Plot2D::plot(L3vz, std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png", "x [px]", "y [px]", "phase correlation", -L3.cols / 7 / 2, +L3.cols / 7 / 2, -L3.rows / 7 / 2, +L3.rows / 7 / 2, 0,
-                   set.savedir + std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png");
+      // Plot2D::Plot(L3vz, std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png", "x [px]", "y [px]", "phase correlation", -L3.cols / 7 / 2, +L3.cols / 7 / 2, -L3.rows / 7 / 2, +L3.rows / 7 / 2,
+      // 0, set.savedir + std::to_string(set.savecntr) + "_ipc_L3_interp_zoom.png");
     }
   }
 

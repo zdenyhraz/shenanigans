@@ -40,40 +40,40 @@ public:
     CalculateFitCoeffs();
 
     // diffrot profiles
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasX, 2), OmegasX, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "west-east flow speed [deg/day]",
+    Plot1D::Plot(toDegrees(Thetas), {polyfit(Thetas, OmegasX, 2), OmegasX, PredicXs[0], PredicXs[1]}, "diffrot profile X", "solar latitude [deg]", "west-east flow speed [deg/day]",
                  {"polyfit2", "average", "Derek A. Lamb (2017)", "Howard et al. (1983)"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 2), QPen(Plot::red, 2)},
                  saveDir + "1DXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, OmegasY, 3), OmegasY}, "diffrot profile Y", "solar latitude [deg]", "north-south flow speed [deg/day]", {"polyfit3", "average"},
+    Plot1D::Plot(toDegrees(Thetas), {polyfit(Thetas, OmegasY, 3), OmegasY}, "diffrot profile Y", "solar latitude [deg]", "north-south flow speed [deg/day]", {"polyfit3", "average"},
                  {QPen(Plot::black, 3), QPen(Plot::green, 1.5)}, saveDir + "1DYs" + to_string(SourceStride) + ".png"); // rgb(119, 136, 153)
 
     // diffrot profiles NS
-    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X",
+    Plot1D::Plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasXavgN), sin2sin4fit(ThetasNS, OmegasXavgS), OmegasXavgN, OmegasXavgS, PredicXsNS[0], PredicXsNS[1]}, "diffrot profile NS X",
                  "absolute solar latitude [deg]", "west-east flow speed [deg/day]",
                  {"trigfit North", "trigfit South", "average North", "average South", "Derek A. Lamb (2017)", "Howard et al. (1983)", "Derek N", "Derek S"},
                  {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5), QPen(Plot::green, 2), QPen(Plot::black, 2), QPen(Plot::blue, 2), QPen(Plot::red, 2)},
                  saveDir + "1DNSXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasYavgN), sin2sin4fit(ThetasNS, OmegasYavgS), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]",
+    Plot1D::Plot(toDegrees(ThetasNS), {sin2sin4fit(ThetasNS, OmegasYavgN), sin2sin4fit(ThetasNS, OmegasYavgS), OmegasYavgN, OmegasYavgS}, "diffrot profile NS Y", "absolute solar latitude [deg]",
                  "north-south flow speed [deg/day]", {"trigfit North", "trigfit South", "average North", "average South"},
                  {QPen(Plot::blue, 3), QPen(Plot::red, 3), QPen(Plot::blue, 1.5), QPen(Plot::red, 1.5)}, saveDir + "1DNSYs" + to_string(SourceStride) + ".png");
 
     // shifts profiles
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsX, 2), ShiftsX, ShiftsXErrorsBot, ShiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "west-east image shift [px]",
+    Plot1D::Plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsX, 2), ShiftsX, ShiftsXErrorsBot, ShiftsXErrorsTop}, "shifts profile X", "solar latitude [deg]", "west-east image shift [px]",
                  {"polyfit2", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)},
                  saveDir + "1DsXs" + to_string(SourceStride) + ".png");
-    Plot1D::plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsY, 3), ShiftsY, ShiftsYErrorsBot, ShiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "north-south image shift [px]",
+    Plot1D::Plot(toDegrees(Thetas), {polyfit(Thetas, ShiftsY, 3), ShiftsY, ShiftsYErrorsBot, ShiftsYErrorsTop}, "shifts profile Y", "solar latitude [deg]", "north-south image shift [px]",
                  {"polyfit3", "average", "average - stdev", "average + stdev"}, {QPen(Plot::black, 3), QPen(Plot::green, 1.5), QPen(Plot::blue, 0.75), QPen(Plot::red, 0.75)},
                  saveDir + "1DsYs" + to_string(SourceStride) + ".png");
 
     // flows ratio1
-    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+    Plot2D::Plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
                  toDegrees(EndTheta), colRowRatio1, saveDir + "2DXm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
-    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+    Plot2D::Plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
                  toDegrees(EndTheta), colRowRatio1, saveDir + "2DYm" + to_string(medianSize) + "r1s" + to_string(SourceStride) + ".png");
 
     // flows ratio2
-    Plot2D::plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X r", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+    Plot2D::Plot(applyQuantile(FlowX, quanBot, quanTop), "diffrot flow X r", "time [days]", "solar latitude [deg]", "west-east flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
                  toDegrees(EndTheta), colRowRatio2, saveDir + "2DXm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
-    Plot2D::plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
+    Plot2D::Plot(applyQuantile(FlowY, quanBot, quanTop), "diffrot flow Y r", "time [days]", "solar latitude [deg]", "north-south flow speed [deg/day]", StartTime, EndTime, toDegrees(StartTheta),
                  toDegrees(EndTheta), colRowRatio2, saveDir + "2DYm" + to_string(medianSize) + "r2s" + to_string(SourceStride) + ".png");
 
     LOG_INFO("Predic error = {}", GetError());

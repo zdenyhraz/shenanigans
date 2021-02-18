@@ -2,10 +2,10 @@
 #include "fourier.h"
 
 #ifdef FOURIER_WITH_FFTW
-#  include <fftw3.h>
+#include <fftw3.h>
 #endif
 
-void showfourier(const Mat &DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
+void showfourier(const Mat& DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
 {
   Mat DFTimg = DFTimgIn.clone();
   if (DFTimg.channels() == 2)
@@ -30,7 +30,7 @@ void showfourier(const Mat &DFTimgIn, bool logar, bool expon, std::string magnwi
       }
     }
 
-    Plot2D::plot(magnitudeimglog, magnwindowname);
+    Plot2D::Plot(magnwindowname, magnitudeimglog);
     // showimg(magnitudeimglog, magnwindowname, true);
 
     // Mat phaseimg;
@@ -110,7 +110,7 @@ Mat deconvolute(Mat sourceimg, Mat PSFimg)
   return deconvimg;
 }
 
-Mat deconvoluteWiener(const Mat &sourceimg, const Mat &PSFimg)
+Mat deconvoluteWiener(const Mat& sourceimg, const Mat& PSFimg)
 {
   Mat DFT1 = fourier(sourceimg);
   Mat DFT2 = fourier(PSFimg);
@@ -149,7 +149,7 @@ Mat deconvoluteWiener(const Mat &sourceimg, const Mat &PSFimg)
   return deconvimg;
 }
 
-Mat frequencyFilter(const Mat &sourceimg, const Mat &mask)
+Mat frequencyFilter(const Mat& sourceimg, const Mat& mask)
 {
   Mat sourceimgDFT = fourier(sourceimg);
   Mat planesold[2];
@@ -172,7 +172,7 @@ Mat frequencyFilter(const Mat &sourceimg, const Mat &mask)
 }
 
 #ifdef FOURIER_WITH_FFTW
-Mat fourierFFTW(const Mat &sourceimgIn, int fftw)
+Mat fourierFFTW(const Mat& sourceimgIn, int fftw)
 {
   Mat sourceimg = sourceimgIn.clone();
   sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
@@ -180,8 +180,8 @@ Mat fourierFFTW(const Mat &sourceimgIn, int fftw)
   if (fftw == 1)                         // fftw slowest version
   {
     int r, c;
-    fftw_complex *in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
-    fftw_complex *out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
+    fftw_complex* in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
+    fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
     fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
     for (r = 0; r < sourceimg.rows; r++)
     {
@@ -210,11 +210,11 @@ Mat fourierFFTW(const Mat &sourceimgIn, int fftw)
   }
   if (fftw == 2)
   {
-    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double *)sourceimg.data, (fftw_complex *)sourceimg.data, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double *)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double *)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+    Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
     Mat result2[2] = {resultRe, resultIm};
     Mat result;
     merge(result2, 2, result);
@@ -222,12 +222,11 @@ Mat fourierFFTW(const Mat &sourceimgIn, int fftw)
   }
   if (fftw == 3)
   {
-    fftw_plan plan =
-        fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex *)sourceimg.data, (fftw_complex *)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double *)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double *)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    Mat resultRe = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+    Mat resultIm = Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
     Mat result2[2] = {resultRe, resultIm};
     Mat result;
     merge(result2, 2, result);

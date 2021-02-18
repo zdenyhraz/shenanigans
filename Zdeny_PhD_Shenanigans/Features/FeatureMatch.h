@@ -246,9 +246,9 @@ inline void featureMatch( const FeatureMatchData &data )
 	showimg( std::get<2>( mats ), "Velocity surface Mwnn", true );
 	showimg( std::get<3>( mats ), "Velocity surface Pwnn", true );
 
-	Plot2D::plot( applyQuantile( img_base, 0.05, 0.95 ), "Image source" );
-	Plot2D::plot( std::get<2>( mats ), "Velocity magnitude [km/s]" );
-	Plot2D::plot( std::get<3>( mats ), "Velocity angle [deg]" );
+	Plot2D::Plot( applyQuantile( img_base, 0.05, 0.95 ), "Image source" );
+	Plot2D::Plot( std::get<2>( mats ), "Velocity magnitude [km/s]" );
+	Plot2D::Plot( std::get<3>( mats ), "Velocity angle [deg]" );
 
 	showimg( combinePics( img_base_ups, std::get<2>( mats ), COMBINE_JET, 0.05, 0.95 ), "Combined" );
 }
