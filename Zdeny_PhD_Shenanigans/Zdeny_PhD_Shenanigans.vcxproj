@@ -163,6 +163,7 @@
     <QtMoc Include="Gui\Windows\FITS\WindowFITS.h" />
     <ClInclude Include="Filtering\HistogramEqualization.h" />
     <QtMoc Include="Gui\Windows\Filtering\WindowFiltering.h" />
+    <ClInclude Include="IPC\IPC.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Log\LogFunction.h" />
     <ClInclude Include="Log\QtLogger.h" />
@@ -198,7 +199,6 @@
     <ClInclude Include="IPC\ipcAux.h" />
     <ClInclude Include="Optimization\GraphOptimization.h" />
     <ClInclude Include="InverseMap\inverseMapping.h" />
-    <ClInclude Include="IPC\IPC.h" />
     <ClInclude Include="Log\Logger.h" />
     <ClInclude Include="Neural\neural.h" />
     <ClInclude Include="Optimization\Optimization.h" />

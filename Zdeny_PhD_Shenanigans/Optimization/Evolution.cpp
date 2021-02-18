@@ -86,19 +86,13 @@ try
 
   if (mPlotOutput)
   {
-    Plot1D::Reset("EvolutionObj");
+    Plot1D::Reset("Evolution");
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("error");
-    Plot1D::SetYnames({"obj", "valid"});
-
-    Plot1D::Reset("EvolutionDiff");
-    Plot1D::SetXlabel("generation");
-    Plot1D::SetYlabel("best-average absolute difference");
     Plot1D::SetY2label("best-average relative difference");
-    Plot1D::SetYnames({"absdiff"});
-    Plot1D::SetY2names({"reldiff", "reldiff max"});
-    Plot1D::SetPens({Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)});
-    Plot1D::SetYLogarithmic(true);
+    Plot1D::SetYnames({"obj", "valid"});
+    Plot1D::SetY2names({"reldiff", "reldiff thr"});
+    Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1], QPen(Plot::orange, Plot::pt / 2, Qt::DotLine)});
   }
 }
 catch (const std::exception& e)
@@ -189,10 +183,7 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
   }
 
   if (mPlotOutput)
-  {
-    Plot1D::Plot("EvolutionObj", gen, {(population.bestEntity.fitness), (valid(population.bestEntity.params))});
-    Plot1D::Plot("EvolutionDiff", gen, {population.absoluteDifference}, {population.relativeDifference, mRelativeDifferenceThreshold});
-  }
+    Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference, mRelativeDifferenceThreshold});
 }
 
 void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)

@@ -153,9 +153,6 @@
     <ClInclude Include="Astrophysics\FITS.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
-    <ClInclude Include="IPC\IPC.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Neural\neural.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
@@ -307,6 +304,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plot\PlotCSV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC\IPC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
