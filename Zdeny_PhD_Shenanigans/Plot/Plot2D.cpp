@@ -1,12 +1,14 @@
 #include "Plot2D.h"
 
 std::unordered_map<std::string, Plot2D> Plot2D::mPlots;
+std::string Plot2D::mLastAccessedPlot = "Plot2D";
 
 Plot2D& Plot2D::GetPlot(const std::string& name)
 {
   if (mPlots.count(name) == 0)
     mPlots.emplace(name, Plot2D(name));
 
+  mLastAccessedPlot = name;
   return mPlots.at(name);
 }
 
