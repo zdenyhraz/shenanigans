@@ -67,8 +67,8 @@ try
   if (mDebugMode)
   {
     InitializePlots();
-    mImagePlot->Plot(image1);
-    mImagePlot->Plot(image2);
+    Plot::GetPlot2D("IPC image").Plot(image1, true);
+    Plot::GetPlot2D("IPC image").Plot(image2, true);
   }
 
   auto dft1 = CalculateFourierTransform(std::move(image1));
@@ -81,8 +81,8 @@ try
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
   if (mDebugMode)
   {
-    mColormapPlot->mSavepath = mDebugDirectory + "/L3.png";
-    mColormapPlot->Plot(L3);
+    Plot::GetPlot2D("IPC subregion").mSavepath = mDebugDirectory + "/L3.png";
+    Plot::GetPlot2D("IPC subregion").Plot(L3, true);
   }
 
   Point2f result = L3peak - L3mid;
@@ -99,8 +99,8 @@ try
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
   {
-    mColormapPlot->mSavepath = mDebugDirectory + "/L2.png";
-    mColormapPlot->Plot(L2);
+    Plot::GetPlot2D("IPC subregion").mSavepath = mDebugDirectory + "/L2.png";
+    Plot::GetPlot2D("IPC subregion").Plot(L2, true);
   }
 
   // L2U
@@ -109,8 +109,8 @@ try
   Point2f L2Upeak;
   if (mDebugMode)
   {
-    mColormapPlot->mSavepath = mDebugDirectory + "/L2U.png";
-    mColormapPlot->Plot(L2U);
+    Plot::GetPlot2D("IPC subregion").mSavepath = mDebugDirectory + "/L2U.png";
+    Plot::GetPlot2D("IPC subregion").Plot(L2U, true);
 
     if (0)
     {
@@ -136,8 +136,8 @@ try
     Point2f L1peak;
     if (mDebugMode)
     {
-      mColormapPlot->mSavepath = mDebugDirectory + "/L1B.png";
-      mColormapPlot->Plot(CalculateL1(L2U, L2Upeak, L1size));
+      Plot::GetPlot2D("IPC subregion").mSavepath = mDebugDirectory + "/L1B.png";
+      Plot::GetPlot2D("IPC subregion").Plot(CalculateL1(L2U, L2Upeak, L1size), true);
     }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -153,8 +153,8 @@ try
       {
         if (mDebugMode)
         {
-          mColormapPlot->mSavepath = mDebugDirectory + "/L1A.png";
-          mColormapPlot->Plot(L1);
+          Plot::GetPlot2D("IPC subregion").mSavepath = mDebugDirectory + "/L1A.png";
+          Plot::GetPlot2D("IPC subregion").Plot(L1, true);
         }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
@@ -433,35 +433,21 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 
 void IterativePhaseCorrelation::InitializePlots() const
 {
-  if (!mImagePlot)
-  {
-    mImagePlot = std::make_unique<Plot::Plot2D>("IPC image");
-    mImagePlot->mColormapType = QCPColorGradient::gpGrayscale;
-  }
+  Plot::GetPlot2D("IPC image").mColormapType = QCPColorGradient::gpGrayscale;
 
-  if (!mColormapPlot)
-  {
-    mColormapPlot = std::make_unique<Plot::Plot2D>("IPC subregion");
-    mColormapPlot->mColormapType = QCPColorGradient::gpJet;
-  }
+  Plot::GetPlot2D("IPC subregion").mColormapType = QCPColorGradient::gpJet;
 
-  if (!mFractionalShiftHistogramPlot)
-  {
-    mFractionalShiftHistogramPlot = std::make_unique<Plot::Plot1D>("IPC fractional shift histogram");
-    mFractionalShiftHistogramPlot->mXlabel = "fractional shift";
-    mFractionalShiftHistogramPlot->mY1label = "count";
-    mFractionalShiftHistogramPlot->mY1names = {"reference", "before", "after"};
-  }
+  Plot::GetPlot1D("IPC fractional shift histogram").mXlabel = "fractional shift";
+  Plot::GetPlot1D("IPC fractional shift histogram").mY1label = "count";
+  Plot::GetPlot1D("IPC fractional shift histogram").mY1names = {"reference", "before", "after"};
+  Plot::GetPlot1D("IPC fractional shift histogram").mScatter = true;
 
-  if (!mShiftPlot)
-  {
-    mShiftPlot = std::make_unique<Plot::Plot1D>("IPC shift");
-    mShiftPlot->mXlabel = "reference shift";
-    mShiftPlot->mY1label = "calculated shift";
-    mShiftPlot->mY1names = {"reference", "before", "after"};
-    mShiftPlot->mPens = {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)};
-    mShiftPlot->mLegendPosition = Plot::LegendPosition::BotRight;
-  }
+  Plot::GetPlot1D("IPC shift").mXlabel = "reference shift";
+  Plot::GetPlot1D("IPC shift").mY1label = "calculated shift";
+  Plot::GetPlot1D("IPC shift").mY1names = {"reference", "before", "after"};
+  Plot::GetPlot1D("IPC shift").mPens = {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)};
+  Plot::GetPlot1D("IPC shift").mLegendPosition = Plot::LegendPosition::BotRight;
+  Plot::GetPlot1D("IPC shift").mScatter = true;
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -480,22 +466,21 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
     copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
-    // clang-format off
-	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "w0", "x", "window", {"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
-	Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "w1", "fx", "log DFT",{"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindowsDFT.png");
+    Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
+    Plot1D::plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"Rect", "Hann"}, Plot::pens,
+                 mDebugDirectory + "/1DWindowsDFT.png");
 
-	mImagePlot->mSavepath=mDebugDirectory + "/2DImage.png";
-	mImagePlot->Plot(img);
+    Plot::GetPlot2D("IPC image").mSavepath = mDebugDirectory + "/2DImage.png";
+    Plot::GetPlot2D("IPC image").Plot(img, true);
 
-	mImagePlot->mSavepath=mDebugDirectory + "/2DImageWindow.png";
-	mImagePlot->Plot(imgw);
+    Plot::GetPlot2D("IPC image").mSavepath = mDebugDirectory + "/2DImageWindow.png";
+    Plot::GetPlot2D("IPC image").Plot(imgw, true);
 
-	Plot2D::plot(Fourier::fftlogmagn(r0), "w2", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
-	Plot2D::plot(Fourier::fftlogmagn(w0), "w3", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
-	Plot2D::plot(w, "w5", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
-	Plot2D::plot(Fourier::fftlogmagn(img), "w7", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
-	Plot2D::plot(Fourier::fftlogmagn(imgw), "w8", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
-    // clang-format on
+    Plot2D::plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
+    Plot2D::plot(Fourier::fftlogmagn(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
+    Plot2D::plot(w, "2DWindow", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
+    Plot2D::plot(Fourier::fftlogmagn(img), "2DImageDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
+    Plot2D::plot(Fourier::fftlogmagn(imgw), "2DImageWindowDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
   }
 
   // bandpass
@@ -525,14 +510,13 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     copyMakeBorder(bpR, bpR0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
     copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
-    // clang-format off
-    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"Rect","Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
-    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"Rect","Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpassIDFT.png");
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"Rect", "Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
+    Plot1D::plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"Rect", "Gauss"}, Plot::pens,
+                 mDebugDirectory + "/1DBandpassIDFT.png");
     Plot2D::plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png");
     Plot2D::plot(bpG, "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png");
-	Plot2D::plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
-	Plot2D::plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
-    // clang-format on
+    Plot2D::plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
+    Plot2D::plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
   }
 
   // bandpass image ringing
@@ -574,11 +558,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
 
-    mImagePlot->mSavepath = mDebugDirectory + "/2DBandpassImageR.png";
-    mImagePlot->Plot(imgfR);
+    Plot::GetPlot2D("IPC image").mSavepath = mDebugDirectory + "/2DBandpassImageR.png";
+    Plot::GetPlot2D("IPC image").Plot(imgfR);
 
-    mImagePlot->mSavepath = mDebugDirectory + "/2DBandpassImageG.png";
-    mImagePlot->Plot(imgfG);
+    Plot::GetPlot2D("IPC image").mSavepath = mDebugDirectory + "/2DBandpassImageG.png";
+    Plot::GetPlot2D("IPC image").Plot(imgfG);
   }
 
   // 2 pic
@@ -640,6 +624,7 @@ try
   const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
   const auto shiftsBefore = GetShifts(trainingImagePairs);
   const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
+  ShowOptimizationPlots(referenceShifts, shiftsBefore, {});
 
   // opt
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
@@ -650,8 +635,8 @@ try
   // after
   const auto shiftsAfter = GetShifts(trainingImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
   ShowOptimizationPlots(referenceShifts, shiftsBefore, shiftsAfter);
+  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
@@ -892,10 +877,11 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   }
 
   // slice because 0 & 1 bins are just half-full
-  mFractionalShiftHistogramPlot->Plot(Slice(histogram, 1, histogramBinCount - 1),
-                                      {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
+  Plot::GetPlot1D("IPC fractional shift histogram")
+      .Plot(Slice(histogram, 1, histogramBinCount - 1),
+            {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
 
-  mShiftPlot->Plot(shiftsXReference, {shiftsXReference, shiftsXBefore, shiftsXAfter}, false);
+  Plot::GetPlot1D("IPC shift").Plot(shiftsXReference, {shiftsXReference, shiftsXBefore, shiftsXAfter}, false);
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const

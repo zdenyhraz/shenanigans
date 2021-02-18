@@ -3,7 +3,7 @@
 
 int PlotCSV::counter = 0;
 
-void PlotCSV::plot(const std::string &path, const std::string &savepath)
+void PlotCSV::plot(const std::string& path, const std::string& savepath)
 {
   auto [x, ys, xlabel, ylabels] = ParseCSV(path);
 
@@ -17,7 +17,7 @@ void PlotCSV::plot(const std::string &path, const std::string &savepath)
   counter++;
 }
 
-std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, std::vector<std::string>> PlotCSV::ParseCSV(const std::string &path)
+std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, std::vector<std::string>> PlotCSV::ParseCSV(const std::string& path)
 {
   std::ifstream file(path);
   if (!file.is_open() || !file.good())

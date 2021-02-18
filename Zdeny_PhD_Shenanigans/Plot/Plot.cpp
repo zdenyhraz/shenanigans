@@ -3,13 +3,13 @@
 #include "Gui/Windows/Plot/WindowPlot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
+std::unordered_map<std::string, Plot::Plot1D> Plot::mPlots1D;
+std::unordered_map<std::string, Plot::Plot2D> Plot::mPlots2D;
 
 QFont Plot::fontTicks("Newyork", 17);
 QFont Plot::fontLabels("Newyork", 17);
 QFont Plot::fontLegend("Newyork", 17);
-
 double Plot::pt = 3.0;
-
 QColor Plot::black(50, 50, 50);
 QColor Plot::blue(0, 113.9850, 188.9550);
 QColor Plot::orange(216.750, 82.875, 24.990);
@@ -68,6 +68,22 @@ void Plot::CloseAll()
 {
   for (auto& plt : plots)
     plots.erase(plt.first);
+}
+
+Plot::Plot1D& Plot::GetPlot1D(const std::string& name)
+{
+  if (mPlots1D.count(name) == 0)
+    mPlots1D.emplace(name, Plot1D(name));
+
+  return mPlots1D.at(name);
+}
+
+Plot::Plot2D& Plot::GetPlot2D(const std::string& name)
+{
+  if (mPlots2D.count(name) == 0)
+    mPlots2D.emplace(name, Plot2D(name));
+
+  return mPlots2D.at(name);
 }
 
 Plot::Plot1D::Plot1D(const std::string& name) : mName(name)
