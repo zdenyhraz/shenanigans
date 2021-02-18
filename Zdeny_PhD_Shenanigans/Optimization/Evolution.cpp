@@ -87,18 +87,18 @@ try
   if (mPlotOutput)
   {
     Plot1D::Reset("EvolutionObj");
-    Plot1D::SetXlabel("EvolutionObj", "generation");
-    Plot1D::SetYlabel("EvolutionObj", "error");
-    Plot1D::SetYnames("EvolutionObj", {"obj", "valid"});
+    Plot1D::SetXlabel("generation");
+    Plot1D::SetYlabel("error");
+    Plot1D::SetYnames({"obj", "valid"});
 
     Plot1D::Reset("EvolutionDiff");
-    Plot1D::SetXlabel("EvolutionDiff", "generation");
-    Plot1D::SetYlabel("EvolutionDiff", "best-average absolute difference");
-    Plot1D::SetY2label("EvolutionDiff", "best-average relative difference");
-    Plot1D::SetYnames("EvolutionDiff", {"absdiff"});
-    Plot1D::SetY2names("EvolutionDiff", {"reldiff", "reldiff max"});
-    Plot1D::SetPens("EvolutionDiff", {Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)});
-    Plot1D::SetYLogarithmic("EvolutionDiff", true);
+    Plot1D::SetXlabel("generation");
+    Plot1D::SetYlabel("best-average absolute difference");
+    Plot1D::SetY2label("best-average relative difference");
+    Plot1D::SetYnames({"absdiff"});
+    Plot1D::SetY2names({"reldiff", "reldiff max"});
+    Plot1D::SetPens({Plot::pens[0], Plot::pens[1], QPen(Plot::red, 1, Qt::DotLine)});
+    Plot1D::SetYLogarithmic(true);
   }
 }
 catch (const std::exception& e)

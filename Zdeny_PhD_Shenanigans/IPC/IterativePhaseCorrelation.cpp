@@ -118,11 +118,11 @@ try
       resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
       resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
       resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
-      Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L2UN.png");
+      Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
       Plot2D::Plot("IPCcolormap", nearest, true);
-      Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L2UL.png");
+      Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
       Plot2D::Plot("IPCcolormap", linear, true);
-      Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L2UC.png");
+      Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
       Plot2D::Plot("IPCcolormap", cubic, true);
     }
   }
@@ -436,20 +436,25 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 
 void IterativePhaseCorrelation::InitializePlots() const
 {
-  Plot2D::SetColorMapType("IPCgrayscale", QCPColorGradient::gpGrayscale);
-  Plot2D::SetColorMapType("IPCcolormap", QCPColorGradient::gpJet);
+  Plot2D::Reset("IPCgrayscale");
+  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
 
-  Plot1D::SetXlabel("IPCshifthistogram", "fractional shift");
-  Plot1D::SetYlabel("IPCshifthistogram", "count");
-  Plot1D::SetYnames("IPCshifthistogram", {"reference", "before", "after"});
-  Plot1D::SetScatterStyle("IPCshifthistogram", true);
+  Plot2D::Reset("IPCcolormap");
+  Plot2D::SetColorMapType(QCPColorGradient::gpJet);
 
-  Plot1D::SetXlabel("IPCshift", "reference shift");
-  Plot1D::SetYlabel("IPCshift", "calculated shift");
-  Plot1D::SetYnames("IPCshift", {"reference", "before", "after"});
-  Plot1D::SetPens("IPCshift", {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)});
-  Plot1D::SetLegendPosition("IPCshift", Plot1D::LegendPosition::BotRight);
-  Plot1D::SetScatterStyle("IPCshift", true);
+  Plot1D::Reset("IPCshifthistogram");
+  Plot1D::SetXlabel("fractional shift");
+  Plot1D::SetYlabel("count");
+  Plot1D::SetYnames({"reference", "before", "after"});
+  Plot1D::SetScatterStyle(true);
+
+  Plot1D::Reset("IPCshift");
+  Plot1D::SetXlabel("reference shift");
+  Plot1D::SetYlabel("calculated shift");
+  Plot1D::SetYnames({"reference", "before", "after"});
+  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+  Plot1D::SetScatterStyle(true);
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const

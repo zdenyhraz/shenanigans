@@ -24,6 +24,8 @@ public:
   static void Plot(const std::string& name, double x, double y1, double y2) { GetPlot(name).Plot(x, y1, y2); }
   static void Plot(const std::string& name, double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot(name).Plot(x, y1s, y2s); }
   static void Reset(const std::string& name) { GetPlot(name).Reset(); }
+
+  // named setters
   static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
   static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
   static void SetY2label(const std::string& name, const std::string& y2label) { GetPlot(name).mY2label = y2label; }
@@ -36,6 +38,20 @@ public:
   static void SetYLogarithmic(const std::string& name, bool yLogarithmic) { GetPlot(name).mYLogarithmic = yLogarithmic; }
   static void SetY2Logarithmic(const std::string& name, bool y2Logarithmic) { GetPlot(name).mY2Logarithmic = y2Logarithmic; }
   static void SetScatterStyle(const std::string& name, bool scatterStype) { GetPlot(name).mScatterStyle = scatterStype; }
+
+  // unnamed setters
+  static void SetXlabel(const std::string& xlabel) { GetPlot().mXlabel = xlabel; }
+  static void SetYlabel(const std::string& ylabel) { GetPlot().mYlabel = ylabel; }
+  static void SetY2label(const std::string& y2label) { GetPlot().mY2label = y2label; }
+  static void SetYnames(const std::vector<std::string>& ynames) { GetPlot().mYnames = ynames; }
+  static void SetY2names(const std::vector<std::string>& y2names) { GetPlot().mY2names = y2names; }
+  static void SetPens(const std::vector<QPen>& pens) { GetPlot().mPens = pens; }
+  static void SetSavePath(const std::string& savePath) { GetPlot().mSavepath = savePath; }
+  static void SetLegendVisible(bool legendVisible) { GetPlot().mLegendVisible = legendVisible; }
+  static void SetLegendPosition(LegendPosition legendPosition) { GetPlot().mLegendPosition = legendPosition; }
+  static void SetYLogarithmic(bool yLogarithmic) { GetPlot().mYLogarithmic = yLogarithmic; }
+  static void SetY2Logarithmic(bool y2Logarithmic) { GetPlot().mY2Logarithmic = y2Logarithmic; }
+  static void SetScatterStyle(bool scatterStype) { GetPlot().mScatterStyle = scatterStype; }
 
 private:
   Plot1D(const std::string& name);
@@ -52,9 +68,10 @@ private:
   void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
   void Initialize(int ycnt, int y1cnt, int y2cnt);
   std::string GetName();
-  static Plot1D& GetPlot(const std::string& name);
+  static Plot1D& GetPlot(const std::string& name = mLastAccessedPlot);
 
   static std::unordered_map<std::string, Plot1D> mPlots;
+  static std::string mLastAccessedPlot;
   std::string mName = "plot";
   std::string mXlabel = "x";
   std::string mYlabel = "y";
