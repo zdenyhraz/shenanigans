@@ -262,7 +262,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_12">
          <property name="text">
-          <string>0.25</string>
+          <string>0.004</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -279,7 +279,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_13">
          <property name="text">
-          <string>0.01</string>
+          <string>0.00</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -313,7 +313,7 @@
        <item row="3" column="1">
         <widget class="QLineEdit" name="lineEdit_20">
          <property name="text">
-          <string>0.2</string>
+          <string>0.05</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -330,7 +330,7 @@
        <item row="4" column="1">
         <widget class="QLineEdit" name="lineEdit_21">
          <property name="text">
-          <string>50</string>
+          <string>5</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -341,7 +341,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>8</x>
@@ -393,7 +393,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit">
          <property name="text">
-          <string>1000</string>
+          <string>256</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -433,7 +433,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_9">
          <property name="text">
-          <string>1000</string>
+          <string>256</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

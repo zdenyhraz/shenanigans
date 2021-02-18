@@ -73,6 +73,7 @@ private:
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
   std::string mDebugDirectory = "Debug";
+  mutable bool mNonIterative = false;
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
@@ -127,8 +128,10 @@ private:
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
-  void ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsBefore, const std::vector<Point2f>& shiftsAfter) const;
+  void ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsNonit, const std::vector<Point2f>& shiftsBefore,
+                             const std::vector<Point2f>& shiftsAfter) const;
   std::vector<Point2f> GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
+  std::vector<Point2f> GetNonIterativeShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<Point2f> GetReferenceShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   double GetAverageAccuracy(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shifts) const;
   static double GetFractionalPart(double x);
