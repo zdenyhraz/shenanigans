@@ -79,13 +79,30 @@ try
   Mat L3 = CalculateL3(std::move(crosspower));
   Point2f L3peak = GetPeak(L3);
   Point2f L3mid(L3.cols / 2, L3.rows / 2);
+  Point2f result = L3peak - L3mid;
+
   if (mDebugMode)
   {
     Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L3.png");
     Plot2D::Plot("IPCcolormap", L3);
   }
 
-  Point2f result = L3peak - L3mid;
+  if (mAccuracyType == AccuracyType::Pixel)
+    return L3peak - L3mid;
+
+  if (mAccuracyType == AccuracyType::Subpixel)
+  {
+    int L2size = 5;
+    while (IsOutOfBounds(L3peak, L3, L2size))
+      if (!ReduceL2size(L2size))
+        return result;
+
+    Mat L2 = CalculateL2(L3, L3peak, 5);
+    Point2f L2peak = GetPeakSubpixel(L2);
+    Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    return L3peak - L3mid + L2peak - L2mid;
+  }
+
   int L2size = mL2size;
   double L1ratio = mL1ratio;
 
@@ -125,15 +142,6 @@ try
       Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
       Plot2D::Plot("IPCcolormap", cubic, true);
     }
-  }
-
-  if (mNonIterative)
-  {
-    int L1size = GetL1size(L2U, L1ratio);
-    Mat L1 = CalculateL1(L2U, L2Umid, L1size);
-    Point2f L1mid(L1size / 2, L1size / 2);
-    Point2f L1peak = GetPeakSubpixel(L1);
-    return L3peak - L3mid + (Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y))) / mUpsampleCoeff;
   }
 
   while (true)
@@ -430,7 +438,7 @@ inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, co
 
 inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
-  L2size -= mL2sizeStep;
+  L2size -= 2;
   if (mDebugMode)
     LOG_ERROR("Reducing L2size to {}", L2size);
   return L2size >= 3;
@@ -455,23 +463,22 @@ void IterativePhaseCorrelation::InitializePlots() const
   Plot1D::SetXlabel("fractional shift");
   Plot1D::SetYlabel("count");
   Plot1D::SetYnames({"reference", "before", "after"});
-  // Plot1D::SetScatterStyle(true);
 
   Plot1D::Reset("IPCshift");
   Plot1D::SetXlabel("reference shift");
   Plot1D::SetYlabel("calculated shift");
-  Plot1D::SetYnames({"reference", "non-iterative", "before", "after"});
-  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
+  Plot1D::SetPens(
+      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-  // Plot1D::SetScatterStyle(true);
 
   Plot1D::Reset("IPCshifterror");
   Plot1D::SetXlabel("reference shift");
   Plot1D::SetYlabel("pixel error");
-  Plot1D::SetYnames({"reference", "non-iterative", "before", "after"});
-  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
+  Plot1D::SetPens(
+      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-  // Plot1D::SetScatterStyle(true);
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -617,14 +624,16 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   LOG_INFO("IPC debug stuff shown");
 }
 
-void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio, float noiseStdev, int itersPerImage,
+void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift, float noiseStdev, int itersPerImage,
                                          double validationRatio, int populationSize)
 try
 {
+  LOG_FUNCTION("IPC optimization");
+
   if (itersPerImage < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
-  if (maxShiftRatio <= 0 || maxShiftRatio >= 1)
-    throw std::runtime_error(fmt::format("Invalid max shift ratio ({})", maxShiftRatio));
+  if (maxShift <= 0)
+    throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
@@ -635,8 +644,8 @@ try
   if (trainingImages.empty())
     throw std::runtime_error("Empty training images vector");
 
-  const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShiftRatio, itersPerImage, noiseStdev);
-  const auto validationImagePairs = CreateImagePairs(validationImages, maxShiftRatio, validationRatio * itersPerImage, noiseStdev);
+  const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
+  const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
            trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols,
@@ -644,21 +653,25 @@ try
 
   // before
   const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
-  const auto shiftsBeforeNonit = GetNonIterativeShifts(trainingImagePairs);
+  const auto shiftsPixel = GetPixelShifts(trainingImagePairs);
+  const auto shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
   const auto shiftsBefore = GetShifts(trainingImagePairs);
   const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
-  ShowOptimizationPlots(referenceShifts, shiftsBeforeNonit, shiftsBefore, {});
+  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
+  return; // debug
 
   // opt
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
+  PlotObjectiveFunctionLandscape(obj);
+  return; // debug
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   ApplyOptimalParameters(optimalParameters);
 
   // after
   const auto shiftsAfter = GetShifts(trainingImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-  ShowOptimizationPlots(referenceShifts, shiftsBeforeNonit, shiftsBefore, shiftsAfter);
+  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
   LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
 
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
@@ -700,14 +713,13 @@ std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& images
   return images;
 }
 
-std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const
+std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<Mat>& images, double maxShift, int itersPerImage, double noiseStdev) const
 {
   for (const auto& image : images)
   {
-    const Point2f maxShift(maxShiftRatio * mCols, maxShiftRatio * mRows);
-    if (image.rows < mRows + maxShift.y || image.cols < mCols + maxShift.x)
+    if (image.rows < mRows + maxShift || image.cols < mCols + maxShift)
       throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
-                                           mRows + maxShift.y, mCols + maxShift.x));
+                                           mRows + maxShift, mCols + maxShift));
   }
 
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
@@ -718,7 +730,7 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
     for (int i = 0; i < itersPerImage; ++i)
     {
       // random shift from a random point
-      Point2f shift(rand11() * maxShiftRatio * mCols, rand11() * maxShiftRatio * mRows);
+      Point2f shift(rand11() * maxShift, rand11() * maxShift);
       LOG_DEBUG("Creating {}x{} image pair shifted by [{:.2f}, {:.2f}] px", mCols, mRows, shift.x, shift.y);
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       Mat imageS;
@@ -867,10 +879,11 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   return "Unknown";
 }
 
-void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsNonit, const std::vector<Point2f>& shiftsBefore,
-                                                      const std::vector<Point2f>& shiftsAfter) const
+void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsPixel, const std::vector<Point2f>& shiftsNonit,
+                                                      const std::vector<Point2f>& shiftsBefore, const std::vector<Point2f>& shiftsAfter) const
 {
   std::vector<double> shiftsXReference, shiftsXReferenceError;
+  std::vector<double> shiftsXPixel, shiftsXPixelError;
   std::vector<double> shiftsXNonit, shiftsXNonitError;
   std::vector<double> shiftsXBefore, shiftsXBeforeError;
   std::vector<double> shiftsXAfter, shiftsXAfterError;
@@ -887,6 +900,7 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   for (int i = 0; i < shiftsReference.size(); ++i)
   {
     const auto& referenceShift = shiftsReference[i];
+    const auto& shiftPixel = shiftsPixel[i];
     const auto& shiftNonit = shiftsNonit[i];
     const auto& shiftBefore = shiftsBefore[i];
 
@@ -894,10 +908,12 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
     shiftsXReferenceError.push_back(0.0);
     histogramReference[std::round(GetFractionalPart(referenceShift.x) * (histogramBinCount - 1))]++;
 
+    shiftsXPixel.push_back(shiftPixel.x);
     shiftsXNonit.push_back(shiftNonit.x);
     shiftsXBefore.push_back(shiftBefore.x);
     histogramBefore[std::round(GetFractionalPart(shiftBefore.x) * (histogramBinCount - 1))]++;
 
+    shiftsXPixelError.push_back(shiftPixel.x - referenceShift.x);
     shiftsXNonitError.push_back(shiftNonit.x - referenceShift.x);
     shiftsXBeforeError.push_back(shiftBefore.x - referenceShift.x);
 
@@ -915,8 +931,8 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   Plot1D::Plot("IPCshifthistogram", Slice(histogram, 1, histogramBinCount - 1),
                {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
 
-  Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
-  Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
+  Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
+  Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
@@ -935,10 +951,23 @@ std::vector<Point2f> IterativePhaseCorrelation::GetNonIterativeShifts(const std:
   std::vector<Point2f> out;
   out.reserve(imagePairs.size());
 
-  mNonIterative = true;
+  mAccuracyType = AccuracyType::Subpixel;
   for (const auto& [image1, image2, referenceShift] : imagePairs)
     out.push_back(Calculate(image1, image2));
-  mNonIterative = false;
+  mAccuracyType = AccuracyType::SubpixelIterative;
+
+  return out;
+}
+
+std::vector<Point2f> IterativePhaseCorrelation::GetPixelShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
+{
+  std::vector<Point2f> out;
+  out.reserve(imagePairs.size());
+
+  mAccuracyType = AccuracyType::Pixel;
+  for (const auto& [image1, image2, referenceShift] : imagePairs)
+    out.push_back(Calculate(image1, image2));
+  mAccuracyType = AccuracyType::SubpixelIterative;
 
   return out;
 }
@@ -971,4 +1000,42 @@ double IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<Point2f>&
 double IterativePhaseCorrelation::GetFractionalPart(double x)
 {
   return abs(x - std::floor(x));
+}
+
+void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::function<double(const std::vector<double>&)>& obj)
+{
+  LOG_FUNCTION("PlotObjectiveFunctionLandscape");
+  const int rows = 17;
+  const int cols = 17;
+  Mat landscape(rows, cols, CV_32F);
+  const double parameterXmin = 0.1;
+  const double parameterXmax = 0.9;
+  const double parameterYmin = 0.0;
+  const double parameterYmax = 1.0;
+
+#pragma omp parallel for
+  for (int r = 0; r < rows; ++r)
+  {
+    LOG_INFO("Calculating objective function landscape ( {} / {} )", r + 1, rows);
+    for (int c = 0; c < cols; ++c)
+    {
+      std::vector<double> parameters(ParameterCount);
+      // default
+      parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+      parameters[BandpassLParameter] = mBandpassL;
+      parameters[BandpassHParameter] = mBandpassH;
+      parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
+      parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+      parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+      parameters[L1ratioParameter] = mL1ratio;
+
+      // modified
+      parameters[L1ratioParameter] = parameterXmin + (double)c / (cols - 1) * (parameterXmax - parameterXmin);
+      parameters[BandpassHParameter] = parameterYmin + (double)r / (rows - 1) * (parameterYmax - parameterYmin);
+
+      landscape.at<float>(r, c) = log(obj(parameters));
+    }
+  }
+
+  Plot2D::Plot("IPCcolormap", landscape);
 }
