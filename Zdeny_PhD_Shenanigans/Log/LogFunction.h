@@ -31,11 +31,11 @@ private:
     if (durationms < kSecondMs)
       return fmt::format("{} ms", durationms);
     else if (durationms < kMinuteMs)
-      return fmt::format("{} s", (double)durationms / kSecondMs);
+      return fmt::format("{:.2f} s", (double)durationms / kSecondMs);
     else if (durationms < kHourMs)
-      return fmt::format("{} m", (double)durationms / kMinuteMs);
+      return fmt::format("{:.2f} m", (double)durationms / kMinuteMs);
     else
-      return fmt::format("{} h", (double)durationms / kHourMs);
+      return fmt::format("{:.2f} h", (double)durationms / kHourMs);
   }
 
   std::string mFunName;

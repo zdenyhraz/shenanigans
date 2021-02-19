@@ -459,11 +459,6 @@ void IterativePhaseCorrelation::InitializePlots() const
   Plot2D::Reset("IPCcolormap");
   Plot2D::SetColorMapType(QCPColorGradient::gpJet);
 
-  Plot1D::Reset("IPCshifthistogram");
-  Plot1D::SetXlabel("fractional shift");
-  Plot1D::SetYlabel("count");
-  Plot1D::SetYnames({"reference", "before", "after"});
-
   Plot1D::Reset("IPCshift");
   Plot1D::SetXlabel("reference shift");
   Plot1D::SetYlabel("calculated shift");
@@ -478,6 +473,13 @@ void IterativePhaseCorrelation::InitializePlots() const
   Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
   Plot1D::SetPens(
       {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+
+  Plot1D::Reset("IPCshifterrorIPC");
+  Plot1D::SetXlabel("reference shift");
+  Plot1D::SetYlabel("pixel error");
+  Plot1D::SetYnames({"reference", "ipc", "ipc opt"});
+  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
 }
 
@@ -658,13 +660,11 @@ try
   const auto shiftsBefore = GetShifts(trainingImagePairs);
   const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
-  return; // debug
 
   // opt
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
-  PlotObjectiveFunctionLandscape(obj);
-  return; // debug
+  // PlotObjectiveFunctionLandscape(obj);
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   ApplyOptimalParameters(optimalParameters);
 
@@ -888,15 +888,6 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
   std::vector<double> shiftsXBefore, shiftsXBeforeError;
   std::vector<double> shiftsXAfter, shiftsXAfterError;
 
-  const int histogramBinCount = 11;
-  std::vector<double> histogram(histogramBinCount, 0);
-  std::vector<double> histogramReference(histogramBinCount, 0);
-  std::vector<double> histogramBefore(histogramBinCount, 0);
-  std::vector<double> histogramAfter(histogramBinCount, 0);
-
-  for (int i = 0; i < histogramBinCount; ++i)
-    histogram[i] = (double)i / (histogramBinCount - 1);
-
   for (int i = 0; i < shiftsReference.size(); ++i)
   {
     const auto& referenceShift = shiftsReference[i];
@@ -906,12 +897,10 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
 
     shiftsXReference.push_back(referenceShift.x);
     shiftsXReferenceError.push_back(0.0);
-    histogramReference[std::round(GetFractionalPart(referenceShift.x) * (histogramBinCount - 1))]++;
 
     shiftsXPixel.push_back(shiftPixel.x);
     shiftsXNonit.push_back(shiftNonit.x);
     shiftsXBefore.push_back(shiftBefore.x);
-    histogramBefore[std::round(GetFractionalPart(shiftBefore.x) * (histogramBinCount - 1))]++;
 
     shiftsXPixelError.push_back(shiftPixel.x - referenceShift.x);
     shiftsXNonitError.push_back(shiftNonit.x - referenceShift.x);
@@ -923,16 +912,12 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
 
       shiftsXAfter.push_back(shiftAfter.x);
       shiftsXAfterError.push_back(shiftAfter.x - referenceShift.x);
-      histogramAfter[std::round(GetFractionalPart(shiftAfter.x) * (histogramBinCount - 1))]++;
     }
   }
 
-  // slice because 0 & 1 bins are just half-full
-  Plot1D::Plot("IPCshifthistogram", Slice(histogram, 1, histogramBinCount - 1),
-               {Slice(histogramReference, 1, histogramBinCount - 1), Slice(histogramBefore, 1, histogramBinCount - 1), Slice(histogramAfter, 1, histogramBinCount - 1)}, false);
-
   Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
   Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
+  Plot1D::Plot("IPCshifterrorIPC", shiftsXReference, {shiftsXReferenceError, shiftsXBeforeError, shiftsXAfterError}, false);
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
