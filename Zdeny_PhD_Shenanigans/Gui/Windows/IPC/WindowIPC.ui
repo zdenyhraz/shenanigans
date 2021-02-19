@@ -255,14 +255,14 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
-          <string>max shift ratio</string>
+          <string>max shift</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_12">
          <property name="text">
-          <string>0.004</string>
+          <string>2.0</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

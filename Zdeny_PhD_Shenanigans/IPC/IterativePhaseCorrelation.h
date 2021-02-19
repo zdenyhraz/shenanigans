@@ -23,6 +23,13 @@ public:
     Cubic,
   };
 
+  enum class AccuracyType
+  {
+    Pixel,
+    Subpixel,
+    SubpixelIterative
+  };
+
   IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
   IterativePhaseCorrelation(const Mat& img, double bandpassL = 1.0, double bandpassH = 0.01);
 
@@ -54,7 +61,7 @@ public:
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
 
   void ShowDebugStuff() const;
-  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShiftRatio = 0.25, float noiseStdev = 0.01, int itersPerImage = 100,
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
                 double validationRatio = 0.2, int populationSize = ParameterCount * 7);
 
 private:
@@ -63,7 +70,6 @@ private:
   double mBandpassL = 0.0;
   double mBandpassH = 0.6;
   int mL2size = 11;
-  int mL2sizeStep = 2;
   double mL1ratio = 0.35;
   double mL1ratioStep = 0.05;
   int mUpsampleCoeff = 51;
@@ -73,7 +79,7 @@ private:
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
   std::string mDebugDirectory = "Debug";
-  mutable bool mNonIterative = false;
+  mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
@@ -128,11 +134,13 @@ private:
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
-  void ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsNonit, const std::vector<Point2f>& shiftsBefore,
+  void ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsPixel, const std::vector<Point2f>& shiftsNonit, const std::vector<Point2f>& shiftsBefore,
                              const std::vector<Point2f>& shiftsAfter) const;
   std::vector<Point2f> GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<Point2f> GetNonIterativeShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
+  std::vector<Point2f> GetPixelShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<Point2f> GetReferenceShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   double GetAverageAccuracy(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shifts) const;
   static double GetFractionalPart(double x);
+  void PlotObjectiveFunctionLandscape(const std::function<double(const std::vector<double>&)>& obj);
 };
