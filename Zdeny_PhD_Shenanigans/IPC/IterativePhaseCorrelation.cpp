@@ -474,13 +474,6 @@ void IterativePhaseCorrelation::InitializePlots() const
   Plot1D::SetPens(
       {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-
-  Plot1D::Reset("IPCshifterrorIPC");
-  Plot1D::SetXlabel("reference shift");
-  Plot1D::SetYlabel("pixel error");
-  Plot1D::SetYnames({"reference", "ipc", "ipc opt"});
-  Plot1D::SetPens({QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
-  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
@@ -917,7 +910,6 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
 
   Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
   Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
-  Plot1D::Plot("IPCshifterrorIPC", shiftsXReference, {shiftsXReferenceError, shiftsXBeforeError, shiftsXAfterError}, false);
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
