@@ -659,6 +659,8 @@ try
   const auto valid = CreateObjectiveFunction(validationImagePairs);
   // PlotObjectiveFunctionLandscape(obj);
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
+  if (optimalParameters.empty())
+    throw std::runtime_error("Optimization failed");
   ApplyOptimalParameters(optimalParameters);
 
   // after
@@ -811,12 +813,12 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<double>
 
   LOG_INFO("Final IPC BandpassType: {}",
            BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
-  LOG_INFO("Final IPC BandpassL: {}", optimalParameters[BandpassLParameter]);
-  LOG_INFO("Final IPC BandpassH: {}", optimalParameters[BandpassHParameter]);
+  LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
+  LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
   LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
   LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
-  LOG_INFO("Final IPC UpsampleCoeff: {}", optimalParameters[UpsampleCoeffParameter]);
-  LOG_INFO("Final IPC L1ratio: {}", optimalParameters[L1ratioParameter]);
+  LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<int>(optimalParameters[UpsampleCoeffParameter]));
+  LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const
