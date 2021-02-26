@@ -18,6 +18,7 @@ private slots:
   void RefreshIPCparametersAndExit();
   void Optimize();
   void PlotObjectiveFunctionLandscape();
+  void PlotUpsampleCoefficientAccuracyDependence();
   void align();
   void alignXY();
   void flowMap();

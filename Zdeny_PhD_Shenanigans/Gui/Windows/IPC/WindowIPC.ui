@@ -636,7 +636,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="label_27">
          <property name="text">
-          <string>landscape iters</string>
+          <string>plot iterations</string>
          </property>
         </widget>
        </item>
