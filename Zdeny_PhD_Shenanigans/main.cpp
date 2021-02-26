@@ -10,6 +10,8 @@
 
 int main(int argc, char* argv[])
 {
+  srand(time(0));
+
 #ifdef ATTACH_CONSOLE
   // detach from the current console window
   // if launched from a console window, that will still run waiting for the new console (below) to close

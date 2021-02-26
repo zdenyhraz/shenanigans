@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "PlotCSV.h"
+#include "Plot1D.h"
 
 int PlotCSV::counter = 0;
 
-void PlotCSV::plot(const std::string &path, const std::string &savepath)
+void PlotCSV::plot(const std::string& path, const std::string& savepath)
 {
   auto [x, ys, xlabel, ylabels] = ParseCSV(path);
 
@@ -13,11 +14,11 @@ void PlotCSV::plot(const std::string &path, const std::string &savepath)
   std::string plotname = std::string("csv plot ") + to_string(counter);
   std::string ylabel = "";
 
-  Plot1D::plot(x, ys, plotname, xlabel, ylabel, ylabels, Plot::pens, savepath);
+  // Plot1D::Plot(path, x, ys, plotname, xlabel, ylabel, ylabels, Plot::pens, savepath);
   counter++;
 }
 
-std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, std::vector<std::string>> PlotCSV::ParseCSV(const std::string &path)
+std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, std::vector<std::string>> PlotCSV::ParseCSV(const std::string& path)
 {
   std::ifstream file(path);
   if (!file.is_open() || !file.good())

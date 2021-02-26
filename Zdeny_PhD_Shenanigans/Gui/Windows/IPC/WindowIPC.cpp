@@ -30,6 +30,7 @@ void WindowIPC::RefreshIPCparameters(bool init)
   globals->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
   globals->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
+  globals->IPC->SetDebugMode(ui.checkBox->isChecked());
 
   if (!init)
     LOG_DEBUG("IPC parameter values updated");
@@ -43,12 +44,14 @@ void WindowIPC::RefreshIPCparametersAndExit()
 
 void WindowIPC::Optimize()
 {
+  RefreshIPCparameters();
   globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
-                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble());
+                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
 }
 
 void WindowIPC::align()
 {
+  RefreshIPCparameters();
   std::string path1 = ui.lineEdit_15->text().toStdString();
   std::string path2 = ui.lineEdit_16->text().toStdString();
   Mat img1 = loadImage(path1);
@@ -86,6 +89,7 @@ void WindowIPC::align()
 void WindowIPC::alignXY()
 {
   LOG_DEBUG("Starting IPC image align process(XY)...");
+  RefreshIPCparameters();
   std::string path1 = ui.lineEdit_15->text().toStdString();
   std::string path2 = ui.lineEdit_16->text().toStdString();
   Mat img1 = loadImage(path1);
@@ -106,6 +110,7 @@ void WindowIPC::alignXY()
 
 void WindowIPC::flowMap()
 {
+  RefreshIPCparameters();
   std::string path1 = ui.lineEdit_15->text().toStdString();
   std::string path2 = ui.lineEdit_16->text().toStdString();
   Mat img1 = loadImage(path1);

@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-inline std::vector<float> CalculateHistogram(const Mat &img)
+inline std::vector<float> CalculateHistogram(const Mat& img)
 {
   std::vector<float> hist(256, 0);
   for (int r = 0; r < img.rows; ++r)
@@ -11,7 +11,7 @@ inline std::vector<float> CalculateHistogram(const Mat &img)
   return hist;
 }
 
-inline std::vector<float> CalculateCummulativeHistogram(const Mat &img)
+inline std::vector<float> CalculateCummulativeHistogram(const Mat& img)
 {
   std::vector<float> hist(256, 0);
 
@@ -25,7 +25,7 @@ inline std::vector<float> CalculateCummulativeHistogram(const Mat &img)
   return hist;
 }
 
-inline void ShowHistogram(const Mat &img, const std::string &plotname)
+inline void ShowHistogram(const Mat& img, const std::string& plotname)
 {
   auto hist_ = CalculateHistogram(img);
   auto chist_ = CalculateCummulativeHistogram(img);
@@ -35,10 +35,10 @@ inline void ShowHistogram(const Mat &img, const std::string &plotname)
   std::vector<double> x(hist.size());
   std::iota(x.begin(), x.end(), 0);
 
-  Plot1D::plot(x, hist, chist, plotname, "pixel value", "histogram", "cummulative histogram");
+  // Plot1D::Plot(x, hist, chist, plotname, "pixel value", "histogram", "cummulative histogram");
 }
 
-inline Mat EqualizeHistogram(const Mat &img)
+inline Mat EqualizeHistogram(const Mat& img)
 {
   Mat out = img.clone();
   auto chist = CalculateCummulativeHistogram(img);
@@ -50,7 +50,7 @@ inline Mat EqualizeHistogram(const Mat &img)
   return out;
 }
 
-inline Mat EqualizeHistogramAdaptive(const Mat &img, int wsize)
+inline Mat EqualizeHistogramAdaptive(const Mat& img, int wsize)
 {
   Mat out = img.clone();
 
