@@ -27,9 +27,9 @@ public:
 private:
   QtLogger()
   {
-    mColors[LogLevel::Trace] = QColor(180, 180, 180);
+    mColors[LogLevel::Trace] = QColor(150, 150, 150);
     mColors[LogLevel::Debug] = QColor(51, 153, 255);
-    mColors[LogLevel::Info] = QColor(179, 91, 255);
+    mColors[LogLevel::Info] = QColor(205, 255, 0);
     mColors[LogLevel::Success] = QColor(0, 204, 0);
     mColors[LogLevel::Warning] = QColor(255, 154, 20);
     mColors[LogLevel::Error] = QColor(225, 0, 0);
@@ -51,6 +51,26 @@ private:
     return buf;
   }
 
+  static std::string GetLogLevelString(LogLevel logLevel)
+  {
+    switch (logLevel)
+    {
+    case LogLevel::Trace:
+      return "Trace";
+    case LogLevel::Debug:
+      return "Debug";
+    case LogLevel::Info:
+      return "Info";
+    case LogLevel::Success:
+      return "Success";
+    case LogLevel::Warning:
+      return "Warning";
+    case LogLevel::Error:
+      return "Error";
+    }
+    return "-";
+  }
+
   template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     std::scoped_lock lock(mMutex);
@@ -58,7 +78,7 @@ private:
       return;
 
     mTextBrowser->setTextColor(mColors[logLevel]);
-    mTextBrowser->append(fmt::format("[{}] {}", GetCurrentTime(), fmt::format(fmt, args...)).c_str());
+    mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), GetLogLevelString(logLevel), fmt::format(fmt, args...)).c_str());
     QCoreApplication::processEvents();
   }
 

@@ -1,144 +1,252 @@
-#include "stdafx.h"
 #include "Plot1D.h"
-#include "Plot2D.h"
+#include "stdafx.h"
 
-void Plot1D::Reset(std::string name)
+std::unordered_map<std::string, Plot1D> Plot1D::mPlots;
+std::string Plot1D::mLastAccessedPlot = "Plot1D";
+
+Plot1D& Plot1D::GetPlot(const std::string& name)
 {
-  auto idx = Plot::plots.find(name);
-  if (idx != Plot::plots.end())
-  {
-    LOG_DEBUG("Reseting 1Dplot '{}'", name);
-    WindowPlot* windowPlot = idx->second.get();
-    for (int i = 0; i < windowPlot->ui.widget->graphCount(); i++)
-      windowPlot->ui.widget->graph(i)->data().data()->clear();
+  if (mPlots.count(name) == 0)
+    mPlots.emplace(name, Plot1D(name));
 
-    windowPlot->ui.widget->rescaleAxes();
-    windowPlot->ui.widget->replot();
-    windowPlot->show();
-  }
+  mLastAccessedPlot = name;
+  return mPlots.at(name);
 }
 
-void Plot1D::plotcore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, std::string name, std::string xlabel, std::string y1label,
-                      std::string y2label, std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath)
+Plot1D::Plot1D(const std::string& name) : mName(name)
+{
+}
+
+void Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot)
+{
+  PlotCore(x, {y}, {}, newplot);
+}
+
+void Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot)
+{
+  PlotCore(x, ys, {}, newplot);
+}
+
+void Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot)
+{
+  PlotCore(x, {y1}, {y2}, newplot);
+}
+
+void Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
+{
+  PlotCore(x, y1s, y2s, newplot);
+}
+
+void Plot1D::Plot(double x, double y)
+{
+  PlotCore(x, {y}, {});
+}
+
+void Plot1D::Plot(double x, const std::vector<double>& ys)
+{
+  PlotCore(x, ys, {});
+}
+
+void Plot1D::Plot(double x, double y1, double y2)
+{
+  PlotCore(x, {y1}, {y2});
+}
+
+void Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
+{
+  PlotCore(x, y1s, y2s);
+}
+
+void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
+{
+  if (newplot)
+    mCounter++;
+
+  int y1cnt = y1s.size();
+  int y2cnt = y2s.size();
+  int ycnt = y1cnt + y2cnt;
+
+  if (!mInitialized || newplot)
+    Initialize(ycnt, y1cnt, y2cnt);
+
+  auto& windowPlot = Plot::plots[GetName()];
+  auto& plot = windowPlot->ui.widget;
+
+  for (int i = 0; i < ycnt; i++)
+  {
+    if (i < y1cnt)
+      plot->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y1s[i]));
+    else
+      plot->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y2s[i - y1cnt]));
+  }
+
+  plot->rescaleAxes();
+  plot->replot();
+  windowPlot->show();
+
+  if (mSavepath.length() > 0)
+    plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
+}
+
+void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
 {
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  WindowPlot* windowPlot = RefreshGraph(name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens);
+  if (!mInitialized)
+    Initialize(ycnt, y1cnt, y2cnt);
+
+  auto& windowPlot = Plot::plots[GetName()];
+  auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
   {
+    auto graph = plot->graph(i);
+
     if (i < y1cnt)
-      windowPlot->ui.widget->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y1s[i]));
+      graph->addData(x, y1s[i]);
     else
-      windowPlot->ui.widget->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y2s[i - y1cnt]));
+      graph->addData(x, y2s[i - y1cnt]);
   }
 
-  windowPlot->ui.widget->rescaleAxes();
-  windowPlot->ui.widget->replot();
+  plot->rescaleAxes();
+  plot->replot();
   windowPlot->show();
 
-  if (savepath != "")
-    windowPlot->ui.widget->savePng(QString::fromStdString(savepath), 0, 0, 3, -1);
+  if (mSavepath.length() > 0)
+    plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot1D::plotcore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s, std::string name, std::string xlabel, std::string y1label, std::string y2label,
-                      std::vector<std::string> y1names, std::vector<std::string> y2names, std::vector<QPen> pens, std::string savepath)
+void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
-  int y1cnt = y1s.size();
-  int y2cnt = y2s.size();
-  int ycnt = y1cnt + y2cnt;
-
-  WindowPlot* windowPlot = RefreshGraph(name, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens);
-
-  for (int i = 0; i < ycnt; i++)
-  {
-    if (i < y1cnt)
-      windowPlot->ui.widget->graph(i)->addData(x, y1s[i]);
-    else
-      windowPlot->ui.widget->graph(i)->addData(x, y2s[i - y1cnt]);
-  }
-
-  windowPlot->ui.widget->rescaleAxes();
-  windowPlot->ui.widget->replot();
-  windowPlot->show();
-
-  if (savepath != "")
-    windowPlot->ui.widget->savePng(QString::fromStdString(savepath), 0, 0, 3, -1);
-}
-
-WindowPlot* Plot1D::RefreshGraph(std::string name, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string>& y1names,
-                                 std::vector<std::string>& y2names, std::vector<QPen> pens)
-{
-  WindowPlot* windowPlot;
+  auto name = GetName();
   auto idx = Plot::plots.find(name);
   if (idx != Plot::plots.end())
   {
-    windowPlot = idx->second.get();
+    Reset();
+    mInitialized = true;
+    return;
   }
-  else
+
+  LOG_DEBUG("Initializing plot {}", name);
+  Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
+  auto& windowPlot = Plot::plots[name];
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
+  auto& plot = windowPlot->ui.widget;
+
+  plot->xAxis->setTickLabelFont(Plot::fontTicks);
+  plot->yAxis->setTickLabelFont(Plot::fontTicks);
+  plot->yAxis2->setTickLabelFont(Plot::fontTicks);
+  plot->xAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis->setLabelFont(Plot::fontLabels);
+  plot->yAxis2->setLabelFont(Plot::fontLabels);
+  plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+  plot->xAxis->setLabel(QString::fromStdString(mXlabel));
+  plot->yAxis->setLabel(QString::fromStdString(mYlabel));
+  plot->yAxis2->setLabel(QString::fromStdString(mY2label));
+  plot->legend->setVisible(mLegendVisible && ycnt > 1);
+  plot->legend->setFont(Plot::fontLegend);
+
+  switch (mLegendPosition)
   {
-    Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
-    windowPlot = Plot::plots[name].get();
-    windowPlot->move(Plot::GetNewPlotPosition(windowPlot, name));
-    SetupGraph(windowPlot, ycnt, y1cnt, y2cnt, xlabel, y1label, y2label, y1names, y2names, pens);
+  case LegendPosition::TopRight:
+    plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
+    break;
+  case LegendPosition::BotRight:
+    plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignRight);
+    break;
+  case LegendPosition::BotLeft:
+    plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom | Qt::AlignLeft);
+    break;
+  case LegendPosition::TopLeft:
+    plot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignLeft);
+    break;
   }
-  return windowPlot;
-}
 
-void Plot1D::SetupGraph(WindowPlot* windowPlot, int ycnt, int y1cnt, int y2cnt, std::string xlabel, std::string y1label, std::string y2label, std::vector<std::string>& y1names,
-                        std::vector<std::string>& y2names, std::vector<QPen> pens)
-{
-  windowPlot->ui.widget->xAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->yAxis->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->yAxis2->setTickLabelFont(Plot::fontTicks);
-  windowPlot->ui.widget->xAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->yAxis2->setLabelFont(Plot::fontLabels);
-  windowPlot->ui.widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-  windowPlot->ui.widget->xAxis->setLabel(QString::fromStdString(xlabel));
-  windowPlot->ui.widget->yAxis->setLabel(QString::fromStdString(y1label));
-  windowPlot->ui.widget->yAxis2->setLabel(QString::fromStdString(y2label));
-  windowPlot->ui.widget->legend->setVisible(ycnt > 1);
-  windowPlot->ui.widget->legend->setFont(Plot::fontLegend);
-  windowPlot->ui.widget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop | Qt::AlignRight);
+  if (mYLogarithmic)
+  {
+    plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+    plot->yAxis->setNumberPrecision(1);
+    // plot->yAxis->setNumberFormat("eb");
+    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+    plot->yAxis->setTicker(logTicker);
+  }
 
-  // logarithmic scape options
-  // windowPlot->ui.widget->yAxis->setScaleType(QCPAxis::stLogarithmic);
-  // windowPlot->ui.widget->yAxis->setNumberPrecision(0);
-  // windowPlot->ui.widget->yAxis->setNumberFormat("eb"); // e = exponential, b = beautiful decimal powers
-  // QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
-  // windowPlot->ui.widget->yAxis->setTicker(logTicker);
+  if (mY2Logarithmic)
+  {
+    plot->yAxis2->setScaleType(QCPAxis::stLogarithmic);
+    plot->yAxis2->setNumberPrecision(1);
+    // plot->yAxis2->setNumberFormat("eb");
+    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+    plot->yAxis2->setTicker(logTicker);
+  }
 
   for (int i = 0; i < ycnt; i++)
   {
+    auto graph = plot->graph(i);
+
     if (i < y1cnt)
     {
-      windowPlot->ui.widget->addGraph(windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis);
-      if (y1names.size() > i)
-        windowPlot->ui.widget->graph(i)->setName(QString::fromStdString(y1names[i]));
+      plot->addGraph(plot->xAxis, plot->yAxis);
+      graph = plot->graph(i);
+
+      if (mYnames.size() > i)
+        graph->setName(QString::fromStdString(mYnames[i]));
       else
-        windowPlot->ui.widget->graph(i)->setName(QString::fromStdString("y1_" + to_string(i + 1)));
+        graph->setName(QString::fromStdString("y1_" + to_string(i + 1)));
     }
     else
     {
-      windowPlot->ui.widget->addGraph(windowPlot->ui.widget->xAxis, windowPlot->ui.widget->yAxis2);
-      if (y2names.size() > i - y1cnt)
-        windowPlot->ui.widget->graph(i)->setName(QString::fromStdString(y2names[i - y1cnt]));
+      plot->addGraph(plot->xAxis, plot->yAxis2);
+      graph = plot->graph(i);
+
+      if (mY2names.size() > i - y1cnt)
+        graph->setName(QString::fromStdString(mY2names[i - y1cnt]));
       else
-        windowPlot->ui.widget->graph(i)->setName(QString::fromStdString("y2_" + to_string(i - y1cnt + 1)));
+        graph->setName(QString::fromStdString("y2_" + to_string(i - y1cnt + 1)));
     }
 
-    if (i < pens.size())
-      windowPlot->ui.widget->graph(i)->setPen(pens[i]);
+    if (i < mPens.size())
+      graph->setPen(mPens[i]);
     else
-      windowPlot->ui.widget->graph(i)->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      graph->setPen(QPen(QColor(randr(0, 255), randr(0, 255), randr(0, 255)), Plot::pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+    if (mScatterStyle)
+    {
+      graph->setLineStyle(QCPGraph::lsNone);
+      graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, Plot::pt));
+    }
   }
 
   if (y2cnt > 0)
-    windowPlot->ui.widget->yAxis2->setVisible(true);
+    plot->yAxis2->setVisible(true);
 
   windowPlot->show();
   QCoreApplication::processEvents();
+  mInitialized = true;
+}
+
+std::string Plot1D::GetName()
+{
+  return mCounter > 0 ? fmt::format("{}:{}", mName, mCounter) : mName;
+}
+
+void Plot1D::Reset()
+{
+  auto name = GetName();
+  auto idx = Plot::plots.find(name);
+  if (idx == Plot::plots.end())
+    return;
+
+  LOG_DEBUG("Resetting plot {}", name);
+  auto& windowPlot = idx->second;
+  auto& plot = windowPlot->ui.widget;
+
+  for (int i = 0; i < plot->graphCount(); i++)
+    plot->graph(i)->data().data()->clear();
+
+  plot->rescaleAxes();
+  plot->replot();
+  windowPlot->show();
 }

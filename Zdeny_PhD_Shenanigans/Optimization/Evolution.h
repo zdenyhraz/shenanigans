@@ -35,7 +35,7 @@ public:
 private:
   struct Entity
   {
-    Entity();
+    Entity() = default;
     Entity(int N);
 
     std::vector<double> params;
@@ -44,7 +44,7 @@ private:
 
   struct Offspring
   {
-    Offspring();
+    Offspring() = default;
     Offspring(int N, int nParents);
     void UpdateDistinctParents(int eid, int NP);
     void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR);
@@ -84,6 +84,7 @@ private:
   };
 
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
+  void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
   int GetNumberOfParents();
   void InitializeOutputs();
@@ -101,6 +102,4 @@ private:
   std::string mOutputFileDir;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
-  std::unique_ptr<Plot::Plot1D> mPlotDiff;
-  std::unique_ptr<Plot::Plot1D> mPlotObj;
 };

@@ -165,6 +165,7 @@
     <QtMoc Include="Gui\Windows\FITS\WindowFITS.h" />
     <ClInclude Include="Filtering\HistogramEqualization.h" />
     <QtMoc Include="Gui\Windows\Filtering\WindowFiltering.h" />
+    <ClInclude Include="IPC\IPC.h" />
     <ClInclude Include="IPC\IterativePhaseCorrelation.h" />
     <ClInclude Include="Log\LogFunction.h" />
     <ClInclude Include="Log\QtLogger.h" />
@@ -174,6 +175,8 @@
     <ClInclude Include="Optimization\PatternSearch.h" />
     <ClInclude Include="Optimization\VisualOptimization.h" />
     <ClInclude Include="Phon\stmpref.h" />
+    <ClInclude Include="Plot\Plot1D.h" />
+    <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Plot\PlotCSV.h" />
     <ClInclude Include="Sasko\NonMaximaSuppression.h" />
     <ClInclude Include="UnitTests\IterativePhaseCorrelationTest.h" />
@@ -198,7 +201,6 @@
     <ClInclude Include="IPC\ipcAux.h" />
     <ClInclude Include="Optimization\GraphOptimization.h" />
     <ClInclude Include="InverseMap\inverseMapping.h" />
-    <ClInclude Include="IPC\IPC.h" />
     <ClInclude Include="Log\Logger.h" />
     <ClInclude Include="Neural\neural.h" />
     <ClInclude Include="Optimization\Optimization.h" />
@@ -206,8 +208,6 @@
     <QtMoc Include="Gui\Windows\Plot\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />
     <ClInclude Include="Plot\Plot.h" />
-    <ClInclude Include="Plot\Plot1D.h" />
-    <ClInclude Include="Plot\Plot2D.h" />
     <ClInclude Include="Procedural\baseFunctions2d.h" />
     <ClInclude Include="Procedural\procedural.h" />
     <ClInclude Include="Snake\game.h" />

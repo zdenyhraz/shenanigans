@@ -4,7 +4,6 @@
 
 static void SnakeGame()
 {
-  srand(time(0));
   bool stop = false;
   int size = 50;
   Map map(size, size);
