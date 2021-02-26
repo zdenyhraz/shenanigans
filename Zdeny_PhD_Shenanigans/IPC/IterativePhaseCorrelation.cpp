@@ -765,7 +765,8 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
 
   Plot1D::Reset("UpsampleCoefficientAccuracyDependence");
   Plot1D::SetXlabel("Upsample coefficient");
-  Plot1D::SetYlabel("Average accuracy");
+  Plot1D::SetYlabel("Average pixel error");
+  Plot1D::SetYLogarithmic(true);
   Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy, false);
 }
 
