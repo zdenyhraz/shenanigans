@@ -725,8 +725,44 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
   Plot2D::Plot("IPCcolormap", landscape);
 }
 
-void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence() const
+void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters)
 {
+  const auto trainingImages = LoadImages(trainingImagesDirectory);
+  std::vector<double> imageSizes(iters);
+  std::vector<double> accuracy(iters);
+  const double xmin = 16;
+  const double xmax = mRows;
+  std::atomic<int> progress = 0;
+
+  for (int i = 0; i < iters; ++i)
+  {
+    LOG_INFO("Calculating image size accuracy dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
+    int imageSize = xmin + (double)i / (iters - 1) * (xmax - xmin);
+    imageSize = imageSize % 2 ? imageSize + 1 : imageSize;
+    SetSize(imageSize, imageSize);
+    const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
+    const auto obj = CreateObjectiveFunction(trainingImagePairs);
+    std::vector<double> parameters(ParameterCount);
+
+    // default
+    parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+    parameters[BandpassLParameter] = mBandpassL;
+    parameters[BandpassHParameter] = mBandpassH;
+    parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
+    parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+    parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+    parameters[L1ratioParameter] = mL1ratio;
+
+    imageSizes[i] = imageSize;
+    accuracy[i] = obj(parameters);
+    progress++;
+  }
+
+  Plot1D::Reset("ImageSizeAccuracyDependence");
+  Plot1D::SetXlabel("Image size");
+  Plot1D::SetYlabel("Average pixel error");
+  Plot1D::SetYLogarithmic(true);
+  Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy, false);
 }
 
 void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
@@ -770,8 +806,42 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
   Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy, false);
 }
 
-void IterativePhaseCorrelation::PlotNoiseAccuracyDependence() const
+void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
 {
+  const auto trainingImages = LoadImages(trainingImagesDirectory);
+  std::vector<double> noiseStdevs(iters);
+  std::vector<double> accuracy(iters);
+  const double xmin = 0;
+  const double xmax = noiseStdev;
+  std::atomic<int> progress = 0;
+
+#pragma omp parallel for
+  for (int i = 0; i < iters; ++i)
+  {
+    LOG_INFO("Calculating noise stdev accuracy dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
+    float noise = xmin + (double)i / (iters - 1) * (xmax - xmin);
+    const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noise);
+    const auto obj = CreateObjectiveFunction(trainingImagePairs);
+    std::vector<double> parameters(ParameterCount);
+
+    // default
+    parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+    parameters[BandpassLParameter] = mBandpassL;
+    parameters[BandpassHParameter] = mBandpassH;
+    parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
+    parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+    parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+    parameters[L1ratioParameter] = mL1ratio;
+
+    noiseStdevs[i] = noise;
+    accuracy[i] = obj(parameters);
+    progress++;
+  }
+
+  Plot1D::Reset("NoiseAccuracyDependence");
+  Plot1D::SetXlabel("Noise stdev");
+  Plot1D::SetYlabel("Average pixel error");
+  Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy, false);
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -820,7 +890,7 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
     {
       // random shift from a random point
       Point2f shift(rand11() * maxShift, rand11() * maxShift);
-      LOG_DEBUG("Creating {}x{} image pair shifted by [{:.2f}, {:.2f}] px", mCols, mRows, shift.x, shift.y);
+      // LOG_DEBUG("Creating {}x{} image pair shifted by [{:.2f}, {:.2f}] px", mCols, mRows, shift.x, shift.y);
       Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       Mat imageS;
       warpAffine(image, imageS, T, image.size());
