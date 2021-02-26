@@ -7,16 +7,17 @@ class WindowIPC : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowIPC(QWidget *parent, Globals *globals);
+  WindowIPC(QWidget* parent, Globals* globals);
 
 private:
   Ui::WindowIPC ui;
-  Globals *globals;
+  Globals* globals;
 
 private slots:
   void RefreshIPCparameters(bool init = false);
   void RefreshIPCparametersAndExit();
   void Optimize();
+  void PlotObjectiveFunctionLandscape();
   void align();
   void alignXY();
   void flowMap();

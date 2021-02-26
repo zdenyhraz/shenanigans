@@ -675,9 +675,14 @@ catch (const std::exception& e)
 {
   LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
 }
-catch (...)
+
+void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift, float noiseStdev,
+                                                               int itersPerImage, int iters) const
 {
-  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization");
+  const auto trainingImages = LoadImages(trainingImagesDirectory);
+  const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
+  const auto obj = CreateObjectiveFunction(trainingImagePairs);
+  PlotObjectiveFunctionLandscape(obj, iters);
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -981,24 +986,26 @@ double IterativePhaseCorrelation::GetFractionalPart(double x)
   return abs(x - std::floor(x));
 }
 
-void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::function<double(const std::vector<double>&)>& obj)
+void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::function<double(const std::vector<double>&)>& obj, int iters) const
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
-  const int rows = 17;
-  const int cols = 17;
+  const int rows = iters;
+  const int cols = iters;
   Mat landscape(rows, cols, CV_32F);
-  const double parameterXmin = 0.1;
-  const double parameterXmax = 0.9;
-  const double parameterYmin = 0.0;
-  const double parameterYmax = 1.0;
+  const double xmin = -0.25;
+  const double xmax = 0.75;
+  const double ymin = 0.25;
+  const double ymax = 1.25;
+  std::atomic<int> progress = 0;
 
 #pragma omp parallel for
   for (int r = 0; r < rows; ++r)
   {
-    LOG_INFO("Calculating objective function landscape ( {} / {} )", r + 1, rows);
     for (int c = 0; c < cols; ++c)
     {
+      LOG_INFO("Calculating objective function landscape ({:.1f}%)", (float)progress / (rows * cols - 1) * 100);
       std::vector<double> parameters(ParameterCount);
+
       // default
       parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
       parameters[BandpassLParameter] = mBandpassL;
@@ -1009,12 +1016,18 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::functi
       parameters[L1ratioParameter] = mL1ratio;
 
       // modified
-      parameters[L1ratioParameter] = parameterXmin + (double)c / (cols - 1) * (parameterXmax - parameterXmin);
-      parameters[BandpassHParameter] = parameterYmin + (double)r / (rows - 1) * (parameterYmax - parameterYmin);
+      parameters[BandpassLParameter] = xmin + (double)c / (cols - 1) * (xmax - xmin);
+      parameters[BandpassHParameter] = ymin + (double)r / (rows - 1) * (ymax - ymin);
 
       landscape.at<float>(r, c) = log(obj(parameters));
+      progress++;
     }
   }
 
+  Plot2D::Reset("IPCcolormap");
+  Plot2D::SetXmin(xmin);
+  Plot2D::SetXmax(xmax);
+  Plot2D::SetYmin(ymin);
+  Plot2D::SetYmax(ymax);
   Plot2D::Plot("IPCcolormap", landscape);
 }
