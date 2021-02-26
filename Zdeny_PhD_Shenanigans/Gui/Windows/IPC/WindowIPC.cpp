@@ -11,6 +11,7 @@ WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), g
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(RefreshIPCparametersAndExit()));
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(RefreshIPCparameters()));
   connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(Optimize()));
+  connect(ui.pushButton_13, SIGNAL(clicked()), this, SLOT(PlotObjectiveFunctionLandscape()));
   connect(ui.pushButton_9, SIGNAL(clicked()), this, SLOT(align()));
   connect(ui.pushButton_6, SIGNAL(clicked()), this, SLOT(alignXY()));
   connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(flowMap()));
@@ -47,6 +48,13 @@ void WindowIPC::Optimize()
   RefreshIPCparameters();
   globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
                          ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
+}
+
+void WindowIPC::PlotObjectiveFunctionLandscape()
+{
+  RefreshIPCparameters();
+  globals->IPC->PlotObjectiveFunctionLandscape(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
+                                               ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::align()
