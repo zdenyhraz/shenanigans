@@ -64,9 +64,9 @@ public:
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
                 double validationRatio = 0.2, int populationSize = ParameterCount * 7);
   void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
-  void PlotImageSizeAccuracyDependence() const;
+  void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters);
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
-  void PlotNoiseAccuracyDependence() const;
+  void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
 
 private:
   int mRows = 0;

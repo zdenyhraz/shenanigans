@@ -19,6 +19,8 @@ private slots:
   void Optimize();
   void PlotObjectiveFunctionLandscape();
   void PlotUpsampleCoefficientAccuracyDependence();
+  void PlotNoiseAccuracyDependence();
+  void PlotImageSizeAccuracyDependence();
   void align();
   void alignXY();
   void flowMap();
