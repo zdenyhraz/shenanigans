@@ -196,18 +196,18 @@ inline void IterativePhaseCorrelation::UpdateWindow()
   switch (mWindowType)
   {
   case WindowType::Rectangular:
-    mWindow = Mat::ones(mRows, mCols, CV_32F);
+    mWindow = Mat::ones(mRows, mCols, mDataType);
     break;
 
   case WindowType::Hann:
-    createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
+    createHanningWindow(mWindow, cv::Size(mCols, mRows), mDataType);
     break;
   }
 }
 
 inline void IterativePhaseCorrelation::UpdateBandpass()
 {
-  mBandpass = Mat::ones(mRows, mCols, CV_32F);
+  mBandpass = Mat::ones(mRows, mCols, mDataType);
 
   switch (mBandpassType)
   {
@@ -294,7 +294,8 @@ inline bool IterativePhaseCorrelation::CheckChannels(const Mat& image1, const Ma
 
 inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image) const
 {
-  image.convertTo(image, CV_32F);
+  if (image.type() != mDataType)
+    image.convertTo(image, mDataType);
   normalize(image, image, 0, 1, NORM_MINMAX);
 }
 
@@ -485,10 +486,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   {
     Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
     Mat w, imgw;
-    createHanningWindow(w, img.size(), CV_32F);
+    createHanningWindow(w, img.size(), mDataType);
     multiply(img, w, imgw);
     Mat w0 = w.clone();
-    Mat r0 = Mat::ones(w.size(), CV_32F);
+    Mat r0 = Mat::ones(w.size(), mDataType);
     copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
     copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, BORDER_CONSTANT, Scalar::all(0));
 
@@ -512,8 +513,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   // bandpass
   if (0)
   {
-    Mat bpR = Mat::zeros(mRows, mCols, CV_32F);
-    Mat bpG = Mat::zeros(mRows, mCols, CV_32F);
+    Mat bpR = Mat::zeros(mRows, mCols, mDataType);
+    Mat bpG = Mat::zeros(mRows, mCols, mDataType);
     for (int r = 0; r < mRows; ++r)
     {
       for (int c = 0; c < mCols; ++c)
@@ -549,8 +550,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     Mat img = roicrop(loadImage("Resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     Mat fftR = Fourier::fft(img);
     Mat fftG = Fourier::fft(img);
-    Mat filterR = Mat::zeros(img.size(), CV_32F);
-    Mat filterG = Mat::zeros(img.size(), CV_32F);
+    Mat filterR = Mat::zeros(img.size(), mDataType);
+    Mat filterG = Mat::zeros(img.size(), mDataType);
 
     for (int r = 0; r < mRows; ++r)
     {
@@ -599,8 +600,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     if (1)
     {
       double noiseStdev = 0.03;
-      Mat noise1 = Mat::zeros(image1.rows, image1.cols, CV_32F);
-      Mat noise2 = Mat::zeros(image2.rows, image2.cols, CV_32F);
+      Mat noise1 = Mat::zeros(image1.rows, image1.cols, mDataType);
+      Mat noise2 = Mat::zeros(image2.rows, image2.cols, mDataType);
       randn(noise1, 0, noiseStdev);
       randn(noise2, 0, noiseStdev);
       image1 += noise1;
@@ -684,7 +685,7 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const int rows = iters;
   const int cols = iters;
-  Mat landscape(rows, cols, CV_32F);
+  Mat landscape(rows, cols, mDataType);
   const double xmin = -0.25;
   const double xmax = 0.75;
   const double ymin = 0.25;
@@ -922,7 +923,7 @@ void IterativePhaseCorrelation::AddNoise(Mat& image, double noiseStdev) const
   if (noiseStdev <= 0)
     return;
 
-  Mat noise = Mat::zeros(image.rows, image.cols, CV_32F);
+  Mat noise = Mat::zeros(image.rows, image.cols, mDataType);
   randn(noise, 0, noiseStdev);
   image += noise;
 }
