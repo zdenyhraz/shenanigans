@@ -87,6 +87,7 @@ private:
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
+  int mDataType = CV_32F;
 
   void UpdateWindow();
   void UpdateBandpass();
