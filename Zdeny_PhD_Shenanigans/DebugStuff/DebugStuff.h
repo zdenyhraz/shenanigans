@@ -20,6 +20,27 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
+  if (1) // cuda
+  {
+    Mat img = loadImage("Resources/test.png");
+
+    Mat fft = Fourier::fft(img);
+    Mat cufft = Fourier::cufft(img);
+
+    Mat TB = Fourier::ifft(fft);
+    Mat cuTB = Fourier::icufft(cufft);
+
+    Plot2D::Plot("img", img);
+    Plot2D::Plot("fft logmagn", Fourier::logmagn(fft));
+    Plot2D::Plot("TB", TB);
+
+    Plot2D::Plot("cuimg", img);
+    Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
+    Plot2D::Plot("cuTB", cuTB);
+
+    // Plot2D::Plot("cufft-fft logmagn", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
+    return;
+  }
   if (1) // log levels
   {
     LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
