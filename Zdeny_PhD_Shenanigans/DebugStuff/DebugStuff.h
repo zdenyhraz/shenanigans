@@ -23,22 +23,53 @@ void Debug(Globals* globals)
   if (1) // cuda
   {
     Mat img = loadImage("Resources/test.png");
+    Mat fft, symfft, cufft, cufftsym;
+    Mat TB, symTB, cuTB, cuTBsym;
 
-    Mat fft = Fourier::fft(img);
-    Mat cufft = Fourier::cufft(img);
+    {
+      LOG_FUNCTION("fft");
+      fft = Fourier::fft(img);
+      TB = Fourier::ifft(fft);
+    }
 
-    Mat TB = Fourier::ifft(fft);
-    Mat cuTB = Fourier::icufft(cufft);
+    {
+      LOG_FUNCTION("symfft");
+      symfft = Fourier::fftsym(img);
+      symTB = Fourier::ifftsym(symfft);
+    }
+
+    {
+      auto dummy = Fourier::cufft(img); // dummy to init gpu
+      LOG_FUNCTION("cufft");
+      cufft = Fourier::cufft(img);
+      cuTB = Fourier::icufft(cufft);
+    }
+
+    {
+      auto dummy = Fourier::cufftsym(img); // dummy to init gpu
+      LOG_FUNCTION("cufftsym");
+      cufftsym = Fourier::cufftsym(img);
+      cuTBsym = Fourier::icufftsym(cufftsym);
+    }
 
     Plot2D::Plot("img", img);
     Plot2D::Plot("fft logmagn", Fourier::logmagn(fft));
     Plot2D::Plot("TB", TB);
 
+    Plot2D::Plot("img", img);
+    Plot2D::Plot("symfft logmagn", Fourier::logmagn(symfft));
+    Plot2D::Plot("symTB", symTB);
+
     Plot2D::Plot("cuimg", img);
     Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
     Plot2D::Plot("cuTB", cuTB);
 
-    // Plot2D::Plot("cufft-fft logmagn", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
+    Plot2D::Plot("cuimgsym", img);
+    Plot2D::Plot("cufftsym logmagn", Fourier::logmagn(cufftsym));
+    Plot2D::Plot("cuTBsym", cuTBsym);
+
+    // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
+    // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));
     return;
   }
   if (1) // log levels
