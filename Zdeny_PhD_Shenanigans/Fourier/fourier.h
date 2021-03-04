@@ -3,9 +3,6 @@
 #include "Core/functionsBaseCV.h"
 #include "Core/constants.h"
 
-//#define FOURIER_WITH_FFTW//optional use of the fftw library
-//#define FOURIER_WITH_CUDA//optional use of the cuda library
-
 namespace Fourier
 {
 inline Mat fft(Mat&& img)
@@ -13,11 +10,27 @@ inline Mat fft(Mat&& img)
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  Mat imgcp[] = {img, Mat::zeros(img.size(), CV_32F)};
+  Mat imgcplx[] = {img, Mat::zeros(img.size(), CV_32F)};
   Mat fft;
-  merge(imgcp, 2, fft);
+  merge(imgcplx, 2, fft);
+
   dft(fft, fft);
   return fft;
+}
+
+inline Mat cufft(Mat&& img)
+{
+  if (img.type() != CV_32F)
+    img.convertTo(img, CV_32F);
+
+  Mat imgreim[] = {img, Mat::zeros(img.size(), CV_32F)};
+  Mat imgComplex;
+  merge(imgreim, 2, imgComplex);
+
+  cuda::GpuMat imgGpu;
+  imgGpu.upload(imgComplex);
+  cuda::dft(imgGpu, imgGpu, imgGpu.size());
+  return Mat(imgGpu);
 }
 
 inline Mat ifft(Mat&& fft, bool conjsym = true)
@@ -26,7 +39,21 @@ inline Mat ifft(Mat&& fft, bool conjsym = true)
     dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
   else
     dft(fft, fft, DFT_INVERSE | DFT_SCALE);
+
   return fft;
+}
+
+inline Mat icufft(Mat&& fft, bool conjsym = false)
+{
+  cuda::GpuMat fftGpu;
+  fftGpu.upload(fft);
+
+  if (conjsym)
+    cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+  else
+    cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE);
+
+  return Mat(fftGpu);
 }
 
 inline Mat fft(const Mat& img)
@@ -34,9 +61,19 @@ inline Mat fft(const Mat& img)
   return fft(img.clone());
 }
 
+inline Mat cufft(const Mat& img)
+{
+  return cufft(img.clone());
+}
+
 inline Mat ifft(const Mat& fft)
 {
   return ifft(fft.clone());
+}
+
+inline Mat icufft(const Mat& fft)
+{
+  return icufft(fft.clone());
 }
 
 inline void fftshift(Mat& mat)

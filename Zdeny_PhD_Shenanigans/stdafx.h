@@ -36,7 +36,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/xfeatures2d.hpp>
-//QCustomPlot
+#include <opencv2/cudaarithm.hpp>
+// QCustomPlot
 #include "Plot/qcustomplot.h"
 // spdlog
 #include <spdlog/spdlog.h>
