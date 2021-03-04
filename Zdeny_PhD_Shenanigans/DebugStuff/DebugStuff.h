@@ -43,6 +43,12 @@ void Debug(Globals* globals)
     Evo.SetPlotOutput(true);
     auto result = Evo.Optimize(f);
   }
+  if (0) // OpenCV pdb test
+  {
+    Mat mat(100, 100, CV_32F);
+    roicrop(mat, 4, 4, 11, 11);
+    return;
+  }
   if (0) // non maxima suppression
   {
     Mat img = loadImage("Resources/test.png");
