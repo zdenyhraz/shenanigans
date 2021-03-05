@@ -30,14 +30,14 @@ void Debug(Globals* globals)
     resize(img1, img1, size);
     resize(img2, img2, size);
 
-    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0, 0.8);
+    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
     ipc.SetDebugMode(true);
     ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
     // ipc.SetBandpassParameters(0.2, 0.6);
     // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
 
     auto shiftCalc = ipc.Calculate(img1, img2);
-    LOG_DEBUG("IPC shift: [{}]", -shiftCalc);
+    LOG_DEBUG("IPC shift: [{}]", shiftCalc);
     return;
   }
   if (0) // cuda
