@@ -29,45 +29,42 @@ inline Mat cufft(Mat&& img, bool packed)
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
+  cuda::GpuMat imgGpu;
+
   if (packed)
   {
-    cuda::GpuMat fftGpu;
-    fftGpu.upload(img);
-    cuda::dft(fftGpu, fftGpu, fftGpu.size());
-    return Mat(fftGpu);
+    imgGpu.upload(img);
+    cuda::dft(imgGpu, imgGpu, imgGpu.size());
   }
   else
   {
     Mat planes[] = {img, Mat::zeros(img.size(), CV_32F)};
-    Mat fft;
-    merge(planes, 2, fft);
-
-    cuda::GpuMat fftGpu;
-    fftGpu.upload(fft);
-
-    cuda::dft(fftGpu, fftGpu, fftGpu.size());
-    return Mat(fftGpu);
+    merge(planes, 2, img);
+    imgGpu.upload(img);
+    cuda::dft(imgGpu, imgGpu, imgGpu.size());
   }
+
+  imgGpu.download(img);
+  return img;
 }
 
 inline Mat icufft(Mat&& fft, bool packed)
 {
-  if (packed)
+  cuda::GpuMat fftGpu;
+  fftGpu.upload(fft);
+
+  if (0 && packed)
   {
-    cuda::GpuMat fftGpu;
-    fftGpu.upload(fft);
-    cuda::GpuMat img;
-    cuda::dft(fftGpu, img, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
-    return Mat(img);
+    cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+    fftGpu.download(fft);
+    return fft;
   }
   else
   {
-    cuda::GpuMat fftGpu;
-    fftGpu.upload(fft);
     cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE);
-    Mat img(fftGpu);
+    fftGpu.download(fft);
     Mat planes[2];
-    split(img, planes);
+    split(fft, planes);
     return planes[0];
   }
 }
