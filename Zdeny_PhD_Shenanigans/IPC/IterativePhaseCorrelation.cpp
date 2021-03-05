@@ -329,11 +329,9 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
     {
       for (int col = 0; col < cps.cols; ++col)
       {
-        const float& re = cps.at<Vec2f>(row, col)[0];
-        const float& im = cps.at<Vec2f>(row, col)[1];
-        const float mag = sqrt(re * re + im * im);
-        cps.at<Vec2f>(row, col)[0] = re / mag;
-        cps.at<Vec2f>(row, col)[1] = im / mag;
+        // for packed FFT the cps vector is real, not complex
+        // calculating magnitude & dividing is non-trivial
+        // see magSpectrum() & divSpectrums() in OpenCV phaseCorrelate()
       }
     }
     return cps;
