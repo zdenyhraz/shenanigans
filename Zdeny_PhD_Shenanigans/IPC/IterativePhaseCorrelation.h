@@ -88,6 +88,7 @@ private:
   Mat mFrequencyBandpass;
   Mat mWindow;
   static constexpr bool mPackedFFT = false;
+  static constexpr bool mCudaFFT = false;
 
   void UpdateWindow();
   void UpdateBandpass();
