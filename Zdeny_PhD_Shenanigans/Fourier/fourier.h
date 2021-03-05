@@ -66,9 +66,9 @@ inline Mat icufft(Mat&& fft, bool packed)
   {
     cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE);
     fftGpu.download(fft);
-    Mat planes[2];
-    split(fft, planes);
-    return planes[0];
+    Mat out;
+    extractChannel(fft, out, 0);
+    return out;
   }
 }
 
