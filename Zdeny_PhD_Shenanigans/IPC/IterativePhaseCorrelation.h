@@ -87,7 +87,8 @@ private:
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
-  int mDataType = CV_32F;
+  static constexpr int mDataType = CV_32F;
+  static constexpr bool mPackedFFT = false;
 
   void UpdateWindow();
   void UpdateBandpass();
@@ -101,7 +102,7 @@ private:
   void ConvertToUnitFloat(Mat& image) const;
   void ApplyWindow(Mat& image) const;
   Mat CalculateFourierTransform(Mat&& image) const;
-  Mat CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const;
+  Mat CalculateCrossPowerSpectrum(Mat&& dft1, Mat&& dft2) const;
   void ApplyBandpass(Mat& crosspower) const;
   void CalculateFrequencyBandpass();
   Mat CalculateL3(Mat&& crosspower) const;

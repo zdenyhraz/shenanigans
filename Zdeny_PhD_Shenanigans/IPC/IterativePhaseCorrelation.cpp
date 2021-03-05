@@ -73,7 +73,7 @@ try
 
   auto dft1 = CalculateFourierTransform(std::move(image1));
   auto dft2 = CalculateFourierTransform(std::move(image2));
-  auto crosspower = CalculateCrossPowerSpectrum(dft1, dft2);
+  auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
   ApplyBandpass(crosspower);
 
   Mat L3 = CalculateL3(std::move(crosspower));
@@ -306,11 +306,22 @@ inline void IterativePhaseCorrelation::ApplyWindow(Mat& image) const
 
 inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) const
 {
-  return Fourier::fft(std::move(image));
+  return Fourier::fft(std::move(image), mPackedFFT);
 }
 
-inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(const Mat& dft1, const Mat& dft2) const
+inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Mat&& dft2) const
 {
+  /*
+  Mat cps, cpsm;
+  Mat cpsp[2];
+  mulSpectrums(dft1, dft2, cps, 0, true);
+  split(cps, cpsp);
+  magnitude(cpsp[0], cpsp[1], cpsm);
+  cpsp[0] / cpsm;
+  cpsp[1] / cpsm;
+  merge(cpsp, 2, cps);
+  return cps;*/
+
   Mat planes1[2];
   Mat planes2[2];
   Mat CrossPowerPlanes[2];
@@ -349,7 +360,7 @@ inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 
 inline Mat IterativePhaseCorrelation::CalculateL3(Mat&& crosspower) const
 {
-  Mat L3 = Fourier::ifft(std::move(crosspower));
+  Mat L3 = Fourier::ifft(std::move(crosspower), mPackedFFT);
   Fourier::fftshift(L3);
   return L3;
 }
