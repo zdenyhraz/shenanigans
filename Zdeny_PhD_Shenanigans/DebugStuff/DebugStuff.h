@@ -20,7 +20,27 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // cuda
+  if (1) // ipc shift test
+  {
+    Mat img1 = loadImage("Resources/test1.png");
+    Mat img2 = loadImage("Resources/test2.png");
+
+    int sajz = 512;
+    cv::Size size(sajz, sajz);
+    resize(img1, img1, size);
+    resize(img2, img2, size);
+
+    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0, 0.8);
+    ipc.SetDebugMode(true);
+    ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
+    // ipc.SetBandpassParameters(0.2, 0.6);
+    // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
+
+    auto shiftCalc = ipc.Calculate(img1, img2);
+    LOG_DEBUG("IPC shift: [{}]", -shiftCalc);
+    return;
+  }
+  if (0) // cuda
   {
     Mat img = loadImage("Resources/test.png");
     Mat fft, fftpacked, cufft, cufftpacked;
@@ -75,7 +95,6 @@ void Debug(Globals* globals)
 
     // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
     // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));
-    return;
   }
   if (1) // log levels
   {
