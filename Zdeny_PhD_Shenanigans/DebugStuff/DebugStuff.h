@@ -20,7 +20,7 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // dft vs cuda::dft
+  if (0) // dft vs cuda::dft
   {
     int iters = 512 - 16 + 1;
     int itersPerSize = 10;
