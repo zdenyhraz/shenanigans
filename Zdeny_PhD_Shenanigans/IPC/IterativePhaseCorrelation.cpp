@@ -183,6 +183,9 @@ try
           Plot2D::Plot("IPCcolormap", L1, true);
         }
 
+        if (mPackedFFT)
+          return -(L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff);
+
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
       }
     }
@@ -326,11 +329,11 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
     {
       for (int col = 0; col < cps.cols; ++col)
       {
-        const float& a = cps.at<Vec2f>(row, col)[0];
-        const float& b = cps.at<Vec2f>(row, col)[1];
-        const float mag = sqrt(a * a + b * b);
-        cps.at<Vec2f>(row, col)[0] = a / mag;
-        cps.at<Vec2f>(row, col)[1] = b / mag;
+        const float& re = cps.at<Vec2f>(row, col)[0];
+        const float& im = cps.at<Vec2f>(row, col)[1];
+        const float mag = sqrt(re * re + im * im);
+        cps.at<Vec2f>(row, col)[0] = re / mag;
+        cps.at<Vec2f>(row, col)[1] = im / mag;
       }
     }
     return cps;
@@ -358,6 +361,9 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
 
 inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
 {
+  if (mBandpassL <= 0 && mBandpassH >= 1)
+    return;
+
   multiply(crosspower, mFrequencyBandpass, crosspower);
 }
 
@@ -863,13 +869,6 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
   Plot1D::SetXlabel("Noise stdev");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy, false);
-}
-
-void IterativePhaseCorrelation::ShiftImage(Mat& img, const Point2f& shift)
-{
-  Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-  Mat imageS;
-  warpAffine(img, img, T, img.size());
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
