@@ -33,8 +33,12 @@ inline Mat cufft(Mat&& img, bool packed)
 
   if (packed)
   {
+    LOG_ERROR("cufft packed input channels: {}", img.channels());
     imgGpu.upload(img);
     cuda::dft(imgGpu, imgGpu, imgGpu.size());
+    imgGpu.download(img);
+    LOG_ERROR("cufft packed output channels: {}", img.channels());
+    return img;
   }
   else
   {
@@ -42,10 +46,9 @@ inline Mat cufft(Mat&& img, bool packed)
     merge(planes, 2, img);
     imgGpu.upload(img);
     cuda::dft(imgGpu, imgGpu, imgGpu.size());
+    imgGpu.download(img);
+    return img;
   }
-
-  imgGpu.download(img);
-  return img;
 }
 
 inline Mat icufft(Mat&& fft, bool packed)
@@ -53,10 +56,12 @@ inline Mat icufft(Mat&& fft, bool packed)
   cuda::GpuMat fftGpu;
   fftGpu.upload(fft);
 
-  if (0 && packed)
+  if (packed)
   {
+    LOG_ERROR("icufft packed input channels: {}", fft.channels());
     cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
     fftGpu.download(fft);
+    LOG_ERROR("icufft packed output channels: {}", fft.channels());
     return fft;
   }
   else

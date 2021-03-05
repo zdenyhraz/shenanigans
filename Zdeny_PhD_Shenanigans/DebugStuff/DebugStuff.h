@@ -25,8 +25,8 @@ void Debug(Globals* globals)
     Mat img = loadImage("Resources/test.png");
     Mat fft, fftpacked, cufft, cufftpacked;
     Mat TB, TBpacked, cuTB, cuTBpacked;
-    bool cpu = 0;
-    bool gpu = 1;
+    bool cpu = 1;
+    bool gpu = 0;
 
     if (cpu)
     {
@@ -42,14 +42,12 @@ void Debug(Globals* globals)
     }
     if (gpu)
     {
-      auto dummy = Fourier::cufft(img); // dummy to init gpu
       LOG_FUNCTION("cufft");
       cufft = Fourier::cufft(img);
       cuTB = Fourier::icufft(cufft);
     }
     if (gpu)
     {
-      auto dummy = Fourier::cufft(img, true); // dummy to init gpu
       LOG_FUNCTION("cufftpacked");
       cufftpacked = Fourier::cufft(img, true);
       cuTBpacked = Fourier::icufft(cufftpacked, true);
