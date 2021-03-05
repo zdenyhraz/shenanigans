@@ -5,126 +5,91 @@
 
 namespace Fourier
 {
-inline Mat fft(Mat&& img)
+inline Mat fft(Mat&& img, bool packed)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  Mat fft;
-  dft(img, fft, DFT_COMPLEX_OUTPUT);
-  return fft;
-}
-
-inline Mat ifft(Mat&& fft, bool conjsym = true)
-{
-  if (conjsym)
-    dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+  if (packed)
+    dft(img, img);
   else
-    dft(fft, fft, DFT_INVERSE | DFT_SCALE);
-  return fft;
+    dft(img, img, DFT_COMPLEX_OUTPUT);
+
+  return img;
 }
 
-inline Mat fftpacked(Mat&& img)
-{
-  if (img.type() != CV_32F)
-    img.convertTo(img, CV_32F);
-
-  Mat fft;
-  dft(img, fft);
-  return fft;
-}
-
-inline Mat ifftpacked(Mat&& fft)
+inline Mat ifft(Mat&& fft, bool packed)
 {
   dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
   return fft;
 }
 
-inline Mat cufft(Mat&& img)
+inline Mat cufft(Mat&& img, bool packed)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  Mat planes[] = {img, Mat::zeros(img.size(), CV_32F)};
-  Mat fft;
-  merge(planes, 2, fft);
+  if (packed)
+  {
+    cuda::GpuMat fftGpu;
+    fftGpu.upload(img);
+    cuda::dft(fftGpu, fftGpu, fftGpu.size());
+    return Mat(fftGpu);
+  }
+  else
+  {
+    Mat planes[] = {img, Mat::zeros(img.size(), CV_32F)};
+    Mat fft;
+    merge(planes, 2, fft);
 
-  cuda::GpuMat fftGpu;
-  fftGpu.upload(fft);
+    cuda::GpuMat fftGpu;
+    fftGpu.upload(fft);
 
-  cuda::dft(fftGpu, fftGpu, fftGpu.size());
-  return Mat(fftGpu);
+    cuda::dft(fftGpu, fftGpu, fftGpu.size());
+    return Mat(fftGpu);
+  }
 }
 
-inline Mat cufftpacked(Mat&& img)
+inline Mat icufft(Mat&& fft, bool packed)
 {
-  if (img.type() != CV_32F)
-    img.convertTo(img, CV_32F);
-
-  cuda::GpuMat fftGpu;
-  fftGpu.upload(img);
-
-  cuda::dft(fftGpu, fftGpu, fftGpu.size());
-  return Mat(fftGpu);
+  if (packed)
+  {
+    cuda::GpuMat fftGpu;
+    fftGpu.upload(fft);
+    cuda::GpuMat img;
+    cuda::dft(fftGpu, img, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+    return Mat(img);
+  }
+  else
+  {
+    cuda::GpuMat fftGpu;
+    fftGpu.upload(fft);
+    cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE);
+    Mat img(fftGpu);
+    Mat planes[2];
+    split(img, planes);
+    return planes[0];
+  }
 }
 
-inline Mat icufft(Mat&& fft)
+inline Mat fft(const Mat& img, bool packed = false)
 {
-  cuda::GpuMat fftGpu;
-  fftGpu.upload(fft);
-  cuda::dft(fftGpu, fftGpu, fftGpu.size(), DFT_INVERSE | DFT_SCALE);
-  Mat img(fftGpu);
-  Mat planes[2];
-  split(img, planes);
-  return planes[0];
+  return fft(img.clone(), packed);
 }
 
-inline Mat icufftpacked(Mat&& fft)
+inline Mat ifft(const Mat& fft, bool packed = false)
 {
-  cuda::GpuMat fftGpu;
-  fftGpu.upload(fft);
-  cuda::GpuMat img;
-  cuda::dft(fftGpu, img, fftGpu.size(), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
-  return Mat(img);
+  return ifft(fft.clone(), packed);
 }
 
-inline Mat fft(const Mat& img)
+inline Mat cufft(const Mat& img, bool packed = false)
 {
-  return fft(img.clone());
+  return cufft(img.clone(), packed);
 }
 
-inline Mat ifft(const Mat& fft)
+inline Mat icufft(const Mat& fft, bool packed = false)
 {
-  return ifft(fft.clone());
-}
-inline Mat fftpacked(const Mat& img)
-{
-  return fftpacked(img.clone());
-}
-
-inline Mat ifftpacked(const Mat& fft)
-{
-  return ifftpacked(fft.clone());
-}
-
-inline Mat cufft(const Mat& img)
-{
-  return cufft(img.clone());
-}
-
-inline Mat icufft(const Mat& fft)
-{
-  return icufft(fft.clone());
-}
-
-inline Mat cufftpacked(const Mat& img)
-{
-  return cufftpacked(img.clone());
-}
-
-inline Mat icufftpacked(const Mat& fft)
-{
-  return icufftpacked(fft.clone());
+  return icufft(fft.clone(), packed);
 }
 
 inline void fftshift(Mat& mat)

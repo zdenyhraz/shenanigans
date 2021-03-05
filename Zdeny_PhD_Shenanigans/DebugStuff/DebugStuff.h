@@ -34,10 +34,11 @@ void Debug(Globals* globals)
 
     {
       LOG_FUNCTION("fftpacked");
-      fftpacked = Fourier::fftpacked(img);
-      TBpacked = Fourier::ifftpacked(fftpacked);
+      fftpacked = Fourier::fft(img, true);
+      TBpacked = Fourier::ifft(fftpacked, true);
     }
 
+    if (0)
     {
       auto dummy = Fourier::cufft(img); // dummy to init gpu
       LOG_FUNCTION("cufft");
@@ -45,11 +46,12 @@ void Debug(Globals* globals)
       cuTB = Fourier::icufft(cufft);
     }
 
+    if (0)
     {
-      auto dummy = Fourier::cufftpacked(img); // dummy to init gpu
+      auto dummy = Fourier::cufft(img, true); // dummy to init gpu
       LOG_FUNCTION("cufftpacked");
-      cufftpacked = Fourier::cufftpacked(img);
-      cuTBpacked = Fourier::icufftpacked(cufftpacked);
+      cufftpacked = Fourier::cufft(img, true);
+      cuTBpacked = Fourier::icufft(cufftpacked, true);
     }
 
     Plot2D::Plot("img", img);
@@ -60,13 +62,16 @@ void Debug(Globals* globals)
     Plot2D::Plot("fftpacked logmagn", Fourier::logmagn(fftpacked));
     Plot2D::Plot("TBpacked", TBpacked);
 
-    Plot2D::Plot("cuimg", img);
-    Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
-    Plot2D::Plot("cuTB", cuTB);
+    if (0)
+    {
+      Plot2D::Plot("cuimg", img);
+      Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
+      Plot2D::Plot("cuTB", cuTB);
 
-    Plot2D::Plot("cuimgsym", img);
-    Plot2D::Plot("cufftpacked logmagn", Fourier::logmagn(cufftpacked));
-    Plot2D::Plot("cuTBpacked", cuTBpacked);
+      Plot2D::Plot("cuimgsym", img);
+      Plot2D::Plot("cufftpacked logmagn", Fourier::logmagn(cufftpacked));
+      Plot2D::Plot("cuTBpacked", cuTBpacked);
+    }
 
     // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
     // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));
