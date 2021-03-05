@@ -23,8 +23,8 @@ void Debug(Globals* globals)
   if (1) // cuda
   {
     Mat img = loadImage("Resources/test.png");
-    Mat fft, symfft, cufft, cufftsym;
-    Mat TB, symTB, cuTB, cuTBsym;
+    Mat fft, fftpacked, cufft, cufftpacked;
+    Mat TB, TBpacked, cuTB, cuTBpacked;
 
     {
       LOG_FUNCTION("fft");
@@ -33,9 +33,9 @@ void Debug(Globals* globals)
     }
 
     {
-      LOG_FUNCTION("symfft");
-      symfft = Fourier::fftsym(img);
-      symTB = Fourier::ifftsym(symfft);
+      LOG_FUNCTION("fftpacked");
+      fftpacked = Fourier::fftpacked(img);
+      TBpacked = Fourier::ifftpacked(fftpacked);
     }
 
     {
@@ -46,10 +46,10 @@ void Debug(Globals* globals)
     }
 
     {
-      auto dummy = Fourier::cufftsym(img); // dummy to init gpu
-      LOG_FUNCTION("cufftsym");
-      cufftsym = Fourier::cufftsym(img);
-      cuTBsym = Fourier::icufftsym(cufftsym);
+      auto dummy = Fourier::cufftpacked(img); // dummy to init gpu
+      LOG_FUNCTION("cufftpacked");
+      cufftpacked = Fourier::cufftpacked(img);
+      cuTBpacked = Fourier::icufftpacked(cufftpacked);
     }
 
     Plot2D::Plot("img", img);
@@ -57,16 +57,16 @@ void Debug(Globals* globals)
     Plot2D::Plot("TB", TB);
 
     Plot2D::Plot("img", img);
-    Plot2D::Plot("symfft logmagn", Fourier::logmagn(symfft));
-    Plot2D::Plot("symTB", symTB);
+    Plot2D::Plot("fftpacked logmagn", Fourier::logmagn(fftpacked));
+    Plot2D::Plot("TBpacked", TBpacked);
 
     Plot2D::Plot("cuimg", img);
     Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
     Plot2D::Plot("cuTB", cuTB);
 
     Plot2D::Plot("cuimgsym", img);
-    Plot2D::Plot("cufftsym logmagn", Fourier::logmagn(cufftsym));
-    Plot2D::Plot("cuTBsym", cuTBsym);
+    Plot2D::Plot("cufftpacked logmagn", Fourier::logmagn(cufftpacked));
+    Plot2D::Plot("cuTBpacked", cuTBpacked);
 
     // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
     // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));

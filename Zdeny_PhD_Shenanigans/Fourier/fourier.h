@@ -24,7 +24,7 @@ inline Mat ifft(Mat&& fft, bool conjsym = true)
   return fft;
 }
 
-inline Mat fftsym(Mat&& img)
+inline Mat fftpacked(Mat&& img)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -34,7 +34,7 @@ inline Mat fftsym(Mat&& img)
   return fft;
 }
 
-inline Mat ifftsym(Mat&& fft)
+inline Mat ifftpacked(Mat&& fft)
 {
   dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
   return fft;
@@ -56,7 +56,7 @@ inline Mat cufft(Mat&& img)
   return Mat(fftGpu);
 }
 
-inline Mat cufftsym(Mat&& img)
+inline Mat cufftpacked(Mat&& img)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -79,7 +79,7 @@ inline Mat icufft(Mat&& fft)
   return planes[0];
 }
 
-inline Mat icufftsym(Mat&& fft)
+inline Mat icufftpacked(Mat&& fft)
 {
   cuda::GpuMat fftGpu;
   fftGpu.upload(fft);
@@ -97,14 +97,14 @@ inline Mat ifft(const Mat& fft)
 {
   return ifft(fft.clone());
 }
-inline Mat fftsym(const Mat& img)
+inline Mat fftpacked(const Mat& img)
 {
-  return fftsym(img.clone());
+  return fftpacked(img.clone());
 }
 
-inline Mat ifftsym(const Mat& fft)
+inline Mat ifftpacked(const Mat& fft)
 {
-  return ifftsym(fft.clone());
+  return ifftpacked(fft.clone());
 }
 
 inline Mat cufft(const Mat& img)
@@ -117,14 +117,14 @@ inline Mat icufft(const Mat& fft)
   return icufft(fft.clone());
 }
 
-inline Mat cufftsym(const Mat& img)
+inline Mat cufftpacked(const Mat& img)
 {
-  return cufftsym(img.clone());
+  return cufftpacked(img.clone());
 }
 
-inline Mat icufftsym(const Mat& fft)
+inline Mat icufftpacked(const Mat& fft)
 {
-  return icufftsym(fft.clone());
+  return icufftpacked(fft.clone());
 }
 
 inline void fftshift(Mat& mat)
