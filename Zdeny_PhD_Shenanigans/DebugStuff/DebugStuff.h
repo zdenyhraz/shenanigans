@@ -33,8 +33,8 @@ void Debug(Globals* globals)
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
     ipc.SetDebugMode(true);
     ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
-    // ipc.SetBandpassParameters(0.2, 0.6);
-    // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
+    ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
+    ipc.SetBandpassParameters(0, 1);
 
     auto shiftCalc = ipc.Calculate(img1, img2);
     LOG_DEBUG("IPC shift: [{}]", shiftCalc);
