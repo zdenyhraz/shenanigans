@@ -347,19 +347,21 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
 
   for (int row = 0; row < dft1.rows; ++row)
   {
+    auto dft1p = dft1.ptr<Vec2f>(row);
+    auto dft2p = dft2.ptr<Vec2f>(row);
     for (int col = 0; col < dft1.cols; ++col)
     {
-      const float& a = dft1.at<Vec2f>(row, col)[0];
-      const float& b = -dft1.at<Vec2f>(row, col)[1];
-      const float& c = dft2.at<Vec2f>(row, col)[0];
-      const float& d = dft2.at<Vec2f>(row, col)[1];
+      const float& a = dft1p[col][0];
+      const float& b = -dft1p[col][1];
+      const float& c = dft2p[col][0];
+      const float& d = dft2p[col][1];
       // multiply is (ac-bd)+i*(ad+bc)
       const float& re = a * c - b * d;
       const float& im = a * d + b * c;
       const float& mag = sqrt(re * re + im * im);
       // reuse dft1 data
-      dft1.at<Vec2f>(row, col)[0] = re / mag;
-      dft1.at<Vec2f>(row, col)[1] = im / mag;
+      dft1p[col][0] = re / mag;
+      dft1p[col][1] = im / mag;
     }
   }
   return dft1;
@@ -417,11 +419,12 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat& mat) const
 
   for (int r = 0; r < mat.rows; ++r)
   {
+    auto matp = mat.ptr<float>(r);
     for (int c = 0; c < mat.cols; ++c)
     {
-      M += mat.at<float>(r, c);
-      My += mat.at<float>(r, c) * r;
-      Mx += mat.at<float>(r, c) * c;
+      M += matp[c];
+      My += matp[c] * r;
+      Mx += matp[c] * c;
     }
   }
 
