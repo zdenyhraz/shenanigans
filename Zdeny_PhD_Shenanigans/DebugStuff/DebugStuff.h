@@ -25,7 +25,7 @@ void Debug(Globals* globals)
     Mat img1 = loadImage("Resources/test1.png");
     Mat img2 = loadImage("Resources/test2.png");
 
-    int sajz = 512;
+    int sajz = 128;
     cv::Size size(sajz, sajz);
     resize(img1, img1, size);
     resize(img2, img2, size);

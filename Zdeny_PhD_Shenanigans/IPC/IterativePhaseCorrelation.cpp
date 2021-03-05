@@ -337,7 +337,6 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
     return cps;
   }
 
-  Mat cps = Mat::zeros(dft1.size(), CV_32FC2);
   for (int row = 0; row < dft1.rows; ++row)
   {
     for (int col = 0; col < dft1.cols; ++col)
@@ -350,11 +349,11 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
       const float re = a * c - b * d;
       const float im = a * d + b * c;
       const float mag = sqrt(re * re + im * im);
-      cps.at<Vec2f>(row, col)[0] = re / mag;
-      cps.at<Vec2f>(row, col)[1] = im / mag;
+      dft1.at<Vec2f>(row, col)[0] = re / mag;
+      dft1.at<Vec2f>(row, col)[1] = im / mag;
     }
   }
-  return cps;
+  return dft1;
 }
 
 inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
