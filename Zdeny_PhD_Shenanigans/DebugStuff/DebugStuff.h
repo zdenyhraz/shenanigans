@@ -20,25 +20,70 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // ipc shift test
+  if (1) // dft vs cuda::dft
+  {
+    int iters = 512 - 16 + 1;
+    int itersPerSize = 10;
+    int minsize = 16;
+    int maxsize = 512;
+    Mat img = loadImage("Resources/test.png");
+    std::vector<double> sizes(iters);
+    std::vector<double> timeCpu(iters);
+    std::vector<double> timeGpu(iters);
+    Mat fft = Fourier::cufft(img); // init
+
+    for (int i = 0; i < iters; ++i)
+    {
+      int size = minsize + (float)i / (iters - 1) * (maxsize - minsize);
+      sizes[i] = size;
+      LOG_INFO("{} / {} Calculating FFT speeds for image size {}", i + 1, iters, size);
+      Mat resized = roicrop(img, img.cols / 2, img.rows / 2, size, size);
+
+      {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        for (int it = 0; it < itersPerSize; ++it)
+          Mat fft = Fourier::fft(resized);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        timeCpu[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+      }
+
+      {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        for (int it = 0; it < itersPerSize; ++it)
+          Mat fft = Fourier::cufft(resized);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        timeGpu[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+      }
+    }
+
+    Plot1D::Reset("FFT CPU vs GPU");
+    Plot1D::SetYnames({"fft cpu", "fft gpu"});
+    Plot1D::SetYlabel("time");
+    Plot1D::SetXlabel("image size");
+    Plot1D::Plot("FFT CPU vs GPU", sizes, {timeCpu, timeGpu}, false);
+    return;
+  }
+  if (0) // ipc shift test
   {
     Mat img1 = loadImage("Resources/test1.png");
     Mat img2 = loadImage("Resources/test2.png");
 
-    int sajz = 128;
+    int sajz = 512;
     cv::Size size(sajz, sajz);
     resize(img1, img1, size);
     resize(img2, img2, size);
 
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
     ipc.SetDebugMode(true);
-    ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
-    ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
-    // ipc.SetBandpassParameters(0, 1);
+    ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
+    ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
 
     auto shiftCalc = ipc.Calculate(img1, img2);
     LOG_DEBUG("IPC shift: [{}]", shiftCalc);
-    return;
   }
   if (0) // cuda
   {
@@ -96,7 +141,7 @@ void Debug(Globals* globals)
     // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
     // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));
   }
-  if (1) // log levels
+  if (0) // log levels
   {
     LOG_TRACE("Trace boiiii xdxd {} a {} a {}", 1, 2, 3);
     LOG_DEBUG("Debug boiiii xdxd {} a {} a {}", 1, 2, 3);

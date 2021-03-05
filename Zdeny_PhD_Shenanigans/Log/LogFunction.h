@@ -8,20 +8,17 @@ class LogFunction
 {
   using clock = std::chrono::high_resolution_clock;
   using time_point = std::chrono::time_point<clock>;
-  using duration = std::chrono::milliseconds;
 
 public:
   LogFunction(const std::string& funName) : mFunName(funName), mStartTime(clock::now()) { LOG_DEBUG(fmt::format("{} started", mFunName)); }
 
   ~LogFunction()
   {
-    const auto duration = TimeSinceEpoch(clock::now()) - TimeSinceEpoch(mStartTime);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - mStartTime).count();
     LOG_DEBUG(fmt::format("{} finished ({})", mFunName, FormatDuration(duration)));
   }
 
 private:
-  static constexpr long long TimeSinceEpoch(const time_point& tmp) { return std::chrono::time_point_cast<duration>(tmp).time_since_epoch().count(); }
-
   static std::string FormatDuration(long long durationms)
   {
     static constexpr long long kSecondMs = 1000;
