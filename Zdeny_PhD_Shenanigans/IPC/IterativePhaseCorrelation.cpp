@@ -318,36 +318,69 @@ inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) con
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Mat&& dft2) const
 {
-  /*
-  Mat cps, cpsm;
-  Mat cpsp[2];
-  mulSpectrums(dft1, dft2, cps, 0, true); // move maybe
-  split(cps, cpsp);
-  magnitude(cpsp[0], cpsp[1], cpsm);
-  cpsp[0] / cpsm;
-  cpsp[1] / cpsm;
-  merge(cpsp, 2, cps);
-  return cps;
-  */
+  if (0)
+  {
+    LOG_FUNCTION("MulSpectrums OpenCV");
+    Mat cps, cpsm;
+    Mat cpsp[2];
+    mulSpectrums(dft1, dft2, cps, 0, true);
+    split(cps, cpsp);
+    magnitude(cpsp[0], cpsp[1], cpsm);
+    cpsp[0] /= cpsm;
+    cpsp[1] /= cpsm;
+    merge(cpsp, 2, cps);
+    return cps;
+  }
 
-  Mat planes1[2];
-  Mat planes2[2];
-  split(dft1, planes1);
-  split(dft2, planes2);
-  planes1[1] *= -1; // complex conjugate of second pic
+  if (1)
+  {
+    LOG_FUNCTION("MulSpectrums Zdeny");
+    Mat cpsp[2];
+    cpsp[0] = Mat::zeros(dft1.size(), CV_32F);
+    cpsp[1] = Mat::zeros(dft1.size(), CV_32F);
+    for (int row = 0; row < dft1.rows; ++row)
+    {
+      for (int col = 0; col < dft1.cols; ++col)
+      {
+        const float& a = dft1.at<Vec2f>(row, col)[0];
+        const float& b = dft1.at<Vec2f>(row, col)[1];
+        const float& c = dft2.at<Vec2f>(row, col)[0];
+        const float& d = dft2.at<Vec2f>(row, col)[1];
+        // complex conjugate multiply is (ac+bd)+i*(bc-ad)
+        const float re = a * c + b * d;
+        const float im = b * c - a * d;
+        const float mag = sqrt(re * re + im * im);
+        cpsp[0].at<float>(row, col) = re / mag;
+        cpsp[1].at<float>(row, col) = im / mag;
+      }
+    }
+    Mat cps;
+    merge(cpsp, 2, cps);
+    return cps;
+  }
 
-  Mat planes[2];
-  planes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);
-  planes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);
+  if (0)
+  {
+    LOG_FUNCTION("MulSpectrums Old");
+    Mat planes1[2];
+    Mat planes2[2];
+    split(dft1, planes1);
+    split(dft2, planes2);
+    planes1[1] *= -1; // complex conjugate of second pic
 
-  Mat mag;
-  magnitude(planes[0], planes[1], mag);
-  planes[0] /= mag;
-  planes[1] /= mag;
+    Mat cpsp[2];
+    cpsp[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);
+    cpsp[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);
 
-  Mat cps;
-  merge(planes, 2, cps);
-  return cps;
+    Mat mag;
+    magnitude(cpsp[0], cpsp[1], mag);
+    cpsp[0] /= mag;
+    cpsp[1] /= mag;
+
+    Mat cps;
+    merge(cpsp, 2, cps);
+    return cps;
+  }
 }
 
 inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
