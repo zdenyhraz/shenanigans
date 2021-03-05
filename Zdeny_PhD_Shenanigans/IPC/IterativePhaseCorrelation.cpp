@@ -364,7 +364,10 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
   if (mBandpassL <= 0 && mBandpassH >= 1)
     return;
 
-  multiply(crosspower, mFrequencyBandpass, crosspower);
+  if constexpr (mPackedFFT)
+    multiply(crosspower, mFrequencyBandpass(Rect(0, 0, crosspower.cols, crosspower.rows)), crosspower);
+  else
+    multiply(crosspower, mFrequencyBandpass, crosspower);
 }
 
 inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
