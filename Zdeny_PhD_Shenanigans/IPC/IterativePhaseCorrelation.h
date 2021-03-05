@@ -30,18 +30,18 @@ public:
     SubpixelIterative
   };
 
-  IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 1.0, double bandpassH = 0.01);
-  IterativePhaseCorrelation(const Mat& img, double bandpassL = 1.0, double bandpassH = 0.01);
+  IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 0, double bandpassH = 1);
+  IterativePhaseCorrelation(const Mat& img, double bandpassL = 0, double bandpassH = 1);
 
   void SetSize(int rows, int cols = -1);
   void SetSize(Size size);
   void SetBandpassParameters(double bandpassL, double bandpassH);
+  void SetBandpassType(BandpassType type);
   void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
   void SetUpsampleCoeff(int upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
   void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
-  void SetBandpassType(BandpassType type) { mBandpassType = type; }
   void SetWindowType(WindowType type) { mWindowType = type; }
   void SetDebugMode(bool mode) const { mDebugMode = mode; }
   void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
@@ -67,12 +67,13 @@ public:
   void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters);
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
   void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
+  static void ShiftImage(Mat& img, const Point2f& shift);
 
 private:
   int mRows = 0;
   int mCols = 0;
-  double mBandpassL = 0.0;
-  double mBandpassH = 0.6;
+  double mBandpassL = 0;
+  double mBandpassH = 1;
   int mL2size = 11;
   double mL1ratio = 0.35;
   double mL1ratioStep = 0.05;

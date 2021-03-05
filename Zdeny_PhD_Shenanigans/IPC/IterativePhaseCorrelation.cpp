@@ -27,6 +27,12 @@ void IterativePhaseCorrelation::SetBandpassParameters(double bandpassL, double b
   UpdateBandpass();
 }
 
+void IterativePhaseCorrelation::SetBandpassType(BandpassType type)
+{
+  mBandpassType = type;
+  UpdateBandpass();
+}
+
 void IterativePhaseCorrelation::SetSize(int rows, int cols)
 {
   mRows = rows;
@@ -301,7 +307,8 @@ inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image) const
 
 inline void IterativePhaseCorrelation::ApplyWindow(Mat& image) const
 {
-  multiply(image, mWindow, image);
+  if (mWindowType != WindowType::Rectangular)
+    multiply(image, mWindow, image);
 }
 
 inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) const
@@ -314,37 +321,33 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
   /*
   Mat cps, cpsm;
   Mat cpsp[2];
-  mulSpectrums(dft1, dft2, cps, 0, true);
+  mulSpectrums(dft1, dft2, cps, 0, true); // move maybe
   split(cps, cpsp);
   magnitude(cpsp[0], cpsp[1], cpsm);
   cpsp[0] / cpsm;
   cpsp[1] / cpsm;
   merge(cpsp, 2, cps);
-  return cps;*/
+  return cps;
+  */
 
   Mat planes1[2];
   Mat planes2[2];
-  Mat CrossPowerPlanes[2];
-
   split(dft1, planes1);
   split(dft2, planes2);
+  planes1[1] *= -1; // complex conjugate of second pic
 
-  planes1[1] *= -1;                                                              // complex conjugate of second pic
-  CrossPowerPlanes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]); // pointwise multiplications real
-  CrossPowerPlanes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]); // imag
+  Mat planes[2];
+  planes[0] = planes1[0].mul(planes2[0]) - planes1[1].mul(planes2[1]);
+  planes[1] = planes1[0].mul(planes2[1]) + planes1[1].mul(planes2[0]);
 
-  Mat magnre, magnim;
-  pow(CrossPowerPlanes[0], 2, magnre);
-  pow(CrossPowerPlanes[1], 2, magnim);
-  Mat normalizationdenominator = magnre + magnim;
-  sqrt(normalizationdenominator, normalizationdenominator);
-  normalizationdenominator += std::numeric_limits<float>::epsilon();
-  CrossPowerPlanes[0] /= normalizationdenominator;
-  CrossPowerPlanes[1] /= normalizationdenominator;
+  Mat mag;
+  magnitude(planes[0], planes[1], mag);
+  planes[0] /= mag;
+  planes[1] /= mag;
 
-  Mat CrossPower;
-  merge(CrossPowerPlanes, 2, CrossPower);
-  return CrossPower;
+  Mat cps;
+  merge(planes, 2, cps);
+  return cps;
 }
 
 inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
@@ -854,6 +857,13 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
   Plot1D::SetXlabel("Noise stdev");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy, false);
+}
+
+void IterativePhaseCorrelation::ShiftImage(Mat& img, const Point2f& shift)
+{
+  Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+  Mat imageS;
+  warpAffine(img, img, T, img.size());
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
