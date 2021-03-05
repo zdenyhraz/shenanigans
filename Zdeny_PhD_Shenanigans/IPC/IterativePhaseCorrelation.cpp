@@ -183,9 +183,6 @@ try
           Plot2D::Plot("IPCcolormap", L1, true);
         }
 
-        if (mPackedFFT)
-          return -(L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff);
-
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
       }
     }
@@ -305,13 +302,16 @@ inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image) const
 {
   if (image.type() != CV_32F)
     image.convertTo(image, CV_32F);
+
   normalize(image, image, 0, 1, NORM_MINMAX);
 }
 
 inline void IterativePhaseCorrelation::ApplyWindow(Mat& image) const
 {
-  if (mWindowType != WindowType::Rectangular)
-    multiply(image, mWindow, image);
+  if (mWindowType == WindowType::Rectangular)
+    return;
+
+  multiply(image, mWindow, image);
 }
 
 inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) const
@@ -321,10 +321,10 @@ inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) con
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Mat&& dft2) const
 {
-  if (mPackedFFT)
+  if constexpr (mPackedFFT)
   {
     Mat cps;
-    mulSpectrums(dft1, dft2, cps, 0, true);
+    mulSpectrums(dft2, dft1, cps, 0, true);
     for (int row = 0; row < cps.rows; ++row)
     {
       for (int col = 0; col < cps.cols; ++col)
