@@ -69,7 +69,12 @@ try
 
   if (mDebugMode)
   {
-    InitializePlots();
+    Plot2D::Reset("IPCgrayscale");
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+
+    Plot2D::Reset("IPCcolormap");
+    Plot2D::SetColorMapType(QCPColorGradient::gpJet);
+
     Plot2D::Plot("IPCgrayscale", image1);
     Plot2D::Plot("IPCgrayscale", image2);
   }
@@ -410,10 +415,10 @@ inline Point2f IterativePhaseCorrelation::GetPeakSubpixel(const Mat& mat) const
 
   Point2f result(Mx / M, My / M);
 
-  if (result.x < 0 || result.y < 0 || result.x > mat.cols - 1 || result.y > mat.rows - 1)
+  if (result.x < 0 || result.y < 0 || result.x >= mat.cols || result.y >= mat.rows)
     return Point2f(mat.cols / 2, mat.rows / 2);
-  else
-    return result;
+
+  return result;
 }
 
 inline Mat IterativePhaseCorrelation::CalculateL2(const Mat& L3, const Point2f& L3peak, int L2size) const
@@ -479,34 +484,13 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
     LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
 }
 
-void IterativePhaseCorrelation::InitializePlots() const
+void IterativePhaseCorrelation::ShowDebugStuff() const
 {
   Plot2D::Reset("IPCgrayscale");
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
 
   Plot2D::Reset("IPCcolormap");
   Plot2D::SetColorMapType(QCPColorGradient::gpJet);
-
-  Plot1D::Reset("IPCshift");
-  Plot1D::SetXlabel("reference shift");
-  Plot1D::SetYlabel("calculated shift");
-  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
-  Plot1D::SetPens(
-      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
-  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-
-  Plot1D::Reset("IPCshifterror");
-  Plot1D::SetXlabel("reference shift");
-  Plot1D::SetYlabel("pixel error");
-  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
-  Plot1D::SetPens(
-      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
-  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-}
-
-void IterativePhaseCorrelation::ShowDebugStuff() const
-{
-  InitializePlots();
 
   // window
   if (1)
@@ -660,7 +644,6 @@ try
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
-  InitializePlots();
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto validationImages = LoadImages(validationImagesDirectory);
 
@@ -675,6 +658,7 @@ try
            mRows);
 
   // before
+  ShowRandomImagePair(trainingImagePairs);
   const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
   const auto shiftsPixel = GetPixelShifts(trainingImagePairs);
   const auto shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
@@ -1102,7 +1086,22 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
     }
   }
 
+  Plot1D::Reset("IPCshift");
+  Plot1D::SetXlabel("reference shift");
+  Plot1D::SetYlabel("calculated shift");
+  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
+  Plot1D::SetPens(
+      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
+
+  Plot1D::Reset("IPCshifterror");
+  Plot1D::SetXlabel("reference shift");
+  Plot1D::SetYlabel("pixel error");
+  Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
+  Plot1D::SetPens(
+      {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
 }
 
@@ -1171,4 +1170,14 @@ double IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<Point2f>&
 double IterativePhaseCorrelation::GetFractionalPart(double x)
 {
   return abs(x - std::floor(x));
+}
+
+void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs)
+{
+  const auto& [img1, img2, shift] = imagePairs[static_cast<size_t>(rand01() * imagePairs.size())];
+  Mat concat;
+  hconcat(img1, img2, concat);
+  Plot2D::Reset("Random image pair");
+  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  Plot2D::Plot("Random image pair", concat, false);
 }
