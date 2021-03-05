@@ -88,7 +88,6 @@ private:
   Mat mBandpass;
   Mat mFrequencyBandpass;
   Mat mWindow;
-  static constexpr int mDataType = CV_32F;
   static constexpr bool mPackedFFT = false;
 
   void UpdateWindow();
