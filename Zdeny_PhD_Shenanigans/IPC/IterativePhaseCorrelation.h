@@ -116,7 +116,6 @@ private:
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;
-  void InitializePlots() const;
 
   enum OptimizedParameters
   {
@@ -148,4 +147,5 @@ private:
   std::vector<Point2f> GetReferenceShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   double GetAverageAccuracy(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shifts) const;
   static double GetFractionalPart(double x);
+  void ShowRandomImagePair(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs);
 };
