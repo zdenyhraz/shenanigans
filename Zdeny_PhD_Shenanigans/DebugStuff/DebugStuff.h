@@ -22,21 +22,19 @@ void Debug(Globals* globals)
 
   if (1) // ipc align test
   {
-    Mat img1 = loadImage("Resources/test.png");
-    Mat img2;
+    Point focus(1200, 2600);
+    int size = 1500;
 
-    int sajz = 512;
-    cv::Size size(sajz, sajz);
-    resize(img1, img1, size);
-    resize(img1, img2, size);
-    Shift(img2, 125, -220);
-    Rotate(img2, 79, 1.29);
+    Mat img1 = roicrop(loadImage("Resources/304A.png"), focus.x, focus.y, size, size);
+    Mat img2 = roicrop(loadImage("Resources/171A.png"), focus.x, focus.y, size, size);
+
+    Shift(img2, 0.17 * size, -0.12 * size);
+    Rotate(img2, -53, 1.29);
 
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
     Mat aligned = ipc.Align(img1, img2);
-    showimg(img1, "img1");
-    showimg(img2, "img2");
-    showimg(aligned, "aligned");
+
+    showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
     return;
   }
   if (0) // dft vs cuda::dft

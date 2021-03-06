@@ -2,7 +2,7 @@
 #include "Core/functionsBaseCV.h"
 #include "Draw/colormap.h"
 
-inline void showimg(const Mat &sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
+inline void showimg(const Mat& sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
 {
   Mat sourceimg = sourceimgIn.clone();
 
@@ -13,6 +13,9 @@ inline void showimg(const Mat &sourceimgIn, std::string windowname, bool color =
 
   sourceimg.convertTo(sourceimg, CV_32F);
   normalize(sourceimg, sourceimg, 0, 1, NORM_MINMAX);
+
+  if (sourceimg.channels() > 1 && (quantileB != 0 || quantileT != 1))
+    LOG_WARNING("Quantile clipping not implemented for color images");
 
   if (sourceimg.channels() == 1)
   {
@@ -26,13 +29,13 @@ inline void showimg(const Mat &sourceimgIn, std::string windowname, bool color =
   waitKey(1);
 }
 
-inline void showimg(const std::vector<Mat> &sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
+inline void showimg(const std::vector<Mat>& sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
 {
   // 1st image determines the main hconcat height
   int mainHeight = sourceimgIns[0].rows;
   std::vector<Mat> sourceimgs;
   sourceimgs.reserve(sourceimgIns.size());
-  for (auto &srcimg : sourceimgIns)
+  for (auto& srcimg : sourceimgIns)
   {
     if (!srcimg.empty())
     {
@@ -49,7 +52,7 @@ inline void showimg(const std::vector<Mat> &sourceimgIns, std::string windowname
   showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void saveimg(std::string path, const Mat &sourceimgIn, bool bilinear = false, Size size = Size(0, 0), bool color = false, double quantileB = 0, double quantileT = 1)
+inline void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear = false, Size size = Size(0, 0), bool color = false, double quantileB = 0, double quantileT = 1)
 {
   Mat saveimg = sourceimgIn.clone();
 
