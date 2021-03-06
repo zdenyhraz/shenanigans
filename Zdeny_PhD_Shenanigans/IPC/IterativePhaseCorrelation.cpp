@@ -542,8 +542,8 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 
 Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2)
 {
-  const Vec3f img1clr = {0.5, 0, 1};
-  const Vec3f img2clr = {0.5, 1, 0};
+  const Vec3f img1clr = {1, 0.5, 0};
+  const Vec3f img2clr = {0, 0.5, 1};
 
   const float gamma1 = 1.0;
   const float gamma2 = 1.0;
@@ -573,7 +573,10 @@ Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2
   normalize(img1c, img1c, 0, 1, NORM_MINMAX);
   normalize(img2c, img2c, 0, 1, NORM_MINMAX);
   Mat out = (img1c + img2c) / 2;
-  showimg(std::vector<Mat>{img1c, img2c, out}, "color composition triplet", 0, 0, 1, 1000);
+
+  showimg(std::vector<Mat>{img1c, img2c}, "color composition input");
+  showimg(std::vector<Mat>{out}, "color composition result", 0, 0, 1, 1000);
+
   return out;
 }
 
