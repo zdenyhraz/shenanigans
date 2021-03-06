@@ -542,16 +542,11 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 
 Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2)
 {
-  const Vec3f blue(0 / 255, 113.9850 / 255, 188.9550 / 255);
-  const Vec3f orange(216.750 / 255, 82.875 / 255, 24.990 / 255);
-  const Vec3f yellow(236.895 / 255, 176.970 / 255, 31.875 / 255);
-  const Vec3f magenta(125.970 / 255, 46.920 / 255, 141.780 / 255);
-  const Vec3f green(118.830 / 255, 171.870 / 255, 47.940 / 255);
-  const Vec3f cyan(76.755 / 255, 189.975 / 255, 237.915 / 255);
-  const Vec3f red(161.925 / 255, 19.890 / 255, 46.920 / 255);
+  const Vec3f img1clr = {0.5, 0, 1};
+  const Vec3f img2clr = {0.5, 1, 0};
 
-  const Vec3f img1clr = orange;
-  const Vec3f img2clr = blue;
+  const float gamma1 = 1.0;
+  const float gamma2 = 1.0;
 
   Mat img1c = Mat::zeros(img1.size(), CV_32FC3);
   Mat img2c = Mat::zeros(img2.size(), CV_32FC3);
@@ -565,16 +560,18 @@ Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2
 
     for (int col = 0; col < img1.cols; ++col)
     {
-      img1cp[col][0] = img1clr[2] * img1p[col];
-      img1cp[col][1] = img1clr[1] * img1p[col];
-      img1cp[col][2] = img1clr[0] * img1p[col];
+      img1cp[col][0] = pow(img1clr[2] * img1p[col], 1. / gamma1);
+      img1cp[col][1] = pow(img1clr[1] * img1p[col], 1. / gamma1);
+      img1cp[col][2] = pow(img1clr[0] * img1p[col], 1. / gamma1);
 
-      img2cp[col][0] = img2clr[2] * img2p[col];
-      img2cp[col][1] = img2clr[1] * img2p[col];
-      img2cp[col][2] = img2clr[0] * img2p[col];
+      img2cp[col][0] = pow(img2clr[2] * img2p[col], 1. / gamma2);
+      img2cp[col][1] = pow(img2clr[1] * img2p[col], 1. / gamma2);
+      img2cp[col][2] = pow(img2clr[0] * img2p[col], 1. / gamma2);
     }
   }
 
+  normalize(img1c, img1c, 0, 1, NORM_MINMAX);
+  normalize(img2c, img2c, 0, 1, NORM_MINMAX);
   Mat out = (img1c + img2c) / 2;
   showimg(std::vector<Mat>{img1c, img2c, out}, "color composition triplet", 0, 0, 1, 1000);
   return out;
