@@ -22,18 +22,23 @@ void Debug(Globals* globals)
 
   if (1) // ipc align test
   {
-    Point focus(1675, 2200);
-    int size = 500;
+    // silocary @1675/2200
 
-    Mat img1 = roicrop(loadImage("Resources/304A.png"), focus.x, focus.y, size, size);
-    Mat img2 = roicrop(loadImage("Resources/171A.png"), focus.x, focus.y, size, size);
+    Point cropfocus(2048, 2048);
+    int cropsize = 1.0 * 4096;
 
-    // Shift(img2, 0.17 * size, -0.12 * size);
-    // Rotate(img2, -53, 1.29);
+    Mat img1 = roicrop(loadImage("Resources/304A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
-    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
+    int size = cropsize;
+    resize(img1, img1, Size(size, size));
+    resize(img2, img2, Size(size, size));
+
+    Shift(img2, -950, 1050);
+    Rotate(img2, 70, 1.2);
+
+    IterativePhaseCorrelation ipc(size);
     Mat aligned = ipc.Align(img1, img2);
-
     showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
     return;
   }
