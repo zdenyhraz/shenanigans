@@ -250,7 +250,7 @@ Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
   estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
   warpAffine(output, output, estT, cv::Size(image1.cols, image1.rows));
 
-  showimg(ColorComposition(image1, output), "align color");
+  std::ignore = ColorComposition(image1, output);
 
   return output;
 }
@@ -542,21 +542,41 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 
 Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2)
 {
-  Mat out = Mat::zeros(img1.size(), CV_32FC3);
+  Mat img1c = Mat::zeros(img1.size(), CV_32FC3);
+  Mat img2c = Mat::zeros(img1.size(), CV_32FC3);
 
-  for (int row = 0; row < out.rows; ++row)
+  const Vec3f blue(0 / 255, 113.9850 / 255, 188.9550 / 255);
+  const Vec3f orange(216.750 / 255, 82.875 / 255, 24.990 / 255);
+  const Vec3f yellow(236.895 / 255, 176.970 / 255, 31.875 / 255);
+  const Vec3f magenta(125.970 / 255, 46.920 / 255, 141.780 / 255);
+  const Vec3f green(118.830 / 255, 171.870 / 255, 47.940 / 255);
+  const Vec3f cyan(76.755 / 255, 189.975 / 255, 237.915 / 255);
+  const Vec3f red(161.925 / 255, 19.890 / 255, 46.920 / 255);
+
+  const Vec3f img1clr = orange;
+  const Vec3f img2clr = cyan;
+
+  for (int row = 0; row < img1.rows; ++row)
   {
     auto img1p = img1.ptr<float>(row);
     auto img2p = img2.ptr<float>(row);
-    auto outp = out.ptr<Vec3f>(row);
-    for (int col = 0; col < out.cols; ++col)
+    auto img1cp = img1c.ptr<Vec3f>(row);
+    auto img2cp = img2c.ptr<Vec3f>(row);
+
+    for (int col = 0; col < img1.cols; ++col)
     {
-      outp[col][0] = img2p[col];                      // B
-      outp[col][1] = img1p[col];                      // G
-      outp[col][2] = 0.5 * (img1p[col] + img2p[col]); // R
+      img1cp[col][0] = img1clr[0] * img1p[col];
+      img1cp[col][1] = img1clr[1] * img1p[col];
+      img1cp[col][2] = img1clr[2] * img1p[col];
+
+      img2cp[col][0] = img2clr[0] * img2p[col];
+      img2cp[col][1] = img2clr[1] * img2p[col];
+      img2cp[col][2] = img2clr[2] * img2p[col];
     }
   }
 
+  Mat out = (img1c + img2c) / 2;
+  showimg(std::vector<Mat>{img1c, img2c, out}, "color composition triplet", 0, 0, 1, 1000);
   return out;
 }
 
