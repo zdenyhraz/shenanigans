@@ -20,6 +20,25 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
+  if (1) // ipc align test
+  {
+    Mat img1 = loadImage("Resources/test.png");
+    Mat img2;
+
+    int sajz = 512;
+    cv::Size size(sajz, sajz);
+    resize(img1, img1, size);
+    resize(img1, img2, size);
+    Shift(img2, 125, -220);
+    Rotate(img2, 79, 1.29);
+
+    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
+    Mat aligned = ipc.Align(img1, img2);
+    showimg(img1, "img1");
+    showimg(img2, "img2");
+    showimg(aligned, "aligned");
+    return;
+  }
   if (0) // dft vs cuda::dft
   {
     int iters = 512 - 16 + 1;

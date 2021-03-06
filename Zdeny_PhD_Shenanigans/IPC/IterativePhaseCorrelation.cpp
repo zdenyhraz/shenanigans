@@ -199,6 +199,62 @@ catch (const std::exception& e)
   return {0, 0};
 }
 
+Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
+{
+  Mat estR, estT, output;
+  Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
+  output = image2.clone();
+
+  // calculate rotation and scale
+  Mat img1FT = fourier(image1);
+  Mat img2FT = fourier(image2);
+  img1FT = quadrantswap(img1FT);
+  img2FT = quadrantswap(img2FT);
+  Mat planes1[2];
+  Mat planes2[2];
+  split(img1FT, planes1);
+  split(img2FT, planes2);
+  Mat img1FTm, img2FTm;
+  magnitude(planes1[0], planes1[1], img1FTm);
+  magnitude(planes2[0], planes2[1], img2FTm);
+  bool logar = true;
+  if (logar)
+  {
+    img1FTm += Scalar::all(1.);
+    img2FTm += Scalar::all(1.);
+    log(img1FTm, img1FTm);
+    log(img2FTm, img2FTm);
+  }
+  normalize(img1FTm, img1FTm, 0, 1, NORM_MINMAX);
+  normalize(img2FTm, img2FTm, 0, 1, NORM_MINMAX);
+  Mat img1LP, img2LP;
+  double maxRadius = 1. * min(center.y, center.x);
+  warpPolar(img1FTm, img1LP, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
+  warpPolar(img2FTm, img2LP, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
+  auto LPshifts = Calculate(img1LP, img2LP);
+  cout << "LPshifts: " << LPshifts << endl;
+  double anglePredicted = -LPshifts.y / image1.rows * 360;
+  double scalePredicted = exp(LPshifts.x * log(maxRadius) / image1.cols);
+  cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
+  cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
+  estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
+  warpAffine(output, output, estR, cv::Size(image1.cols, image1.rows));
+
+  // calculate shift
+  auto shifts = Calculate(image1, output);
+  cout << "shifts: " << shifts << endl;
+  double shiftXPredicted = shifts.x;
+  double shiftYPredicted = shifts.y;
+  cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
+  cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
+  estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
+  warpAffine(output, output, estT, cv::Size(image1.cols, image1.rows));
+
+  showimg(ColorComposition(image1, output), "align color");
+
+  return output;
+}
+
 inline void IterativePhaseCorrelation::UpdateWindow()
 {
   switch (mWindowType)
@@ -482,6 +538,26 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
   L1ratio -= mL1ratioStep;
   if (mDebugMode)
     LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
+}
+
+Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2)
+{
+  Mat out = Mat::zeros(img1.size(), CV_32FC3);
+
+  for (int row = 0; row < out.rows; ++row)
+  {
+    auto img1p = img1.ptr<float>(row);
+    auto img2p = img2.ptr<float>(row);
+    auto outp = out.ptr<Vec3f>(row);
+    for (int col = 0; col < out.cols; ++col)
+    {
+      outp[col][0] = img2p[col];                      // B
+      outp[col][1] = img1p[col];                      // G
+      outp[col][2] = 0.5 * (img1p[col] + img2p[col]); // R
+    }
+  }
+
+  return out;
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const

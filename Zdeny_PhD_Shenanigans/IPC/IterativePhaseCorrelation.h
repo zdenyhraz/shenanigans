@@ -59,6 +59,7 @@ public:
 
   Point2f Calculate(const Mat& image1, const Mat& image2) const;
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
+  Mat Align(const Mat& image1, const Mat& image2) const;
 
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
@@ -116,6 +117,7 @@ private:
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;
+  static Mat ColorComposition(const Mat& image1, const Mat& image2);
 
   enum OptimizedParameters
   {
@@ -149,3 +151,21 @@ private:
   static double GetFractionalPart(double x);
   void ShowRandomImagePair(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs);
 };
+
+inline void Shift(Mat& image, const Point2f& shift)
+{
+  Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+  warpAffine(image, image, T, image.size());
+}
+
+inline void Shift(Mat& image, float shiftx, float shifty)
+{
+  Shift(image, {shiftx, shifty});
+}
+
+inline void Rotate(Mat& image, float rot, float scale = 1)
+{
+  Point2f center((float)image.cols / 2, (float)image.rows / 2);
+  Mat R = getRotationMatrix2D(center, rot, scale);
+  warpAffine(image, image, R, image.size());
+}
