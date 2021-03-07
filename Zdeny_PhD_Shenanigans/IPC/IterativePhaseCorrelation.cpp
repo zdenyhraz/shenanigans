@@ -221,7 +221,6 @@ Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
       const float& im1 = img1FTp[col][1];
       const float& re2 = img2FTp[col][0];
       const float& im2 = img2FTp[col][1];
-
       img1FTmp[col] = log(sqrt(re1 * re1 + im1 * im1));
       img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
     }
