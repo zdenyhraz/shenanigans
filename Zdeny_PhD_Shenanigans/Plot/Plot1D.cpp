@@ -227,7 +227,7 @@ void Plot1D::Reset()
   if (idx == Plot::plots.end())
     return;
 
-  LOG_DEBUG("Resetting plot {}", name);
+  LOG_TRACE("Resetting plot {}", name);
   auto& windowPlot = idx->second;
   auto& plot = windowPlot->ui.widget;
 
