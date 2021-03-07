@@ -7,6 +7,7 @@ public:
   enum class LogLevel
   {
     Trace,
+    Function,
     Debug,
     Info,
     Success,
@@ -18,6 +19,7 @@ public:
   static void SetLogLevel(LogLevel logLevel) { Get().mLogLevel = logLevel; }
 
   template <typename... Args> static void Trace(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Trace, fmt, args...); }
+  template <typename... Args> static void Function(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Function, fmt, args...); }
   template <typename... Args> static void Debug(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Debug, fmt, args...); }
   template <typename... Args> static void Info(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Info, fmt, args...); }
   template <typename... Args> static void Success(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Success, fmt, args...); }
@@ -28,6 +30,7 @@ private:
   QtLogger()
   {
     mColors[LogLevel::Trace] = QColor(150, 150, 150);
+    mColors[LogLevel::Function] = QColor(178, 102, 255);
     mColors[LogLevel::Debug] = QColor(51, 153, 255);
     mColors[LogLevel::Info] = QColor(205, 255, 0);
     mColors[LogLevel::Success] = QColor(0, 204, 0);
@@ -57,6 +60,8 @@ private:
     {
     case LogLevel::Trace:
       return "Trace";
+    case LogLevel::Function:
+      return "Function";
     case LogLevel::Debug:
       return "Debug";
     case LogLevel::Info:
@@ -83,7 +88,7 @@ private:
   }
 
   QTextBrowser* mTextBrowser = nullptr;
-  LogLevel mLogLevel = LogLevel::Debug;
+  LogLevel mLogLevel = LogLevel::Function;
   std::unordered_map<LogLevel, QColor> mColors;
   std::mutex mMutex;
 };

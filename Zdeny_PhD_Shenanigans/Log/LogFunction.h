@@ -10,12 +10,12 @@ class LogFunction
   using time_point = std::chrono::time_point<clock>;
 
 public:
-  LogFunction(const std::string& funName) : mFunName(funName), mStartTime(clock::now()) { LOG_DEBUG(fmt::format("{} started", mFunName)); }
+  LogFunction(const std::string& funName) : mFunName(funName), mStartTime(clock::now()) { Logger::Function(fmt::format("{} started", mFunName)); }
 
   ~LogFunction()
   {
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - mStartTime).count();
-    LOG_DEBUG(fmt::format("{} finished ({})", mFunName, FormatDuration(duration)));
+    Logger::Function(fmt::format("{} finished ({})", mFunName, FormatDuration(duration)));
   }
 
 private:
