@@ -201,43 +201,41 @@ catch (const std::exception& e)
 
 Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
 {
-  Mat estR, estT, output;
+  Mat output;
   Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
   output = image2.clone();
 
   // calculate rotation and scale
-  Mat img1FT = fourier(image1);
-  Mat img2FT = fourier(image2);
-  img1FT = quadrantswap(img1FT);
-  img2FT = quadrantswap(img2FT);
-  Mat planes1[2];
-  Mat planes2[2];
-  split(img1FT, planes1);
-  split(img2FT, planes2);
-  Mat img1FTm, img2FTm;
-  magnitude(planes1[0], planes1[1], img1FTm);
-  magnitude(planes2[0], planes2[1], img2FTm);
-  bool logar = true;
-  if (logar)
+  Mat img1FT = Fourier::fft(image1, mPackedFFT);
+  Mat img2FT = Fourier::fft(image2, mPackedFFT);
+  Fourier::fftshift(img1FT);
+  Fourier::fftshift(img2FT);
+  Mat img1FTm = Mat::zeros(img1FT.size(), CV_32F);
+  Mat img2FTm = Mat::zeros(img2FT.size(), CV_32F);
+  for (int row = 0; row < img1FT.rows; ++row)
   {
-    img1FTm += Scalar::all(1.);
-    img2FTm += Scalar::all(1.);
-    log(img1FTm, img1FTm);
-    log(img2FTm, img2FTm);
+    auto img1FTp = img1FT.ptr<Vec2f>(row);
+    auto img2FTp = img2FT.ptr<Vec2f>(row);
+    auto img1FTmp = img1FTm.ptr<float>(row);
+    auto img2FTmp = img2FTm.ptr<float>(row);
+    for (int col = 0; col < img1FT.cols; ++col)
+    {
+      const float& re1 = img1FTp[col][0];
+      const float& im1 = img1FTp[col][1];
+      const float& re2 = img2FTp[col][0];
+      const float& im2 = img2FTp[col][1];
+
+      img1FTmp[col] = log(sqrt(re1 * re1 + im1 * im1));
+      img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
+    }
   }
-  normalize(img1FTm, img1FTm, 0, 1, NORM_MINMAX);
-  normalize(img2FTm, img2FTm, 0, 1, NORM_MINMAX);
-  Mat img1LP, img2LP;
   double maxRadius = 1. * min(center.y, center.x);
-  warpPolar(img1FTm, img1LP, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
-  warpPolar(img2FTm, img2LP, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
-  auto LPshifts = Calculate(img1LP, img2LP);
-  cout << "LPshifts: " << LPshifts << endl;
+  warpPolar(img1FTm, img1FTm, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
+  warpPolar(img2FTm, img2FTm, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
+  auto LPshifts = Calculate(img1FTm, img2FTm);
   double anglePredicted = -LPshifts.y / image1.rows * 360;
   double scalePredicted = exp(LPshifts.x * log(maxRadius) / image1.cols);
-  cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
-  cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
-  estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
+  Mat estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
   warpAffine(output, output, estR, cv::Size(image1.cols, image1.rows));
 
   // calculate shift
@@ -245,11 +243,14 @@ Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
   cout << "shifts: " << shifts << endl;
   double shiftXPredicted = shifts.x;
   double shiftYPredicted = shifts.y;
-  cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
-  cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
-  estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
+  Mat estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
   warpAffine(output, output, estT, cv::Size(image1.cols, image1.rows));
 
+  cout << "LogPolar shifts: " << LPshifts << endl;
+  cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
+  cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
+  cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
+  cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
   std::ignore = ColorComposition(image1, output);
 
   return output;
