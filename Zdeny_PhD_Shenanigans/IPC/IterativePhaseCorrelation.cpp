@@ -64,20 +64,14 @@ try
   ConvertToUnitFloat(image1);
   ConvertToUnitFloat(image2);
 
-  ApplyWindow(image1);
-  ApplyWindow(image2);
-
   if (mDebugMode)
   {
-    Plot2D::Reset("IPCgrayscale");
-    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-    Plot2D::Reset("IPCcolormap");
-    Plot2D::SetColorMapType(QCPColorGradient::gpJet);
-
-    Plot2D::Plot("IPCgrayscale", image1);
-    Plot2D::Plot("IPCgrayscale", image2);
+    Plot2D::Plot("IPCdebug2D", image1);
+    Plot2D::Plot("IPCdebug2D", image2);
   }
+
+  ApplyWindow(image1);
+  ApplyWindow(image2);
 
   auto dft1 = CalculateFourierTransform(std::move(image1));
   auto dft2 = CalculateFourierTransform(std::move(image2));
@@ -91,8 +85,8 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L3.png");
-    Plot2D::Plot("IPCcolormap", L3);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L3.png");
+    Plot2D::Plot("IPCdebug2D", L3);
   }
 
   if (mAccuracyType == AccuracyType::Pixel)
@@ -124,8 +118,8 @@ try
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L2.png");
-    Plot2D::Plot("IPCcolormap", L2);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L2.png");
+    Plot2D::Plot("IPCdebug2D", L2);
   }
 
   // L2U
@@ -134,8 +128,8 @@ try
   Point2f L2Upeak;
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L2U.png");
-    Plot2D::Plot("IPCcolormap", L2U, true);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L2U.png");
+    Plot2D::Plot("IPCdebug2D", L2U, true);
 
     if (0)
     {
@@ -144,11 +138,11 @@ try
       resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
       resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
       Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
-      Plot2D::Plot("IPCcolormap", nearest, true);
+      Plot2D::Plot("IPCdebug2D", nearest, true);
       Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
-      Plot2D::Plot("IPCcolormap", linear, true);
+      Plot2D::Plot("IPCdebug2D", linear, true);
       Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
-      Plot2D::Plot("IPCcolormap", cubic, true);
+      Plot2D::Plot("IPCdebug2D", cubic, true);
     }
   }
 
@@ -164,8 +158,8 @@ try
     Point2f L1peak;
     if (mDebugMode)
     {
-      Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L1B.png");
-      Plot2D::Plot("IPCcolormap", CalculateL1(L2U, L2Upeak, L1size), true);
+      Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L1B.png");
+      Plot2D::Plot("IPCdebug2D", CalculateL1(L2U, L2Upeak, L1size), true);
     }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -181,8 +175,8 @@ try
       {
         if (mDebugMode)
         {
-          Plot2D::SetSavePath("IPCcolormap", mDebugDirectory + "/L1A.png");
-          Plot2D::Plot("IPCcolormap", L1, true);
+          Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L1A.png");
+          Plot2D::Plot("IPCdebug2D", L1, true);
         }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
@@ -246,10 +240,13 @@ Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
   auto shiftT = Calculate(image1, output);
   Shift(output, -shiftT);
 
-  cout << "Evaluated rotation: " << rotation << " deg" << endl;
-  cout << "Evaluated scale: " << 1. / scale << " " << endl;
-  cout << "Evaluated shift: " << shiftT << endl;
-  std::ignore = ColorComposition(image1, output);
+  if (mDebugMode)
+  {
+    LOG_INFO("Evaluated rotation: {} deg", rotation);
+    LOG_INFO("Evaluated scale: {}", 1.f / scale);
+    LOG_INFO("Evaluated shift: {} px", shiftT);
+    showimg(ColorComposition(image1, output), "color composition result", 0, 0, 1, 1000);
+  }
   return output;
 }
 
@@ -568,22 +565,21 @@ Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2
     }
   }
 
-  normalize(img1c, img1c, 0, 1, NORM_MINMAX);
-  normalize(img2c, img2c, 0, 1, NORM_MINMAX);
-  Mat out = (img1c + img2c) / 2;
+  if (gamma1 != 1 || gamma2 != 1)
+  {
+    normalize(img1c, img1c, 0, 1, NORM_MINMAX);
+    normalize(img2c, img2c, 0, 1, NORM_MINMAX);
+  }
 
-  showimg(std::vector<Mat>{img1c, img2c}, "color composition input");
-  showimg(std::vector<Mat>{out}, "color composition result", 0, 0, 1, 1000);
-
-  return out;
+  return (img1c + img2c) / 2;
 }
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  Plot2D::Reset("IPCgrayscale");
+  Plot2D::Reset("IPCdebug2D");
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
 
-  Plot2D::Reset("IPCcolormap");
+  Plot2D::Reset("IPCdebug2D");
   Plot2D::SetColorMapType(QCPColorGradient::gpJet);
 
   // window
@@ -602,11 +598,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"Rect", "Hann"}, Plot::pens, mDebugDirectory +
     // "/1DWindowsDFT.png");
 
-    Plot2D::SetSavePath("IPCgrayscale", mDebugDirectory + "/2DImage.png");
-    Plot2D::Plot("IPCgrayscale", img, true);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
+    Plot2D::Plot("IPCdebug2D", img, true);
 
-    Plot2D::SetSavePath("IPCgrayscale", mDebugDirectory + "/2DImageWindow.png");
-    Plot2D::Plot("IPCgrayscale", imgw, true);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
+    Plot2D::Plot("IPCdebug2D", imgw, true);
 
     // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
     // Plot2D::Plot(Fourier::fftlogmagn(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
@@ -688,11 +684,11 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
 
-    Plot2D::SetSavePath("IPCgrayscale", mDebugDirectory + "/2DBandpassImageR.png");
-    Plot2D::Plot("IPCgrayscale", imgfR);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
+    Plot2D::Plot("IPCdebug2D", imgfR);
 
-    Plot2D::SetSavePath("IPCgrayscale", mDebugDirectory + "/2DBandpassImageG.png");
-    Plot2D::Plot("IPCgrayscale", imgfG);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
+    Plot2D::Plot("IPCdebug2D", imgfG);
   }
 
   // 2 pic
@@ -823,12 +819,12 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
     }
   }
 
-  Plot2D::Reset("IPCcolormap");
+  Plot2D::Reset("IPCdebug2D");
   Plot2D::SetXmin(xmin);
   Plot2D::SetXmax(xmax);
   Plot2D::SetYmin(ymin);
   Plot2D::SetYmax(ymax);
-  Plot2D::Plot("IPCcolormap", landscape);
+  Plot2D::Plot("IPCdebug2D", landscape);
 }
 
 void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters)

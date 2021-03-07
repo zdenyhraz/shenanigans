@@ -27,7 +27,7 @@ void Debug(Globals* globals)
     Point cropfocus(2048, 2048);
     int cropsize = 1.0 * 4096;
 
-    Mat img1 = roicrop(loadImage("Resources/304A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
     Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
     int size = cropsize;
@@ -37,7 +37,9 @@ void Debug(Globals* globals)
     Shift(img2, -950, 1050);
     Rotate(img2, 70, 1.2);
 
-    IterativePhaseCorrelation ipc(size);
+    IterativePhaseCorrelation ipc = *globals->IPC;
+    ipc.SetSize(img1.size());
+    ipc.SetDebugMode(true);
     Mat aligned = ipc.Align(img1, img2);
     showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
     return;
