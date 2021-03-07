@@ -201,11 +201,14 @@ catch (const std::exception& e)
 
 Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
 {
-  Mat output;
-  Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
-  output = image2.clone();
+  return Align(image1.clone(), image2.clone());
+}
 
-  // calculate rotation and scale
+Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
+{
+  Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
+  Mat output = image2.clone();
+
   Mat img1FT = Fourier::fft(image1, mPackedFFT);
   Mat img2FT = Fourier::fft(image2, mPackedFFT);
   Fourier::fftshift(img1FT);
@@ -229,30 +232,24 @@ Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
       img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
     }
   }
-  double maxRadius = 1. * min(center.y, center.x);
-  warpPolar(img1FTm, img1FTm, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
-  warpPolar(img2FTm, img2FTm, cv::Size(image1.cols, image1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
-  auto LPshifts = Calculate(img1FTm, img2FTm);
-  double anglePredicted = -LPshifts.y / image1.rows * 360;
-  double scalePredicted = exp(LPshifts.x * log(maxRadius) / image1.cols);
-  Mat estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
-  warpAffine(output, output, estR, cv::Size(image1.cols, image1.rows));
+  double maxRadius = min(center.y, center.x);
+  warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, INTER_LINEAR | WARP_FILL_OUTLIERS | WARP_POLAR_LOG); // semilog Polar
+  warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, INTER_LINEAR | WARP_FILL_OUTLIERS | WARP_POLAR_LOG); // semilog Polar
 
-  // calculate shift
-  auto shifts = Calculate(image1, output);
-  cout << "shifts: " << shifts << endl;
-  double shiftXPredicted = shifts.x;
-  double shiftYPredicted = shifts.y;
-  Mat estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
-  warpAffine(output, output, estT, cv::Size(image1.cols, image1.rows));
+  // rotation
+  auto shiftR = Calculate(img1FTm, img2FTm);
+  double rotation = -shiftR.y / image1.rows * 360;
+  double scale = exp(shiftR.x * log(maxRadius) / image1.cols);
+  Rotate(output, -rotation, scale);
 
-  cout << "LogPolar shifts: " << LPshifts << endl;
-  cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
-  cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
-  cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
-  cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
+  // translation
+  auto shiftT = Calculate(image1, output);
+  Shift(output, -shiftT);
+
+  cout << "Evaluated rotation: " << rotation << " deg" << endl;
+  cout << "Evaluated scale: " << 1. / scale << " " << endl;
+  cout << "Evaluated shift: " << shiftT << endl;
   std::ignore = ColorComposition(image1, output);
-
   return output;
 }
 
