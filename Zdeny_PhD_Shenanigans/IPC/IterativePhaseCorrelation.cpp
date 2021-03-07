@@ -992,13 +992,12 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
     {
       // random shift from a random point
       Point2f shift(rand11() * maxShift, rand11() * maxShift);
-      // LOG_DEBUG("Creating {}x{} image pair shifted by [{:.2f}, {:.2f}] px", mCols, mRows, shift.x, shift.y);
-      Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-      Mat imageS;
-      warpAffine(image, imageS, T, image.size());
       Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
+      Mat T = (Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+      Mat imageShifted;
+      warpAffine(image, imageShifted, T, image.size());
       Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
-      Mat image2 = roicrop(imageS, point.x, point.y, mCols, mRows);
+      Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
 
       ConvertToUnitFloat(image1);
       ConvertToUnitFloat(image2);
