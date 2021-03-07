@@ -164,12 +164,12 @@ try
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
     {
+      if (IsOutOfBounds(L2Upeak, L2U, L1size))
+        break;
+
       L1 = CalculateL1(L2U, L2Upeak, L1size);
       L1peak = GetPeakSubpixel(L1);
       L2Upeak += Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
-
-      if (IsOutOfBounds(L2Upeak, L2U, L1size))
-        break;
 
       if (AccuracyReached(L1peak, L1mid))
       {
