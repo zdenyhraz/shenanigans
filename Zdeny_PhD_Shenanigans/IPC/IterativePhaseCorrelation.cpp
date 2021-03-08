@@ -200,11 +200,12 @@ Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
 
 Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
 {
-  Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
-  Mat output = image2.clone();
-
-  Mat img1FT = Fourier::fft(image1, mPackedFFT);
-  Mat img2FT = Fourier::fft(image2, mPackedFFT);
+  Mat img1W = image1.clone();
+  Mat img2W = image2.clone();
+  ApplyWindow(img1W);
+  ApplyWindow(img2W);
+  Mat img1FT = Fourier::fft(img1W, mPackedFFT);
+  Mat img2FT = Fourier::fft(img2W, mPackedFFT);
   Fourier::fftshift(img1FT);
   Fourier::fftshift(img2FT);
   Mat img1FTm = Mat::zeros(img1FT.size(), CV_32F);
@@ -225,6 +226,7 @@ Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
       img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
     }
   }
+  Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
   double maxRadius = min(center.y, center.x);
   warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, INTER_LINEAR | WARP_FILL_OUTLIERS | WARP_POLAR_LOG); // semilog Polar
   warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, INTER_LINEAR | WARP_FILL_OUTLIERS | WARP_POLAR_LOG); // semilog Polar
@@ -233,20 +235,20 @@ Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
   auto shiftR = Calculate(img1FTm, img2FTm);
   double rotation = -shiftR.y / image1.rows * 360;
   double scale = exp(shiftR.x * log(maxRadius) / image1.cols);
-  Rotate(output, -rotation, scale);
+  Rotate(image2, -rotation, scale);
 
   // translation
-  auto shiftT = Calculate(image1, output);
-  Shift(output, -shiftT);
+  auto shiftT = Calculate(image1, image2);
+  Shift(image2, -shiftT);
 
   if (mDebugMode)
   {
     LOG_INFO("Evaluated rotation: {} deg", rotation);
     LOG_INFO("Evaluated scale: {}", 1.f / scale);
     LOG_INFO("Evaluated shift: {} px", shiftT);
-    showimg(ColorComposition(image1, output), "color composition result", 0, 0, 1, 1000);
+    showimg(ColorComposition(image1, image2), "color composition result", 0, 0, 1, 1000);
   }
-  return output;
+  return image2;
 }
 
 inline void IterativePhaseCorrelation::UpdateWindow()
