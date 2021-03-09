@@ -68,6 +68,11 @@
       <string>AKAZE</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>SIFT</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">

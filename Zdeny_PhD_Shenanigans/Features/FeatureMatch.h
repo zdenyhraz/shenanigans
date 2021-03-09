@@ -28,7 +28,8 @@ enum FeatureType
   AGAST,
   GFTT,
   KAZE,
-  AKAZE
+  AKAZE,
+  SIFT
 };
 
 struct FeatureMatchData
@@ -73,10 +74,11 @@ inline int GetFeatureTypeMatcher(const FeatureMatchData& data)
 
 inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
 {
+  using namespace xfeatures2d;
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return xfeatures2d::SURF::create(std::min(data.thresh, 500.), 4, 3, data.surfExtended, data.surfUpright);
+    return SURF::create(std::min(data.thresh, 500.), 4, 3, data.surfExtended, data.surfUpright);
   case FeatureType::BRISK:
     return BRISK::create();
   case FeatureType::ORB:
@@ -93,6 +95,8 @@ inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
     return KAZE::create();
   case FeatureType::AKAZE:
     return AKAZE::create();
+  case FeatureType::SIFT:
+    return SIFT::create();
   }
   return ORB::create();
 }
