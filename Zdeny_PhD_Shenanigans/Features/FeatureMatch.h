@@ -39,13 +39,8 @@ struct FeatureMatchData
   int matchcnt;
   double minSpeed;
   double maxSpeed;
-  std::string path1;
-  std::string path2;
   std::string path;
   std::string pathout;
-  int degree;
-  int proxpts;
-  double proxcoeff;
   double overlapdistance;
   bool drawOverlapCircles = false;
   double ratioThreshold = 0.7;

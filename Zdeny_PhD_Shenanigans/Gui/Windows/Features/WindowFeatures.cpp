@@ -12,17 +12,12 @@ void WindowFeatures::FeatureMatch()
   LOG_FUNCTION("FeatureMatch GUI");
 
   FeatureMatchData data;
-  data.path1 = ui.lineEdit->text().toStdString();
-  data.path2 = ui.lineEdit_2->text().toStdString();
   data.path = ui.lineEdit_8->text().toStdString();
   data.ftype = (FeatureType)ui.comboBox->currentIndex();
   data.thresh = ui.lineEdit_4->text().toDouble();
   data.matchcnt = ui.lineEdit_3->text().toInt();
   data.minSpeed = ui.lineEdit_6->text().toDouble();
   data.maxSpeed = ui.lineEdit_7->text().toDouble();
-  data.degree = ui.lineEdit_9->text().toInt();
-  data.proxpts = ui.lineEdit_10->text().toInt();
-  data.proxcoeff = ui.lineEdit_11->text().toDouble();
   data.pathout = ui.lineEdit_12->text().toStdString();
   data.overlapdistance = ui.lineEdit_13->text().toDouble();
   data.drawOverlapCircles = ui.checkBox->isChecked();
