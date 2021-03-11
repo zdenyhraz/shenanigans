@@ -21,15 +21,7 @@ static constexpr double text_yoffset = -7 * text_xoffset;
 enum FeatureType
 {
   SURF,
-  BRISK,
-  ORB,
-  MSER,
-  FAST,
-  AGAST,
-  GFTT,
-  KAZE,
-  AKAZE,
-  SIFT
+  SIFT,
 };
 
 struct FeatureMatchData
@@ -47,6 +39,8 @@ struct FeatureMatchData
   double upscale = 1;
   bool surfExtended = false;
   bool surfUpright = false;
+  int nOctaves = 4;
+  int nOctaveLayers = 3;
 };
 
 inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
@@ -61,10 +55,15 @@ inline std::pair<Point2f, Point2f> GetFeatureMatchPoints(const DMatch& match, co
 
 inline int GetFeatureTypeMatcher(const FeatureMatchData& data)
 {
-  if (data.ftype == FeatureType::SURF)
+  switch (data.ftype)
+  {
+  case FeatureType::SURF:
     return DescriptorMatcher::MatcherType::BRUTEFORCE;
-  else
-    return DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING;
+  case FeatureType::SIFT:
+    return DescriptorMatcher::MatcherType::BRUTEFORCE;
+  }
+
+  throw std::runtime_error("Unknown feature type");
 }
 
 inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
@@ -73,27 +72,12 @@ inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return SURF::create(std::min(data.thresh, 500.), 4, 3, data.surfExtended, data.surfUpright);
-  case FeatureType::BRISK:
-    return BRISK::create();
-  case FeatureType::ORB:
-    return ORB::create();
-  case FeatureType::MSER:
-    return MSER::create();
-  case FeatureType::FAST:
-    return ORB::create();
-  case FeatureType::AGAST:
-    return ORB::create();
-  case FeatureType::GFTT:
-    return ORB::create();
-  case FeatureType::KAZE:
-    return KAZE::create();
-  case FeatureType::AKAZE:
-    return AKAZE::create();
+    return SURF::create(std::min(data.thresh, 500.), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
   case FeatureType::SIFT:
-    return SIFT::create();
+    return SIFT::create(0, std::max(data.nOctaveLayers, 1), 0, 1e5);
   }
-  return ORB::create();
+
+  throw std::runtime_error("Unknown feature type");
 }
 
 inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point2f>& points, const std::vector<double>& speeds, const std::vector<double>& directions)
@@ -179,6 +163,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 }
 
 inline void featureMatch(const FeatureMatchData& data)
+try
 {
   LOG_FUNCTION("FeatureMatch");
 
@@ -295,4 +280,8 @@ inline void featureMatch(const FeatureMatchData& data)
 
   const auto arrows = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data);
   showimg(arrows, "Match arrows", false, 0, 1, 1200);
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Feature match error: {}", e.what());
 }

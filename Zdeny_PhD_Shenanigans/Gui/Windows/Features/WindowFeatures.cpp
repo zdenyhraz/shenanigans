@@ -25,6 +25,8 @@ void WindowFeatures::FeatureMatch()
   data.upscale = ui.lineEdit_15->text().toDouble();
   data.surfExtended = ui.checkBox_2->isChecked();
   data.surfUpright = ui.checkBox_3->isChecked();
+  data.nOctaves = ui.lineEdit_16->text().toInt();
+  data.nOctaveLayers = ui.lineEdit_16->text().toInt();
 
   featureMatch(data);
 }

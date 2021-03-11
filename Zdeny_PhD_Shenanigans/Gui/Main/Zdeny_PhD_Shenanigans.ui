@@ -242,9 +242,9 @@
     </property>
     <addaction name="actionIPC"/>
     <addaction name="actionDiffrot"/>
-    <addaction name="actionFiltering"/>
     <addaction name="actionFeatures"/>
     <addaction name="actionFITS"/>
+    <addaction name="actionFiltering"/>
     <addaction name="actionProcedural"/>
     <addaction name="actionSnake"/>
     <addaction name="actionUnitTests"/>
@@ -400,7 +400,7 @@
   </action>
   <action name="actionFeatures">
    <property name="text">
-    <string>Feature matching</string>
+    <string>S-wind</string>
    </property>
   </action>
   <action name="actionSnake">
