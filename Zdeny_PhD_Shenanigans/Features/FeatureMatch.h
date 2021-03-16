@@ -178,7 +178,7 @@ try
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    LOG_FUNCTION(fmt::format("Matching images {} - {} @ {}", pic, pic + 1, data.path));
+    LOG_DEBUG(fmt::format("Matching images {} - {} @ {}", pic, pic + 1, path1));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 
@@ -280,6 +280,7 @@ try
 
   const auto arrows = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data);
   showimg(arrows, "Match arrows", false, 0, 1, 1200);
+  saveimg("../articles/swind/arrows/arrows.png", arrows);
 }
 catch (const std::exception& e)
 {
