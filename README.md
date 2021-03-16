@@ -4,8 +4,8 @@ Zdenek Hrazdira, 2019 / 2020 / 2021
 Semi-random PhD funky stuff. Mainly contains calculations for astrophysics articles I worked on - [Solar Dynamics Observatory](https://sdo.gsfc.nasa.gov/) image processing, image registration, also non-convex optimization, fractals. With Qt GUI, #uses STL, OpenCV, OpenMP, fftw, QCustomPlot, spdlog, cuda. ***Examples below.***
 
 ### Article links
-- [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7/pdf)
-- [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702/pdf)
+- [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
+- [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
 ### The GUI
 <img src="https://raw.githubusercontent.com/zdenyhraz/Zdeny_PhD_Shenanigans/master/Zdeny_PhD_Shenanigans/Resources/gui.PNG" width="100%">
