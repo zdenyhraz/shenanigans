@@ -178,7 +178,7 @@ try
   {
     std::string path1 = data.path + to_string(pic) + ".PNG";
     std::string path2 = data.path + to_string(pic + 1) + ".PNG";
-    LOG_DEBUG(fmt::format("Matching images {} - {} @ {}", pic, pic + 1, path1));
+    LOG_DEBUG(fmt::format("Matching images {} & {}", path1, path2));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
 

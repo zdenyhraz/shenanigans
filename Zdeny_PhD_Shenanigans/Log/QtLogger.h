@@ -29,14 +29,20 @@ public:
 private:
   QtLogger()
   {
-    mColors[LogLevel::Trace] = QColor(150, 150, 150);
-    mColors[LogLevel::Function] = QColor(178, 102, 255);
-    mColors[LogLevel::Debug] = QColor(51, 153, 255);
-    mColors[LogLevel::Info] = QColor(205, 255, 0);
-    mColors[LogLevel::Success] = QColor(0, 204, 0);
-    mColors[LogLevel::Warning] = QColor(255, 154, 20);
-    mColors[LogLevel::Error] = QColor(225, 0, 0);
+    mLogLevelSettings[LogLevel::Trace] = {QColor(150, 150, 150), "Trace"};
+    mLogLevelSettings[LogLevel::Function] = {QColor(150, 150, 150), "Function"}; // QColor(178, 102, 255)
+    mLogLevelSettings[LogLevel::Debug] = {QColor(51, 153, 255), "Debug"};
+    mLogLevelSettings[LogLevel::Info] = {QColor(205, 255, 0), "Info"};
+    mLogLevelSettings[LogLevel::Success] = {QColor(0, 204, 0), "Success"};
+    mLogLevelSettings[LogLevel::Warning] = {QColor(255, 154, 20), "Warning"};
+    mLogLevelSettings[LogLevel::Error] = {QColor(225, 0, 0), "Error"};
   }
+
+  struct LogLevelSettings
+  {
+    QColor color;
+    std::string name;
+  };
 
   static QtLogger& Get()
   {
@@ -54,41 +60,21 @@ private:
     return buf;
   }
 
-  static std::string GetLogLevelString(LogLevel logLevel)
-  {
-    switch (logLevel)
-    {
-    case LogLevel::Trace:
-      return "Trace";
-    case LogLevel::Function:
-      return "Function";
-    case LogLevel::Debug:
-      return "Debug";
-    case LogLevel::Info:
-      return "Info";
-    case LogLevel::Success:
-      return "Success";
-    case LogLevel::Warning:
-      return "Warning";
-    case LogLevel::Error:
-      return "Error";
-    }
-    return "-";
-  }
-
   template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     std::scoped_lock lock(mMutex);
     if (!ShouldLog(logLevel))
       return;
 
-    mTextBrowser->setTextColor(mColors[logLevel]);
-    mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), GetLogLevelString(logLevel), fmt::format(fmt, args...)).c_str());
+    const auto& [color, name] = mLogLevelSettings[logLevel];
+
+    mTextBrowser->setTextColor(color);
+    mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), name, fmt::format(fmt, args...)).c_str());
     QCoreApplication::processEvents();
   }
 
   QTextBrowser* mTextBrowser = nullptr;
   LogLevel mLogLevel = LogLevel::Function;
-  std::unordered_map<LogLevel, QColor> mColors;
+  std::map<LogLevel, LogLevelSettings> mLogLevelSettings;
   std::mutex mMutex;
 };
