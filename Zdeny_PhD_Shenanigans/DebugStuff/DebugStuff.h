@@ -20,7 +20,7 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // ipc align test
+  if (0) // ipc align test
   {
     // silocary @1675/2200
 
@@ -44,12 +44,13 @@ void Debug(Globals* globals)
     showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
     return;
   }
-  if (0) // dft vs cuda::dft
+  if (1) // dft vs cuda::dft
   {
-    int iters = 512 - 16 + 1;
-    int itersPerSize = 10;
-    int minsize = 16;
-    int maxsize = 512;
+    const int minsize = 16;
+    const int maxsize = 512;
+    const int sizeStep = 10;
+    const int iters = (maxsize - minsize + 1) / sizeStep % 2 ? (maxsize - minsize + 1) / sizeStep : (maxsize - minsize + 1) / sizeStep + 1;
+    const int itersPerSize = 100;
     Mat img = loadImage("Resources/test.png");
     std::vector<double> sizes(iters);
     std::vector<double> timeCpu(iters);
@@ -70,7 +71,7 @@ void Debug(Globals* globals)
           Mat fft = Fourier::fft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
-        timeCpu[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        timeCpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
       }
 
       {
@@ -80,13 +81,13 @@ void Debug(Globals* globals)
           Mat fft = Fourier::cufft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
-        timeGpu[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        timeGpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
       }
     }
 
     Plot1D::Reset("FFT CPU vs GPU");
     Plot1D::SetYnames({"fft cpu", "fft gpu"});
-    Plot1D::SetYlabel("time");
+    Plot1D::SetYlabel("time per DFT [ms]");
     Plot1D::SetXlabel("image size");
     Plot1D::Plot("FFT CPU vs GPU", sizes, {timeCpu, timeGpu}, false);
     return;
