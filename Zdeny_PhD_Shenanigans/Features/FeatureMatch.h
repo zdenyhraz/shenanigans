@@ -159,7 +159,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     shouldDraw[idx] = true;
   }
 
-  size_t drawcounter = 0;
+  size_t drawcounter = 1;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -175,7 +175,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     Point2f arrStart = data.upscale * pts.first;
     Point2f arrEnd = data.upscale * pts.first + arrow_scale * out.cols / maxspd * (pts.second - pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
-    Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2); // not too strong colors
+    Scalar color = colorMapJet(spd, 100, 1050); // not too strong colors
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
     arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.1);
