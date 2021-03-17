@@ -15,8 +15,8 @@ static constexpr double arrow_scale = 12;
 static constexpr double arrow_thickness = 0.0015;
 static constexpr double text_scale = 0.001;
 static constexpr double text_thickness = arrow_thickness * 1.0;
-static constexpr double text_xoffset = -0.0025;
-static constexpr double text_yoffset = -7 * text_xoffset;
+static constexpr double text_xoffset = 0.0075;
+static constexpr double text_yoffset = 2 * text_xoffset;
 
 enum FeatureType
 {
@@ -41,6 +41,7 @@ struct FeatureMatchData
   bool surfUpright = false;
   int nOctaves = 4;
   int nOctaveLayers = 3;
+  bool mask = true;
 };
 
 inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
@@ -93,7 +94,7 @@ inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point
 }
 
 inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<size_t, size_t, DMatch, bool>>& matches_all, const std::vector<std::vector<KeyPoint>>& kp1_all,
-                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data)
+                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data, bool drawSpeed)
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
@@ -113,7 +114,15 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     if (overlap)
       continue;
 
-    if (img.at<uchar>(kp1_all[pic][match.queryIdx].pt) < 10)
+    const auto& point = kp1_all[pic][match.queryIdx].pt;
+
+    if (data.mask && (point.y < img.rows * 0.5 || point.x > img.cols * 0.8))
+    {
+      LOG_TRACE("Skipping match {}: masked out", idx);
+      continue;
+    }
+
+    if (img.at<uchar>(point) < 10)
     {
       LOG_TRACE("Skipping match {}: black region", idx);
       continue;
@@ -149,7 +158,10 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
     arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.1);
-    putText(out, fmt::format("{:.0f}({})", spd, drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
+    if (drawSpeed)
+      putText(out, fmt::format("{} ({:.0f})", drawcounter, spd), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
+    else
+      putText(out, fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
 
     if (data.drawOverlapCircles)
       circle(out, arrStart, data.upscale * data.overlapdistance, Scalar(0, 255, 255), text_thickness * out.cols, LINE_AA);
@@ -198,14 +210,20 @@ try
 
     // filter matches using the Lowe's ratio test
     std::vector<DMatch> matches;
-    for (size_t i = 0; i < knn_matches.size(); i++)
-      if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
-        matches.push_back(knn_matches[i][0]);
+    {
+      LOG_FUNCTION("Filter matches based on ratio test");
+      for (size_t i = 0; i < knn_matches.size(); i++)
+        if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
+          matches.push_back(knn_matches[i][0]);
+    }
 
     // get first best fits
-    std::sort(matches.begin(), matches.end(), [&](const DMatch& a, const DMatch& b) { return a.distance < b.distance; });
-    matches = std::vector<DMatch>(matches.begin(), matches.begin() + min(data.matchcnt, (int)matches.size()));
-    matches_all[pic] = matches;
+    {
+      LOG_FUNCTION("Calculate N best matches");
+      std::sort(matches.begin(), matches.end(), [&](const DMatch& a, const DMatch& b) { return a.distance < b.distance; });
+      matches = std::vector<DMatch>(matches.begin(), matches.begin() + min(data.matchcnt, (int)matches.size()));
+      matches_all[pic] = matches;
+    }
 
     // calculate feature shifts
     std::vector<Point2f> shifts(matches.size());
@@ -227,9 +245,8 @@ try
   }
 
   std::vector<std::tuple<size_t, size_t, DMatch, bool>> matches_all_serialized;
-  if (1)
   {
-    LOG_FUNCTION("Sort matches from fastest to slowest s-wind speeds");
+    LOG_FUNCTION("Sort matches from fastest to slowest speeds");
 
     size_t idx = 0;
     for (size_t pic = 0; pic < piccnt - 1; pic++)
@@ -278,9 +295,14 @@ try
     }
   }
 
-  const auto arrows = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data);
-  showimg(arrows, "Match arrows", false, 0, 1, 1200);
-  saveimg("../articles/swind/arrows/arrows.png", arrows);
+  const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data, false);
+  const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data, true);
+
+  showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
+  showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
+
+  saveimg("../articles/swind/arrows/arrowsIdx.png", arrowsIdx);
+  saveimg("../articles/swind/arrows/arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
