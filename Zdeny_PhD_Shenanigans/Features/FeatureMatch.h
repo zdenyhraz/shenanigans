@@ -103,9 +103,9 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   if (data.upscale != 1)
     resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
 
-  double minspd = std::max(getQuantile(speeds_all, 0), data.minSpeed);
-  double maxspd = std::min(getQuantile(speeds_all, 1), data.maxSpeed);
-  size_t drawcounter = 0;
+  double minspd = std::numeric_limits<double>::max();
+  double maxspd = std::numeric_limits<double>::min();
+  std::vector<bool> shouldDraw(matches_all.size(), false);
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -150,18 +150,36 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
       continue;
     }
 
+    if (spd < minspd)
+      minspd = spd;
+
+    if (spd > maxspd)
+      maxspd = spd;
+
+    shouldDraw[idx] = true;
+  }
+
+  size_t drawcounter = 0;
+
+  for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
+  {
+    const auto& [idx, pic, match, overlap] = *it;
+
+    if (!shouldDraw[idx])
+      continue;
+
+    const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
+    const double spd = magnitude(shift) * kmpp / dt;
+
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
     Point2f arrStart = data.upscale * pts.first;
     Point2f arrEnd = data.upscale * pts.first + arrow_scale * out.cols / maxspd * (pts.second - pts.first);
     Point2f textpos = (arrStart + arrEnd) / 2;
-    Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2);
+    Scalar color = colorMapJet(spd, minspd * 0.5, maxspd * 1.2); // not too strong colors
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
     arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, LINE_AA, 0, 0.1);
-    if (drawSpeed)
-      putText(out, fmt::format("{} ({:.0f})", drawcounter, spd), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
-    else
-      putText(out, fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
+    putText(out, drawSpeed ? fmt::format("{} ({:.0f})", drawcounter, spd) : fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, LINE_AA);
 
     if (data.drawOverlapCircles)
       circle(out, arrStart, data.upscale * data.overlapdistance, Scalar(0, 255, 255), text_thickness * out.cols, LINE_AA);
@@ -170,7 +188,6 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   }
 
   LOG_INFO("Drew {} out of {} matches", drawcounter, matches_all.size());
-
   return out;
 }
 
