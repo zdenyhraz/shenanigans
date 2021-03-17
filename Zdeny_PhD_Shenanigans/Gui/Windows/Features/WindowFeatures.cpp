@@ -27,6 +27,7 @@ void WindowFeatures::FeatureMatch()
   data.surfUpright = ui.checkBox_3->isChecked();
   data.nOctaves = ui.lineEdit_16->text().toInt();
   data.nOctaveLayers = ui.lineEdit_16->text().toInt();
+  data.mask = ui.checkBox_4->isChecked();
 
   featureMatch(data);
 }
