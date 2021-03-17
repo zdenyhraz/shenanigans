@@ -10,7 +10,6 @@
 static constexpr int piccnt = 8;                // number of pics
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
 static constexpr double dt = 11.8;              // dt temporally adjacent pics
-
 static constexpr double arrow_scale = 12;
 static constexpr double arrow_thickness = 0.0015;
 static constexpr double text_scale = 0.001;
@@ -106,6 +105,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   double minspd = std::numeric_limits<double>::max();
   double maxspd = std::numeric_limits<double>::min();
   std::vector<bool> shouldDraw(matches_all.size(), false);
+  const double removeSpd = 418;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -116,7 +116,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     const auto& point = kp1_all[pic][match.queryIdx].pt;
 
-    if (data.mask && (point.y < img.rows * 0.5 || point.x > img.cols * 0.8))
+    if (data.mask && (point.y < img.rows * 0.45))
     {
       LOG_TRACE("Skipping match {}: masked out", idx);
       continue;
@@ -131,6 +131,9 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
     const double spd = magnitude(shift) * kmpp / dt;
     const double dir = toDegrees(atan2(-shift.y, shift.x));
+
+    if (abs(spd - removeSpd) < 1)
+      continue;
 
     if (spd < data.minSpeed)
     {
@@ -318,8 +321,8 @@ try
   showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
   showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
 
-  saveimg("../articles/swind/arrows/arrowsIdx.png", arrowsIdx);
-  saveimg("../articles/swind/arrows/arrowsSpd.png", arrowsSpd);
+  saveimg(data.mask ? "../articles/swind/arrows/arrowsIdxMasked.png" : "../articles/swind/arrows/arrowsIdx.png", arrowsIdx);
+  saveimg(data.mask ? "../articles/swind/arrows/arrowsSpdMasked.png" : "../articles/swind/arrows/arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
