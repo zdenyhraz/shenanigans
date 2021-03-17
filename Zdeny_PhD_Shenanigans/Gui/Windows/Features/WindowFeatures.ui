@@ -168,7 +168,7 @@
      <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_7">
        <property name="text">
-        <string>850</string>
+        <string>841</string>
        </property>
       </widget>
      </item>

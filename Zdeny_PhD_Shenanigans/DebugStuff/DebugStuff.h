@@ -20,6 +20,20 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
+  if (1) // swind crop
+  {
+    std::string path = "../articles/swind/source/2";
+    double scale = 0.8;
+    int sizeX = 1500;
+    int sizeY = 1000;
+
+    for (int i = 0; i < 11; i++)
+    {
+      auto pic = imread(fmt::format("{}/raw/0{}_calib.PNG", path, i + 1), IMREAD_ANYDEPTH);
+      pic = roicrop(pic, 0.33 * pic.cols, 0.69 * pic.rows, sizeX, sizeY);
+      saveimg(fmt::format("{}/cropped/crop{}.PNG", path, i), pic);
+    }
+  }
   if (0) // ipc align test
   {
     // silocary @1675/2200
@@ -42,9 +56,8 @@ void Debug(Globals* globals)
     ipc.SetDebugMode(true);
     Mat aligned = ipc.Align(img1, img2);
     showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
-    return;
   }
-  if (1) // dft vs cuda::dft
+  if (0) // dft vs cuda::dft
   {
     const int minsize = 16;
     const int maxsize = 512;
@@ -408,20 +421,6 @@ void Debug(Globals* globals)
 
     // Plot1D::Plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
     // Plot2D::Plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
-  }
-  if (0) // swind crop
-  {
-    std::string path = "E:\\Zdeny_PhD_Shenanigans\\articles\\swind\\source\\";
-    double scale = 0.8;
-    int sizeX = 1500;
-    int sizeY = 1000;
-
-    for (int i = 0; i < 10; i++)
-    {
-      auto pic = imread(path + "0" + to_string(i + 1) + "_calib.PNG", IMREAD_ANYDEPTH);
-      pic = roicrop(pic, 0.33 * pic.cols, 0.65 * pic.rows, sizeX, sizeY);
-      saveimg(path + "cropped\\crop" + to_string(i) + ".PNG", pic);
-    }
   }
   if (0) // 2d poylfit
   {

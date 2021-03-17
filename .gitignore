@@ -4,7 +4,8 @@
 # Custom stuff
 *.diffrot
 [Dd]ist*/
-*.[Pp]ng
+#*.[Pp]ng
+*.[bB]if
 
 # User-specific files
 *.suo
