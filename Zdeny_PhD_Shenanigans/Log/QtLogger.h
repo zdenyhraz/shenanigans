@@ -15,8 +15,8 @@ public:
     Error
   };
 
-  static void SetTextBrowser(QTextBrowser* textBrowser) { Get().mTextBrowser = textBrowser; }
-  static void SetLogLevel(LogLevel logLevel) { Get().mLogLevel = logLevel; }
+  static void SetTextBrowser(QTextBrowser* textBrowser) { Get().SetTextBrowserInternal(textBrowser); }
+  static void SetLogLevel(LogLevel logLevel) { Get().SetLogLevelInternal(logLevel); }
 
   template <typename... Args> static void Trace(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Trace, fmt, args...); }
   template <typename... Args> static void Function(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Function, fmt, args...); }
@@ -51,6 +51,18 @@ private:
   }
 
   bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr && logLevel >= mLogLevel; }
+
+  void SetTextBrowserInternal(QTextBrowser* textBrowser)
+  {
+    std::scoped_lock lock(mMutex);
+    mTextBrowser = textBrowser;
+  }
+
+  void SetLogLevelInternal(LogLevel logLevel)
+  {
+    std::scoped_lock lock(mMutex);
+    mLogLevel = logLevel;
+  }
 
   static std::string GetCurrentTime()
   {
