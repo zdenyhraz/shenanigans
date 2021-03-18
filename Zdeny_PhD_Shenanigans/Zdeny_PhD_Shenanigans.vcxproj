@@ -102,6 +102,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>false</ConformanceMode>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,6 +159,7 @@
     <ClInclude Include="Astrophysics\diffrotFileIO.h" />
     <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Astrophysics\SwindFlow.h" />
+    <ClInclude Include="Core\BlazeUtils.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="DebugStuff\DebugStuff.h" />
     <ClInclude Include="Draw\combinepics.h" />
