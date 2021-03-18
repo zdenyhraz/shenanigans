@@ -13,6 +13,7 @@
 #include "Filtering/HistogramEqualization.h"
 #include "Sasko/NonMaximaSuppression.h"
 #include "Log/QtLogger.h"
+#include "Core/BlazeUtils.h"
 
 namespace Debug
 {
@@ -20,7 +21,56 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // swind crop
+  if (0) // blaze vector vs std::vector benchmark
+  {
+    int iters = 10000;
+    int size = 100000;
+    std::vector<float> stdVec(size, 0);
+    blaze::DynamicVector<float> blazeVec(size);
+    blazeVec = 0;
+
+    auto stdVecOut = stdVec;
+    auto blazeVecOut = blazeVec;
+
+    {
+      LOG_FUNCTION("std vecadd");
+      for (int i = 0; i < iters; ++i)
+        stdVecOut = stdVec + stdVec;
+    }
+
+    {
+      LOG_FUNCTION("blaze vecadd");
+      for (int i = 0; i < iters; ++i)
+        blazeVecOut = blazeVec + blazeVec;
+    }
+  }
+  if (1) // blaze matmul vs opencv matmul benchmark
+  {
+    auto iters = 1000;
+    auto path = "Resources/snake.png";
+    auto imgOpenCV = loadImage(path);
+    auto imgBlaze = LoadImageBlaze(path);
+    auto imgOpenCVOut = imgOpenCV.clone();
+    auto imgBlazeOut = imgBlaze;
+
+    LOG_INFO("Matrix size: {}", imgOpenCV.size());
+
+    {
+      LOG_FUNCTION("OpenCV matmul");
+      for (int i = 0; i < iters; ++i)
+        imgOpenCVOut = imgOpenCV.mul(imgOpenCV);
+    }
+
+    {
+      LOG_FUNCTION("Blaze matmul");
+      for (int i = 0; i < iters; ++i)
+        imgBlazeOut = imgBlaze % imgBlaze;
+    }
+
+    LOG_DEBUG("One element equality test: {} & {}", imgOpenCVOut.at<float>(imgOpenCV.rows / 2, imgOpenCV.cols / 2), imgBlazeOut(imgOpenCV.rows / 2, imgOpenCV.cols / 2));
+    return;
+  }
+  if (0) // swind crop
   {
     std::string path = "../articles/swind/source/2";
     double scale = 0.8;
