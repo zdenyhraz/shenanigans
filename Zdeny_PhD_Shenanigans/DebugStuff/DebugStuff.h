@@ -30,6 +30,9 @@ void Debug(Globals* globals)
     Mat fftCV;
     BlazeMatComplex fftBlaze;
 
+    showimg(imgCV, "image CV");
+    showimg(WrapOpenCVMat(imgBlaze), "image Blaze");
+
     {
       LOG_FUNCTION("CV fft");
       Mat planes[] = {imgCV, Mat::zeros(imgCV.size(), CV_32F)};
@@ -45,6 +48,19 @@ void Debug(Globals* globals)
 
     showfourier(fftCV, true, false, "FFT CV");
     showfourier(WrapOpenCVMat(fftBlaze), true, false, "FFT BLAZE");
+
+    {
+      LOG_FUNCTION("CV ifft");
+      dft(fftCV, fftCV, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+    }
+
+    {
+      LOG_FUNCTION("Blaze ifft");
+      dft(WrapOpenCVMat(fftBlaze), WrapOpenCVMatReal(fftBlaze), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
+    }
+
+    showimg(imgCV, "image CV out");
+    showimg(WrapOpenCVMat(imgBlaze), "image Blaze out");
   }
   if (0) // opencv fft with blaze benchmark
   {
