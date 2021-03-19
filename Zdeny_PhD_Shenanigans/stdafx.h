@@ -1,4 +1,6 @@
 #pragma once
+#define BLAZE_USE_SHARED_MEMORY_PARALLELIZATION 0
+
 // Qt
 #include <QtWidgets>
 #include <QtWidgets>
