@@ -59,6 +59,7 @@ public:
 
   Point2f Calculate(const Mat& image1, const Mat& image2) const;
   Point2f Calculate(Mat&& image1, Mat&& image2) const;
+
   Mat Align(const Mat& image1, const Mat& image2) const;
   Mat Align(Mat&& image1, Mat&& image2) const;
 
