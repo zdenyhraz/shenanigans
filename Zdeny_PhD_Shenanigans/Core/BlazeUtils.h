@@ -23,11 +23,6 @@ inline Mat WrapOpenCVMat(BlazeMat& mat)
   return Mat(mat.rows(), mat.columns(), CV_32FC1, mat.data(), mat.spacing() * sizeof(float));
 }
 
-inline const Mat WrapOpenCVMat(const BlazeMat& mat)
-{
-  return Mat(mat.rows(), mat.columns(), CV_32FC1, const_cast<void*>(static_cast<const void*>(mat.data())), mat.spacing() * sizeof(float));
-}
-
 inline Mat WrapOpenCVMat(BlazeMatComplex& mat)
 {
   return Mat(mat.rows(), mat.columns(), CV_32FC2, mat.data(), mat.spacing() * sizeof(std::complex<float>));
@@ -38,7 +33,17 @@ inline Mat WrapOpenCVMatReal(BlazeMatComplex& mat)
   return Mat(mat.rows(), mat.columns(), CV_32FC1, mat.data(), mat.spacing() * sizeof(float));
 }
 
+inline const Mat WrapOpenCVMat(const BlazeMat& mat)
+{
+  return WrapOpenCVMat(const_cast<BlazeMat&>(mat));
+}
+
 inline const Mat WrapOpenCVMat(const BlazeMatComplex& mat)
 {
-  return Mat(mat.rows(), mat.columns(), CV_32FC2, const_cast<void*>(static_cast<const void*>(mat.data())), mat.spacing() * sizeof(std::complex<float>));
+  return WrapOpenCVMat(const_cast<BlazeMatComplex&>(mat));
+}
+
+inline const Mat WrapOpenCVMatReal(const BlazeMatComplex& mat)
+{
+  return WrapOpenCVMatReal(const_cast<BlazeMatComplex&>(mat));
 }

@@ -21,7 +21,7 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (0) // opencv fft with blaze complex matrix memory layout
+  if (1) // opencv fft with blaze complex matrix memory layout
   {
     const auto path = "Resources/171A.png";
     const auto imgCV = loadImage(path);
@@ -59,8 +59,9 @@ void Debug(Globals* globals)
       dft(WrapOpenCVMat(fftBlaze), WrapOpenCVMatReal(fftBlaze), DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
     }
 
-    showimg(imgCV, "image CV out");
-    showimg(WrapOpenCVMat(imgBlaze), "image Blaze out");
+    showimg(fftCV, "image CV out");
+    showimg(WrapOpenCVMatReal(fftBlaze), "image Blaze out");
+    return;
   }
   if (0) // opencv fft with blaze benchmark
   {
