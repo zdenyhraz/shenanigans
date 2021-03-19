@@ -21,7 +21,32 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (0) // opencv fft with blaze
+  if (0) // opencv fft with blaze complex matrix memory layout
+  {
+    const auto path = "Resources/171A.png";
+    const auto imgCV = loadImage(path);
+    const auto imgBlaze = LoadImageBlaze(path);
+
+    Mat fftCV;
+    BlazeMatComplex fftBlaze;
+
+    {
+      LOG_FUNCTION("CV fft");
+      Mat planes[] = {imgCV, Mat::zeros(imgCV.size(), CV_32F)};
+      merge(planes, 2, fftCV);
+      dft(fftCV, fftCV, DFT_COMPLEX_OUTPUT);
+    }
+
+    {
+      LOG_FUNCTION("Blaze fft");
+      fftBlaze = blaze::map(imgBlaze, [](float real) { return std::complex<float>(real, 0); });
+      dft(WrapOpenCVMat(fftBlaze), WrapOpenCVMat(fftBlaze), DFT_COMPLEX_OUTPUT);
+    }
+
+    showfourier(fftCV, true, false, "FFT CV");
+    showfourier(WrapOpenCVMat(fftBlaze), true, false, "FFT BLAZE");
+  }
+  if (0) // opencv fft with blaze benchmark
   {
     const auto path = "Resources/snake.png";
     auto imgOpenCV = loadImage(path);
@@ -54,10 +79,8 @@ void Debug(Globals* globals)
 
     showfourier(outCV, true, false, "FFT CV");
     showfourier(outBlaze, true, false, "FFT BLAZE-CV");
-
-    return;
   }
-  if (1) // blaze matmul vs opencv matmul benchmark
+  if (0) // blaze matmul vs opencv matmul benchmark
   {
     const auto iters = 1000;
     const auto path = "Resources/171A.png";
