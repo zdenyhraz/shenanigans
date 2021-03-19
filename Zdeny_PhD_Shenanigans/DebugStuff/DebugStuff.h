@@ -21,35 +21,48 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (0) // blaze vector vs std::vector benchmark
+  if (0) // opencv fft with blaze
   {
-    int iters = 10000;
-    int size = 100000;
-    std::vector<float> stdVec(size, 0);
-    blaze::DynamicVector<float> blazeVec(size);
-    blazeVec = 0;
+    const auto path = "Resources/snake.png";
+    auto imgOpenCV = loadImage(path);
+    auto imgBlaze = WrapOpenCVMat(LoadImageBlaze(path)).clone();
+    Mat outCV, outBlaze;
 
-    auto stdVecOut = stdVec;
-    auto blazeVecOut = blazeVec;
+    // pre-alloc
+    outCV = Fourier::fft(imgOpenCV);
+    outBlaze = Fourier::fft(imgBlaze);
 
     {
-      LOG_FUNCTION("std vecadd");
-      for (int i = 0; i < iters; ++i)
-        stdVecOut = stdVec + stdVec;
+      LOG_FUNCTION("OpenCV fft");
+      outCV = Fourier::fft(imgOpenCV);
     }
 
     {
-      LOG_FUNCTION("blaze vecadd");
-      for (int i = 0; i < iters; ++i)
-        blazeVecOut = blazeVec + blazeVec;
+      LOG_FUNCTION("Blaze-OpenCV fft");
+      outBlaze = Fourier::fft(imgBlaze);
     }
+
+    {
+      LOG_FUNCTION("OpenCV fft move");
+      outCV = Fourier::fft(std::move(imgOpenCV));
+    }
+
+    {
+      LOG_FUNCTION("Blaze-OpenCV fft move");
+      outBlaze = Fourier::fft(std::move(imgBlaze));
+    }
+
+    showfourier(outCV, true, false, "FFT CV");
+    showfourier(outBlaze, true, false, "FFT BLAZE-CV");
+
+    return;
   }
   if (1) // blaze matmul vs opencv matmul benchmark
   {
-    auto iters = 1000;
-    auto path = "Resources/171A.png";
-    auto imgOpenCV = loadImage(path);
-    auto imgBlaze = LoadImageBlaze(path);
+    const auto iters = 1000;
+    const auto path = "Resources/171A.png";
+    const auto imgOpenCV = loadImage(path);
+    const auto imgBlaze = LoadImageBlaze(path);
     auto imgOpenCVOut = imgOpenCV.clone();
     auto imgBlazeOut = imgBlaze;
 

@@ -5,7 +5,7 @@
 
 namespace Fourier
 {
-inline Mat fft(Mat&& img, bool packed)
+inline Mat fft(Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -18,13 +18,13 @@ inline Mat fft(Mat&& img, bool packed)
   return img;
 }
 
-inline Mat ifft(Mat&& fft, bool packed)
+inline Mat ifft(Mat&& fft, bool packed = false)
 {
   dft(fft, fft, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT);
   return fft;
 }
 
-inline Mat cufft(Mat&& img, bool packed)
+inline Mat cufft(Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -51,7 +51,7 @@ inline Mat cufft(Mat&& img, bool packed)
   }
 }
 
-inline Mat icufft(Mat&& fft, bool packed)
+inline Mat icufft(Mat&& fft, bool packed = false)
 {
   cuda::GpuMat fftGpu;
   fftGpu.upload(fft);

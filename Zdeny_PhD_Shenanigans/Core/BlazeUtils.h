@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "Astrophysics/FITS.h"
 
 using BlazeMat = blaze::DynamicMatrix<float>;
 
@@ -13,4 +14,9 @@ inline BlazeMat LoadImageBlaze(const std::string& path)
       out(r, c) = img.at<float>(r, c);
 
   return out;
+}
+
+inline Mat WrapOpenCVMat(BlazeMat& mat)
+{
+  return Mat(mat.rows(), mat.columns(), CV_32F, mat.data(), mat.spacing() * sizeof(float));
 }

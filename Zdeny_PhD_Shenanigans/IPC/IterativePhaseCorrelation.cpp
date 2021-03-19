@@ -383,7 +383,7 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
     {
       for (int col = 0; col < cps.cols; ++col)
       {
-        // for packed FFT the cps vector is real, not complex
+        // for CCS packed FFT the cps vector is real, not complex
         // calculating magnitude & dividing is non-trivial
         // see magSpectrum() & divSpectrums() in OpenCV phaseCorrelate()
       }
