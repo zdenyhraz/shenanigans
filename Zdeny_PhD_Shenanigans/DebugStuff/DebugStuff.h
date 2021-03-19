@@ -47,7 +47,7 @@ void Debug(Globals* globals)
   if (1) // blaze matmul vs opencv matmul benchmark
   {
     auto iters = 1000;
-    auto path = "Resources/snake.png";
+    auto path = "Resources/171A.png";
     auto imgOpenCV = loadImage(path);
     auto imgBlaze = LoadImageBlaze(path);
     auto imgOpenCVOut = imgOpenCV.clone();
