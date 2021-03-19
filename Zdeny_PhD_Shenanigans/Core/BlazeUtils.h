@@ -2,7 +2,9 @@
 #include "stdafx.h"
 #include "Astrophysics/FITS.h"
 
-using BlazeMat = blaze::DynamicMatrix<float>;
+using BlazeMatReal = blaze::DynamicMatrix<float>;
+using BlazeMatComplex = blaze::DynamicMatrix<std::complex<float>>;
+using BlazeMat = BlazeMatReal;
 
 inline BlazeMat LoadImageBlaze(const std::string& path)
 {
@@ -18,5 +20,10 @@ inline BlazeMat LoadImageBlaze(const std::string& path)
 
 inline Mat WrapOpenCVMat(BlazeMat& mat)
 {
-  return Mat(mat.rows(), mat.columns(), CV_32F, mat.data(), mat.spacing() * sizeof(float));
+  return Mat(mat.rows(), mat.columns(), CV_32FC1, mat.data(), mat.spacing() * sizeof(float));
+}
+
+inline Mat WrapOpenCVMat(BlazeMatComplex& mat)
+{
+  return Mat(mat.rows(), mat.columns(), CV_32FC2, mat.data(), mat.spacing() * sizeof(std::complex<float>));
 }
