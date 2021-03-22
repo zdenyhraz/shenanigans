@@ -93,7 +93,7 @@ inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point
 }
 
 inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<size_t, size_t, DMatch, bool>>& matches_all, const std::vector<std::vector<KeyPoint>>& kp1_all,
-                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const std::vector<std::vector<double>>& speeds_all, const FeatureMatchData& data, bool drawSpeed)
+                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
@@ -203,7 +203,6 @@ try
   std::vector<std::vector<DMatch>> matches_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints1_all(piccnt - 1);
   std::vector<std::vector<KeyPoint>> keypoints2_all(piccnt - 1);
-  std::vector<std::vector<double>> speeds_all(piccnt - 1);
 
 #pragma omp parallel for
   for (int pic = 1; pic < piccnt - 1; pic++)
@@ -244,16 +243,6 @@ try
       matches = std::vector<DMatch>(matches.begin(), matches.begin() + min(data.matchcnt, (int)matches.size()));
       matches_all[pic] = matches;
     }
-
-    // calculate feature shifts
-    std::vector<Point2f> shifts(matches.size());
-    std::vector<double> speeds(matches.size());
-    for (int i = 0; i < matches.size(); i++)
-    {
-      shifts[i] = GetFeatureMatchShift(matches[i], keypoints1, keypoints2);
-      speeds[i] = magnitude(shifts[i]) * kmpp / dt;
-    }
-    speeds_all[pic] = speeds;
 
     if (0)
     {
@@ -315,8 +304,8 @@ try
     }
   }
 
-  const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data, false);
-  const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, speeds_all, data, true);
+  const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, false);
+  const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, true);
 
   showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
   showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
