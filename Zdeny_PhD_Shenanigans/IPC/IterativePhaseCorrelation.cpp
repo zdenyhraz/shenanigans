@@ -66,7 +66,9 @@ try
 
   if (mDebugMode)
   {
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/I1.png");
     Plot2D::Plot("IPCdebug2D", image1);
+    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/I2.png");
     Plot2D::Plot("IPCdebug2D", image2);
   }
 

@@ -21,7 +21,30 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // opencv fft with blaze complex matrix memory layout
+  if (1) // ipc shift test
+  {
+    Mat img1 = loadImage("../articles/dissertation/swind/twopeaks1src.png");
+    Mat img2 = loadImage("../articles/dissertation/swind/twopeaks2src.png");
+
+    int sajz = 512;
+    Size size(sajz, sajz);
+    if (sajz != -1 && img1.size() != size)
+    {
+      resize(img1, img1, size);
+      resize(img2, img2, size);
+    }
+
+    IterativePhaseCorrelation ipc = *globals->IPC;
+    ipc.SetSize(img1.rows, img1.cols);
+    ipc.SetDebugMode(true);
+    // ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
+    // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
+
+    const auto shiftCalc = ipc.Calculate(img1, img2);
+    LOG_DEBUG("IPC shift: [{}]", shiftCalc);
+    return;
+  }
+  if (0) // opencv fft with blaze complex matrix memory layout
   {
     const auto path = "Resources/171A.png";
     const auto imgCV = loadImage(path);
@@ -208,24 +231,6 @@ void Debug(Globals* globals)
     Plot1D::Plot("FFT CPU vs GPU", sizes, {timeCpu, timeGpu}, false);
     return;
   }
-  if (0) // ipc shift test
-  {
-    Mat img1 = loadImage("Resources/test1.png");
-    Mat img2 = loadImage("Resources/test2.png");
-
-    int sajz = 512;
-    cv::Size size(sajz, sajz);
-    resize(img1, img1, size);
-    resize(img2, img2, size);
-
-    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 0.4);
-    ipc.SetDebugMode(true);
-    ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
-    ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
-
-    auto shiftCalc = ipc.Calculate(img1, img2);
-    LOG_DEBUG("IPC shift: [{}]", shiftCalc);
-  }
   if (0) // cuda
   {
     Mat img = loadImage("Resources/test.png");
@@ -290,20 +295,6 @@ void Debug(Globals* globals)
     LOG_SUCCESS("Success boiiii xdxd {} a {} a {}", 1, 2, 3);
     LOG_WARNING("Warning boiiii xdxd {} a {} a {}", 1, 2, 3);
     LOG_ERROR("Error boiiii xdxd {} a {} a {}", 1, 2, 3);
-  }
-  if (1) // plot in optimization
-  {
-    auto f = OptimizationTestFunctions::Paraboloid;
-    int N = 3;
-    Evolution Evo(N);
-    Evo.mNP = 10 * N;
-    Evo.mLB = zerovect(N, (double)-N);
-    Evo.mUB = zerovect(N, (double)+N);
-    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
-    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
-    Evo.SetOptimizationName("debug opt");
-    Evo.SetPlotOutput(true);
-    auto result = Evo.Optimize(f);
   }
   if (0) // OpenCV pdb test
   {
@@ -719,8 +710,18 @@ void Debug(Globals* globals)
       }
     }
   }
-  if (0)
-  {
-  }
+
+  // plot in optimization - default
+  auto f = OptimizationTestFunctions::Paraboloid;
+  int N = 3;
+  Evolution Evo(N);
+  Evo.mNP = 10 * N;
+  Evo.mLB = zerovect(N, (double)-N);
+  Evo.mUB = zerovect(N, (double)+N);
+  Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
+  Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
+  Evo.SetOptimizationName("debug opt");
+  Evo.SetPlotOutput(true);
+  auto result = Evo.Optimize(f);
 }
 }
