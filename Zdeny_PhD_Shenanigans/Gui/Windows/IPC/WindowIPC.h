@@ -23,7 +23,7 @@ private slots:
   void PlotImageSizeAccuracyDependence();
   void align();
   void alignXY();
-  void flowMap();
+  void CalculateFlow();
   void features();
   void linearFlow();
   void constantFlow();

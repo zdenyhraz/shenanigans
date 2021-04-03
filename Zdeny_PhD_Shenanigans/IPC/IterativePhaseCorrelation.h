@@ -63,8 +63,8 @@ public:
   Mat Align(const Mat& image1, const Mat& image2) const;
   Mat Align(Mat&& image1, Mat&& image2) const;
 
-  Mat CalculateFlow(const Mat& image1, const Mat& image2) const;
-  Mat CalculateFlow(Mat&& image1, Mat&& image2) const;
+  std::tuple<Mat, Mat> CalculateFlow(const Mat& image1, const Mat& image2, float resolution) const;
+  std::tuple<Mat, Mat> CalculateFlow(Mat&& image1, Mat&& image2, float resolution) const;
 
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
@@ -118,7 +118,8 @@ private:
   Mat CalculateL2U(const Mat& L2) const;
   int GetL1size(const Mat& L2U, double L1ratio) const;
   Mat CalculateL1(const Mat& L2U, const Point2f& L2Upeak, int L1size) const;
-  bool IsOutOfBounds(const Point2f& peak, const Mat& mat, int size) const;
+  bool IsOutOfBounds(const Point2i& peak, const Mat& mat, int size) const;
+  bool IsOutOfBounds(const Point2i& peak, const Mat& mat, Size size) const;
   bool AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const;
   bool ReduceL2size(int& L2size) const;
   void ReduceL1ratio(double& L1ratio) const;

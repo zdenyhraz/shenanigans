@@ -17,7 +17,7 @@ WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), g
   connect(ui.pushButton_11, SIGNAL(clicked()), this, SLOT(PlotImageSizeAccuracyDependence()));
   connect(ui.pushButton_9, SIGNAL(clicked()), this, SLOT(align()));
   connect(ui.pushButton_6, SIGNAL(clicked()), this, SLOT(alignXY()));
-  connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(flowMap()));
+  connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(CalculateFlow()));
   connect(ui.pushButton_8, SIGNAL(clicked()), this, SLOT(features()));
   connect(ui.pushButton_5, SIGNAL(clicked()), this, SLOT(linearFlow()));
   connect(ui.pushButton_7, SIGNAL(clicked()), this, SLOT(constantFlow()));
@@ -129,34 +129,28 @@ void WindowIPC::alignXY()
   auto shifts = phasecorrel(img1, img2, set);
 }
 
-void WindowIPC::flowMap()
+void WindowIPC::CalculateFlow()
 {
   RefreshIPCparameters();
-  std::string path1 = ui.lineEdit_15->text().toStdString();
-  std::string path2 = ui.lineEdit_16->text().toStdString();
+  const auto path1 = ui.lineEdit_15->text().toStdString();
+  const auto path2 = ui.lineEdit_16->text().toStdString();
   Mat img1 = loadImage(path1);
   Mat img2 = loadImage(path2);
+  Plot2D::Plot("FlowSample", roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
 
-  int size = 1024;
-  img1 = roicrop(img1, 0.4 * img1.cols, 0.7 * img1.rows, size, size);
-  img2 = roicrop(img2, 0.4 * img2.cols, 0.7 * img2.rows, size, size);
-
-  showimg(img1, "img");
-  Mat flowAD = abs(img1 - img2);
-  showimg(flowAD, "flowAD", true, 0, 1);
-
-  auto flowMap = calculateFlowMap(img1, img2, *globals->IPCset, 1);
-  Mat flowX = std::get<0>(flowMap);
-  Mat flowY = std::get<1>(flowMap);
-
+  const auto [flowX, flowY] = globals->IPC->CalculateFlow(img1, img2, 0.5);
   Mat flowM, flowP;
   magnitude(flowX, flowY, flowM);
   phase(flowX, flowY, flowP);
+  flowM *= 696010. / 378.3 / 11.8;
+  flowP *= Constants::Rad;
 
-  showimg(flowX, "flowX", true);
-  showimg(flowY, "flowY", true);
-  showimg(flowM, "flowM", true);
-  showimg(flowP, "flowP", true);
+  for (int r = 0; r < flowM.rows; ++r)
+    for (int c = 0; c < flowM.cols; ++c)
+      flowM.at<float>(r, c) = std::clamp(flowM.at<float>(r, c), 0.f, 800.f);
+
+  Plot2D::Plot("FlowM", flowM);
+  Plot2D::Plot("FlowP", flowP);
 }
 
 void WindowIPC::features()

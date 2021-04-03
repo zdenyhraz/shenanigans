@@ -9,7 +9,7 @@
 
 static constexpr int piccnt = 8;                // number of pics
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
-static constexpr double dt = 11.8;              // dt temporally adjacent pics
+static constexpr double dt = 11.8;              // dt seconds temporally adjacent pics
 static constexpr double arrow_scale = 12;
 static constexpr double arrow_thickness = 0.0015;
 static constexpr double text_scale = 0.001;
