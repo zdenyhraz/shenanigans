@@ -4,8 +4,8 @@
 class Plot2D
 {
 public:
-  static void Plot(const std::string& name, const Mat& z, bool newplot = true) { GetPlot(name).Plot(z, newplot); }
-  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z, bool newplot = true) { GetPlot(name).Plot(z, newplot); }
+  static void Plot(const std::string& name, const Mat& z, bool newplot = false) { GetPlot(name).Plot(z, newplot); }
+  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z, bool newplot = false) { GetPlot(name).Plot(z, newplot); }
   static void Reset(const std::string& name) { GetPlot(name).Reset(); }
 
   // named setters

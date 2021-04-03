@@ -66,10 +66,10 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/I1.png");
-    Plot2D::Plot("IPCdebug2D", image1);
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/I2.png");
-    Plot2D::Plot("IPCdebug2D", image2);
+    Plot2D::SetSavePath("IPCI1", mDebugDirectory + "/I1.png");
+    Plot2D::SetSavePath("IPCI2", mDebugDirectory + "/I2.png");
+    Plot2D::Plot("IPCI1", image1);
+    Plot2D::Plot("IPCI2", image2);
   }
 
   ApplyWindow(image1);
@@ -87,8 +87,8 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L3.png");
-    Plot2D::Plot("IPCdebug2D", L3);
+    Plot2D::SetSavePath("IPCL3", mDebugDirectory + "/L3.png");
+    Plot2D::Plot("IPCL3", L3);
   }
 
   if (mAccuracyType == AccuracyType::Pixel)
@@ -120,8 +120,8 @@ try
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L2.png");
-    Plot2D::Plot("IPCdebug2D", L2);
+    Plot2D::SetSavePath("IPCL2", mDebugDirectory + "/L2.png");
+    Plot2D::Plot("IPCL2", L2);
   }
 
   // L2U
@@ -130,8 +130,8 @@ try
   Point2f L2Upeak;
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L2U.png");
-    Plot2D::Plot("IPCdebug2D", L2U, true);
+    Plot2D::SetSavePath("IPCL2U", mDebugDirectory + "/L2U.png");
+    Plot2D::Plot("IPCL2U", L2U);
 
     if (0)
     {
@@ -139,12 +139,12 @@ try
       resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
       resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
       resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
-      Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
-      Plot2D::Plot("IPCdebug2D", nearest, true);
-      Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
-      Plot2D::Plot("IPCdebug2D", linear, true);
-      Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
-      Plot2D::Plot("IPCdebug2D", cubic, true);
+      Plot2D::SetSavePath("IPCL2UN", mDebugDirectory + "/L2UN.png");
+      Plot2D::Plot("IPCL2UN", nearest);
+      Plot2D::SetSavePath("IPCL2UL", mDebugDirectory + "/L2UL.png");
+      Plot2D::Plot("IPCL2UL", linear);
+      Plot2D::SetSavePath("IPCL2UC", mDebugDirectory + "/L2UC.png");
+      Plot2D::Plot("IPCL2UC", cubic);
     }
   }
 
@@ -160,8 +160,8 @@ try
     Point2f L1peak;
     if (mDebugMode)
     {
-      Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L1B.png");
-      Plot2D::Plot("IPCdebug2D", CalculateL1(L2U, L2Upeak, L1size), true);
+      Plot2D::SetSavePath("IPCL1B", mDebugDirectory + "/L1B.png");
+      Plot2D::Plot("IPCL1B", CalculateL1(L2U, L2Upeak, L1size));
     }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -177,8 +177,8 @@ try
       {
         if (mDebugMode)
         {
-          Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/L1A.png");
-          Plot2D::Plot("IPCdebug2D", L1, true);
+          Plot2D::SetSavePath("IPCL1A", mDebugDirectory + "/L1A.png");
+          Plot2D::Plot("IPCL1A", L1);
         }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
