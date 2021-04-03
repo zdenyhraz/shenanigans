@@ -194,7 +194,7 @@ try
     ReduceL1ratio(L1ratio);
   }
 
-  throw std::runtime_error("L1 failed to converge");
+  throw std::runtime_error("L1 failed to converge with all L1ratios");
 }
 catch (const std::exception& e)
 {
