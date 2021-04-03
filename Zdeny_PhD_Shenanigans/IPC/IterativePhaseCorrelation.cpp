@@ -201,6 +201,7 @@ Mat IterativePhaseCorrelation::Align(const Mat& image1, const Mat& image2) const
 }
 
 Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
+try
 {
   Mat img1W = image1.clone();
   Mat img2W = image2.clone();
@@ -251,6 +252,27 @@ Mat IterativePhaseCorrelation::Align(Mat&& image1, Mat&& image2) const
     showimg(ColorComposition(image1, image2), "color composition result", 0, 0, 1, 1000);
   }
   return image2;
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Unexpected error occurred: {}", e.what());
+  return Mat();
+}
+
+Mat IterativePhaseCorrelation::CalculateFlow(const Mat& image1, const Mat& image2) const
+{
+  return CalculateFlow(image1.clone(), image2.clone());
+}
+
+Mat IterativePhaseCorrelation::CalculateFlow(Mat&& image1, Mat&& image2) const
+try
+{
+  return Mat();
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Unexpected error occurred: {}", e.what());
+  return Mat();
 }
 
 inline void IterativePhaseCorrelation::UpdateWindow()

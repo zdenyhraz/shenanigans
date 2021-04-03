@@ -182,7 +182,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
       if (mYnames.size() > i)
         graph->setName(QString::fromStdString(mYnames[i]));
       else
-        graph->setName(QString::fromStdString("y1_" + to_string(i + 1)));
+        graph->setName(QString::fromStdString("y1_" + std::to_string(i + 1)));
     }
     else
     {
@@ -192,7 +192,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
       if (mY2names.size() > i - y1cnt)
         graph->setName(QString::fromStdString(mY2names[i - y1cnt]));
       else
-        graph->setName(QString::fromStdString("y2_" + to_string(i - y1cnt + 1)));
+        graph->setName(QString::fromStdString("y2_" + std::to_string(i - y1cnt + 1)));
     }
 
     if (i < mPens.size())

@@ -7,7 +7,6 @@
 #include "Filtering/filtering.h"
 #include "Log/logger.h"
 
-using namespace std;
 using namespace cv;
 
 static constexpr int maxPCit = 20;
@@ -43,7 +42,7 @@ public:
   Mat bandpass;
   Mat window;
   bool save = false;
-  string savedir = "";
+  std::string savedir = "";
   cv::Size savesize = cv::Size(500, 500);
   mutable int savecntr = -1;
 
@@ -84,7 +83,7 @@ public:
 
 inline void ipcsaveimg(const char* filename, const Mat& img, const IPCsettings& set)
 {
-  saveimg(set.savedir + to_string(set.savecntr) + "_" + filename, img, false, set.savesize, true, 0, 1);
+  saveimg(set.savedir + std::to_string(set.savecntr) + "_" + filename, img, false, set.savesize, true, 0, 1);
 }
 
 inline Point2f ipccore(Mat&& sourceimg1, Mat&& sourceimg2, const IPCsettings& set, bool forceshow = false)

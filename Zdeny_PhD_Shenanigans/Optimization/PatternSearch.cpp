@@ -5,14 +5,14 @@
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
-  vector<double> boundsRange = mUB - mLB;
+  std::vector<double> boundsRange = mUB - mLB;
   double initialStep = vectorMax(boundsRange) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
-  vector<double> topPoint = zerovect(N, 0.);
+  std::vector<double> topPoint = zerovect(N, 0.);
   double topPointFitness = std::numeric_limits<double>::max();
   // generate all starting points
-  vector<vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
+  std::vector<std::vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
   for (int run = 0; run < multistartMaxCnt; run++)
     for (int indexParam = 0; indexParam < N; indexParam++)
       mainPointsInitial[run][indexParam] = randr(mLB[indexParam], mUB[indexParam]); // idk dude
@@ -29,10 +29,10 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
     int funEvalsThisRun = 0;
     // initialize vectors
     double step = initialStep;
-    vector<double> mainPoint = mainPointsInitial[run];
+    std::vector<double> mainPoint = mainPointsInitial[run];
     double mainPointFitness = obj(mainPoint);
-    vector<vector<vector<double>>> pattern;                                                    // N-2-N (N pairs of N-dimensional points)
-    vector<vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
+    std::vector<std::vector<std::vector<double>>> pattern;                                               // N-2-N (N pairs of N-dimensional points)
+    std::vector<std::vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
 
     for (int dim = 0; dim < N; dim++)
@@ -71,7 +71,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
               double testPointFitness = mainPointFitness;
               for (int exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
               {
-                vector<double> testPoint = mainPoint;
+                std::vector<double> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
                 testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
                 testPointFitness = obj(testPoint);

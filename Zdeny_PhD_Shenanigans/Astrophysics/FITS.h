@@ -4,7 +4,6 @@
 #include "Filtering/filtering.h"
 #include "Log/logger.h"
 
-using namespace std;
 using namespace cv;
 
 //.fits parameters
@@ -55,7 +54,7 @@ private:
 
   inline std::tuple<Mat, FitsParams> loadfits(std::string path)
   {
-    ifstream streamIN(path, ios::binary | ios::in);
+    std::ifstream streamIN(path, std::ios::binary | std::ios::in);
     if (!streamIN)
     {
       LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
@@ -75,7 +74,7 @@ private:
       {
         streamIN.read(&cline[0], lineBytes);
         linecnt++;
-        string sline(cline);
+        std::string sline(cline);
 
         if (sline.find("NAXIS1") != std::string::npos)
         {
@@ -211,11 +210,11 @@ private:
 
         if constexpr (0) // show
         {
-          showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + to_string(rand()));
-          showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + to_string(rand()));
-          showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + to_string(rand()));
-          showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + to_string(rand()));
-          showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + to_string(rand()));
+          showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
+          showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
+          showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
+          showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
+          showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
         }
       }
 
@@ -286,50 +285,50 @@ private:
 
   void timeToStringS()
   {
-    yearS = to_string(year);
+    yearS = std::to_string(year);
     if (month < 10)
     {
-      monthS = "0" + to_string(month);
+      monthS = "0" + std::to_string(month);
     }
     else
     {
-      monthS = to_string(month);
+      monthS = std::to_string(month);
     }
 
     if (day < 10)
     {
-      dayS = "0" + to_string(day);
+      dayS = "0" + std::to_string(day);
     }
     else
     {
-      dayS = to_string(day);
+      dayS = std::to_string(day);
     }
 
     if (hour < 10)
     {
-      hourS = "0" + to_string(hour);
+      hourS = "0" + std::to_string(hour);
     }
     else
     {
-      hourS = to_string(hour);
+      hourS = std::to_string(hour);
     }
 
     if (minute < 10)
     {
-      minuteS = "0" + to_string(minute);
+      minuteS = "0" + std::to_string(minute);
     }
     else
     {
-      minuteS = to_string(minute);
+      minuteS = std::to_string(minute);
     }
 
     if (second < 10)
     {
-      secondS = "0" + to_string(second);
+      secondS = "0" + std::to_string(second);
     }
     else
     {
-      secondS = to_string(second);
+      secondS = std::to_string(second);
     }
   }
 
@@ -434,11 +433,11 @@ public:
 
 Mat loadfits(std::string path, FitsParams& params);
 
-void generateFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain);
+void generateFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain);
 
-void generateFitsDownloadUrlSingles(int delta, int pics, string urlmain);
+void generateFitsDownloadUrlSingles(int delta, int pics, std::string urlmain);
 
-void checkFitsDownloadUrlPairs(int delta, int step, int pics, string urlmain, string pathMasterIn);
+void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain, std::string pathMasterIn);
 
 void loadImageDebug(Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop);
 

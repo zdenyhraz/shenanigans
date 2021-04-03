@@ -86,36 +86,25 @@ void WindowIPC::align()
   RefreshIPCparameters();
   std::string path1 = ui.lineEdit_15->text().toStdString();
   std::string path2 = ui.lineEdit_16->text().toStdString();
-  Mat img1 = loadImage(path1);
-  Mat img2 = loadImage(path2);
 
-  int size = globals->IPCset->getcols();
-  img1 = roicrop(img1, 0.5 * img1.cols, 0.5 * img1.rows, size, size);
-  img2 = roicrop(img2, 0.5 * img2.cols, 0.5 * img2.rows, size, size);
+  Point cropfocus(2048, 2048);
+  int cropsize = 1.0 * 4096;
 
-  IPCsettings set = *globals->IPCset;
-  set.speak = IPCsettings::All;
+  Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
-  if (0) // artificial misalign
-  {
-    img2 = img1.clone();
-    double angle = 0;
-    double scale = 1;
-    double shiftX = 0;
-    double shiftY = 0;
-    Point2f center((float)img1.cols / 2, (float)img1.rows / 2);
-    cout << "Artificial parameters:" << endl << "Angle: " << angle << endl << "Scale: " << scale << endl << "ShiftX: " << shiftX << endl << "ShiftY: " << shiftY << endl;
-    Mat R = getRotationMatrix2D(center, angle, scale);
-    Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
-    warpAffine(img2, img2, T, cv::Size(img1.cols, img1.rows));
-    warpAffine(img2, img2, R, cv::Size(img1.cols, img1.rows));
-  }
+  int size = cropsize;
+  cv::resize(img1, img1, Size(size, size));
+  cv::resize(img2, img2, Size(size, size));
 
-  showimg(img1, "img1");
-  showimg(img2, "img2");
-  showimg(AlignStereovision(img1, img2), "img 1n2 not aligned");
-  alignPics(img1, img2, img2, set);
-  showimg(AlignStereovision(img1, img2), "img 1n2 yes aligned");
+  Shift(img2, -950, 1050);
+  Rotate(img2, 70, 1.2);
+
+  IterativePhaseCorrelation ipc = *globals->IPC;
+  ipc.SetSize(img1.size());
+  ipc.SetDebugMode(true);
+  Mat aligned = ipc.Align(img1, img2);
+  showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
 }
 
 void WindowIPC::alignXY()
@@ -186,10 +175,10 @@ void WindowIPC::linearFlow()
   auto yshifts = std::get<1>(xyi);
   auto indices = std::get<2>(xyi);
 
-  LOG_DEBUG("xshifts min = " + to_string(vectorMin(xshifts)));
-  LOG_DEBUG("xshifts max = " + to_string(vectorMax(xshifts)));
-  LOG_DEBUG("yshifts min = " + to_string(vectorMin(yshifts)));
-  LOG_DEBUG("yshifts max = " + to_string(vectorMax(yshifts)));
+  LOG_DEBUG("xshifts min = " + std::to_string(vectorMin(xshifts)));
+  LOG_DEBUG("xshifts max = " + std::to_string(vectorMax(xshifts)));
+  LOG_DEBUG("yshifts min = " + std::to_string(vectorMin(yshifts)));
+  LOG_DEBUG("yshifts max = " + std::to_string(vectorMax(yshifts)));
   LOG_DEBUG("Linear solar wind speed calculated");
 }
 
@@ -201,10 +190,10 @@ void WindowIPC::constantFlow()
   auto yshifts = std::get<1>(xyi);
   auto indices = std::get<2>(xyi);
 
-  LOG_DEBUG("xshifts min = " + to_string(vectorMin(xshifts)));
-  LOG_DEBUG("xshifts max = " + to_string(vectorMax(xshifts)));
-  LOG_DEBUG("yshifts min = " + to_string(vectorMin(yshifts)));
-  LOG_DEBUG("yshifts max = " + to_string(vectorMax(yshifts)));
+  LOG_DEBUG("xshifts min = " + std::to_string(vectorMin(xshifts)));
+  LOG_DEBUG("xshifts max = " + std::to_string(vectorMax(xshifts)));
+  LOG_DEBUG("yshifts min = " + std::to_string(vectorMin(yshifts)));
+  LOG_DEBUG("yshifts max = " + std::to_string(vectorMax(yshifts)));
   LOG_DEBUG("Constant solar wind speed calculated");
 }
 

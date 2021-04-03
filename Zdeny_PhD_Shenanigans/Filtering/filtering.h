@@ -2,16 +2,15 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 
-using namespace std;
 using namespace cv;
 
 struct filterSettings
 {
-	double contrast;
-	double brightness;
-	double gamma;
+  double contrast;
+  double brightness;
+  double gamma;
 
-	filterSettings(double contrast, double brightness, double gamma) : contrast(contrast), brightness(brightness), gamma(gamma) {}
+  filterSettings(double contrast, double brightness, double gamma) : contrast(contrast), brightness(brightness), gamma(gamma) {}
 };
 
 Mat filterContrastBrightness(const Mat& sourceimg, double contrast, double brightness);

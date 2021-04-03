@@ -3,7 +3,6 @@
 #include "Core/functionsBaseCV.h"
 #include "Utils/vectmat.h"
 
-using namespace std;
 using namespace cv;
 
 enum CostFunction : char
@@ -223,11 +222,11 @@ public:
           Mat kost = cost(a.back(), trainingOutputs_[indexData], costFunction);
           if constexpr (0) // debug
           {
-            cout << endl;
-            cout << "<training epoch " << indexEpoch << "><data " << indexData << "> z" << indexData << " = " << z.back() << endl;
-            cout << "<training epoch " << indexEpoch << "><data " << indexData << "> a" << indexData << " = " << a.back() << endl;
-            cout << "<training epoch " << indexEpoch << "><data " << indexData << "> y" << indexData << " = " << trainingOutputs_[indexData] << endl;
-            cout << "<training epoch " << indexEpoch << "><data " << indexData << "> kost" << indexData << " = " << kost << endl;
+            std::cout << endl;
+            std::cout << "<training epoch " << indexEpoch << "><data " << indexData << "> z" << indexData << " = " << z.back() << endl;
+            std::cout << "<training epoch " << indexEpoch << "><data " << indexData << "> a" << indexData << " = " << a.back() << endl;
+            std::cout << "<training epoch " << indexEpoch << "><data " << indexData << "> y" << indexData << " = " << trainingOutputs_[indexData] << endl;
+            std::cout << "<training epoch " << indexEpoch << "><data " << indexData << "> kost" << indexData << " = " << kost << endl;
           }
           costFunVal += sum(kost)[0];
         }
@@ -237,13 +236,13 @@ public:
       {
         for (int L = 0; L < layerCount; L++)
         {
-          cout << endl;
-          cout << "<training> "
-               << "weight matrix:" << w[L].size() << endl
-               << w[L] << endl;
-          cout << "<training> "
-               << "bias matrix:" << b[L].size() << endl
-               << b[L] << endl;
+          std::cout << endl;
+          std::cout << "<training> "
+                    << "weight matrix:" << w[L].size() << endl
+                    << w[L] << endl;
+          std::cout << "<training> "
+                    << "bias matrix:" << b[L].size() << endl
+                    << b[L] << endl;
         }
       }
 
@@ -255,7 +254,7 @@ public:
       if (!((indexEpoch + 1) % 5000))
         learningRate *= 0.9;
       if (!(indexEpoch % 500))
-        cout << "<training epoch " << indexEpoch << "> costFunVal = " << costFunVal << endl;
+        std::cout << "<training epoch " << indexEpoch << "> costFunVal = " << costFunVal << endl;
     }
   }
 
@@ -293,13 +292,13 @@ private:
 
     for (int L = 0; L < layerCount; L++) // debug
     {
-      cout << endl;
-      cout << "<initialization> "
-           << "weight matrix:" << w[L].size() << endl
-           << w[L] << endl;
-      cout << "<initialization> "
-           << "bias matrix:" << b[L].size() << endl
-           << b[L] << endl;
+      std::cout << endl;
+      std::cout << "<initialization> "
+                << "weight matrix:" << w[L].size() << endl
+                << w[L] << endl;
+      std::cout << "<initialization> "
+                << "bias matrix:" << b[L].size() << endl
+                << b[L] << endl;
     }
   }
 

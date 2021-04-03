@@ -15,8 +15,6 @@
 
 #define TIMER(name) std::unique_ptr<Timer> t = std::make_unique<Timer>(name);
 
-using namespace std;
-
 class Timer // benchmarking struct
 {
   using clock = std::chrono::high_resolution_clock;
@@ -406,12 +404,12 @@ inline std::vector<double> iota(int first, int size)
 
 inline std::string operator+(const std::string& str, const int val)
 {
-  return str + to_string(val);
+  return str + std::to_string(val);
 }
 
 inline std::string operator+(const int val, const std::string& str)
 {
-  return to_string(val) + str;
+  return std::to_string(val) + str;
 }
 
 inline void filterMedian(std::vector<double>& vec, int size)
@@ -500,7 +498,7 @@ inline std::vector<double> toRadians(const std::vector<double>& vecdeg)
 
 inline std::string to_stringp(double val, int prec)
 {
-  std::string vals = to_string(val);
+  std::string vals = std::to_string(val);
   return vals.substr(0, vals.find(".") + prec + 1);
 }
 

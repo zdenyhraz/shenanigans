@@ -63,6 +63,9 @@ public:
   Mat Align(const Mat& image1, const Mat& image2) const;
   Mat Align(Mat&& image1, Mat&& image2) const;
 
+  Mat CalculateFlow(const Mat& image1, const Mat& image2) const;
+  Mat CalculateFlow(Mat&& image1, Mat&& image2) const;
+
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
                 double validationRatio = 0.2, int populationSize = ParameterCount * 7);
