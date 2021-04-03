@@ -58,11 +58,14 @@ Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image
 inline Point2f IterativePhaseCorrelation::Calculate(Mat&& image1, Mat&& image2) const
 try
 {
-  if (image1.rows != mRows || image1.cols != mCols || image2.rows != mRows || image2.cols != mCols)
-    throw std::runtime_error(fmt::format("Invalid image sizes ({} and {} != {})", image1.size(), image2.size(), Size(mCols, mRows)));
+  if (image1.size() != image2.size())
+    throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+
+  if (image1.size() != Size(mCols, mRows))
+    throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), Size(mCols, mRows)));
 
   if (image1.channels() != 1 || image2.channels() != 1)
-    throw std::runtime_error("Only grayscale images are supported");
+    throw std::runtime_error("Multichannel images are not supported");
 
   ConvertToUnitFloat(image1);
   ConvertToUnitFloat(image2);
