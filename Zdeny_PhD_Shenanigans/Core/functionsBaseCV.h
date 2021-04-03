@@ -5,7 +5,6 @@
 #include <opencv2/highgui.hpp>
 #include "Core/functionsBaseSTL.h"
 
-using namespace std;
 using namespace cv;
 
 inline Mat roicrop(const Mat& sourceimgIn, int x, int y, int w, int h)
@@ -37,12 +36,12 @@ inline std::pair<double, double> minMaxMat(const Mat& sourceimg)
 {
   double minR, maxR;
   minMaxLoc(sourceimg, &minR, &maxR, nullptr, nullptr);
-  return make_pair(minR, maxR);
+  return std::make_pair(minR, maxR);
 }
 
 inline std::string to_string(const Point2d& point)
 {
-  return std::string("[" + to_string(point.x) + "," + to_string(point.y) + "]");
+  return std::string("[" + std::to_string(point.x) + "," + std::to_string(point.y) + "]");
 }
 
 inline Point2f findCentroid(const Mat& sourceimg)

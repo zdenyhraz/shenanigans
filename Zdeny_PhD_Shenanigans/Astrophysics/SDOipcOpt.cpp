@@ -2,7 +2,7 @@
 #include "SDOipcOpt.h"
 #include "Optimization/Evolution.h"
 
-double absoluteSubpixelRegistrationError(IPCsettings &set, const Mat &src, double noisestddev, double maxShift, double accuracy)
+double absoluteSubpixelRegistrationError(IPCsettings& set, const Mat& src, double noisestddev, double maxShift, double accuracy)
 {
   double returnVal = 0;
   Mat srcCrop1, srcCrop2;
@@ -50,7 +50,7 @@ double absoluteSubpixelRegistrationError(IPCsettings &set, const Mat &src, doubl
   return returnVal;
 }
 
-double IPCparOptFun(const std::vector<double> &args, const IPCsettings &settingsMaster, const Mat &source, double noisestddev, double maxShift, double accuracy)
+double IPCparOptFun(const std::vector<double>& args, const IPCsettings& settingsMaster, const Mat& source, double noisestddev, double maxShift, double accuracy)
 {
   IPCsettings settings = settingsMaster;
   settings.setBandpassParameters(args[0], args[1]);
@@ -61,7 +61,7 @@ double IPCparOptFun(const std::vector<double> &args, const IPCsettings &settings
   return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShift, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings &settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs)
 {
   std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
   listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << endl;
@@ -70,22 +70,23 @@ void optimizeIPCParameters(const IPCsettings &settingsMaster, std::string pathIn
   std::string windowname = "objective function source";
   showimg(pic, windowname);
   double noisestdev = 0;
-  auto f = [&](const std::vector<double> &args) { return IPCparOptFun(args, settingsMaster, pic, noisestdev, maxShift, accuracy); };
+  auto f = [&](const std::vector<double>& args) { return IPCparOptFun(args, settingsMaster, pic, noisestdev, maxShift, accuracy); };
 
   for (int iterOpt = 0; iterOpt < runs; iterOpt++)
   {
     Evolution Evo(4);
     Evo.mNP = 24;
     Evo.mMutStrat = Evolution::MutationStrategy::RAND1;
-    Evo.mLB = vector<double>{0, 0, 3, -1};
-    Evo.mUB = vector<double>{10, 200, 19, 1};
+    Evo.mLB = std::vector<double>{0, 0, 3, -1};
+    Evo.mUB = std::vector<double>{10, 200, 19, 1};
     auto Result = Evo.Optimize(f);
-    // listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
+    // listing << pathInput << "," << settingsMaster.getcols() << "x" << settingsMaster.getrows() << "," << maxShift << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] <<
+    // "," << f(Result) << "," << currentDateTime() << endl;
   }
   destroyWindow(windowname);
 }
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, double maxShift, double accuracy, unsigned runs)
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs)
 {
   std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
   if constexpr (1) // OPT 4par
@@ -95,20 +96,20 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings &settingsMaster, d
     for (int wavelength = 0; wavelength < WAVELENGTHS_STR.size(); wavelength++)
     {
       std::string path = "D:\\MainOutput\\png\\" + WAVELENGTHS_STR[wavelength] + "_proc.png";
-      cout << "OPT .png load path: " << path << endl;
+      std::cout << "OPT .png load path: " << path << endl;
       Mat pic = imread(path, IMREAD_ANYDEPTH);
       showimg(pic, "objfun current source");
       if constexpr (1) // optimize
       {
-        auto f = [&](const std::vector<double> &args) { return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy); };
+        auto f = [&](const std::vector<double>& args) { return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy); };
         for (int iterOpt = 0; iterOpt < runs; iterOpt++)
         {
           Evolution Evo(4);
           Evo.mNP = 25;
           Evo.mMutStrat = Evolution::MutationStrategy::RAND1;
           Evo.optimalFitness = 0;
-          Evo.mLB = vector<double>{0, 0, 3, -1};
-          Evo.mUB = vector<double>{20, 200, 19, 1};
+          Evo.mLB = std::vector<double>{0, 0, 3, -1};
+          Evo.mUB = std::vector<double>{20, 200, 19, 1};
           auto Result = Evo.Optimize(f);
           // listing << WAVELENGTHS_STR[wavelength] << "," << Result[0] << "," << Result[1] << "," << Result[2] << "," << Result[3] << "," << f(Result) << "," << currentDateTime() << endl;
         }

@@ -11,7 +11,7 @@ void PlotCSV::plot(const std::string& path, const std::string& savepath)
   if (x.empty() || ys.empty())
     return;
 
-  std::string plotname = std::string("csv plot ") + to_string(counter);
+  std::string plotname = std::string("csv plot ") + std::to_string(counter);
   std::string ylabel = "";
 
   // Plot1D::Plot(path, x, ys, plotname, xlabel, ylabel, ylabels, Plot::pens, savepath);

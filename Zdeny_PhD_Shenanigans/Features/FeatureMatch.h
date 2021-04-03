@@ -207,8 +207,8 @@ try
 #pragma omp parallel for
   for (int pic = 1; pic < piccnt - 1; pic++)
   {
-    std::string path1 = data.path + to_string(pic) + ".PNG";
-    std::string path2 = data.path + to_string(pic + 1) + ".PNG";
+    std::string path1 = data.path + std::to_string(pic) + ".PNG";
+    std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
     LOG_DEBUG(fmt::format("Matching images {} & {}", path1, path2));
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);

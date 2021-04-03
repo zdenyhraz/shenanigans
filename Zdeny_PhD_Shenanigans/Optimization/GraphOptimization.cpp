@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "GraphOptimization.h"
 
-std::ostream &operator<<(std::ostream &out, std::tuple<unsigned, double, unsigned> tuple)
+std::ostream& operator<<(std::ostream& out, std::tuple<unsigned, double, unsigned> tuple)
 {
   out << "<" << std::get<0>(tuple) << "," << std::get<1>(tuple) << "," << std::get<2>(tuple) << ">";
   return out;
@@ -38,6 +38,6 @@ void findOptimalGraphPathDebug()
   graph.addEdge(1, 8, 0.3);
   graph.addEdge(8, 7, 2);
   graph.addEdge(4, 7, 0.1);
-  graph.nodeNames = vector<string>{"A", "B", "C", "D", "E", "F", "G", "H", "I"};
+  graph.nodeNames = std::vector<std::string>{"A", "B", "C", "D", "E", "F", "G", "H", "I"};
   graph.findOptimalPath_Dijkstra(0, 7);
 }

@@ -35,11 +35,11 @@ void alignPics(const Mat& input1, const Mat& input2, Mat& output, IPCsettings se
     warpPolar(img1FTm, img1LP, cv::Size(input1.cols, input1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
     warpPolar(img2FTm, img2LP, cv::Size(input1.cols, input1.rows), center, maxRadius, INTER_LINEAR + WARP_FILL_OUTLIERS + WARP_POLAR_LOG); // semilog Polar
     auto LPshifts = phasecorrel(img1LP, img2LP, set);
-    cout << "LPshifts: " << LPshifts << endl;
+    std::cout << "LPshifts: " << LPshifts << endl;
     double anglePredicted = -LPshifts.y / input1.rows * 360;
     double scalePredicted = exp(LPshifts.x * log(maxRadius) / input1.cols);
-    cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
-    cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
+    std::cout << "Evaluated rotation: " << anglePredicted << " deg" << endl;
+    std::cout << "Evaluated scale: " << 1. / scalePredicted << " " << endl;
     estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
     warpAffine(output, output, estR, cv::Size(input1.cols, input1.rows));
   }
@@ -47,11 +47,11 @@ void alignPics(const Mat& input1, const Mat& input2, Mat& output, IPCsettings se
   if (1) // calculate shift
   {
     auto shifts = phasecorrel(input1, output, set);
-    cout << "shifts: " << shifts << endl;
+    std::cout << "shifts: " << shifts << endl;
     double shiftXPredicted = shifts.x;
     double shiftYPredicted = shifts.y;
-    cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
-    cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
+    std::cout << "Evaluated shiftX: " << shiftXPredicted << " px" << endl;
+    std::cout << "Evaluated shiftY: " << shiftYPredicted << " px" << endl;
     estT = (Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
     warpAffine(output, output, estT, cv::Size(input1.cols, input1.rows));
   }
@@ -69,11 +69,11 @@ Mat AlignStereovision(const Mat& img1In, const Mat& img2In)
   double d = 0.0;
   double g = 0.5;
 
-  vector<double> rgb1 = {1. - d, g, d};
-  vector<double> rgb2 = {d, 1. - g, 1. - d};
+  std::vector<double> rgb1 = {1. - d, g, d};
+  std::vector<double> rgb2 = {d, 1. - g, 1. - d};
 
-  vector<Mat> channels1(3);
-  vector<Mat> channels2(3);
+  std::vector<Mat> channels1(3);
+  std::vector<Mat> channels2(3);
   Mat img1CLR, img2CLR;
 
   channels1[0] = rgb1[2] * img1;
@@ -125,7 +125,7 @@ void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_setti
     double shiftX = -950; //-958;
     double shiftY = 1050; // 1050;
 
-    cout << "Artificial parameters:" << endl << "Angle: " << angle << endl << "Scale: " << scale << endl << "ShiftX: " << shiftX << endl << "ShiftY: " << shiftY << endl;
+    std::cout << "Artificial parameters:" << endl << "Angle: " << angle << endl << "Scale: " << scale << endl << "ShiftX: " << shiftX << endl << "ShiftY: " << shiftY << endl;
     Mat R = getRotationMatrix2D(center, angle, scale);
     Mat T = (Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
     warpAffine(img2, img2, T, cv::Size(img1.cols, img1.rows));
@@ -152,21 +152,21 @@ void alignPicsDebug(const Mat& img1In, const Mat& img2In, IPCsettings& IPC_setti
   if (0)
     saveimg("D:\\MainOutput\\align\\ASV_Aligned.png", gammaCorrect(filterContrastBrightness(AlignStereovision(img1, img2), filterSetASV.contrast, filterSetASV.brightness), filterSetASV.gamma));
 
-  cout << "Finito senor" << endl;
+  std::cout << "Finito senor" << endl;
 }
 
 void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings2)
 {
   if (IPC_settings1.getcols() == 0 || IPC_settings2.getcols() == 0)
   {
-    cout << "> please initialize IPC_settings1 and IPC_settings2 to run benchmarks" << endl;
+    std::cout << "> please initialize IPC_settings1 and IPC_settings2 to run benchmarks" << endl;
     return;
   }
   // initialize main parameters
   double artificialShiftRange = IPC_settings1.getcols() / 8;
   int trialsPerStartPos = 1000;
-  vector<double> startFractionX = {0.5};
-  vector<double> startFractionY = {0.5};
+  std::vector<double> startFractionX = {0.5};
+  std::vector<double> startFractionY = {0.5};
   int progress = 0;
 
   // load the test picture
@@ -208,7 +208,7 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
       {
         listing << shiftX << "," << shifts1.x << "," << shifts2.x << endl;
         progress++;
-        cout << "> IPC benchmark progress " << progress << " / " << trialsPerStartPos * startFractionX.size() << endl;
+        std::cout << "> IPC benchmark progress " << progress << " / " << trialsPerStartPos * startFractionX.size() << endl;
       }
     }
   }
@@ -255,7 +255,7 @@ std::tuple<Mat, Mat> calculateFlowMap(const Mat& img1In, const Mat& img2In, IPCs
 #pragma omp critical
     {
       progress++;
-      cout << "> calculating flow map, " << (double)progress / rows * 100 << "% done." << endl;
+      std::cout << "> calculating flow map, " << (double)progress / rows * 100 << "% done." << endl;
     }
   }
   return std::make_tuple(flowX, flowY);
