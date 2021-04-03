@@ -58,8 +58,11 @@ Point2f IterativePhaseCorrelation::Calculate(const Mat& image1, const Mat& image
 inline Point2f IterativePhaseCorrelation::Calculate(Mat&& image1, Mat&& image2) const
 try
 {
-  if (!IsValid(image1, image2))
-    return {0, 0};
+  if (image1.rows != mRows || image1.cols != mCols || image2.rows != mRows || image2.cols != mCols)
+    throw std::runtime_error(fmt::format("Invalid image sizes ({} and {} != {})", image1.size(), image2.size(), Size(mCols, mRows)));
+
+  if (image1.channels() != 1 || image2.channels() != 1)
+    throw std::runtime_error("Only grayscale images are supported");
 
   ConvertToUnitFloat(image1);
   ConvertToUnitFloat(image2);
@@ -127,7 +130,6 @@ try
   // L2U
   Mat L2U = CalculateL2U(L2);
   Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-  Point2f L2Upeak;
   if (mDebugMode)
   {
     Plot2D::SetSavePath("IPCL2U", mDebugDirectory + "/L2U.png");
@@ -148,10 +150,10 @@ try
     }
   }
 
-  while (true)
+  while (L1ratio > 0)
   {
     // reset L2U peak position
-    L2Upeak = L2Umid;
+    Point2f L2Upeak = L2Umid;
 
     // L1
     Mat L1;
@@ -188,10 +190,12 @@ try
     // maximum iterations reached - reduce L1 size by reducing L1ratio
     ReduceL1ratio(L1ratio);
   }
+
+  throw std::runtime_error("L1 failed to converge");
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Unexpected error occurred: {}", e.what());
+  LOG_ERROR("IPC Calculate error: {}", e.what());
   return {0, 0};
 }
 
@@ -255,7 +259,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Unexpected error occurred: {}", e.what());
+  LOG_ERROR("IPC Align error: {}", e.what());
   return Mat();
 }
 
@@ -300,7 +304,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Unexpected error occurred: {}", e.what());
+  LOG_ERROR("IPC CalculateFlow error: {}", e.what());
   return {};
 }
 
@@ -379,30 +383,6 @@ inline float IterativePhaseCorrelation::BandpassREquation(int row, int col) cons
 {
   double r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
-}
-
-inline bool IterativePhaseCorrelation::IsValid(const Mat& image1, const Mat& image2) const
-{
-  // size must be equal for matching bandpass / window
-  if (!CheckSize(image1, image2))
-    return false;
-
-  // only grayscale images are supported
-  if (!CheckChannels(image1, image2))
-    return false;
-
-  return true;
-}
-
-inline bool IterativePhaseCorrelation::CheckSize(const Mat& image1, const Mat& image2) const
-{
-  Size ipcsize(mCols, mRows);
-  return image1.size() == image2.size() && image1.size() == ipcsize && image2.size() == ipcsize;
-}
-
-inline bool IterativePhaseCorrelation::CheckChannels(const Mat& image1, const Mat& image2) const
-{
-  return image1.channels() == 1 && image2.channels() == 1;
 }
 
 inline void IterativePhaseCorrelation::ConvertToUnitFloat(Mat& image) const
@@ -583,7 +563,7 @@ inline bool IterativePhaseCorrelation::ReduceL2size(int& L2size) const
 {
   L2size -= 2;
   if (mDebugMode)
-    LOG_ERROR("Reducing L2size to {}", L2size);
+    LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
   return L2size >= 3;
 }
 
@@ -591,7 +571,7 @@ void IterativePhaseCorrelation::ReduceL1ratio(double& L1ratio) const
 {
   L1ratio -= mL1ratioStep;
   if (mDebugMode)
-    LOG_ERROR("Reducing L1ratio to {:.2f}", L1ratio);
+    LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
 }
 
 Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2)
