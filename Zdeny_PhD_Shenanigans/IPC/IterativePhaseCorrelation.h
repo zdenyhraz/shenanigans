@@ -102,9 +102,6 @@ private:
   float HighpassEquation(int row, int col) const;
   float BandpassGEquation(int row, int col) const;
   float BandpassREquation(int row, int col) const;
-  bool IsValid(const Mat& image1, const Mat& image2) const;
-  bool CheckSize(const Mat& image1, const Mat& image2) const;
-  bool CheckChannels(const Mat& image1, const Mat& image2) const;
   void ConvertToUnitFloat(Mat& image) const;
   void ApplyWindow(Mat& image) const;
   Mat CalculateFourierTransform(Mat&& image) const;
