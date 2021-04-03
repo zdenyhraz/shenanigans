@@ -259,20 +259,47 @@ catch (const std::exception& e)
   return Mat();
 }
 
-Mat IterativePhaseCorrelation::CalculateFlow(const Mat& image1, const Mat& image2) const
+std::tuple<Mat, Mat> IterativePhaseCorrelation::CalculateFlow(const Mat& image1, const Mat& image2, float resolution) const
 {
-  return CalculateFlow(image1.clone(), image2.clone());
+  return CalculateFlow(image1.clone(), image2.clone(), resolution);
 }
 
-Mat IterativePhaseCorrelation::CalculateFlow(Mat&& image1, Mat&& image2) const
+std::tuple<Mat, Mat> IterativePhaseCorrelation::CalculateFlow(Mat&& image1, Mat&& image2, float resolution) const
 try
 {
-  return Mat();
+  if (image1.size() != image2.size())
+    throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+
+  if (mRows > image1.rows || mCols > image1.cols)
+    throw std::runtime_error(fmt::format("Images are too small ({} < {})", image1.size(), cv::Size(mCols, mRows)));
+
+  Mat flowX = Mat::zeros(image1.size(), CV_32F);
+  Mat flowY = Mat::zeros(image1.size(), CV_32F);
+  const auto step = static_cast<size_t>(std::round(1.f / resolution));
+  std::atomic<size_t> progress = 0;
+
+#pragma omp parallel for
+  for (int r = 0; r < flowX.rows; r += step)
+  {
+    LOG_DEBUG("Calculating flow profile ({:.1f}%)", static_cast<float>(++progress * step) / flowX.rows * 100);
+
+    for (int c = 0; c < flowX.cols; c += step)
+    {
+      if (IsOutOfBounds({c, r}, image1, {mCols, mRows}))
+        continue;
+
+      const auto shift = Calculate(roicrop(image1, c, r, mCols, mRows), roicrop(image2, c, r, mCols, mRows));
+      flowX.at<float>(r, c) = shift.x;
+      flowY.at<float>(r, c) = shift.y;
+    }
+  }
+
+  return {flowX, flowY};
 }
 catch (const std::exception& e)
 {
   LOG_ERROR("Unexpected error occurred: {}", e.what());
-  return Mat();
+  return {};
 }
 
 inline void IterativePhaseCorrelation::UpdateWindow()
@@ -535,9 +562,14 @@ inline Mat IterativePhaseCorrelation::CalculateL1(const Mat& L2U, const Point2f&
   return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
 }
 
-inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2f& peak, const Mat& mat, int size) const
+inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2i& peak, const Mat& mat, int size) const
 {
-  return peak.x - size / 2 < 0 || peak.y - size / 2 < 0 || peak.x + size / 2 >= mat.cols || peak.y + size / 2 >= mat.rows;
+  return IsOutOfBounds(peak, mat, {size, size});
+}
+
+inline bool IterativePhaseCorrelation::IsOutOfBounds(const Point2i& peak, const Mat& mat, Size size) const
+{
+  return peak.x - size.width / 2 < 0 || peak.y - size.height / 2 < 0 || peak.x + size.width / 2 >= mat.cols || peak.y + size.height / 2 >= mat.rows;
 }
 
 inline bool IterativePhaseCorrelation::AccuracyReached(const Point2f& L1peak, const Point2f& L1mid) const
