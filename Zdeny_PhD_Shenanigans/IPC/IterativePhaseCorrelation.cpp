@@ -273,22 +273,24 @@ try
   if (mRows > image1.rows || mCols > image1.cols)
     throw std::runtime_error(fmt::format("Images are too small ({} < {})", image1.size(), cv::Size(mCols, mRows)));
 
-  Mat flowX = Mat::zeros(image1.size(), CV_32F);
-  Mat flowY = Mat::zeros(image1.size(), CV_32F);
-  const auto step = static_cast<size_t>(std::round(1.f / resolution));
-  std::atomic<size_t> progress = 0;
+  Mat flowX = Mat::zeros(Size(resolution * image1.cols, resolution * image1.rows), CV_32F);
+  Mat flowY = Mat::zeros(Size(resolution * image2.cols, resolution * image2.rows), CV_32F);
+  std::atomic<int> progress = 0;
 
 #pragma omp parallel for
-  for (int r = 0; r < flowX.rows; r += step)
+  for (int r = 0; r < flowX.rows; ++r)
   {
-    LOG_DEBUG("Calculating flow profile ({:.1f}%)", static_cast<float>(++progress * step) / flowX.rows * 100);
+    if (++progress % (flowX.rows / 20) == 0)
+      LOG_DEBUG("Calculating IPC flow profile ({:.0f}%)", static_cast<float>(progress) / flowX.rows * 100);
 
-    for (int c = 0; c < flowX.cols; c += step)
+    for (int c = 0; c < flowX.cols; ++c)
     {
-      if (IsOutOfBounds({c, r}, image1, {mCols, mRows}))
+      const Point2i center(c / resolution, r / resolution);
+
+      if (IsOutOfBounds(center, image1, {mCols, mRows}))
         continue;
 
-      const auto shift = Calculate(roicrop(image1, c, r, mCols, mRows), roicrop(image2, c, r, mCols, mRows));
+      const auto shift = Calculate(roicrop(image1, center.x, center.y, mCols, mRows), roicrop(image2, center.x, center.y, mCols, mRows));
       flowX.at<float>(r, c) = shift.x;
       flowY.at<float>(r, c) = shift.y;
     }
