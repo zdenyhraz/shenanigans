@@ -21,7 +21,39 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // ipc shift test
+  if (1) // sasko DFT test
+  {
+    Mat img1 = roicropmid(loadImage("Resources/test.png"), 1000, 1000);
+    Mat img2;
+    flip(img1, img2, 1);
+    rotate(img2, img2, ROTATE_90_COUNTERCLOCKWISE);
+    Plot2D::Plot("img1", img1);
+    Plot2D::Plot("img2", img2);
+    Mat fft1 = Fourier::fft(img1);
+    Mat fft2 = Fourier::fft(img2);
+
+    transpose(fft2, fft2);
+
+    Fourier::fftshift(fft1);
+    Fourier::fftshift(fft2);
+    Plot2D::Plot("fft1", Fourier::logmagn(fft1));
+    Plot2D::Plot("fft2", Fourier::logmagn(fft2));
+    Plot2D::Plot("fft diff", abs(Fourier::logmagn(fft2) - Fourier::logmagn(fft1)));
+
+    Mat planes1[2], planes2[2];
+    split(fft1, planes1);
+    split(fft2, planes2);
+    log(planes1[0], planes1[0]);
+    log(planes1[1], planes1[1]);
+    log(planes2[0], planes2[0]);
+    log(planes2[1], planes2[1]);
+
+    Plot2D::Plot("re diff", abs(planes1[0] - planes2[0]));
+    Plot2D::Plot("im diff", abs(planes1[1] - planes2[1]));
+
+    return;
+  }
+  if (0) // ipc shift test
   {
     Mat img1 = loadImage("../articles/dissertation/swind/twopeaks1src.png");
     Mat img2 = loadImage("../articles/dissertation/swind/twopeaks2src.png");
