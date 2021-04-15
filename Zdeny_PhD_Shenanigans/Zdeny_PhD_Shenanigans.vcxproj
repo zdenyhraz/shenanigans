@@ -159,6 +159,7 @@
     <ClInclude Include="Astrophysics\diffrotFileIO.h" />
     <ClInclude Include="Astrophysics\diffrotResults.h" />
     <ClInclude Include="Astrophysics\SwindFlow.h" />
+    <ClInclude Include="Complexity\ComplexityClassEstimation.h" />
     <ClInclude Include="Core\BlazeUtils.h" />
     <ClInclude Include="Core\constants.h" />
     <ClInclude Include="DebugStuff\DebugStuff.h" />

@@ -13,3 +13,4 @@ AccessModifierOffset: -2
 AllowShortFunctionsOnASingleLine: InlineOnly
 FixNamespaceComments: false
 SortIncludes: false
+AlwaysBreakTemplateDeclarations: true
