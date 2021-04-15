@@ -14,6 +14,7 @@
 #include "Sasko/NonMaximaSuppression.h"
 #include "Log/QtLogger.h"
 #include "Core/BlazeUtils.h"
+#include "Complexity/ComplexityClassEstimation.h"
 
 namespace Debug
 {
@@ -21,7 +22,20 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // sasko DFT test
+  if (1) // complexity estimation test
+  {
+    const auto f = [](const std::vector<double>& x) {
+      double g = 0;
+      for (const auto& a : x)
+        for (const auto& b : x)
+          for (const auto& c : x)
+            g += a + b + c;
+      return g;
+    };
+    EstimateComplexity(f);
+    return;
+  }
+  if (0) // sasko DFT test
   {
     Mat img1 = roicropmid(loadImage("Resources/test.png"), 1000, 1000);
     Mat img2;

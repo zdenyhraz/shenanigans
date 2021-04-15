@@ -12,10 +12,13 @@ public:
     TopLeft
   };
 
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y, bool newplot = true) { GetPlot(name).Plot(x, y, newplot); }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot = true) { GetPlot(name).Plot(x, ys, newplot); }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot = true) { GetPlot(name).Plot(x, y1, y2, newplot); }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot = true)
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y, bool newplot = false) { GetPlot(name).Plot(x, y, newplot); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot = false) { GetPlot(name).Plot(x, ys, newplot); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot = false)
+  {
+    GetPlot(name).Plot(x, y1, y2, newplot);
+  }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot = false)
   {
     GetPlot(name).Plot(x, y1s, y2s, newplot);
   }
