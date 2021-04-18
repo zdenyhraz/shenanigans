@@ -136,14 +136,16 @@ void WindowIPC::CalculateFlow()
   const auto path2 = ui.lineEdit_16->text().toStdString();
   Mat img1 = loadImage(path1);
   Mat img2 = loadImage(path2);
-  // Plot2D::Plot("FlowSample1", roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
-  // Plot2D::Plot("FlowSample2", roicrop(img2, img2.cols / 2, img2.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
-  auto debugipc = *globals->IPC;
-  debugipc.SetDebugMode(true);
-  debugipc.Calculate(roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()),
-                     roicrop(img2, img2.cols / 2, img2.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
 
-  return;
+  if (0)
+  {
+    auto debugipc = *globals->IPC;
+    debugipc.SetDebugMode(true);
+    debugipc.Calculate(roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()),
+                       roicrop(img2, img2.cols / 2, img2.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
+
+    return;
+  }
 
   const auto [flowX, flowY] = globals->IPC->CalculateFlow(img1, img2, 0.125);
   Mat flowM, flowP;

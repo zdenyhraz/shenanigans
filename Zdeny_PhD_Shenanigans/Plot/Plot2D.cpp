@@ -37,9 +37,7 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newplot)
   if (newplot)
     mCounter++;
 
-  if (!mInitialized || newplot)
-    Initialize(z[0].size(), z.size());
-
+  Initialize(z[0].size(), z.size());
   auto& windowPlot = Plot::plots[GetName()];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
@@ -64,7 +62,6 @@ void Plot2D::Initialize(int xcnt, int ycnt)
   if (idx != Plot::plots.end())
   {
     Reset();
-    mInitialized = true;
     return;
   }
 
@@ -106,12 +103,11 @@ void Plot2D::Initialize(int xcnt, int ycnt)
 
   windowPlot->show();
   QCoreApplication::processEvents();
-  mInitialized = true;
 }
 
 std::string Plot2D::GetName()
 {
-  return fmt::format("{}:{}", mName, mCounter);
+  return mCounter > 0 ? fmt::format("{}:{}", mName, mCounter) : fmt::format("{}", mName);
 }
 
 void Plot2D::Reset()

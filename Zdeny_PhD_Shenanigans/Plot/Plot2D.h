@@ -57,5 +57,4 @@ private:
   bool mShowAxisLabels = false;
   QCPColorGradient mColormapType = QCPColorGradient::gpJet;
   size_t mCounter = 0;
-  bool mInitialized = false;
 };

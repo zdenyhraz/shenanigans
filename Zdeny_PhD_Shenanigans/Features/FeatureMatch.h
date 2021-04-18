@@ -53,7 +53,7 @@ inline std::pair<Point2f, Point2f> GetFeatureMatchPoints(const DMatch& match, co
   return std::make_pair(kp1[match.queryIdx].pt, kp2[match.trainIdx].pt);
 }
 
-inline int GetFeatureTypeMatcher(const FeatureMatchData& data)
+inline DescriptorMatcher::MatcherType GetFeatureTypeMatcher(const FeatureMatchData& data)
 {
   switch (data.ftype)
   {
@@ -80,7 +80,7 @@ inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   throw std::runtime_error("Unknown feature type");
 }
 
-inline void exportFeaturesToCsv(const std::string& path, const std::vector<Point2f>& points, const std::vector<double>& speeds, const std::vector<double>& directions)
+inline void ExportFeaturesToCsv(const std::string& path, const std::vector<Point2f>& points, const std::vector<double>& speeds, const std::vector<double>& directions)
 {
   std::string pth = path + "features.csv";
   std::ofstream csv(pth, std::ios::out | std::ios::trunc);
@@ -223,7 +223,7 @@ try
     keypoints2_all[pic] = keypoints2;
 
     // matching descriptor vectors
-    auto matcher = DescriptorMatcher::create((DescriptorMatcher::MatcherType)GetFeatureTypeMatcher(data));
+    auto matcher = DescriptorMatcher::create(GetFeatureTypeMatcher(data));
     std::vector<std::vector<DMatch>> knn_matches;
     matcher->knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
