@@ -1,7 +1,7 @@
 #include "Plot2D.h"
 #include "stdafx.h"
 
-std::unordered_map<std::string, Plot2D> Plot2D::mPlots;
+std::map<std::string, Plot2D> Plot2D::mPlots;
 std::string Plot2D::mCurrentPlot = "Plot2D";
 
 Plot2D::Plot2D(const std::string& mName) : mName(mName)
@@ -17,7 +17,7 @@ Plot2D& Plot2D::GetPlot(const std::string& mName)
   return mPlots.at(mName);
 }
 
-void Plot2D::Plot(const Mat& z)
+void Plot2D::PlotCore(const Mat& z)
 {
   std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
   for (int r = 0; r < z.rows; r++)
@@ -25,11 +25,6 @@ void Plot2D::Plot(const Mat& z)
       zv[r][c] = z.at<float>(r, c);
 
   PlotCore(zv);
-}
-
-void Plot2D::Plot(const std::vector<std::vector<double>>& z)
-{
-  PlotCore(z);
 }
 
 void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)

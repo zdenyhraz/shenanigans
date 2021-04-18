@@ -6,8 +6,8 @@ class Plot2D
 public:
   // named setters
   static void Set(const std::string& name) { mCurrentPlot = name; }
-  static void Plot(const std::string& name, const Mat& z) { GetPlot(name).Plot(z); }
-  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z) { GetPlot(name).Plot(z); }
+  static void Plot(const std::string& name, const Mat& z) { GetPlot(name).PlotCore(z); }
+  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z) { GetPlot(name).PlotCore(z); }
   static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
   static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
   static void SetZlabel(const std::string& name, const std::string& zlabel) { GetPlot(name).mZlabel = zlabel; }
@@ -20,8 +20,8 @@ public:
   static void SetColorMapType(const std::string& name, QCPColorGradient colorMapType) { GetPlot(name).mColormapType = colorMapType; }
 
   // unnamed setters
-  // static void Plot(const Mat& z) { GetPlot().Plot(z); }
-  // static void Plot(const std::vector<std::vector<double>>& z) { GetPlot().Plot(z); }
+  static void Plot(const Mat& z) { GetPlot().PlotCore(z); }
+  static void Plot(const std::vector<std::vector<double>>& z) { GetPlot().PlotCore(z); }
   static void SetXlabel(const std::string& xlabel) { GetPlot().mXlabel = xlabel; }
   static void SetYlabel(const std::string& ylabel) { GetPlot().mYlabel = ylabel; }
   static void SetZlabel(const std::string& zlabel) { GetPlot().mZlabel = zlabel; }
@@ -34,15 +34,15 @@ public:
   static void SetColorMapType(QCPColorGradient colorMapType) { GetPlot().mColormapType = colorMapType; }
 
 private:
+  static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
+  static std::map<std::string, Plot2D> mPlots;
+  static std::string mCurrentPlot;
+
   Plot2D(const std::string& name);
-  void Plot(const Mat& z);
-  void Plot(const std::vector<std::vector<double>>& z);
+  void PlotCore(const Mat& z);
   void PlotCore(const std::vector<std::vector<double>>& z);
   void Initialize(int xcnt, int ycnt);
-  static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
 
-  static std::unordered_map<std::string, Plot2D> mPlots;
-  static std::string mCurrentPlot;
   std::string mName = "plot";
   std::string mXlabel = "x";
   std::string mYlabel = "y";
