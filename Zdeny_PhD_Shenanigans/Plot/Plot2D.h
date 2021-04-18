@@ -4,11 +4,10 @@
 class Plot2D
 {
 public:
-  static void Plot(const std::string& name, const Mat& z, bool newplot = false) { GetPlot(name).Plot(z, newplot); }
-  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z, bool newplot = false) { GetPlot(name).Plot(z, newplot); }
-  static void Reset(const std::string& name) { GetPlot(name).Reset(); }
-
   // named setters
+  static void Set(const std::string& name) { mCurrentPlot = name; }
+  static void Plot(const std::string& name, const Mat& z) { GetPlot(name).Plot(z); }
+  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z) { GetPlot(name).Plot(z); }
   static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
   static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
   static void SetZlabel(const std::string& name, const std::string& zlabel) { GetPlot(name).mZlabel = zlabel; }
@@ -21,6 +20,8 @@ public:
   static void SetColorMapType(const std::string& name, QCPColorGradient colorMapType) { GetPlot(name).mColormapType = colorMapType; }
 
   // unnamed setters
+  // static void Plot(const Mat& z) { GetPlot().Plot(z); }
+  // static void Plot(const std::vector<std::vector<double>>& z) { GetPlot().Plot(z); }
   static void SetXlabel(const std::string& xlabel) { GetPlot().mXlabel = xlabel; }
   static void SetYlabel(const std::string& ylabel) { GetPlot().mYlabel = ylabel; }
   static void SetZlabel(const std::string& zlabel) { GetPlot().mZlabel = zlabel; }
@@ -33,17 +34,15 @@ public:
   static void SetColorMapType(QCPColorGradient colorMapType) { GetPlot().mColormapType = colorMapType; }
 
 private:
-  void Plot(const Mat& z, bool newplot);
-  void Plot(const std::vector<std::vector<double>>& z, bool newplot);
   Plot2D(const std::string& name);
-  void Reset();
-  void PlotCore(const std::vector<std::vector<double>>& z, bool newplot);
+  void Plot(const Mat& z);
+  void Plot(const std::vector<std::vector<double>>& z);
+  void PlotCore(const std::vector<std::vector<double>>& z);
   void Initialize(int xcnt, int ycnt);
-  std::string GetName();
-  static Plot2D& GetPlot(const std::string& name = mLastAccessedPlot);
+  static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
 
   static std::unordered_map<std::string, Plot2D> mPlots;
-  static std::string mLastAccessedPlot;
+  static std::string mCurrentPlot;
   std::string mName = "plot";
   std::string mXlabel = "x";
   std::string mYlabel = "y";
@@ -53,8 +52,7 @@ private:
   double mYmin = 0;
   double mYmax = 1;
   double mColRowRatio = 0;
-  std::string mSavepath = {};
+  std::string mSavepath;
   bool mShowAxisLabels = false;
   QCPColorGradient mColormapType = QCPColorGradient::gpJet;
-  size_t mCounter = 0;
 };

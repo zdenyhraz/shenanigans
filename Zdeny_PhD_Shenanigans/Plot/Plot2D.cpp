@@ -2,43 +2,40 @@
 #include "stdafx.h"
 
 std::unordered_map<std::string, Plot2D> Plot2D::mPlots;
-std::string Plot2D::mLastAccessedPlot = "Plot2D";
+std::string Plot2D::mCurrentPlot = "Plot2D";
 
-Plot2D& Plot2D::GetPlot(const std::string& name)
-{
-  if (mPlots.count(name) == 0)
-    mPlots.emplace(name, Plot2D(name));
-
-  mLastAccessedPlot = name;
-  return mPlots.at(name);
-}
-
-Plot2D::Plot2D(const std::string& name) : mName(name)
+Plot2D::Plot2D(const std::string& mName) : mName(mName)
 {
 }
 
-void Plot2D::Plot(const Mat& z, bool newplot)
+Plot2D& Plot2D::GetPlot(const std::string& mName)
+{
+  if (mPlots.count(mName) == 0)
+    mPlots.emplace(mName, Plot2D(mName));
+
+  mCurrentPlot = mName;
+  return mPlots.at(mName);
+}
+
+void Plot2D::Plot(const Mat& z)
 {
   std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
   for (int r = 0; r < z.rows; r++)
     for (int c = 0; c < z.cols; c++)
       zv[r][c] = z.at<float>(r, c);
 
-  PlotCore(zv, newplot);
+  PlotCore(zv);
 }
 
-void Plot2D::Plot(const std::vector<std::vector<double>>& z, bool newplot)
+void Plot2D::Plot(const std::vector<std::vector<double>>& z)
 {
-  PlotCore(z, newplot);
+  PlotCore(z);
 }
 
-void Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newplot)
+void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
 {
-  if (newplot)
-    mCounter++;
-
   Initialize(z[0].size(), z.size());
-  auto& windowPlot = Plot::plots[GetName()];
+  auto& windowPlot = Plot::plots[mName];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
@@ -57,18 +54,20 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z, bool newplot)
 
 void Plot2D::Initialize(int xcnt, int ycnt)
 {
-  auto name = GetName();
-  auto idx = Plot::plots.find(name);
+  auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {
-    Reset();
+    LOG_TRACE("Resetting plot {}", mName);
+    auto& windowPlot = idx->second;
+    auto& plot = windowPlot->ui.widget;
+    plot->graph(0)->data().clear();
     return;
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
-  Plot::plots[name] = std::make_unique<WindowPlot>(name, colRowRatio, Plot::OnClose);
-  auto& windowPlot = Plot::plots[name];
-  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
+  Plot::plots[mName] = std::make_unique<WindowPlot>(mName, colRowRatio, Plot::OnClose);
+  auto& windowPlot = Plot::plots[mName];
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), mName));
 
   auto& plot = windowPlot->ui.widget;
   auto& colorMap = windowPlot->colorMap;
@@ -103,22 +102,4 @@ void Plot2D::Initialize(int xcnt, int ycnt)
 
   windowPlot->show();
   QCoreApplication::processEvents();
-}
-
-std::string Plot2D::GetName()
-{
-  return mCounter > 0 ? fmt::format("{}:{}", mName, mCounter) : fmt::format("{}", mName);
-}
-
-void Plot2D::Reset()
-{
-  auto name = GetName();
-  auto idx = Plot::plots.find(name);
-  if (idx == Plot::plots.end())
-    return;
-
-  LOG_TRACE("Resetting plot {}", name);
-  auto& windowPlot = idx->second;
-  auto& plot = windowPlot->ui.widget;
-  plot->graph(0)->data().clear();
 }
