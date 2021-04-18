@@ -618,12 +618,6 @@ Mat IterativePhaseCorrelation::ColorComposition(const Mat& img1, const Mat& img2
 
 void IterativePhaseCorrelation::ShowDebugStuff() const
 {
-  Plot2D::Reset("IPCdebug2D");
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-  Plot2D::Reset("IPCdebug2D");
-  Plot2D::SetColorMapType(QCPColorGradient::gpJet);
-
   // window
   if (1)
   {
@@ -641,10 +635,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // "/1DWindowsDFT.png");
 
     Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
-    Plot2D::Plot("IPCdebug2D", img, true);
+    Plot2D::Plot("IPCdebug2D", img);
 
     Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
-    Plot2D::Plot("IPCdebug2D", imgw, true);
+    Plot2D::Plot("IPCdebug2D", imgw);
 
     // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
     // Plot2D::Plot(Fourier::fftlogmagn(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
@@ -861,7 +855,7 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
     }
   }
 
-  Plot2D::Reset("IPCdebug2D");
+  Plot2D::Set("IPCdebug2D");
   Plot2D::SetXmin(xmin);
   Plot2D::SetXmax(xmax);
   Plot2D::SetYmin(ymin);
@@ -1308,7 +1302,7 @@ void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple
   const auto& [img1, img2, shift] = imagePairs[static_cast<size_t>(rand01() * imagePairs.size())];
   Mat concat;
   hconcat(img1, img2, concat);
-  Plot2D::Reset("Random image pair");
+  Plot2D::Set("Random image pair");
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot("Random image pair", concat, false);
+  Plot2D::Plot("Random image pair", concat);
 }
