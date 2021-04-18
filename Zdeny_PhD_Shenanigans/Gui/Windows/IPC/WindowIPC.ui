@@ -620,14 +620,14 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_15">
          <property name="text">
-          <string>../articles/swind/source/1/cropped/crop0.PNG</string>
+          <string>../articles/swind/source/1/cropped/crop1.PNG</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_16">
          <property name="text">
-          <string>../articles/swind/source/1/cropped/crop1.PNG</string>
+          <string>../articles/swind/source/1/cropped/crop2.PNG</string>
          </property>
         </widget>
        </item>

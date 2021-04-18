@@ -22,18 +22,18 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // complexity estimation test
+  if (0) // complexity estimation test
   {
     const auto f = [](const std::vector<double>& x) {
       double g = 0;
+
       for (const auto& a : x)
         for (const auto& b : x)
-          for (const auto& c : x)
-            g += a + b + c;
+          g += a + b;
+
       return g;
     };
     EstimateComplexity(f);
-    return;
   }
   if (0) // sasko DFT test
   {
@@ -64,20 +64,26 @@ void Debug(Globals* globals)
 
     Plot2D::Plot("re diff", abs(planes1[0] - planes2[0]));
     Plot2D::Plot("im diff", abs(planes1[1] - planes2[1]));
-
-    return;
   }
-  if (0) // ipc shift test
+  if (1) // ipc shift test
   {
-    Mat img1 = loadImage("../articles/dissertation/swind/twopeaks1src.png");
-    Mat img2 = loadImage("../articles/dissertation/swind/twopeaks2src.png");
+    Mat img1 = loadImage("../articles/swind/source/1/cropped/crop1.png");
+    Mat img2 = loadImage("../articles/swind/source/1/cropped/crop2.png");
 
-    int sajz = 512;
+    int sajz = 0;
     Size size(sajz, sajz);
-    if (sajz != -1 && img1.size() != size)
+    if (sajz > 0 && img1.size() != size)
     {
       resize(img1, img1, size);
       resize(img2, img2, size);
+    }
+
+    bool crop = true;
+    if (crop)
+    {
+      int cropsize = 128;
+      img1 = roicrop(img1, img1.cols * 0.6, img1.rows * 0.63, cropsize, cropsize);
+      img2 = roicrop(img2, img2.cols * 0.6, img2.rows * 0.63, cropsize, cropsize);
     }
 
     IterativePhaseCorrelation ipc = *globals->IPC;
@@ -130,7 +136,6 @@ void Debug(Globals* globals)
 
     showimg(fftCV, "image CV out");
     showimg(WrapOpenCVMatReal(fftBlaze), "image Blaze out");
-    return;
   }
   if (0) // opencv fft with blaze benchmark
   {
@@ -190,7 +195,6 @@ void Debug(Globals* globals)
     }
 
     LOG_DEBUG("One element equality test: {} & {}", imgOpenCVOut.at<float>(imgOpenCV.rows / 2, imgOpenCV.cols / 2), imgBlazeOut(imgOpenCV.rows / 2, imgOpenCV.cols / 2));
-    return;
   }
   if (0) // swind crop
   {
