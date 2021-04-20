@@ -30,7 +30,7 @@ void Debug(Globals* globals)
       for (int i = 0; i < 1e7; ++i) // constant portion
         g += i;
 
-      const int scale = 1;
+      const int scale = 3;
       for (int i = 0; i < scale; ++i) // scale
         for (const auto& a : x)       // n^2
           for (const auto& b : x)
@@ -38,7 +38,7 @@ void Debug(Globals* globals)
 
       return g;
     };
-    EstimateComplexity(f);
+    EstimateComplexity<double, double>(f);
     return;
   }
   if (0) // sasko DFT test

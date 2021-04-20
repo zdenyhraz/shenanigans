@@ -10,24 +10,20 @@ Mat LeastSquares(const Mat& Y, const Mat& X)
   return (X.t() * X).inv() * X.t() * Y;
 }
 
-void EstimateComplexity(const std::function<double(const std::vector<double>)>& f)
+template <typename I, typename O>
+void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, size_t nMin = 1000, size_t nMax = 10000, size_t nIters = 21, size_t timeIters = 3)
 {
   using clock = std::chrono::high_resolution_clock;
   using time_unit = std::chrono::nanoseconds;
 
-  const size_t nMin = 1000;
-  const size_t nMax = 5000;
-  const size_t nIters = 101;
   const size_t nStep = (nMax - nMin) / (nIters - 1);
-  const size_t timeIters = 3;
-
   std::vector<double> ns(nIters);
   std::vector<double> times(nIters);
   std::vector<double> timesZero(nIters);
   Mat Y = Mat::zeros(nIters, 1, CV_64F);
   Mat X = Mat::zeros(nIters, 2, CV_64F);
 
-  const std::vector<double> emptyVec;
+  const std::vector<I> emptyVec;
   std::ignore = f(emptyVec); // hot cache
   const auto constantStart = clock::now();
   for (int i = 0; i < timeIters; ++i)
@@ -40,7 +36,7 @@ void EstimateComplexity(const std::function<double(const std::vector<double>)>& 
     const int n = nMin + i * nStep;
     LOG_DEBUG("Measuring function complexity... (n={})", n);
 
-    std::vector<double> input(n);
+    std::vector<I> input(n);
     for (auto& in : input)
       in = rand01();
 
@@ -64,6 +60,7 @@ void EstimateComplexity(const std::function<double(const std::vector<double>)>& 
   Plot1D::SetXlabel("log(n)");
   Plot1D::SetYlabel("log(time)");
   Plot1D::SetYnames({"log(timesZero)", "log(timesZero) fit"});
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot("complexity log", GetCol(X, 1), {GetCol(Y, 0), GetCol(fit, 0)});
 
   const double estimatedScalar = std::exp(coeffs.at<double>(0, 0));
@@ -79,5 +76,6 @@ void EstimateComplexity(const std::function<double(const std::vector<double>)>& 
   Plot1D::SetYlabel("time");
   Plot1D::SetYnames({"times", "timesZero", "timesZero fit"});
   Plot1D::SetYmin(0);
+  Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot("complexity", ns, {times, timesZero, timesFit});
 }
