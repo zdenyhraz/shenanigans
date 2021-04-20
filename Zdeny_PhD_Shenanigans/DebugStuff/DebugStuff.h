@@ -22,18 +22,24 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (0) // complexity estimation test
+  if (1) // complexity estimation test
   {
     const auto f = [](const std::vector<double>& x) {
       double g = 0;
 
-      for (const auto& a : x)
-        for (const auto& b : x)
-          g += a + b;
+      for (int i = 0; i < 1e7; ++i) // constant portion
+        g += i;
+
+      const int scale = 1;
+      for (int i = 0; i < scale; ++i) // scale
+        for (const auto& a : x)       // n^2
+          for (const auto& b : x)
+            g += a - b;
 
       return g;
     };
     EstimateComplexity(f);
+    return;
   }
   if (0) // sasko DFT test
   {
@@ -65,7 +71,7 @@ void Debug(Globals* globals)
     Plot2D::Plot("re diff", abs(planes1[0] - planes2[0]));
     Plot2D::Plot("im diff", abs(planes1[1] - planes2[1]));
   }
-  if (1) // ipc shift test
+  if (0) // ipc shift test
   {
     Mat img1 = loadImage("../articles/swind/source/1/cropped/crop1.png");
     Mat img2 = loadImage("../articles/swind/source/1/cropped/crop2.png");

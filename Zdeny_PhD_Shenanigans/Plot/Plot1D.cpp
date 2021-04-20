@@ -129,7 +129,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
     return;
   }
 
-  LOG_DEBUG("Initializing plot {}", name);
+  LOG_TRACE("Initializing plot {}", name);
   Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
   auto& windowPlot = Plot::plots[name];
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
