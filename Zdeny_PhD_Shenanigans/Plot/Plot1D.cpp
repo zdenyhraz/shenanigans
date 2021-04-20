@@ -2,74 +2,29 @@
 #include "stdafx.h"
 
 std::unordered_map<std::string, Plot1D> Plot1D::mPlots;
-std::string Plot1D::mLastAccessedPlot = "Plot1D";
+std::string Plot1D::mCurrentPlot = "Plot1D";
 
-Plot1D& Plot1D::GetPlot(const std::string& name)
-{
-  if (mPlots.count(name) == 0)
-    mPlots.emplace(name, Plot1D(name));
-
-  mLastAccessedPlot = name;
-  return mPlots.at(name);
-}
-
-Plot1D::Plot1D(const std::string& name) : mName(name)
+Plot1D::Plot1D(const std::string& mName) : mName(mName)
 {
 }
 
-void Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot)
+Plot1D& Plot1D::GetPlot(const std::string& mName)
 {
-  PlotCore(x, {y}, {}, newplot);
+  if (mPlots.count(mName) == 0)
+    mPlots.emplace(mName, Plot1D(mName));
+
+  mCurrentPlot = mName;
+  return mPlots.at(mName);
 }
 
-void Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot)
+void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
 {
-  PlotCore(x, ys, {}, newplot);
-}
-
-void Plot1D::Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot)
-{
-  PlotCore(x, {y1}, {y2}, newplot);
-}
-
-void Plot1D::Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
-{
-  PlotCore(x, y1s, y2s, newplot);
-}
-
-void Plot1D::Plot(double x, double y)
-{
-  PlotCore(x, {y}, {});
-}
-
-void Plot1D::Plot(double x, const std::vector<double>& ys)
-{
-  PlotCore(x, ys, {});
-}
-
-void Plot1D::Plot(double x, double y1, double y2)
-{
-  PlotCore(x, {y1}, {y2});
-}
-
-void Plot1D::Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
-{
-  PlotCore(x, y1s, y2s);
-}
-
-void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot)
-{
-  if (newplot)
-    mCounter++;
-
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  if (!mInitialized || newplot)
-    Initialize(ycnt, y1cnt, y2cnt);
-
-  auto& windowPlot = Plot::plots[GetName()];
+  Initialize(ycnt, y1cnt, y2cnt);
+  auto& windowPlot = Plot::plots[mName];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -81,6 +36,16 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
   }
 
   plot->rescaleAxes();
+
+  if (mYmin != -std::numeric_limits<double>::infinity())
+    plot->yAxis->setRangeLower(mYmin);
+  if (mYmax != std::numeric_limits<double>::infinity())
+    plot->yAxis->setRangeUpper(mYmax);
+  if (mY2min != -std::numeric_limits<double>::infinity())
+    plot->yAxis2->setRangeLower(mY2min);
+  if (mY2max != std::numeric_limits<double>::infinity())
+    plot->yAxis2->setRangeUpper(mY2max);
+
   plot->replot();
   windowPlot->show();
 
@@ -94,10 +59,8 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  if (!mInitialized)
-    Initialize(ycnt, y1cnt, y2cnt);
-
-  auto& windowPlot = Plot::plots[GetName()];
+  Initialize(ycnt, y1cnt, y2cnt);
+  auto& windowPlot = Plot::plots[mName];
   auto& plot = windowPlot->ui.widget;
 
   for (int i = 0; i < ycnt; i++)
@@ -111,6 +74,16 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
   }
 
   plot->rescaleAxes();
+
+  if (mYmin != -std::numeric_limits<double>::infinity())
+    plot->yAxis->setRangeLower(mYmin);
+  if (mYmax != std::numeric_limits<double>::infinity())
+    plot->yAxis->setRangeUpper(mYmax);
+  if (mY2min != -std::numeric_limits<double>::infinity())
+    plot->yAxis2->setRangeLower(mY2min);
+  if (mY2max != std::numeric_limits<double>::infinity())
+    plot->yAxis2->setRangeUpper(mY2max);
+
   plot->replot();
   windowPlot->show();
 
@@ -120,19 +93,21 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
 
 void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 {
-  auto name = GetName();
-  auto idx = Plot::plots.find(name);
+  auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {
-    Reset();
-    mInitialized = true;
+    LOG_TRACE("Resetting plot {}", mName);
+    auto& windowPlot = idx->second;
+    auto& plot = windowPlot->ui.widget;
+    for (int i = 0; i < plot->graphCount(); i++)
+      plot->graph(i)->data().data()->clear();
     return;
   }
 
-  LOG_TRACE("Initializing plot {}", name);
-  Plot::plots[name] = std::make_unique<WindowPlot>(name, 1.3, Plot::OnClose);
-  auto& windowPlot = Plot::plots[name];
-  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), name));
+  LOG_TRACE("Initializing plot {}", mName);
+  Plot::plots[mName] = std::make_unique<WindowPlot>(mName, 1.3, Plot::OnClose);
+  auto& windowPlot = Plot::plots[mName];
+  windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), mName));
   auto& plot = windowPlot->ui.widget;
 
   plot->xAxis->setTickLabelFont(Plot::fontTicks);
@@ -212,29 +187,4 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 
   windowPlot->show();
   QCoreApplication::processEvents();
-  mInitialized = true;
-}
-
-std::string Plot1D::GetName()
-{
-  return mCounter > 0 ? fmt::format("{}:{}", mName, mCounter) : mName;
-}
-
-void Plot1D::Reset()
-{
-  auto name = GetName();
-  auto idx = Plot::plots.find(name);
-  if (idx == Plot::plots.end())
-    return;
-
-  LOG_TRACE("Resetting plot {}", name);
-  auto& windowPlot = idx->second;
-  auto& plot = windowPlot->ui.widget;
-
-  for (int i = 0; i < plot->graphCount(); i++)
-    plot->graph(i)->data().data()->clear();
-
-  plot->rescaleAxes();
-  plot->replot();
-  windowPlot->show();
 }

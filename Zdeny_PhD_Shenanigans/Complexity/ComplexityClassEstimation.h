@@ -60,7 +60,7 @@ void EstimateComplexity(const std::function<double(const std::vector<double>)>& 
   Mat coeffs = LeastSquares(Y, X);
   Mat fit = X * coeffs;
 
-  Plot1D::Reset("complexity log");
+  Plot1D::Set("complexity log");
   Plot1D::SetXlabel("log(n)");
   Plot1D::SetYlabel("log(time)");
   Plot1D::SetYnames({"log(timesZero)", "log(timesZero) fit"});
@@ -74,9 +74,10 @@ void EstimateComplexity(const std::function<double(const std::vector<double>)>& 
   for (int i = 0; i < fit.rows; ++i)
     timesFit[i] = std::exp(fit.at<double>(i, 0));
 
-  Plot1D::Reset("complexity");
+  Plot1D::Set("complexity");
   Plot1D::SetXlabel("n");
   Plot1D::SetYlabel("time");
   Plot1D::SetYnames({"times", "timesZero", "timesZero fit"});
+  Plot1D::SetYmin(0);
   Plot1D::Plot("complexity", ns, {times, timesZero, timesFit});
 }

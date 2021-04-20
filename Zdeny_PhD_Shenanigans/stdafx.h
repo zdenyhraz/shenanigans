@@ -29,6 +29,7 @@
 #include <memory>
 #include <regex>
 #include <ctime>
+#include <limits>
 // OpenMP
 #include <omp.h>
 // OpenCV

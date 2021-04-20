@@ -4,20 +4,9 @@
 class Plot2D
 {
 public:
-  // named setters
   static void Set(const std::string& name) { mCurrentPlot = name; }
   static void Plot(const std::string& name, const Mat& z) { GetPlot(name).PlotCore(z); }
   static void Plot(const std::string& name, const std::vector<std::vector<double>>& z) { GetPlot(name).PlotCore(z); }
-  static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
-  static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
-  static void SetZlabel(const std::string& name, const std::string& zlabel) { GetPlot(name).mZlabel = zlabel; }
-  static void SetXmin(const std::string& name, double xmin) { GetPlot(name).mXmin = xmin; }
-  static void SetXmax(const std::string& name, double xmax) { GetPlot(name).mXmax = xmax; }
-  static void SetYmin(const std::string& name, double ymin) { GetPlot(name).mYmin = ymin; }
-  static void SetYmax(const std::string& name, double ymax) { GetPlot(name).mYmax = ymax; }
-  static void SetColRowRatio(const std::string& name, double colRowRatio) { GetPlot(name).mColRowRatio = colRowRatio; }
-  static void SetSavePath(const std::string& name, const std::string& savePath) { GetPlot(name).mSavepath = savePath; }
-  static void SetColorMapType(const std::string& name, QCPColorGradient colorMapType) { GetPlot(name).mColormapType = colorMapType; }
 
   // unnamed setters
   static void Plot(const Mat& z) { GetPlot().PlotCore(z); }
