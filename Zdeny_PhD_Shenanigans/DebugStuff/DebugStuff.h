@@ -22,7 +22,7 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // complexity estimation test
+  if (0) // complexity estimation test
   {
     const auto f = [](const std::vector<double>& x) {
       double g = 0;

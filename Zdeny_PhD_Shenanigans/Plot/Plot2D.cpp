@@ -52,10 +52,7 @@ void Plot2D::Initialize(int xcnt, int ycnt)
   auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {
-    LOG_TRACE("Resetting plot {}", mName);
-    auto& windowPlot = idx->second;
-    auto& plot = windowPlot->ui.widget;
-    plot->graph(0)->data().clear();
+    ClearCore();
     return;
   }
 
@@ -97,4 +94,16 @@ void Plot2D::Initialize(int xcnt, int ycnt)
 
   windowPlot->show();
   QCoreApplication::processEvents();
+}
+
+void Plot2D::ClearCore()
+{
+  auto idx = Plot::plots.find(mName);
+  if (idx != Plot::plots.end())
+  {
+    LOG_TRACE("Clearing plot {}", mName);
+    auto& windowPlot = idx->second;
+    auto& plot = windowPlot->ui.widget;
+    plot->graph(0)->data().clear();
+  }
 }
