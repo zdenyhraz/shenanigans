@@ -1,9 +1,12 @@
 #pragma once
 #include "Core/functionsBaseCV.h"
 
-inline Mat vectToMat(std::vector<double> &vec) { return Mat(vec).reshape(0, vec.size()); }
+inline Mat vectToMat(std::vector<double>& vec)
+{
+  return Mat(vec).reshape(0, vec.size());
+}
 
-inline std::vector<Mat> vect2ToMats(std::vector<std::vector<double>> &vec)
+inline std::vector<Mat> vect2ToMats(std::vector<std::vector<double>>& vec)
 {
   std::vector<Mat> result(vec.size());
   for (int i = 0; i < vec.size(); i++)
@@ -11,7 +14,7 @@ inline std::vector<Mat> vect2ToMats(std::vector<std::vector<double>> &vec)
   return result;
 }
 
-inline std::vector<double> mat1ToVect(const Mat &mat)
+inline std::vector<double> mat1ToVect(const Mat& mat)
 {
   std::vector<double> result(mat.rows, 0);
   for (int r = 0; r < mat.rows; r++)
@@ -19,7 +22,7 @@ inline std::vector<double> mat1ToVect(const Mat &mat)
   return result;
 }
 
-inline std::vector<std::vector<double>> matToVect2(const Mat &mat)
+inline std::vector<std::vector<double>> matToVect2(const Mat& mat)
 {
   std::vector<std::vector<double>> result = zerovect2(mat.rows, mat.cols, 0.);
   for (int r = 0; r < mat.rows; r++)
@@ -28,7 +31,7 @@ inline std::vector<std::vector<double>> matToVect2(const Mat &mat)
   return result;
 }
 
-inline Mat matFromVector(std::vector<double> &vec, int cols)
+inline Mat matFromVector(std::vector<double>& vec, int cols)
 {
   int rows = vec.size();
   Mat result = Mat::zeros(rows, cols, CV_32F);
@@ -42,7 +45,7 @@ inline Mat matFromVector(std::vector<double> &vec, int cols)
   return result;
 }
 
-inline Mat matFromVector(const std::vector<std::vector<double>> &vec, bool transpose = false)
+inline Mat matFromVector(const std::vector<std::vector<double>>& vec, bool transpose = false)
 {
   if (transpose)
   {
@@ -68,7 +71,7 @@ inline Mat matFromVector(const std::vector<std::vector<double>> &vec, bool trans
   }
 }
 
-inline std::vector<double> meanHorizontal(const std::vector<std::vector<double>> &vec)
+inline std::vector<double> meanHorizontal(const std::vector<std::vector<double>>& vec)
 {
   std::vector<double> meansH(vec.size(), 0);
   Mat mat = matFromVector(vec);
@@ -84,7 +87,7 @@ inline std::vector<double> meanHorizontal(const std::vector<std::vector<double>>
   return meansH;
 }
 
-inline std::vector<double> meanVertical(const std::vector<std::vector<double>> &vec)
+inline std::vector<double> meanVertical(const std::vector<std::vector<double>>& vec)
 {
   std::vector<double> meansV(vec[0].size(), 0);
   Mat mat = matFromVector(vec);
@@ -98,4 +101,20 @@ inline std::vector<double> meanVertical(const std::vector<std::vector<double>> &
     meansV[c] /= mat.rows;
   }
   return meansV;
+}
+
+inline std::vector<double> GetRow(const Mat& mat, int row)
+{
+  std::vector<double> out(mat.cols);
+  for (int c = 0; c < mat.cols; ++c)
+    out[c] = mat.at<double>(row, c);
+  return out;
+}
+
+inline std::vector<double> GetCol(const Mat& mat, int col)
+{
+  std::vector<double> out(mat.rows);
+  for (int r = 0; r < mat.rows; ++r)
+    out[r] = mat.at<double>(r, col);
+  return out;
 }

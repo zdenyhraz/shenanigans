@@ -54,7 +54,7 @@ public:
   static void SetLegendPosition(LegendPosition legendPosition) { GetPlot().mLegendPosition = legendPosition; }
   static void SetYLogarithmic(bool yLogarithmic) { GetPlot().mYLogarithmic = yLogarithmic; }
   static void SetY2Logarithmic(bool y2Logarithmic) { GetPlot().mY2Logarithmic = y2Logarithmic; }
-  static void SetScatterStyle(bool scatterStype) { GetPlot().mScatterStyle = scatterStype; }
+  static void SetScatterStyle(bool scatterStyle) { GetPlot().mScatterStyle = scatterStyle; }
 
 private:
   Plot1D(const std::string& name);
