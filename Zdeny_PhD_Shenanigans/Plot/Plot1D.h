@@ -13,6 +13,7 @@ public:
   };
 
   static void Set(const std::string& name) { mCurrentPlot = name; }
+  static void Clear(const std::string& name) { GetPlot(name).ClearCore(); }
   static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y) { GetPlot(name).PlotCore(x, {y}, {}); }
   static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys) { GetPlot(name).PlotCore(x, ys); }
   static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) { GetPlot(name).PlotCore(x, {y1}, {y2}); }
@@ -26,6 +27,7 @@ public:
   static void Plot(const std::string& name, double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot(name).PlotCore(x, y1s, y2s); }
 
   // unnamed setters
+  static void Clear() { GetPlot().ClearCore(); }
   static void Plot(const std::vector<double>& x, const std::vector<double>& y) { GetPlot().PlotCore(x, {y}, {}); }
   static void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys) { GetPlot().PlotCore(x, ys); }
   static void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) { GetPlot().PlotCore(x, {y1}, {y2}); }
@@ -59,7 +61,8 @@ private:
   Plot1D(const std::string& name);
   void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s = {});
   void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s = {});
-  void Initialize(int ycnt, int y1cnt, int y2cnt);
+  void Initialize(int ycnt, int y1cnt, int y2cnt, bool clear);
+  void ClearCore();
 
   std::string mName = "plot";
   std::string mXlabel = "x";

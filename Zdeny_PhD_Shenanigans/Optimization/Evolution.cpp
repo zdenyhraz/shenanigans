@@ -87,6 +87,7 @@ try
   if (mPlotOutput)
   {
     Plot1D::Set("Evolution");
+    Plot1D::Clear();
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("error");
     Plot1D::SetY2label("best-average relative difference");

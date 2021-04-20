@@ -31,6 +31,7 @@ private:
   void PlotCore(const Mat& z);
   void PlotCore(const std::vector<std::vector<double>>& z);
   void Initialize(int xcnt, int ycnt);
+  void ClearCore();
 
   std::string mName = "plot";
   std::string mXlabel = "x";

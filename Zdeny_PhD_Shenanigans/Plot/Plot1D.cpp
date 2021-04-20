@@ -23,7 +23,7 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  Initialize(ycnt, y1cnt, y2cnt);
+  Initialize(ycnt, y1cnt, y2cnt, true);
   auto& windowPlot = Plot::plots[mName];
   auto& plot = windowPlot->ui.widget;
 
@@ -59,7 +59,7 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
 
-  Initialize(ycnt, y1cnt, y2cnt);
+  Initialize(ycnt, y1cnt, y2cnt, false);
   auto& windowPlot = Plot::plots[mName];
   auto& plot = windowPlot->ui.widget;
 
@@ -91,16 +91,13 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
     plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
 }
 
-void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
+void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
 {
   auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {
-    LOG_TRACE("Resetting plot {}", mName);
-    auto& windowPlot = idx->second;
-    auto& plot = windowPlot->ui.widget;
-    for (int i = 0; i < plot->graphCount(); i++)
-      plot->graph(i)->data().data()->clear();
+    if (clear)
+      ClearCore();
     return;
   }
 
@@ -187,4 +184,17 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt)
 
   windowPlot->show();
   QCoreApplication::processEvents();
+}
+
+void Plot1D::ClearCore()
+{
+  auto idx = Plot::plots.find(mName);
+  if (idx != Plot::plots.end())
+  {
+    LOG_TRACE("Clearing plot {}", mName);
+    auto& windowPlot = idx->second;
+    auto& plot = windowPlot->ui.widget;
+    for (int i = 0; i < plot->graphCount(); i++)
+      plot->graph(i)->data().data()->clear();
+  }
 }
