@@ -72,10 +72,13 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCI1", mDebugDirectory + "/I1.png");
-    Plot2D::SetSavePath("IPCI2", mDebugDirectory + "/I2.png");
-    Plot2D::Plot("IPCI1", image1);
-    Plot2D::Plot("IPCI2", image2);
+    Plot2D::Set("IPCI1");
+    Plot2D::SetSavePath(mDebugDirectory + "/I1.png");
+    Plot2D::Plot(image1);
+
+    Plot2D::Set("IPCI2");
+    Plot2D::SetSavePath(mDebugDirectory + "/I2.png");
+    Plot2D::Plot(image2);
   }
 
   ApplyWindow(image1);
@@ -93,8 +96,9 @@ try
 
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCL3", mDebugDirectory + "/L3.png");
-    Plot2D::Plot("IPCL3", L3);
+    Plot2D::Set("IPCL3");
+    Plot2D::SetSavePath(mDebugDirectory + "/L3.png");
+    Plot2D::Plot(L3);
   }
 
   if (mAccuracyType == AccuracyType::Pixel)
@@ -126,8 +130,9 @@ try
   Point2f L2mid(L2.cols / 2, L2.rows / 2);
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCL2", mDebugDirectory + "/L2.png");
-    Plot2D::Plot("IPCL2", L2);
+    Plot2D::Set("IPCL2");
+    Plot2D::SetSavePath(mDebugDirectory + "/L2.png");
+    Plot2D::Plot(L2);
   }
 
   // L2U
@@ -135,8 +140,9 @@ try
   Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
   if (mDebugMode)
   {
-    Plot2D::SetSavePath("IPCL2U", mDebugDirectory + "/L2U.png");
-    Plot2D::Plot("IPCL2U", L2U);
+    Plot2D::Set("IPCL2U");
+    Plot2D::SetSavePath(mDebugDirectory + "/L2U.png");
+    Plot2D::Plot(L2U);
 
     if (0)
     {
@@ -144,11 +150,12 @@ try
       resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
       resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, INTER_LINEAR);
       resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, INTER_CUBIC);
-      Plot2D::SetSavePath("IPCL2UN", mDebugDirectory + "/L2UN.png");
+
+      // Plot2D::SetSavePath("IPCL2UN", mDebugDirectory + "/L2UN.png");
       Plot2D::Plot("IPCL2UN", nearest);
-      Plot2D::SetSavePath("IPCL2UL", mDebugDirectory + "/L2UL.png");
+      // Plot2D::SetSavePath("IPCL2UL", mDebugDirectory + "/L2UL.png");
       Plot2D::Plot("IPCL2UL", linear);
-      Plot2D::SetSavePath("IPCL2UC", mDebugDirectory + "/L2UC.png");
+      // Plot2D::SetSavePath("IPCL2UC", mDebugDirectory + "/L2UC.png");
       Plot2D::Plot("IPCL2UC", cubic);
     }
   }
@@ -165,8 +172,9 @@ try
     Point2f L1peak;
     if (mDebugMode)
     {
-      Plot2D::SetSavePath("IPCL1B", mDebugDirectory + "/L1B.png");
-      Plot2D::Plot("IPCL1B", CalculateL1(L2U, L2Upeak, L1size));
+      Plot2D::Set("IPCL1B");
+      Plot2D::SetSavePath(mDebugDirectory + "/L1B.png");
+      Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size));
     }
 
     for (int iter = 0; iter < mMaxIterations; ++iter)
@@ -182,8 +190,9 @@ try
       {
         if (mDebugMode)
         {
-          Plot2D::SetSavePath("IPCL1A", mDebugDirectory + "/L1A.png");
-          Plot2D::Plot("IPCL1A", L1);
+          Plot2D::Set("IPCL1A");
+          Plot2D::SetSavePath(mDebugDirectory + "/L1A.png");
+          Plot2D::Plot(L1);
         }
 
         return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
@@ -634,10 +643,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"Rect", "Hann"}, Plot::pens, mDebugDirectory +
     // "/1DWindowsDFT.png");
 
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
+    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
     Plot2D::Plot("IPCdebug2D", img);
 
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
+    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
     Plot2D::Plot("IPCdebug2D", imgw);
 
     // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
@@ -720,10 +729,10 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
     normalize(imgfR, imgfR, 0.0, 1.0, NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, NORM_MINMAX);
 
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
+    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::Plot("IPCdebug2D", imgfR);
 
-    Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
+    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
     Plot2D::Plot("IPCdebug2D", imgfG);
   }
 
@@ -896,11 +905,11 @@ void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::strin
     progress++;
   }
 
-  Plot1D::Reset("ImageSizeAccuracyDependence");
+  Plot1D::Set("ImageSizeAccuracyDependence");
   Plot1D::SetXlabel("Image size");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::SetYLogarithmic(true);
-  Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy, false);
+  Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy);
 }
 
 void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
@@ -937,11 +946,11 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
     progress++;
   }
 
-  Plot1D::Reset("UpsampleCoefficientAccuracyDependence");
+  Plot1D::Set("UpsampleCoefficientAccuracyDependence");
   Plot1D::SetXlabel("Upsample coefficient");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::SetYLogarithmic(true);
-  Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy, false);
+  Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy);
 }
 
 void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
@@ -976,10 +985,10 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
     progress++;
   }
 
-  Plot1D::Reset("NoiseAccuracyDependence");
+  Plot1D::Set("NoiseAccuracyDependence");
   Plot1D::SetXlabel("Noise stdev");
   Plot1D::SetYlabel("Average pixel error");
-  Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy, false);
+  Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy);
 }
 
 std::vector<Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory) const
@@ -1211,23 +1220,23 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>
     }
   }
 
-  Plot1D::Reset("IPCshift");
+  Plot1D::Set("IPCshift");
   Plot1D::SetXlabel("reference shift");
   Plot1D::SetYlabel("calculated shift");
   Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
   Plot1D::SetPens(
       {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-  Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter}, false);
+  Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter});
 
-  Plot1D::Reset("IPCshifterror");
+  Plot1D::Set("IPCshifterror");
   Plot1D::SetXlabel("reference shift");
   Plot1D::SetYlabel("pixel error");
   Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
   Plot1D::SetPens(
       {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-  Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError}, false);
+  Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError});
 }
 
 std::vector<Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const

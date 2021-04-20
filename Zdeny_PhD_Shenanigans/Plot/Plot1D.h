@@ -12,37 +12,28 @@ public:
     TopLeft
   };
 
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y, bool newplot = false) { GetPlot(name).Plot(x, y, newplot); }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot = false) { GetPlot(name).Plot(x, ys, newplot); }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot = false)
+  static void Set(const std::string& name) { mCurrentPlot = name; }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y) { GetPlot(name).PlotCore(x, {y}, {}); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& ys) { GetPlot(name).PlotCore(x, ys); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) { GetPlot(name).PlotCore(x, {y1}, {y2}); }
+  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
   {
-    GetPlot(name).Plot(x, y1, y2, newplot);
+    GetPlot(name).PlotCore(x, y1s, y2s);
   }
-  static void Plot(const std::string& name, const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot = false)
-  {
-    GetPlot(name).Plot(x, y1s, y2s, newplot);
-  }
-  static void Plot(const std::string& name, double x, double y) { GetPlot(name).Plot(x, y); }
-  static void Plot(const std::string& name, double x, const std::vector<double>& ys) { GetPlot(name).Plot(x, ys); }
-  static void Plot(const std::string& name, double x, double y1, double y2) { GetPlot(name).Plot(x, y1, y2); }
-  static void Plot(const std::string& name, double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot(name).Plot(x, y1s, y2s); }
-  static void Reset(const std::string& name) { GetPlot(name).Reset(); }
-
-  // named setters
-  static void SetXlabel(const std::string& name, const std::string& xlabel) { GetPlot(name).mXlabel = xlabel; }
-  static void SetYlabel(const std::string& name, const std::string& ylabel) { GetPlot(name).mYlabel = ylabel; }
-  static void SetY2label(const std::string& name, const std::string& y2label) { GetPlot(name).mY2label = y2label; }
-  static void SetYnames(const std::string& name, const std::vector<std::string>& ynames) { GetPlot(name).mYnames = ynames; }
-  static void SetY2names(const std::string& name, const std::vector<std::string>& y2names) { GetPlot(name).mY2names = y2names; }
-  static void SetPens(const std::string& name, const std::vector<QPen>& pens) { GetPlot(name).mPens = pens; }
-  static void SetSavePath(const std::string& name, const std::string& savePath) { GetPlot(name).mSavepath = savePath; }
-  static void SetLegendVisible(const std::string& name, bool legendVisible) { GetPlot(name).mLegendVisible = legendVisible; }
-  static void SetLegendPosition(const std::string& name, LegendPosition legendPosition) { GetPlot(name).mLegendPosition = legendPosition; }
-  static void SetYLogarithmic(const std::string& name, bool yLogarithmic) { GetPlot(name).mYLogarithmic = yLogarithmic; }
-  static void SetY2Logarithmic(const std::string& name, bool y2Logarithmic) { GetPlot(name).mY2Logarithmic = y2Logarithmic; }
-  static void SetScatterStyle(const std::string& name, bool scatterStype) { GetPlot(name).mScatterStyle = scatterStype; }
+  static void Plot(const std::string& name, double x, double y) { GetPlot(name).PlotCore(x, {y}); }
+  static void Plot(const std::string& name, double x, const std::vector<double>& ys) { GetPlot(name).PlotCore(x, ys); }
+  static void Plot(const std::string& name, double x, double y1, double y2) { GetPlot(name).PlotCore(x, {y1}, {y2}); }
+  static void Plot(const std::string& name, double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot(name).PlotCore(x, y1s, y2s); }
 
   // unnamed setters
+  static void Plot(const std::vector<double>& x, const std::vector<double>& y) { GetPlot().PlotCore(x, {y}, {}); }
+  static void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys) { GetPlot().PlotCore(x, ys); }
+  static void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2) { GetPlot().PlotCore(x, {y1}, {y2}); }
+  static void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s) { GetPlot().PlotCore(x, y1s, y2s); }
+  static void Plot(double x, double y) { GetPlot().PlotCore(x, {y}); }
+  static void Plot(double x, const std::vector<double>& ys) { GetPlot().PlotCore(x, ys); }
+  static void Plot(double x, double y1, double y2) { GetPlot().PlotCore(x, {y1}, {y2}); }
+  static void Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s) { GetPlot().PlotCore(x, y1s, y2s); }
   static void SetXlabel(const std::string& xlabel) { GetPlot().mXlabel = xlabel; }
   static void SetYlabel(const std::string& ylabel) { GetPlot().mYlabel = ylabel; }
   static void SetY2label(const std::string& y2label) { GetPlot().mY2label = y2label; }
@@ -55,26 +46,21 @@ public:
   static void SetYLogarithmic(bool yLogarithmic) { GetPlot().mYLogarithmic = yLogarithmic; }
   static void SetY2Logarithmic(bool y2Logarithmic) { GetPlot().mY2Logarithmic = y2Logarithmic; }
   static void SetScatterStyle(bool scatterStyle) { GetPlot().mScatterStyle = scatterStyle; }
+  static void SetYmin(double ymin) { GetPlot().mYmin = ymin; }
+  static void SetYmax(double ymax) { GetPlot().mYmax = ymax; }
+  static void SetY2min(double y2min) { GetPlot().mY2min = y2min; }
+  static void SetY2max(double y2max) { GetPlot().mY2max = y2max; }
 
 private:
-  Plot1D(const std::string& name);
-  void Plot(const std::vector<double>& x, const std::vector<double>& y, bool newplot);
-  void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& ys, bool newplot);
-  void Plot(const std::vector<double>& x, const std::vector<double>& y1, const std::vector<double>& y2, bool newplot);
-  void Plot(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot);
-  void Plot(double x, double y);
-  void Plot(double x, const std::vector<double>& ys);
-  void Plot(double x, double y1, double y2);
-  void Plot(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
-  void Reset();
-  void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s, bool newplot);
-  void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s);
-  void Initialize(int ycnt, int y1cnt, int y2cnt);
-  std::string GetName();
-  static Plot1D& GetPlot(const std::string& name = mLastAccessedPlot);
-
+  static Plot1D& GetPlot(const std::string& name = mCurrentPlot);
   static std::unordered_map<std::string, Plot1D> mPlots;
-  static std::string mLastAccessedPlot;
+  static std::string mCurrentPlot;
+
+  Plot1D(const std::string& name);
+  void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s = {});
+  void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s = {});
+  void Initialize(int ycnt, int y1cnt, int y2cnt);
+
   std::string mName = "plot";
   std::string mXlabel = "x";
   std::string mYlabel = "y";
@@ -88,6 +74,8 @@ private:
   bool mYLogarithmic = false;
   bool mY2Logarithmic = false;
   bool mScatterStyle = false;
-  size_t mCounter = 0;
-  bool mInitialized = false;
+  double mYmin = -std::numeric_limits<double>::infinity();
+  double mYmax = std::numeric_limits<double>::infinity();
+  double mY2min = -std::numeric_limits<double>::infinity();
+  double mY2max = std::numeric_limits<double>::infinity();
 };

@@ -280,11 +280,11 @@ void Debug(Globals* globals)
       }
     }
 
-    Plot1D::Reset("FFT CPU vs GPU");
+    Plot1D::Set("FFT CPU vs GPU");
     Plot1D::SetYnames({"fft cpu", "fft gpu"});
     Plot1D::SetYlabel("time per DFT [ms]");
     Plot1D::SetXlabel("image size");
-    Plot1D::Plot("FFT CPU vs GPU", sizes, {timeCpu, timeGpu}, false);
+    Plot1D::Plot("FFT CPU vs GPU", sizes, {timeCpu, timeGpu});
     return;
   }
   if (0) // cuda
