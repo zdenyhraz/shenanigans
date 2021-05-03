@@ -26,25 +26,42 @@ void Debug(Globals* globals)
   if (1) // ellipse fit optimization
   {
     const double imgsize = 1000;
-    const Point2f ellipseCenter(400, 600);
-    const Size ellipseSize(350, 200);
-    const float ellipseAngle = 37;
+    const double border = 500;
+    Point2f ellipseCenter;
+    Size ellipseSize;
+    float ellipseAngle;
     Mat ellipseImg = Mat::zeros(imgsize, imgsize, CV_32F);
-    ellipse(ellipseImg, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1), -1, LINE_AA);
 
-    const auto f = [&](const std::vector<double>& params) {
+    do
+    {
+      ellipseCenter = Point2f(imgsize / 2 + rand01() * (imgsize / 2 + border), imgsize / 2 + rand01() * (imgsize / 2 + border));
+      ellipseSize = Size(std::max(rand01() * imgsize, 20.), std::max(rand01() * imgsize, 20.));
+      ellipseAngle = rand11() * 90;
+      ellipse(ellipseImg, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1), -1, LINE_AA);
+    } while (sum(ellipseImg)[0] < 100);
+
+    const auto f = [&](const std::vector<double>& params)
+    {
       Point2f center(params[0], params[1]);
       Size size(params[2], params[3]);
       float angle = params[4];
       Mat img = Mat::zeros(imgsize, imgsize, CV_32F);
       ellipse(img, RotatedRect(center, size, angle), Scalar(1), -1, LINE_AA);
-      return sum(abs(img - ellipseImg))[0];
+      auto imgDiff = sum(abs(img - ellipseImg))[0] / sum(ellipseImg)[0];
+      auto sumDiff = abs(sum(img)[0] - sum(ellipseImg)[0]) / sum(ellipseImg)[0];
+      auto cenDiff = findCentroid(img) - findCentroid(ellipseImg);
+      cenDiff.x = abs(cenDiff.x) / img.cols;
+      cenDiff.y = abs(cenDiff.y) / img.rows;
+      const auto cost = imgDiff + cenDiff.x + cenDiff.y + sumDiff;
+      return std::isfinite(cost) ? cost : std::numeric_limits<float>::max();
     };
 
     Evolution evo(5);
-    evo.mNP = 20;
-    evo.mLB = {0, 0, 10, 10, -90};
-    evo.mUB = {imgsize, imgsize, imgsize, imgsize, 90};
+    evo.mNP = 100;
+    evo.mMutStrat = Evolution::MutationStrategy::BEST1;
+    evo.mLB = {-border, -border, 1, 1, -90};
+    evo.mUB = {imgsize + border, imgsize + border, imgsize, imgsize, 90};
+    evo.optimalFitness = 1e-2;
     evo.SetParameterNames({"X", "Y", "A", "B", "R"});
 
     const auto res = evo.Optimize(f);
@@ -58,13 +75,28 @@ void Debug(Globals* globals)
     const Size calcSize(res[2], res[3]);
     const float calcAngle = res[4];
 
+    Mat ellipseImgCalculated = Mat::zeros(imgsize, imgsize, CV_32F);
+    ellipse(ellipseImgCalculated, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(1), -1, LINE_AA);
+
+    auto imgDiff = sum(abs(ellipseImgCalculated - ellipseImg))[0] / sum(ellipseImg)[0];
+    auto sumDiff = abs(sum(ellipseImgCalculated)[0] - sum(ellipseImg)[0]) / sum(ellipseImg)[0];
+    auto cenDiff = findCentroid(ellipseImgCalculated) - findCentroid(ellipseImg);
+    cenDiff.x = abs(cenDiff.x) / ellipseImg.cols;
+    cenDiff.y = abs(cenDiff.y) / ellipseImg.rows;
+
+    LOG_DEBUG("ImgDiff: {:.1e}, SumDiff: {:.1e}, CenDiff: {:.1e}", imgDiff, sumDiff, cenDiff.x + cenDiff.y);
     LOG_INFO("True ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", ellipseCenter.x, ellipseCenter.y, ellipseSize.width, ellipseSize.height, ellipseAngle);
     LOG_SUCCESS("Calculated ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", calcCenter.x, calcCenter.y, calcSize.width, calcSize.height, calcAngle);
+    LOG_SUCCESS("Errors center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", abs(ellipseCenter.x - calcCenter.x), abs(ellipseCenter.y - calcCenter.y), abs(ellipseSize.width - calcSize.width),
+                abs(ellipseSize.height - calcSize.height), abs(ellipseAngle - calcAngle));
 
     Mat ellipseImgColor = Mat::zeros(imgsize, imgsize, CV_32FC3);
-    ellipse(ellipseImgColor, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1, 1, 1), -1, LINE_AA);
-    ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0, 0, 1), 3, LINE_AA);
-    showimg(ellipseImgColor, "ellipse fit");
+    ellipse(ellipseImgColor, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(0.8, 0.8, 0.8), -1, LINE_AA);          // ellipse
+    ellipse(ellipseImgColor, RotatedRect(findCentroid(ellipseImg), Size(10, 10), 0), Scalar(1, 0, 0), -1, LINE_AA);               // ellipse centroid
+    ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0.7, 0, 0.8), 3, LINE_AA);                      // calc ellipse
+    ellipse(ellipseImgColor, RotatedRect(findCentroid(ellipseImgCalculated), Size(10, 10), 0), Scalar(0.7, 0, 0.8), -1, LINE_AA); // calc ellipse centroid
+
+    showimg(ellipseImgColor, "ellipse fit", 0, 0, 1, 1000);
     return;
   }
   if (0) // ellipse fit least squares
@@ -140,7 +172,8 @@ void Debug(Globals* globals)
   }
   if (0) // complexity estimation test
   {
-    const auto f = [](const std::vector<double>& x) {
+    const auto f = [](const std::vector<double>& x)
+    {
       double g = 0;
 
       for (int i = 0; i < 1e7; ++i) // constant portion
