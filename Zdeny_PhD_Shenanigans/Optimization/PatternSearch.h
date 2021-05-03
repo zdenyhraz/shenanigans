@@ -10,5 +10,6 @@ struct PatternSearch : public OptimizationAlgorithm
   double stepReducer = 0.5;
 
   PatternSearch(int N) : OptimizationAlgorithm(N){};
-  OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid) override;
+  OptimizationResult Optimize(
+      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
 };

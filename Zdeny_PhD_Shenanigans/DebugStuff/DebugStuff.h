@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Zdeny_PhD_Shenanigans.h"
 #include "Optimization/Evolution.h"
+#include "Optimization/PatternSearch.h"
 #include "Optimization/OptimizationTestFunctions.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
@@ -62,7 +63,7 @@ void Debug(Globals* globals)
 
     Mat ellipseImgColor = Mat::zeros(imgsize, imgsize, CV_32FC3);
     ellipse(ellipseImgColor, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1, 1, 1), -1, LINE_AA);
-    ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0, 0, 1), 5, LINE_AA);
+    ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0, 0, 1), 3, LINE_AA);
     showimg(ellipseImgColor, "ellipse fit");
     return;
   }
