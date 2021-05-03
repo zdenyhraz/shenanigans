@@ -22,6 +22,121 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
+  if (1) // ellipse fit optimization
+  {
+    const double imgsize = 1000;
+    const Point2f ellipseCenter(400, 600);
+    const Size ellipseSize(350, 200);
+    const float ellipseAngle = 37;
+    Mat ellipseImg = Mat::zeros(imgsize, imgsize, CV_32F);
+    ellipse(ellipseImg, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1), -1, LINE_AA);
+
+    const auto f = [&](const std::vector<double>& params) {
+      Point2f center(params[0], params[1]);
+      Size size(params[2], params[3]);
+      float angle = params[4];
+      Mat img = Mat::zeros(imgsize, imgsize, CV_32F);
+      ellipse(img, RotatedRect(center, size, angle), Scalar(1), -1, LINE_AA);
+      return sum(abs(img - ellipseImg))[0];
+    };
+
+    Evolution evo(5);
+    evo.mNP = 20;
+    evo.mLB = {0, 0, 10, 10, -90};
+    evo.mUB = {imgsize, imgsize, imgsize, imgsize, 90};
+    evo.SetParameterNames({"X", "Y", "A", "B", "R"});
+
+    const auto res = evo.Optimize(f);
+    if (res.empty())
+    {
+      LOG_ERROR("Optimization failed");
+      return;
+    }
+
+    const Point2f calcCenter(res[0], res[1]);
+    const Size calcSize(res[2], res[3]);
+    const float calcAngle = res[4];
+
+    LOG_INFO("True ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", ellipseCenter.x, ellipseCenter.y, ellipseSize.width, ellipseSize.height, ellipseAngle);
+    LOG_SUCCESS("Calculated ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", calcCenter.x, calcCenter.y, calcSize.width, calcSize.height, calcAngle);
+
+    Mat ellipseImgColor = Mat::zeros(imgsize, imgsize, CV_32FC3);
+    ellipse(ellipseImgColor, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1, 1, 1), -1, LINE_AA);
+    ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0, 0, 1), 5, LINE_AA);
+    showimg(ellipseImgColor, "ellipse fit");
+    return;
+  }
+  if (0) // ellipse fit least squares
+  {
+    const int size = 100;
+    Point2d center(50, 50);
+    std::vector<Point2d> points;
+    points.push_back({center.x + 10.1, center.y - 0.4});
+    points.push_back({center.x + 7.2, center.y - 7.4});
+    points.push_back({center.x + 0.2, center.y - 10.3});
+    points.push_back({center.x + -7.1, center.y - 7.3});
+
+    const size_t pointsCount = points.size();
+    Mat img = Mat::zeros(size, size, CV_32F);
+
+    for (const auto& point : points)
+      img.at<float>(point.y, point.x) = 1;
+
+    Mat X(pointsCount, 5, CV_32F);
+    Mat Y(pointsCount, 1, CV_32F);
+
+    for (int r = 0; r < X.rows; ++r)
+    {
+      const auto& pt = points[r];
+
+      for (int c = 0; c < X.cols; ++c)
+      {
+        if (c == 0)
+          X.at<float>(r, c) = pt.x * pt.y;
+        else if (c == 1)
+          X.at<float>(r, c) = sqr(pt.y);
+        else if (c == 2)
+          X.at<float>(r, c) = pt.x;
+        else if (c == 3)
+          X.at<float>(r, c) = pt.y;
+        else if (c == 4)
+          X.at<float>(r, c) = 1;
+      }
+      Y.at<float>(r, 0) = -sqr(pt.x);
+    }
+
+    Mat Beta = (X.t() * X).inv() * X.t() * Y;
+
+    float A = 1.;
+    float B = Beta.at<float>(0, 0);
+    float C = Beta.at<float>(1, 0);
+    float D = Beta.at<float>(2, 0);
+    float E = Beta.at<float>(3, 0);
+    float F = Beta.at<float>(4, 0);
+
+    // math.stackexchange.com/a/423272
+    float R = 0.5 * std::atan2(B, A - C);
+    float Ar = A * sqr(cos(R)) + B * cos(R) * sin(R) + C * sqr(sin(R));
+    float Cr = A * sqr(sin(R)) - B * cos(R) * sin(R) + C * sqr(cos(R));
+    float Dr = D * cos(R) + E * sin(R);
+    float Er = -D * sin(R) + E * cos(R);
+
+    float centerXr = -Dr / (2. * Ar);
+    float centerYr = -Er / (2. * Cr);
+    float excX;
+    float excY;
+
+    float centerX = centerXr * cos(R) - centerYr * sin(R);
+    float centerY = centerXr * sin(R) + centerYr * cos(R);
+
+    Plot2D::Set("ellipse fit");
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+    Plot2D::Plot(img);
+
+    LOG_DEBUG("Calculated ellipse center be4 rotation: [{:.1f} , {:.1f}], angle: {:.1f}", centerXr, centerYr, toDegrees(R));
+    LOG_INFO("True ellipse center: [{:.1f} , {:.1f}]", center.x, center.y);
+    LOG_SUCCESS("Calculated ellipse center: [{:.1f} , {:.1f}]", centerX, centerY);
+  }
   if (0) // complexity estimation test
   {
     const auto f = [](const std::vector<double>& x) {
