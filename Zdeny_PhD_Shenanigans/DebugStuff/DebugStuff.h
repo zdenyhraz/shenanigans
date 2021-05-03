@@ -34,11 +34,11 @@ void Debug(Globals* globals)
 
     do
     {
-      ellipseCenter = Point2f(imgsize / 2 + rand01() * (imgsize / 2 + border), imgsize / 2 + rand01() * (imgsize / 2 + border));
+      ellipseCenter = Point2f(imgsize / 2 + rand11() * (imgsize / 2 + border), imgsize / 2 + rand11() * (imgsize / 2 + border));
       ellipseSize = Size(std::max(rand01() * imgsize, 20.), std::max(rand01() * imgsize, 20.));
       ellipseAngle = rand11() * 90;
       ellipse(ellipseImg, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(1), -1, LINE_AA);
-    } while (sum(ellipseImg)[0] < 100);
+    } while (sum(ellipseImg)[0] < 1000);
 
     const auto f = [&](const std::vector<double>& params)
     {
@@ -58,7 +58,7 @@ void Debug(Globals* globals)
 
     Evolution evo(5);
     evo.mNP = 100;
-    evo.mMutStrat = Evolution::MutationStrategy::BEST1;
+    evo.mMutStrat = Evolution::MutationStrategy::RAND1;
     evo.mLB = {-border, -border, 1, 1, -90};
     evo.mUB = {imgsize + border, imgsize + border, imgsize, imgsize, 90};
     evo.optimalFitness = 1e-2;
@@ -87,11 +87,20 @@ void Debug(Globals* globals)
     LOG_DEBUG("ImgDiff: {:.1e}, SumDiff: {:.1e}, CenDiff: {:.1e}", imgDiff, sumDiff, cenDiff.x + cenDiff.y);
     LOG_INFO("True ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", ellipseCenter.x, ellipseCenter.y, ellipseSize.width, ellipseSize.height, ellipseAngle);
     LOG_SUCCESS("Calculated ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", calcCenter.x, calcCenter.y, calcSize.width, calcSize.height, calcAngle);
-    LOG_SUCCESS("Errors center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", abs(ellipseCenter.x - calcCenter.x), abs(ellipseCenter.y - calcCenter.y), abs(ellipseSize.width - calcSize.width),
+    LOG_WARNING("Errors: center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", abs(ellipseCenter.x - calcCenter.x), abs(ellipseCenter.y - calcCenter.y), abs(ellipseSize.width - calcSize.width),
                 abs(ellipseSize.height - calcSize.height), abs(ellipseAngle - calcAngle));
 
     Mat ellipseImgColor = Mat::zeros(imgsize, imgsize, CV_32FC3);
-    ellipse(ellipseImgColor, RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), Scalar(0.8, 0.8, 0.8), -1, LINE_AA);          // ellipse
+    for (int r = 0; r < ellipseImgColor.rows; ++r)
+    {
+      for (int c = 0; c < ellipseImgColor.cols; ++c)
+      {
+        ellipseImgColor.at<Vec3f>(r, c)[0] = ellipseImg.at<float>(r, c);
+        ellipseImgColor.at<Vec3f>(r, c)[1] = ellipseImg.at<float>(r, c);
+        ellipseImgColor.at<Vec3f>(r, c)[2] = ellipseImg.at<float>(r, c);
+      }
+    }
+
     ellipse(ellipseImgColor, RotatedRect(findCentroid(ellipseImg), Size(10, 10), 0), Scalar(1, 0, 0), -1, LINE_AA);               // ellipse centroid
     ellipse(ellipseImgColor, RotatedRect(calcCenter, calcSize, calcAngle), Scalar(0.7, 0, 0.8), 3, LINE_AA);                      // calc ellipse
     ellipse(ellipseImgColor, RotatedRect(findCentroid(ellipseImgCalculated), Size(10, 10), 0), Scalar(0.7, 0, 0.8), -1, LINE_AA); // calc ellipse centroid
