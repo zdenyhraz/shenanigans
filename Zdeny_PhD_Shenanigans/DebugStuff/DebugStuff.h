@@ -30,10 +30,11 @@ void Debug(Globals* globals)
     Point2f ellipseCenter;
     Size ellipseSize;
     float ellipseAngle;
-    Mat ellipseImg = Mat::zeros(imgsize, imgsize, CV_32F);
+    Mat ellipseImg;
 
     do
     {
+      ellipseImg = Mat::zeros(imgsize, imgsize, CV_32F);
       ellipseCenter = Point2f(imgsize / 2 + rand11() * (imgsize / 2 + border), imgsize / 2 + rand11() * (imgsize / 2 + border));
       ellipseSize = Size(std::max(rand01() * imgsize, 20.), std::max(rand01() * imgsize, 20.));
       ellipseAngle = rand11() * 90;
