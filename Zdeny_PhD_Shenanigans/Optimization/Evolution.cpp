@@ -92,8 +92,8 @@ try
     Plot1D::SetYlabel("error");
     Plot1D::SetY2label("best-average relative difference");
     Plot1D::SetYnames({"obj", "valid"});
-    Plot1D::SetY2names({"reldiff", "reldiff thr"});
-    Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1], QPen(Plot::orange, Plot::pt / 2, Qt::DotLine)});
+    Plot1D::SetY2names({"reldiff"});
+    Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
   }
 }
 catch (const std::exception& e)
@@ -184,7 +184,7 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
   }
 
   if (mPlotOutput)
-    Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference, mRelativeDifferenceThreshold});
+    Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
 }
 
 void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)
