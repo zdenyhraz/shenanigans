@@ -2,7 +2,7 @@ IndentWidth: 2
 TabWidth: 2
 UseTab: Never
 Language: Cpp
-Standard: Cpp11
+Standard: c++17
 BreakBeforeBraces: Allman
 ColumnLimit: 200
 PointerAlignment: Left
@@ -14,3 +14,8 @@ AllowShortFunctionsOnASingleLine: InlineOnly
 FixNamespaceComments: false
 SortIncludes: false
 AlwaysBreakTemplateDeclarations: true
+IndentPPDirectives: BeforeHash
+AlwaysBreakTemplateDeclarations: Yes
+AlignAfterOpenBracket: DontAlign
+IncludeBlocks: Preserve
+AllowShortIfStatementsOnASingleLine: Never
