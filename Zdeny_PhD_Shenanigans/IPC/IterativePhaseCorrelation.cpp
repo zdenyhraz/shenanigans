@@ -413,14 +413,14 @@ inline void IterativePhaseCorrelation::ApplyWindow(Mat& image) const
 
 inline Mat IterativePhaseCorrelation::CalculateFourierTransform(Mat&& image) const
 {
-  if (mCudaFFT)
+  if constexpr (mCudaFFT)
     return Fourier::cufft(std::move(image), mPackedFFT);
   return Fourier::fft(std::move(image), mPackedFFT);
 }
 
 inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Mat&& dft2) const
 {
-  if (mPackedFFT)
+  if constexpr (mPackedFFT)
   {
     Mat cps;
     mulSpectrums(dft2, dft1, cps, 0, true);
@@ -458,7 +458,7 @@ inline void IterativePhaseCorrelation::ApplyBandpass(Mat& crosspower) const
   if (mBandpassL <= 0 && mBandpassH >= 1)
     return;
 
-  if (mPackedFFT)
+  if constexpr (mPackedFFT)
     multiply(crosspower, mFrequencyBandpass(Rect(0, 0, crosspower.cols, crosspower.rows)), crosspower);
   else
     multiply(crosspower, mFrequencyBandpass, crosspower);
@@ -473,7 +473,7 @@ inline void IterativePhaseCorrelation::CalculateFrequencyBandpass()
 inline Mat IterativePhaseCorrelation::CalculateL3(Mat&& crosspower) const
 {
   Mat L3;
-  if (mCudaFFT)
+  if constexpr (mCudaFFT)
     L3 = Fourier::icufft(std::move(crosspower), mPackedFFT);
   else
     L3 = Fourier::ifft(std::move(crosspower), mPackedFFT);
