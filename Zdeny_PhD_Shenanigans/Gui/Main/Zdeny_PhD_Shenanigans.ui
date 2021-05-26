@@ -400,7 +400,7 @@
   </action>
   <action name="actionFeatures">
    <property name="text">
-    <string>Swind</string>
+    <string>S-wind</string>
    </property>
   </action>
   <action name="actionSnake">
