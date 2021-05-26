@@ -7,7 +7,7 @@
 #include "Draw/combinepics.h"
 #include "Utils/export.h"
 
-static constexpr int piccnt = 8;                // number of pics
+static constexpr int piccnt = 9;                // number of pics
 static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
 static constexpr double dt = 11.8;              // dt seconds temporally adjacent pics
 static constexpr double arrow_scale = 12;
@@ -31,7 +31,6 @@ struct FeatureMatchData
   double minSpeed;
   double maxSpeed;
   std::string path;
-  std::string pathout;
   double overlapdistance;
   bool drawOverlapCircles = false;
   double ratioThreshold = 0.7;
@@ -51,19 +50,6 @@ inline Point2f GetFeatureMatchShift(const DMatch& match, const std::vector<KeyPo
 inline std::pair<Point2f, Point2f> GetFeatureMatchPoints(const DMatch& match, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2)
 {
   return std::make_pair(kp1[match.queryIdx].pt, kp2[match.trainIdx].pt);
-}
-
-inline DescriptorMatcher::MatcherType GetFeatureTypeMatcher(const FeatureMatchData& data)
-{
-  switch (data.ftype)
-  {
-  case FeatureType::SURF:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE;
-  case FeatureType::SIFT:
-    return DescriptorMatcher::MatcherType::BRUTEFORCE;
-  }
-
-  throw std::runtime_error("Unknown feature type");
 }
 
 inline Ptr<Feature2D> GetFeatureDetector(const FeatureMatchData& data)
@@ -93,7 +79,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<Point
 }
 
 inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<size_t, size_t, DMatch, bool>>& matches_all, const std::vector<std::vector<KeyPoint>>& kp1_all,
-                                  const std::vector<std::vector<KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
+    const std::vector<std::vector<KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   Mat out;
@@ -105,7 +91,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   double minspd = std::numeric_limits<double>::max();
   double maxspd = std::numeric_limits<double>::min();
   std::vector<bool> shouldDraw(matches_all.size(), false);
-  const double removeSpd = 418;
+  std::vector<double> removeSpeeds = {};
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -132,7 +118,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     const double spd = magnitude(shift) * kmpp / dt;
     const double dir = toDegrees(atan2(-shift.y, shift.x));
 
-    if (abs(spd - removeSpd) < 1)
+    if (std::any_of(removeSpeeds.begin(), removeSpeeds.end(), [&](const auto& remspd) { return std::abs(spd - remspd) < 1; }))
       continue;
 
     if (spd < data.minSpeed)
@@ -147,7 +133,9 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
       continue;
     }
 
-    if (dir < -170 || dir > -100)
+    static constexpr double kMinDir = -170;
+    static constexpr double kMaxDir = -120;
+    if (dir < kMinDir || dir > kMaxDir)
     {
       LOG_TRACE("Skipping match {}: direction {} deg off limits", idx, dir);
       continue;
@@ -207,11 +195,12 @@ try
 #pragma omp parallel for
   for (int pic = 1; pic < piccnt - 1; pic++)
   {
-    std::string path1 = data.path + std::to_string(pic) + ".PNG";
-    std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
-    LOG_DEBUG(fmt::format("Matching images {} & {}", path1, path2));
+    const std::string path1 = data.path + std::to_string(pic) + ".PNG";
+    const std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
     Mat img1 = imread(path1, IMREAD_GRAYSCALE);
     Mat img2 = imread(path2, IMREAD_GRAYSCALE);
+
+    LOG_DEBUG(fmt::format("Matching images {} & {}", path1, path2));
 
     // detect the keypoints, compute the descriptors
     Ptr<Feature2D> detector = GetFeatureDetector(data);
@@ -223,7 +212,7 @@ try
     keypoints2_all[pic] = keypoints2;
 
     // matching descriptor vectors
-    auto matcher = DescriptorMatcher::create(GetFeatureTypeMatcher(data));
+    auto matcher = DescriptorMatcher::create(DescriptorMatcher::MatcherType::BRUTEFORCE);
     std::vector<std::vector<DMatch>> knn_matches;
     matcher->knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
@@ -262,15 +251,17 @@ try
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({idx++, pic, match, false});
 
-    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(), [&](const auto& a, const auto& b) {
-      const auto& [idx1, pic1, match1, ignore1] = a;
-      const auto& [idx2, pic2, match2, ignore2] = b;
-      const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
-      const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-      const auto spd1 = magnitude(shift1) * kmpp / dt;
-      const auto spd2 = magnitude(shift2) * kmpp / dt;
-      return spd1 > spd2;
-    });
+    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(),
+        [&](const auto& a, const auto& b)
+        {
+          const auto& [idx1, pic1, match1, ignore1] = a;
+          const auto& [idx2, pic2, match2, ignore2] = b;
+          const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
+          const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
+          const auto spd1 = magnitude(shift1) * kmpp / dt;
+          const auto spd2 = magnitude(shift2) * kmpp / dt;
+          return spd1 > spd2;
+        });
 
     size_t newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)

@@ -18,7 +18,6 @@ void WindowFeatures::FeatureMatch()
   data.matchcnt = ui.lineEdit_3->text().toInt();
   data.minSpeed = ui.lineEdit_6->text().toDouble();
   data.maxSpeed = ui.lineEdit_7->text().toDouble();
-  data.pathout = ui.lineEdit_12->text().toStdString();
   data.overlapdistance = ui.lineEdit_13->text().toDouble();
   data.drawOverlapCircles = ui.checkBox->isChecked();
   data.ratioThreshold = ui.lineEdit_14->text().toDouble();
