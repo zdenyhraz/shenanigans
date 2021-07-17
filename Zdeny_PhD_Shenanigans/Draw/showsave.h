@@ -76,4 +76,5 @@ inline void saveimg(std::string path, const Mat& sourceimgIn, bool bilinear = fa
   }
 
   imwrite(path, saveimg);
+  LOG_DEBUG("Saved image to {}", path);
 }

@@ -261,8 +261,8 @@ try
           const auto& [idx2, pic2, match2, ignore2] = b;
           const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
           const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-          const auto spd1 = magnitude(shift1) * kmpp / dt;
-          const auto spd2 = magnitude(shift2) * kmpp / dt;
+          const auto spd1 = magnitude(shift1);
+          const auto spd2 = magnitude(shift2);
           return spd1 > spd2;
         });
 
