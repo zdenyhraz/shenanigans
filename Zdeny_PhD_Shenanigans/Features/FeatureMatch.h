@@ -86,12 +86,12 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   cvtColor(img, out, COLOR_GRAY2BGR);
 
   if (data.upscale != 1)
-    resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LANCZOS4);
+    resize(out, out, Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, INTER_LINEAR);
 
   double minspd = std::numeric_limits<double>::max();
   double maxspd = std::numeric_limits<double>::min();
   std::vector<bool> shouldDraw(matches_all.size(), false);
-  std::vector<double> removeSpeeds = {};
+  std::vector<double> removeSpeeds = {}; // 639, 652
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -141,11 +141,8 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
       continue;
     }
 
-    if (spd < minspd)
-      minspd = spd;
-
-    if (spd > maxspd)
-      maxspd = spd;
+    minspd = std::min(spd, minspd);
+    maxspd = std::max(spd, maxspd);
 
     shouldDraw[idx] = true;
   }

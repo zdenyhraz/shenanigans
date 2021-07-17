@@ -23,7 +23,31 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // ellipse fit optimization
+  if (1) // Haar wavelet plot
+  {
+    Mat haarX(1000, 1000, CV_32F);
+    Mat haarY(1000, 1000, CV_32F);
+
+    for (int r = 0; r < haarX.rows; ++r)
+    {
+      for (int c = 0; c < haarX.cols; ++c)
+      {
+        haarX.at<float>(r, c) = c > haarX.cols / 2 ? 1 : -1;
+        haarY.at<float>(r, c) = r > haarY.rows / 2 ? 1 : -1;
+      }
+    }
+
+    Plot2D::Set("haarX");
+    Plot2D::SetSavePath("Debug/haarX.png");
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+    Plot2D::Plot(haarX);
+
+    Plot2D::Set("haarY");
+    Plot2D::SetSavePath("Debug/haarY.png");
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+    Plot2D::Plot(haarY);
+  }
+  if (0) // ellipse fit optimization
   {
     const double imgsize = 1000;
     const double border = 500;
@@ -89,7 +113,7 @@ void Debug(Globals* globals)
     LOG_INFO("True ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", ellipseCenter.x, ellipseCenter.y, ellipseSize.width, ellipseSize.height, ellipseAngle);
     LOG_SUCCESS("Calculated ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", calcCenter.x, calcCenter.y, calcSize.width, calcSize.height, calcAngle);
     LOG_WARNING("Errors: center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", abs(ellipseCenter.x - calcCenter.x), abs(ellipseCenter.y - calcCenter.y), abs(ellipseSize.width - calcSize.width),
-                abs(ellipseSize.height - calcSize.height), abs(ellipseAngle - calcAngle));
+        abs(ellipseSize.height - calcSize.height), abs(ellipseAngle - calcAngle));
 
     Mat ellipseImgColor = Mat::zeros(imgsize, imgsize, CV_32FC3);
     for (int r = 0; r < ellipseImgColor.rows; ++r)
