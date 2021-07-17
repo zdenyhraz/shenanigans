@@ -93,6 +93,12 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   std::vector<bool> shouldDraw(matches_all.size(), false);
   std::vector<double> removeSpeeds = {}; // 639, 652
 
+  if (false)
+    for (int r = 0; r < out.rows; ++r)
+      for (int c = 0; c < out.cols; ++c)
+        if (((float)c / img.cols + (float)r / img.rows) / 2 < 0.5)
+          out.at<Vec3b>(r, c) = (out.at<Vec3b>(r, c) + Vec3b(0, 0, 255)) / 2;
+
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
     const auto& [idx, pic, match, overlap] = *it;
@@ -102,7 +108,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     const auto& point = kp1_all[pic][match.queryIdx].pt;
 
-    if (data.mask && (point.y < img.rows * 0.45))
+    if (data.mask && (((float)point.x / img.cols + (float)point.y / img.rows) / 2 < 0.5))
     {
       LOG_TRACE("Skipping match {}: masked out", idx);
       continue;
@@ -123,13 +129,13 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
 
     if (spd < data.minSpeed)
     {
-      LOG_TRACE("Skipping match {}: speed {} km/s too slow", idx, spd);
+      LOG_TRACE("Skipping match {}: speed {:.2f} km/s too slow", idx, spd);
       continue;
     }
 
     if (spd > data.maxSpeed)
     {
-      LOG_WARNING("Skipping match {}: speed {} km/s too fast", idx, spd);
+      LOG_WARNING("Skipping match {}: speed {:.2f} km/s too fast", idx, spd);
       continue;
     }
 
@@ -137,7 +143,7 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
     static constexpr double kMaxDir = -120;
     if (dir < kMinDir || dir > kMaxDir)
     {
-      LOG_TRACE("Skipping match {}: direction {} deg off limits", idx, dir);
+      LOG_TRACE("Skipping match {}: direction {:.2f} deg off limits", idx, dir);
       continue;
     }
 
