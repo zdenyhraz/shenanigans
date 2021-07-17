@@ -304,8 +304,8 @@ try
   showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
   showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
 
-  saveimg(data.mask ? "../articles/swind/arrows/arrowsIdxMasked.png" : "../articles/swind/arrows/arrowsIdx.png", arrowsIdx);
-  saveimg(data.mask ? "../articles/swind/arrows/arrowsSpdMasked.png" : "../articles/swind/arrows/arrowsSpd.png", arrowsSpd);
+  saveimg("Debug/arrowsIdx.png", arrowsIdx);
+  saveimg("Debug/arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
