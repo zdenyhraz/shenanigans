@@ -25,8 +25,8 @@ void Debug(Globals* globals)
 
   if (1) // CC/PC dizertacka pics
   {
-    Mat img1 = loadImage("Resources/split1f.png");
-    Mat img2 = loadImage("Resources/split2f.png");
+    Mat img1 = loadImage("Resources/shape.png");
+    Mat img2 = loadImage("Resources/shapes.png");
 
     addnoise(img1, 0.1);
     addnoise(img2, 0.1);
@@ -40,8 +40,8 @@ void Debug(Globals* globals)
     CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
     PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
 
-    CC.SetL2size(25);
-    PC.SetL2size(25);
+    CC.SetL2size(256);
+    PC.SetL2size(256);
 
     const auto shiftCC = CC.Calculate(img1, img2);
     const auto shiftPC = PC.Calculate(img1, img2);
