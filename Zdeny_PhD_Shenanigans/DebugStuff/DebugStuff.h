@@ -23,21 +23,25 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // IPC dizertacka pics
+  if (1) // CC/PC dizertacka pics
   {
     Mat img1 = loadImage("Resources/shapef.png");
     Mat img2 = loadImage("Resources/shapesf.png");
-    // Shift(img2, std::floor(0.195 * img2.cols), std::floor(0.26 * img2.rows));
 
     addnoise(img1, 0.2);
     addnoise(img2, 0.2);
 
-    IterativePhaseCorrelation ipc = *globals->IPC;
-    ipc.SetSize(img1.rows, img1.cols);
-    ipc.SetDebugMode(true);
+    IterativePhaseCorrelation<true, false> PC(img1.size());
+    IterativePhaseCorrelation<true, true> CC(img1.size());
 
-    const auto shiftCalc = ipc.Calculate(img1, img2);
-    LOG_DEBUG("Calculated IPC shift: {}", shiftCalc);
+    PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+    CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
+
+    const auto shiftPC = PC.Calculate(img1, img2);
+    const auto shiftCC = CC.Calculate(img1, img2);
+
+    LOG_DEBUG("Calculated PC shift: {}", shiftPC);
+    LOG_DEBUG("Calculated CC shift: {}", shiftCC);
   }
   if (0) // fourier inverse coeff test
   {
@@ -308,9 +312,8 @@ void Debug(Globals* globals)
 
     IterativePhaseCorrelation ipc = *globals->IPC;
     ipc.SetSize(img1.rows, img1.cols);
-    ipc.SetDebugMode(true);
-    // ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
-    // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
+    // ipc.SetWindowType(IterativePhaseCorrelation<>::WindowType::Hann);
+    // ipc.SetBandpassType(IterativePhaseCorrelation<>::BandpassType::Gaussian);
 
     const auto shiftCalc = ipc.Calculate(img1, img2);
     LOG_DEBUG("IPC shift: [{}]", shiftCalc);
@@ -449,7 +452,6 @@ void Debug(Globals* globals)
 
     IterativePhaseCorrelation ipc = *globals->IPC;
     ipc.SetSize(img1.size());
-    ipc.SetDebugMode(true);
     Mat aligned = ipc.Align(img1, img2);
     showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
   }

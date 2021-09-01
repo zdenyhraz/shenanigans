@@ -27,8 +27,9 @@ struct DiffrotSettings
   bool video = false;
 };
 
-DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation &ipc, FitsTime &time, const DiffrotSettings &drset);
+DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, FitsTime& time, const DiffrotSettings& drset);
 
-void loadFitsFuzzy(FitsImage &pic, FitsTime &time, int &lag);
+void loadFitsFuzzy(FitsImage& pic, FitsTime& time, int& lag);
 
-void calculateOmegas(const FitsImage &pic1, const FitsImage &pic2, std::vector<double> &shiftsX, std::vector<double> &shiftsY, std::vector<double> &thetas, std::vector<double> &omegasX, std::vector<double> &omegasY, const IterativePhaseCorrelation &ipc, const DiffrotSettings &drset, double R, double theta0, double dy, int lag1, int lag2, int predShift);
+void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& shiftsY, std::vector<double>& thetas, std::vector<double>& omegasX,
+    std::vector<double>& omegasY, const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift);
