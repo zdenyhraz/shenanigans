@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "diffrotResults.h"
 
-void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filename, DiffrotResults* dr, IterativePhaseCorrelation* ipc)
+void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filename, DiffrotResults* dr, IterativePhaseCorrelation<>* ipc)
 {
   LOG_FUNCTION("SaveDiffrotResultsToFile");
 

@@ -122,7 +122,6 @@
     <ClCompile Include="Gui\Windows\Filtering\WindowFiltering.cpp" />
     <ClCompile Include="Gui\Windows\FITS\WindowFITS.cpp" />
     <ClCompile Include="IPC\ipcAux.cpp" />
-    <ClCompile Include="IPC\IterativePhaseCorrelation.cpp" />
     <ClCompile Include="Optimization\Evolution.cpp" />
     <ClCompile Include="Optimization\GraphOptimization.cpp" />
     <ClCompile Include="InverseMap\inverseMapping.cpp" />

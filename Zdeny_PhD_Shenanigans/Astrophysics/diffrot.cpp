@@ -4,7 +4,7 @@
 #include "Plot/Plot2D.h"
 #include "Utils/vectmat.h"
 
-DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, FitsTime& time, const DiffrotSettings& drset)
+DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, FitsTime& time, const DiffrotSettings& drset)
 {
   int dy = drset.vFov / (drset.ys - 1);
   std::vector<std::vector<double>> thetas2D;
@@ -110,7 +110,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, Fit
 }
 
 inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& shiftsY, std::vector<double>& thetas, std::vector<double>& omegasX,
-                            std::vector<double>& omegasY, const IterativePhaseCorrelation& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
+    std::vector<double>& omegasY, const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
 {
 #pragma omp parallel for
   for (int y = 0; y < drset.ys; y++)

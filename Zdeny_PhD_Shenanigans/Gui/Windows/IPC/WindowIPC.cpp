@@ -26,15 +26,14 @@ WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), g
 
 void WindowIPC::RefreshIPCparameters(bool init)
 {
-  globals->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation::BandpassType>(ui.comboBox->currentIndex()));
-  globals->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation::InterpolationType>(ui.comboBox_2->currentIndex()));
-  globals->IPC->SetWindowType(static_cast<IterativePhaseCorrelation::WindowType>(ui.comboBox_3->currentIndex()));
+  globals->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation<>::BandpassType>(ui.comboBox->currentIndex()));
+  globals->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation<>::InterpolationType>(ui.comboBox_2->currentIndex()));
+  globals->IPC->SetWindowType(static_cast<IterativePhaseCorrelation<>::WindowType>(ui.comboBox_3->currentIndex()));
   globals->IPC->SetSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
   globals->IPC->SetL2size(ui.lineEdit_2->text().toInt());
   globals->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
   globals->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
-  globals->IPC->SetDebugMode(ui.checkBox->isChecked());
 
   if (!init)
     LOG_DEBUG("IPC parameter values updated");
@@ -50,35 +49,35 @@ void WindowIPC::Optimize()
 {
   RefreshIPCparameters();
   globals->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
-                         ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
+      ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
 }
 
 void WindowIPC::PlotObjectiveFunctionLandscape()
 {
   RefreshIPCparameters();
-  globals->IPC->PlotObjectiveFunctionLandscape(ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(),
-                                               ui.lineEdit_22->text().toInt());
+  globals->IPC->PlotObjectiveFunctionLandscape(
+      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::PlotUpsampleCoefficientAccuracyDependence()
 {
   RefreshIPCparameters();
-  globals->IPC->PlotUpsampleCoefficientAccuracyDependence(ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(),
-                                                          ui.lineEdit_22->text().toInt());
+  globals->IPC->PlotUpsampleCoefficientAccuracyDependence(
+      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::PlotNoiseAccuracyDependence()
 {
   RefreshIPCparameters();
-  globals->IPC->PlotNoiseAccuracyDependence(ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(),
-                                            ui.lineEdit_22->text().toInt());
+  globals->IPC->PlotNoiseAccuracyDependence(
+      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::PlotImageSizeAccuracyDependence()
 {
   RefreshIPCparameters();
-  globals->IPC->PlotImageSizeAccuracyDependence(ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(),
-                                                ui.lineEdit_22->text().toInt());
+  globals->IPC->PlotImageSizeAccuracyDependence(
+      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::align()
@@ -102,7 +101,6 @@ void WindowIPC::align()
 
   IterativePhaseCorrelation ipc = *globals->IPC;
   ipc.SetSize(img1.size());
-  ipc.SetDebugMode(true);
   Mat aligned = ipc.Align(img1, img2);
   showimg(std::vector<Mat>{img1, img2, aligned}, "align triplet");
 }
@@ -140,9 +138,8 @@ void WindowIPC::CalculateFlow()
   if (0)
   {
     auto debugipc = *globals->IPC;
-    debugipc.SetDebugMode(true);
-    debugipc.Calculate(roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()),
-                       roicrop(img2, img2.cols / 2, img2.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
+    debugipc.Calculate(
+        roicrop(img1, img1.cols / 2, img1.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()), roicrop(img2, img2.cols / 2, img2.rows / 2, globals->IPC->GetCols(), globals->IPC->GetRows()));
 
     return;
   }
