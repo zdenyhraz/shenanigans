@@ -86,8 +86,64 @@ try
 
   auto dft1 = CalculateFourierTransform(std::move(image1));
   auto dft2 = CalculateFourierTransform(std::move(image2));
+
+  if (mDebugMode)
+  {
+    auto plot1 = dft1.clone();
+    Fourier::fftshift(plot1);
+
+    Plot2D::Set("IPCDFT1m");
+    Plot2D::SetSavePath(mDebugDirectory + "/DFT1m.png");
+    Plot2D::Plot(Fourier::logmagn(plot1));
+
+    Plot2D::Set("IPCDFT1p");
+    Plot2D::SetSavePath(mDebugDirectory + "/DFT1p.png");
+    Plot2D::Plot(Fourier::phase(plot1));
+
+    auto plot2 = dft2.clone();
+    Fourier::fftshift(plot2);
+
+    Plot2D::Set("IPCDFT2m");
+    Plot2D::SetSavePath(mDebugDirectory + "/DFT2m.png");
+    Plot2D::Plot(Fourier::logmagn(plot2));
+
+    Plot2D::Set("IPCDFT2p");
+    Plot2D::SetSavePath(mDebugDirectory + "/DFT2p.png");
+    Plot2D::Plot(Fourier::phase(plot2));
+  }
+
   auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
+
+  if (mDebugMode) // cps boring image
+  {
+    auto plot = crosspower.clone();
+    Fourier::fftshift(plot);
+
+    Plot2D::Set("IPCCPSm");
+    Plot2D::SetSavePath(mDebugDirectory + "/CPSm.png");
+    Plot2D::Plot(Fourier::logmagn(plot));
+
+    Plot2D::Set("IPCCPSp");
+    Plot2D::SetSavePath(mDebugDirectory + "/CPSp.png");
+    Plot2D::Plot(Fourier::phase(plot));
+  }
+
   ApplyBandpass(crosspower);
+
+  if (mDebugMode) // cps boring image
+  {
+    auto plot = crosspower.clone();
+    Fourier::fftshift(plot);
+
+    Plot2D::Set("IPCCPSFm");
+    Plot2D::SetSavePath(mDebugDirectory + "/CPSFm.png");
+    Plot2D::Plot(Fourier::logmagn(plot));
+
+    Plot2D::Set("IPCCPSFp");
+    Plot2D::SetSavePath(mDebugDirectory + "/CPSFp.png");
+    Plot2D::Plot(Fourier::phase(plot));
+  }
+
   Mat L3 = CalculateL3(std::move(crosspower));
 
   Point2f L3peak = GetPeak(L3);
@@ -99,6 +155,10 @@ try
     Plot2D::Set("IPCL3");
     Plot2D::SetSavePath(mDebugDirectory + "/L3.png");
     Plot2D::Plot(L3);
+
+    Plot2D::Set("IPCL3lm");
+    Plot2D::SetSavePath(mDebugDirectory + "/L3lm.png");
+    Plot2D::Plot(Fourier::logmagn(L3, 1));
   }
 
   if (mAccuracyType == AccuracyType::Pixel)
@@ -445,9 +505,19 @@ inline Mat IterativePhaseCorrelation::CalculateCrossPowerSpectrum(Mat&& dft1, Ma
       const float re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
       const float im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
       const float mag = sqrt(re * re + im * im);
-      // reuse dft1 memory
-      dft1p[col][0] = re / mag;
-      dft1p[col][1] = im / mag;
+
+      if constexpr (mCrossCorrel)
+      {
+        // reuse dft1 memory
+        dft1p[col][0] = re;
+        dft1p[col][1] = im;
+      }
+      else
+      {
+        // reuse dft1 memory
+        dft1p[col][0] = re / mag;
+        dft1p[col][1] = im / mag;
+      }
     }
   }
   return dft1;
@@ -766,8 +836,8 @@ void IterativePhaseCorrelation::ShowDebugStuff() const
   LOG_INFO("IPC debug stuff shown");
 }
 
-void IterativePhaseCorrelation::Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift, float noiseStdev, int itersPerImage,
-                                         double validationRatio, int populationSize)
+void IterativePhaseCorrelation::Optimize(
+    const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, double validationRatio, int populationSize)
 try
 {
   LOG_FUNCTION("IPC optimization");
@@ -789,8 +859,7 @@ try
   const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
 
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
-           trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols,
-           mRows);
+      trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
 
   // before
   ShowRandomImagePair(trainingImagePairs);
@@ -1025,7 +1094,7 @@ std::vector<std::tuple<Mat, Mat, Point2f>> IterativePhaseCorrelation::CreateImag
   {
     if (image.rows < mRows + maxShift || image.cols < mCols + maxShift)
       throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
-                                           mRows + maxShift, mCols + maxShift));
+          mRows + maxShift, mCols + maxShift));
   }
 
   std::vector<std::tuple<Mat, Mat, Point2f>> imagePairs;
@@ -1075,7 +1144,8 @@ void IterativePhaseCorrelation::AddNoise(Mat& image, double noiseStdev) const
 
 const std::function<double(const std::vector<double>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const
 {
-  return [&](const std::vector<double>& params) {
+  return [&](const std::vector<double>& params)
+  {
     IterativePhaseCorrelation ipc(mRows, mCols);
     ipc.SetBandpassType(static_cast<BandpassType>((int)params[BandpassTypeParameter]));
     ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
@@ -1097,8 +1167,8 @@ const std::function<double(const std::vector<double>&)> IterativePhaseCorrelatio
   };
 }
 
-std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid,
-                                                                          int populationSize) const
+std::vector<double> IterativePhaseCorrelation::CalculateOptimalParameters(
+    const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int populationSize) const
 {
   Evolution evo(ParameterCount);
   evo.mNP = populationSize;
@@ -1122,7 +1192,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<double>
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
   LOG_INFO("Final IPC BandpassType: {}",
-           BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
+      BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
   LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
   LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
   LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
@@ -1185,7 +1255,7 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
 }
 
 void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsPixel, const std::vector<Point2f>& shiftsNonit,
-                                                      const std::vector<Point2f>& shiftsBefore, const std::vector<Point2f>& shiftsAfter) const
+    const std::vector<Point2f>& shiftsBefore, const std::vector<Point2f>& shiftsAfter) const
 {
   std::vector<double> shiftsXReference, shiftsXReferenceError;
   std::vector<double> shiftsXPixel, shiftsXPixelError;

@@ -21,4 +21,6 @@ Mat gammaCorrect(const Mat& sourceimgIn, double gamma);
 
 Mat addnoise(const Mat& sourceimgIn);
 
+void addnoise(Mat& img, double stddev);
+
 void showhistogram(const Mat& sourceimgIn, int channels, int minimum = 0, int maximum = 255, std::string winname = "histogram");

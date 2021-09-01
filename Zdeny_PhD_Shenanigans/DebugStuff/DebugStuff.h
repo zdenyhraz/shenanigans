@@ -23,7 +23,38 @@ void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
 
-  if (1) // Haar wavelet plot
+  if (1) // IPC dizertacka pics
+  {
+    Mat img1 = loadImage("Resources/shapef.png");
+    Mat img2 = loadImage("Resources/shapesf.png");
+    // Shift(img2, std::floor(0.195 * img2.cols), std::floor(0.26 * img2.rows));
+
+    addnoise(img1, 0.2);
+    addnoise(img2, 0.2);
+
+    IterativePhaseCorrelation ipc = *globals->IPC;
+    ipc.SetSize(img1.rows, img1.cols);
+    ipc.SetDebugMode(true);
+
+    const auto shiftCalc = ipc.Calculate(img1, img2);
+    LOG_DEBUG("Calculated IPC shift: {}", shiftCalc);
+  }
+  if (0) // fourier inverse coeff test
+  {
+    Mat fun = Mat::zeros(4, 4, CV_32F);
+    for (int r = 0; r < fun.rows; ++r)
+      for (int c = 0; c < fun.cols; ++c)
+        fun.at<float>(r, c) = r + c;
+
+    Mat fft = Fourier::fft(fun);
+    Mat ifft = Fourier::ifft(fft);
+
+    LOG_DEBUG(fmt::format("fun:\n{}\n", fun));
+    LOG_DEBUG(fmt::format("fft:\n{}\n", fft));
+    LOG_DEBUG(fmt::format("ifft:\n{}\n", ifft));
+    return;
+  }
+  if (0) // Haar wavelet plot
   {
     Mat haarX(1000, 1000, CV_32F);
     Mat haarY(1000, 1000, CV_32F);
@@ -949,18 +980,20 @@ void Debug(Globals* globals)
       }
     }
   }
-
-  // plot in optimization - default
-  auto f = OptimizationTestFunctions::Paraboloid;
-  int N = 3;
-  Evolution Evo(N);
-  Evo.mNP = 10 * N;
-  Evo.mLB = zerovect(N, (double)-N);
-  Evo.mUB = zerovect(N, (double)+N);
-  Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
-  Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
-  Evo.SetOptimizationName("debug opt");
-  Evo.SetPlotOutput(true);
-  auto result = Evo.Optimize(f);
+  if (0)
+  {
+    // plot in optimization - default
+    auto f = OptimizationTestFunctions::Paraboloid;
+    int N = 3;
+    Evolution Evo(N);
+    Evo.mNP = 10 * N;
+    Evo.mLB = zerovect(N, (double)-N);
+    Evo.mUB = zerovect(N, (double)+N);
+    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
+    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
+    Evo.SetOptimizationName("debug opt");
+    Evo.SetPlotOutput(true);
+    auto result = Evo.Optimize(f);
+  }
 }
 }

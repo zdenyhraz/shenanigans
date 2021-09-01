@@ -166,6 +166,24 @@ inline Mat logmagn(const Mat& img, int logs = 1)
   return mag;
 }
 
+inline Mat magn(const Mat& img)
+{
+  return logmagn(img, 0);
+}
+
+inline Mat phase(const Mat& img)
+{
+  if (img.channels() != 2)
+    throw std::runtime_error("Need two channels for phase info");
+
+  Mat phs;
+  Mat planes[2];
+  split(img, planes);
+  phase(planes[0], planes[1], phs);
+
+  return phs;
+}
+
 inline Mat fftlogmagn(const Mat& img, int logs = 1)
 {
   Mat out = fft(img);
