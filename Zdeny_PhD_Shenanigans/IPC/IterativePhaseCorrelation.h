@@ -162,9 +162,13 @@ public:
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
 
+      Plot2D::Set(fmt::format("{} CPSm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSm.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(Fourier::logmagn(plot, 0));
+
       Plot2D::Set(fmt::format("{} CPSlm", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_CPSlm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot));
+      Plot2D::Plot(Fourier::logmagn(plot, 1));
 
       Plot2D::Set(fmt::format("{} CPSp", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_CPSp.png", mDebugDirectory, mDebugName));
@@ -178,13 +182,13 @@ public:
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
 
+      Plot2D::Set(fmt::format("{} CPSFm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFm.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(Fourier::logmagn(plot, 0));
+
       Plot2D::Set(fmt::format("{} CPSFlm", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_CPSFlm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot));
-
-      Plot2D::Set(fmt::format("{} CPSFp", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFp.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::phase(plot));
+      Plot2D::Plot(Fourier::logmagn(plot, 1));
     }
 
     Mat L3 = CalculateL3(std::move(crosspower));
@@ -195,13 +199,11 @@ public:
 
     if constexpr (DebugMode)
     {
+      auto plot = L3.clone();
+      normalize(plot, plot, 0, 1, NORM_MINMAX);
       Plot2D::Set(fmt::format("{} L3", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(L3);
-
-      Plot2D::Set(fmt::format("{} L3lm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_L3lm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(L3, 1));
+      Plot2D::Plot(plot);
     }
 
     if (mAccuracyType == AccuracyType::Pixel)
@@ -233,9 +235,11 @@ public:
     Point2f L2mid(L2.cols / 2, L2.rows / 2);
     if constexpr (DebugMode)
     {
+      auto plot = L2.clone();
+      normalize(plot, plot, 0, 1, NORM_MINMAX);
       Plot2D::Set(fmt::format("{} L2", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(L2);
+      Plot2D::Plot(plot);
     }
 
     // L2U
@@ -243,9 +247,11 @@ public:
     Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
     if constexpr (DebugMode)
     {
+      auto plot = L2U.clone();
+      normalize(plot, plot, 0, 1, NORM_MINMAX);
       Plot2D::Set(fmt::format("{} L2U", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(L2U);
+      Plot2D::Plot(plot);
 
       if (0)
       {
