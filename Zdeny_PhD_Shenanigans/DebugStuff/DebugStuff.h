@@ -31,17 +31,20 @@ void Debug(Globals* globals)
     addnoise(img1, 0.2);
     addnoise(img2, 0.2);
 
-    IterativePhaseCorrelation<true, false> PC(img1.size());
     IterativePhaseCorrelation<true, true> CC(img1.size());
+    IterativePhaseCorrelation<true, false> PC(img1.size());
 
-    PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+    CC.SetDebugName("CC");
+    PC.SetDebugName("PC");
+
     CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
+    PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
 
-    const auto shiftPC = PC.Calculate(img1, img2);
     const auto shiftCC = CC.Calculate(img1, img2);
+    const auto shiftPC = PC.Calculate(img1, img2);
 
-    LOG_DEBUG("Calculated PC shift: {}", shiftPC);
     LOG_DEBUG("Calculated CC shift: {}", shiftCC);
+    LOG_DEBUG("Calculated PC shift: {}", shiftPC);
   }
   if (0) // fourier inverse coeff test
   {

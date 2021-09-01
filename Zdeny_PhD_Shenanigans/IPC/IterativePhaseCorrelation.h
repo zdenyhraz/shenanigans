@@ -84,6 +84,7 @@ public:
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetWindowType(WindowType type) { mWindowType = type; }
   void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
+  void SetDebugName(const std::string& name) { mDebugName = name; }
 
   int GetRows() const { return mRows; }
   int GetCols() const { return mCols; }
@@ -114,12 +115,12 @@ public:
 
     if constexpr (DebugMode)
     {
-      Plot2D::Set("IPCI1");
-      Plot2D::SetSavePath(mDebugDirectory + "/I1.png");
+      Plot2D::Set(fmt::format("{} I1", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(image1);
 
-      Plot2D::Set("IPCI2");
-      Plot2D::SetSavePath(mDebugDirectory + "/I2.png");
+      Plot2D::Set(fmt::format("{} I2", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(image2);
     }
 
@@ -134,23 +135,23 @@ public:
       auto plot1 = dft1.clone();
       Fourier::fftshift(plot1);
 
-      Plot2D::Set("IPCDFT1m");
-      Plot2D::SetSavePath(mDebugDirectory + "/DFT1m.png");
+      Plot2D::Set(fmt::format("{} DFT1lm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1lm.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot1));
 
-      Plot2D::Set("IPCDFT1p");
-      Plot2D::SetSavePath(mDebugDirectory + "/DFT1p.png");
+      Plot2D::Set(fmt::format("{} DFT1p", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1p.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot1));
 
       auto plot2 = dft2.clone();
       Fourier::fftshift(plot2);
 
-      Plot2D::Set("IPCDFT2m");
-      Plot2D::SetSavePath(mDebugDirectory + "/DFT2m.png");
+      Plot2D::Set(fmt::format("{} DFT2lm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2lm.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot2));
 
-      Plot2D::Set("IPCDFT2p");
-      Plot2D::SetSavePath(mDebugDirectory + "/DFT2p.png");
+      Plot2D::Set(fmt::format("{} DFT2p", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2p.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot2));
     }
 
@@ -161,12 +162,12 @@ public:
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
 
-      Plot2D::Set("IPCCPSm");
-      Plot2D::SetSavePath(mDebugDirectory + "/CPSm.png");
+      Plot2D::Set(fmt::format("{} CPSlm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSlm.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot));
 
-      Plot2D::Set("IPCCPSp");
-      Plot2D::SetSavePath(mDebugDirectory + "/CPSp.png");
+      Plot2D::Set(fmt::format("{} CPSp", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSp.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot));
     }
 
@@ -177,12 +178,12 @@ public:
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
 
-      Plot2D::Set("IPCCPSFm");
-      Plot2D::SetSavePath(mDebugDirectory + "/CPSFm.png");
+      Plot2D::Set(fmt::format("{} CPSFlm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFlm.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot));
 
-      Plot2D::Set("IPCCPSFp");
-      Plot2D::SetSavePath(mDebugDirectory + "/CPSFp.png");
+      Plot2D::Set(fmt::format("{} CPSFp", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFp.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot));
     }
 
@@ -194,12 +195,12 @@ public:
 
     if constexpr (DebugMode)
     {
-      Plot2D::Set("IPCL3");
-      Plot2D::SetSavePath(mDebugDirectory + "/L3.png");
+      Plot2D::Set(fmt::format("{} L3", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(L3);
 
-      Plot2D::Set("IPCL3lm");
-      Plot2D::SetSavePath(mDebugDirectory + "/L3lm.png");
+      Plot2D::Set(fmt::format("{} L3lm", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_L3lm.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(L3, 1));
     }
 
@@ -232,8 +233,8 @@ public:
     Point2f L2mid(L2.cols / 2, L2.rows / 2);
     if constexpr (DebugMode)
     {
-      Plot2D::Set("IPCL2");
-      Plot2D::SetSavePath(mDebugDirectory + "/L2.png");
+      Plot2D::Set(fmt::format("{} L2", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(L2);
     }
 
@@ -242,8 +243,8 @@ public:
     Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
     if constexpr (DebugMode)
     {
-      Plot2D::Set("IPCL2U");
-      Plot2D::SetSavePath(mDebugDirectory + "/L2U.png");
+      Plot2D::Set(fmt::format("{} L2U", mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(L2U);
 
       if (0)
@@ -274,8 +275,8 @@ public:
       Point2f L1peak;
       if constexpr (DebugMode)
       {
-        Plot2D::Set("IPCL1B");
-        Plot2D::SetSavePath(mDebugDirectory + "/L1B.png");
+        Plot2D::Set(fmt::format("{} L1B", mDebugName));
+        Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
         Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size));
       }
 
@@ -292,8 +293,8 @@ public:
         {
           if constexpr (DebugMode)
           {
-            Plot2D::Set("IPCL1A");
-            Plot2D::SetSavePath(mDebugDirectory + "/L1A.png");
+            Plot2D::Set(fmt::format("{} L1A", mDebugName));
+            Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
             Plot2D::Plot(L1);
           }
 
@@ -786,6 +787,7 @@ private:
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
   std::string mDebugDirectory = "Debug";
+  std::string mDebugName = "IPC";
   mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   Mat mBandpass;
   Mat mFrequencyBandpass;
