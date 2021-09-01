@@ -25,8 +25,8 @@ void Debug(Globals* globals)
 
   if (1) // CC/PC dizertacka pics
   {
-    Mat img1 = loadImage("Resources/shape.png");
-    Mat img2 = loadImage("Resources/shapes.png");
+    Mat img1 = loadImage("Resources/shapef.png");
+    Mat img2 = loadImage("Resources/shapesf.png");
 
     addnoise(img1, 0.1);
     addnoise(img2, 0.1);
