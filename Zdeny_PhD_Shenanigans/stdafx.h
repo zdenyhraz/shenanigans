@@ -30,6 +30,7 @@
 #include <regex>
 #include <ctime>
 #include <limits>
+#include <random>
 // OpenMP
 #include <omp.h>
 // OpenCV

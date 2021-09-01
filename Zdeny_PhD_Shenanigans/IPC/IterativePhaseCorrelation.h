@@ -68,7 +68,7 @@ public:
 
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
-                double validationRatio = 0.2, int populationSize = ParameterCount * 7);
+      double validationRatio = 0.2, int populationSize = ParameterCount * 7);
   void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
   void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters);
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const;
@@ -95,6 +95,7 @@ private:
   Mat mWindow;
   static constexpr bool mPackedFFT = false;
   static constexpr bool mCudaFFT = false;
+  static constexpr bool mCrossCorrel = false;
 
   void UpdateWindow();
   void UpdateBandpass();
@@ -138,14 +139,14 @@ private:
   std::vector<std::tuple<Mat, Mat, Point2f>> CreateImagePairs(const std::vector<Mat>& images, double maxShiftRatio, int itersPerImage, double noiseStdev) const;
   void AddNoise(Mat& image, double noiseStdev) const;
   const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
-  std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid,
-                                                 int populationSize) const;
+  std::vector<double> CalculateOptimalParameters(
+      const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int populationSize) const;
   void ApplyOptimalParameters(const std::vector<double>& optimalParameters);
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const;
   std::string WindowType2String(WindowType type) const;
   std::string InterpolationType2String(InterpolationType type) const;
   void ShowOptimizationPlots(const std::vector<Point2f>& shiftsReference, const std::vector<Point2f>& shiftsPixel, const std::vector<Point2f>& shiftsNonit, const std::vector<Point2f>& shiftsBefore,
-                             const std::vector<Point2f>& shiftsAfter) const;
+      const std::vector<Point2f>& shiftsAfter) const;
   std::vector<Point2f> GetShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<Point2f> GetNonIterativeShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
   std::vector<Point2f> GetPixelShifts(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs) const;
