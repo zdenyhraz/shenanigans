@@ -65,11 +65,12 @@ Mat addnoise(const Mat& sourceimgIn)
 
 void addnoise(Mat& img, double stddev)
 {
+  std::random_device device;
+  std::mt19937 generator(device());
   std::normal_distribution<float> distribution(0, stddev);
-  std::random_device generator;
 
-  for (int r = 0; r < img.rows; r++)
-    for (int c = 0; c < img.cols; c++)
+  for (int c = 0; c < img.cols; c++)
+    for (int r = 0; r < img.rows; r++)
       img.at<float>(r, c) = std::clamp(img.at<float>(r, c) + distribution(generator), 0.f, 1.f);
 }
 
