@@ -28,8 +28,8 @@ void Debug(Globals* globals)
     Mat img1 = loadImage("Resources/shapef.png");
     Mat img2 = loadImage("Resources/shapesf.png");
 
-    addnoise(img1, 0.2);
-    addnoise(img2, 0.2);
+    // addnoise(img1, 0.1);
+    // addnoise(img2, 0.1);
 
     IterativePhaseCorrelation<true, true> CC(img1.size());
     IterativePhaseCorrelation<true, false> PC(img1.size());
@@ -39,6 +39,9 @@ void Debug(Globals* globals)
 
     CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
     PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+
+    CC.SetL2size(25);
+    PC.SetL2size(25);
 
     const auto shiftCC = CC.Calculate(img1, img2);
     const auto shiftPC = PC.Calculate(img1, img2);
