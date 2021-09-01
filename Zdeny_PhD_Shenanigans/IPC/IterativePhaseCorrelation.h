@@ -201,6 +201,7 @@ public:
     {
       auto plot = L3.clone();
       normalize(plot, plot, 0, 1, NORM_MINMAX);
+
       Plot2D::Set(fmt::format("{} L3", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
