@@ -112,7 +112,7 @@ public:
     ConvertToUnitFloat(image1);
     ConvertToUnitFloat(image2);
 
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       Plot2D::Set("IPCI1");
       Plot2D::SetSavePath(mDebugDirectory + "/I1.png");
@@ -129,7 +129,7 @@ public:
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
 
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       auto plot1 = dft1.clone();
       Fourier::fftshift(plot1);
@@ -156,7 +156,7 @@ public:
 
     auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
 
-    if (DebugMode) // cps boring image
+    if constexpr (DebugMode) // cps boring image
     {
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
@@ -172,7 +172,7 @@ public:
 
     ApplyBandpass(crosspower);
 
-    if (DebugMode) // cps boring image
+    if constexpr (DebugMode) // cps boring image
     {
       auto plot = crosspower.clone();
       Fourier::fftshift(plot);
@@ -192,7 +192,7 @@ public:
     Point2f L3mid(L3.cols / 2, L3.rows / 2);
     Point2f result = L3peak - L3mid;
 
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       Plot2D::Set("IPCL3");
       Plot2D::SetSavePath(mDebugDirectory + "/L3.png");
@@ -230,7 +230,7 @@ public:
     // L2
     Mat L2 = CalculateL2(L3, L3peak, L2size);
     Point2f L2mid(L2.cols / 2, L2.rows / 2);
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       Plot2D::Set("IPCL2");
       Plot2D::SetSavePath(mDebugDirectory + "/L2.png");
@@ -240,7 +240,7 @@ public:
     // L2U
     Mat L2U = CalculateL2U(L2);
     Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       Plot2D::Set("IPCL2U");
       Plot2D::SetSavePath(mDebugDirectory + "/L2U.png");
@@ -272,7 +272,7 @@ public:
       int L1size = GetL1size(L2U, L1ratio);
       Point2f L1mid(L1size / 2, L1size / 2);
       Point2f L1peak;
-      if (DebugMode)
+      if constexpr (DebugMode)
       {
         Plot2D::Set("IPCL1B");
         Plot2D::SetSavePath(mDebugDirectory + "/L1B.png");
@@ -290,7 +290,7 @@ public:
 
         if (AccuracyReached(L1peak, L1mid))
         {
-          if (DebugMode)
+          if constexpr (DebugMode)
           {
             Plot2D::Set("IPCL1A");
             Plot2D::SetSavePath(mDebugDirectory + "/L1A.png");
@@ -358,7 +358,7 @@ public:
     auto shiftT = Calculate(image1, image2);
     Shift(image2, -shiftT);
 
-    if (DebugMode)
+    if constexpr (DebugMode)
     {
       LOG_INFO("Evaluated rotation: {} deg", rotation);
       LOG_INFO("Evaluated scale: {}", 1.f / scale);
@@ -1018,14 +1018,14 @@ private:
   bool ReduceL2size(int& L2size) const
   {
     L2size -= 2;
-    if (DebugMode)
+    if constexpr (DebugMode)
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
   void ReduceL1ratio(double& L1ratio) const
   {
     L1ratio -= mL1ratioStep;
-    if (DebugMode)
+    if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
   }
   static Mat ColorComposition(const Mat& img1, const Mat& img2)
@@ -1139,7 +1139,7 @@ private:
 
         imagePairs.push_back({image1, image2, shift});
 
-        if (DebugMode)
+        if constexpr (DebugMode)
         {
           Mat hcct;
           hconcat(image1, image2, hcct);
