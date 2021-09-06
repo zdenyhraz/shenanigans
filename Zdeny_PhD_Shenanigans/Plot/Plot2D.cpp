@@ -20,9 +20,21 @@ Plot2D& Plot2D::GetPlot(const std::string& mName)
 void Plot2D::PlotCore(const Mat& z)
 {
   std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
-  for (int r = 0; r < z.rows; r++)
-    for (int c = 0; c < z.cols; c++)
-      zv[r][c] = z.at<float>(r, c);
+
+  if (z.depth() != CV_32F)
+  {
+    Mat zf;
+    z.convertTo(zf, CV_32F);
+    for (int r = 0; r < z.rows; r++)
+      for (int c = 0; c < z.cols; c++)
+        zv[r][c] = zf.at<float>(r, c);
+  }
+  else
+  {
+    for (int r = 0; r < z.rows; r++)
+      for (int c = 0; c < z.cols; c++)
+        zv[r][c] = z.at<float>(r, c);
+  }
 
   PlotCore(zv);
 }
