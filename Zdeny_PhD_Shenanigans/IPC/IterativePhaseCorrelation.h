@@ -117,10 +117,12 @@ public:
     {
       Plot2D::Set(fmt::format("{} I1", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
+      Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
       Plot2D::Plot(image1);
 
       Plot2D::Set(fmt::format("{} I2", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
+      Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
       Plot2D::Plot(image2);
     }
 

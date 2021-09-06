@@ -22,23 +22,25 @@ namespace Debug
 void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
-
   if (1) // CC/PC dizertacka pics
   {
-    Mat img1 = loadImage("Resources/shapef.png");
-    Mat img2 = loadImage("Resources/shapesf.png");
+    Mat img1 = loadImage("Resources/shape.png");
+    Mat img2 = loadImage("Resources/shapes.png");
 
     addnoise(img1, 0.1);
     addnoise(img2, 0.1);
 
-    IterativePhaseCorrelation<true, true> CC(img1.size());
-    IterativePhaseCorrelation<true, false> PC(img1.size());
+    IterativePhaseCorrelation<true, true> CC(img1.size(), 0, 1);
+    IterativePhaseCorrelation<true, false> PC(img1.size(), 0, 1);
 
     CC.SetDebugName("CC");
     PC.SetDebugName("PC");
 
     CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
     PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+
+    CC.SetBandpassType(IterativePhaseCorrelation<true, true>::BandpassType::Rectangular);
+    PC.SetBandpassType(IterativePhaseCorrelation<true, false>::BandpassType::Rectangular);
 
     CC.SetL2size(256);
     PC.SetL2size(256);

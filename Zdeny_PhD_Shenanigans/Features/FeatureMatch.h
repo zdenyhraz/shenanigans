@@ -31,6 +31,8 @@ struct FeatureMatchData
   double minSpeed;
   double maxSpeed;
   std::string path;
+  std::string path1;
+  std::string path2;
   double overlapdistance;
   bool drawOverlapCircles = false;
   double ratioThreshold = 0.7;
@@ -185,6 +187,52 @@ inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<std::tuple<s
   return out;
 }
 
+inline Mat DrawFeatureMatchArrows(const Mat& img, const std::vector<DMatch>& matches, const std::vector<KeyPoint>& kp1, const std::vector<KeyPoint>& kp2, const FeatureMatchData& data)
+{
+  LOG_FUNCTION("DrawFeatureMatchArrows");
+  Mat out;
+  cvtColor(img, out, COLOR_GRAY2BGR);
+
+  std::vector<std::pair<DMatch, bool>> matches_filtered;
+  for (const auto& match : matches)
+    matches_filtered.push_back({match, true});
+
+  std::random_device rd;
+  std::mt19937 g(rd());
+  std::shuffle(matches_filtered.begin(), matches_filtered.end(), g);
+
+  for (auto& [match, draw] : matches_filtered)
+  {
+    if (!draw)
+      continue;
+
+    for (auto& [othermatch, otherdraw] : matches_filtered)
+    {
+      if (!otherdraw)
+        continue;
+
+      if (magnitude(kp1[match.queryIdx].pt - kp2[othermatch.queryIdx].pt) < data.overlapdistance)
+        otherdraw = false;
+    }
+  }
+
+  for (const auto& [match, draw] : matches_filtered)
+  {
+    if (!draw)
+      continue;
+
+    const auto pts = GetFeatureMatchPoints(match, kp1, kp2);
+    const double spd = magnitude(GetFeatureMatchShift(match, kp1, kp2));
+    const double diagonal = sqrt(sqr(img.rows) + sqr(img.cols));
+
+    Scalar color = colorMapJet(spd, 0, 0.3 * diagonal);
+    arrowedLine(out, pts.first, pts.second, color, 0.002 * out.cols, LINE_AA, 0, 0.1);
+  }
+
+  LOG_INFO("Drew {} matches", matches.size());
+  return out;
+}
+
 inline void featureMatch(const FeatureMatchData& data)
 try
 {
@@ -306,6 +354,54 @@ try
 
   saveimg("Debug/arrowsIdx.png", arrowsIdx);
   saveimg("Debug/arrowsSpd.png", arrowsSpd);
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("Feature match error: {}", e.what());
+}
+
+inline void featureMatch2pic(const FeatureMatchData& data)
+try
+{
+  Mat img1 = imread(data.path1, IMREAD_GRAYSCALE);
+  Mat img2 = imread(data.path2, IMREAD_GRAYSCALE);
+
+  LOG_DEBUG(fmt::format("Matching images {} & {}", data.path1, data.path2));
+
+  // detect the keypoints, compute the descriptors
+  Ptr<Feature2D> detector = GetFeatureDetector(data);
+  std::vector<KeyPoint> keypoints1, keypoints2;
+  Mat descriptors1, descriptors2;
+  detector->detectAndCompute(img1, noArray(), keypoints1, descriptors1);
+  detector->detectAndCompute(img2, noArray(), keypoints2, descriptors2);
+
+  // matching descriptor vectors
+  auto matcher = DescriptorMatcher::create(DescriptorMatcher::MatcherType::BRUTEFORCE);
+  std::vector<std::vector<DMatch>> knn_matches;
+  matcher->knnMatch(descriptors1, descriptors2, knn_matches, 2);
+
+  // filter matches using the Lowe's ratio test
+  std::vector<DMatch> matches;
+  {
+    LOG_FUNCTION("Filter matches based on ratio test");
+    for (size_t i = 0; i < knn_matches.size(); i++)
+      if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
+        matches.push_back(knn_matches[i][0]);
+  }
+
+  Plot2D::Set(fmt::format("{} I1", "featurematch"));
+  Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", "Debug", "featurematch"));
+  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  Plot2D::Plot(img1);
+
+  Plot2D::Set(fmt::format("{} I2", "featurematch"));
+  Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", "Debug", "featurematch"));
+  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  Plot2D::Plot(img2);
+
+  const auto arrows = DrawFeatureMatchArrows(img1, matches, keypoints1, keypoints2, data);
+  showimg(arrows, "matches", false, 0, 1, 1024);
+  saveimg("Debug/featurematch_ARR.png", arrows);
 }
 catch (const std::exception& e)
 {

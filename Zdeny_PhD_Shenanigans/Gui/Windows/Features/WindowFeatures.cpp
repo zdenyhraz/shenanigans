@@ -27,6 +27,11 @@ void WindowFeatures::FeatureMatch()
   data.nOctaves = ui.lineEdit_16->text().toInt();
   data.nOctaveLayers = ui.lineEdit_16->text().toInt();
   data.mask = ui.checkBox_4->isChecked();
+  data.path1 = ui.lineEdit_9->text().toStdString();
+  data.path2 = ui.lineEdit_10->text().toStdString();
 
-  featureMatch(data);
+  if (!data.path1.empty() && !data.path2.empty())
+    featureMatch2pic(data);
+  else
+    featureMatch(data);
 }
