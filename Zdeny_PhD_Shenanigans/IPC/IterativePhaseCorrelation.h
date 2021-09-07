@@ -132,7 +132,7 @@ public:
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
 
-    if constexpr (DebugMode)
+    if constexpr (DebugMode && 0)
     {
       auto plot1 = dft1.clone();
       Fourier::fftshift(plot1);
@@ -158,43 +158,9 @@ public:
     }
 
     auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
-
-    if constexpr (DebugMode) // cps boring image
-    {
-      auto plot = crosspower.clone();
-      Fourier::fftshift(plot);
-
-      Plot2D::Set(fmt::format("{} CPSm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot, 0));
-
-      Plot2D::Set(fmt::format("{} CPSlm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSlm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot, 1));
-
-      Plot2D::Set(fmt::format("{} CPSp", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSp.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::phase(plot));
-    }
-
     ApplyBandpass(crosspower);
 
-    if constexpr (DebugMode) // cps boring image
-    {
-      auto plot = crosspower.clone();
-      Fourier::fftshift(plot);
-
-      Plot2D::Set(fmt::format("{} CPSFm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot, 0));
-
-      Plot2D::Set(fmt::format("{} CPSFlm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPSFlm.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot, 1));
-    }
-
     Mat L3 = CalculateL3(std::move(crosspower));
-
     Point2f L3peak = GetPeak(L3);
     Point2f L3mid(L3.cols / 2, L3.rows / 2);
     Point2f result = L3peak - L3mid;
@@ -202,8 +168,7 @@ public:
     if constexpr (DebugMode)
     {
       auto plot = L3.clone();
-      normalize(plot, plot, 0, 1, NORM_MINMAX);
-
+      // normalize(plot, plot, 0, 1, NORM_MINMAX);
       Plot2D::Set(fmt::format("{} L3", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
@@ -239,7 +204,8 @@ public:
     if constexpr (DebugMode)
     {
       auto plot = L2.clone();
-      normalize(plot, plot, 0, 1, NORM_MINMAX);
+      // normalize(plot, plot, 0, 1, NORM_MINMAX);
+      resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, INTER_NEAREST);
       Plot2D::Set(fmt::format("{} L2", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
@@ -251,7 +217,7 @@ public:
     if constexpr (DebugMode)
     {
       auto plot = L2U.clone();
-      normalize(plot, plot, 0, 1, NORM_MINMAX);
+      // normalize(plot, plot, 0, 1, NORM_MINMAX);
       Plot2D::Set(fmt::format("{} L2U", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
