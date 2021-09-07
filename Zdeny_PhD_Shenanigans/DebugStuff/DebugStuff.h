@@ -24,32 +24,41 @@ void Debug(Globals* globals)
   LOG_FUNCTION("Debug");
   if (1) // CC/PC dizertacka pics
   {
-    Mat img1 = loadImage("Resources/shape.png");
-    Mat img2 = loadImage("Resources/shapes.png");
+    Mat img1 = loadImage("Resources/shapef.png");
+    Mat img2 = loadImage("Resources/shapesf.png");
 
-    addnoise(img1, 0.1);
-    addnoise(img2, 0.1);
+    addnoise(img1, 0.3);
+    addnoise(img2, 0.3);
 
-    IterativePhaseCorrelation<true, true> CC(img1.size(), 0, 1);
-    IterativePhaseCorrelation<true, false> PC(img1.size(), 0, 1);
+    IterativePhaseCorrelation<true, true> CC(img1.size(), 0, 0.5);
+    IterativePhaseCorrelation<true, false> PC(img1.size(), 0, 0.5);
 
     CC.SetDebugName("CC");
     PC.SetDebugName("PC");
 
-    CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
-    PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+    // CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
+    // PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
 
-    CC.SetBandpassType(IterativePhaseCorrelation<true, true>::BandpassType::Rectangular);
-    PC.SetBandpassType(IterativePhaseCorrelation<true, false>::BandpassType::Rectangular);
+    // CC.SetBandpassType(IterativePhaseCorrelation<true, true>::BandpassType::Rectangular);
+    // PC.SetBandpassType(IterativePhaseCorrelation<true, false>::BandpassType::Rectangular);
 
-    CC.SetL2size(256);
-    PC.SetL2size(256);
+    CC.SetInterpolationType(IterativePhaseCorrelation<true, true>::InterpolationType::Cubic);
+    PC.SetInterpolationType(IterativePhaseCorrelation<true, false>::InterpolationType::Cubic);
 
-    const auto shiftCC = CC.Calculate(img1, img2);
-    const auto shiftPC = PC.Calculate(img1, img2);
+    CC.SetL2size(15);
+    PC.SetL2size(15);
 
-    LOG_DEBUG("Calculated CC shift: {}", shiftCC);
-    LOG_DEBUG("Calculated PC shift: {}", shiftPC);
+    if (0)
+    {
+      const auto shiftCC = CC.Calculate(img1, img2);
+      LOG_DEBUG("Calculated CC shift: {}", shiftCC);
+    }
+
+    if (1)
+    {
+      const auto shiftPC = PC.Calculate(img1, img2);
+      LOG_DEBUG("Calculated PC shift: {}", shiftPC);
+    }
   }
   if (0) // fourier inverse coeff test
   {
