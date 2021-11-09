@@ -8,7 +8,8 @@ public:
   OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
   void SetFileOutputDir(const std::string& dir);
-  void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; };
+  void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
+  void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetOptimizationName(const std::string& optname) { mOptimizationName = optname; }
 
@@ -57,7 +58,7 @@ private:
 
   struct Population
   {
-    Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents);
+    Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput);
     void UpdateDistinctParents(int eid);
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
     void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
@@ -81,6 +82,8 @@ private:
     void InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);
     void InitializeBestEntity();
     void InitializeOffspring(int nParents);
+
+    bool mConsoleOutput = true;
   };
 
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
@@ -95,6 +98,7 @@ private:
 
   bool mFileOutput = false;
   bool mPlotOutput = true;
+  bool mConsoleOutput = true;
   double mAbsoluteDifferenceThreshold = 1e-10;
   double mRelativeDifferenceThreshold = 0.9;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;

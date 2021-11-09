@@ -526,17 +526,17 @@
      </item>
      <item row="2" column="1">
       <layout class="QGridLayout" name="gridLayout_8">
+       <item row="4" column="0">
+        <widget class="QPushButton" name="pushButton_13">
+         <property name="text">
+          <string>OptimizationLandscape plot</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QPushButton" name="pushButton_11">
          <property name="text">
           <string>ImgSize/accuracy plot</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton_12">
-         <property name="text">
-          <string>UpsampleCoeff/accuracy plot</string>
          </property>
         </widget>
        </item>
@@ -547,10 +547,17 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="pushButton_13">
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButton_12">
          <property name="text">
-          <string>OptimizationLandscape plot</string>
+          <string>UpsampleCoeff/accuracy plot</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="pushButton_15">
+         <property name="text">
+          <string>NoiseStdev/optimal BPH plot</string>
          </property>
         </widget>
        </item>

@@ -7,8 +7,11 @@ Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 try
 {
-  LOG_FUNCTION("Evolution optimization");
-  LOG_INFO("Running evolution...");
+  if (mConsoleOutput)
+  {
+    LOG_FUNCTION("Evolution optimization");
+    LOG_INFO("Running evolution...");
+  }
 
   InitializeOutputs();
   CheckBounds();
@@ -16,9 +19,9 @@ try
   CheckValidationFunctionNormality(valid);
 
   int gen = 0;
-  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents());
-  TerminationReason termReason = NotTerminated;
+  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput);
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
+  TerminationReason termReason = NotTerminated;
   UpdateOutputs(gen, population, valid);
 
   try
@@ -44,12 +47,14 @@ try
   }
   catch (const std::exception& e)
   {
-    LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
+    if (mConsoleOutput)
+      LOG_ERROR("Unexpected error occured during generation {}: {}", gen, e.what());
     termReason = UnexpectedErrorOccured;
   }
   catch (...)
   {
-    LOG_ERROR("Unexpected error occured during generation {}", gen);
+    if (mConsoleOutput)
+      LOG_ERROR("Unexpected error occured during generation {}", gen);
     termReason = UnexpectedErrorOccured;
   }
 
@@ -58,12 +63,14 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Evolution optimization error: {}", e.what());
+  if (mConsoleOutput)
+    LOG_ERROR("Evolution optimization error: {}", e.what());
   return OptimizationResult();
 }
 catch (...)
 {
-  LOG_ERROR("Unexpected evolution optimization error");
+  if (mConsoleOutput)
+    LOG_ERROR("Unexpected evolution optimization error");
   return OptimizationResult();
 }
 
@@ -76,7 +83,8 @@ void Evolution::SetFileOutputDir(const std::string& dir)
 void Evolution::InitializeOutputs()
 try
 {
-  LOG_FUNCTION("Output initialization");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Output initialization");
 
   if (mFileOutput)
   {
@@ -104,25 +112,26 @@ catch (const std::exception& e)
 void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 try
 {
-  LOG_FUNCTION("Objective function normality check");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Objective function normality check");
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = obj(arg);
   const auto result2 = obj(arg);
 
   if (result1 != result2)
-    throw std::runtime_error(fmt::format("Objective function is not consistent"));
-  else
+    throw std::runtime_error(fmt::format("Objective function is not consistent ({} != {})", result1, result2));
+  else if (mConsoleOutput)
     LOG_TRACE("Objective function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Objective function is not finite"));
-  else
+  else if (mConsoleOutput)
     LOG_TRACE("Objective function is finite");
 
   if (result1 < 0)
     throw std::runtime_error(fmt::format("Objective function is not positive"));
-  else
+  else if (mConsoleOutput)
     LOG_TRACE("Objective function is positive");
 }
 catch (const std::exception& e)
@@ -133,25 +142,26 @@ catch (const std::exception& e)
 void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
 try
 {
-  LOG_FUNCTION("Validation function normality check");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Validation function normality check");
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = valid(arg);
   const auto result2 = valid(arg);
 
   if (result1 != result2)
-    throw std::runtime_error(fmt::format("Validation function is not consistent"));
-  else
+    throw std::runtime_error(fmt::format("Validation function is not consistent ({} != {})", result1, result2));
+  else if (mConsoleOutput)
     LOG_TRACE("Validation function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Validation function is not finite"));
-  else
+  else if (mConsoleOutput)
     LOG_TRACE("Validation function is finite");
 
   if (result1 < 0)
     throw std::runtime_error(fmt::format("Validation function is not positive"));
-  else
+  else if (mConsoleOutput)
     LOG_TRACE("Validation function is positive");
 }
 catch (const std::exception& e)
@@ -161,7 +171,8 @@ catch (const std::exception& e)
 
 void Evolution::CheckBounds()
 {
-  LOG_FUNCTION("Objective function parameter bounds check");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Objective function parameter bounds check");
 
   if (mLB.size() != mUB.size())
     throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
@@ -180,7 +191,8 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
     if (mFileOutput)
       fmt::print(mOutputFile, "{}\n", message);
 
-    LOG_INFO("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
+    if (mConsoleOutput)
+      LOG_INFO("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
   }
 
   if (mPlotOutput)
@@ -197,12 +209,16 @@ try
     mOutputFile.close();
   }
 
-  LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-  LOG_SUCCESS("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
+  if (mConsoleOutput)
+  {
+    LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
+    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
+  }
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Could not uninitialize outputs: {}", e.what());
+  if (mConsoleOutput)
+    LOG_ERROR("Could not uninitialize outputs: {}", e.what());
 }
 
 Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, int generation)
@@ -270,11 +286,12 @@ int Evolution::GetNumberOfParents()
   return 3;
 }
 
-Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents)
+Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput)
 try
 {
   functionEvaluations = 0;
   relativeDifferenceGenerationsOverThreshold = 0;
+  mConsoleOutput = consoleOutput;
   InitializePopulation(NP, N, obj, LB, UB);
   InitializeBestEntity();
   InitializeOffspring(nParents);
@@ -332,12 +349,14 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   }
   catch (const std::exception& e)
   {
-    LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
+    if (mConsoleOutput)
+      LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
     newoffspring.fitness = Constants::Inf;
   }
   catch (...)
   {
-    LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
+    if (mConsoleOutput)
+      LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
     newoffspring.fitness = Constants::Inf;
   }
 }
@@ -390,7 +409,8 @@ void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenc
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB)
 {
-  LOG_FUNCTION("Population initialization");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Population initialization");
   entities = zerovect(NP, Entity(N));
   std::vector<double> RB = UB - LB;
   const double initialMinAvgDist = 0.5;
@@ -440,7 +460,8 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
 void Evolution::Population::InitializeOffspring(int nParents)
 {
-  LOG_FUNCTION("Offspring initialization");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Offspring initialization");
   offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
   for (int eid = 0; eid < entities.size(); eid++)
   {
@@ -451,10 +472,12 @@ void Evolution::Population::InitializeOffspring(int nParents)
 
 void Evolution::Population::InitializeBestEntity()
 {
-  LOG_FUNCTION("Best entity search");
+  if (mConsoleOutput)
+    LOG_FUNCTION("Best entity search");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  LOG_INFO("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
+  if (mConsoleOutput)
+    LOG_INFO("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity(int N)
