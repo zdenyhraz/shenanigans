@@ -528,6 +528,7 @@ public:
 
     LOG_INFO("IPC debug stuff shown");
   }
+
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
       double validationRatio = 0.2, int populationSize = ParameterCount * 7)
   try
@@ -576,7 +577,6 @@ public:
     const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
     ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
     LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
-
     LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
   }
   catch (const std::exception& e)
@@ -619,7 +619,7 @@ public:
         parameters[BandpassLParameter] = xmin + (double)c / (cols - 1) * (xmax - xmin);
         parameters[BandpassHParameter] = ymin + (double)r / (rows - 1) * (ymax - ymin);
 
-        landscape.at<float>(r, c) = log(obj(parameters));
+        landscape.at<float>(r, c) = std::log(obj(parameters));
         progress++;
       }
     }
@@ -667,7 +667,7 @@ public:
     Plot1D::Set("ImageSizeAccuracyDependence");
     Plot1D::SetXlabel("Image size");
     Plot1D::SetYlabel("Average pixel error");
-    Plot1D::SetYLogarithmic(true);
+    // Plot1D::SetYLogarithmic(true);
     Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy);
   }
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
@@ -712,6 +712,12 @@ public:
   }
   void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
   {
+    if (noiseStdev <= 0.0f)
+    {
+      LOG_ERROR("Please set some non-zero positive max noise stdev");
+      return;
+    }
+
     const auto trainingImages = LoadImages(trainingImagesDirectory);
     std::vector<double> noiseStdevs(iters);
     std::vector<double> accuracy(iters);
@@ -1351,7 +1357,6 @@ private:
     }
     return avgerror / shifts.size();
   }
-  static double GetFractionalPart(double x) { return abs(x - std::floor(x)); }
   void ShowRandomImagePair(const std::vector<std::tuple<Mat, Mat, Point2f>>& imagePairs)
   {
     const auto& [img1, img2, shift] = imagePairs[static_cast<size_t>(rand01() * imagePairs.size())];
@@ -1361,6 +1366,7 @@ private:
     Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
     Plot2D::Plot("Random image pair", concat);
   }
+  static double GetFractionalPart(double x) { return abs(x - std::floor(x)); }
 };
 
 inline void Shift(Mat& image, const Point2f& shift)

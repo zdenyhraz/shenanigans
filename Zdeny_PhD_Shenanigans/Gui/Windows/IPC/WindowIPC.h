@@ -14,7 +14,7 @@ private:
   Globals* globals;
 
 private slots:
-  void RefreshIPCparameters(bool init = false);
+  void RefreshIPCparameters();
   void RefreshIPCparametersAndExit();
   void Optimize();
   void PlotObjectiveFunctionLandscape();
