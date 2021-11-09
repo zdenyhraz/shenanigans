@@ -7,7 +7,7 @@
 WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
 {
   ui.setupUi(this);
-  RefreshIPCparameters(true);
+  RefreshIPCparameters();
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(RefreshIPCparametersAndExit()));
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(RefreshIPCparameters()));
   connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(Optimize()));
@@ -24,7 +24,7 @@ WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), g
   connect(ui.pushButton_10, SIGNAL(clicked()), this, SLOT(ShowDebugStuff()));
 }
 
-void WindowIPC::RefreshIPCparameters(bool init)
+void WindowIPC::RefreshIPCparameters()
 {
   globals->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation<>::BandpassType>(ui.comboBox->currentIndex()));
   globals->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation<>::InterpolationType>(ui.comboBox_2->currentIndex()));
@@ -34,9 +34,6 @@ void WindowIPC::RefreshIPCparameters(bool init)
   globals->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
   globals->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   globals->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
-
-  if (!init)
-    LOG_DEBUG("IPC parameter values updated");
 }
 
 void WindowIPC::RefreshIPCparametersAndExit()
