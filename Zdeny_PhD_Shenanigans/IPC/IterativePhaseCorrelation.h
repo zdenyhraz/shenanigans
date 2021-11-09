@@ -530,10 +530,11 @@ public:
   }
 
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
-      double validationRatio = 0.2, int populationSize = ParameterCount * 7)
+      double validationRatio = 0.2, int populationSize = ParameterCount * 7, bool mute = false)
   try
   {
-    LOG_FUNCTION("IPC optimization");
+    if (!mute)
+      LOG_FUNCTION("IPC optimization");
 
     if (itersPerImage < 1)
       throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
@@ -542,8 +543,8 @@ public:
     if (noiseStdev < 0)
       throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
-    const auto trainingImages = LoadImages(trainingImagesDirectory);
-    const auto validationImages = LoadImages(validationImagesDirectory);
+    const auto trainingImages = LoadImages(trainingImagesDirectory, mute);
+    const auto validationImages = LoadImages(validationImagesDirectory, mute);
 
     if (trainingImages.empty())
       throw std::runtime_error("Empty training images vector");
@@ -551,33 +552,42 @@ public:
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
     const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
 
-    LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
-        trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
+    std::vector<Point2f> referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore;
+    double objBefore;
 
     // before
-    ShowRandomImagePair(trainingImagePairs);
-    const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
-    const auto shiftsPixel = GetPixelShifts(trainingImagePairs);
-    const auto shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
-    const auto shiftsBefore = GetShifts(trainingImagePairs);
-    const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
-    ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
+    if (!mute)
+    {
+      LOG_INFO(
+          "Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
+          trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols,
+          mRows);
+      ShowRandomImagePair(trainingImagePairs);
+      referenceShifts = GetReferenceShifts(trainingImagePairs);
+      shiftsPixel = GetPixelShifts(trainingImagePairs);
+      shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
+      shiftsBefore = GetShifts(trainingImagePairs);
+      objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
+      ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
+    }
 
     // opt
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
     const auto valid = CreateObjectiveFunction(validationImagePairs);
-    // PlotObjectiveFunctionLandscape(obj);
-    const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
+    const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize, mute);
     if (optimalParameters.empty())
       throw std::runtime_error("Optimization failed");
-    ApplyOptimalParameters(optimalParameters);
+    ApplyOptimalParameters(optimalParameters, mute);
 
     // after
-    const auto shiftsAfter = GetShifts(trainingImagePairs);
-    const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-    ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
-    LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
-    LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
+    if (!mute)
+    {
+      const auto shiftsAfter = GetShifts(trainingImagePairs);
+      const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
+      ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
+      LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
+      LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
+    }
   }
   catch (const std::exception& e)
   {
@@ -752,6 +762,38 @@ public:
     Plot1D::SetXlabel("Noise stdev");
     Plot1D::SetYlabel("Average pixel error");
     Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy);
+  }
+  void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
+  {
+    if (noiseStdev <= 0.0f)
+    {
+      LOG_ERROR("Please set some non-zero positive max noise stdev");
+      return;
+    }
+
+    std::vector<double> noiseStdevs(iters);
+    std::vector<double> optimalBPHs(iters);
+    const double xmin = 0;
+    const double xmax = noiseStdev;
+    int progress = 0;
+
+    for (int i = 0; i < iters; ++i)
+    {
+      LOG_INFO("Calculating noise stdev optimal BPH dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
+      float noise = xmin + (double)i / (iters - 1) * (xmax - xmin);
+
+      IterativePhaseCorrelation ipc = *this; // copy this
+      ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, ParameterCount * 2, true);
+
+      noiseStdevs[i] = noise;
+      optimalBPHs[i] = ipc.GetBandpassH();
+      progress++;
+    }
+
+    Plot1D::Set("NoiseOptimalBPHDependence");
+    Plot1D::SetXlabel("Noise stdev");
+    Plot1D::SetYlabel("Optimal BPH");
+    Plot1D::Plot("NoiseOptimalBPHDependence", noiseStdevs, optimalBPHs);
   }
 
 private:
@@ -1062,9 +1104,10 @@ private:
     ParameterCount // last
   };
 
-  std::vector<Mat> LoadImages(const std::string& imagesDirectory) const
+  std::vector<Mat> LoadImages(const std::string& imagesDirectory, bool mute = false) const
   {
-    LOG_INFO("Loading images from '{}'...", imagesDirectory);
+    if (!mute)
+      LOG_INFO("Loading images from '{}'...", imagesDirectory);
 
     if (!std::filesystem::is_directory(imagesDirectory))
       throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
@@ -1076,7 +1119,8 @@ private:
 
       if (!IsImage(path))
       {
-        LOG_DEBUG("Directory contains a non-image file {}", path);
+        if (!mute)
+          LOG_DEBUG("Directory contains a non-image file {}", path);
         continue;
       }
 
@@ -1085,7 +1129,8 @@ private:
       auto image = loadImage(path);
       image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
       images.push_back(image);
-      LOG_DEBUG("Loaded image {}", path);
+      if (!mute)
+        LOG_DEBUG("Loaded image {}", path);
     }
     return images;
   }
@@ -1162,10 +1207,11 @@ private:
         const auto error = ipc.Calculate(image1, image2) - shift;
         avgerror += sqrt(error.x * error.x + error.y * error.y);
       }
-      return avgerror / imagePairs.size();
+      return imagePairs.size() > 0 ? avgerror / imagePairs.size() : 0.0f;
     };
   }
-  std::vector<double> CalculateOptimalParameters(const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int populationSize) const
+  std::vector<double> CalculateOptimalParameters(
+      const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int populationSize, bool mute) const
   {
     Evolution evo(ParameterCount);
     evo.mNP = populationSize;
@@ -1173,9 +1219,11 @@ private:
     evo.SetParameterNames({"BPT", "BPL", "BPH", "ITPT", "WINT", "UC", "L1R"});
     evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
     evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
+    evo.SetPlotOutput(!mute);
+    evo.SetConsoleOutput(!mute);
     return evo.Optimize(obj, valid);
   }
-  void ApplyOptimalParameters(const std::vector<double>& optimalParameters)
+  void ApplyOptimalParameters(const std::vector<double>& optimalParameters, bool mute)
   {
     if (optimalParameters.size() != ParameterCount)
       throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
@@ -1187,14 +1235,17 @@ private:
     SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
     SetL1ratio(optimalParameters[L1ratioParameter]);
 
-    LOG_INFO("Final IPC BandpassType: {}",
-        BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
-    LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
-    LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
-    LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
-    LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
-    LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<int>(optimalParameters[UpsampleCoeffParameter]));
-    LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
+    if (!mute)
+    {
+      LOG_INFO("Final IPC BandpassType: {}",
+          BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
+      LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
+      LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
+      LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
+      LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
+      LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<int>(optimalParameters[UpsampleCoeffParameter]));
+      LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
+    }
   }
   std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const
   {

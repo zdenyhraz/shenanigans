@@ -14,6 +14,7 @@ WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), g
   connect(ui.pushButton_13, SIGNAL(clicked()), this, SLOT(PlotObjectiveFunctionLandscape()));
   connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(PlotUpsampleCoefficientAccuracyDependence()));
   connect(ui.pushButton_14, SIGNAL(clicked()), this, SLOT(PlotNoiseAccuracyDependence()));
+  connect(ui.pushButton_15, SIGNAL(clicked()), this, SLOT(PlotNoiseOptimalBPHDependence()));
   connect(ui.pushButton_11, SIGNAL(clicked()), this, SLOT(PlotImageSizeAccuracyDependence()));
   connect(ui.pushButton_9, SIGNAL(clicked()), this, SLOT(align()));
   connect(ui.pushButton_6, SIGNAL(clicked()), this, SLOT(alignXY()));
@@ -67,6 +68,13 @@ void WindowIPC::PlotNoiseAccuracyDependence()
 {
   RefreshIPCparameters();
   globals->IPC->PlotNoiseAccuracyDependence(
+      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
+}
+
+void WindowIPC::PlotNoiseOptimalBPHDependence()
+{
+  RefreshIPCparameters();
+  globals->IPC->PlotNoiseOptimalBPHDependence(
       ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 

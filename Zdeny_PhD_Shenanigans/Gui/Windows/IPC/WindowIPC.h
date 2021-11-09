@@ -20,6 +20,7 @@ private slots:
   void PlotObjectiveFunctionLandscape();
   void PlotUpsampleCoefficientAccuracyDependence();
   void PlotNoiseAccuracyDependence();
+  void PlotNoiseOptimalBPHDependence();
   void PlotImageSizeAccuracyDependence();
   void align();
   void alignXY();
