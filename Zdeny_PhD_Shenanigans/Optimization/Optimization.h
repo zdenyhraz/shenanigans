@@ -20,7 +20,13 @@ public:
   using ObjectiveFunction = const std::function<double(const std::vector<double>&)>&;
   using ValidationFunction = ObjectiveFunction;
   using Optimum = std::vector<double>;
-  using OptimizationResult = Optimum;
+
+  struct OptimizationResult
+  {
+    Optimum optimum;
+    TerminationReason terminationReason = NotTerminated;
+    int functionEvaluations = -1;
+  };
 
   OptimizationAlgorithm(int N);
   virtual ~OptimizationAlgorithm();

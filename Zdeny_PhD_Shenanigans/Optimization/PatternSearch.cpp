@@ -150,5 +150,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
       }
     }
   } // multistart end
-  return topPoint;
+  OptimizationResult result;
+  result.optimum = topPoint;
+  return result;
 } // opt end
