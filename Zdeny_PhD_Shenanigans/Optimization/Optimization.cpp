@@ -8,12 +8,13 @@ OptimizationAlgorithm::OptimizationAlgorithm(int N) : N(N)
 }
 
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
-    double ymin, double ymax, const std::string& xName, const std::string& yName, bool applyLog)
+    double ymin, double ymax, const std::string& xName, const std::string& yName)
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
   int rows = iters;
   int cols = iters;
   auto landscape = zerovect2(rows, cols, 0.0);
+  auto landscapeLog = zerovect2(rows, cols, 0.0);
   std::atomic<int> progress = 0;
 
 #pragma omp parallel for
@@ -25,20 +26,36 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       auto parameters = baseParams;
       parameters[xParamIndex] = xmin + (double)c / (cols - 1) * (xmax - xmin);
       parameters[yParamIndex] = ymax - (double)r / (rows - 1) * (ymax - ymin);
-      landscape[r][c] = applyLog ? std::log(f(parameters)) : f(parameters);
+      const auto fval = f(parameters);
+      landscape[r][c] = fval;
+      landscapeLog[r][c] = std::log(fval);
     }
   }
 
-  Plot2D::Set("ObjectiveFunctionLandscape");
+  if (false) // usually nothing interesting here
+  {
+    Plot2D::Set("ObjectiveFunctionLandscape");
+    Plot2D::SetXmin(xmin);
+    Plot2D::SetXmax(xmax);
+    Plot2D::SetYmin(ymin);
+    Plot2D::SetYmax(ymax);
+    Plot2D::SetXlabel(xName);
+    Plot2D::SetYlabel(yName);
+    Plot2D::SetZlabel("obj");
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::Plot(landscape);
+  }
+
+  Plot2D::Set("ObjectiveFunctionLandscapeLog");
   Plot2D::SetXmin(xmin);
   Plot2D::SetXmax(xmax);
   Plot2D::SetYmin(ymin);
   Plot2D::SetYmax(ymax);
   Plot2D::SetXlabel(xName);
   Plot2D::SetYlabel(yName);
-  Plot2D::SetZlabel(applyLog ? "log(obj)" : "obj");
+  Plot2D::SetZlabel("log(obj)");
   Plot2D::ShowAxisLabels(true);
-  Plot2D::Plot(landscape);
+  Plot2D::Plot(landscapeLog);
 }
 
 std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
