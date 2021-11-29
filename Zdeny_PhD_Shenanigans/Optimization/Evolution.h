@@ -4,6 +4,27 @@
 class Evolution : public OptimizationAlgorithm
 {
 public:
+  enum MutationStrategy
+  {
+    RAND1,
+    BEST1,
+    RAND2,
+    BEST2,
+    MutationStrategyCount
+  };
+
+  enum CrossoverStrategy
+  {
+    BIN,
+    EXP,
+    CrossoverStrategyCount
+  };
+
+  enum MetaObjectiveFunctionType
+  {
+    ObjectiveFunctionValue
+  };
+
   Evolution(int N, const std::string& optname = "noname");
   OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid = nullptr) override;
   void SetFileOutputDir(const std::string& dir);
@@ -11,21 +32,7 @@ public:
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetOptimizationName(const std::string& optname) { mOptimizationName = optname; }
-  void MetaOptimize(ObjectiveFunction obj, int runsPerObj = 3, int maxFunEvals = 10000, double optimalFitness = 1e-6);
-
-  enum MutationStrategy
-  {
-    RAND1,
-    BEST1,
-    RAND2,
-    BEST2
-  };
-
-  enum CrossoverStrategy
-  {
-    BIN,
-    EXP
-  };
+  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, int runsPerObj = 3, int maxFunEvals = 10000, double optimalFitness = -Constants::Inf);
 
   int mNP = 4;
   double mF = 0.65;
@@ -63,8 +70,6 @@ private:
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
     void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
     void PerformSelection();
-    void UpdatePopulationFunctionEvaluations();
-    void UpdateOffspringFunctionEvaluations();
     void UpdateBestEntity();
     void UpdateTerminationCriterions(double relativeDifferenceThreshold);
 
@@ -89,12 +94,15 @@ private:
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
   void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
+  void CheckParameters();
   int GetNumberOfParents();
   void InitializeOutputs(ValidationFunction valid);
   void UninitializeOutputs(const Population& population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population& population, ValidationFunction valid);
   TerminationReason CheckTerminationCriterions(const Population& population, int generation);
   std::string GetOutputFileString(int generation, const std::vector<double>& bestEntity, double bestFitness);
+  static const char* GetMutationStrategyString(MutationStrategy strategy);
+  static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
 
   bool mFileOutput = false;
   bool mPlotOutput = true;
@@ -102,7 +110,7 @@ private:
   double mAbsoluteDifferenceThreshold = 1e-10;
   double mRelativeDifferenceThreshold = 0.9;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
-  std::string mOptimizationName = "noname";
+  std::string mOptimizationName;
   std::string mOutputFileDir;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
