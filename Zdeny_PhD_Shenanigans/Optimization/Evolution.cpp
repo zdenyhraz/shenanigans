@@ -13,6 +13,7 @@ try
     LOG_INFO("Running evolution...");
   }
 
+  CheckParameters();
   InitializeOutputs(valid);
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
@@ -36,9 +37,9 @@ try
         population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
         population.UpdateOffspring(eid, mMutStrat, obj, mF, mLB, mUB);
       }
+      population.functionEvaluations += mNP;
       population.PerformSelection();
       population.UpdateBestEntity();
-      population.UpdateOffspringFunctionEvaluations();
       population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
 
       termReason = CheckTerminationCriterions(population, gen);
@@ -84,16 +85,18 @@ void Evolution::SetFileOutputDir(const std::string& dir)
   mFileOutput = true;
 }
 
-void Evolution::MetaOptimize(ObjectiveFunction obj, int runsPerObj, int maxFunEvals, double optimalFitness)
+void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, int runsPerObj, int maxFunEvals, double optimalFitness)
 {
-  enum MetaParameters
+  LOG_FUNCTION("Evolution metaoptimization");
+
+  enum MetaParameter
   {
     NP,
     CR,
     F,
     MutationStrategy,
     CrossoverStrategy,
-    MetaParametersCount
+    MetaParameterCount
   };
 
   const auto metaobj = [&](const std::vector<double>& metaparams)
@@ -112,29 +115,106 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, int runsPerObj, int maxFunEv
       evo.SetPlotOutput(false);
       evo.maxFunEvals = maxFunEvals;
       evo.optimalFitness = optimalFitness;
+      evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<int>(metaparams[MutationStrategy]));
+      evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<int>(metaparams[CrossoverStrategy]));
 
       const auto result = evo.Optimize(obj);
-      retval += result.terminationReason == OptimalFitnessReached ? result.functionEvaluations : maxFunEvals;
+
+      switch (metaObjType)
+      {
+      case ObjectiveFunctionValue:
+        retval += obj(result.optimum);
+        break;
+      }
     }
 
     return retval / runsPerObj;
   };
 
-  Evolution evo(MetaParametersCount);
+  // save original settings
+  const auto optimizationName = mOptimizationName;
+  const auto consoleOutput = mConsoleOutput;
+  const auto plotOutput = mPlotOutput;
+
+  // set up meta optimizer
+  Evolution evo(MetaParameterCount, "metaopt");
   evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
-  evo.mLB = {5, 0.1, 0.1, -1, -1};
-  evo.mUB = {100, 1, 2, 1, 1};
-  evo.mMutStrat = mMutStrat;
-  evo.mCrossStrat = mCrossStrat;
+  evo.mNP = 10 * MetaParameterCount;
+  evo.mMutStrat = RAND1;
+  evo.mCrossStrat = BIN;
+  evo.mLB = {7, 0.1, 0.1, 0, 0};
+  evo.mUB = {100, 1, 2, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
+  evo.SetConsoleOutput(true);
+  evo.SetPlotOutput(true);
 
-  auto optimalMetaParams = evo.Optimize(metaobj).optimum;
-
-  if (optimalMetaParams.size() != MetaParametersCount)
+  // calculate metaopt parameters
+  const auto optimalMetaParams = evo.Optimize(metaobj).optimum;
+  if (optimalMetaParams.size() != MetaParameterCount)
     return;
 
+  // statistics B4 metaopt
+  LOG_INFO("Evolution parameters before metaoptimization ({:.2e}): NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", metaobj({(double)mNP, mCR, mF, (double)mMutStrat, (double)mCrossStrat}), mNP, mCR, mF,
+      GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
+  std::vector<Evolution::OptimizationResult> resultsB4;
+  SetConsoleOutput(false);
+  SetPlotOutput(false);
+  for (int run = 0; run < runsPerObj; run++)
+    resultsB4.push_back(Optimize(obj));
+  SetOptimizationName("before metaopt");
+  SetPlotOutput(true);
+  Optimize(obj);
+
+  // apply metaopt parameters
   mNP = optimalMetaParams[NP];
   mCR = optimalMetaParams[CR];
   mF = optimalMetaParams[F];
+  mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<int>(optimalMetaParams[MutationStrategy]));
+  mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<int>(optimalMetaParams[CrossoverStrategy]));
+
+  // statistics A4 metaopt
+  LOG_INFO("Evolution parameters after metaoptimization ({:.2e}): NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", metaobj(optimalMetaParams), mNP, mCR, mF, GetMutationStrategyString(mMutStrat),
+      GetCrossoverStrategyString(mCrossStrat));
+  std::vector<Evolution::OptimizationResult> resultsA4;
+  SetConsoleOutput(false);
+  SetPlotOutput(false);
+  for (int run = 0; run < runsPerObj; run++)
+    resultsA4.push_back(Optimize(obj));
+  SetOptimizationName("after metaopt");
+  SetPlotOutput(true);
+  Optimize(obj);
+
+  // restore original settings
+  SetOptimizationName(optimizationName);
+  SetConsoleOutput(consoleOutput);
+  SetPlotOutput(plotOutput);
+
+  struct OptimizationPerformanceStatistics
+  {
+    double averageFitness = 0;
+    double averageFunctionEvaluations = 0;
+  };
+
+  OptimizationPerformanceStatistics statsB4, statsA4;
+
+  for (int run = 0; run < runsPerObj; run++)
+  {
+    statsB4.averageFitness += (1.0 / runsPerObj) * obj(resultsB4[run].optimum);
+    statsA4.averageFitness += (1.0 / runsPerObj) * obj(resultsA4[run].optimum);
+
+    statsB4.averageFunctionEvaluations += (1.0 / runsPerObj) * resultsB4[run].functionEvaluations;
+    statsA4.averageFunctionEvaluations += (1.0 / runsPerObj) * resultsA4[run].functionEvaluations;
+  }
+
+  LOG_INFO("Before metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)", statsB4.averageFitness, statsB4.averageFunctionEvaluations,
+      statsB4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
+  LOG_INFO("After metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)", statsA4.averageFitness, statsA4.averageFunctionEvaluations,
+      statsA4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
+
+  if (statsA4.averageFitness < statsB4.averageFitness)
+    LOG_SUCCESS(
+        "Metaopt with {} function evaluations budget improved average resulting fitness from {:.2e} to {:.2e} ({} runs)", maxFunEvals, statsB4.averageFitness, statsA4.averageFitness, runsPerObj);
+  else
+    LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
 }
 
 void Evolution::InitializeOutputs(ValidationFunction valid)
@@ -151,7 +231,7 @@ try
 
   if (mPlotOutput)
   {
-    Plot1D::Set("Evolution");
+    Plot1D::Set(fmt::format("Evolution ({})", mOptimizationName));
     Plot1D::Clear();
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("error");
@@ -180,7 +260,10 @@ try
   const auto result2 = obj(arg);
 
   if (result1 != result2)
-    LOG_WARNING("Objective function is not consistent ({} != {})", result1, result2);
+  {
+    if (mConsoleOutput)
+      LOG_WARNING("Objective function is not consistent ({} != {})", result1, result2);
+  }
   else if (mConsoleOutput)
     LOG_TRACE("Objective function is consistent");
 
@@ -245,6 +328,15 @@ void Evolution::CheckBounds()
     throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUB.size(), N));
 }
 
+void Evolution::CheckParameters()
+{
+  if (mMutStrat == MutationStrategyCount)
+    throw std::runtime_error("Invalid mutation strategy");
+
+  if (mCrossStrat == CrossoverStrategyCount)
+    throw std::runtime_error("Invalid crossover strategy");
+}
+
 void Evolution::UpdateOutputs(int gen, const Population& population, ValidationFunction valid)
 {
   if (population.bestEntity.fitness < population.previousFitness)
@@ -261,9 +353,9 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
   if (mPlotOutput)
   {
     if (valid)
-      Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
+      Plot1D::Plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
     else
-      Plot1D::Plot("Evolution", gen, population.bestEntity.fitness, {population.relativeDifference});
+      Plot1D::Plot(gen, population.bestEntity.fitness, {population.relativeDifference});
   }
 }
 
@@ -336,6 +428,36 @@ std::string Evolution::GetOutputFileString(int gen, const std::vector<double>& b
     }
   }
   return value;
+}
+
+const char* Evolution::GetMutationStrategyString(MutationStrategy strategy)
+{
+  switch (strategy)
+  {
+  case RAND1:
+    return "RAND1";
+  case BEST1:
+    return "BEST1";
+  case RAND2:
+    return "RAND2";
+  case BEST2:
+    return "BEST2";
+  }
+
+  return nullptr;
+}
+
+const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
+{
+  switch (strategy)
+  {
+  case BIN:
+    return "BIN";
+  case EXP:
+    return "EXP";
+  }
+
+  return nullptr;
 }
 
 int Evolution::GetNumberOfParents()
@@ -441,16 +563,6 @@ void Evolution::Population::PerformSelection()
   }
 }
 
-void Evolution::Population::UpdatePopulationFunctionEvaluations()
-{
-  functionEvaluations += entities.size();
-}
-
-void Evolution::Population::UpdateOffspringFunctionEvaluations()
-{
-  functionEvaluations += offspring.size();
-}
-
 void Evolution::Population::UpdateBestEntity()
 {
   averageFitness = 0;
@@ -523,7 +635,7 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
   for (int eid = 0; eid < NP; eid++)
     entities[eid].fitness = obj(entities[eid].params);
 
-  UpdatePopulationFunctionEvaluations();
+  functionEvaluations += NP;
 }
 
 void Evolution::Population::InitializeOffspring(int nParents)
