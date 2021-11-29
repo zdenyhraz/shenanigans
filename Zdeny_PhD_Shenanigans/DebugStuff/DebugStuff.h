@@ -22,7 +22,7 @@ namespace Debug
 void Debug(Globals* globals)
 {
   LOG_FUNCTION("Debug");
-  if (1) // CC/PC dizertacka pics
+  if (0) // CC/PC dizertacka pics
   {
     Mat img1 = loadImage("Resources/shapef.png");
     Mat img2 = loadImage("Resources/shapesf.png");
@@ -141,7 +141,7 @@ void Debug(Globals* globals)
     evo.optimalFitness = 1e-2;
     evo.SetParameterNames({"X", "Y", "A", "B", "R"});
 
-    const auto res = evo.Optimize(f);
+    const auto res = evo.Optimize(f).optimum;
     if (res.empty())
     {
       LOG_ERROR("Optimization failed");
@@ -999,20 +999,24 @@ void Debug(Globals* globals)
       }
     }
   }
-  if (0)
+  if (1)
   {
-    // plot in optimization - default
-    auto f = OptimizationTestFunctions::Paraboloid;
-    int N = 3;
+    // optimization / metaoptimization
+    bool meta = true;
+    auto f = OptimizationTestFunctions::Rosenbrock;
+    int N = 2;
     Evolution Evo(N);
     Evo.mNP = 10 * N;
     Evo.mLB = zerovect(N, (double)-N);
     Evo.mUB = zerovect(N, (double)+N);
-    Evo.SetParameterNames({"L", "H", "L2", "B", "W", "S"});
-    Evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
+    Evo.SetParameterNames({"x1", "x2", "x3", "x4", "x5"});
     Evo.SetOptimizationName("debug opt");
     Evo.SetPlotOutput(true);
-    auto result = Evo.Optimize(f);
+
+    if (meta)
+      Evo.MetaOptimize(f);
+    else
+      Evo.Optimize(f);
   }
 }
 }

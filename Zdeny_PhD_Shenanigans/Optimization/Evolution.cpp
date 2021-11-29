@@ -13,7 +13,7 @@ try
     LOG_INFO("Running evolution...");
   }
 
-  InitializeOutputs();
+  InitializeOutputs(valid);
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
   CheckValidationFunctionNormality(valid);
@@ -59,7 +59,11 @@ try
   }
 
   UninitializeOutputs(population, termReason);
-  return population.bestEntity.params;
+  OptimizationResult result;
+  result.optimum = population.bestEntity.params;
+  result.functionEvaluations = population.functionEvaluations;
+  result.terminationReason = termReason;
+  return result;
 }
 catch (const std::exception& e)
 {
@@ -80,7 +84,60 @@ void Evolution::SetFileOutputDir(const std::string& dir)
   mFileOutput = true;
 }
 
-void Evolution::InitializeOutputs()
+void Evolution::MetaOptimize(ObjectiveFunction obj, int runsPerObj, int maxFunEvals, double optimalFitness)
+{
+  enum MetaParameters
+  {
+    NP,
+    CR,
+    F,
+    MutationStrategy,
+    CrossoverStrategy,
+    MetaParametersCount
+  };
+
+  const auto metaobj = [&](const std::vector<double>& metaparams)
+  {
+    double retval = 0;
+
+    for (int run = 0; run < runsPerObj; run++)
+    {
+      Evolution evo(N);
+      evo.mLB = mLB;
+      evo.mUB = mUB;
+      evo.mNP = metaparams[NP];
+      evo.mCR = metaparams[CR];
+      evo.mF = metaparams[F];
+      evo.SetConsoleOutput(false);
+      evo.SetPlotOutput(false);
+      evo.maxFunEvals = maxFunEvals;
+      evo.optimalFitness = optimalFitness;
+
+      const auto result = evo.Optimize(obj);
+      retval += result.terminationReason == OptimalFitnessReached ? result.functionEvaluations : maxFunEvals;
+    }
+
+    return retval / runsPerObj;
+  };
+
+  Evolution evo(MetaParametersCount);
+  evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
+  evo.mLB = {5, 0.1, 0.1, -1, -1};
+  evo.mUB = {100, 1, 2, 1, 1};
+  evo.mMutStrat = mMutStrat;
+  evo.mCrossStrat = mCrossStrat;
+
+  auto optimalMetaParams = evo.Optimize(metaobj).optimum;
+
+  if (optimalMetaParams.size() != MetaParametersCount)
+    return;
+
+  mNP = optimalMetaParams[NP];
+  mCR = optimalMetaParams[CR];
+  mF = optimalMetaParams[F];
+}
+
+void Evolution::InitializeOutputs(ValidationFunction valid)
 try
 {
   if (mConsoleOutput)
@@ -99,7 +156,10 @@ try
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("error");
     Plot1D::SetY2label("best-average relative difference");
-    Plot1D::SetYnames({"obj", "valid"});
+    if (valid)
+      Plot1D::SetYnames({"obj", "valid"});
+    else
+      Plot1D::SetYnames({"obj"});
     Plot1D::SetY2names({"reldiff"});
     Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
   }
@@ -120,7 +180,7 @@ try
   const auto result2 = obj(arg);
 
   if (result1 != result2)
-    throw std::runtime_error(fmt::format("Objective function is not consistent ({} != {})", result1, result2));
+    LOG_WARNING("Objective function is not consistent ({} != {})", result1, result2);
   else if (mConsoleOutput)
     LOG_TRACE("Objective function is consistent");
 
@@ -142,6 +202,9 @@ catch (const std::exception& e)
 void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
 try
 {
+  if (!valid)
+    return;
+
   if (mConsoleOutput)
     LOG_FUNCTION("Validation function normality check");
 
@@ -196,7 +259,12 @@ void Evolution::UpdateOutputs(int gen, const Population& population, ValidationF
   }
 
   if (mPlotOutput)
-    Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
+  {
+    if (valid)
+      Plot1D::Plot("Evolution", gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
+    else
+      Plot1D::Plot("Evolution", gen, population.bestEntity.fitness, {population.relativeDifference});
+  }
 }
 
 void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)

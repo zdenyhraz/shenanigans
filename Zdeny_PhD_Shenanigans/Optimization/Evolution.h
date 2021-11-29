@@ -5,13 +5,13 @@ class Evolution : public OptimizationAlgorithm
 {
 public:
   Evolution(int N, const std::string& optname = "noname");
-  OptimizationResult Optimize(
-      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
+  OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid = nullptr) override;
   void SetFileOutputDir(const std::string& dir);
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetOptimizationName(const std::string& optname) { mOptimizationName = optname; }
+  void MetaOptimize(ObjectiveFunction obj, int runsPerObj = 3, int maxFunEvals = 10000, double optimalFitness = 1e-6);
 
   enum MutationStrategy
   {
@@ -90,7 +90,7 @@ private:
   void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
   int GetNumberOfParents();
-  void InitializeOutputs();
+  void InitializeOutputs(ValidationFunction valid);
   void UninitializeOutputs(const Population& population, TerminationReason reason);
   void UpdateOutputs(int generation, const Population& population, ValidationFunction valid);
   TerminationReason CheckTerminationCriterions(const Population& population, int generation);

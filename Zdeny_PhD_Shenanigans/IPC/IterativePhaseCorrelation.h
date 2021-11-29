@@ -1221,7 +1221,7 @@ private:
     evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
     evo.SetPlotOutput(!mute);
     evo.SetConsoleOutput(!mute);
-    return evo.Optimize(obj, valid);
+    return evo.Optimize(obj, valid).optimum;
   }
   void ApplyOptimalParameters(const std::vector<double>& optimalParameters, bool mute)
   {

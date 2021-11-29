@@ -144,7 +144,8 @@ void WindowDiffrot::optimizeDiffrot()
 
   try
   {
-    auto f = [&](const std::vector<double>& args) {
+    auto f = [&](const std::vector<double>& args)
+    {
       int winsize = std::floor(args[5]);
       int L2size = std::floor(args[2]);
       int upsampleCoeff = std::floor(args[6]);
@@ -174,7 +175,7 @@ void WindowDiffrot::optimizeDiffrot()
       evo.SetFileOutputDir("E:\\Zdeny_PhD_Shenanigans\\articles\\diffrot\\temp\\");
       evo.SetParameterNames({"BPL", "BPH", "L2", "+BP", "+HANN", "WSIZE", "UC", "+BICUBIC"});
       evo.SetOptimizationName(std::string("diffrot full") + " p" + std::to_string(drset.pics) + " s" + std::to_string(drset.sPic) + " y" + std::to_string(drset.ys));
-      auto result = evo.Optimize(f);
+      auto result = evo.Optimize(f).optimum;
       LOG_SUCCESS("Evolution run {}/{} result = {}", run + 1, runs, result);
     }
   }
@@ -264,5 +265,5 @@ FitsTime WindowDiffrot::GetStartFitsTime()
 {
   UpdateDrset();
   return FitsTime(ui.lineEdit_17->text().toStdString(), ui.lineEdit_10->text().toInt(), ui.lineEdit_11->text().toInt(), ui.lineEdit_12->text().toInt(), ui.lineEdit_13->text().toInt(),
-                  ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
+      ui.lineEdit_14->text().toInt(), ui.lineEdit_15->text().toInt());
 }
