@@ -999,9 +999,13 @@ void Debug(Globals* globals)
       }
     }
   }
-  if (1)
+  if (0) // objective function landscape
   {
-    // optimization / metaoptimization
+    const auto f = OptimizationTestFunctions::Rosenbrock;
+    OptimizationAlgorithm::PlotObjectiveFunctionLandscape(f, {0., 0.}, 501, 0, 1, -4, 4, -4, 4, "x", "y", true);
+  }
+  if (1) // optimization / metaoptimization
+  {
     const auto f = OptimizationTestFunctions::Rosenbrock;
     const int N = 2;
     const int runs = 20;

@@ -21,6 +21,7 @@ public:
   static void SetColRowRatio(double colRowRatio) { GetPlot().mColRowRatio = colRowRatio; }
   static void SetSavePath(const std::string& savePath) { GetPlot().mSavepath = savePath; }
   static void SetColorMapType(QCPColorGradient colorMapType) { GetPlot().mColormapType = colorMapType; }
+  static void ShowAxisLabels(bool showAxisLabels) { GetPlot().mShowAxisLabels = showAxisLabels; }
 
 private:
   static Plot2D& GetPlot(const std::string& name = mCurrentPlot);

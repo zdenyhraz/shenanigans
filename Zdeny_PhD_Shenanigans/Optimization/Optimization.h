@@ -29,10 +29,13 @@ public:
   };
 
   OptimizationAlgorithm(int N);
-  virtual ~OptimizationAlgorithm();
+  virtual ~OptimizationAlgorithm() = default;
 
   virtual OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) = 0;
+
+  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax, double ymin, double ymax,
+      const std::string& xName, const std::string& yName, bool applyLog);
 
   int N = 1;                               // the problem dimension
   std::vector<double> mLB;                 // lower search space bounds

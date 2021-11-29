@@ -45,7 +45,7 @@ inline double Paraboloid(const std::vector<double>& arg)
 {
   double val = 0;
   for (int i = 0; i < arg.size(); i++)
-    val += sqr(arg[i] - i);
+    val += sqr(arg[i] - i - 1);
   return val;
 }
 }

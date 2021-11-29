@@ -48,6 +48,8 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
     for (int yIndex = 0; yIndex < z.size(); ++yIndex)
       windowPlot->colorMap->data()->setCell(xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex]);
+  // the cell with indices (0, 0) is in the bottom left corner and the cell with
+  // indices(keySize - 1, valueSize - 1) is in the top right corner of the colormap
 
   windowPlot->ui.widget->rescaleAxes();
   windowPlot->colorMap->rescaleDataRange(true);
@@ -69,6 +71,8 @@ void Plot2D::Initialize(int xcnt, int ycnt)
   }
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
+  if (mShowAxisLabels)
+    colRowRatio *= 1.2;
   Plot::plots[mName] = std::make_unique<WindowPlot>(mName, colRowRatio, Plot::OnClose);
   auto& windowPlot = Plot::plots[mName];
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), mName));
