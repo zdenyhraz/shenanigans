@@ -140,8 +140,9 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   Evolution evo(MetaParameterCount, "metaopt");
   evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
   evo.mNP = 10 * MetaParameterCount;
-  evo.mMutStrat = RAND1;
+  evo.mMutStrat = BEST1;
   evo.mCrossStrat = BIN;
+  evo.maxFunEvals = 1000;
   evo.mLB = {7, 0.1, 0.1, 0, 0};
   evo.mUB = {100, 1, 2, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
   evo.SetConsoleOutput(true);
@@ -153,8 +154,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     return;
 
   // statistics B4 metaopt
-  LOG_INFO("Evolution parameters before metaoptimization ({:.2e}): NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", metaobj({(double)mNP, mCR, mF, (double)mMutStrat, (double)mCrossStrat}), mNP, mCR, mF,
-      GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
+  LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsB4;
   SetConsoleOutput(false);
   SetPlotOutput(false);
@@ -172,8 +172,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<int>(optimalMetaParams[CrossoverStrategy]));
 
   // statistics A4 metaopt
-  LOG_INFO("Evolution parameters after metaoptimization ({:.2e}): NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", metaobj(optimalMetaParams), mNP, mCR, mF, GetMutationStrategyString(mMutStrat),
-      GetCrossoverStrategyString(mCrossStrat));
+  LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsA4;
   SetConsoleOutput(false);
   SetPlotOutput(false);
@@ -234,7 +233,7 @@ try
     Plot1D::Set(fmt::format("Evolution ({})", mOptimizationName));
     Plot1D::Clear();
     Plot1D::SetXlabel("generation");
-    Plot1D::SetYlabel("error");
+    Plot1D::SetYlabel("objective function value");
     Plot1D::SetY2label("best-average relative difference");
     if (valid)
       Plot1D::SetYnames({"obj", "valid"});

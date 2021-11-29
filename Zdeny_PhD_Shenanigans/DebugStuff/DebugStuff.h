@@ -1005,25 +1005,20 @@ void Debug(Globals* globals)
     const auto f = OptimizationTestFunctions::Rosenbrock;
     const int N = 2;
     const int runs = 20;
-    const int maxFunEvals = 1e3;
+    const int maxFunEvals = 500;
     const float optimalFitness = -Constants::Inf;
     Evolution Evo(N);
     Evo.mNP = 10;
     Evo.mMutStrat = Evolution::RAND1;
-    Evo.mLB = zerovect(N, -2.0);
-    Evo.mUB = zerovect(N, +2.0);
+    Evo.mLB = zerovect(N, -4.0);
+    Evo.mUB = zerovect(N, +4.0);
     Evo.maxFunEvals = maxFunEvals;
     Evo.optimalFitness = optimalFitness;
     Evo.SetOptimizationName("debug opt");
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
 
-    if (1)
-    {
-      Evo.MetaOptimize(f, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-    }
-    else
-      Evo.Optimize(f);
+    Evo.MetaOptimize(f, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
 }
