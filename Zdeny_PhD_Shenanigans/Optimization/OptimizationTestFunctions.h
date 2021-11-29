@@ -24,21 +24,21 @@ inline double Himmelblau(const std::vector<double>& arg)
 {
   double x = arg[0];
   double y = arg[1];
-  return pow(x * x + y - 11, 2) + pow(x + y * y - 7, 2);
+  return sqr(x * x + y - 11) + sqr(x + y * y - 7);
 }
 
 inline double Rosenbrock(const std::vector<double>& arg)
 {
   double x = arg[0];
   double y = arg[1];
-  return 100 * pow(y - x * x, 2) + pow(1 - x, 2);
+  return 100 * sqr(y - x * x) + sqr(1 - x);
 }
 
 inline double Beale(const std::vector<double>& arg)
 {
   double x = arg[0];
   double y = arg[1];
-  return pow(1.5 - x + x * y, 2) + pow(2.25 - x + x * y * y, 2) + pow(2.625 - x + x * y * y * y, 2);
+  return sqr(1.5 - x + x * y) + sqr(2.25 - x + x * y * y) + sqr(2.625 - x + x * y * y * y);
 }
 
 inline double Paraboloid(const std::vector<double>& arg)
