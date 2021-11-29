@@ -124,11 +124,11 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     for (int run = 0; run < runsPerObj; run++)
     {
       Evolution evo(N);
-      evo.mLB = mLB;
-      evo.mUB = mUB;
       evo.mNP = metaparams[NP];
       evo.mCR = metaparams[CR];
       evo.mF = metaparams[F];
+      evo.mLB = mLB;
+      evo.mUB = mUB;
       evo.SetConsoleOutput(false);
       evo.SetPlotOutput(false);
       evo.maxFunEvals = maxFunEvals;
@@ -176,8 +176,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   const auto baseParams = std::vector<double>{20., mCR, mF, (double)RAND1, (double)BIN};
   const int iters = 51;
   PlotObjectiveFunctionLandscape(metaObj, baseParams, iters, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)),
-      GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)));
-  return;
+      GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mOptimizationName));
 
   // calculate metaopt parameters
   const auto optimalMetaParams = evo.Optimize(metaObj).optimum;
@@ -292,7 +291,7 @@ try
   if (result1 != result2)
   {
     if (mConsoleOutput)
-      LOG_WARNING("Objective function is not consistent ({} != {})", result1, result2);
+      LOG_WARNING("Objective function is not consistent ({:.2e} != {:.2e})", result1, result2);
   }
   else if (mConsoleOutput)
     LOG_TRACE("Objective function is consistent");
@@ -303,7 +302,10 @@ try
     LOG_TRACE("Objective function is finite");
 
   if (result1 < 0)
-    throw std::runtime_error(fmt::format("Objective function is not positive"));
+  {
+    if (mConsoleOutput)
+      LOG_WARNING("Objective function is not positive ({:.2e})", result1);
+  }
   else if (mConsoleOutput)
     LOG_TRACE("Objective function is positive");
 }
@@ -736,8 +738,9 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   {
     int L = 0;
     do
-      L++;
-    while ((rand01() < CR) && (L < params.size())); // at least one param undergoes crossover
+      L++; // at least one param undergoes crossover
+    while ((rand01() < CR) && (L < params.size()));
+
     int pid = rand() % params.size();
     for (int i = 0; i < L; i++)
     {

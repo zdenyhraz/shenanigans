@@ -999,10 +999,6 @@ void Debug(Globals* globals)
       }
     }
   }
-  if (0) // objective function landscape
-  {
-    OptimizationAlgorithm::PlotObjectiveFunctionLandscape(OptimizationTestFunctions::Rosenbrock, {0., 0.}, 501, 0, 1, -4, 4, -4, 4, "x", "y");
-  }
   if (1) // optimization / metaoptimization
   {
     const auto f = OptimizationTestFunctions::Beale;
@@ -1021,7 +1017,26 @@ void Debug(Globals* globals)
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
 
-    Evo.MetaOptimize(f, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    Evo.SetOptimizationName("Rosenbrock");
+    Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+    if (false)
+    {
+      Evo.SetOptimizationName("Paraboloid");
+      Evo.MetaOptimize(OptimizationTestFunctions::Paraboloid, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+      Evo.SetOptimizationName("Rosenbrock");
+      Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+      Evo.SetOptimizationName("Beale");
+      Evo.MetaOptimize(OptimizationTestFunctions::Beale, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+      Evo.SetOptimizationName("Himmelblau");
+      Evo.MetaOptimize(OptimizationTestFunctions::Himmelblau, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+      Evo.SetOptimizationName("Ackley");
+      Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    }
   }
 }
 }

@@ -8,7 +8,7 @@ OptimizationAlgorithm::OptimizationAlgorithm(int N) : N(N)
 }
 
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
-    double ymin, double ymax, const std::string& xName, const std::string& yName)
+    double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName)
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
   int rows = iters;
@@ -32,9 +32,9 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     }
   }
 
-  if (false) // usually nothing interesting here
+  if (true)
   {
-    Plot2D::Set("ObjectiveFunctionLandscape");
+    Plot2D::Set(fmt::format("Objective function landscape: {} raw", funName));
     Plot2D::SetXmin(xmin);
     Plot2D::SetXmax(xmax);
     Plot2D::SetYmin(ymin);
@@ -46,16 +46,19 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     Plot2D::Plot(landscape);
   }
 
-  Plot2D::Set("ObjectiveFunctionLandscapeLog");
-  Plot2D::SetXmin(xmin);
-  Plot2D::SetXmax(xmax);
-  Plot2D::SetYmin(ymin);
-  Plot2D::SetYmax(ymax);
-  Plot2D::SetXlabel(xName);
-  Plot2D::SetYlabel(yName);
-  Plot2D::SetZlabel("log(obj)");
-  Plot2D::ShowAxisLabels(true);
-  Plot2D::Plot(landscapeLog);
+  if (true)
+  {
+    Plot2D::Set(fmt::format("Objective function landscape: {}", funName));
+    Plot2D::SetXmin(xmin);
+    Plot2D::SetXmax(xmax);
+    Plot2D::SetYmin(ymin);
+    Plot2D::SetYmax(ymax);
+    Plot2D::SetXlabel(xName);
+    Plot2D::SetYlabel(yName);
+    Plot2D::SetZlabel("log(obj)");
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::Plot(landscapeLog);
+  }
 }
 
 std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
