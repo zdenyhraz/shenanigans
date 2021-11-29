@@ -7,8 +7,8 @@ public:
   enum MutationStrategy
   {
     RAND1,
-    BEST1,
     RAND2,
+    BEST1,
     BEST2,
     MutationStrategyCount
   };

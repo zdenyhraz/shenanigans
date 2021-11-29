@@ -162,21 +162,21 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mCrossStrat = BIN;
   evo.maxFunEvals = 1000;
   evo.mLB = {7, 0.1, 0.2, 0, 0};
-  evo.mUB = {100, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
+  evo.mUB = {50, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
 
   // plot metaopt surface
   const int xParamIndex = NP;
-  const int yParamIndex = F;
+  const int yParamIndex = MutationStrategy;
   const double xmin = evo.mLB[xParamIndex];
   const double xmax = evo.mUB[xParamIndex];
   const double ymin = evo.mLB[yParamIndex];
   const double ymax = evo.mUB[yParamIndex];
-  const auto baseParams = evo.mUB - evo.mLB;
+  const auto baseParams = std::vector<double>{20., mCR, mF, (double)RAND1, (double)BIN};
   const int iters = 51;
   PlotObjectiveFunctionLandscape(metaObj, baseParams, iters, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)),
-      GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), true);
+      GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)));
   return;
 
   // calculate metaopt parameters

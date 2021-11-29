@@ -1001,15 +1001,14 @@ void Debug(Globals* globals)
   }
   if (0) // objective function landscape
   {
-    const auto f = OptimizationTestFunctions::Rosenbrock;
-    OptimizationAlgorithm::PlotObjectiveFunctionLandscape(f, {0., 0.}, 501, 0, 1, -4, 4, -4, 4, "x", "y", true);
+    OptimizationAlgorithm::PlotObjectiveFunctionLandscape(OptimizationTestFunctions::Rosenbrock, {0., 0.}, 501, 0, 1, -4, 4, -4, 4, "x", "y");
   }
   if (1) // optimization / metaoptimization
   {
-    const auto f = OptimizationTestFunctions::Rosenbrock;
+    const auto f = OptimizationTestFunctions::Beale;
     const int N = 2;
     const int runs = 20;
-    const int maxFunEvals = 500;
+    const int maxFunEvals = 1000;
     const float optimalFitness = -Constants::Inf;
     Evolution Evo(N);
     Evo.mNP = 10;
