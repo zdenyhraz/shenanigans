@@ -60,13 +60,14 @@ private:
 
   struct Population
   {
-    Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput);
+    Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput, bool saveProgress);
     void UpdateDistinctParents(int eid);
     void UpdateCrossoverParameters(int eid, CrossoverStrategy crossoverStrategy, double CR);
     void UpdateOffspring(int eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
     void PerformSelection();
     void UpdateBestEntity();
     void UpdateTerminationCriterions(double relativeDifferenceThreshold);
+    void UpdateProgress();
 
     std::vector<Entity> entities;
     std::vector<Offspring> offspring;
@@ -77,6 +78,9 @@ private:
     double absoluteDifference;
     double relativeDifference;
     int relativeDifferenceGenerationsOverThreshold;
+    bool mSaveProgress;
+    std::vector<double> bestFitnessProgress;
+    std::vector<std::vector<double>> bestParametersProgress;
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);

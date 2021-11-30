@@ -32,7 +32,7 @@ try
   }
 
   int gen = 0;
-  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput);
+  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   TerminationReason termReason = NotTerminated;
   UpdateOutputs(gen, population, valid);
@@ -53,6 +53,7 @@ try
       population.PerformSelection();
       population.UpdateBestEntity();
       population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
+      population.UpdateProgress();
 
       termReason = CheckTerminationCriterions(population, gen);
       UpdateOutputs(gen, population, valid);
@@ -76,6 +77,8 @@ try
   result.optimum = population.bestEntity.params;
   result.functionEvaluations = population.functionEvaluations;
   result.terminationReason = termReason;
+  result.fitnessProgress = population.bestFitnessProgress;
+  result.parametersProgress = population.bestParametersProgress;
   return result;
 }
 catch (const std::exception& e)
@@ -155,16 +158,6 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     return retval / runsPerObj;
   };
 
-  // save original settings
-  const auto optimizationName = mName;
-  const auto consoleOutput = mConsoleOutput;
-  const auto plotOutput = mPlotOutput;
-  const auto plotObjFunLandscape = mPlotObjectiveFunctionLandscape;
-
-  SetConsoleOutput(false);
-  SetPlotOutput(false);
-  SetPlotObjectiveFunctionLandscape(false);
-
   // set up meta optimizer
   Evolution evo(MetaParameterCount, "metaopt");
   evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
@@ -176,6 +169,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mUB = {50, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
+  evo.SetFileOutput(false);
+  evo.SetPlotObjectiveFunctionLandscape(false);
 
   if (mPlotObjectiveFunctionLandscape) // plot metaopt surface
   {
@@ -195,15 +190,19 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   if (optimalMetaParams.size() != MetaParameterCount)
     return;
 
+  // save original settings and mute
+  const auto consoleOutput = mConsoleOutput;
+  const auto plotOutput = mPlotOutput;
+  const auto plotObjFunLandscape = mPlotObjectiveFunctionLandscape;
+  const auto saveProgress = mSaveProgress;
+  Mute();
+  SetSaveProgress(true);
+
   // statistics B4 metaopt
   LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsB4;
-  SetPlotOutput(false);
   for (int run = 0; run < runsPerObj; run++)
     resultsB4.push_back(Optimize(obj));
-  SetName("before metaopt");
-  SetPlotOutput(true);
-  Optimize(obj);
 
   // apply metaopt parameters
   mNP = optimalMetaParams[NP];
@@ -215,18 +214,24 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   // statistics A4 metaopt
   LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsA4;
-  SetPlotOutput(false);
   for (int run = 0; run < runsPerObj; run++)
     resultsA4.push_back(Optimize(obj));
-  SetName("after metaopt");
-  SetPlotOutput(true);
-  Optimize(obj);
+
+  // plot unoptimized vs optimized
+  std::vector<double> xs(resultsB4[0].fitnessProgress.size());
+  std::iota(xs.begin(), xs.end(), 0);
+  Plot1D::Set(fmt::format("{} metaopt comparison", mName));
+  Plot1D::SetXlabel("generation");
+  Plot1D::SetYlabel("objective function value");
+  Plot1D::SetYnames({"obj B4", "obj A4"});
+  Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
+  Plot1D::Plot(xs, {resultsB4[0].fitnessProgress, resultsA4[0].fitnessProgress});
 
   // restore original settings
-  SetName(optimizationName);
   SetConsoleOutput(consoleOutput);
   SetPlotOutput(plotOutput);
   SetPlotObjectiveFunctionLandscape(plotObjFunLandscape);
+  SetSaveProgress(saveProgress);
 
   struct OptimizationPerformanceStatistics
   {
@@ -519,12 +524,20 @@ int Evolution::GetNumberOfParents()
   return 3;
 }
 
-Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput)
+Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput, bool saveProgress)
 try
 {
   functionEvaluations = 0;
   relativeDifferenceGenerationsOverThreshold = 0;
   mConsoleOutput = consoleOutput;
+  mSaveProgress = saveProgress;
+
+  if (mSaveProgress)
+  {
+    bestFitnessProgress.reserve(100);
+    bestParametersProgress.reserve(100);
+  }
+
   InitializePopulation(NP, N, obj, LB, UB);
   InitializeBestEntity();
   InitializeOffspring(nParents);
@@ -628,6 +641,15 @@ void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenc
     relativeDifferenceGenerationsOverThreshold++;
   else
     relativeDifferenceGenerationsOverThreshold = 0;
+}
+
+void Evolution::Population::UpdateProgress()
+{
+  if (!mSaveProgress)
+    return;
+
+  bestFitnessProgress.push_back(bestEntity.fitness);
+  bestParametersProgress.push_back(bestEntity.params);
 }
 
 void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB)
