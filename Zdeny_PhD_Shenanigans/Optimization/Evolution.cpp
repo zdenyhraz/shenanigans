@@ -19,18 +19,6 @@ try
   CheckObjectiveFunctionNormality(obj);
   CheckValidationFunctionNormality(valid);
 
-  if (mPlotObjectiveFunctionLandscape)
-  {
-    const int xParamIndex = 0;
-    const int yParamIndex = 1;
-    const double xmin = mLB[xParamIndex];
-    const double xmax = mUB[xParamIndex];
-    const double ymin = mLB[yParamIndex];
-    const double ymax = mUB[yParamIndex];
-    const auto baseParams = mLB + 0.5 * (mUB - mLB);
-    PlotObjectiveFunctionLandscape(obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName));
-  }
-
   int gen = 0;
   Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
@@ -79,6 +67,19 @@ try
   result.terminationReason = termReason;
   result.fitnessProgress = population.bestFitnessProgress;
   result.parametersProgress = population.bestParametersProgress;
+
+  if (mPlotObjectiveFunctionLandscape)
+  {
+    const int xParamIndex = 0;
+    const int yParamIndex = 1;
+    const double xmin = mLB[xParamIndex];
+    const double xmax = mUB[xParamIndex];
+    const double ymin = mLB[yParamIndex];
+    const double ymax = mUB[yParamIndex];
+    const auto baseParams = mLB + 0.5 * (mUB - mLB);
+    PlotObjectiveFunctionLandscape(obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName), &result);
+  }
+
   return result;
 }
 catch (const std::exception& e)
