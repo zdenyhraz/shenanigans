@@ -16,6 +16,7 @@
 #include "Log/QtLogger.h"
 #include "Core/BlazeUtils.h"
 #include "Complexity/ComplexityClassEstimation.h"
+#include "Fractal/fractal.h"
 
 namespace Debug
 {
@@ -998,6 +999,11 @@ void Debug(Globals* globals)
         }
       }
     }
+  }
+  if (0)
+  {
+    Fractalset fractalSet;
+    computeFractal(fractalSet);
   }
   if (1) // optimization / metaoptimization
   {

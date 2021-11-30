@@ -35,6 +35,7 @@ struct Fractalset
     magnTresh = 2.;
     computeDependent();
   }
+
   void computeDependent()
   {
     xmin = fractalCenter.x - 1.5 * zoom;
