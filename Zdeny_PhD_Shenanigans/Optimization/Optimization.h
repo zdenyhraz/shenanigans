@@ -19,13 +19,14 @@ public:
 
   using ObjectiveFunction = const std::function<double(const std::vector<double>&)>&;
   using ValidationFunction = ObjectiveFunction;
-  using Optimum = std::vector<double>;
 
   struct OptimizationResult
   {
-    Optimum optimum;
+    std::vector<double> optimum;
     TerminationReason terminationReason = NotTerminated;
     int functionEvaluations = -1;
+    std::vector<double> fitnessProgress;
+    std::vector<std::vector<double>> parametersProgress;
   };
 
   OptimizationAlgorithm(int N, const std::string& optname = "default");
@@ -34,15 +35,24 @@ public:
   virtual OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) = 0;
 
+  void Mute()
+  {
+    SetConsoleOutput(false);
+    SetPlotOutput(false);
+    SetFileOutput(false);
+    SetPlotObjectiveFunctionLandscape(false);
+  }
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
+  void SetFileOutput(bool FileOutput) { mFileOutput = FileOutput; }
   void SetFileOutputDir(const std::string& dir)
   {
     mOutputFileDir = dir;
     mFileOutput = true;
   }
-  void SetPlotObjectiveFunctionLandscape(bool plotObjectiveFunctionLandscape) { mPlotObjectiveFunctionLandscape = plotObjectiveFunctionLandscape; }
-  void SetPlotObjectiveFunctionLandscapeIterations(int plotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = plotObjectiveFunctionLandscapeIterations; }
+  void SetPlotObjectiveFunctionLandscape(bool PlotObjectiveFunctionLandscape) { mPlotObjectiveFunctionLandscape = PlotObjectiveFunctionLandscape; }
+  void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
+  void SetPlotObjectiveFunctionLandscapeIterations(int PlotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetName(const std::string& optname) { mName = optname; }
 
@@ -63,6 +73,7 @@ protected:
   bool mPlotOutput = true;
   bool mFileOutput = false;
   bool mPlotObjectiveFunctionLandscape = false;
+  bool mSaveProgress = false;
   int mPlotObjectiveFunctionLandscapeIterations = 51;
   std::string mOutputFileDir;
   std::string mName;

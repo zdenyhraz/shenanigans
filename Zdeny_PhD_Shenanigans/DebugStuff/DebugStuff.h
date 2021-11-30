@@ -1018,10 +1018,12 @@ void Debug(Globals* globals)
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
     Evo.SetPlotObjectiveFunctionLandscape(true);
-    Evo.SetPlotObjectiveFunctionLandscapeIterations(501);
+    Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
+    Evo.SetSaveProgress(true);
 
     Evo.SetName("Rosenbrock");
-    Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
+    Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    // Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
 
     if (false)
     {
