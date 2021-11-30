@@ -65,8 +65,7 @@ Mat computeFractal(Fractalset& fractalset)
   setTrackbarMax("magnTresh", "Fractal", 100);
 
   showimg(Fractal, "Fractal");
-  showimg(Fractal, "Fractal_JET", true, COLORMAP_JET);
-  showimg(Fractal, "Fractal_RAINBOW", true, COLORMAP_RAINBOW);
+  showimg(Fractal, "Fractal_JET", true);
 
   std::cout << "Fractal created." << endl;
   return Fractal;
