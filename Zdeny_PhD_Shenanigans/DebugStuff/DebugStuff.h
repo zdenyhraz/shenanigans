@@ -1006,52 +1006,22 @@ void Debug(Globals* globals)
     const int maxFunEvals = 1000;
     const float optimalFitness = -Constants::Inf;
     Evolution Evo(N);
-    Evo.mNP = 7;
+    Evo.mNP = 5 * N;
     Evo.mMutStrat = Evolution::RAND1;
-    Evo.mLB = zerovect(N, -4.0);
-    Evo.mUB = zerovect(N, +4.0);
+    Evo.mLB = zerovect(N, -5.0);
+    Evo.mUB = zerovect(N, +5.0);
     Evo.maxFunEvals = maxFunEvals;
     Evo.optimalFitness = optimalFitness;
-    Evo.SetName("debug opt");
+    Evo.SetName("debug");
     Evo.SetParameterNames({"x", "y"});
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
     Evo.SetPlotObjectiveFunctionLandscape(true);
-    Evo.SetPlotObjectiveFunctionLandscapeIterations(201);
+    Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
-    if (false)
-    {
-      Evo.SetName("Cone");
-      Evo.Optimize(OptimizationTestFunctions::Cone);
-      Evo.MetaOptimize(OptimizationTestFunctions::Cone, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Sphere");
-      Evo.Optimize(OptimizationTestFunctions::Sphere);
-      Evo.MetaOptimize(OptimizationTestFunctions::Sphere, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Paraboloid");
-      Evo.Optimize(OptimizationTestFunctions::Paraboloid);
-      Evo.MetaOptimize(OptimizationTestFunctions::Paraboloid, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Rosenbrock");
-      Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
-      Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Beale");
-      Evo.Optimize(OptimizationTestFunctions::Beale);
-      Evo.MetaOptimize(OptimizationTestFunctions::Beale, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Himmelblau");
-      Evo.Optimize(OptimizationTestFunctions::Himmelblau);
-      Evo.MetaOptimize(OptimizationTestFunctions::Himmelblau, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-
-      Evo.SetName("Ackley");
-      Evo.Optimize(OptimizationTestFunctions::Ackley);
-      Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-    }
-
-    Evo.Optimize(OptimizationTestFunctions::Sphere);
+    // Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
+    Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
 }
