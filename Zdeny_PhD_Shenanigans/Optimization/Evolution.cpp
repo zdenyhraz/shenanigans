@@ -229,7 +229,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   Plot1D::SetYlabel("objective function value");
   Plot1D::SetYnames({"obj B4", "obj A4"});
   Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
-  Plot1D::Plot(xs, {resultsB4[0].bestFitnessProgress, resultsA4[0].bestFitnessProgress});
+  Plot1D::Plot(xs, {resultsB4.front().bestFitnessProgress, resultsA4.front().bestFitnessProgress});
 
   // restore original settings
   SetConsoleOutput(consoleOutput);

@@ -16,7 +16,6 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   Mat landscape = Mat::zeros(rows, cols, CV_32F);
   Mat landscapeLog = Mat::zeros(rows, cols, CV_32F);
   std::atomic<int> progress = 0;
-  static const double logConstant = 1e-10;
 
 #pragma omp parallel for
   for (int r = 0; r < rows; ++r)
@@ -30,26 +29,35 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       auto parameters = baseParams;
       parameters[xParamIndex] = xmin + (double)c / (cols - 1) * (xmax - xmin);
       parameters[yParamIndex] = ymax - (double)r / (rows - 1) * (ymax - ymin);
-      const auto fval = f(parameters);
-      landscape.at<float>(r, c) = fval;
-      landscapeLog.at<float>(r, c) = std::log(fval + logConstant);
+      landscape.at<float>(r, c) = f(parameters);
     }
   }
 
-  double minVal, maxVal, minValLog, maxValLog;
+  double minVal, maxVal;
   Point minLoc;
   minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
+
+  const double logConstant = 1.; // std::max(minVal, 1e-8);
+  for (int r = 0; r < rows; ++r)
+    for (int c = 0; c < cols; ++c)
+      landscapeLog.at<float>(r, c) = std::log(landscape.at<float>(r, c) + logConstant);
+
+  double minValLog, maxValLog;
   minMaxLoc(landscapeLog, &minValLog, &maxValLog);
-  static const int landscapeSize = 1000;
-  double lanscapeSizeMultiplier = (double)landscapeSize / cols;
-  resize(landscape, landscape, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
-  resize(landscapeLog, landscapeLog, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
-  rows = landscape.rows;
-  cols = landscape.cols;
-  Point2f minLocf = minLoc;
-  minLocf += {0.5, 0.5};
-  minLocf *= lanscapeSizeMultiplier;
-  minLoc = minLocf;
+
+  if (true)
+  {
+    static const int landscapeSize = 1000;
+    double lanscapeSizeMultiplier = (double)landscapeSize / cols;
+    resize(landscape, landscape, Size(landscapeSize, lanscapeSizeMultiplier * rows), 0, 0, INTER_LINEAR);
+    resize(landscapeLog, landscapeLog, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
+    rows = landscape.rows;
+    cols = landscape.cols;
+    Point2f minLocf = minLoc;
+    minLocf += {0.5, 0.5};
+    minLocf *= lanscapeSizeMultiplier;
+    minLoc = minLocf;
+  }
 
   static const double pointSizeMultiplierMin = 0.01;
   static const double pointSizeMultiplierBest = 0.008;
@@ -81,6 +89,13 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     return point;
   };
 
+  const auto GetParams = [&](Mat& mat, const Point& point)
+  {
+    double x = xmin + (double)point.x / (cols - 1) * (xmax - xmin);
+    double y = ymax - (double)point.y / (rows - 1) * (ymax - ymin);
+    return std::make_pair(x, y);
+  };
+
   const auto DrawPoint = [](Mat& mat, const Point& point, const Scalar& color, int size, int thickness)
   {
     const Point pointOffset1(size, size);
@@ -104,7 +119,9 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     DrawCircle(mat, point, color, 1.9 * size, thickness);
   };
 
-  LOG_DEBUG("Objective function landscape parameters: minVal: {:.2e} ({}), maxVal: {:.2e}", minVal, minLoc, maxVal);
+  const auto [minxcoord, minycoord] = GetParams(landscape, minLoc);
+  LOG_DEBUG("Objective function landscape parameters: minVal: {} ({}), maxVal: {}", minVal, Point(minxcoord, minycoord), maxVal);
+  LOG_DEBUG("Objective function landscape parameters: minValLog: {} ({}), maxValLog: {}", minValLog, Point(minxcoord, minycoord), maxValLog);
 
   if (optResult)
   {
