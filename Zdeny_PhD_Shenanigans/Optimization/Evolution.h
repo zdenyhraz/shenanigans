@@ -25,13 +25,8 @@ public:
     ObjectiveFunctionValue
   };
 
-  Evolution(int N, const std::string& optname = "noname");
+  Evolution(int N, const std::string& optname = "default");
   OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid = nullptr) override;
-  void SetFileOutputDir(const std::string& dir);
-  void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
-  void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
-  void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
-  void SetOptimizationName(const std::string& optname) { mOptimizationName = optname; }
   void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, int runsPerObj = 3, int maxFunEvals = 10000, double optimalFitness = -Constants::Inf);
 
   int mNP = 4;
@@ -104,14 +99,7 @@ private:
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
 
-  bool mFileOutput = false;
-  bool mPlotOutput = true;
-  bool mConsoleOutput = true;
   double mAbsoluteDifferenceThreshold = 1e-10;
   double mRelativeDifferenceThreshold = 0.9;
   int mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
-  std::string mOptimizationName;
-  std::string mOutputFileDir;
-  std::ofstream mOutputFile;
-  std::vector<std::string> mParameterNames;
 };

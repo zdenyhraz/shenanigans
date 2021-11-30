@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Optimization.h"
 
-OptimizationAlgorithm::OptimizationAlgorithm(int N) : N(N)
+OptimizationAlgorithm::OptimizationAlgorithm(int N, const std::string& optname) : N(N), mName(optname)
 {
   mLB = zerovect(N, -1.);
   mUB = zerovect(N, 1.);
@@ -61,7 +61,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   }
 }
 
-std::string OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
+const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
 {
   switch (reason)
   {

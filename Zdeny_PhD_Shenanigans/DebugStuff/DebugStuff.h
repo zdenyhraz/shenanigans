@@ -1013,28 +1013,31 @@ void Debug(Globals* globals)
     Evo.mUB = zerovect(N, +4.0);
     Evo.maxFunEvals = maxFunEvals;
     Evo.optimalFitness = optimalFitness;
-    Evo.SetOptimizationName("debug opt");
+    Evo.SetName("debug opt");
+    Evo.SetParameterNames({"x", "y"});
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
+    Evo.SetPlotObjectiveFunctionLandscape(true);
+    Evo.SetPlotObjectiveFunctionLandscapeIterations(501);
 
-    Evo.SetOptimizationName("Rosenbrock");
-    Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    Evo.SetName("Rosenbrock");
+    Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
 
     if (false)
     {
-      Evo.SetOptimizationName("Paraboloid");
+      Evo.SetName("Paraboloid");
       Evo.MetaOptimize(OptimizationTestFunctions::Paraboloid, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
 
-      Evo.SetOptimizationName("Rosenbrock");
+      Evo.SetName("Rosenbrock");
       Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
 
-      Evo.SetOptimizationName("Beale");
+      Evo.SetName("Beale");
       Evo.MetaOptimize(OptimizationTestFunctions::Beale, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
 
-      Evo.SetOptimizationName("Himmelblau");
+      Evo.SetName("Himmelblau");
       Evo.MetaOptimize(OptimizationTestFunctions::Himmelblau, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
 
-      Evo.SetOptimizationName("Ackley");
+      Evo.SetName("Ackley");
       Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     }
   }

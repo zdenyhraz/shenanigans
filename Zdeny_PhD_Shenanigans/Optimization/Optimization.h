@@ -28,11 +28,23 @@ public:
     int functionEvaluations = -1;
   };
 
-  OptimizationAlgorithm(int N);
+  OptimizationAlgorithm(int N, const std::string& optname = "default");
   virtual ~OptimizationAlgorithm() = default;
 
   virtual OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) = 0;
+
+  void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
+  void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
+  void SetFileOutputDir(const std::string& dir)
+  {
+    mOutputFileDir = dir;
+    mFileOutput = true;
+  }
+  void SetPlotObjectiveFunctionLandscape(bool plotObjectiveFunctionLandscape) { mPlotObjectiveFunctionLandscape = plotObjectiveFunctionLandscape; }
+  void SetPlotObjectiveFunctionLandscapeIterations(int plotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = plotObjectiveFunctionLandscapeIterations; }
+  void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
+  void SetName(const std::string& optname) { mName = optname; }
 
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax, double ymin, double ymax,
       const std::string& xName, const std::string& yName, const std::string& funName);
@@ -45,5 +57,15 @@ public:
   int maxGen = 1000;                       // maximum # of algorithm iterations
 
 protected:
-  std::string GetTerminationReasonString(const TerminationReason& reason);
+  static const char* GetTerminationReasonString(const TerminationReason& reason);
+
+  bool mConsoleOutput = true;
+  bool mPlotOutput = true;
+  bool mFileOutput = false;
+  bool mPlotObjectiveFunctionLandscape = false;
+  int mPlotObjectiveFunctionLandscapeIterations = 51;
+  std::string mOutputFileDir;
+  std::string mName;
+  std::ofstream mOutputFile;
+  std::vector<std::string> mParameterNames;
 };
