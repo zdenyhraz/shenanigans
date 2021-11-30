@@ -72,7 +72,7 @@ void Plot2D::Initialize(int xcnt, int ycnt)
 
   double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
   if (mShowAxisLabels)
-    colRowRatio *= 1.2;
+    colRowRatio *= 1.1;
   Plot::plots[mName] = std::make_unique<WindowPlot>(mName, colRowRatio, Plot::OnClose);
   auto& windowPlot = Plot::plots[mName];
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), mName));

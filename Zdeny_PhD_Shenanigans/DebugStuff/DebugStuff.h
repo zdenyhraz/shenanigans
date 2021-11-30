@@ -1021,11 +1021,16 @@ void Debug(Globals* globals)
     Evo.SetPlotObjectiveFunctionLandscapeIterations(501);
     Evo.SetSaveProgress(true);
 
-    Evo.SetName("Rosenbrock");
-    Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
-
     if (false)
     {
+      Evo.SetName("Cone");
+      Evo.Optimize(OptimizationTestFunctions::Cone);
+      Evo.MetaOptimize(OptimizationTestFunctions::Cone, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
+      Evo.SetName("Sphere");
+      Evo.Optimize(OptimizationTestFunctions::Sphere);
+      Evo.MetaOptimize(OptimizationTestFunctions::Sphere, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+
       Evo.SetName("Paraboloid");
       Evo.Optimize(OptimizationTestFunctions::Paraboloid);
       Evo.MetaOptimize(OptimizationTestFunctions::Paraboloid, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
@@ -1046,6 +1051,8 @@ void Debug(Globals* globals)
       Evo.Optimize(OptimizationTestFunctions::Ackley);
       Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     }
+
+    Evo.Optimize(OptimizationTestFunctions::Cone);
   }
 }
 }

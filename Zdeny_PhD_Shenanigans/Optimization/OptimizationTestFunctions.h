@@ -13,6 +13,16 @@ inline double Sphere(const std::vector<double>& arg)
   return returnVal;
 }
 
+inline double Cone(const std::vector<double>& arg)
+{
+  double returnVal = 0;
+  for (int i = 0; i < arg.size(); i++)
+  {
+    returnVal += std::abs(arg[i]);
+  }
+  return returnVal;
+}
+
 inline double Ackley(const std::vector<double>& arg)
 {
   double x = arg[0];
