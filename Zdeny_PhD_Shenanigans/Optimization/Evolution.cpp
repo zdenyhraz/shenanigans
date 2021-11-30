@@ -165,7 +165,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mNP = 10 * MetaParameterCount;
   evo.mMutStrat = BEST1;
   evo.mCrossStrat = BIN;
-  evo.maxFunEvals = 1000;
+  evo.maxFunEvals = 5000;
   evo.mLB = {7, 0.1, 0.2, 0, 0};
   evo.mUB = {30. * N, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
   evo.SetConsoleOutput(true);
@@ -229,6 +229,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   Plot1D::SetYlabel("objective function value");
   Plot1D::SetYnames({"obj B4", "obj A4"});
   Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
+  Plot1D::SetYLogarithmic(true);
   Plot1D::Plot(xs, {resultsB4.front().bestFitnessProgress, resultsA4.front().bestFitnessProgress});
 
   // restore original settings
