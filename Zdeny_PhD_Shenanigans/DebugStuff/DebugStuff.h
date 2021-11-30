@@ -1001,13 +1001,12 @@ void Debug(Globals* globals)
   }
   if (1) // optimization / metaoptimization
   {
-    const auto f = OptimizationTestFunctions::Beale;
     const int N = 2;
     const int runs = 20;
     const int maxFunEvals = 1000;
     const float optimalFitness = -Constants::Inf;
     Evolution Evo(N);
-    Evo.mNP = 10;
+    Evo.mNP = 7;
     Evo.mMutStrat = Evolution::RAND1;
     Evo.mLB = zerovect(N, -4.0);
     Evo.mUB = zerovect(N, +4.0);
@@ -1018,7 +1017,7 @@ void Debug(Globals* globals)
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
     Evo.SetPlotObjectiveFunctionLandscape(true);
-    Evo.SetPlotObjectiveFunctionLandscapeIterations(501);
+    Evo.SetPlotObjectiveFunctionLandscapeIterations(101);
     Evo.SetSaveProgress(true);
 
     if (false)
@@ -1052,7 +1051,7 @@ void Debug(Globals* globals)
       Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     }
 
-    Evo.Optimize(OptimizationTestFunctions::Cone);
+    Evo.Optimize(OptimizationTestFunctions::Himmelblau);
   }
 }
 }
