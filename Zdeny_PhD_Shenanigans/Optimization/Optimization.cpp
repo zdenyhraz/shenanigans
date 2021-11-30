@@ -36,36 +36,65 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   }
 
   static const int landscapeSize = 1000;
-  static const double pointSizeMultiplier = 0.01;
-  static const double pointThicknessMultiplier = 0.005;
-  static const double lineThicknessMultiplier = 0.002;
-  static const double pointColorMultiplier = 0.8;
-  static const double pointColorMinMultiplier = 0.5;
   resize(landscape, landscape, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
   resize(landscapeLog, landscapeLog, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
   rows = landscape.rows;
   cols = landscape.cols;
+
   double minVal, maxVal, minValLog, maxValLog;
   Point minLoc;
   minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
   minMaxLoc(landscapeLog, &minValLog, &maxValLog);
+  static const double pointSizeMultiplier = 0.01;
+  static const double pointThicknessMultiplier = 0.005;
+  static const double lineThicknessMultiplier = 0.002;
   const int pointSize = pointSizeMultiplier * cols;
   const int pointThickness = pointThicknessMultiplier * cols;
   const int lineThickness = lineThicknessMultiplier * cols;
-  const Scalar pointColorMin(minVal + pointColorMinMultiplier * (maxVal - minVal));
-  const Scalar pointColorMinLog(minValLog + pointColorMinMultiplier * (maxValLog - minValLog));
-  const Scalar pointColor(minVal + pointColorMultiplier * (maxVal - minVal));
-  const Scalar pointColorLog(minValLog + pointColorMultiplier * (maxValLog - minValLog));
   const Point pointOffset1(pointSize, pointSize);
   const Point pointOffset2(pointSize, -pointSize);
 
+  LOG_DEBUG("Objective function landscape parameters: minVal: {:.1e}, maxVal:{:.1e}", minVal, maxVal);
+
   if (optResult)
   {
+    if (true) // dbg
+    {
+      const int dbgcnt = 51;
+      optResult->parametersProgress.clear();
+      optResult->parametersProgress.resize(dbgcnt);
+
+      optResult->fitnessProgress.clear();
+      optResult->fitnessProgress.resize(dbgcnt);
+
+      for (int i = 0; i < dbgcnt; i++)
+      {
+        const double dbgX = -4. + ((double)i / (dbgcnt - 1)) * 8.;
+        const double dbgY = 4. - ((double)i / (dbgcnt - 1)) * 4.;
+        optResult->parametersProgress[i] = baseParams;
+        optResult->parametersProgress[i][xParamIndex] = dbgX;
+        optResult->parametersProgress[i][yParamIndex] = dbgY;
+        optResult->fitnessProgress[i] = f(optResult->parametersProgress[i]);
+      }
+    }
+
     LOG_DEBUG("Drawing optimization progress ({} points)", optResult->parametersProgress.size());
+
     for (int i = 0; i < optResult->parametersProgress.size(); i++)
     {
-      double x = optResult->parametersProgress[i][xParamIndex];
-      double y = optResult->parametersProgress[i][yParamIndex];
+      const double x = optResult->parametersProgress[i][xParamIndex];
+      const double y = optResult->parametersProgress[i][yParamIndex];
+      const double fitness = std::clamp(optResult->fitnessProgress[i], minVal, maxVal);
+      const double fitnessLog = std::log(fitness);
+      static const double pointColorMultiplierMin = 0.0;
+      static const double pointColorMultiplierMax = 1.0;
+      const double pointColorMultiplier = (std::clamp(1.0 - (fitness - minVal) / (maxVal - minVal), pointColorMultiplierMin, pointColorMultiplierMax));
+      const double pointColorMultiplierLog = (std::clamp(1.0 - (fitnessLog - minValLog) / (maxValLog - minValLog), pointColorMultiplierMin, pointColorMultiplierMax));
+      const Scalar pointColor(minVal + pointColorMultiplier * (maxVal - minVal));
+      const Scalar pointColorLog(minValLog + pointColorMultiplierLog * (maxValLog - minValLog));
+
+      LOG_DEBUG("Drawing optimization progress point {}/{}, fitness: {:.1e}, pointColorMultiplier: {:.1f}, pointColorMultiplierLog: {:.1f}", i + 1, optResult->parametersProgress.size(), fitness,
+          pointColorMultiplier, pointColorMultiplierLog);
 
       Point point;
       point.x = (x - xmin) / (xmax - xmin) * cols;
@@ -80,21 +109,33 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       {
         double xprev = optResult->parametersProgress[i - 1][xParamIndex];
         double yprev = optResult->parametersProgress[i - 1][yParamIndex];
+        double fitnessprev = optResult->fitnessProgress[i - 1];
+        const double fitnessprevLog = std::log(fitnessprev);
+        const double pointColorMultiplierprev = (std::clamp(1.0 - (fitnessprev - minVal) / (maxVal - minVal), pointColorMultiplierMin, pointColorMultiplierMax));
+        const double pointColorMultiplierprevLog = (std::clamp(1.0 - (fitnessprevLog - minValLog) / (maxValLog - minValLog), pointColorMultiplierMin, pointColorMultiplierMax));
+        const Scalar pointColorprev(minVal + pointColorMultiplierprev * (maxVal - minVal));
+        const Scalar pointColorprevLog(minValLog + pointColorMultiplierprevLog * (maxValLog - minValLog));
 
         Point pointprev;
         pointprev.x = (xprev - xmin) / (xmax - xmin) * cols;
         pointprev.y = rows - 1 - (yprev - ymin) / (ymax - ymin) * rows;
 
-        line(landscape, pointprev, point, pointColor, lineThickness);
-        line(landscapeLog, pointprev, point, pointColorLog, lineThickness);
+        line(landscape, pointprev, point, pointColorprev, lineThickness);
+        line(landscapeLog, pointprev, point, pointColorprevLog, lineThickness);
       }
     }
   }
 
+  static const double pointColorMinMultiplier = 0.5;
+  static const double circleSizeMultiplier = 2.2;
+  const Scalar pointColorMin(minVal + pointColorMinMultiplier * (maxVal - minVal));
+  const Scalar pointColorMinLog(minValLog + pointColorMinMultiplier * (maxValLog - minValLog));
   line(landscape, minLoc - pointOffset1, minLoc + pointOffset1, pointColorMin, pointThickness);
   line(landscape, minLoc - pointOffset2, minLoc + pointOffset2, pointColorMin, pointThickness);
+  circle(landscape, minLoc, circleSizeMultiplier * pointSize, pointColorMin, pointThickness);
   line(landscapeLog, minLoc - pointOffset1, minLoc + pointOffset1, pointColorMinLog, pointThickness);
   line(landscapeLog, minLoc - pointOffset2, minLoc + pointOffset2, pointColorMinLog, pointThickness);
+  circle(landscapeLog, minLoc, circleSizeMultiplier * pointSize, pointColorMinLog, pointThickness);
 
   if (true)
   {
