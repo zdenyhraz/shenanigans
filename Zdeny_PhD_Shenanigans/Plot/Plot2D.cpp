@@ -45,11 +45,11 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
   auto& windowPlot = Plot::plots[mName];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
+  // the cell with indices (0, 0) is in the bottom left corner and the cell with
+  // indices(keySize - 1, valueSize - 1) is in the top right corner of the colormap
   for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
     for (int yIndex = 0; yIndex < z.size(); ++yIndex)
       windowPlot->colorMap->data()->setCell(xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex]);
-  // the cell with indices (0, 0) is in the bottom left corner and the cell with
-  // indices(keySize - 1, valueSize - 1) is in the top right corner of the colormap
 
   windowPlot->ui.widget->rescaleAxes();
   windowPlot->colorMap->rescaleDataRange(true);

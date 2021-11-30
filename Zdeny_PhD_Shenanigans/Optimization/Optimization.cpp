@@ -8,7 +8,7 @@ OptimizationAlgorithm::OptimizationAlgorithm(int N, const std::string& optname) 
 }
 
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
-    double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName, OptimizationResult* optResult)
+    double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
   int rows = iters;
@@ -16,6 +16,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   Mat landscape = Mat::zeros(rows, cols, CV_32F);
   Mat landscapeLog = Mat::zeros(rows, cols, CV_32F);
   std::atomic<int> progress = 0;
+  static const double logConstant = 1e-10;
 
 #pragma omp parallel for
   for (int r = 0; r < rows; ++r)
@@ -31,13 +32,13 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       parameters[yParamIndex] = ymax - (double)r / (rows - 1) * (ymax - ymin);
       const auto fval = f(parameters);
       landscape.at<float>(r, c) = fval;
-      landscapeLog.at<float>(r, c) = std::log(1. + fval);
+      landscapeLog.at<float>(r, c) = std::log(fval + logConstant);
     }
   }
 
   double minVal, maxVal, minValLog, maxValLog;
-  Point minLoci;
-  minMaxLoc(landscape, &minVal, &maxVal, &minLoci);
+  Point minLoc;
+  minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
   minMaxLoc(landscapeLog, &minValLog, &maxValLog);
   static const int landscapeSize = 1000;
   double lanscapeSizeMultiplier = (double)landscapeSize / cols;
@@ -45,72 +46,103 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   resize(landscapeLog, landscapeLog, Size(landscapeSize, landscapeSize * rows / cols), 0, 0, INTER_LINEAR);
   rows = landscape.rows;
   cols = landscape.cols;
-  Point2f minLocf = minLoci;
+  Point2f minLocf = minLoc;
   minLocf += {0.5, 0.5};
   minLocf *= lanscapeSizeMultiplier;
-  Point minLoc = minLocf;
+  minLoc = minLocf;
 
-  static const double pointSizeMultiplier = 0.008;
   static const double pointSizeMultiplierMin = 0.01;
+  static const double pointSizeMultiplierBest = 0.008;
+  static const double pointSizeMultiplierEvaluated = 0.004;
   static const double pointThicknessMultiplier = 0.005;
-  static const double lineThicknessMultiplier = 0.002;
-  static const double circleSizeMultiplier = 1.8;
-  const int pointSize = pointSizeMultiplier * cols;
+  static const double lineThicknessMultiplier = 0.003;
+  static const double pointColorRangeMultiplierMin = 0.5;
+  static const double pointColorRangeMultiplierBest = 0.85;
+  static const double pointColorRangeMultiplierEvaluated = 0.65;
   const int pointSizeMin = pointSizeMultiplierMin * cols;
+  const int pointSizeBest = pointSizeMultiplierBest * cols;
+  const int pointSizeEvaluated = pointSizeMultiplierEvaluated * cols;
   const int pointThickness = pointThicknessMultiplier * cols;
   const int lineThickness = lineThicknessMultiplier * cols;
-  const Point pointOffset1(pointSize, pointSize);
-  const Point pointOffset2(pointSize, -pointSize);
   const Point pointOffset1Min(pointSizeMin, pointSizeMin);
   const Point pointOffset2Min(pointSizeMin, -pointSizeMin);
-  static const double pointColorRangeMultiplierMin = 0.5;
-  static const double pointColorRangeMultiplier = 0.85;
-  const Scalar pointColor(minVal + pointColorRangeMultiplier * (maxVal - minVal));
-  const Scalar pointColorLog(minValLog + pointColorRangeMultiplier * (maxValLog - minValLog));
+  const Scalar pointColorBest(minVal + pointColorRangeMultiplierBest * (maxVal - minVal));
+  const Scalar pointColorBestLog(minValLog + pointColorRangeMultiplierBest * (maxValLog - minValLog));
+  const Scalar pointColorEvaluated(minVal + pointColorRangeMultiplierEvaluated * (maxVal - minVal));
+  const Scalar pointColorEvaluatedLog(minValLog + pointColorRangeMultiplierEvaluated * (maxValLog - minValLog));
   const Scalar pointColorMin(minVal + pointColorRangeMultiplierMin * (maxVal - minVal));
   const Scalar pointColorMinLog(minValLog + pointColorRangeMultiplierMin * (maxValLog - minValLog));
 
-  line(landscape, minLoc - pointOffset1Min, minLoc + pointOffset1Min, pointColorMin, pointThickness);
-  line(landscape, minLoc - pointOffset2Min, minLoc + pointOffset2Min, pointColorMin, pointThickness);
-  circle(landscape, minLoc, circleSizeMultiplier * pointSizeMin, pointColorMin, pointThickness);
-  line(landscapeLog, minLoc - pointOffset1Min, minLoc + pointOffset1Min, pointColorMinLog, pointThickness);
-  line(landscapeLog, minLoc - pointOffset2Min, minLoc + pointOffset2Min, pointColorMinLog, pointThickness);
-  circle(landscapeLog, minLoc, circleSizeMultiplier * pointSizeMin, pointColorMinLog, pointThickness);
+  const auto GetPoint = [&](const std::vector<double>& parameters)
+  {
+    Point point;
+    point.x = (parameters[xParamIndex] - xmin) / (xmax - xmin) * cols;
+    point.y = rows - 1 - (parameters[yParamIndex] - ymin) / (ymax - ymin) * rows;
+    return point;
+  };
 
-  LOG_DEBUG("Objective function landscape parameters: minVal: {}, maxVal: {}", minVal, maxVal);
+  const auto DrawPoint = [](Mat& mat, const Point& point, const Scalar& color, int size, int thickness)
+  {
+    const Point pointOffset1(size, size);
+    const Point pointOffset2(size, -size);
+
+    line(mat, point - pointOffset1, point + pointOffset1, color, thickness, LINE_AA);
+    line(mat, point - pointOffset2, point + pointOffset2, color, thickness, LINE_AA);
+  };
+
+  const auto DrawCircle = [](Mat& mat, const Point& point, const Scalar& color, int size, int thickness) { circle(mat, point, size, color, thickness, LINE_AA); };
+
+  const auto DrawLine = [](Mat& mat, const Point& point1, const Point& point2, const Scalar& color, int thickness)
+  {
+    line(mat, point1, point2, color, thickness, LINE_AA);
+    // arrowedLine(mat, point1, point2, color, thickness, LINE_AA);
+  };
+
+  const auto DrawCircledPoint = [&](Mat& mat, const Point& point, const Scalar& color, int size, int thickness)
+  {
+    DrawPoint(mat, point, color, size, thickness);
+    DrawCircle(mat, point, color, 1.9 * size, thickness);
+  };
+
+  LOG_DEBUG("Objective function landscape parameters: minVal: {:.2e} ({}), maxVal: {:.2e}", minVal, minLoc, maxVal);
 
   if (optResult)
   {
-    LOG_DEBUG("Drawing optimization progress ({} points)", optResult->parametersProgress.size());
+    LOG_DEBUG("Drawing optimization progress ({} points)", optResult->bestParametersProgress.size());
 
-    for (int i = 0; i < optResult->parametersProgress.size(); i++)
+    for (const auto& parameters : optResult->evaluatedParameters)
     {
-      const double x = optResult->parametersProgress[i][xParamIndex];
-      const double y = optResult->parametersProgress[i][yParamIndex];
+      // all evaluated points
+      const Point point = GetPoint(parameters);
+      DrawCircle(landscape, point, pointColorEvaluated, pointSizeEvaluated, -1);
+      DrawCircle(landscapeLog, point, pointColorEvaluatedLog, pointSizeEvaluated, -1);
+    }
 
-      Point point;
-      point.x = (x - xmin) / (xmax - xmin) * cols;
-      point.y = rows - 1 - (y - ymin) / (ymax - ymin) * rows;
-
-      line(landscape, point - pointOffset1, point + pointOffset1, pointColor, pointThickness);
-      line(landscape, point - pointOffset2, point + pointOffset2, pointColor, pointThickness);
-      line(landscapeLog, point - pointOffset1, point + pointOffset1, pointColorLog, pointThickness);
-      line(landscapeLog, point - pointOffset2, point + pointOffset2, pointColorLog, pointThickness);
+    Point pointprev;
+    for (int i = 0; i < optResult->bestParametersProgress.size(); i++)
+    {
+      // best entity points
+      const Point point = GetPoint(optResult->bestParametersProgress[i]);
+      DrawCircle(landscape, point, pointColorBest, pointSizeBest, -1);
+      DrawCircle(landscapeLog, point, pointColorBestLog, pointSizeBest, -1);
 
       if (i > 0)
       {
-        double xprev = optResult->parametersProgress[i - 1][xParamIndex];
-        double yprev = optResult->parametersProgress[i - 1][yParamIndex];
-
-        Point pointprev;
-        pointprev.x = (xprev - xmin) / (xmax - xmin) * cols;
-        pointprev.y = rows - 1 - (yprev - ymin) / (ymax - ymin) * rows;
-
-        line(landscape, pointprev, point, pointColor, lineThickness);
-        line(landscapeLog, pointprev, point, pointColorLog, lineThickness);
+        // also draw best path
+        if (point != pointprev)
+        {
+          DrawLine(landscape, pointprev, point, pointColorBest, lineThickness);
+          DrawLine(landscapeLog, pointprev, point, pointColorBestLog, lineThickness);
+          pointprev = point;
+        }
       }
+      else
+        pointprev = point;
     }
   }
+
+  DrawCircledPoint(landscape, minLoc, pointColorMin, pointSizeMin, pointThickness);
+  DrawCircledPoint(landscapeLog, minLoc, pointColorMinLog, pointSizeMin, pointThickness);
 
   if (true)
   {
@@ -135,7 +167,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     Plot2D::SetYmax(ymax);
     Plot2D::SetXlabel(xName);
     Plot2D::SetYlabel(yName);
-    Plot2D::SetZlabel("log(1+obj)");
+    Plot2D::SetZlabel(fmt::format("log({:.1e}+obj)", logConstant));
     Plot2D::ShowAxisLabels(true);
     Plot2D::Plot(landscapeLog);
   }

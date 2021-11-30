@@ -25,8 +25,9 @@ public:
     std::vector<double> optimum;
     TerminationReason terminationReason = NotTerminated;
     int functionEvaluations = -1;
-    std::vector<double> fitnessProgress;
-    std::vector<std::vector<double>> parametersProgress;
+    std::vector<double> bestFitnessProgress;
+    std::vector<std::vector<double>> bestParametersProgress;
+    std::vector<std::vector<double>> evaluatedParameters;
   };
 
   OptimizationAlgorithm(int N, const std::string& optname = "default");
@@ -57,7 +58,7 @@ public:
   void SetName(const std::string& optname) { mName = optname; }
 
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax, double ymin, double ymax,
-      const std::string& xName, const std::string& yName, const std::string& funName, OptimizationResult* optResult = nullptr);
+      const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
   int N = 1;                               // the problem dimension
   std::vector<double> mLB;                 // lower search space bounds
