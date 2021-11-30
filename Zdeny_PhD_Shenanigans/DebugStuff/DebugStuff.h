@@ -1017,7 +1017,7 @@ void Debug(Globals* globals)
     Evo.SetConsoleOutput(true);
     Evo.SetPlotOutput(true);
     Evo.SetPlotObjectiveFunctionLandscape(true);
-    Evo.SetPlotObjectiveFunctionLandscapeIterations(101);
+    Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
     if (false)
@@ -1051,7 +1051,7 @@ void Debug(Globals* globals)
       Evo.MetaOptimize(OptimizationTestFunctions::Ackley, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     }
 
-    Evo.Optimize(OptimizationTestFunctions::Himmelblau);
+    Evo.MetaOptimize(OptimizationTestFunctions::Sphere, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
 }

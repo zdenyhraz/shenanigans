@@ -81,6 +81,7 @@ private:
     bool mSaveProgress;
     std::vector<double> bestFitnessProgress;
     std::vector<std::vector<double>> bestParametersProgress;
+    std::vector<std::vector<double>> evaluatedParameters;
 
   private:
     void InitializePopulation(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);

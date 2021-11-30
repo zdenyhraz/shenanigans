@@ -65,8 +65,9 @@ try
   result.optimum = population.bestEntity.params;
   result.functionEvaluations = population.functionEvaluations;
   result.terminationReason = termReason;
-  result.fitnessProgress = population.bestFitnessProgress;
-  result.parametersProgress = population.bestParametersProgress;
+  result.bestFitnessProgress = population.bestFitnessProgress;
+  result.bestParametersProgress = population.bestParametersProgress;
+  result.evaluatedParameters = population.evaluatedParameters;
 
   if (mPlotObjectiveFunctionLandscape)
   {
@@ -139,12 +140,11 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
       evo.mF = metaparams[F];
       evo.mLB = mLB;
       evo.mUB = mUB;
-      evo.SetConsoleOutput(false);
-      evo.SetPlotOutput(false);
       evo.maxFunEvals = maxFunEvals;
       evo.optimalFitness = optimalFitness;
       evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<int>(metaparams[MutationStrategy]));
       evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<int>(metaparams[CrossoverStrategy]));
+      evo.Mute();
 
       const auto result = evo.Optimize(obj);
 
@@ -159,7 +159,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     return retval / runsPerObj;
   };
 
-  // set up meta optimizer
+  // set up the meta optimizer
   Evolution evo(MetaParameterCount, "metaopt");
   evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
   evo.mNP = 10 * MetaParameterCount;
@@ -172,9 +172,17 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.SetPlotOutput(true);
   evo.SetFileOutput(false);
   evo.SetPlotObjectiveFunctionLandscape(false);
+  evo.SetSaveProgress(true);
 
-  if (mPlotObjectiveFunctionLandscape) // plot metaopt surface
+  // calculate metaopt parameters
+  const auto metaOptResult = evo.Optimize(metaObj);
+  const auto& optimalMetaParams = metaOptResult.optimum;
+  if (optimalMetaParams.size() != MetaParameterCount)
+    return;
+
+  if (mPlotObjectiveFunctionLandscape)
   {
+    // plot metaopt surface
     const int xParamIndex = NP;
     const int yParamIndex = MutationStrategy;
     const double xmin = evo.mLB[xParamIndex];
@@ -183,13 +191,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     const double ymax = evo.mUB[yParamIndex];
     const auto baseParams = std::vector<double>{20., mCR, mF, (double)RAND1, (double)BIN};
     PlotObjectiveFunctionLandscape(metaObj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax,
-        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName));
+        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName), &metaOptResult);
   }
-
-  // calculate metaopt parameters
-  const auto optimalMetaParams = evo.Optimize(metaObj).optimum;
-  if (optimalMetaParams.size() != MetaParameterCount)
-    return;
 
   // save original settings and mute
   const auto consoleOutput = mConsoleOutput;
@@ -219,14 +222,14 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     resultsA4.push_back(Optimize(obj));
 
   // plot unoptimized vs optimized
-  std::vector<double> xs(resultsB4[0].fitnessProgress.size());
+  std::vector<double> xs(resultsB4[0].bestFitnessProgress.size());
   std::iota(xs.begin(), xs.end(), 0);
   Plot1D::Set(fmt::format("{} metaopt comparison", mName));
   Plot1D::SetXlabel("generation");
   Plot1D::SetYlabel("objective function value");
   Plot1D::SetYnames({"obj B4", "obj A4"});
   Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
-  Plot1D::Plot(xs, {resultsB4[0].fitnessProgress, resultsA4[0].fitnessProgress});
+  Plot1D::Plot(xs, {resultsB4[0].bestFitnessProgress, resultsA4[0].bestFitnessProgress});
 
   // restore original settings
   SetConsoleOutput(consoleOutput);
@@ -537,6 +540,7 @@ try
   {
     bestFitnessProgress.reserve(100);
     bestParametersProgress.reserve(100);
+    evaluatedParameters.reserve(1000);
   }
 
   InitializePopulation(NP, N, obj, LB, UB);
@@ -593,6 +597,10 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
   try
   {
     newoffspring.fitness = obj(newoffspring.params);
+
+    if (mSaveProgress)
+#pragma omp critical
+      evaluatedParameters.push_back(newoffspring.params);
   }
   catch (const std::exception& e)
   {
@@ -699,8 +707,13 @@ void Evolution::Population::InitializePopulation(int NP, int N, ObjectiveFunctio
 
 #pragma omp parallel for
   for (int eid = 0; eid < NP; eid++)
+  {
     entities[eid].fitness = obj(entities[eid].params);
 
+    if (mSaveProgress)
+#pragma omp critical
+      evaluatedParameters.push_back(entities[eid].params);
+  }
   functionEvaluations += NP;
 }
 
