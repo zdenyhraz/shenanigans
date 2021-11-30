@@ -2,7 +2,7 @@
 #include "Evolution.h"
 #include "Plot/Plot.h"
 
-Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(N), mOptimizationName(optname), mNP(7 * N){};
+Evolution::Evolution(int N, const std::string& optname) : OptimizationAlgorithm(N, optname), mNP(7 * N){};
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 try
@@ -18,6 +18,18 @@ try
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
   CheckValidationFunctionNormality(valid);
+
+  if (mPlotObjectiveFunctionLandscape)
+  {
+    const int xParamIndex = 0;
+    const int yParamIndex = 1;
+    const double xmin = mLB[xParamIndex];
+    const double xmax = mUB[xParamIndex];
+    const double ymin = mLB[yParamIndex];
+    const double ymax = mUB[yParamIndex];
+    const auto baseParams = mLB + 0.5 * (mUB - mLB);
+    PlotObjectiveFunctionLandscape(obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName));
+  }
 
   int gen = 0;
   Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput);
@@ -77,12 +89,6 @@ catch (...)
   if (mConsoleOutput)
     LOG_ERROR("Unexpected evolution optimization error");
   return OptimizationResult();
-}
-
-void Evolution::SetFileOutputDir(const std::string& dir)
-{
-  mOutputFileDir = dir;
-  mFileOutput = true;
 }
 
 void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, int runsPerObj, int maxFunEvals, double optimalFitness)
@@ -150,9 +156,14 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   };
 
   // save original settings
-  const auto optimizationName = mOptimizationName;
+  const auto optimizationName = mName;
   const auto consoleOutput = mConsoleOutput;
   const auto plotOutput = mPlotOutput;
+  const auto plotObjFunLandscape = mPlotObjectiveFunctionLandscape;
+
+  SetConsoleOutput(false);
+  SetPlotOutput(false);
+  SetPlotObjectiveFunctionLandscape(false);
 
   // set up meta optimizer
   Evolution evo(MetaParameterCount, "metaopt");
@@ -166,17 +177,18 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
 
-  // plot metaopt surface
-  const int xParamIndex = NP;
-  const int yParamIndex = MutationStrategy;
-  const double xmin = evo.mLB[xParamIndex];
-  const double xmax = evo.mUB[xParamIndex];
-  const double ymin = evo.mLB[yParamIndex];
-  const double ymax = evo.mUB[yParamIndex];
-  const auto baseParams = std::vector<double>{20., mCR, mF, (double)RAND1, (double)BIN};
-  const int iters = 51;
-  PlotObjectiveFunctionLandscape(metaObj, baseParams, iters, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)),
-      GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mOptimizationName));
+  if (mPlotObjectiveFunctionLandscape) // plot metaopt surface
+  {
+    const int xParamIndex = NP;
+    const int yParamIndex = MutationStrategy;
+    const double xmin = evo.mLB[xParamIndex];
+    const double xmax = evo.mUB[xParamIndex];
+    const double ymin = evo.mLB[yParamIndex];
+    const double ymax = evo.mUB[yParamIndex];
+    const auto baseParams = std::vector<double>{20., mCR, mF, (double)RAND1, (double)BIN};
+    PlotObjectiveFunctionLandscape(metaObj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax,
+        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName));
+  }
 
   // calculate metaopt parameters
   const auto optimalMetaParams = evo.Optimize(metaObj).optimum;
@@ -186,11 +198,10 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   // statistics B4 metaopt
   LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsB4;
-  SetConsoleOutput(false);
   SetPlotOutput(false);
   for (int run = 0; run < runsPerObj; run++)
     resultsB4.push_back(Optimize(obj));
-  SetOptimizationName("before metaopt");
+  SetName("before metaopt");
   SetPlotOutput(true);
   Optimize(obj);
 
@@ -204,18 +215,18 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   // statistics A4 metaopt
   LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsA4;
-  SetConsoleOutput(false);
   SetPlotOutput(false);
   for (int run = 0; run < runsPerObj; run++)
     resultsA4.push_back(Optimize(obj));
-  SetOptimizationName("after metaopt");
+  SetName("after metaopt");
   SetPlotOutput(true);
   Optimize(obj);
 
   // restore original settings
-  SetOptimizationName(optimizationName);
+  SetName(optimizationName);
   SetConsoleOutput(consoleOutput);
   SetPlotOutput(plotOutput);
+  SetPlotObjectiveFunctionLandscape(plotObjFunLandscape);
 
   struct OptimizationPerformanceStatistics
   {
@@ -254,13 +265,13 @@ try
 
   if (mFileOutput)
   {
-    mOutputFile.open(mOutputFileDir + mOptimizationName + ".txt", std::ios::out | std::ios::app);
-    fmt::print(mOutputFile, "Evolution optimization '{}' started\n", mOptimizationName);
+    mOutputFile.open(mOutputFileDir + mName + ".txt", std::ios::out | std::ios::app);
+    fmt::print(mOutputFile, "Evolution optimization '{}' started\n", mName);
   }
 
   if (mPlotOutput)
   {
-    Plot1D::Set(fmt::format("Evolution ({})", mOptimizationName));
+    Plot1D::Set(fmt::format("Evolution ({})", mName));
     Plot1D::Clear();
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("objective function value");
@@ -396,7 +407,7 @@ try
 {
   if (mFileOutput)
   {
-    fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mOptimizationName);
+    fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
     fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
     mOutputFile.close();
   }
