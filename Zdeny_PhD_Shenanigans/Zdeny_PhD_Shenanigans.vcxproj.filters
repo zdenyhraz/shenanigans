@@ -115,9 +115,6 @@
     <ClCompile Include="Optimization\VisualOptimization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Optimization\Optimization.cpp">
-      <Filter>Source Files\Custom sources</Filter>
-    </ClCompile>
     <ClCompile Include="Optimization\GraphOptimization.cpp">
       <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
@@ -138,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="Plot\PlotCSV.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Optimization\Optimization_.cpp">
+      <Filter>Source Files\Custom sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -258,9 +258,6 @@
     <ClInclude Include="Optimization\VisualOptimization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Optimization\Optimization.h">
-      <Filter>Header Files\Custom Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Optimization\GraphOptimization.h">
       <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
@@ -311,6 +308,9 @@
     </ClInclude>
     <ClInclude Include="Complexity\ComplexityClassEstimation.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimization\Optimization_.h">
+      <Filter>Header Files\Custom Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

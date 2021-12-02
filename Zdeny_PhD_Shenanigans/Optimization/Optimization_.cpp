@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "Optimization.h"
+#include "Optimization_.h"
 
-OptimizationAlgorithm::OptimizationAlgorithm(int N, const std::string& optname) : N(N), mName(optname)
+OptimizationAlgorithm_::OptimizationAlgorithm_(int N, const std::string& optname) : N(N), mName(optname)
 {
   mLB = zerovect(N, -1.);
   mUB = zerovect(N, 1.);
 }
 
-void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
+void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
     double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
@@ -182,7 +182,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   }
 }
 
-const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
+const char* OptimizationAlgorithm_::GetTerminationReasonString(const TerminationReason& reason)
 {
   switch (reason)
   {
