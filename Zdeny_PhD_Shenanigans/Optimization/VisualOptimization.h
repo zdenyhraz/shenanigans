@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "optimization.h"
+#include "Optimization_.h"
 #include "Evolution.h"
 #include "PatternSearch.h"
 #include "OptimizationTestFunctions.h"
@@ -12,7 +12,7 @@ inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, 
   cv::Mat resultMat = cv::Mat::zeros(stepsY, stepsX, CV_32F);
   int progress = 0;
 
-#  pragma omp parallel for
+  #pragma omp parallel for
   for (int r = 0; r < resultMat.rows; ++r)
   {
     for (int c = 0; c < resultMat.cols; ++c)
@@ -21,7 +21,7 @@ inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, 
       double y = ymax - (ymax - ymin) / (stepsY - 1) * r;
       resultMat.at<float>(r, c) = f(vector<double>{x, y});
     }
-#  pragma omp critical
+  #pragma omp critical
     {
       progress++;
       cout << (double)progress / resultMat.rows * 100 << "% done." << endl;
@@ -31,7 +31,7 @@ inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, 
   return resultMat;
 }
 
-inline void drawPoint2D(const cv::Mat &funcLandscape, cv::Point point, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(255 * 0.7, 0, 255 * 0.7))
+inline void drawPoint2D(const cv::Mat& funcLandscape, cv::Point point, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(255 * 0.7, 0, 255 * 0.7))
 {
   // Scalar(255 * 0.7, 0, 255 * 0.7) - magenta
   int linePxLength = max(funcLandscape.cols / 120, 1);
@@ -46,7 +46,7 @@ inline void drawPoint2D(const cv::Mat &funcLandscape, cv::Point point, double st
   line(funcLandscape, NE, SW, CrosshairColor, thickness);
 }
 
-inline void drawArrow2D(const cv::Mat &funcLandscape, cv::Point point1, cv::Point point2, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(0, 0, 255))
+inline void drawArrow2D(const cv::Mat& funcLandscape, cv::Point point1, cv::Point point2, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = Scalar(0, 0, 255))
 {
   point1.x *= stretchFactorX;
   point1.y *= stretchFactorY;
@@ -56,7 +56,8 @@ inline void drawArrow2D(const cv::Mat &funcLandscape, cv::Point point1, cv::Poin
   arrowedLine(funcLandscape, point1, point2, CrosshairColor, thickness);
 }
 
-cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY, double stretchFactorX, double stretchFactorY, bool drawArrows)
+cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY, double stretchFactorX,
+    double stretchFactorY, bool drawArrows)
 {
   cv::Mat resultMat = funcLandscape.clone();
   for (int run = 0; run < points.size(); run++)
@@ -95,7 +96,8 @@ cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points,
   return resultMat;
 }
 
-inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> mLB, vector<double> mUB, vector<int> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, cv::Mat *landscape)
+inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> mLB, vector<double> mUB, vector<int> steps, Evolution Evo, PatternSearch Pat,
+    bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, cv::Mat* landscape)
 {
   cv::Mat optimizedFuncLandscapeCLR = cv::Mat::zeros(steps[0], steps[1], CV_32F);
   cv::Point2i minloc, maxloc;
@@ -185,7 +187,7 @@ void optimizeWithLandscapeDebug()
   std::function<double(vector<double>)> f = OptimizationTestFunctions::Rosenbrock;
   vector<double> mLB{-4.5, -4.5};
   vector<double> mUB{4.5, 4.5}; // odd
-  vector<int> steps{501, 501};          // odd
+  vector<int> steps{501, 501};  // odd
 
   /*
   //meta Evo

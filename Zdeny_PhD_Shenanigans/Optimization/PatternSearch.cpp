@@ -2,7 +2,7 @@
 #include "PatternSearch.h"
 #include "Plot/Plot1D.h"
 
-OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
+OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
   std::vector<double> boundsRange = mUB - mLB;

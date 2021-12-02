@@ -128,7 +128,7 @@
     <ClCompile Include="IPC\IPC.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Neural\neural.cpp" />
-    <ClCompile Include="Optimization\Optimization.cpp" />
+    <ClCompile Include="Optimization\Optimization_.cpp" />
     <ClCompile Include="Optimization\PatternSearch.cpp" />
     <ClCompile Include="Optimization\VisualOptimization.cpp" />
     <ClCompile Include="Plot\Plot.cpp" />
@@ -205,7 +205,7 @@
     <ClInclude Include="InverseMap\inverseMapping.h" />
     <ClInclude Include="Log\Logger.h" />
     <ClInclude Include="Neural\neural.h" />
-    <ClInclude Include="Optimization\Optimization.h" />
+    <ClInclude Include="Optimization\Optimization_.h" />
     <QtMoc Include="Gui\Windows\Features\WindowFeatures.h" />
     <QtMoc Include="Gui\Windows\Plot\WindowPlot.h" />
     <QtMoc Include="Plot\qcustomplot.h" />

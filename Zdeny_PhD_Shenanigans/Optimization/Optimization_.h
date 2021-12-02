@@ -3,7 +3,7 @@
 #include "Core/functionsBaseCV.h"
 #include "Log/logger.h"
 
-class OptimizationAlgorithm
+class OptimizationAlgorithm_
 {
 public:
   enum TerminationReason
@@ -30,8 +30,8 @@ public:
     std::vector<std::vector<double>> evaluatedParameters;
   };
 
-  OptimizationAlgorithm(int N, const std::string& optname = "default");
-  virtual ~OptimizationAlgorithm() = default;
+  OptimizationAlgorithm_(int N, const std::string& optname = "default");
+  virtual ~OptimizationAlgorithm_() = default;
 
   virtual OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) = 0;
