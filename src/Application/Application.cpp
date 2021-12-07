@@ -1,6 +1,7 @@
 #include "WindowShenanigans.h"
 
 int main(int argc, char** argv)
+try
 {
   srand(time(0));
 
@@ -10,4 +11,12 @@ int main(int argc, char** argv)
   WindowShenanigans w;
   w.show();
   return a.exec();
+}
+catch (const std::exception& e)
+{
+  fmt::print("Error: {}\n", e.what());
+}
+catch (...)
+{
+  fmt::print("Error: {}\n", "An unknown error has occured");
 }
