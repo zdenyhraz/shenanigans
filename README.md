@@ -1,4 +1,4 @@
-# Zdeny_PhD_Shenanigans
+# Zdeny's shenanigans
 Zdenek Hrazdira, 2019 / 2020 / 2021
 
 Semi-random PhD funky stuff. Mainly contains calculations for astrophysics articles I worked on - [Solar Dynamics Observatory](https://sdo.gsfc.nasa.gov/) image processing, image registration, also non-convex optimization, fractals. With Qt GUI, #uses STL, OpenCV, OpenMP, fftw, QCustomPlot, spdlog, cuda. ***Examples below.***

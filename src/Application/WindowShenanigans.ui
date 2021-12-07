@@ -51,7 +51,7 @@
    <cursorShape>ArrowCursor</cursorShape>
   </property>
   <property name="windowTitle">
-   <string>Zdeny_PhD_Shenanigans</string>
+   <string>WindowShenanigans</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="label">
@@ -109,7 +109,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Zdeny's PhD Shenanigans</string>
+     <string>Zdeny's shenanigans</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -265,7 +265,7 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About Zdeny's PhD Shenanigans</string>
+    <string>About Zdeny's shenanigans</string>
    </property>
   </action>
   <action name="actiongamma_contrast_brightness">
