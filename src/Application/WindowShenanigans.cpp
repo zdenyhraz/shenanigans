@@ -1033,8 +1033,8 @@ void WindowShenanigans::RandomShit()
     Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
-    // Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
-    Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
+    //Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
 
