@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gui/Windows/Plot/WindowPlot.h"
+#include "Application/Windows/Plot/WindowPlot.h"
 
 class Plot
 {

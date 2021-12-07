@@ -1,6 +1,6 @@
 
 #include "Log/Logger.h"
-#include "Gui/Windows/Plot/WindowPlot.h"
+#include "Application/Windows/Plot/WindowPlot.h"
 #include "Plot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;

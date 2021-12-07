@@ -1,4 +1,4 @@
-#include "Gui/Main/Zdeny_PhD_Shenanigans.h"
+#include "Zdeny_PhD_Shenanigans.h"
 
 
 int main(int argc, char** argv)

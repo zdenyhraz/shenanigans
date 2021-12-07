@@ -1,9 +1,9 @@
 #pragma once
 #include <regex>
 
+#include "Application/Zdeny_PhD_Shenanigans.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
-#include "Gui/Main/Zdeny_PhD_Shenanigans.h"
 #include "Optimization/Evolution.h"
 #include "Optimization/PatternSearch.h"
 #include "Optimization/OptimizationTestFunctions.h"
