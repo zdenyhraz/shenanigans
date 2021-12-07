@@ -1,14 +1,20 @@
-#pragma once
-#include <regex>
 
-#include "Application/Zdeny_PhD_Shenanigans.h"
+#include <regex>
+#include "WindowShenanigans.h"
+
+#include "Application/Windows/IPC/WindowIPC.h"
+#include "Application/Windows/Diffrot/WindowDiffrot.h"
+#include "Application/Windows/Features/WindowFeatures.h"
+#include "Application/Windows/FITS/WindowFITS.h"
+#include "Application/Windows/Filtering/WindowFiltering.h"
+#include "Procedural/procedural.h"
+#include "Snake/game.h"
+#include "UnitTests/UnitTests.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Optimization/Evolution.h"
 #include "Optimization/PatternSearch.h"
 #include "Optimization/OptimizationTestFunctions.h"
-#include "Procedural/procedural.h"
-#include "Snake/game.h"
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
 #include "IPC/IPC.h"
@@ -18,15 +24,137 @@
 #include "Sasko/NonMaximaSuppression.h"
 #include "Log/Logger.h"
 #include "Log/QtLogger.h"
-#include "Complexity/ComplexityClassEstimation.h"
+#include "ComplexityEstimation/ComplexityClassEstimation.h"
 #include "Fractal/fractal.h"
 #include "Astrophysics/diffrotResults.h"
 
-namespace Debug
+WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 {
-void Debug(Globals* globals)
+  // create global data shared within windows
+  globals = std::make_unique<Globals>();
+
+  // create windows
+  mWindows["ipc"] = std::make_unique<WindowIPC>(this, globals.get());
+  mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, globals.get());
+  mWindows["features"] = std::make_unique<WindowFeatures>(this, globals.get());
+  mWindows["fits"] = std::make_unique<WindowFITS>(this, globals.get());
+  mWindows["filtering"] = std::make_unique<WindowFiltering>(this, globals.get());
+
+  // setup Qt ui - meta compiled
+  ui.setupUi(this);
+
+  // show the logo
+  QPixmap pm("Resources/logo.png");
+  ui.label_2->setPixmap(pm);
+  ui.label_2->setScaledContents(true);
+
+  // set the logging text browser
+  QtLogger::SetTextBrowser(ui.textBrowser);
+  // QtLogger::SetLogLevel(QtLogger::LogLevel::Function);
+
+  LOG_INFO("Welcome back, my friend.");
+
+  // make signal - slot connections
+  connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
+  connect(ui.actionDiffrot, SIGNAL(triggered()), this, SLOT(ShowWindowDiffrot()));
+  connect(ui.actionFeatures, SIGNAL(triggered()), this, SLOT(ShowWindowFeatures()));
+  connect(ui.actionFITS, SIGNAL(triggered()), this, SLOT(ShowWindowFITS()));
+  connect(ui.actionFiltering, SIGNAL(triggered()), this, SLOT(ShowWindowFiltering()));
+  connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(About()));
+  connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(CloseAll()));
+  connect(ui.actionSnake, SIGNAL(triggered()), this, SLOT(Snake()));
+  connect(ui.actionProcedural, SIGNAL(triggered()), this, SLOT(GenerateLand()));
+  connect(ui.actionUnitTests, SIGNAL(triggered()), this, SLOT(UnitTests()));
+  connect(ui.pushButtonDebug, SIGNAL(clicked()), this, SLOT(RandomShit()));
+}
+
+void WindowShenanigans::ShowWindowIPC()
 {
-  LOG_FUNCTION("Debug");
+  mWindows["ipc"]->show();
+}
+
+void WindowShenanigans::ShowWindowDiffrot()
+{
+  mWindows["diffrot"]->show();
+}
+
+void WindowShenanigans::ShowWindowFeatures()
+{
+  mWindows["features"]->show();
+}
+
+void WindowShenanigans::ShowWindowFITS()
+{
+  mWindows["fits"]->show();
+}
+
+void WindowShenanigans::ShowWindowFiltering()
+{
+  mWindows["filtering"]->show();
+}
+
+void WindowShenanigans::Exit()
+{
+  QApplication::exit();
+}
+
+void WindowShenanigans::About()
+{
+  QMessageBox msgBox;
+  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\n� Zdenek Hrazdira");
+  msgBox.exec();
+}
+
+void WindowShenanigans::CloseAll()
+{
+  cv::destroyAllWindows();
+  Plot::CloseAll();
+
+  for (auto& [windowname, window] : mWindows)
+    window->close();
+
+  LOG_INFO("All windows closed");
+}
+
+void WindowShenanigans::GenerateLand()
+{
+  LOG_FUNCTION("Generate land");
+  cv::Mat mat = procedural(1000, 1000);
+  showimg(colorlandscape(mat), "procedural nature");
+}
+
+void WindowShenanigans::UnitTests()
+{
+  UnitTests::TestAll();
+}
+
+void WindowShenanigans::Snake()
+{
+  LOG_FUNCTION("Play snake");
+  SnakeGame();
+}
+
+void WindowShenanigans::closeEvent(QCloseEvent* event)
+{
+  /*QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Quit", "Are you sure you want to quit?    ", QMessageBox::Cancel | QMessageBox::Yes, QMessageBox::Yes);
+  if (resBtn != QMessageBox::Yes)
+  {
+    event->ignore();
+  }
+  else
+  {
+    event->accept();
+    CloseAll();
+    LOG_SUCCESS("Good bye.");
+  }*/
+
+  CloseAll();
+  LOG_INFO("Good bye.");
+}
+
+void WindowShenanigans::RandomShit()
+{
+  LOG_FUNCTION("RandomShit");
   if (0) // CC/PC dizertacka pics
   {
     cv::Mat img1 = loadImage("Resources/shapef.png");
@@ -160,11 +288,11 @@ void Debug(Globals* globals)
     cv::Mat ellipseImgCalculated = cv::Mat::zeros(imgsize, imgsize, CV_32F);
     ellipse(ellipseImgCalculated, cv::RotatedRect(calcCenter, calcSize, calcAngle), cv::Scalar(1), -1, cv::LINE_AA);
 
-    auto imgDiff = sum(abs(ellipseImgCalculated - ellipseImg))[0] / sum(ellipseImg)[0];
-    auto sumDiff = abs(sum(ellipseImgCalculated)[0] - sum(ellipseImg)[0]) / sum(ellipseImg)[0];
+    auto imgDiff = cv::sum(cv::abs(ellipseImgCalculated - ellipseImg))[0] / cv::sum(ellipseImg)[0];
+    auto sumDiff = cv::abs(cv::sum(ellipseImgCalculated)[0] - cv::sum(ellipseImg)[0]) / sum(ellipseImg)[0];
     auto cenDiff = findCentroid(ellipseImgCalculated) - findCentroid(ellipseImg);
-    cenDiff.x = abs(cenDiff.x) / ellipseImg.cols;
-    cenDiff.y = abs(cenDiff.y) / ellipseImg.rows;
+    cenDiff.x = std::abs(cenDiff.x) / ellipseImg.cols;
+    cenDiff.y = std::abs(cenDiff.y) / ellipseImg.rows;
 
     LOG_DEBUG("ImgDiff: {:.1e}, SumDiff: {:.1e}, CenDiff: {:.1e}", imgDiff, sumDiff, cenDiff.x + cenDiff.y);
     LOG_INFO("True ellipse center: [{:.1f} , {:.1f}], size: [{} , {}], angle: {:.1f}", ellipseCenter.x, ellipseCenter.y, ellipseSize.width, ellipseSize.height, ellipseAngle);
@@ -320,8 +448,8 @@ void Debug(Globals* globals)
     cv::Size size(sajz, sajz);
     if (sajz > 0 && img1.size() != size)
     {
-      resize(img1, img1, size);
-      resize(img2, img2, size);
+      cv::resize(img1, img1, size);
+      cv::resize(img2, img2, size);
     }
 
     bool crop = true;
@@ -366,8 +494,8 @@ void Debug(Globals* globals)
     cv::Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
     int size = cropsize;
-    resize(img1, img1, cv::Size(size, size));
-    resize(img2, img2, cv::Size(size, size));
+    cv::resize(img1, img1, cv::Size(size, size));
+    cv::resize(img2, img2, cv::Size(size, size));
 
     Shift(img2, -950, 1050);
     Rotate(img2, 70, 1.2);
@@ -500,7 +628,7 @@ void Debug(Globals* globals)
   {
     cv::Mat img = loadImage("Resources/test.png");
     float scale = 1.0;
-    resize(img, img, cv::Size(scale * img.cols, scale * img.rows));
+    cv::resize(img, img, cv::Size(scale * img.cols, scale * img.rows));
     NonMaximaSuppresion(img);
   }
   if (0) // kirkl test
@@ -508,7 +636,7 @@ void Debug(Globals* globals)
     for (int i = 5; i < 21; i += 2)
     {
       cv::Mat kirklik;
-      resize(kirkl(i), kirklik, cv::Size(999, 999), 0, 0, cv::INTER_NEAREST);
+      cv::resize(kirkl(i), kirklik, cv::Size(999, 999), 0, 0, cv::INTER_NEAREST);
       // Plot2D::Plot(kirklik, std::string("kirkl") + i);
     }
     // Plot2D::Plot(kirkl(999), std::string("kirkl999"));
@@ -613,7 +741,7 @@ void Debug(Globals* globals)
     cv::Mat img = cv::imread("Resources/test.png", cv::IMREAD_GRAYSCALE);
     normalize(img, img, 0, 255, cv::NORM_MINMAX);
     img.convertTo(img, CV_8UC1);
-    resize(img, img, cv::Size(500, 500));
+    cv::resize(img, img, cv::Size(500, 500));
     cv::Mat heq = EqualizeHistogram(img);
     cv::Mat aheq = EqualizeHistogramAdaptive(img, 201);
 
@@ -630,8 +758,8 @@ void Debug(Globals* globals)
   }
   if (0) // plot from csv file
   {
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens1.png");
-    PlotCSV::plot("E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\Zdeny_PhD_Shenanigans\\articles\\tokens\\plots\\tokens2.png");
+    PlotCSV::plot("E:\\WindowShenanigans\\articles\\tokens\\data\\tokens1.csv", "E:\\WindowShenanigans\\articles\\tokens\\plots\\tokens1.png");
+    PlotCSV::plot("E:\\WindowShenanigans\\articles\\tokens\\data\\tokens2.csv", "E:\\WindowShenanigans\\articles\\tokens\\plots\\tokens2.png");
   }
   if (0) // plot pen colors
   {
@@ -909,4 +1037,4 @@ void Debug(Globals* globals)
     Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
-}
+

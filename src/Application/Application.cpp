@@ -1,5 +1,4 @@
-#include "Zdeny_PhD_Shenanigans.h"
-
+#include "WindowShenanigans.h"
 
 int main(int argc, char** argv)
 {
@@ -9,7 +8,7 @@ int main(int argc, char** argv)
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); // HiDPI pixmaps
 
   QApplication a(argc, argv);
-  Zdeny_PhD_Shenanigans w;
+  WindowShenanigans w;
   w.show();
   return a.exec();
 }

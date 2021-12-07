@@ -1,13 +1,13 @@
 #pragma once
-#include "ui_Zdeny_PhD_Shenanigans.h"
+#include "ui_WindowShenanigans.h"
 #include "Core/globals.h"
 
-class Zdeny_PhD_Shenanigans : public QMainWindow
+class WindowShenanigans : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  Zdeny_PhD_Shenanigans(QWidget* parent = Q_NULLPTR);
+  WindowShenanigans(QWidget* parent = Q_NULLPTR);
 
 private:
   Ui::Zdeny_PhD_ShenanigansClass ui;
@@ -24,8 +24,8 @@ private slots:
   void Exit();
   void About();
   void CloseAll();
-  void Debug();
   void Snake();
   void GenerateLand();
   void UnitTests();
+  void RandomShit();
 };
