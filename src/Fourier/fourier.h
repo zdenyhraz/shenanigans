@@ -5,26 +5,26 @@
 
 namespace Fourier
 {
-inline cv::Mat fft(cv::Mat&& img, bool packed = false)
+inline cv::Mat fftcore(cv::Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
   if (packed)
-    dft(img, img);
+    cv::dft(img, img);
   else
-    dft(img, img, cv::DFT_COMPLEX_OUTPUT);
+    cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);
 
   return img;
 }
 
-inline cv::Mat ifft(cv::Mat&& fft)
+inline cv::Mat ifftcore(cv::Mat&& fft)
 {
-  dft(fft, fft, cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
+  cv::dft(fft, fft, cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
   return fft;
 }
 
-inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
+inline cv::Mat cufftcore(cv::Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -51,7 +51,7 @@ inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
   }
 }
 
-inline cv::Mat icufft(cv::Mat&& fft, bool packed = false)
+inline cv::Mat icufftcore(cv::Mat&& fft, bool packed = false)
 {
   // cuda::GpuMat fftGpu;
   // fftGpu.upload(fft);
@@ -74,22 +74,22 @@ inline cv::Mat icufft(cv::Mat&& fft, bool packed = false)
 
 inline cv::Mat fft(const cv::Mat& img, bool packed = false)
 {
-  return fft(img.clone(), packed);
+  return fftcore(img.clone(), packed);
 }
 
-inline cv::Mat ifft(const cv::Mat& fft, bool packed = false)
+inline cv::Mat ifft(const cv::Mat& fft)
 {
-  return ifft(fft.clone(), packed);
+  return ifftcore(fft.clone());
 }
 
 inline cv::Mat cufft(const cv::Mat& img, bool packed = false)
 {
-  return cufft(img.clone(), packed);
+  return cufftcore(img.clone(), packed);
 }
 
 inline cv::Mat icufft(const cv::Mat& fft, bool packed = false)
 {
-  return icufft(fft.clone(), packed);
+  return icufftcore(fft.clone(), packed);
 }
 
 inline void fftshift(cv::Mat& mat)
@@ -193,7 +193,7 @@ inline cv::Mat fftlogmagn(const cv::Mat& img, int logs = 1)
 
 inline cv::Mat ifftlogmagn(const cv::Mat& img, int logs = 1)
 {
-  cv::Mat out = ifft(dupchansz(img), false);
+  cv::Mat out = ifft(dupchansz(img));
   fftshift(out);
   return logmagn(out, logs);
 }
