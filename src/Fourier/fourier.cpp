@@ -9,7 +9,7 @@ void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, std::string ma
   if (DFTimg.channels() == 2)
   {
     cv::Mat DFTimgcentered = quadrantswap(DFTimg);
-    cv::Mat planes[2];                 // = { cv::Mat::zeros(DFTimg.size(),CV_32F),cv::Mat::zeros(DFTimg.size(),CV_32F) };
+    cv::Mat planes[2];             // = { cv::Mat::zeros(DFTimg.size(),CV_32F),cv::Mat::zeros(DFTimg.size(),CV_32F) };
     split(DFTimgcentered, planes); // planes[0] = Re(DFT(sourceimg), planes[1] = Im(DFT(sourceimg))
     cv::Mat magnitudeimglog;
     magnitude(planes[0], planes[1], magnitudeimglog);
@@ -21,7 +21,7 @@ void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, std::string ma
     }
     if (expon)
     {
-      for (int i = 0; i < 20; i++)
+      for (size_t i = 0; i < 20; i++)
       {
         exp(magnitudeimglog, magnitudeimglog);
         normalize(magnitudeimglog, magnitudeimglog, 0, 1, cv::NORM_MINMAX);

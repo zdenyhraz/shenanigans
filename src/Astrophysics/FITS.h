@@ -27,7 +27,7 @@ struct FitsParams
 
 inline void swapbytes(char* input, unsigned length)
 {
-  for (int i = 0; i < length; i += 2)
+  for (size_t i = 0; i < length; i += 2)
   {
     char temp = std::move(input[i]);
     input[i] = std::move(input[i + 1]);

@@ -392,12 +392,12 @@ void WindowShenanigans::RandomShit()
     {
       double g = 0;
 
-      for (int i = 0; i < 1e7; ++i) // constant portion
+      for (size_t i = 0; i < 1e7; ++i) // constant portion
         g += i;
 
       const int scale = 3;
-      for (int i = 0; i < scale; ++i) // scale
-        for (const auto& a : x)       // n^2
+      for (size_t i = 0; i < scale; ++i) // scale
+        for (const auto& a : x)          // n^2
           for (const auto& b : x)
             g += a - b;
 
@@ -472,7 +472,7 @@ void WindowShenanigans::RandomShit()
     int sizeX = 1500;
     int sizeY = 1000;
 
-    for (int i = 0; i < 11; i++)
+    for (size_t i = 0; i < 11; i++)
     {
       auto pic = cv::imread(fmt::format("{}/raw/0{}_calib.PNG", path, i + 1), cv::IMREAD_ANYDEPTH);
       pic = roicrop(pic, 0.33 * pic.cols, 0.69 * pic.rows, sizeX, sizeY);
@@ -514,7 +514,7 @@ void WindowShenanigans::RandomShit()
     std::vector<double> timeGpu(iters);
     cv::Mat fft = Fourier::cufft(img); // init
 
-    for (int i = 0; i < iters; ++i)
+    for (size_t i = 0; i < iters; ++i)
     {
       int size = minsize + (float)i / (iters - 1) * (maxsize - minsize);
       sizes[i] = size;
@@ -823,12 +823,12 @@ void WindowShenanigans::RandomShit()
     }
 
     // 2D
-    int Ny = 1000;
-    int Nx = 1000;
+    size_t Ny = 1000;
+    size_t Nx = 1000;
     auto Z = zerovect2(Ny, Nx, 0.);
 
-    for (int y = 0; y < Ny; y++)
-      for (int x = 0; x < Nx; x++)
+    for (size_t y = 0; y < Ny; y++)
+      for (size_t x = 0; x < Nx; x++)
         Z[y][x] = sin((double)x * y / Nx / Ny * 100) * rand();
 
     // Plot1D::Plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
@@ -836,9 +836,9 @@ void WindowShenanigans::RandomShit()
   }
   if (0) // 2d poylfit
   {
-    int size = 100;
-    int size2 = 1000;
-    int trials = 500;
+    size_t size = 100;
+    size_t size2 = 1000;
+    size_t trials = 500;
     int degree = 5;
     std::vector<double> xdata(trials);
     std::vector<double> ydata(trials);
@@ -847,9 +847,9 @@ void WindowShenanigans::RandomShit()
     cv::Mat pointiky = cv::Mat::zeros(size2, size2, CV_8UC3);
 
     cv::Mat orig = cv::Mat::zeros(size, size, CV_32F);
-    for (int r = 0; r < size; r++)
+    for (size_t r = 0; r < size; r++)
     {
-      for (int c = 0; c < size; c++)
+      for (size_t c = 0; c < size; c++)
       {
         double x = (float)c / 99;
         double y = (float)r / 99;
@@ -857,13 +857,13 @@ void WindowShenanigans::RandomShit()
       }
     }
 
-    for (int i = 0; i < trials; i++)
+    for (size_t i = 0; i < trials; i++)
     {
       xdata[i] = rand01();
       ydata[i] = rand01();
       pts[i] = cv::Point2f(xdata[i], ydata[i]);
       zdata[i] = sqr(xdata[i] - 0.75) + sqr(ydata[i] - 0.25) + 0.1 * sin(0.1 * (xdata[i] * 99 + ydata[i] * 99) + 1);
-      drawPoint(pointiky, size2 * pts[i], cv::Scalar(rand() % 256, rand() % 256, rand() % 256), 5, 3);
+      drawPoint(pointiky, static_cast<int>(size2) * pts[i], cv::Scalar(rand() % 256, rand() % 256, rand() % 256), 5, 3);
     }
 
     cv::Mat fitPoly = polyfit(xdata, ydata, zdata, degree, 0, 1, 0, 1, size, size);

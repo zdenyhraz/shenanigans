@@ -29,14 +29,14 @@ inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  //cuda::GpuMat imgGpu;
+  // cuda::GpuMat imgGpu;
 
   if (packed)
   {
     LOG_ERROR("cufft packed input channels: {}", img.channels());
-    //imgGpu.upload(img);
-    //cuda::dft(imgGpu, imgGpu, imgGpu.size());
-    //imgGpu.download(img);
+    // imgGpu.upload(img);
+    // cuda::dft(imgGpu, imgGpu, imgGpu.size());
+    // imgGpu.download(img);
     LOG_ERROR("cufft packed output channels: {}", img.channels());
     return img;
   }
@@ -44,28 +44,28 @@ inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
   {
     cv::Mat planes[] = {img, cv::Mat::zeros(img.size(), CV_32F)};
     merge(planes, 2, img);
-    //imgGpu.upload(img);
-    //cuda::dft(imgGpu, imgGpu, imgGpu.size());
-    //imgGpu.download(img);
+    // imgGpu.upload(img);
+    // cuda::dft(imgGpu, imgGpu, imgGpu.size());
+    // imgGpu.download(img);
     return img;
   }
 }
 
 inline cv::Mat icufft(cv::Mat&& fft, bool packed = false)
 {
-  //cuda::GpuMat fftGpu;
-  //fftGpu.upload(fft);
+  // cuda::GpuMat fftGpu;
+  // fftGpu.upload(fft);
 
   if (packed)
   {
-    //cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
-    //fftGpu.download(fft);
+    // cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
+    // fftGpu.download(fft);
     return fft;
   }
   else
   {
-    //cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE);
-    //fftGpu.download(fft);
+    // cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE);
+    // fftGpu.download(fft);
     cv::Mat out;
     extractChannel(fft, out, 0);
     return out;

@@ -18,7 +18,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
   if (xParamIndex < 0 || yParamIndex < 0 || xParamIndex == yParamIndex)
     throw std::runtime_error("Bad x/y parameter indices");
 
-  if (baseParams.size() <= std::max(xParamIndex, yParamIndex))
+  if (baseParams.size() <= static_cast<size_t>(std::max(xParamIndex, yParamIndex)))
     throw std::runtime_error(fmt::format("Base parameters size ({}) is too small for x/y indices {}/{}", baseParams.size(), xParamIndex, yParamIndex));
 
   int rows = iters;
@@ -131,7 +131,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
     }
 
     cv::Point pointprev;
-    for (int i = 0; i < optResult->bestParametersProgress.size(); i++)
+    for (size_t i = 0; i < optResult->bestParametersProgress.size(); i++)
     {
       // best entity points
       const cv::Point point = GetPoint(optResult->bestParametersProgress[i]);

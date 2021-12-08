@@ -1,6 +1,5 @@
 #pragma once
 
-
 std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
 {
   cv::Mat gradM = cv::Mat::zeros(img.size(), CV_32F);
@@ -71,7 +70,7 @@ cv::Mat NonMaximaSuppresion(const cv::Mat& img)
       if (rr || cc)
         relativePoints.push_back(cv::Point2f(cc, rr));
 
-  if (relativePoints.size() != sqr(size) - 1)
+  if (relativePoints.size() != static_cast<size_t>(sqr(size)) - 1)
     throw;
 
   for (int r = 1; r < out.rows - 1; ++r)

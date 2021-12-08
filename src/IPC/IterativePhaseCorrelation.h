@@ -1310,7 +1310,7 @@ private:
     std::vector<double> shiftsXBefore, shiftsXBeforeError;
     std::vector<double> shiftsXAfter, shiftsXAfterError;
 
-    for (int i = 0; i < shiftsReference.size(); ++i)
+    for (size_t i = 0; i < shiftsReference.size(); ++i)
     {
       const auto& referenceShift = shiftsReference[i];
       const auto& shiftPixel = shiftsPixel[i];
@@ -1405,7 +1405,7 @@ private:
       throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
 
     double avgerror = 0;
-    for (int i = 0; i < shifts.size(); ++i)
+    for (size_t i = 0; i < shifts.size(); ++i)
     {
       const auto error = shifts[i] - shiftsReference[i];
       avgerror += sqrt(error.x * error.x + error.y * error.y);

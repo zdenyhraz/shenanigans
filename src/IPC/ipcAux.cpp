@@ -180,7 +180,7 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
   listing << IPC_settings1.getcols() << std::endl;
 
 #pragma omp parallel for
-  for (int startPos = 0; startPos < startFractionX.size(); startPos++)
+  for (size_t startPos = 0; startPos < startFractionX.size(); startPos++)
   {
     // testing shifts @different picture positions
     int startX = src1.cols * startFractionX[startPos];

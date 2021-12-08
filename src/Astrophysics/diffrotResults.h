@@ -5,7 +5,6 @@
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 
-
 inline double predictDiffrotProfile(double theta, double A, double B, double C = 0)
 {
   return (A + B * pow(sin(theta), 2) + C * pow(sin(theta), 4));
@@ -92,7 +91,7 @@ public:
     const auto& myfit = polyfit(Thetas, OmegasX, 2);
     const auto& targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
 
-    for (int y = 0; y < ycount; ++y)
+    for (size_t y = 0; y < ycount; ++y)
       error += 0.8 * std::pow(myfit[y] - targetcurve[y], 2) + 0.2 * std::pow(mycurve[y] - targetcurve[y], 2);
 
     return sqrt(error / ycount);
@@ -108,7 +107,7 @@ public:
       if (x >= xs.back())
         return ys.back();
 
-      for (int i = 0; i < xs.size() - 1; ++i)
+      for (size_t i = 0; i < xs.size() - 1; ++i)
         if (xs[i] <= x && xs[i + 1] > x)
           return ys[i] + (x - xs[i]) / (xs[i + 1] - xs[i]) * (ys[i + 1] - ys[i]);
     }
@@ -121,7 +120,7 @@ public:
       if (x <= xs.back())
         return ys.back();
 
-      for (int i = 0; i < xs.size() - 1; ++i)
+      for (size_t i = 0; i < xs.size() - 1; ++i)
         if (xs[i] > x && xs[i + 1] <= x)
           return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
@@ -142,7 +141,7 @@ public:
   }
 
   void SetData2D(const std::vector<std::vector<double>>& thetas2D, const std::vector<std::vector<double>>& omegasX, const std::vector<std::vector<double>>& omegasY,
-                 const std::vector<std::vector<double>>& shiftsX, const std::vector<std::vector<double>>& shiftsY)
+      const std::vector<std::vector<double>>& shiftsX, const std::vector<std::vector<double>>& shiftsY)
   {
     SourceThetas = thetas2D;
     SourceShiftsX = shiftsX;
@@ -163,7 +162,7 @@ public:
   }
 
   auto GetVecs2D(std::vector<std::vector<double>>& sourceThetas, std::vector<std::vector<double>>& sourceShiftsX, std::vector<std::vector<double>>& sourceShiftsY,
-                 std::vector<std::vector<double>>& sourceOmegasX, std::vector<std::vector<double>>& sourceOmegasY) const
+      std::vector<std::vector<double>>& sourceOmegasX, std::vector<std::vector<double>>& sourceOmegasY) const
   {
     sourceThetas = SourceThetas;
     sourceShiftsX = SourceShiftsX;
@@ -179,7 +178,7 @@ public:
   }
 
   void SetVecs2DRaw(const std::vector<std::vector<double>>& sourceThetas, const std::vector<std::vector<double>>& sourceShiftsX, const std::vector<std::vector<double>>& sourceShiftsY,
-                    const std::vector<std::vector<double>>& sourceOmegasX, const std::vector<std::vector<double>>& sourceOmegasY)
+      const std::vector<std::vector<double>>& sourceOmegasX, const std::vector<std::vector<double>>& sourceOmegasY)
   {
     SourceThetas = sourceThetas;
     SourceShiftsX = sourceShiftsX;
@@ -306,7 +305,7 @@ private:
   void CalculatePredics()
   {
     PredicXs = zerovect2(predicCnt, Thetas.size(), 0.);
-    for (int i = 0; i < Thetas.size(); i++)
+    for (size_t i = 0; i < Thetas.size(); i++)
     {
       PredicXs[0][i] = predictDiffrotProfile(Thetas[i], 14.296, -1.847, -2.615); // Derek A. Lamb (2017)
       PredicXs[1][i] = predictDiffrotProfile(Thetas[i], 14.192, -1.70, -2.36);   // Howard et al. (1983)
@@ -330,7 +329,7 @@ private:
     PredicXsNS.resize(predicCnt);
 
     int zeroidx = 0;
-    for (int i = 0; i < Thetas.size() - 2; ++i)
+    for (size_t i = 0; i < Thetas.size() - 2; ++i)
     {
       if ((Thetas[i] > 0 && Thetas[i + 1] < 0) || Thetas[i] == 0)
       {
@@ -400,7 +399,7 @@ private:
 
   void LogFitCoeffs(const std::string& fitname, const std::vector<double>& coeffs)
   {
-    for (int i = 0; i < coeffs.size(); i++)
+    for (size_t i = 0; i < coeffs.size(); i++)
       LOG_DEBUG("{} fit coefficient {} = {:.2f}", fitname, (char)('A' + i), coeffs[i]);
   }
 };

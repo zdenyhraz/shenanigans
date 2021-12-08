@@ -63,7 +63,7 @@ cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points,
   for (int run = 0; run < points.size(); run++)
   {
     auto colorThisRun = cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
-    for (int i = 0; i < points[run].size(); i++)
+    for (size_t i = 0; i < points[run].size(); i++)
     {
       int col1 = (points[run][i][0] - xmin) / (xmax - xmin) * (stepsX - 1);
       int row1 = stepsY - (points[run][i][1] - ymin) / (ymax - ymin) * (stepsY - 1);

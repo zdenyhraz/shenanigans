@@ -1,12 +1,11 @@
 #pragma once
 
-
 namespace OptimizationTestFunctions
 {
 inline double Cone(const std::vector<double>& arg)
 {
   double returnVal = 0;
-  for (int i = 0; i < arg.size(); i++)
+  for (size_t i = 0; i < arg.size(); i++)
     returnVal += std::abs(arg[i]);
   return returnVal;
 }
@@ -14,7 +13,7 @@ inline double Cone(const std::vector<double>& arg)
 inline double Paraboloid(const std::vector<double>& arg)
 {
   double val = 0;
-  for (int i = 0; i < arg.size(); i++)
+  for (size_t i = 0; i < arg.size(); i++)
     val += sqr(arg[i] - i - 1);
   return val;
 }
@@ -134,7 +133,7 @@ inline double Styblinski(const std::vector<double>& arg)
 inline double Exp(const std::vector<double>& arg)
 {
   double retval = 0;
-  for (int i = 0; i < arg.size(); i++)
+  for (size_t i = 0; i < arg.size(); i++)
     retval += sqr((i + 1) * arg[i] - 1 - i);
   return std::exp(std::sqrt(retval));
 }
@@ -142,7 +141,7 @@ inline double Exp(const std::vector<double>& arg)
 inline double Noisy(const std::vector<double>& arg)
 {
   double retval = 0;
-  for (int i = 0; i < arg.size(); i++)
+  for (size_t i = 0; i < arg.size(); i++)
     retval += arg[i] * (std::sin(3 * arg[i]) + 0.3 * rand11());
   return retval / arg.size();
 }

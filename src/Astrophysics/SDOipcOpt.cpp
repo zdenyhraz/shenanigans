@@ -12,7 +12,7 @@ double absoluteSubpixelRegistrationError(IPCsettings& set, const cv::Mat& src, d
   // std::vector<double> startFractionX = { 0.5 };
   // std::vector<double> startFractionY = { 0.5 };
   int trials = (double)maxShift / accuracy + 1;
-  for (int startposition = 0; startposition < startFractionX.size(); startposition++)
+  for (size_t startposition = 0; startposition < startFractionX.size(); startposition++)
   {
     int startX = src.cols * startFractionX[startposition];
     int startY = src.rows * startFractionY[startposition];
@@ -61,7 +61,7 @@ double IPCparOptFun(const std::vector<double>& args, const IPCsettings& settings
   return absoluteSubpixelRegistrationError(settings, source, noisestddev, maxShift, accuracy);
 }
 
-void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, unsigned runs)
+void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathInput, std::string pathOutput, double maxShift, double accuracy, size_t runs)
 {
   std::ofstream listing(pathOutput, std::ios::out | std::ios::app);
   listing << "Running IPC parameter optimization (" << currentDateTime() << ")" << std::endl;
@@ -72,7 +72,7 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
   double noisestdev = 0;
   auto f = [&](const std::vector<double>& args) { return IPCparOptFun(args, settingsMaster, pic, noisestdev, maxShift, accuracy); };
 
-  for (int iterOpt = 0; iterOpt < runs; iterOpt++)
+  for (size_t iterOpt = 0; iterOpt < runs; iterOpt++)
   {
     Evolution Evo(4);
     Evo.mNP = 24;
@@ -86,14 +86,14 @@ void optimizeIPCParameters(const IPCsettings& settingsMaster, std::string pathIn
   cv::destroyWindow(windowname);
 }
 
-void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, unsigned runs)
+void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, double maxShift, double accuracy, size_t runs)
 {
   std::ofstream listing("D:\\MainOutput\\IPC_parOpt.csv", std::ios::out | std::ios::trunc);
   if constexpr (1) // OPT 4par
   {
     listing << "Running IPC parameter optimization (" << currentDateTime() << "), image size " << settingsMaster.getcols() << std::endl;
     listing << "wavelength,stdevLmul,stdevHmul,L2,window,avgError,dateTime" << std::endl;
-    for (int wavelength = 0; wavelength < WAVELENGTHS_STR.size(); wavelength++)
+    for (size_t wavelength = 0; wavelength < WAVELENGTHS_STR.size(); wavelength++)
     {
       std::string path = "D:\\MainOutput\\png\\" + WAVELENGTHS_STR[wavelength] + "_proc.png";
       std::cout << "OPT .png load path: " << path << std::endl;
@@ -102,7 +102,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
       if constexpr (1) // optimize
       {
         auto f = [&](const std::vector<double>& args) { return IPCparOptFun(args, settingsMaster, pic, STDDEVS[wavelength], maxShift, accuracy); };
-        for (int iterOpt = 0; iterOpt < runs; iterOpt++)
+        for (size_t iterOpt = 0; iterOpt < runs; iterOpt++)
         {
           Evolution Evo(4);
           Evo.mNP = 25;

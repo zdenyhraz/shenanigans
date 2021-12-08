@@ -48,8 +48,8 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
   windowPlot->colorMap->data()->setRange(QCPRange(mXmin, mXmax), QCPRange(mYmin, mYmax));
   // the cell with indices (0, 0) is in the bottom left corner and the cell with
   // indices(keySize - 1, valueSize - 1) is in the top right corner of the colormap
-  for (int xIndex = 0; xIndex < z[0].size(); ++xIndex)
-    for (int yIndex = 0; yIndex < z.size(); ++yIndex)
+  for (size_t xIndex = 0; xIndex < z[0].size(); ++xIndex)
+    for (size_t yIndex = 0; yIndex < z.size(); ++yIndex)
       windowPlot->colorMap->data()->setCell(xIndex, yIndex, z[z.size() - 1 - yIndex][xIndex]);
 
   windowPlot->ui.widget->rescaleAxes();

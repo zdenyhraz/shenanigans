@@ -49,7 +49,7 @@ std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, s
   while (std::getline(file, line))
   {
     std::stringstream ss(line);
-    int col = 0;
+    size_t col = 0;
 
     while (ss >> value)
     {

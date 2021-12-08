@@ -267,7 +267,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
         cv::Point2f L1mid(L1.cols / 2, L1.rows / 2);
         imageshift_SUBPIXEL = (cv::Point2f)L3peak - L3mid + findCentroid(L1) - L1mid;
 
-        for (int i = 0; i < maxPCit; i++)
+        for (size_t i = 0; i < maxPCit; i++)
         {
           L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
           cv::Point2f L1peak = findCentroid(L1);

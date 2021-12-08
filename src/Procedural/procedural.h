@@ -6,10 +6,10 @@ namespace Procedural
 {
 inline cv::Mat procedural(int rows, int cols)
 {
-  int N = 500;
+  size_t N = 500;
   cv::Mat mat = cv::Mat::zeros(rows, cols, CV_32F);
 
-  for (int i = 0; i < N; i++)
+  for (size_t i = 0; i < N; i++)
   {
     float cx = 0.02 * rand01();
     float cy = 0.02 * rand01();
