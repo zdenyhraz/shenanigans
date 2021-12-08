@@ -130,8 +130,9 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
       return "MutationStrategy";
     case CrossoverStrategy:
       return "CrossoverStrategy";
+    default:
+      return "";
     }
-    return "";
   };
 
   const auto metaObj = [&](const std::vector<double>& metaparams)
@@ -501,9 +502,9 @@ const char* Evolution::GetMutationStrategyString(MutationStrategy strategy)
     return "RAND2";
   case BEST2:
     return "BEST2";
+  default:
+    throw std::runtime_error("Unknown mutation strategy");
   }
-
-  return nullptr;
 }
 
 const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
@@ -514,9 +515,9 @@ const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
     return "BIN";
   case EXP:
     return "EXP";
+  default:
+    throw std::runtime_error("Unknown crossover strategy");
   }
-
-  return nullptr;
 }
 
 int Evolution::GetNumberOfParents()
@@ -531,8 +532,9 @@ int Evolution::GetNumberOfParents()
     return 5;
   case MutationStrategy::BEST2:
     return 4;
+  default:
+    throw std::runtime_error("Unknown mutation strategy");
   }
-  return 3;
 }
 
 Evolution::Population::Population(int NP, int N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, int nParents, bool consoleOutput, bool saveProgress)
@@ -595,6 +597,8 @@ void Evolution::Population::UpdateOffspring(int eid, MutationStrategy mutationSt
         newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) +
                                    F * (entities[newoffspring.parentIndices[2]].params[pid] - entities[newoffspring.parentIndices[3]].params[pid]);
         break;
+      default:
+        throw std::runtime_error("Unknown mutation strategy");
       }
     }
     // check for boundaries, effectively clamp
@@ -804,5 +808,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
     }
     return;
   }
+  default:
+    throw std::runtime_error("Unknown crossover strategy");
   }
 }

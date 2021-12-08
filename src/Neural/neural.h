@@ -152,7 +152,7 @@ public:
   CostFunction costFunction = MSE;
   PredictionType predictionType = VALUE;
   double batchSizeRatio = 1;
-  int trainingEpochs;
+  int trainingEpochs = 1000;
   std::vector<std::vector<double>> trainingInputs;
   std::vector<std::vector<double>> trainingOutputs;
   double learningRate = 0.001;
@@ -184,7 +184,6 @@ public:
     std::vector<cv::Mat> trainingInputs_ = vect2ToMats(trainingInputs);   // input vector to mat conversion
     std::vector<cv::Mat> trainingOutputs_ = vect2ToMats(trainingOutputs); // output vector to mat conversion
     int dataSize = trainingInputs_.size();
-    int indexEpoch = 0;
     double costFunVal = DBL_MAX; // cost function value
 
     for (int indexEpoch = 0; indexEpoch < trainingEpochs; indexEpoch++)
@@ -259,8 +258,8 @@ public:
 private:
   int inputSize;
   std::vector<int> layerSizes;
-  int layerCount;     // auto
-  int outputSize;     // auto
+  int layerCount;         // auto
+  int outputSize;         // auto
   std::vector<cv::Mat> w; // weights
   std::vector<cv::Mat> b; // biases
 

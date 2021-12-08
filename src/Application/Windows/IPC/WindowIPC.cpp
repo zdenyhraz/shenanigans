@@ -129,7 +129,7 @@ void WindowIPC::alignXY()
 
   showimg(img1, "img1");
   showimg(img2, "img2");
-  auto shifts = phasecorrel(img1, img2, set);
+  phasecorrel(img1, img2, set);
 }
 
 void WindowIPC::CalculateFlow()

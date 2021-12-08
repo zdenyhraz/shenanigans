@@ -364,7 +364,6 @@ void WindowShenanigans::RandomShit()
     float C = Beta.at<float>(1, 0);
     float D = Beta.at<float>(2, 0);
     float E = Beta.at<float>(3, 0);
-    float F = Beta.at<float>(4, 0);
 
     // math.stackexchange.com/a/423272
     float R = 0.5 * std::atan2(B, A - C);
@@ -375,8 +374,6 @@ void WindowShenanigans::RandomShit()
 
     float centerXr = -Dr / (2. * Ar);
     float centerYr = -Er / (2. * Cr);
-    float excX;
-    float excY;
 
     float centerX = centerXr * cos(R) - centerYr * sin(R);
     float centerY = centerXr * sin(R) + centerYr * cos(R);
@@ -472,7 +469,6 @@ void WindowShenanigans::RandomShit()
   if (0) // swind crop
   {
     std::string path = "../articles/swind/source/2";
-    double scale = 0.8;
     int sizeX = 1500;
     int sizeY = 1000;
 
@@ -801,7 +797,7 @@ void WindowShenanigans::RandomShit()
     set.speak = IPCsettings::All;
     set.setSize(img1.rows, img1.cols);
 
-    auto shifts = phasecorrel(img1, img2, set);
+    phasecorrel(img1, img2, set);
   }
   if (0) // Plot1D + Plot2D test
   {
@@ -893,10 +889,6 @@ void WindowShenanigans::RandomShit()
     int L2size = 15;
     int UpsampleCoeff = 51;
     double DivisionEpsilon = 0;
-    int MaxIterations = 20;
-    cv::InterpolationFlags InterpolationType = cv::INTER_LINEAR;
-    bool ApplyWindow = true;
-    bool ApplyBandpass = true;
     bool SubpixelEstimation = true;
     bool CrossCorrelate = false;
 
@@ -1033,7 +1025,9 @@ void WindowShenanigans::RandomShit()
     Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
-    Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
-    // Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    if (0)
+      Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    else
+      Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
 }
