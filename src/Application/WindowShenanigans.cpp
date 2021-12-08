@@ -312,7 +312,7 @@ void WindowShenanigans::RandomShit()
     }
 
     ellipse(ellipseImgColor, cv::RotatedRect(findCentroid(ellipseImg), cv::Size(10, 10), 0), cv::Scalar(1, 0, 0), -1, cv::LINE_AA);               // ellipse centroid
-    ellipse(ellipseImgColor, cv::RotatedRect(calcCenter, calcSize, calcAngle), cv::Scalar(0.7, 0, 0.8), 3, cv::LINE_AA);                      // calc ellipse
+    ellipse(ellipseImgColor, cv::RotatedRect(calcCenter, calcSize, calcAngle), cv::Scalar(0.7, 0, 0.8), 3, cv::LINE_AA);                          // calc ellipse
     ellipse(ellipseImgColor, cv::RotatedRect(findCentroid(ellipseImgCalculated), cv::Size(10, 10), 0), cv::Scalar(0.7, 0, 0.8), -1, cv::LINE_AA); // calc ellipse centroid
 
     showimg(ellipseImgColor, "ellipse fit", 0, 0, 1, 1000);
@@ -468,7 +468,7 @@ void WindowShenanigans::RandomShit()
     const auto shiftCalc = ipc.Calculate(img1, img2);
     LOG_DEBUG("IPC shift: [{}]", shiftCalc);
     return;
-  }  
+  }
   if (0) // swind crop
   {
     std::string path = "../articles/swind/source/2";
@@ -1034,7 +1034,6 @@ void WindowShenanigans::RandomShit()
     Evo.SetSaveProgress(true);
 
     Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
-    //Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
+    // Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   }
 }
-

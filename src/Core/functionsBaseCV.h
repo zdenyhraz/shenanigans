@@ -131,7 +131,7 @@ struct fmt::formatter<cv::Point2f>
   template <typename FormatContext>
   constexpr auto format(const cv::Point2f& point, FormatContext& ctx)
   {
-    return fmt::format_to(ctx.out(), "[{}, {}]",point.x,point.y);
+    return fmt::format_to(ctx.out(), "[{}, {}]", point.x, point.y);
   }
 };
 
@@ -183,10 +183,10 @@ struct fmt::formatter<cv::Mat>
       return fmt::format_to(ctx.out(), "[]");
 
     fmt::format_to(ctx.out(), "[");
-    for (int r = 0;r<mat.rows;++r)
+    for (int r = 0; r < mat.rows; ++r)
     {
-      for (int c = 0;c<mat.cols;++c)
-        fmt::format_to(ctx.out(), "{}, ", mat.at<float>(r,c));
+      for (int c = 0; c < mat.cols; ++c)
+        fmt::format_to(ctx.out(), "{}, ", mat.at<float>(r, c));
       fmt::format_to(ctx.out(), "\n");
     }
 
