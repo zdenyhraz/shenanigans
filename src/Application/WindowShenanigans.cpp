@@ -153,6 +153,7 @@ void WindowShenanigans::closeEvent(QCloseEvent* event)
 }
 
 void WindowShenanigans::RandomShit()
+try
 {
   LOG_FUNCTION("RandomShit");
   if (0) // CC/PC dizertacka pics
@@ -567,7 +568,7 @@ void WindowShenanigans::RandomShit()
     {
       LOG_FUNCTION("fftpacked");
       fftpacked = Fourier::fft(img, true);
-      TBpacked = Fourier::ifft(fftpacked, true);
+      TBpacked = Fourier::ifft(fftpacked);
     }
     if (gpu)
     {
@@ -916,16 +917,17 @@ void WindowShenanigans::RandomShit()
     LOG_INFO("shift2 = {}", shift2);
     LOG_INFO("shift2n = {}", shift2n);
   }
-  if (0) // ipc sign test
+  if (1) // ipc sign test
   {
-    cv::Mat img1 = loadImage("Resources\\test1.png");
-    cv::Mat img2 = loadImage("Resources\\test2.png");
+    cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
+    cv::Mat img2 = loadImage("../resources/Shapes/shapes.png");
 
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
 
     auto shift = ipc.Calculate(img1, img2);
 
     LOG_INFO("shift = {}", shift);
+    return;
   }
   if (0) // loadfits test
   {
@@ -1025,9 +1027,17 @@ void WindowShenanigans::RandomShit()
     Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
-    if (1)
+    if (0)
       Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("RandomShit() error: {}", e.what());
+}
+catch (...)
+{
+  LOG_ERROR("RandomShit() error: {}", "Unknown error");
 }

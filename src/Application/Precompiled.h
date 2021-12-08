@@ -2,15 +2,10 @@
 
 // STL
 #include <iostream>
-#include <stdio.h>
-#include <conio.h>
 #include <fstream>
-#include <stdint.h>
 #include <string>
 #include <chrono>
 #include <numeric>
-#include <time.h>
-#include <math.h>
 #include <filesystem>
 #include <queue>
 #include <functional>
@@ -27,6 +22,7 @@
 #include <mutex>
 #include <map>
 #include <unordered_map>
+#include <stdexcept>
 
 // Qt
 #include <QtWidgets>

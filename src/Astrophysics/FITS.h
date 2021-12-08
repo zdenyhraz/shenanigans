@@ -446,6 +446,8 @@ inline cv::Mat loadImage(std::string path)
     return FitsImage(path).image();
 
   cv::Mat result = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+  if (result.empty())
+    throw std::runtime_error(fmt::format("Could not load image '{}'", path));
   result.convertTo(result, CV_32F);
   normalize(result, result, 0, 1, cv::NORM_MINMAX);
   return result;
