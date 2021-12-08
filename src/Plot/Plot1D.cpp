@@ -4,7 +4,7 @@
 std::unordered_map<std::string, Plot1D> Plot1D::mPlots;
 std::string Plot1D::mCurrentPlot = "Plot1D";
 
-Plot1D::Plot1D(const std::string& mName) : mName(mName)
+Plot1D::Plot1D(const std::string& name) : mName(name)
 {
 }
 

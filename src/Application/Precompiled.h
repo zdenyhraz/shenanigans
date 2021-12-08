@@ -27,6 +27,7 @@
 #include <mutex>
 #include <map>
 #include <unordered_map>
+
 // Qt
 #include <QtWidgets>
 #include <QtWidgets>
@@ -34,21 +35,26 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QCloseEvent>
+
 // OpenMP
 #include <omp.h>
+
 // OpenCV
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
-//#include <opencv2/xfeatures2d.hpp>
 //#include <opencv2/cudaarithm.hpp>
+//#include <opencv2/xfeatures2d.hpp>
+
 // QCustomPlot
 #include "Plot/qcustomplot.h"
+
 // fmt
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+
 // custom
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"

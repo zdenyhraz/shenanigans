@@ -304,10 +304,10 @@ try
   {
     LOG_FUNCTION("Sort matches from fastest to slowest speeds");
 
-    size_t idx = 0;
+    size_t i = 0;
     for (size_t pic = 0; pic < piccnt - 1; pic++)
       for (const auto& match : matches_all[pic])
-        matches_all_serialized.push_back({idx++, pic, match, false});
+        matches_all_serialized.push_back({i++, pic, match, false});
 
     std::sort(matches_all_serialized.begin(), matches_all_serialized.end(),
         [&](const auto& a, const auto& b)

@@ -271,7 +271,7 @@ void WindowShenanigans::RandomShit()
     evo.mMutStrat = Evolution::MutationStrategy::RAND1;
     evo.mLB = {-border, -border, 1, 1, -90};
     evo.mUB = {imgsize + border, imgsize + border, imgsize, imgsize, 90};
-    evo.optimalFitness = 1e-2;
+    evo.mOptimalFitness = 1e-2;
     evo.SetParameterNames({"X", "Y", "A", "B", "R"});
 
     const auto res = evo.Optimize(f).optimum;
@@ -525,7 +525,7 @@ void WindowShenanigans::RandomShit()
         auto start = std::chrono::high_resolution_clock::now();
 
         for (int it = 0; it < itersPerSize; ++it)
-          cv::Mat fft = Fourier::fft(resized);
+          cv::Mat fft_ = Fourier::fft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
         timeCpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
@@ -535,7 +535,7 @@ void WindowShenanigans::RandomShit()
         auto start = std::chrono::high_resolution_clock::now();
 
         for (int it = 0; it < itersPerSize; ++it)
-          cv::Mat fft = Fourier::cufft(resized);
+          cv::Mat fft_ = Fourier::cufft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
         timeGpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
@@ -1015,8 +1015,8 @@ void WindowShenanigans::RandomShit()
     Evo.mMutStrat = Evolution::RAND1;
     Evo.mLB = zerovect(N, -5.0);
     Evo.mUB = zerovect(N, +5.0);
-    Evo.maxFunEvals = maxFunEvals;
-    Evo.optimalFitness = optimalFitness;
+    Evo.mMaxFunEvals = maxFunEvals;
+    Evo.mOptimalFitness = optimalFitness;
     Evo.SetName("debug");
     Evo.SetParameterNames({"x", "y"});
     Evo.SetConsoleOutput(true);

@@ -8,7 +8,7 @@ struct filterSettings
   double brightness;
   double gamma;
 
-  filterSettings(double contrast, double brightness, double gamma) : contrast(contrast), brightness(brightness), gamma(gamma) {}
+  filterSettings(double contrast_, double brightness_, double gamma_) : contrast(contrast_), brightness(brightness_), gamma(gamma_) {}
 };
 
 cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, double contrast, double brightness);

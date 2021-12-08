@@ -2,7 +2,7 @@
 #include "Core/functionsBaseSTL.h"
 #include "WindowPlot.h"
 
-WindowPlot::WindowPlot(std::string name, double colRowRatio, std::function<void(std::string)>& OnClose) : QMainWindow(), name(name), OnClose(OnClose)
+WindowPlot::WindowPlot(std::string name_, double colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)
 {
   ui.setupUi(this);
   int wRows = 400;

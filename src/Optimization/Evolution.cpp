@@ -8,7 +8,7 @@
 #include "Plot/Plot1D.h"
 #include "Evolution.h"
 
-Evolution::Evolution(size_t N, const std::string& optname) : OptimizationAlgorithm_(N, optname), mNP(7 * N){};
+Evolution::Evolution(size_t N_, const std::string& optname) : OptimizationAlgorithm_(N_, optname), mNP(7 * N_){};
 
 OptimizationAlgorithm_::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 try
@@ -108,11 +108,11 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
 
   enum MetaParameter
   {
-    NP,
-    CR,
-    F,
-    MutationStrategy,
-    CrossoverStrategy,
+    MetaNP,
+    MetaCR,
+    MetaF,
+    MetaMutationStrategy,
+    MetaCrossoverStrategy,
     MetaParameterCount
   };
 
@@ -120,18 +120,18 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   {
     switch (metaParameter)
     {
-    case NP:
+    case MetaNP:
       return "NP";
-    case CR:
+    case MetaCR:
       return "CR";
-    case F:
+    case MetaF:
       return "F";
-    case MutationStrategy:
+    case MetaMutationStrategy:
       return "MutationStrategy";
-    case CrossoverStrategy:
+    case MetaCrossoverStrategy:
       return "CrossoverStrategy";
     default:
-      return "";
+      throw std::runtime_error("Unknown meta parameter");
     }
   };
 
@@ -142,15 +142,15 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     for (size_t run = 0; run < runsPerObj; run++)
     {
       Evolution evo(N);
-      evo.mNP = metaparams[NP];
-      evo.mCR = metaparams[CR];
-      evo.mF = metaparams[F];
+      evo.mNP = metaparams[MetaNP];
+      evo.mCR = metaparams[MetaCR];
+      evo.mF = metaparams[MetaF];
       evo.mLB = mLB;
       evo.mUB = mUB;
-      evo.maxFunEvals = maxFunEvals;
-      evo.optimalFitness = optimalFitness;
-      evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(metaparams[MutationStrategy]));
-      evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(metaparams[CrossoverStrategy]));
+      evo.mMaxFunEvals = maxFunEvals;
+      evo.mOptimalFitness = optimalFitness;
+      evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(metaparams[MetaMutationStrategy]));
+      evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(metaparams[MetaCrossoverStrategy]));
       evo.Mute();
 
       const auto result = evo.Optimize(obj);
@@ -172,7 +172,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mNP = 10 * MetaParameterCount;
   evo.mMutStrat = BEST1;
   evo.mCrossStrat = BIN;
-  evo.maxFunEvals = 5000;
+  evo.mMaxFunEvals = 5000;
   evo.mLB = {7, 0.1, 0.2, 0, 0};
   evo.mUB = {30. * N, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
   evo.SetConsoleOutput(true);
@@ -190,8 +190,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   if (mPlotObjectiveFunctionLandscape)
   {
     // plot metaopt surface
-    const size_t xParamIndex = NP;
-    const size_t yParamIndex = MutationStrategy;
+    const size_t xParamIndex = MetaNP;
+    const size_t yParamIndex = MetaMutationStrategy;
     const double xmin = evo.mLB[xParamIndex];
     const double xmax = evo.mUB[xParamIndex];
     const double ymin = evo.mLB[yParamIndex];
@@ -216,11 +216,11 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     resultsB4.push_back(Optimize(obj));
 
   // apply metaopt parameters
-  mNP = optimalMetaParams[NP];
-  mCR = optimalMetaParams[CR];
-  mF = optimalMetaParams[F];
-  mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(optimalMetaParams[MutationStrategy]));
-  mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(optimalMetaParams[CrossoverStrategy]));
+  mNP = optimalMetaParams[MetaNP];
+  mCR = optimalMetaParams[MetaCR];
+  mF = optimalMetaParams[MetaF];
+  mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(optimalMetaParams[MetaMutationStrategy]));
+  mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(optimalMetaParams[MetaCrossoverStrategy]));
 
   // statistics A4 metaopt
   LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
@@ -443,13 +443,13 @@ catch (const std::exception& e)
 
 Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, size_t generation)
 {
-  if (population.bestEntity.fitness <= optimalFitness) // populationFitness goal reached
+  if (population.bestEntity.fitness <= mOptimalFitness) // populationFitness goal reached
     return OptimalFitnessReached;
 
   if (generation >= maxGen) // maximum gen reached
     return MaximumGenerationsReached;
 
-  if (population.functionEvaluations >= maxFunEvals) // maximum function evaluations exhausted
+  if (population.functionEvaluations >= mMaxFunEvals) // maximum function evaluations exhausted
     return MaximumFunctionEvaluationsReached;
 
   if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no

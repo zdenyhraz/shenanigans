@@ -41,7 +41,7 @@ void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, size_t
       in = rand01();
 
     const auto start = clock::now();
-    for (size_t i = 0; i < timeIters; ++i)
+    for (size_t ti = 0; ti < timeIters; ++ti)
       std::ignore = f(input);
     const auto duration = static_cast<double>(std::chrono::duration_cast<time_unit>(clock::now() - start).count()) / timeIters;
 
