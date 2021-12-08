@@ -1,8 +1,7 @@
 
 #include "WindowTemplate.h"
 
-WindowTemplate::WindowTemplate(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
+WindowTemplate::WindowTemplate(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
 {
-	ui.setupUi(this);
+  ui.setupUi(this);
 }
-

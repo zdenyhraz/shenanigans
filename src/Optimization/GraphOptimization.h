@@ -10,7 +10,7 @@ struct Graph
   std::vector<std::vector<double>> edgeMatrix; // connection cost [from][to]
   std::vector<std::string> nodeNames;          // names of individual nodes in order
 
-  Graph(unsigned N) : N(N), edgeMatrix(zerovect2(N, N, -1.)), nodeNames(std::vector<std::string>(N, "unnamed_node")){};
+  Graph(unsigned N_) : N(N_), edgeMatrix(zerovect2(N_, N_, -1.)), nodeNames(std::vector<std::string>(N_, "unnamed_node")){};
 
   void addEdge(unsigned from, unsigned to, double cost) // assuming bi-directional edges
   {

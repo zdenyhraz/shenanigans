@@ -1,7 +1,7 @@
 #include "Core/functionsBaseSTL.h"
 #include "map.h"
 
-Map::Map(unsigned width, unsigned height) : width(width), height(height)
+Map::Map(unsigned width_, unsigned height_) : width(width_), height(height_)
 {
   // SetFood();
   m_food = Snake::Coordinate(width / 2, height / 2 + 10);

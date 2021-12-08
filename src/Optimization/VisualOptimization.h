@@ -202,12 +202,12 @@ void optimizeWithLandscapeDebug()
 
   Evo.mLB = mLB;
   Evo.mUB = mUB;
-  Evo.optimalFitness = 1e-4;
+  Evo.mOptimalFitness = 1e-4;
   Evo.mNP = 50;
 
   Pat.mLB = mLB;
   Pat.mUB = mUB;
-  Pat.optimalFitness = 1e-4;
+  Pat.mOptimalFitness = 1e-4;
   Pat.multistartMaxCnt = 3;
 
   auto Result = drawFuncLandscapeAndOptimize2D(f, mLB, mUB, steps, Evo, Pat, 1, 1, 1, 0, 1, nullptr);

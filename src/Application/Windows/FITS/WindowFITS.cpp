@@ -1,7 +1,7 @@
 
 #include "WindowFITS.h"
 
-WindowFITS::WindowFITS(QWidget *parent, Globals *globals) : QMainWindow(parent), globals(globals)
+WindowFITS::WindowFITS(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
 {
   ui.setupUi(this);
 
@@ -9,6 +9,12 @@ WindowFITS::WindowFITS(QWidget *parent, Globals *globals) : QMainWindow(parent),
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(fitsDownloadChecker()));
 }
 
-void WindowFITS::fitsDownloader() { fitsDownloaderImpl(); }
+void WindowFITS::fitsDownloader()
+{
+  fitsDownloaderImpl();
+}
 
-void WindowFITS::fitsDownloadChecker() { fitsDownloadCheckerImpl(); }
+void WindowFITS::fitsDownloadChecker()
+{
+  fitsDownloadCheckerImpl();
+}

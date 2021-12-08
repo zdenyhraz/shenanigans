@@ -35,8 +35,8 @@ std::tuple<std::vector<double>, std::vector<std::vector<double>>, std::string, s
   std::vector<std::string> labels;
   std::string line, colname;
   std::getline(file, line);
-  std::stringstream ss(line);
-  while (std::getline(ss, colname, ','))
+  std::stringstream sss(line);
+  while (std::getline(sss, colname, ','))
     labels.push_back(colname);
 
   // fill x & ys vectors from the rest of the file

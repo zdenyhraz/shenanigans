@@ -157,7 +157,7 @@ public:
   std::vector<std::vector<double>> trainingOutputs;
   double learningRate = 0.001;
 
-  NeuralNetwork(int inputSize, std::vector<int> layerSizes) : inputSize(inputSize), layerSizes(layerSizes) { initialize(); }
+  NeuralNetwork(int inputSize_, std::vector<int> layerSizes_) : inputSize(inputSize_), layerSizes(layerSizes_) { initialize(); }
 
   std::vector<double> predictValue(std::vector<double>& input)
   {
@@ -271,9 +271,8 @@ private:
     w.resize(layerCount);
     b.resize(layerCount);
 
-    int L; // main iterator
     // initialize weights and biases
-    for (L = 0; L < layerCount; L++)
+    for (int L = 0; L < layerCount; L++)
     {
       w[L] = L > 0 ? cv::Mat::zeros(layerSizes[L], layerSizes[L - 1], CV_32FC1) : cv::Mat::zeros(layerSizes[L], inputSize, CV_32FC1); // allocate weight matrices
       b[L] = cv::Mat::zeros(layerSizes[L], 1, CV_32FC1);

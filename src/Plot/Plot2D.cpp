@@ -5,7 +5,7 @@
 std::map<std::string, Plot2D> Plot2D::mPlots;
 std::string Plot2D::mCurrentPlot = "Plot2D";
 
-Plot2D::Plot2D(const std::string& mName) : mName(mName)
+Plot2D::Plot2D(const std::string& name) : mName(name)
 {
 }
 

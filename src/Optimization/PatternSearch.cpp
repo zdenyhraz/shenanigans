@@ -101,7 +101,7 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
         }
         break;
       }
-      if (mainPointFitness < optimalFitness)
+      if (mainPointFitness < mOptimalFitness)
       {
 #pragma omp critical
         {
@@ -117,7 +117,7 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
         }
         break;
       }
-      if ((funEvals >= maxFunEvals) || (funEvalsThisRun >= maxFunEvals))
+      if ((funEvals >= mMaxFunEvals) || (funEvalsThisRun >= mMaxFunEvals))
       {
 #pragma omp critical
         {
@@ -140,7 +140,7 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
         topPoint = mainPoint;
         topPointFitness = mainPointFitness;
 
-        if (topPointFitness < optimalFitness)
+        if (topPointFitness < mOptimalFitness)
           flag = true; // dont do other runs, fitness goal reached
       }
       else

@@ -4,7 +4,7 @@
 #include "Plot/Plot2D.h"
 #include "Optimization_.h"
 
-OptimizationAlgorithm_::OptimizationAlgorithm_(int N, const std::string& optname) : N(N), mName(optname)
+OptimizationAlgorithm_::OptimizationAlgorithm_(int N_, const std::string& optname) : N(N_), mName(optname)
 {
   mLB = zerovect(N, -1.);
   mUB = zerovect(N, 1.);

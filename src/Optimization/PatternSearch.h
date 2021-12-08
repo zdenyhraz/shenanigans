@@ -9,7 +9,8 @@ struct PatternSearch : public OptimizationAlgorithm_
   int maxExploitCnt = 0;
   double stepReducer = 0.5;
 
-  PatternSearch(int N) : OptimizationAlgorithm_(N){};
+  PatternSearch(int N_) : OptimizationAlgorithm_(N_){};
+
   OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
 };

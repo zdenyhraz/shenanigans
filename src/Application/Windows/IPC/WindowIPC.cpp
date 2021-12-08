@@ -4,7 +4,7 @@
 #include "Plot/Plot2D.h"
 #include "IPC/ipcAux.h"
 
-WindowIPC::WindowIPC(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
+WindowIPC::WindowIPC(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
 {
   ui.setupUi(this);
   RefreshIPCparameters();

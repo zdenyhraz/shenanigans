@@ -107,7 +107,7 @@ void optimizeIPCParametersForAllWavelengths(const IPCsettings& settingsMaster, d
           Evolution Evo(4);
           Evo.mNP = 25;
           Evo.mMutStrat = Evolution::MutationStrategy::RAND1;
-          Evo.optimalFitness = 0;
+          Evo.mOptimalFitness = 0;
           Evo.mLB = std::vector<double>{0, 0, 3, -1};
           Evo.mUB = std::vector<double>{20, 200, 19, 1};
           auto Result = Evo.Optimize(f);

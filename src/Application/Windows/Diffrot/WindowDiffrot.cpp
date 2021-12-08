@@ -4,7 +4,7 @@
 #include "Astrophysics/diffrotFileIO.h"
 #include "Optimization/Evolution.h"
 
-WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals) : QMainWindow(parent), globals(globals)
+WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(calculateDiffrot()));
