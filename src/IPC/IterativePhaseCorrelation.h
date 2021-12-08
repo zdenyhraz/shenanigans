@@ -971,7 +971,7 @@ private:
     if constexpr (CudaFFT)
       L3 = Fourier::icufft(std::move(crosspower), PackedFFT);
     else
-      L3 = Fourier::ifft(std::move(crosspower), PackedFFT);
+      L3 = Fourier::ifft(std::move(crosspower));
 
     Fourier::fftshift(L3);
     return L3;

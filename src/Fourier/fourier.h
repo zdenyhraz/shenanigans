@@ -5,7 +5,7 @@
 
 namespace Fourier
 {
-inline cv::Mat fftcore(cv::Mat&& img, bool packed = false)
+inline cv::Mat fft(cv::Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -18,13 +18,13 @@ inline cv::Mat fftcore(cv::Mat&& img, bool packed = false)
   return img;
 }
 
-inline cv::Mat ifftcore(cv::Mat&& fft)
+inline cv::Mat ifft(cv::Mat&& fft)
 {
   cv::dft(fft, fft, cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
   return fft;
 }
 
-inline cv::Mat cufftcore(cv::Mat&& img, bool packed = false)
+inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -51,7 +51,7 @@ inline cv::Mat cufftcore(cv::Mat&& img, bool packed = false)
   }
 }
 
-inline cv::Mat icufftcore(cv::Mat&& fft, bool packed = false)
+inline cv::Mat icufft(cv::Mat&& fft, bool packed = false)
 {
   // cuda::GpuMat fftGpu;
   // fftGpu.upload(fft);
@@ -72,24 +72,24 @@ inline cv::Mat icufftcore(cv::Mat&& fft, bool packed = false)
   }
 }
 
-inline cv::Mat fft(const cv::Mat& img, bool packed = false)
+inline cv::Mat fft(cv::Mat& img, bool packed = false)
 {
-  return fftcore(img.clone(), packed);
+  return fft(img.clone(), packed);
 }
 
-inline cv::Mat ifft(const cv::Mat& fft)
+inline cv::Mat ifft(cv::Mat& fft)
 {
-  return ifftcore(fft.clone());
+  return ifft(fft.clone());
 }
 
-inline cv::Mat cufft(const cv::Mat& img, bool packed = false)
+inline cv::Mat cufft(cv::Mat& img, bool packed = false)
 {
-  return cufftcore(img.clone(), packed);
+  return cufft(img.clone(), packed);
 }
 
-inline cv::Mat icufft(const cv::Mat& fft, bool packed = false)
+inline cv::Mat icufft(cv::Mat& fft, bool packed = false)
 {
-  return icufftcore(fft.clone(), packed);
+  return icufft(fft.clone(), packed);
 }
 
 inline void fftshift(cv::Mat& mat)
@@ -186,7 +186,7 @@ inline cv::Mat phase(const cv::Mat& img)
 
 inline cv::Mat fftlogmagn(const cv::Mat& img, int logs = 1)
 {
-  cv::Mat out = fft(img);
+  cv::Mat out = fft(img.clone());
   fftshift(out);
   return logmagn(out, logs);
 }
