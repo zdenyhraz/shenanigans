@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 project(shenanigans)
 
-# C++
+# cpp
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp") # OpenMP support
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror") # warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror") # warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter") # excluded warnings
 
-# Qt
+# qt
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -24,14 +25,13 @@ find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED PATHS C:\\Qt\
 add_subdirectory(external/fmt)
 include_directories("external/fmt/include")
 
-# OpenCV
+# opencv
 find_package(OpenCV REQUIRED PATHS D:\\include\\opencv\\build\\install-mingw)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-# custom
-include_directories("src")
 
 # the shenanigans executable
+include_directories("src")
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.h src/*.cpp src/*.ui src/*.qrc)
 add_executable(shenanigans ${SRC} ${APP_ICON_RESOURCE_WINDOWS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only)

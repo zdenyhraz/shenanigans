@@ -12,8 +12,8 @@ public:
     Coordinate() {}
     Coordinate(int x_, int y_) : x(x_), y(y_) {}
 
-    size_t x = 0;
-    size_t y = 0;
+    int x = 0;
+    int y = 0;
 
     bool operator==(const Coordinate& other) { return (x == other.x) && (y == other.y); }
     bool operator!=(const Coordinate& other) { return !(*this == other); }
