@@ -425,14 +425,14 @@ try
   if (mFileOutput)
   {
     fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
-    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
+    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness));
     mOutputFile.close();
   }
 
   if (mConsoleOutput)
   {
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(-1, population.bestEntity.params, population.bestEntity.fitness));
+    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness));
   }
 }
 catch (const std::exception& e)
@@ -465,10 +465,7 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
 std::string Evolution::GetOutputFileString(size_t gen, const std::vector<double>& bestEntity, double bestFitness)
 {
   std::string value;
-  if (gen >= 0)
-    value += fmt::format("Gen {} ({:.2e}) [", gen, bestFitness);
-  else
-    value += fmt::format("({:.2e}) [", bestFitness);
+  value += fmt::format("Gen {} ({:.2e}) [", gen, bestFitness);
 
   for (size_t i = 0; i < bestEntity.size(); ++i)
   {

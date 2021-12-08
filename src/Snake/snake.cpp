@@ -1,7 +1,7 @@
 #include "map.h"
 #include "snake.h"
 
-Snake::Snake(Map &map) : m_map(map)
+Snake::Snake(Map& map) : m_map(map)
 {
   // game just started
   m_gameover = false;
@@ -17,13 +17,13 @@ Snake::Snake(Map &map) : m_map(map)
 
 bool Snake::CheckValidMove()
 {
-  auto &head = m_body.back();
+  auto& head = m_body.back();
   bool valid = true;
 
   // check boundaries
-  valid = valid && head.x < m_map.width;
+  valid = valid && head.x < static_cast<int>(m_map.width);
   valid = valid && head.x >= 0;
-  valid = valid && head.y < m_map.height;
+  valid = valid && head.y < static_cast<int>(m_map.height);
   valid = valid && head.y >= 0;
 
   // check self eat
@@ -38,7 +38,7 @@ void Snake::Tick()
   if (m_gameover)
     return;
 
-  auto &head = m_body.back();
+  auto& head = m_body.back();
 
   switch (m_direction)
   {
@@ -83,6 +83,12 @@ void Snake::Turn(Direction direction)
   m_direction = direction;
 }
 
-std::vector<Snake::Coordinate>& Snake::GetBody() { return m_body; }
+std::vector<Snake::Coordinate>& Snake::GetBody()
+{
+  return m_body;
+}
 
-bool Snake::GetGameOver() { return m_gameover; }
+bool Snake::GetGameOver()
+{
+  return m_gameover;
+}

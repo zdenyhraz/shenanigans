@@ -75,7 +75,7 @@ public:
   cv::Mat getWindow() const { return window; }
   cv::Mat getBandpass() const { return bandpass; }
 
-  inline cv::Point2f Calculate(const cv::Mat& img1, const cv::Mat& img2)
+  inline cv::Point2f Calculate(const cv::Mat&, const cv::Mat&)
   {
     LOG_DEBUG("XDD");
     return cv::Point2f();

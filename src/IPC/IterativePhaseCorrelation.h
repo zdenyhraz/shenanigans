@@ -1264,7 +1264,8 @@ private:
         return "Rectangular band pass";
       else if (mBandpassL <= 0 && mBandpassH >= 1)
         return "Rectangular all pass";
-
+      else
+        throw std::runtime_error("Unknown bandpass type");
     case BandpassType::Gaussian:
       if (mBandpassL <= 0 && mBandpassH < 1)
         return "Gaussian low pass";
@@ -1274,8 +1275,11 @@ private:
         return "Gausian band pass";
       else if (mBandpassL <= 0 && mBandpassH >= 1)
         return "Gaussian all pass";
+      else
+        throw std::runtime_error("Unknown bandpass type");
+    default:
+      throw std::runtime_error("Unknown bandpass type");
     }
-    return "Unknown";
   }
   std::string WindowType2String(WindowType type) const
   {
@@ -1285,8 +1289,9 @@ private:
       return "Rectangular";
     case WindowType::Hann:
       return "Hann";
+    default:
+      throw std::runtime_error("Unknown window type");
     }
-    return "Unknown";
   }
   std::string InterpolationType2String(InterpolationType type) const
   {
@@ -1298,8 +1303,9 @@ private:
       return "Linear";
     case InterpolationType::Cubic:
       return "Cubic";
+    default:
+      throw std::runtime_error("Unknown interpolation type");
     }
-    return "Unknown";
   }
   void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
       const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter) const
