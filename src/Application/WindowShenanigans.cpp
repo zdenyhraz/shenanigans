@@ -8,7 +8,6 @@
 #include "Application/Windows/Filtering/WindowFiltering.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
-#include "UnitTests/UnitTests.h"
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 #include "Optimization/Evolution.h"
@@ -124,7 +123,6 @@ void WindowShenanigans::GenerateLand()
 
 void WindowShenanigans::UnitTests()
 {
-  UnitTests::TestAll();
 }
 
 void WindowShenanigans::Snake()
