@@ -20,6 +20,6 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 <img src="articles/dissertation/window/1DWindows.png" width="47%"> <img src="articles/dissertation/window/1DWindowsDFT.png" width="47%">
 <img src="articles/dissertation/window/2DWindowDFTR.png" width="32%"> <img src="articles/dissertation/window/2DImageDFT.png" width="32%">  <img src="articles/dissertation/window/2DImageWindowDFT.png" width="32%"> 
 
-### Visualization of different optimizer paths on a given objective function landscape
-<img src="articles/optim/PATpaths2.PNG" width="49%"> <img src="articles/optim/PATpaths3.PNG" width="49%">
+### Visualization of optimizer progress on a given objective function landscape
+<img src="articles/optim/rosenbrock_paths.PNG" width="100%">
 

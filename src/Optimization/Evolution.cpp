@@ -299,6 +299,7 @@ try
       Plot1D::SetYnames({"obj"});
     Plot1D::SetY2names({"reldiff"});
     Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
+    Plot1D::SetYLogarithmic(true);
   }
 }
 catch (const std::exception& e)
