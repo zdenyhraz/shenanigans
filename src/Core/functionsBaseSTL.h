@@ -58,27 +58,32 @@ inline double clampSmooth(double x_new, double x_prev, double clampMin, double c
   return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
 }
 
-template <typename T = double> inline auto zerovect(int N, T value = 0.)
+template <typename T = double>
+inline auto zerovect(int N, T value = 0.)
 {
   return std::vector<T>(N, value);
 }
 
-template <typename T = double> inline auto zerovect2(int N, int M, T value = 0.)
+template <typename T = double>
+inline auto zerovect2(int N, int M, T value = 0.)
 {
   return std::vector<std::vector<T>>(N, zerovect(M, value));
 }
 
-template <typename T = double> inline auto zerovect3(int N, int M, int O, T value = 0.)
+template <typename T = double>
+inline auto zerovect3(int N, int M, int O, T value = 0.)
 {
   return std::vector<std::vector<std::vector<T>>>(N, zerovect2(M, O, value));
 }
 
-template <typename T = double> inline auto zerovect4(int N, int M, int O, int P, T value = 0.)
+template <typename T = double>
+inline auto zerovect4(int N, int M, int O, int P, T value = 0.)
 {
   return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value));
 }
 
-template <typename T> inline std::string to_string(const std::vector<T>& vec)
+template <typename T>
+inline std::string to_string(const std::vector<T>& vec)
 {
   std::stringstream out;
   out << "[";
@@ -92,7 +97,8 @@ template <typename T> inline std::string to_string(const std::vector<T>& vec)
   return out.str();
 }
 
-template <typename T> inline std::ostream& operator<<(std::ostream& out, const std::vector<T>& vec)
+template <typename T>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<T>& vec)
 {
   out << "[";
   for (int i = 0; i < vec.size(); i++)
@@ -105,7 +111,8 @@ template <typename T> inline std::ostream& operator<<(std::ostream& out, const s
   return out;
 }
 
-template <typename T> inline std::ostream& operator<<(std::ostream& out, const std::vector<std::vector<T>>& vec)
+template <typename T>
+inline std::ostream& operator<<(std::ostream& out, const std::vector<std::vector<T>>& vec)
 {
   for (int r = 0; r < vec.size(); r++)
   {
@@ -128,12 +135,14 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<std::string
   return out;
 }
 
-template <typename T> inline constexpr T sqr(T x)
+template <typename T>
+inline constexpr T sqr(T x)
 {
   return x * x;
 }
 
-template <typename T> inline double mean(const std::vector<T>& vec)
+template <typename T>
+inline double mean(const std::vector<T>& vec)
 {
   double mean = 0;
   for (auto& x : vec)
@@ -141,7 +150,8 @@ template <typename T> inline double mean(const std::vector<T>& vec)
   return mean / vec.size();
 }
 
-template <typename T> inline double mean(const std::vector<std::vector<T>>& vec)
+template <typename T>
+inline double mean(const std::vector<std::vector<T>>& vec)
 {
   double mean = 0;
   for (auto& row : vec)
@@ -150,7 +160,8 @@ template <typename T> inline double mean(const std::vector<std::vector<T>>& vec)
   return mean / vec.size() / vec[0].size();
 }
 
-template <typename T> inline double stdev(const std::vector<T>& vec)
+template <typename T>
+inline double stdev(const std::vector<T>& vec)
 {
   double m = mean(vec);
   double stdev = 0;
@@ -160,7 +171,8 @@ template <typename T> inline double stdev(const std::vector<T>& vec)
   return sqrt(stdev);
 }
 
-template <typename T> inline double stdevs(const std::vector<T>& vec)
+template <typename T>
+inline double stdevs(const std::vector<T>& vec)
 {
   double m = mean(vec);
   double stdev = 0;
@@ -170,7 +182,8 @@ template <typename T> inline double stdevs(const std::vector<T>& vec)
   return sqrt(stdev);
 }
 
-template <typename T> inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
+template <typename T>
+inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
   for (int i = 0; i < vec1.size(); i++)
@@ -178,7 +191,8 @@ template <typename T> inline std::vector<T> operator+(const std::vector<T>& vec1
   return result;
 }
 
-template <typename T> inline std::vector<T> operator-(const std::vector<T>& vec1, const std::vector<T>& vec2)
+template <typename T>
+inline std::vector<T> operator-(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
   for (int i = 0; i < vec1.size(); i++)
@@ -186,21 +200,24 @@ template <typename T> inline std::vector<T> operator-(const std::vector<T>& vec1
   return result;
 }
 
-template <typename T> inline std::vector<T>& operator+=(std::vector<T>& vec1, const std::vector<T>& vec2)
+template <typename T>
+inline std::vector<T>& operator+=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   for (int i = 0; i < vec1.size(); i++)
     vec1[i] += vec2[i];
   return vec1;
 }
 
-template <typename T> inline std::vector<T>& operator-=(std::vector<T>& vec1, const std::vector<T>& vec2)
+template <typename T>
+inline std::vector<T>& operator-=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   for (int i = 0; i < vec1.size(); i++)
     vec1[i] -= vec2[i];
   return vec1;
 }
 
-template <typename T> inline std::vector<T> operator*(double val, const std::vector<T>& vec)
+template <typename T>
+inline std::vector<T> operator*(double val, const std::vector<T>& vec)
 {
   std::vector<T> result = vec;
   for (int i = 0; i < vec.size(); i++)
@@ -208,7 +225,8 @@ template <typename T> inline std::vector<T> operator*(double val, const std::vec
   return result;
 }
 
-template <typename T> inline std::vector<T> abs(const std::vector<T>& vec)
+template <typename T>
+inline std::vector<T> abs(const std::vector<T>& vec)
 {
   auto result = vec;
   for (int i = 0; i < vec.size(); i++)
@@ -216,7 +234,8 @@ template <typename T> inline std::vector<T> abs(const std::vector<T>& vec)
   return result;
 }
 
-template <typename T> inline double median(const std::vector<T>& vec)
+template <typename T>
+inline double median(const std::vector<T>& vec)
 {
   auto result = vec;
   std::sort(result.begin(), result.end());
@@ -234,7 +253,8 @@ inline bool vectorLess(std::vector<double>& left, std::vector<double>& right)
   return L < R;
 }
 
-template <typename T> inline T vectorMax(const std::vector<T>& input)
+template <typename T>
+inline T vectorMax(const std::vector<T>& input)
 {
   T vectmax = input[0];
   for (int i = 0; i < input.size(); i++)
@@ -245,7 +265,8 @@ template <typename T> inline T vectorMax(const std::vector<T>& input)
   return vectmax;
 }
 
-template <typename T> inline T vectorMin(const std::vector<T>& input)
+template <typename T>
+inline T vectorMin(const std::vector<T>& input)
 {
   T vectmin = input[0];
   for (int i = 0; i < input.size(); i++)
@@ -256,7 +277,8 @@ template <typename T> inline T vectorMin(const std::vector<T>& input)
   return vectmin;
 }
 
-template <typename T> inline T arrayMax(T* input, unsigned size)
+template <typename T>
+inline T arrayMax(T* input, unsigned size)
 {
   T arrmax = input[0];
   for (int i = 0; i < size; i++)
@@ -267,7 +289,8 @@ template <typename T> inline T arrayMax(T* input, unsigned size)
   return arrmax;
 }
 
-template <typename T> inline T arrayMin(T* input, unsigned size)
+template <typename T>
+inline T arrayMin(T* input, unsigned size)
 {
   T arrmin = input[0];
   for (int i = 0; i < size; i++)

@@ -21,13 +21,41 @@ public:
   static void SetTextBrowser(QTextBrowser* textBrowser) { Get().SetTextBrowserInternal(textBrowser); }
   static void SetLogLevel(LogLevel logLevel) { Get().SetLogLevelInternal(logLevel); }
 
-  template <typename... Args> static void Trace(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Trace, fmt, args...); }
-  template <typename... Args> static void Function(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Function, fmt, args...); }
-  template <typename... Args> static void Debug(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Debug, fmt, args...); }
-  template <typename... Args> static void Info(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Info, fmt, args...); }
-  template <typename... Args> static void Success(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Success, fmt, args...); }
-  template <typename... Args> static void Warning(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Warning, fmt, args...); }
-  template <typename... Args> static void Error(const std::string& fmt, Args&&... args) { Get().LogMessage(LogLevel::Error, fmt, args...); }
+  template <typename... Args>
+  static void Trace(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Trace, fmt, args...);
+  }
+  template <typename... Args>
+  static void Function(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Function, fmt, args...);
+  }
+  template <typename... Args>
+  static void Debug(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Debug, fmt, args...);
+  }
+  template <typename... Args>
+  static void Info(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Info, fmt, args...);
+  }
+  template <typename... Args>
+  static void Success(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Success, fmt, args...);
+  }
+  template <typename... Args>
+  static void Warning(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Warning, fmt, args...);
+  }
+  template <typename... Args>
+  static void Error(const std::string& fmt, Args&&... args)
+  {
+    Get().LogMessage(LogLevel::Error, fmt, args...);
+  }
 
 private:
   QtLogger()
@@ -75,7 +103,8 @@ private:
     return buf;
   }
 
-  template <typename... Args> void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  template <typename... Args>
+  void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     std::lock_guard<std::mutex> lock(mMutex);
     if (!ShouldLog(logLevel))
