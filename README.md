@@ -8,7 +8,7 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 - [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
 ### The Qt GUI
-<img src="articles/random/gui.PNG" width="100%">
+<img src="articles/random/gui.png" width="100%">
 
 ### Visualization of optimizer progress on a given objective function landscape
 <img src="articles/optim/rosenbrock_paths.PNG" width="100%">
