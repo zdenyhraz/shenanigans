@@ -65,9 +65,9 @@ private:
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];
-      int fitsSize, fitsMid, fitsSize2;
+      int fitsSize = 4096, fitsMid = 4096 / 2, fitsSize2 = fitsSize * fitsSize;
       int linecnt = 0;
-      double pixelarcsec;
+      double pixelarcsec = 1;
 
       while (!streamIN.eof())
       {

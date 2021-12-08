@@ -16,10 +16,10 @@ static constexpr double loglimit = 5;
 class IPCsettings
 {
 private:
-  double stdevLmultiplier = 1;
-  double stdevHmultiplier = 200;
   int rows = 0;
   int cols = 0;
+  double stdevLmultiplier = 1;
+  double stdevHmultiplier = 200;
 
 public:
   enum Speak

@@ -15,8 +15,11 @@ cv::Mat loadfits(std::string path, FitsParams& params)
   {
     bool ENDfound = false;
     char lajnaText[lineBytes];
-    int fitsSize, fitsMid, fitsSize2, angle, lajny = 0;
-    double pixelarcsec;
+    int fitsSize = 4096;
+    int fitsMid = fitsSize / 2;
+    int fitsSize2 = fitsSize * fitsSize;
+    int lajny = 0;
+    double pixelarcsec = 1;
 
     while (!streamIN.eof())
     {
