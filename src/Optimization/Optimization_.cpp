@@ -26,6 +26,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
   cv::Mat landscape = cv::Mat::zeros(rows, cols, CV_32F);
   cv::Mat landscapeLog = cv::Mat::zeros(rows, cols, CV_32F);
   std::atomic<int> progress = 0;
+  static constexpr double logConstant = std::numeric_limits<float>::epsilon();
 
 #pragma omp parallel for
   for (int r = 0; r < rows; ++r)
@@ -41,7 +42,6 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
       parameters[yParamIndex] = ymax - (double)r / (rows - 1) * (ymax - ymin);
       const auto funval = f(parameters);
       landscape.at<float>(r, c) = funval;
-      static constexpr double logConstant = std::numeric_limits<float>::epsilon();
       landscapeLog.at<float>(r, c) = std::log(std::max(logConstant + funval, logConstant));
     }
   }
@@ -179,7 +179,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
     Plot2D::SetYmax(ymax);
     Plot2D::SetXlabel(xName);
     Plot2D::SetYlabel(yName);
-    Plot2D::SetZlabel("log(1+obj)");
+    Plot2D::SetZlabel(fmt::format("log({:.1e}+obj)", logConstant));
     Plot2D::ShowAxisLabels(true);
     Plot2D::Plot(landscapeLog);
   }

@@ -1025,7 +1025,7 @@ void WindowShenanigans::RandomShit()
     Evo.SetPlotObjectiveFunctionLandscapeIterations(51);
     Evo.SetSaveProgress(true);
 
-    if (0)
+    if (1)
       Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
