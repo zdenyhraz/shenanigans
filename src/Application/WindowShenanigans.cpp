@@ -119,8 +119,8 @@ void WindowShenanigans::CloseAll()
 void WindowShenanigans::GenerateLand()
 {
   LOG_FUNCTION("Generate land");
-  cv::Mat mat = procedural(1000, 1000);
-  showimg(colorlandscape(mat), "procedural nature");
+  cv::Mat mat = Procedural::procedural(1000, 1000);
+  showimg(Procedural::colorlandscape(mat), "procedural nature");
 }
 
 void WindowShenanigans::UnitTests()

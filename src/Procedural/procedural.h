@@ -2,8 +2,8 @@
 
 #include "baseFunctions2d.h"
 
-using namespace Procedural;
-
+namespace Procedural
+{
 inline cv::Mat procedural(int rows, int cols)
 {
   int N = 500;
@@ -93,4 +93,5 @@ inline cv::Mat colorlandscape(const cv::Mat& heightmap)
     }
   }
   return mat;
+}
 }
