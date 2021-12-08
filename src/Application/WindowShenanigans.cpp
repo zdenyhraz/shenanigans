@@ -917,17 +917,16 @@ try
     LOG_INFO("shift2 = {}", shift2);
     LOG_INFO("shift2n = {}", shift2n);
   }
-  if (1) // ipc sign test
+  if (0) // ipc sign test
   {
     cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
     cv::Mat img2 = loadImage("../resources/Shapes/shapes.png");
 
-    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
+    IterativePhaseCorrelation<true, true> ipc(img1.rows, img1.cols, 0.1, 200);
 
     auto shift = ipc.Calculate(img1, img2);
 
     LOG_INFO("shift = {}", shift);
-    return;
   }
   if (0) // loadfits test
   {
