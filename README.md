@@ -20,8 +20,8 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 <img src="articles/random/aheq.PNG" width="100%">
 
 ### Convolution theorem aware frequency domain image filtering
-<img src="articles/dissertation/bandpass/2DBandpassRingRIDFT.png" width="32%"> <img src="articles/dissertation/bandpass/2DBandpassImageR.png" width="32%"> <img src="articles/dissertation/bandpass/2DBandpassImageG.png" width="32%">
+<img src="dissertation/bandpass/2DBandpassRingRIDFT.png" width="32%"> <img src="dissertation/bandpass/2DBandpassImageR.png" width="32%"> <img src="dissertation/bandpass/2DBandpassImageG.png" width="32%">
 
 ### Modeling of the windowing effect on the Discrete Fourier transform
-<img src="articles/dissertation/window/1DWindows.png" width="47%"> <img src="articles/dissertation/window/1DWindowsDFT.png" width="47%">
-<img src="articles/dissertation/window/2DWindowDFTR.png" width="32%"> <img src="articles/dissertation/window/2DImageDFT.png" width="32%">  <img src="articles/dissertation/window/2DImageWindowDFT.png" width="32%"> 
+<img src="dissertation/window/1DWindows.png" width="47%"> <img src="dissertation/window/1DWindowsDFT.png" width="47%">
+<img src="dissertation/window/2DWindowDFTR.png" width="32%"> <img src="dissertation/window/2DImageDFT.png" width="32%">  <img src="dissertation/window/2DImageWindowDFT.png" width="32%"> 
