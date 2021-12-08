@@ -127,9 +127,9 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     case MetaF:
       return "F";
     case MetaMutationStrategy:
-      return "MutationStrategy";
+      return "Mutation strategy";
     case MetaCrossoverStrategy:
-      return "CrossoverStrategy";
+      return "Crossover strategy";
     default:
       throw std::runtime_error("Unknown meta parameter");
     }
@@ -168,7 +168,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
 
   // set up the meta optimizer
   Evolution evo(MetaParameterCount, "metaopt");
-  evo.SetParameterNames({"NP", "CR", "F", "MutationStrategy", "CrossoverStrategy"});
+  evo.SetParameterNames({"NP", "CR", "F", "Mutation strategy", "Crossover strategy"});
   evo.mNP = 10 * MetaParameterCount;
   evo.mMutStrat = BEST1;
   evo.mCrossStrat = BIN;
