@@ -107,6 +107,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
   windowPlot->move(Plot::GetNewPlotPosition(windowPlot.get(), mName));
   auto& plot = windowPlot->ui.widget;
 
+  plot->setNoAntialiasingOnDrag(true);
   plot->xAxis->setTickLabelFont(Plot::fontTicks);
   plot->yAxis->setTickLabelFont(Plot::fontTicks);
   plot->yAxis2->setTickLabelFont(Plot::fontTicks);
@@ -137,10 +138,18 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
   }
 
   if (mYLogarithmic)
+  {
     plot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+    plot->yAxis->setTicker(logTicker);
+  }
 
   if (mY2Logarithmic)
+  {
     plot->yAxis2->setScaleType(QCPAxis::stLogarithmic);
+    QSharedPointer<QCPAxisTickerLog> logTicker(new QCPAxisTickerLog);
+    plot->yAxis2->setTicker(logTicker);
+  }
 
   for (int i = 0; i < ycnt; i++)
   {
