@@ -60,12 +60,12 @@ public:
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax, double ymin, double ymax,
       const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
-  int N = 1;                               // the problem dimension
+  size_t N = 1;                            // the problem dimension
   std::vector<double> mLB;                 // lower search space bounds
   std::vector<double> mUB;                 // upper search space bounds
   double optimalFitness = -Constants::Inf; // satisfactory function value
-  int maxFunEvals = Constants::IntInf;     // maximum # of function evaluations
-  int maxGen = 1000;                       // maximum # of algorithm iterations
+  size_t maxFunEvals = Constants::IntInf;  // maximum # of function evaluations
+  size_t maxGen = 1000;                    // maximum # of algorithm iterations
 
 protected:
   static const char* GetTerminationReasonString(const TerminationReason& reason);
@@ -75,7 +75,7 @@ protected:
   bool mFileOutput = false;
   bool mPlotObjectiveFunctionLandscape = false;
   bool mSaveProgress = false;
-  int mPlotObjectiveFunctionLandscapeIterations = 51;
+  size_t mPlotObjectiveFunctionLandscapeIterations = 51;
   std::string mOutputFileDir;
   std::string mName;
   std::ofstream mOutputFile;

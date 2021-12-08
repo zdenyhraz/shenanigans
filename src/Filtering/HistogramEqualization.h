@@ -1,6 +1,5 @@
 #pragma once
 
-
 inline std::vector<float> CalculateHistogram(const cv::Mat& img)
 {
   std::vector<float> hist(256, 0);
@@ -19,7 +18,7 @@ inline std::vector<float> CalculateCummulativeHistogram(const cv::Mat& img)
     for (int c = 0; c < img.cols; ++c)
       hist[img.at<uchar>(r, c)]++;
 
-  for (int i = 1; i < hist.size(); ++i)
+  for (size_t i = 1; i < hist.size(); ++i)
     hist[i] = hist[i - 1] + hist[i];
 
   return hist;

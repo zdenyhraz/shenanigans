@@ -312,7 +312,7 @@ private:
   std::vector<cv::Mat> copyVectorMat(std::vector<cv::Mat>& input, double value = 0)
   {
     std::vector<cv::Mat> output(input.size());
-    for (int i = 0; i < input.size(); i++)
+    for (size_t i = 0; i < input.size(); i++)
     {
       output[i] = 0. * input[i].clone() + value;
     }

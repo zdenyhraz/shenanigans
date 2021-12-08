@@ -31,9 +31,9 @@ struct Graph
 
     for (unsigned nodeExplore = 0; nodeExplore < N; nodeExplore++) // expand all N nodes (worst-case)
     {
-      std::sort(nodes.begin(), nodes.end(), [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right) {
-        return std::get<1>(left) < std::get<1>(right);
-      }); // sorts the nodes according to their path costs
+      std::sort(nodes.begin(), nodes.end(),
+          [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right)
+          { return std::get<1>(left) < std::get<1>(right); }); // sorts the nodes according to their path costs
       std::tuple<unsigned, double, unsigned> currentNode;
       for (unsigned nodeIndex = 0; nodeIndex < N; nodeIndex++)
       {
@@ -64,9 +64,9 @@ struct Graph
 
       if (std::find(visitedNodes.begin(), visitedNodes.end(), endIndex) != visitedNodes.end()) // target end node reached, optimal solution found
       {
-        std::sort(nodes.begin(), nodes.end(), [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right) {
-          return std::get<0>(left) < std::get<0>(right);
-        }); // sorts the nodes according to their index
+        std::sort(nodes.begin(), nodes.end(),
+            [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right)
+            { return std::get<0>(left) < std::get<0>(right); }); // sorts the nodes according to their index
         unsigned backTracingIndex = endIndex;
         double optimalCost = std::get<1>(nodes[backTracingIndex]);
         std::vector<unsigned> optimalPath;
@@ -79,7 +79,7 @@ struct Graph
         std::reverse(optimalPath.begin(), optimalPath.end()); // start-to-end
 
         std::cout << std::endl << "> optimal path indices: ";
-        for (int i = 0; i < optimalPath.size(); i++)
+        for (size_t i = 0; i < optimalPath.size(); i++)
         {
           std::cout << optimalPath[i];
           if (i < optimalPath.size() - 1)
@@ -87,7 +87,7 @@ struct Graph
         }
 
         std::cout << std::endl << "> optimal path node names: ";
-        for (int i = 0; i < optimalPath.size(); i++)
+        for (size_t i = 0; i < optimalPath.size(); i++)
         {
           std::cout << nodeNames[optimalPath[i]];
           if (i < optimalPath.size() - 1)

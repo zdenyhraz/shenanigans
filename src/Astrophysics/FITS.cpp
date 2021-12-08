@@ -15,10 +15,10 @@ cv::Mat loadfits(std::string path, FitsParams& params)
   {
     bool ENDfound = false;
     char lajnaText[lineBytes];
-    int fitsSize = 4096;
-    int fitsMid = fitsSize / 2;
-    int fitsSize2 = fitsSize * fitsSize;
-    int lajny = 0;
+    size_t fitsSize = 4096;
+    size_t fitsMid = fitsSize / 2;
+    size_t fitsSize2 = fitsSize * fitsSize;
+    size_t lajny = 0;
     double pixelarcsec = 1;
 
     while (!streamIN.eof())
@@ -84,7 +84,7 @@ cv::Mat loadfits(std::string path, FitsParams& params)
     {
       std::vector<int> pixely(fitsSize2, 0);
       //#pragma omp parallel for
-      for (int i = 0; i < fitsSize2; i++)
+      for (size_t i = 0; i < fitsSize2; i++)
       {
         // P_shortArray[i] -= DATAMIN;
         int px = (int)(P_shortArray[i]);
@@ -136,8 +136,8 @@ void generateFitsDownloadUrlPairs(int delta, int step, int pics, std::string url
 void generateFitsDownloadUrlSingles(int delta, int pics, std::string urlmain)
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
-  std::size_t posR = urlmain.find("record=");
-  std::size_t posN = posR + 7;
+  size_t posR = urlmain.find("record=");
+  size_t posN = posR + 7;
   std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
   int number = stod(stringcislo);
   urlmain = urlmain.substr(0, posN);
@@ -153,8 +153,8 @@ void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmai
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_missing.txt", std::ios::out | std::ios::trunc);
   std::string pathmain = "drms_export.cgi@series=hmi__Ic_45s;record=";
-  std::size_t posR = urlmain.find("record=");
-  std::size_t posN = posR + 7;
+  size_t posR = urlmain.find("record=");
+  size_t posN = posR + 7;
   std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
   int number = stod(stringcislo);
   urlmain = urlmain.substr(0, posN);

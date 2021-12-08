@@ -9,7 +9,7 @@ inline cv::Mat vectToMat(std::vector<double>& vec)
 inline std::vector<cv::Mat> vect2ToMats(std::vector<std::vector<double>>& vec)
 {
   std::vector<cv::Mat> result(vec.size());
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     result[i] = cv::Mat(vec[i]).reshape(0, vec[i].size());
   return result;
 }

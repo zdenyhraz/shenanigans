@@ -1,4 +1,3 @@
-
 #include "PatternSearch.h"
 #include "Plot/Plot1D.h"
 
@@ -14,19 +13,19 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
   // generate all starting points
   std::vector<std::vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
   for (int run = 0; run < multistartMaxCnt; run++)
-    for (int indexParam = 0; indexParam < N; indexParam++)
+    for (size_t indexParam = 0; indexParam < N; indexParam++)
       mainPointsInitial[run][indexParam] = randr(mLB[indexParam], mUB[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
-  int funEvals = 0;
+  size_t funEvals = 0;
 #pragma omp parallel for shared(flag)
   for (int run = 0; run < multistartMaxCnt; run++)
   {
     if (flag)
       continue;
 
-    int funEvalsThisRun = 0;
+    size_t funEvalsThisRun = 0;
     // initialize vectors
     double step = initialStep;
     std::vector<double> mainPoint = mainPointsInitial[run];
@@ -35,7 +34,7 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
     std::vector<std::vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
 
-    for (int dim = 0; dim < N; dim++)
+    for (size_t dim = 0; dim < N; dim++)
     {
       pattern[dim].resize(2);
       for (int pm = 0; pm < 2; pm++)
@@ -43,11 +42,11 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
     }
 
     // main search cycle
-    for (int generation = 1; generation < 1e8; generation++)
+    for (size_t generation = 1; generation < 1e8; generation++)
     {
       bool smallerStep = true;
       // asign values to pattern vertices - exploration
-      for (int dim = 0; dim < N; dim++)
+      for (size_t dim = 0; dim < N; dim++)
       {
         for (int pm = 0; pm < 2; pm++)
         {

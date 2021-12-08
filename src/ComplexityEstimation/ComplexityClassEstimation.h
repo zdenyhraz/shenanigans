@@ -26,12 +26,12 @@ void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, size_t
   const std::vector<I> emptyVec;
   std::ignore = f(emptyVec); // hot cache
   const auto constantStart = clock::now();
-  for (int i = 0; i < timeIters; ++i)
+  for (size_t i = 0; i < timeIters; ++i)
     std::ignore = f(emptyVec);
   const auto constantDuration = static_cast<double>(std::chrono::duration_cast<time_unit>(clock::now() - constantStart).count()) / timeIters;
 
 #pragma omp parallel for
-  for (int i = 0; i < nIters; i++)
+  for (size_t i = 0; i < nIters; i++)
   {
     const int n = nMin + i * nStep;
     LOG_DEBUG("Measuring function complexity... (n={})", n);
@@ -41,7 +41,7 @@ void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, size_t
       in = rand01();
 
     const auto start = clock::now();
-    for (int i = 0; i < timeIters; ++i)
+    for (size_t i = 0; i < timeIters; ++i)
       std::ignore = f(input);
     const auto duration = static_cast<double>(std::chrono::duration_cast<time_unit>(clock::now() - start).count()) / timeIters;
 

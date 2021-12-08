@@ -5,49 +5,41 @@ class Map;
 class Snake
 {
 public:
-	Snake(Map& map);
+  Snake(Map& map);
 
-	struct Coordinate
-	{
-		Coordinate() {}
-		Coordinate(int x_, int y_) :x(x_), y(y_) {}
+  struct Coordinate
+  {
+    Coordinate() {}
+    Coordinate(int x_, int y_) : x(x_), y(y_) {}
 
-		int x = 0;
-		int y = 0;
+    size_t x = 0;
+    size_t y = 0;
 
-		bool operator==(const Coordinate& other)
-		{
-			return (x == other.x) && (y == other.y);
-		}
+    bool operator==(const Coordinate& other) { return (x == other.x) && (y == other.y); }
+    bool operator!=(const Coordinate& other) { return !(*this == other); }
+  };
 
-		bool operator!=(const Coordinate& other)
-		{
-			return !(*this == other);
-		}
-	};
+  enum Direction
+  {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+  };
 
-	enum Direction
-	{
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT
-	};
+  void Tick();
 
-	void Tick();
+  void Turn(Direction direction);
 
-	void Turn(Direction direction);
+  std::vector<Coordinate>& GetBody();
 
-	std::vector<Coordinate>& GetBody();
-
-	bool GetGameOver();
+  bool GetGameOver();
 
 private:
-	std::vector<Coordinate> m_body;
-	Direction m_direction;
-	bool m_gameover;
-	Map& m_map;
+  std::vector<Coordinate> m_body;
+  Direction m_direction;
+  bool m_gameover;
+  Map& m_map;
 
-	bool CheckValidMove();
-
+  bool CheckValidMove();
 };

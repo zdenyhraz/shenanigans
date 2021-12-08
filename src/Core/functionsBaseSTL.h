@@ -87,7 +87,7 @@ inline std::string to_string(const std::vector<T>& vec)
 {
   std::stringstream out;
   out << "[";
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
   {
     out << vec[i];
     if (i < vec.size() - 1)
@@ -101,7 +101,7 @@ template <typename T>
 inline std::ostream& operator<<(std::ostream& out, const std::vector<T>& vec)
 {
   out << "[";
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
   {
     out << vec[i];
     if (i < vec.size() - 1)
@@ -130,7 +130,7 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<std::vector
 
 inline std::ostream& operator<<(std::ostream& out, const std::vector<std::string>& vec)
 {
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     out << vec[i] << "\n";
   return out;
 }
@@ -186,7 +186,7 @@ template <typename T>
 inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
-  for (int i = 0; i < vec1.size(); i++)
+  for (size_t i = 0; i < vec1.size(); i++)
     result[i] = vec1[i] + vec2[i];
   return result;
 }
@@ -195,7 +195,7 @@ template <typename T>
 inline std::vector<T> operator-(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result = vec1;
-  for (int i = 0; i < vec1.size(); i++)
+  for (size_t i = 0; i < vec1.size(); i++)
     result[i] = vec1[i] - vec2[i];
   return result;
 }
@@ -203,7 +203,7 @@ inline std::vector<T> operator-(const std::vector<T>& vec1, const std::vector<T>
 template <typename T>
 inline std::vector<T>& operator+=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
-  for (int i = 0; i < vec1.size(); i++)
+  for (size_t i = 0; i < vec1.size(); i++)
     vec1[i] += vec2[i];
   return vec1;
 }
@@ -211,7 +211,7 @@ inline std::vector<T>& operator+=(std::vector<T>& vec1, const std::vector<T>& ve
 template <typename T>
 inline std::vector<T>& operator-=(std::vector<T>& vec1, const std::vector<T>& vec2)
 {
-  for (int i = 0; i < vec1.size(); i++)
+  for (size_t i = 0; i < vec1.size(); i++)
     vec1[i] -= vec2[i];
   return vec1;
 }
@@ -220,7 +220,7 @@ template <typename T>
 inline std::vector<T> operator*(double val, const std::vector<T>& vec)
 {
   std::vector<T> result = vec;
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     result[i] = val * vec[i];
   return result;
 }
@@ -229,7 +229,7 @@ template <typename T>
 inline std::vector<T> abs(const std::vector<T>& vec)
 {
   auto result = vec;
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     result[i] = abs(vec[i]);
   return result;
 }
@@ -245,7 +245,7 @@ inline double median(const std::vector<T>& vec)
 inline bool vectorLess(std::vector<double>& left, std::vector<double>& right)
 {
   double L = 0, R = 0;
-  for (int i = 0; i < left.size(); i++)
+  for (size_t i = 0; i < left.size(); i++)
   {
     L += abs(left[i]);
     R += abs(right[i]);
@@ -257,7 +257,7 @@ template <typename T>
 inline T vectorMax(const std::vector<T>& input)
 {
   T vectmax = input[0];
-  for (int i = 0; i < input.size(); i++)
+  for (size_t i = 0; i < input.size(); i++)
   {
     if (input[i] > vectmax)
       vectmax = input[i];
@@ -269,7 +269,7 @@ template <typename T>
 inline T vectorMin(const std::vector<T>& input)
 {
   T vectmin = input[0];
-  for (int i = 0; i < input.size(); i++)
+  for (size_t i = 0; i < input.size(); i++)
   {
     if (input[i] < vectmin)
       vectmin = input[i];
@@ -281,7 +281,7 @@ template <typename T>
 inline T arrayMax(T* input, unsigned size)
 {
   T arrmax = input[0];
-  for (int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
   {
     if (input[i] > arrmax)
       arrmax = input[i];
@@ -293,7 +293,7 @@ template <typename T>
 inline T arrayMin(T* input, unsigned size)
 {
   T arrmin = input[0];
-  for (int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
   {
     if (input[i] < arrmin)
       arrmin = input[i];
@@ -346,7 +346,7 @@ inline void linreg(int n, const std::vector<double>& x, const std::vector<double
   double sumy = 0.;  /* sum of y                      */
   double sumy2 = 0.; /* sum of y**2                   */
 
-  for (int i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++)
   {
     sumx += x[i];
     sumx2 += sqr(x[i]);
@@ -376,27 +376,6 @@ inline double linregPosition(int n, const std::vector<double>& x, const std::vec
   return k * x_ + q;
 }
 
-inline double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange)
-{
-  double result = 0;
-  for (int i = 0; i < vec1.size(); i++)
-    result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // normalize -> 0 to 1
-
-  result /= vec1.size(); // coordinate average
-  return result;
-}
-
-inline bool isDistinct(int inpindex, std::vector<int>& indices, int currindex)
-{
-  bool isdist = true;
-  for (auto& idx : indices)
-  {
-    if (inpindex == idx || inpindex == currindex)
-      isdist = false;
-  }
-  return isdist;
-}
-
 inline void exportToMATLAB(const std::vector<double>& Ydata, double xmin, double xmax, std::string path)
 {
   std::ofstream listing(path, std::ios::out | std::ios::trunc);
@@ -422,7 +401,7 @@ inline void makeDir(std::string path, std::string dirname)
 inline std::vector<double> iota(int first, int size)
 {
   std::vector<double> vec(size);
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     vec[i] = first + i;
   return vec;
 }
@@ -443,7 +422,7 @@ inline void filterMedian(std::vector<double>& vec, int size)
   std::vector<double> med;
   med.reserve(size);
 
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
   {
     med.clear();
     for (int m = 0; m < size; m++)
@@ -469,7 +448,7 @@ inline void filterMovavg(std::vector<double>& vec, int size)
   double movavg;
   int movavgcnt;
 
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
   {
     movavg = 0;
     movavgcnt = 0;
@@ -504,7 +483,7 @@ inline double toRadians(double deg)
 inline std::vector<double> toDegrees(const std::vector<double>& vecrad)
 {
   auto vecdeg = vecrad;
-  for (int i = 0; i < vecrad.size(); i++)
+  for (size_t i = 0; i < vecrad.size(); i++)
   {
     vecdeg[i] = toDegrees(vecrad[i]);
   }
@@ -514,7 +493,7 @@ inline std::vector<double> toDegrees(const std::vector<double>& vecrad)
 inline std::vector<double> toRadians(const std::vector<double>& vecdeg)
 {
   auto vecrad = vecdeg;
-  for (int i = 0; i < vecdeg.size(); i++)
+  for (size_t i = 0; i < vecdeg.size(); i++)
   {
     vecrad[i] = toRadians(vecdeg[i]);
   }
@@ -545,7 +524,7 @@ inline double getQuantile(const std::vector<std::vector<double>>& vec, double qu
 {
   std::vector<double> out;
   out.reserve(vec.size() * vec[0].size());
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
     for (double x : vec[i])
       out.push_back(x);
   std::sort(out.begin(), out.end());
@@ -556,7 +535,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanHorizontal(const std::vecto
 {
   std::vector<double> errors(vec.size());
 
-  for (int i = 0; i < vec.size(); i++)
+  for (size_t i = 0; i < vec.size(); i++)
   {
     double m = mean(vec[i]);
     double s = stdev(vec[i]);
@@ -571,7 +550,7 @@ inline std::vector<double> getStandardErrorsOfTheMeanVertical(const std::vector<
 {
   std::vector<double> errors(vec[0].size());
 
-  for (int i = 0; i < vec[0].size(); i++)
+  for (size_t i = 0; i < vec[0].size(); i++)
   {
     std::vector<double> v(vec.size());
     for (int j = 0; j < vec.size(); j++)
@@ -590,7 +569,7 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
 {
   std::vector<double> stdevs(vec[0].size());
 
-  for (int i = 0; i < vec[0].size(); i++)
+  for (size_t i = 0; i < vec[0].size(); i++)
   {
     std::vector<double> v(vec.size());
     for (int j = 0; j < vec.size(); j++)
@@ -610,7 +589,7 @@ inline bool IsImage(const std::string& path)
 inline std::vector<double> GetIota(int length, double maximum)
 {
   std::vector<double> out(length);
-  for (int i = 0; i < length; ++i)
+  for (size_t i = 0; i < length; ++i)
     out[i] = (double)i / (length - 1) * maximum;
   return out;
 }
@@ -639,7 +618,7 @@ struct fmt::formatter<std::vector<T>>
       return fmt::format_to(ctx.out(), "[]");
 
     fmt::format_to(ctx.out(), "[");
-    for (int i = 0; i < vec.size() - 1; ++i)
+    for (size_t i = 0; i < vec.size() - 1; ++i)
       fmt::format_to(ctx.out(), "{}, ", vec[i]);
     return fmt::format_to(ctx.out(), "{}]", vec[vec.size() - 1]);
   }

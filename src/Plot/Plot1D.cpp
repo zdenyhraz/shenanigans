@@ -151,7 +151,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
       plot->addGraph(plot->xAxis, plot->yAxis);
       graph = plot->graph(i);
 
-      if (mYnames.size() > i)
+      if (mYnames.size() > static_cast<size_t>(i))
         graph->setName(QString::fromStdString(mYnames[i]));
       else
         graph->setName(QString::fromStdString("y1_" + std::to_string(i + 1)));
@@ -161,16 +161,16 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
       plot->addGraph(plot->xAxis, plot->yAxis2);
       graph = plot->graph(i);
 
-      if (mY2names.size() > i - y1cnt)
+      if (mY2names.size() > static_cast<size_t>(i - y1cnt))
         graph->setName(QString::fromStdString(mY2names[i - y1cnt]));
       else
         graph->setName(QString::fromStdString("y2_" + std::to_string(i - y1cnt + 1)));
     }
 
-    if (i < mPens.size())
+    if (static_cast<size_t>(i) < mPens.size())
       graph->setPen(mPens[i]);
     else
-      graph->setPen(QPen(QColor(qrand()%255, qrand()%255, qrand()%255), Plot::pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      graph->setPen(QPen(QColor(qrand() % 255, qrand() % 255, qrand() % 255), Plot::pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     if (mScatterStyle)
     {

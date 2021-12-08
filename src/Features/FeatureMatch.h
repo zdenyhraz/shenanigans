@@ -79,7 +79,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
   std::string pth = path + "features.csv";
   std::ofstream csv(pth, std::ios::out | std::ios::trunc);
   csv << "X,Y,SPD,DIR" << std::endl;
-  for (int i = 0; i < points.size(); i++)
+  for (size_t i = 0; i < points.size(); i++)
   {
     csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << std::endl;
   }
