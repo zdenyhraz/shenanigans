@@ -13,7 +13,7 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 ### Visualization of optimizer progress on a given objective function landscape
 <img src="articles/optim/rosenbrock_paths.png" width="100%">
 
-### Visualization of `meta`-optimizer progress and optimization improvement on a given `meta`-objective function landscape
+### Visualization of *meta*-optimizer progress and optimization improvement on a given *meta*-objective function landscape
 <img src="articles/optim/metaopt_paths.png" width="100%">
 
 ### Adaptive histogram equalization

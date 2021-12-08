@@ -1,7 +1,6 @@
 
 #include <regex>
 #include "WindowShenanigans.h"
-
 #include "Application/Windows/IPC/WindowIPC.h"
 #include "Application/Windows/Diffrot/WindowDiffrot.h"
 #include "Application/Windows/Features/WindowFeatures.h"
