@@ -15,7 +15,7 @@ inline cv::Mat procedural(int rows, int cols)
     float cy = 0.02 * rand01();
     float ratio = cx / cy;
 
-    if (ratio > 5 || ratio < (1. / 5))
+    if (ratio > 5 or ratio < (1. / 5))
       continue;
 
     mat += (rand01() * gaussian(rows, cols, cx, cy, rand01(), rand01()));

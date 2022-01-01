@@ -15,7 +15,7 @@ public:
     int x = 0;
     int y = 0;
 
-    bool operator==(const Coordinate& other) { return (x == other.x) && (y == other.y); }
+    bool operator==(const Coordinate& other) { return (x == other.x) and (y == other.y); }
     bool operator!=(const Coordinate& other) { return !(*this == other); }
   };
 

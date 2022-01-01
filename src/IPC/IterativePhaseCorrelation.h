@@ -61,10 +61,10 @@ public:
     mRows = rows;
     mCols = cols > 0 ? cols : rows;
 
-    if (mWindow.rows != mRows || mWindow.cols != mCols)
+    if (mWindow.rows != mRows or mWindow.cols != mCols)
       UpdateWindow();
 
-    if (mBandpass.rows != mRows || mBandpass.cols != mCols)
+    if (mBandpass.rows != mRows or mBandpass.cols != mCols)
       UpdateBandpass();
   }
   void SetSize(cv::Size size) { SetSize(size.height, size.width); }
@@ -109,7 +109,7 @@ public:
     if (image1.size() != cv::Size(mCols, mRows))
       throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
-    if (image1.channels() != 1 || image2.channels() != 1)
+    if (image1.channels() != 1 or image2.channels() != 1)
       throw std::runtime_error("Multichannel images are not supported");
 
     ConvertToUnitFloat(image1);
@@ -134,7 +134,7 @@ public:
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
 
-    if constexpr (DebugMode && 0)
+    if constexpr (DebugMode and 0)
     {
       auto plot1 = dft1.clone();
       Fourier::fftshift(plot1);
@@ -358,7 +358,7 @@ public:
     if (image1.size() != image2.size())
       throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
-    if (mRows > image1.rows || mCols > image1.cols)
+    if (mRows > image1.rows or mCols > image1.cols)
       throw std::runtime_error(fmt::format("Images are too small ({} < {})", image1.size(), cv::Size(mCols, mRows)));
 
     cv::Mat flowX = cv::Mat::zeros(cv::Size(resolution * image1.cols, resolution * image1.rows), CV_32F);
@@ -435,16 +435,16 @@ public:
         {
           bpR.at<float>(r, c) = BandpassREquation(r, c);
 
-          if (mBandpassL <= 0 && mBandpassH < 1)
+          if (mBandpassL <= 0 and mBandpassH < 1)
             bpG.at<float>(r, c) = LowpassEquation(r, c);
-          else if (mBandpassL > 0 && mBandpassH >= 1)
+          else if (mBandpassL > 0 and mBandpassH >= 1)
             bpG.at<float>(r, c) = HighpassEquation(r, c);
-          else if (mBandpassL > 0 && mBandpassH < 1)
+          else if (mBandpassL > 0 and mBandpassH < 1)
             bpG.at<float>(r, c) = BandpassGEquation(r, c);
         }
       }
 
-      if (mBandpassL > 0 && mBandpassH < 1)
+      if (mBandpassL > 0 and mBandpassH < 1)
         normalize(bpG, bpG, 0.0, 1.0, cv::NORM_MINMAX);
 
       cv::Mat bpR0, bpG0;
@@ -474,11 +474,11 @@ public:
         {
           filterR.at<float>(r, c) = BandpassREquation(r, c);
 
-          if (mBandpassL <= 0 && mBandpassH < 1)
+          if (mBandpassL <= 0 and mBandpassH < 1)
             filterG.at<float>(r, c) = LowpassEquation(r, c);
-          else if (mBandpassL > 0 && mBandpassH >= 1)
+          else if (mBandpassL > 0 and mBandpassH >= 1)
             filterG.at<float>(r, c) = HighpassEquation(r, c);
-          else if (mBandpassL > 0 && mBandpassH < 1)
+          else if (mBandpassL > 0 and mBandpassH < 1)
             filterG.at<float>(r, c) = BandpassGEquation(r, c);
         }
       }
@@ -840,19 +840,19 @@ private:
     switch (mBandpassType)
     {
     case BandpassType::Gaussian:
-      if (mBandpassL <= 0 && mBandpassH < 1)
+      if (mBandpassL <= 0 and mBandpassH < 1)
       {
         for (int r = 0; r < mRows; ++r)
           for (int c = 0; c < mCols; ++c)
             mBandpass.at<float>(r, c) = LowpassEquation(r, c);
       }
-      else if (mBandpassL > 0 && mBandpassH >= 1)
+      else if (mBandpassL > 0 and mBandpassH >= 1)
       {
         for (int r = 0; r < mRows; ++r)
           for (int c = 0; c < mCols; ++c)
             mBandpass.at<float>(r, c) = HighpassEquation(r, c);
       }
-      else if (mBandpassL > 0 && mBandpassH < 1)
+      else if (mBandpassL > 0 and mBandpassH < 1)
       {
         for (int r = 0; r < mRows; ++r)
           for (int c = 0; c < mCols; ++c)
@@ -886,7 +886,7 @@ private:
   float BandpassREquation(int row, int col) const
   {
     double r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
-    return (mBandpassL <= r && r <= mBandpassH) ? 1 : 0;
+    return (mBandpassL <= r and r <= mBandpassH) ? 1 : 0;
   }
   void ConvertToUnitFloat(cv::Mat& image) const
   {
@@ -952,7 +952,7 @@ private:
   }
   void ApplyBandpass(cv::Mat& crosspower) const
   {
-    if (mBandpassL <= 0 && mBandpassH >= 1)
+    if (mBandpassL <= 0 and mBandpassH >= 1)
       return;
 
     if constexpr (PackedFFT)
@@ -981,7 +981,7 @@ private:
     cv::Point2i peak;
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
 
-    if (peak.x < 0 || peak.y < 0 || peak.x >= mat.cols || peak.y >= mat.rows)
+    if (peak.x < 0 or peak.y < 0 or peak.x >= mat.cols or peak.y >= mat.rows)
       return cv::Point2f(0, 0);
 
     return peak;
@@ -1005,7 +1005,7 @@ private:
 
     cv::Point2f result(Mx / M, My / M);
 
-    if (result.x < 0 || result.y < 0 || result.x >= mat.cols || result.y >= mat.rows)
+    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows)
       return cv::Point2f(mat.cols / 2, mat.rows / 2);
 
     return result;
@@ -1041,9 +1041,9 @@ private:
   bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, int size) const { return IsOutOfBounds(peak, mat, {size, size}); }
   bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size) const
   {
-    return peak.x - size.width / 2 < 0 || peak.y - size.height / 2 < 0 || peak.x + size.width / 2 >= mat.cols || peak.y + size.height / 2 >= mat.rows;
+    return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
-  bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) const { return abs(L1peak.x - L1mid.x) < 0.5 && abs(L1peak.y - L1mid.y) < 0.5; }
+  bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) const { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
   bool ReduceL2size(int& L2size) const
   {
     L2size -= 2;
@@ -1087,7 +1087,7 @@ private:
       }
     }
 
-    if (gamma1 != 1 || gamma2 != 1)
+    if (gamma1 != 1 or gamma2 != 1)
     {
       normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
       normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
@@ -1142,7 +1142,7 @@ private:
   {
     for (const auto& image : images)
     {
-      if (image.rows < mRows + maxShift || image.cols < mCols + maxShift)
+      if (image.rows < mRows + maxShift or image.cols < mCols + maxShift)
         throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
             mRows + maxShift, mCols + maxShift));
     }
@@ -1256,24 +1256,24 @@ private:
     switch (type)
     {
     case BandpassType::Rectangular:
-      if (mBandpassL <= 0 && mBandpassH < 1)
+      if (mBandpassL <= 0 and mBandpassH < 1)
         return "Rectangular low pass";
-      else if (mBandpassL > 0 && mBandpassH >= 1)
+      else if (mBandpassL > 0 and mBandpassH >= 1)
         return "Rectangular high pass";
-      else if (mBandpassL > 0 && mBandpassH < 1)
+      else if (mBandpassL > 0 and mBandpassH < 1)
         return "Rectangular band pass";
-      else if (mBandpassL <= 0 && mBandpassH >= 1)
+      else if (mBandpassL <= 0 and mBandpassH >= 1)
         return "Rectangular all pass";
       else
         throw std::runtime_error("Unknown bandpass type");
     case BandpassType::Gaussian:
-      if (mBandpassL <= 0 && mBandpassH < 1)
+      if (mBandpassL <= 0 and mBandpassH < 1)
         return "Gaussian low pass";
-      else if (mBandpassL > 0 && mBandpassH >= 1)
+      else if (mBandpassL > 0 and mBandpassH >= 1)
         return "Gaussian high pass";
-      else if (mBandpassL > 0 && mBandpassH < 1)
+      else if (mBandpassL > 0 and mBandpassH < 1)
         return "Gausian band pass";
-      else if (mBandpassL <= 0 && mBandpassH >= 1)
+      else if (mBandpassL <= 0 and mBandpassH >= 1)
         return "Gaussian all pass";
       else
         throw std::runtime_error("Unknown bandpass type");

@@ -157,7 +157,7 @@ void alignPicsDebug(const cv::Mat& img1In, const cv::Mat& img2In, IPCsettings& I
 
 void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings2)
 {
-  if (IPC_settings1.getcols() == 0 || IPC_settings2.getcols() == 0)
+  if (IPC_settings1.getcols() == 0 or IPC_settings2.getcols() == 0)
   {
     std::cout << "> please initialize IPC_settings1 and IPC_settings2 to run benchmarks" << std::endl;
     return;
@@ -237,7 +237,7 @@ std::tuple<cv::Mat, cv::Mat> calculateFlowMap(const cv::Mat& img1In, const cv::M
       int r_ = (double)r / qualityRatio;
       int c_ = (double)c / qualityRatio;
 
-      if (c_ < pad || r_ < pad || c_ > (img1.cols - pad) || r_ > (img1.rows - pad))
+      if (c_ < pad or r_ < pad or c_ > (img1.cols - pad) or r_ > (img1.rows - pad))
       {
         flowX.at<float>(r, c) = 0;
         flowY.at<float>(r, c) = 0;

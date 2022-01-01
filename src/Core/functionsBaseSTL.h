@@ -335,7 +335,7 @@ inline double gaussian1D(double x, double amp, double mu, double sigma)
 
 constexpr int factorial(int n)
 {
-  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+  return (n == 1 or n == 0) ? 1 : factorial(n - 1) * n;
 }
 
 inline void linreg(int n, const std::vector<double>& x, const std::vector<double>& y, double& k, double& q)
@@ -582,8 +582,8 @@ inline std::vector<double> getStandardDeviationsVertical(const std::vector<std::
 
 inline bool IsImage(const std::string& path)
 {
-  return (path.find(".png") != std::string::npos || path.find(".PNG") != std::string::npos || path.find(".jpg") != std::string::npos || path.find(".JPG") != std::string::npos ||
-          path.find(".jpeg") != std::string::npos || path.find(".JPEG") != std::string::npos || path.find(".fits") != std::string::npos || path.find(".FITS") != std::string::npos);
+  return (path.find(".png") != std::string::npos or path.find(".PNG") != std::string::npos or path.find(".jpg") != std::string::npos or path.find(".JPG") != std::string::npos ||
+          path.find(".jpeg") != std::string::npos or path.find(".JPEG") != std::string::npos or path.find(".fits") != std::string::npos or path.find(".FITS") != std::string::npos);
 }
 
 inline std::vector<double> GetIota(int length, double maximum)
@@ -596,7 +596,7 @@ inline std::vector<double> GetIota(int length, double maximum)
 
 inline std::vector<double> Slice(const std::vector<double>& vec, size_t begin, size_t end)
 {
-  if (begin > vec.size() - 1 || end > vec.size() - 1 || begin >= end)
+  if (begin > vec.size() - 1 or end > vec.size() - 1 or begin >= end)
     return {};
 
   return std::vector<double>(vec.begin() + begin, vec.begin() + end);

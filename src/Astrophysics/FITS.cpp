@@ -70,7 +70,7 @@ cv::Mat loadfits(std::string path, FitsParams& params)
         ENDfound = true;
       }
 
-      if (ENDfound && (lajny % linesMultiplier == 0))
+      if (ENDfound and (lajny % linesMultiplier == 0))
         break;
     }
     params.R /= pixelarcsec;
@@ -90,7 +90,7 @@ cv::Mat loadfits(std::string path, FitsParams& params)
         int px = (int)(P_shortArray[i]);
         px += 32768;
         pixely[i] = px;
-        if (0 && (px > 65535))
+        if (0 and (px > 65535))
         {
           std::cout << "what? pixel out of 16bit range.";
           std::cin.ignore();
@@ -195,7 +195,7 @@ void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmai
 void loadImageDebug(cv::Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop)
 {
   std::string path = "xd";
-  if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
+  if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
   {
     std::cout << "loading a fits file.." << std::endl;
     FitsParams params;

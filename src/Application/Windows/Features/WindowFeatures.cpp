@@ -30,7 +30,7 @@ void WindowFeatures::FeatureMatch()
   fmdata.path1 = ui.lineEdit_9->text().toStdString();
   fmdata.path2 = ui.lineEdit_10->text().toStdString();
 
-  if (!fmdata.path1.empty() && !fmdata.path2.empty())
+  if (!fmdata.path1.empty() and !fmdata.path2.empty())
     featureMatch2pic(fmdata);
   else
     featureMatch(fmdata);

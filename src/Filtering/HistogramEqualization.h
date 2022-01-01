@@ -67,7 +67,7 @@ inline cv::Mat EqualizeHistogramAdaptive(const cv::Mat& img, int wsize)
 #pragma omp parallel for
     for (int c = 0; c < img.cols; ++c)
     {
-      if (r > wsize / 2 && c > wsize / 2 && r < img.rows - wsize / 2 && c < img.cols - wsize / 2)
+      if (r > wsize / 2 and c > wsize / 2 and r < img.rows - wsize / 2 and c < img.cols - wsize / 2)
       {
         auto chist = CalculateCummulativeHistogram(roicrop(img, r, c, wsize, wsize));
         out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);

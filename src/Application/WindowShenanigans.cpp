@@ -441,7 +441,7 @@ try
 
     int sajz = 0;
     cv::Size size(sajz, sajz);
-    if (sajz > 0 && img1.size() != size)
+    if (sajz > 0 and img1.size() != size)
     {
       cv::resize(img1, img1, size);
       cv::resize(img2, img2, size);
@@ -685,7 +685,7 @@ try
       for (int c = 0; c < cols; ++c)
       {
         float R = sqrt(std::pow(((float)c - cols / 2) / (cols / 2), 2) + std::pow(((float)r - rows / 2) / (rows / 2), 2));
-        bandpassR.at<float>(r, c) = (fL <= R && R <= fH) ? 1 : 0;
+        bandpassR.at<float>(r, c) = (fL <= R and R <= fH) ? 1 : 0;
 
         gaussL.at<float>(r, c) = exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
 

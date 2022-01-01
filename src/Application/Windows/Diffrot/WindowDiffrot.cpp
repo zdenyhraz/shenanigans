@@ -93,7 +93,7 @@ void WindowDiffrot::checkDiskShifts()
     if (!pic)
       picshow = pic1.image().clone();
 
-    if (pic1.params().succload && pic2.params().succload)
+    if (pic1.params().succload and pic2.params().succload)
     {
       shiftsN.push_back(phasecorrel(roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set).y);
       shiftsS.push_back(phasecorrel(roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set).y);
@@ -242,7 +242,7 @@ void WindowDiffrot::movingPeak()
       time.advanceTime(dpic * drset.dSec);
       loadFitsFuzzy(pic2, time, lag2);
 
-      if (pic1.params().succload && pic2.params().succload)
+      if (pic1.params().succload and pic2.params().succload)
       {
         cv::Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());
         cv::Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());

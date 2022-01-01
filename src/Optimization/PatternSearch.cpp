@@ -117,7 +117,7 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
         }
         break;
       }
-      if ((funEvals >= mMaxFunEvals) || (funEvalsThisRun >= mMaxFunEvals))
+      if ((funEvals >= mMaxFunEvals) or (funEvalsThisRun >= mMaxFunEvals))
       {
 #pragma omp critical
         {

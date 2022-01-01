@@ -108,7 +108,7 @@ public:
         return ys.back();
 
       for (size_t i = 0; i < xs.size() - 1; ++i)
-        if (xs[i] <= x && xs[i + 1] > x)
+        if (xs[i] <= x and xs[i + 1] > x)
           return ys[i] + (x - xs[i]) / (xs[i + 1] - xs[i]) * (ys[i + 1] - ys[i]);
     }
 
@@ -121,7 +121,7 @@ public:
         return ys.back();
 
       for (size_t i = 0; i < xs.size() - 1; ++i)
-        if (xs[i] > x && xs[i + 1] <= x)
+        if (xs[i] > x and xs[i + 1] <= x)
           return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
 
@@ -280,7 +280,7 @@ private:
     }
   }
 
-  void UpdateCalculated() { calculated = Data2DSet && ParamsSet; }
+  void UpdateCalculated() { calculated = Data2DSet and ParamsSet; }
 
   void CalculateMedianFilters(int medianSize)
   {
@@ -331,7 +331,7 @@ private:
     int zeroidx = 0;
     for (size_t i = 0; i < Thetas.size() - 2; ++i)
     {
-      if ((Thetas[i] > 0 && Thetas[i + 1] < 0) || Thetas[i] == 0)
+      if ((Thetas[i] > 0 and Thetas[i + 1] < 0) or Thetas[i] == 0)
       {
         zeroidx = i;
         LOG_INFO("Diffrot NS zeroidx = {}, ({:.2f} => {:.2f})", zeroidx, toDegrees(Thetas[i]), toDegrees(Thetas[i + 1]));
@@ -358,7 +358,7 @@ private:
     std::reverse(OmegasXavgS.begin(), OmegasXavgS.end());
     std::reverse(OmegasYavgS.begin(), OmegasYavgS.end());
 
-    if (OmegasXavgN.size() != OmegasXavgS.size() || OmegasYavgN.size() != OmegasYavgS.size())
+    if (OmegasXavgN.size() != OmegasXavgS.size() or OmegasYavgN.size() != OmegasYavgS.size())
     {
       LOG_ERROR("<NS> NS sizes mismatch: {} != {} & {} != {}", OmegasXavgN.size(), OmegasXavgS.size(), OmegasYavgN.size(), OmegasYavgS.size());
       throw;

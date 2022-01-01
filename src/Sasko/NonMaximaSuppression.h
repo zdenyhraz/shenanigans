@@ -41,7 +41,7 @@ std::tuple<int, int, int, int> GetTwoPairs(float angle, int r, int c, const std:
 
     if (d <= mind)
     {
-      if (d == mind && dangle < mindangle)
+      if (d == mind and dangle < mindangle)
         continue;
 
       mind = d;
@@ -67,7 +67,7 @@ cv::Mat NonMaximaSuppresion(const cv::Mat& img)
   std::vector<cv::Point2f> relativePoints;
   for (int rr = -size / 2; rr <= size / 2; ++rr)
     for (int cc = -size / 2; cc <= size / 2; ++cc)
-      if (rr || cc)
+      if (rr or cc)
         relativePoints.push_back(cv::Point2f(cc, rr));
 
   if (relativePoints.size() != static_cast<size_t>(sqr(size)) - 1)
@@ -79,7 +79,7 @@ cv::Mat NonMaximaSuppresion(const cv::Mat& img)
     {
       auto [r1, c1, r2, c2] = GetTwoPairs(gradA.at<float>(r, c), r, c, relativePoints);
 
-      if (gradM.at<float>(r1, c1) < gradM.at<float>(r, c) && gradM.at<float>(r2, c2) < gradM.at<float>(r, c))
+      if (gradM.at<float>(r1, c1) < gradM.at<float>(r, c) and gradM.at<float>(r2, c2) < gradM.at<float>(r, c))
         out.at<float>(r, c) = gradM.at<float>(r, c);
     }
   }

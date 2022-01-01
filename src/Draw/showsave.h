@@ -14,14 +14,14 @@ inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool col
   sourceimg.convertTo(sourceimg, CV_32F);
   normalize(sourceimg, sourceimg, 0, 1, cv::NORM_MINMAX);
 
-  if (sourceimg.channels() > 1 && (quantileB != 0 || quantileT != 1))
+  if (sourceimg.channels() > 1 and (quantileB != 0 or quantileT != 1))
     LOG_WARNING("Quantile clipping not implemented for color images");
 
   if (sourceimg.channels() == 1)
   {
     if (color)
       sourceimg = applyQuantileColorMap(sourceimg, quantileB, quantileT);
-    else if (quantileB != 0 || quantileT != 1)
+    else if (quantileB != 0 or quantileT != 1)
       sourceimg = applyQuantile(sourceimg, quantileB, quantileT);
   }
 
@@ -71,7 +71,7 @@ inline void saveimg(std::string path, const cv::Mat& sourceimgIn, bool bilinear 
   {
     if (color)
       saveimg = applyQuantileColorMap(saveimg, quantileB, quantileT);
-    else if (quantileB != 0 || quantileT != 1)
+    else if (quantileB != 0 or quantileT != 1)
       saveimg = applyQuantile(saveimg, quantileB, quantileT);
   }
 

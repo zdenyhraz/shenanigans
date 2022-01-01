@@ -785,7 +785,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
     for (size_t pid = 0; pid < params.size(); pid++)
     {
       double random = rand01();
-      if (random < CR || pid == definite)
+      if (random < CR or pid == definite)
         crossoverParameters[pid] = true;
     }
     return;
@@ -795,7 +795,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
     size_t L = 0;
     do
       L++; // at least one param undergoes crossover
-    while ((rand01() < CR) && (L < params.size()));
+    while ((rand01() < CR) and (L < params.size()));
 
     size_t pid = rand() % params.size();
     for (size_t i = 0; i < L; i++)
@@ -826,7 +826,7 @@ bool Evolution::isDistinct(size_t inpindex, std::vector<size_t>& indices, size_t
   bool isdist = true;
   for (auto& idx : indices)
   {
-    if (inpindex == idx || inpindex == currindex)
+    if (inpindex == idx or inpindex == currindex)
       isdist = false;
   }
   return isdist;

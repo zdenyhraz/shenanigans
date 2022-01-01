@@ -116,7 +116,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 
     const auto& point = kp1_all[pic][match.queryIdx].pt;
 
-    if (data.mask && (((float)point.x / img.cols + (float)point.y / img.rows) / 2 < 0.5))
+    if (data.mask and (((float)point.x / img.cols + (float)point.y / img.rows) / 2 < 0.5))
     {
       LOG_TRACE("Skipping match {}: masked out", idx);
       continue;
@@ -149,7 +149,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 
     static constexpr double kMinDir = -170;
     static constexpr double kMaxDir = -120;
-    if (dir < kMinDir || dir > kMaxDir)
+    if (dir < kMinDir or dir > kMaxDir)
     {
       LOG_TRACE("Skipping match {}: direction {:.2f} deg off limits", idx, dir);
       continue;

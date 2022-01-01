@@ -38,7 +38,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
     time.advanceTime(drset.dPic * drset.dSec);
     loadFitsFuzzy(pic2, time, lag2);
 
-    if (pic1.params().succload && pic2.params().succload && pic1.params().succParamCorrection && pic2.params().succParamCorrection)
+    if (pic1.params().succload and pic2.params().succload and pic1.params().succParamCorrection and pic2.params().succParamCorrection)
     {
       if (drset.video)
       {
@@ -80,7 +80,7 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
         const double diffThreshY = 2; // 2
 
         // filter outlier X/Y data
-        if (abs(diffX) < diffThreshX && abs(diffY) < diffThreshY)
+        if (abs(diffX) < diffThreshX and abs(diffY) < diffThreshY)
         {
           // save data
           thetas2D.emplace_back(thetas);
@@ -134,7 +134,7 @@ inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::v
     filterMovavg(shiftsY, drset.movavgFilterSize);
   }
 
-  if (lag1 != 0 || lag2 != 0)
+  if (lag1 != 0 or lag2 != 0)
     if (drset.speak)
       LOG_DEBUG("Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2);
 
