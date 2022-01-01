@@ -15,7 +15,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
 
-  if (xParamIndex < 0 || yParamIndex < 0 || xParamIndex == yParamIndex)
+  if (xParamIndex < 0 or yParamIndex < 0 or xParamIndex == yParamIndex)
     throw std::runtime_error("Bad x/y parameter indices");
 
   if (baseParams.size() <= static_cast<size_t>(std::max(xParamIndex, yParamIndex)))
@@ -32,7 +32,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
   for (int r = 0; r < rows; ++r)
   {
     progress++;
-    if ((r % std::max(rows / 20, 1) == 0) || r == (rows - 1))
+    if ((r % std::max(rows / 20, 1) == 0) or r == (rows - 1))
       LOG_INFO("Drawing objective function landscape ({:.1f}%)", (float)progress / rows * 100);
 
     for (int c = 0; c < cols; ++c)

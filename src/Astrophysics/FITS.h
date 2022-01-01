@@ -118,7 +118,7 @@ private:
           ENDfound = true;
         }
 
-        if (ENDfound && (linecnt % linesMultiplier == 0))
+        if (ENDfound and (linecnt % linesMultiplier == 0))
           break;
       }
 
@@ -238,7 +238,7 @@ private:
         minEnclosingCircle(contours[0], center, radius);
 
         // only save valid parameters
-        if (radius > 1900 && radius < 2000 && center.x > 2030 && center.x < 2070 && center.y > 2030 && center.y < 2070)
+        if (radius > 1900 and radius < 2000 and center.x > 2030 and center.x < 2070 and center.y > 2030 and center.y < 2070)
         {
           params.fitsMidX = center.x;
           params.fitsMidY = center.y;
@@ -382,7 +382,7 @@ public:
     }
     if (month == 2)
       monthdays = 28; // february
-    if ((month == 2) && (year % 4 == 0))
+    if ((month == 2) and (year % 4 == 0))
       monthdays = 29; // leap year fkn february
 
     // plus
@@ -442,7 +442,7 @@ void loadImageDebug(cv::Mat& activeimg, double gamaa, bool colorr, double quanBo
 
 inline cv::Mat loadImage(std::string path)
 {
-  if (path.find(".fits") != std::string::npos || path.find(".fts") != std::string::npos)
+  if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
     return FitsImage(path).image();
 
   cv::Mat result = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);

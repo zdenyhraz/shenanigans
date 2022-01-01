@@ -48,7 +48,7 @@ struct Graph
 
       for (unsigned edge = 0; edge < edgeMatrix[currentNodeIndex].size(); edge++) // check all connections to current node
       {
-        if ((edgeMatrix[currentNodeIndex][edge] >= 0) && (edge != currentNodeIndex)) // check if connection from current node to target node exists
+        if ((edgeMatrix[currentNodeIndex][edge] >= 0) and (edge != currentNodeIndex)) // check if connection from current node to target node exists
         {
           unsigned currentEdgeIndex = getTupleIndexWithIndex(nodes, edge);
           if ((currentNodeCost + edgeMatrix[currentNodeIndex][edge]) < std::get<1>(nodes[currentEdgeIndex])) // if a better path is found, save it

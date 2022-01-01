@@ -101,7 +101,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
     multiply(sourceimg2, set.window, sourceimg2);
   }
 
-  if (set.speak > IPCsettings::Errors || forceshow)
+  if (set.speak > IPCsettings::Errors or forceshow)
   {
     showMatsGRS.push_back(sourceimg1);
     showMatsGRS.push_back(sourceimg2);
@@ -195,7 +195,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
   cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
   cv::Point2f imageshift_PIXEL(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
 
-  if (set.speak > IPCsettings::Errors || forceshow)
+  if (set.speak > IPCsettings::Errors or forceshow)
   {
     cv::Mat L3v;
     resize(L3, L3v, cv::Size(2000, 2000), 0, 0, cv::INTER_NEAREST);
@@ -226,7 +226,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
       L2size++; // odd!+
     while (!converged)
     {
-      if (((L3peak.x - L2size / 2) < 0) || ((L3peak.y - L2size / 2) < 0) || ((L3peak.x + L2size / 2) >= L3.cols) || ((L3peak.y + L2size / 2) >= L3.rows))
+      if (((L3peak.x - L2size / 2) < 0) or ((L3peak.y - L2size / 2) < 0) or ((L3peak.x + L2size / 2) >= L3.cols) or ((L3peak.y + L2size / 2) >= L3.rows))
       {
         L2size -= 2;
         if (L2size < 3)
@@ -248,7 +248,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
         cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
         cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
         cv::Point2f L2Upeak = L2Umid;
-        if (set.speak > IPCsettings::Errors || forceshow)
+        if (set.speak > IPCsettings::Errors or forceshow)
         {
           cv::Mat L2Uv;
           resize(L2U, L2Uv, cv::Size(2000, 2000), 0, 0, cv::INTER_LINEAR);
@@ -273,15 +273,15 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
           cv::Point2f L1peak = findCentroid(L1);
           L2Upeak.x += round(L1peak.x - L1mid.x);
           L2Upeak.y += round(L1peak.y - L1mid.y);
-          if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) || (L2Upeak.y > (L2U.rows - L1mid.y - 1)) || (L2Upeak.x < (L1mid.x + 1)) || (L2Upeak.y < (L1mid.y + 1)))
+          if ((L2Upeak.x > (L2U.cols - L1mid.x - 1)) or (L2Upeak.y > (L2U.rows - L1mid.y - 1)) or (L2Upeak.x < (L1mid.x + 1)) or (L2Upeak.y < (L1mid.y + 1)))
           {
             L2size += -2;
             break;
           }
-          if ((abs(L1peak.x - L1mid.x) < 0.5) && (abs(L1peak.y - L1mid.y) < 0.5))
+          if ((abs(L1peak.x - L1mid.x) < 0.5) and (abs(L1peak.y - L1mid.y) < 0.5))
           {
             L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
-            if (set.speak > IPCsettings::Errors || forceshow)
+            if (set.speak > IPCsettings::Errors or forceshow)
             {
               cv::Mat L1v;
               resize(L1, L1v, cv::Size(2000, 2000), 0, 0, cv::INTER_LINEAR);
@@ -314,7 +314,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
       }
     }
   }
-  if (set.speak > IPCsettings::Errors || forceshow)
+  if (set.speak > IPCsettings::Errors or forceshow)
   {
     showimg(showMatsGRS, "IPC input", false);
     showimg(showMatsCLR, "IPC pipeline", true);

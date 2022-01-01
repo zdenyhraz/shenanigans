@@ -81,7 +81,7 @@ private:
     return logger;
   }
 
-  bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr && logLevel >= mLogLevel; }
+  bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr and logLevel >= mLogLevel; }
 
   void SetTextBrowserInternal(QTextBrowser* textBrowser)
   {

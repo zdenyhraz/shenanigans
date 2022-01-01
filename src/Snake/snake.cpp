@@ -21,10 +21,10 @@ bool Snake::CheckValidMove()
   bool valid = true;
 
   // check boundaries
-  valid = valid && head.x < static_cast<int>(m_map.width);
-  valid = valid && head.x >= 0;
-  valid = valid && head.y < static_cast<int>(m_map.height);
-  valid = valid && head.y >= 0;
+  valid = valid and head.x < static_cast<int>(m_map.width);
+  valid = valid and head.x >= 0;
+  valid = valid and head.y < static_cast<int>(m_map.height);
+  valid = valid and head.y >= 0;
 
   // check self eat
   if (std::find(m_body.begin(), m_body.end() - 1, head) != (m_body.end() - 1))
@@ -71,13 +71,13 @@ void Snake::Tick()
 
 void Snake::Turn(Direction direction)
 {
-  if (m_direction == UP && direction == DOWN)
+  if (m_direction == UP and direction == DOWN)
     return;
-  if (m_direction == DOWN && direction == UP)
+  if (m_direction == DOWN and direction == UP)
     return;
-  if (m_direction == LEFT && direction == RIGHT)
+  if (m_direction == LEFT and direction == RIGHT)
     return;
-  if (m_direction == RIGHT && direction == LEFT)
+  if (m_direction == RIGHT and direction == LEFT)
     return;
 
   m_direction = direction;
