@@ -5,16 +5,16 @@
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 
-inline double predictDiffrotProfile(double theta, double A, double B, double C = 0)
+inline f64 predictDiffrotProfile(f64 theta, f64 A, f64 B, f64 C = 0)
 {
   return (A + B * pow(sin(theta), 2) + C * pow(sin(theta), 4));
 }
 
-inline int predictDiffrotShift(int dPic, int dSec, double R)
+inline i32 predictDiffrotShift(i32 dPic, i32 dSec, f64 R)
 {
-  double degPerDay = predictDiffrotProfile(0.0, 14.296, -1.847, -2.615);
-  double days = dPic * dSec / Constants::SecondsInDay;
-  double degs = degPerDay * days;
+  f64 degPerDay = predictDiffrotProfile(0.0, 14.296, -1.847, -2.615);
+  f64 days = dPic * dSec / Constants::SecondsInDay;
+  f64 degs = degPerDay * days;
   return R * sin(degs / Constants::Rad);
 }
 
@@ -24,7 +24,7 @@ public:
   bool calculated = false;
   std::string saveDir;
 
-  void ShowResults(int medianSize, double sigma, double quanBot = 0, double quanTop = 1)
+  void ShowResults(i32 medianSize, f64 sigma, f64 quanBot = 0, f64 quanTop = 1)
   {
     if (!calculated)
       LOG_ERROR("Diffrot results not yet calculated!");
@@ -80,24 +80,24 @@ public:
     LOG_INFO("Predic error = {}", GetError());
   }
 
-  double GetError()
+  f64 GetError()
   {
     // used for optimizing - closest profile to literature profiles
     CalculateMainInterp1D();
     CalculatePredics();
-    double error = 0;
-    size_t ycount = OmegasX.size();
+    f64 error = 0;
+    usize ycount = OmegasX.size();
     const auto& mycurve = OmegasX;
     const auto& myfit = polyfit(Thetas, OmegasX, 2);
     const auto& targetcurve = 0.5 * (PredicXs[0] + PredicXs[1]);
 
-    for (size_t y = 0; y < ycount; ++y)
+    for (usize y = 0; y < ycount; ++y)
       error += 0.8 * std::pow(myfit[y] - targetcurve[y], 2) + 0.2 * std::pow(mycurve[y] - targetcurve[y], 2);
 
     return sqrt(error / ycount);
   }
 
-  static double Interpolate(const std::vector<double>& xs, const std::vector<double>& ys, double x)
+  static f64 Interpolate(const std::vector<f64>& xs, const std::vector<f64>& ys, f64 x)
   {
     if (xs.front() <= xs.back()) // ascending x
     {
@@ -107,7 +107,7 @@ public:
       if (x >= xs.back())
         return ys.back();
 
-      for (size_t i = 0; i < xs.size() - 1; ++i)
+      for (usize i = 0; i < xs.size() - 1; ++i)
         if (xs[i] <= x and xs[i + 1] > x)
           return ys[i] + (x - xs[i]) / (xs[i + 1] - xs[i]) * (ys[i + 1] - ys[i]);
     }
@@ -120,7 +120,7 @@ public:
       if (x <= xs.back())
         return ys.back();
 
-      for (size_t i = 0; i < xs.size() - 1; ++i)
+      for (usize i = 0; i < xs.size() - 1; ++i)
         if (xs[i] > x and xs[i + 1] <= x)
           return ys[i + 1] + (x - xs[i + 1]) / (xs[i] - xs[i + 1]) * (ys[i] - ys[i + 1]);
     }
@@ -129,19 +129,19 @@ public:
     throw; // should never get here
   }
 
-  static double Interpolate(const std::vector<std::vector<double>>& xs, const std::vector<std::vector<double>>& ys, double x)
+  static f64 Interpolate(const std::vector<std::vector<f64>>& xs, const std::vector<std::vector<f64>>& ys, f64 x)
   {
-    const int ps = xs.size();
-    double mean = 0;
+    const i32 ps = xs.size();
+    f64 mean = 0;
 
-    for (int p = 0; p < ps; ++p)
+    for (i32 p = 0; p < ps; ++p)
       mean += Interpolate(xs[p], ys[p], x);
 
     return mean / ps;
   }
 
-  void SetData2D(const std::vector<std::vector<double>>& thetas2D, const std::vector<std::vector<double>>& omegasX, const std::vector<std::vector<double>>& omegasY,
-      const std::vector<std::vector<double>>& shiftsX, const std::vector<std::vector<double>>& shiftsY)
+  void SetData2D(const std::vector<std::vector<f64>>& thetas2D, const std::vector<std::vector<f64>>& omegasX, const std::vector<std::vector<f64>>& omegasY,
+      const std::vector<std::vector<f64>>& shiftsX, const std::vector<std::vector<f64>>& shiftsY)
   {
     SourceThetas = thetas2D;
     SourceShiftsX = shiftsX;
@@ -152,7 +152,7 @@ public:
     UpdateCalculated();
   }
 
-  void SetParams(int pics, int stride, std::string savepath)
+  void SetParams(i32 pics, i32 stride, std::string savepath)
   {
     SourcePics = pics;
     SourceStride = stride;
@@ -161,8 +161,8 @@ public:
     UpdateCalculated();
   }
 
-  auto GetVecs2D(std::vector<std::vector<double>>& sourceThetas, std::vector<std::vector<double>>& sourceShiftsX, std::vector<std::vector<double>>& sourceShiftsY,
-      std::vector<std::vector<double>>& sourceOmegasX, std::vector<std::vector<double>>& sourceOmegasY) const
+  auto GetVecs2D(std::vector<std::vector<f64>>& sourceThetas, std::vector<std::vector<f64>>& sourceShiftsX, std::vector<std::vector<f64>>& sourceShiftsY, std::vector<std::vector<f64>>& sourceOmegasX,
+      std::vector<std::vector<f64>>& sourceOmegasY) const
   {
     sourceThetas = SourceThetas;
     sourceShiftsX = SourceShiftsX;
@@ -171,14 +171,14 @@ public:
     sourceOmegasY = SourceOmegasY;
   }
 
-  auto GetParams(int& sourcePics, int& sourceStride) const
+  auto GetParams(i32& sourcePics, i32& sourceStride) const
   {
     sourcePics = SourcePics;
     sourceStride = SourceStride;
   }
 
-  void SetVecs2DRaw(const std::vector<std::vector<double>>& sourceThetas, const std::vector<std::vector<double>>& sourceShiftsX, const std::vector<std::vector<double>>& sourceShiftsY,
-      const std::vector<std::vector<double>>& sourceOmegasX, const std::vector<std::vector<double>>& sourceOmegasY)
+  void SetVecs2DRaw(const std::vector<std::vector<f64>>& sourceThetas, const std::vector<std::vector<f64>>& sourceShiftsX, const std::vector<std::vector<f64>>& sourceShiftsY,
+      const std::vector<std::vector<f64>>& sourceOmegasX, const std::vector<std::vector<f64>>& sourceOmegasY)
   {
     SourceThetas = sourceThetas;
     SourceShiftsX = sourceShiftsX;
@@ -187,7 +187,7 @@ public:
     SourceOmegasY = sourceOmegasY;
   }
 
-  void SetParamsRaw(int sourcePics, int sourceStride)
+  void SetParamsRaw(i32 sourcePics, i32 sourceStride)
   {
     SourcePics = sourcePics;
     SourceStride = sourceStride;
@@ -195,49 +195,49 @@ public:
 
 private:
   // source data
-  int SourcePics;
-  int SourceStride;
-  std::vector<std::vector<double>> SourceThetas;
-  std::vector<std::vector<double>> SourceShiftsX;
-  std::vector<std::vector<double>> SourceShiftsY;
-  std::vector<std::vector<double>> SourceOmegasX;
-  std::vector<std::vector<double>> SourceOmegasY;
+  i32 SourcePics;
+  i32 SourceStride;
+  std::vector<std::vector<f64>> SourceThetas;
+  std::vector<std::vector<f64>> SourceShiftsX;
+  std::vector<std::vector<f64>> SourceShiftsY;
+  std::vector<std::vector<f64>> SourceOmegasX;
+  std::vector<std::vector<f64>> SourceOmegasY;
 
   // internal data
-  std::vector<double> Thetas;
-  std::vector<double> ShiftsX;
-  std::vector<double> ShiftsY;
-  std::vector<double> OmegasX;
-  std::vector<double> OmegasY;
+  std::vector<f64> Thetas;
+  std::vector<f64> ShiftsX;
+  std::vector<f64> ShiftsY;
+  std::vector<f64> OmegasX;
+  std::vector<f64> OmegasY;
   cv::Mat FlowX;
   cv::Mat FlowY;
   bool Data2DSet = false;
   bool ParamsSet = false;
-  static constexpr double colRowRatio1 = 2;
-  static constexpr double colRowRatio2 = 1.5;
-  static constexpr int predicCnt = 4;
-  std::vector<std::vector<double>> PredicXs;
-  std::vector<double> ShiftsXErrors;
-  std::vector<double> ShiftsYErrors;
-  std::vector<double> ShiftsXErrorsBot;
-  std::vector<double> ShiftsXErrorsTop;
-  std::vector<double> ShiftsYErrorsBot;
-  std::vector<double> ShiftsYErrorsTop;
-  std::vector<std::vector<double>> PredicXsNS;
-  std::vector<double> ThetasNS;
-  std::vector<double> OmegasXavgN;
-  std::vector<double> OmegasXavgS;
-  std::vector<double> OmegasYavgN;
-  std::vector<double> OmegasYavgS;
-  double StartTime;
-  double EndTime;
-  double StartTheta;
-  double EndTheta;
+  static constexpr f64 colRowRatio1 = 2;
+  static constexpr f64 colRowRatio2 = 1.5;
+  static constexpr i32 predicCnt = 4;
+  std::vector<std::vector<f64>> PredicXs;
+  std::vector<f64> ShiftsXErrors;
+  std::vector<f64> ShiftsYErrors;
+  std::vector<f64> ShiftsXErrorsBot;
+  std::vector<f64> ShiftsXErrorsTop;
+  std::vector<f64> ShiftsYErrorsBot;
+  std::vector<f64> ShiftsYErrorsTop;
+  std::vector<std::vector<f64>> PredicXsNS;
+  std::vector<f64> ThetasNS;
+  std::vector<f64> OmegasXavgN;
+  std::vector<f64> OmegasXavgS;
+  std::vector<f64> OmegasYavgN;
+  std::vector<f64> OmegasYavgS;
+  f64 StartTime;
+  f64 EndTime;
+  f64 StartTheta;
+  f64 EndTheta;
 
   void CalculateMainInterp1D()
   {
-    int ps = SourceThetas.size();
-    int ys = SourceThetas[0].size();
+    i32 ps = SourceThetas.size();
+    i32 ys = SourceThetas[0].size();
     Thetas.resize(ys);
     ShiftsX.resize(ys);
     ShiftsY.resize(ys);
@@ -245,14 +245,14 @@ private:
     OmegasY.resize(ys);
 
     // calculate theta range
-    double thetaRange = Constants::Inf;
-    for (int p = 0; p < ps; ++p)
+    f64 thetaRange = Constants::Inf;
+    for (i32 p = 0; p < ps; ++p)
       if (SourceThetas[p].front() < thetaRange)
         thetaRange = SourceThetas[p].front();
-    double dth = 2. * thetaRange / (ys - 1);
+    f64 dth = 2. * thetaRange / (ys - 1);
 
     // interpolate shifts and omegas based on equidistant theta
-    for (int y = 0; y < ys; ++y)
+    for (i32 y = 0; y < ys; ++y)
     {
       Thetas[y] = thetaRange - y * dth;
       ShiftsX[y] = Interpolate(SourceThetas, SourceShiftsX, Thetas[y]);
@@ -264,29 +264,29 @@ private:
 
   void CalculateMainInterp2D()
   {
-    int ps = SourceThetas.size();
-    int ys = SourceThetas[0].size();
+    i32 ps = SourceThetas.size();
+    i32 ys = SourceThetas[0].size();
 
     FlowX = cv::Mat::zeros(ys, ps, CV_32F);
     FlowY = cv::Mat::zeros(ys, ps, CV_32F);
 
-    for (int y = 0; y < ys; ++y)
+    for (i32 y = 0; y < ys; ++y)
     {
-      for (int p = 0; p < ps; ++p)
+      for (i32 p = 0; p < ps; ++p)
       {
-        FlowX.at<float>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasX[p], Thetas[y]);
-        FlowY.at<float>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasY[p], Thetas[y]);
+        FlowX.at<f32>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasX[p], Thetas[y]);
+        FlowY.at<f32>(y, ps - 1 - p) = Interpolate(SourceThetas[p], SourceOmegasY[p], Thetas[y]);
       }
     }
   }
 
   void UpdateCalculated() { calculated = Data2DSet and ParamsSet; }
 
-  void CalculateMedianFilters(int medianSize)
+  void CalculateMedianFilters(i32 medianSize)
   {
     if (medianSize)
     {
-      for (int med = 3; med <= std::min(medianSize, 7); med += 2)
+      for (i32 med = 3; med <= std::min(medianSize, 7); med += 2)
       {
         medianBlur(FlowX, FlowX, med);
         medianBlur(FlowY, FlowY, med);
@@ -297,7 +297,7 @@ private:
   void CalculateAxisLimits()
   {
     StartTime = 0;
-    EndTime = (double)(SourcePics - 1) * SourceStride * 45 / 60 / 60 / 24;
+    EndTime = (f64)(SourcePics - 1) * SourceStride * 45 / 60 / 60 / 24;
     StartTheta = Thetas.front();
     EndTheta = Thetas.back();
   }
@@ -305,7 +305,7 @@ private:
   void CalculatePredics()
   {
     PredicXs = zerovect2(predicCnt, Thetas.size(), 0.);
-    for (size_t i = 0; i < Thetas.size(); i++)
+    for (usize i = 0; i < Thetas.size(); i++)
     {
       PredicXs[0][i] = predictDiffrotProfile(Thetas[i], 14.296, -1.847, -2.615); // Derek A. Lamb (2017)
       PredicXs[1][i] = predictDiffrotProfile(Thetas[i], 14.192, -1.70, -2.36);   // Howard et al. (1983)
@@ -328,8 +328,8 @@ private:
   {
     PredicXsNS.resize(predicCnt);
 
-    int zeroidx = 0;
-    for (size_t i = 0; i < Thetas.size() - 2; ++i)
+    i32 zeroidx = 0;
+    for (usize i = 0; i < Thetas.size() - 2; ++i)
     {
       if ((Thetas[i] > 0 and Thetas[i + 1] < 0) or Thetas[i] == 0)
       {
@@ -340,20 +340,20 @@ private:
     }
 
     // north hemisphere
-    ThetasNS = std::vector<double>(Thetas.begin(), Thetas.begin() + zeroidx + 1);
-    PredicXsNS[0] = std::vector<double>(PredicXs[0].begin(), PredicXs[0].begin() + zeroidx + 1);
-    PredicXsNS[1] = std::vector<double>(PredicXs[1].begin(), PredicXs[1].begin() + zeroidx + 1);
-    PredicXsNS[2] = std::vector<double>(PredicXs[2].begin(), PredicXs[2].begin() + zeroidx + 1);
-    PredicXsNS[3] = std::vector<double>(PredicXs[3].begin(), PredicXs[3].begin() + zeroidx + 1);
-    OmegasXavgN = std::vector<double>(OmegasX.begin(), OmegasX.begin() + zeroidx + 1);
-    OmegasYavgN = std::vector<double>(OmegasY.begin(), OmegasY.begin() + zeroidx + 1);
+    ThetasNS = std::vector<f64>(Thetas.begin(), Thetas.begin() + zeroidx + 1);
+    PredicXsNS[0] = std::vector<f64>(PredicXs[0].begin(), PredicXs[0].begin() + zeroidx + 1);
+    PredicXsNS[1] = std::vector<f64>(PredicXs[1].begin(), PredicXs[1].begin() + zeroidx + 1);
+    PredicXsNS[2] = std::vector<f64>(PredicXs[2].begin(), PredicXs[2].begin() + zeroidx + 1);
+    PredicXsNS[3] = std::vector<f64>(PredicXs[3].begin(), PredicXs[3].begin() + zeroidx + 1);
+    OmegasXavgN = std::vector<f64>(OmegasX.begin(), OmegasX.begin() + zeroidx + 1);
+    OmegasYavgN = std::vector<f64>(OmegasY.begin(), OmegasY.begin() + zeroidx + 1);
 
     LOG_INFO("<NS> First (max) North theta = {:.2f}", toDegrees(ThetasNS.front()));
     LOG_INFO("<NS> Last (min) North theta = {:.2f}", toDegrees(ThetasNS.back()));
 
     // south hemisphere
-    OmegasXavgS = std::vector<double>(OmegasX.begin() + zeroidx, OmegasX.begin() + 2 * zeroidx + 1);
-    OmegasYavgS = std::vector<double>(OmegasY.begin() + zeroidx, OmegasY.begin() + 2 * zeroidx + 1);
+    OmegasXavgS = std::vector<f64>(OmegasX.begin() + zeroidx, OmegasX.begin() + 2 * zeroidx + 1);
+    OmegasYavgS = std::vector<f64>(OmegasY.begin() + zeroidx, OmegasY.begin() + 2 * zeroidx + 1);
 
     std::reverse(OmegasXavgS.begin(), OmegasXavgS.end());
     std::reverse(OmegasYavgS.begin(), OmegasYavgS.end());
@@ -397,9 +397,9 @@ private:
     LogFitCoeffs("YcoeffsTrigS", sin2sin4fitCoeffs(ThetasNS, OmegasYavgS));
   }
 
-  void LogFitCoeffs(const std::string& fitname, const std::vector<double>& coeffs)
+  void LogFitCoeffs(const std::string& fitname, const std::vector<f64>& coeffs)
   {
-    for (size_t i = 0; i < coeffs.size(); i++)
+    for (usize i = 0; i < coeffs.size(); i++)
       LOG_DEBUG("{} fit coefficient {} = {:.2f}", fitname, (char)('A' + i), coeffs[i]);
   }
 };

@@ -3,14 +3,14 @@
 
 struct PatternSearch : public OptimizationAlgorithm_
 {
-  double minStep = 1e-5;
-  int multistartMaxCnt = 1;
-  int multistartCnt = 0;
-  int maxExploitCnt = 0;
-  double stepReducer = 0.5;
+  f64 minStep = 1e-5;
+  i32 multistartMaxCnt = 1;
+  i32 multistartCnt = 0;
+  i32 maxExploitCnt = 0;
+  f64 stepReducer = 0.5;
 
-  PatternSearch(int N_) : OptimizationAlgorithm_(N_){};
+  PatternSearch(i32 N_) : OptimizationAlgorithm_(N_){};
 
   OptimizationResult Optimize(
-      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) override;
+      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) override;
 };

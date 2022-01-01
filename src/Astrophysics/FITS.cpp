@@ -15,11 +15,11 @@ cv::Mat loadfits(std::string path, FitsParams& params)
   {
     bool ENDfound = false;
     char lajnaText[lineBytes];
-    size_t fitsSize = 4096;
-    size_t fitsMid = fitsSize / 2;
-    size_t fitsSize2 = fitsSize * fitsSize;
-    size_t lajny = 0;
-    double pixelarcsec = 1;
+    usize fitsSize = 4096;
+    usize fitsMid = fitsSize / 2;
+    usize fitsSize2 = fitsSize * fitsSize;
+    usize lajny = 0;
+    f64 pixelarcsec = 1;
 
     while (!streamIN.eof())
     {
@@ -29,7 +29,7 @@ cv::Mat loadfits(std::string path, FitsParams& params)
 
       if (lajnaString.find("NAXIS1") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         fitsSize = stoi(stringcislo);
         fitsMid = fitsSize / 2;
@@ -37,31 +37,31 @@ cv::Mat loadfits(std::string path, FitsParams& params)
       }
       else if (lajnaString.find("CRPIX1") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         params.fitsMidX = stod(stringcislo) - 1.; // Nasa index od 1
       }
       else if (lajnaString.find("CRPIX2") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         params.fitsMidY = stod(stringcislo) - 1.; // Nasa index od 1
       }
       else if (lajnaString.find("CDELT1") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         pixelarcsec = stod(stringcislo);
       }
       else if (lajnaString.find("RSUN_OBS") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         params.R = stod(stringcislo);
       }
       else if (lajnaString.find("CRLT_OBS") != std::string::npos)
       {
-        std::size_t pos = lajnaString.find("= ");
+        usize pos = lajnaString.find("= ");
         std::string stringcislo = lajnaString.substr(pos + 2);
         params.theta0 = stod(stringcislo) / (360. / 2. / Constants::Pi);
       }
@@ -82,12 +82,12 @@ cv::Mat loadfits(std::string path, FitsParams& params)
 
     if (1) // new korekce
     {
-      std::vector<int> pixely(fitsSize2, 0);
+      std::vector<i32> pixely(fitsSize2, 0);
       //#pragma omp parallel for
-      for (size_t i = 0; i < fitsSize2; i++)
+      for (usize i = 0; i < fitsSize2; i++)
       {
         // P_shortArray[i] -= DATAMIN;
-        int px = (int)(P_shortArray[i]);
+        i32 px = (i32)(P_shortArray[i]);
         px += 32768;
         pixely[i] = px;
         if (0 and (px > 65535))
@@ -112,15 +112,15 @@ cv::Mat loadfits(std::string path, FitsParams& params)
   }
 }
 
-void generateFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain)
+void generateFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain)
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
-  std::size_t posR = urlmain.find("record=");
-  std::size_t posN = posR + 7;
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
   std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
-  int number = stod(stringcislo);
+  i32 number = stod(stringcislo);
   urlmain = urlmain.substr(0, posN);
-  for (int i = 0; i < pics; i++)
+  for (i32 i = 0; i < pics; i++)
   {
     std::string url1 = urlmain + std::to_string(number) + "-" + std::to_string(number);
     number += delta;
@@ -133,15 +133,15 @@ void generateFitsDownloadUrlPairs(int delta, int step, int pics, std::string url
   }
 }
 
-void generateFitsDownloadUrlSingles(int delta, int pics, std::string urlmain)
+void generateFitsDownloadUrlSingles(i32 delta, i32 pics, std::string urlmain)
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
-  size_t posR = urlmain.find("record=");
-  size_t posN = posR + 7;
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
   std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
-  int number = stod(stringcislo);
+  i32 number = stod(stringcislo);
   urlmain = urlmain.substr(0, posN);
-  for (int i = 0; i < pics; i++)
+  for (i32 i = 0; i < pics; i++)
   {
     std::string url = urlmain + std::to_string(number) + "-" + std::to_string(number);
     urls << url << std::endl;
@@ -149,16 +149,16 @@ void generateFitsDownloadUrlSingles(int delta, int pics, std::string urlmain)
   }
 }
 
-void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain, std::string pathMasterIn)
+void checkFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain, std::string pathMasterIn)
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_missing.txt", std::ios::out | std::ios::trunc);
   std::string pathmain = "drms_export.cgi@series=hmi__Ic_45s;record=";
-  size_t posR = urlmain.find("record=");
-  size_t posN = posR + 7;
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
   std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
-  int number = stod(stringcislo);
+  i32 number = stod(stringcislo);
   urlmain = urlmain.substr(0, posN);
-  for (int i = 0; i < pics; i++)
+  for (i32 i = 0; i < pics; i++)
   {
     std::string url1 = urlmain + std::to_string(number) + "-" + std::to_string(number);
     std::string path1 = pathMasterIn + pathmain + std::to_string(number) + "-" + std::to_string(number);
@@ -192,7 +192,7 @@ void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmai
   }
 }
 
-void loadImageDebug(cv::Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop)
+void loadImageDebug(cv::Mat& activeimg, f64 gamaa, bool colorr, f64 quanBot, f64 quanTop)
 {
   std::string path = "xd";
   if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
@@ -215,9 +215,9 @@ void loadImageDebug(cv::Mat& activeimg, double gamaa, bool colorr, double quanBo
   }
   if (0) // raw
   {
-    double colRowRatio = (double)activeimg.cols / (double)activeimg.rows;
-    int namedWindowRows = 600;
-    int namedWindowCols = (double)namedWindowRows * colRowRatio;
+    f64 colRowRatio = (f64)activeimg.cols / (f64)activeimg.rows;
+    i32 namedWindowRows = 600;
+    i32 namedWindowCols = (f64)namedWindowRows * colRowRatio;
     cv::namedWindow("activeimg_imshow_raw", cv::WINDOW_NORMAL);
     cv::resizeWindow("activeimg_imshow_raw", namedWindowCols, namedWindowRows);
     imshow("activeimg_imshow_raw", activeimg);

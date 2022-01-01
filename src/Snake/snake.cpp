@@ -21,9 +21,9 @@ bool Snake::CheckValidMove()
   bool valid = true;
 
   // check boundaries
-  valid = valid and head.x < static_cast<int>(m_map.width);
+  valid = valid and head.x < static_cast<i32>(m_map.width);
   valid = valid and head.x >= 0;
-  valid = valid and head.y < static_cast<int>(m_map.height);
+  valid = valid and head.y < static_cast<i32>(m_map.height);
   valid = valid and head.y >= 0;
 
   // check self eat

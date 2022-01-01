@@ -3,23 +3,23 @@
 #include "IPC/IterativePhaseCorrelation.h"
 #include "diffrotResults.h"
 
-static constexpr int plusminusbufer = 4; // even!
-static constexpr int yshow = 1400;       // ipc show y index
+static constexpr i32 plusminusbufer = 4; // even!
+static constexpr i32 yshow = 1400;       // ipc show y index
 
 struct DiffrotSettings
 {
-  int pics;
-  int ys;
-  int sPic;
-  int dPic;
-  int vFov;
-  int dSec;
+  i32 pics;
+  i32 ys;
+  i32 sPic;
+  i32 dPic;
+  i32 vFov;
+  i32 dSec;
   bool medianFilter;
   bool movavgFilter;
-  int medianFilterSize;
-  int movavgFilterSize;
+  i32 medianFilterSize;
+  i32 movavgFilterSize;
   bool visual;
-  int sy;
+  i32 sy;
   bool pred;
   bool speak = true;
   std::string savepath;
@@ -28,7 +28,7 @@ struct DiffrotSettings
 
 DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, FitsTime& time, const DiffrotSettings& drset);
 
-void loadFitsFuzzy(FitsImage& pic, FitsTime& time, int& lag);
+void loadFitsFuzzy(FitsImage& pic, FitsTime& time, i32& lag);
 
-void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& shiftsY, std::vector<double>& thetas, std::vector<double>& omegasX,
-    std::vector<double>& omegasY, const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift);
+void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<f64>& shiftsX, std::vector<f64>& shiftsY, std::vector<f64>& thetas, std::vector<f64>& omegasX, std::vector<f64>& omegasY,
+    const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, f64 R, f64 theta0, f64 dy, i32 lag1, i32 lag2, i32 predShift);

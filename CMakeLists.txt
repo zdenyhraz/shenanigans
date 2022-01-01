@@ -36,7 +36,8 @@ include_directories("resources")
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.h src/*.cpp src/*.ui src/*.qrc)
 add_executable(shenanigans ${SRC} ${APP_ICON_RESOURCE_WINDOWS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only)
-target_precompile_headers(shenanigans PRIVATE src/Application/Precompiled.h)
+target_precompile_headers(shenanigans PRIVATE src/Precompiled/Precompiled.h)
+
 
 
 

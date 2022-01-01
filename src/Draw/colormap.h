@@ -1,16 +1,16 @@
 #pragma once
 #include "Core/functionsBaseCV.h"
 
-inline std::tuple<float, float, float> colorMapJET(float x, float caxisMin = 0, float caxisMax = 1, float val = 1)
+inline std::tuple<f32, f32, f32> colorMapJET(f32 x, f32 caxisMin = 0, f32 caxisMax = 1, f32 val = 1)
 {
   if (x == 0)
     return std::make_tuple(0., 0., 0.);
 
-  float B, G, R;
-  float sh = 0.125 * (caxisMax - caxisMin);
-  float start = caxisMin;
-  float mid = caxisMin + 0.5 * (caxisMax - caxisMin);
-  float end = caxisMax;
+  f32 B, G, R;
+  f32 sh = 0.125 * (caxisMax - caxisMin);
+  f32 start = caxisMin;
+  f32 mid = caxisMin + 0.5 * (caxisMax - caxisMin);
+  f32 end = caxisMax;
 
   B = (x > (start + sh)) ? clamp(-val / 2 / sh * x + val / 2 / sh * (mid + sh), 0, val) : (x < start ? val / 2 : clamp(val / 2 / sh * x + val / 2 - val / 2 / sh * start, 0, val));
   G = (x < mid) ? clamp(val / 2 / sh * x - val / 2 / sh * (start + sh), 0, val) : clamp(-val / 2 / sh * x + val / 2 / sh * (end - sh), 0, val);
@@ -19,13 +19,13 @@ inline std::tuple<float, float, float> colorMapJET(float x, float caxisMin = 0, 
   return std::make_tuple(B, G, R);
 }
 
-inline cv::Scalar colorMapJet(float x, float caxisMin = 0, float caxisMax = 1, float val = 255)
+inline cv::Scalar colorMapJet(f32 x, f32 caxisMin = 0, f32 caxisMax = 1, f32 val = 255)
 {
-  float B, G, R;
-  float sh = 0.125 * (caxisMax - caxisMin);
-  float start = caxisMin;
-  float mid = caxisMin + 0.5 * (caxisMax - caxisMin);
-  float end = caxisMax;
+  f32 B, G, R;
+  f32 sh = 0.125 * (caxisMax - caxisMin);
+  f32 start = caxisMin;
+  f32 mid = caxisMin + 0.5 * (caxisMax - caxisMin);
+  f32 end = caxisMax;
 
   B = (x > (start + sh)) ? clamp(-val / 2 / sh * x + val / 2 / sh * (mid + sh), 0, val) : (x < start ? val / 2 : clamp(val / 2 / sh * x + val / 2 - val / 2 / sh * start, 0, val));
   G = (x < mid) ? clamp(val / 2 / sh * x - val / 2 / sh * (start + sh), 0, val) : clamp(-val / 2 / sh * x + val / 2 / sh * (end - sh), 0, val);
@@ -34,9 +34,9 @@ inline cv::Scalar colorMapJet(float x, float caxisMin = 0, float caxisMax = 1, f
   return cv::Scalar(B, G, R);
 }
 
-inline std::tuple<int, int, int> colorMapBINARY(double x, double caxisMin = -1, double caxisMax = 1, double sigma = 1)
+inline std::tuple<i32, i32, i32> colorMapBINARY(f64 x, f64 caxisMin = -1, f64 caxisMax = 1, f64 sigma = 1)
 {
-  double B, G, R;
+  f64 B, G, R;
 
   if (sigma == 0) // linear
   {
@@ -55,7 +55,7 @@ inline std::tuple<int, int, int> colorMapBINARY(double x, double caxisMin = -1, 
   }
   else // gaussian
   {
-    double delta = caxisMax - caxisMin;
+    f64 delta = caxisMax - caxisMin;
     if (x < 0)
     {
       B = 255;
@@ -73,45 +73,45 @@ inline std::tuple<int, int, int> colorMapBINARY(double x, double caxisMin = -1, 
   return std::make_tuple(B, G, R);
 }
 
-inline cv::Mat applyQuantile(const cv::Mat& sourceimgIn, double quantileB = 0, double quantileT = 1)
+inline cv::Mat applyQuantile(const cv::Mat& sourceimgIn, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
   sourceimg.convertTo(sourceimg, CV_32FC1);
-  float caxisMin, caxisMax;
+  f32 caxisMin, caxisMax;
   std::tie(caxisMin, caxisMax) = minMaxMat(sourceimg);
 
   if (quantileB > 0 or quantileT < 1)
   {
-    std::vector<float> picvalues(sourceimg.rows * sourceimg.cols, 0);
-    for (int r = 0; r < sourceimg.rows; r++)
-      for (int c = 0; c < sourceimg.cols; c++)
-        picvalues[r * sourceimg.cols + c] = sourceimg.at<float>(r, c);
+    std::vector<f32> picvalues(sourceimg.rows * sourceimg.cols, 0);
+    for (i32 r = 0; r < sourceimg.rows; r++)
+      for (i32 c = 0; c < sourceimg.cols; c++)
+        picvalues[r * sourceimg.cols + c] = sourceimg.at<f32>(r, c);
 
     sort(picvalues.begin(), picvalues.end());
     caxisMin = picvalues[quantileB * (picvalues.size() - 1)];
     caxisMax = picvalues[quantileT * (picvalues.size() - 1)];
   }
 
-  for (int r = 0; r < sourceimg.rows; r++)
-    for (int c = 0; c < sourceimg.cols; c++)
-      sourceimg.at<float>(r, c) = clamp(sourceimg.at<float>(r, c), caxisMin, caxisMax);
+  for (i32 r = 0; r < sourceimg.rows; r++)
+    for (i32 c = 0; c < sourceimg.cols; c++)
+      sourceimg.at<f32>(r, c) = clamp(sourceimg.at<f32>(r, c), caxisMin, caxisMax);
 
   return sourceimg;
 }
 
-inline cv::Mat applyQuantileColorMap(const cv::Mat& sourceimgIn, double quantileB = 0, double quantileT = 1)
+inline cv::Mat applyQuantileColorMap(const cv::Mat& sourceimgIn, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
   sourceimg.convertTo(sourceimg, CV_32F);
-  float caxisMin, caxisMax;
+  f32 caxisMin, caxisMax;
   std::tie(caxisMin, caxisMax) = minMaxMat(sourceimg);
 
   if (quantileB > 0 or quantileT < 1)
   {
-    std::vector<float> picvalues(sourceimg.rows * sourceimg.cols, 0);
-    for (int r = 0; r < sourceimg.rows; r++)
-      for (int c = 0; c < sourceimg.cols; c++)
-        picvalues[r * sourceimg.cols + c] = sourceimg.at<float>(r, c);
+    std::vector<f32> picvalues(sourceimg.rows * sourceimg.cols, 0);
+    for (i32 r = 0; r < sourceimg.rows; r++)
+      for (i32 c = 0; c < sourceimg.cols; c++)
+        picvalues[r * sourceimg.cols + c] = sourceimg.at<f32>(r, c);
 
     sort(picvalues.begin(), picvalues.end());
     caxisMin = picvalues[quantileB * (picvalues.size() - 1)];
@@ -119,12 +119,12 @@ inline cv::Mat applyQuantileColorMap(const cv::Mat& sourceimgIn, double quantile
   }
 
   cv::Mat sourceimgOutCLR(sourceimg.rows, sourceimg.cols, CV_32FC3);
-  for (int r = 0; r < sourceimgOutCLR.rows; r++)
+  for (i32 r = 0; r < sourceimgOutCLR.rows; r++)
   {
-    for (int c = 0; c < sourceimgOutCLR.cols; c++)
+    for (i32 c = 0; c < sourceimgOutCLR.cols; c++)
     {
-      float x = sourceimg.at<float>(r, c);
-      float B, G, R;
+      f32 x = sourceimg.at<f32>(r, c);
+      f32 B, G, R;
       std::tie(B, G, R) = colorMapJET(x, caxisMin, caxisMax);
       sourceimgOutCLR.at<cv::Vec3f>(r, c)[0] = B;
       sourceimgOutCLR.at<cv::Vec3f>(r, c)[1] = G;

@@ -92,12 +92,12 @@ void WindowIPC::align()
   std::string path2 = ui.lineEdit_16->text().toStdString();
 
   cv::Point cropfocus(2048, 2048);
-  int cropsize = 1.0 * 4096;
+  i32 cropsize = 1.0 * 4096;
 
   cv::Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
   cv::Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
-  int size = cropsize;
+  i32 size = cropsize;
   cv::resize(img1, img1, cv::Size(size, size));
   cv::resize(img2, img2, cv::Size(size, size));
 
@@ -119,8 +119,8 @@ void WindowIPC::alignXY()
   cv::Mat img1 = loadImage(path1);
   cv::Mat img2 = loadImage(path2);
 
-  int sizeX = globals->IPCset->getcols();
-  int sizeY = globals->IPCset->getrows();
+  i32 sizeX = globals->IPCset->getcols();
+  i32 sizeY = globals->IPCset->getrows();
   img1 = roicrop(img1, ui.lineEdit_18->text().toDouble() * img1.cols, ui.lineEdit_19->text().toDouble() * img1.rows, sizeX, sizeY);
   img2 = roicrop(img2, ui.lineEdit_18->text().toDouble() * img2.cols, ui.lineEdit_19->text().toDouble() * img2.rows, sizeX, sizeY);
 
@@ -156,9 +156,9 @@ void WindowIPC::CalculateFlow()
   flowM *= 696010. / 378.3 / 11.8;
   flowP *= Constants::Rad;
 
-  for (int r = 0; r < flowM.rows; ++r)
-    for (int c = 0; c < flowM.cols; ++c)
-      flowM.at<float>(r, c) = std::clamp(flowM.at<float>(r, c), 0.f, 800.f);
+  for (i32 r = 0; r < flowM.rows; ++r)
+    for (i32 c = 0; c < flowM.cols; ++c)
+      flowM.at<f32>(r, c) = std::clamp(flowM.at<f32>(r, c), 0.f, 800.f);
 
   Plot2D::Plot("FlowM", flowM);
   Plot2D::Plot("FlowP", flowP);

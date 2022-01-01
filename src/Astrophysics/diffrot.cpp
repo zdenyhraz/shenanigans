@@ -6,21 +6,21 @@
 
 DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, FitsTime& time, const DiffrotSettings& drset)
 {
-  int dy = drset.vFov / (drset.ys - 1);
-  std::vector<std::vector<double>> thetas2D;
-  std::vector<std::vector<double>> shiftsX2D;
-  std::vector<std::vector<double>> shiftsY2D;
-  std::vector<std::vector<double>> omegasX2D;
-  std::vector<std::vector<double>> omegasY2D;
+  i32 dy = drset.vFov / (drset.ys - 1);
+  std::vector<std::vector<f64>> thetas2D;
+  std::vector<std::vector<f64>> shiftsX2D;
+  std::vector<std::vector<f64>> shiftsY2D;
+  std::vector<std::vector<f64>> omegasX2D;
+  std::vector<std::vector<f64>> omegasY2D;
 
-  std::vector<double> thetas(drset.ys);
-  std::vector<double> shiftsX(drset.ys);
-  std::vector<double> shiftsY(drset.ys);
-  std::vector<double> omegasX(drset.ys);
-  std::vector<double> omegasY(drset.ys);
+  std::vector<f64> thetas(drset.ys);
+  std::vector<f64> shiftsX(drset.ys);
+  std::vector<f64> shiftsY(drset.ys);
+  std::vector<f64> omegasX(drset.ys);
+  std::vector<f64> omegasY(drset.ys);
 
-  std::vector<double> omegasXavg(drset.ys);
-  std::vector<double> omegasYavg(drset.ys);
+  std::vector<f64> omegasXavg(drset.ys);
+  std::vector<f64> omegasYavg(drset.ys);
 
   thetas2D.reserve(drset.pics);
   shiftsX2D.reserve(drset.pics);
@@ -29,9 +29,9 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
   omegasY2D.reserve(drset.pics);
 
   FitsImage pic1, pic2;
-  int lag1, lag2;
+  i32 lag1, lag2;
 
-  for (int pic = 0; pic < drset.pics; ++pic)
+  for (i32 pic = 0; pic < drset.pics; ++pic)
   {
     time.advanceTime((bool)pic * (drset.sPic - drset.dPic) * drset.dSec);
     loadFitsFuzzy(pic1, time, lag1);
@@ -48,10 +48,10 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
         continue;
       }
 
-      double R = (pic1.params().R + pic2.params().R) / 2.;
-      double theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2.;
+      f64 R = (pic1.params().R + pic2.params().R) / 2.;
+      f64 theta0 = (pic1.params().theta0 + pic2.params().theta0) / 2.;
 
-      int predShift = 0;
+      i32 predShift = 0;
       if (drset.pred)
       {
         predShift = predictDiffrotShift(drset.dPic, drset.dSec, R);
@@ -73,11 +73,11 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
       }
       else
       {
-        double diffX = mean(omegasX) - mean(omegasXavg);
-        double diffY = mean(omegasY) - mean(omegasYavg);
+        f64 diffX = mean(omegasX) - mean(omegasXavg);
+        f64 diffY = mean(omegasY) - mean(omegasYavg);
 
-        const double diffThreshX = 1; // 1
-        const double diffThreshY = 2; // 2
+        const f64 diffThreshX = 1; // 1
+        const f64 diffThreshY = 2; // 2
 
         // filter outlier X/Y data
         if (abs(diffX) < diffThreshX and abs(diffY) < diffThreshY)
@@ -109,14 +109,14 @@ DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation<>& ipc, F
   return dr;
 }
 
-inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<double>& shiftsX, std::vector<double>& shiftsY, std::vector<double>& thetas, std::vector<double>& omegasX,
-    std::vector<double>& omegasY, const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, double R, double theta0, double dy, int lag1, int lag2, int predShift)
+inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::vector<f64>& shiftsX, std::vector<f64>& shiftsY, std::vector<f64>& thetas, std::vector<f64>& omegasX,
+    std::vector<f64>& omegasY, const IterativePhaseCorrelation<>& ipc, const DiffrotSettings& drset, f64 R, f64 theta0, f64 dy, i32 lag1, i32 lag2, i32 predShift)
 {
 #pragma omp parallel for
-  for (int y = 0; y < drset.ys; y++)
+  for (i32 y = 0; y < drset.ys; y++)
   {
-    cv::Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
-    cv::Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (double)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
+    cv::Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + dy * (f64)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
+    cv::Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX + predShift, pic2.params().fitsMidY + dy * (f64)(y - drset.ys / 2) + drset.sy, ipc.GetCols(), ipc.GetRows());
     auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
     shiftsX[y] = shift.x + predShift;
     shiftsY[y] = shift.y;
@@ -138,17 +138,17 @@ inline void calculateOmegas(const FitsImage& pic1, const FitsImage& pic2, std::v
     if (drset.speak)
       LOG_DEBUG("Nonzero lag! lag1 = {}, lag2 = {}", lag1, lag2);
 
-  const double dt = (double)(drset.dPic * drset.dSec + lag2 - lag1);
-  for (int y = 0; y < drset.ys; y++)
+  const f64 dt = (f64)(drset.dPic * drset.dSec + lag2 - lag1);
+  for (i32 y = 0; y < drset.ys; y++)
   {
-    thetas[y] = asin((dy * (double)(drset.ys / 2 - y) - drset.sy) / R) + theta0;
+    thetas[y] = asin((dy * (f64)(drset.ys / 2 - y) - drset.sy) / R) + theta0;
     shiftsX[y] = clamp(shiftsX[y], 0, Constants::Inf);
     omegasX[y] = asin(shiftsX[y] / (R * cos(thetas[y]))) / dt * Constants::RadPerSecToDegPerDay;
     omegasY[y] = (thetas[y] - asin(sin(thetas[y]) - shiftsY[y] / R)) / dt * Constants::RadPerSecToDegPerDay;
   }
 }
 
-void loadFitsFuzzy(FitsImage& pic, FitsTime& time, int& lag)
+void loadFitsFuzzy(FitsImage& pic, FitsTime& time, i32& lag)
 {
   pic.reload(time.path());
 
@@ -159,9 +159,9 @@ void loadFitsFuzzy(FitsImage& pic, FitsTime& time, int& lag)
   }
   else
   {
-    for (int pm = 1; pm < plusminusbufer; pm++)
+    for (i32 pm = 1; pm < plusminusbufer; pm++)
     {
-      int shift = 0;
+      i32 shift = 0;
 
       if (!(pm % 2))
       {

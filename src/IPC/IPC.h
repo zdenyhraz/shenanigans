@@ -10,16 +10,16 @@
 #include "Draw/crop.h"
 #include "Draw/draw.h"
 
-static constexpr int maxPCit = 20;
-static constexpr double loglimit = 5;
+static constexpr i32 maxPCit = 20;
+static constexpr f64 loglimit = 5;
 
 class IPCsettings
 {
 private:
-  int rows = 0;
-  int cols = 0;
-  double stdevLmultiplier = 1;
-  double stdevHmultiplier = 200;
+  i32 rows = 0;
+  i32 cols = 0;
+  f64 stdevLmultiplier = 1;
+  f64 stdevHmultiplier = 200;
 
 public:
   enum Speak
@@ -29,38 +29,38 @@ public:
     All
   };
 
-  int L2size = 15;
-  double L1ratio = 0.35;
-  int UC = 51;
-  double epsilon = 0;
+  i32 L2size = 15;
+  f64 L1ratio = 0.35;
+  i32 UC = 51;
+  f64 epsilon = 0;
   bool interpolate = 1;
   bool applyWindow = 1;
   bool applyBandpass = 1;
   bool subpixel = 1;
   bool crossCorrel = 0;
   Speak speak = Errors;
-  double minimalShift = 0;
+  f64 minimalShift = 0;
   cv::Mat bandpass;
   cv::Mat window;
   bool save = false;
   std::string savedir = "";
   cv::Size savesize = cv::Size(500, 500);
-  mutable int savecntr = -1;
+  mutable i32 savecntr = -1;
 
-  IPCsettings(int Rows, int Cols, double StdevLmultiplier, double StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
+  IPCsettings(i32 Rows, i32 Cols, f64 StdevLmultiplier, f64 StdevHmultiplier) : rows(Rows), cols(Cols), stdevLmultiplier(StdevLmultiplier), stdevHmultiplier(StdevHmultiplier)
   {
     bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
     window = edgemask(rows, cols);
   }
 
-  void setBandpassParameters(double StdevLmultiplier, double StdevHmultiplier)
+  void setBandpassParameters(f64 StdevLmultiplier, f64 StdevHmultiplier)
   {
     stdevLmultiplier = StdevLmultiplier;
     stdevHmultiplier = StdevHmultiplier;
     bandpass = bandpassian(rows, cols, stdevLmultiplier, stdevHmultiplier);
   }
 
-  void setSize(int Rows, int Cols)
+  void setSize(i32 Rows, i32 Cols)
   {
     rows = Rows;
     cols = Cols;
@@ -68,10 +68,10 @@ public:
     window = edgemask(rows, cols);
   }
 
-  int getrows() const { return rows; }
-  int getcols() const { return cols; }
-  double getL() const { return stdevLmultiplier; }
-  double getH() const { return stdevHmultiplier; }
+  i32 getrows() const { return rows; }
+  i32 getcols() const { return cols; }
+  f64 getL() const { return stdevLmultiplier; }
+  f64 getH() const { return stdevHmultiplier; }
   cv::Mat getWindow() const { return window; }
   cv::Mat getBandpass() const { return bandpass; }
 
@@ -190,7 +190,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
     L3 = L3.mul(1 - kirkl(L3.rows, L3.cols, set.minimalShift));
 
   cv::Point2i L3peak;
-  double maxR;
+  f64 maxR;
   minMaxLoc(L3, nullptr, &maxR, nullptr, &L3peak);
   cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
   cv::Point2f imageshift_PIXEL(L3peak.x - L3mid.x, L3peak.y - L3mid.y);
@@ -199,7 +199,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
   {
     cv::Mat L3v;
     resize(L3, L3v, cv::Size(2000, 2000), 0, 0, cv::INTER_NEAREST);
-    showMatsCLR.push_back(crosshair(L3v, cv::Point2f(round((float)(L3peak.x) * 2000. / (float)L3.cols), round((float)(L3peak.y) * 2000. / (float)L3.rows))));
+    showMatsCLR.push_back(crosshair(L3v, cv::Point2f(round((f32)(L3peak.x) * 2000. / (f32)L3.cols), round((f32)(L3peak.y) * 2000. / (f32)L3.rows))));
 
     cv::Mat L3vz = roicrop(L3, L3mid.x, L3mid.y, L3.cols / 7, L3.rows / 7);
     resize(L3vz, L3vz, cv::Size(2000, 2000), 0, 0, set.interpolate ? cv::INTER_LINEAR : cv::INTER_NEAREST);
@@ -221,7 +221,7 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
   if (set.subpixel)
   {
     bool converged = false;
-    int L2size = set.L2size;
+    i32 L2size = set.L2size;
     if (!(L2size % 2))
       L2size++; // odd!+
     while (!converged)
@@ -260,14 +260,14 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
           }
         }
 
-        int L1size = std::floor((float)L2U.cols * set.L1ratio);
+        i32 L1size = std::floor((f32)L2U.cols * set.L1ratio);
         if (!(L1size % 2))
           L1size++; // odd!+
         cv::Mat L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
         cv::Point2f L1mid(L1.cols / 2, L1.rows / 2);
         imageshift_SUBPIXEL = (cv::Point2f)L3peak - L3mid + findCentroid(L1) - L1mid;
 
-        for (size_t i = 0; i < maxPCit; i++)
+        for (usize i = 0; i < maxPCit; i++)
         {
           L1 = kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size);
           cv::Point2f L1peak = findCentroid(L1);
@@ -303,8 +303,8 @@ inline cv::Point2f ipccore(cv::Mat&& sourceimg1, cv::Mat&& sourceimg2, const IPC
 
         if (converged)
         {
-          imageshift_SUBPIXEL.x = (float)L3peak.x - (float)L3mid.x + 1.0 / (float)set.UC * ((float)L2Upeak.x - (float)L2Umid.x + findCentroid(L1).x - (float)L1mid.x); // image shift in L3 - final
-          imageshift_SUBPIXEL.y = (float)L3peak.y - (float)L3mid.y + 1.0 / (float)set.UC * ((float)L2Upeak.y - (float)L2Umid.y + findCentroid(L1).y - (float)L1mid.y); // image shift in L3 - final
+          imageshift_SUBPIXEL.x = (f32)L3peak.x - (f32)L3mid.x + 1.0 / (f32)set.UC * ((f32)L2Upeak.x - (f32)L2Umid.x + findCentroid(L1).x - (f32)L1mid.x); // image shift in L3 - final
+          imageshift_SUBPIXEL.y = (f32)L3peak.y - (f32)L3mid.y + 1.0 / (f32)set.UC * ((f32)L2Upeak.y - (f32)L2Umid.y + findCentroid(L1).y - (f32)L1mid.y); // image shift in L3 - final
           output = imageshift_SUBPIXEL;
         }
         else if (L2size < 3)

@@ -4,7 +4,7 @@
 void alignPics(const cv::Mat& input1, const cv::Mat& input2, cv::Mat& output, IPCsettings set)
 {
   cv::Mat estR, estT;
-  cv::Point2f center((float)input1.cols / 2, (float)input1.rows / 2);
+  cv::Point2f center((f32)input1.cols / 2, (f32)input1.rows / 2);
   output = input2.clone();
 
   if (1) // calculate rotation and scale
@@ -31,13 +31,13 @@ void alignPics(const cv::Mat& input1, const cv::Mat& input2, cv::Mat& output, IP
     normalize(img1FTm, img1FTm, 0, 1, cv::NORM_MINMAX);
     normalize(img2FTm, img2FTm, 0, 1, cv::NORM_MINMAX);
     cv::Mat img1LP, img2LP;
-    double maxRadius = 1. * std::min(center.y, center.x);
+    f64 maxRadius = 1. * std::min(center.y, center.x);
     warpPolar(img1FTm, img1LP, cv::Size(input1.cols, input1.rows), center, maxRadius, cv::INTER_LINEAR + cv::WARP_FILL_OUTLIERS + cv::WARP_POLAR_LOG); // semilog Polar
     warpPolar(img2FTm, img2LP, cv::Size(input1.cols, input1.rows), center, maxRadius, cv::INTER_LINEAR + cv::WARP_FILL_OUTLIERS + cv::WARP_POLAR_LOG); // semilog Polar
     auto LPshifts = phasecorrel(img1LP, img2LP, set);
     std::cout << "LPshifts: " << LPshifts << std::endl;
-    double anglePredicted = -LPshifts.y / input1.rows * 360;
-    double scalePredicted = exp(LPshifts.x * log(maxRadius) / input1.cols);
+    f64 anglePredicted = -LPshifts.y / input1.rows * 360;
+    f64 scalePredicted = exp(LPshifts.x * log(maxRadius) / input1.cols);
     std::cout << "Evaluated rotation: " << anglePredicted << " deg" << std::endl;
     std::cout << "Evaluated scale: " << 1. / scalePredicted << " " << std::endl;
     estR = getRotationMatrix2D(center, -anglePredicted, scalePredicted);
@@ -48,11 +48,11 @@ void alignPics(const cv::Mat& input1, const cv::Mat& input2, cv::Mat& output, IP
   {
     auto shifts = phasecorrel(input1, output, set);
     std::cout << "shifts: " << shifts << std::endl;
-    double shiftXPredicted = shifts.x;
-    double shiftYPredicted = shifts.y;
+    f64 shiftXPredicted = shifts.x;
+    f64 shiftYPredicted = shifts.y;
     std::cout << "Evaluated shiftX: " << shiftXPredicted << " px" << std::endl;
     std::cout << "Evaluated shiftY: " << shiftYPredicted << " px" << std::endl;
-    estT = (cv::Mat_<float>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
+    estT = (cv::Mat_<f32>(2, 3) << 1., 0., -shiftXPredicted, 0., 1., -shiftYPredicted);
     warpAffine(output, output, estT, cv::Size(input1.cols, input1.rows));
   }
 }
@@ -66,11 +66,11 @@ cv::Mat AlignStereovision(const cv::Mat& img1In, const cv::Mat& img2In)
   img1.convertTo(img1, CV_16U);
   img2.convertTo(img2, CV_16U);
 
-  double d = 0.0;
-  double g = 0.5;
+  f64 d = 0.0;
+  f64 g = 0.5;
 
-  std::vector<double> rgb1 = {1. - d, g, d};
-  std::vector<double> rgb2 = {d, 1. - g, 1. - d};
+  std::vector<f64> rgb1 = {1. - d, g, d};
+  std::vector<f64> rgb2 = {d, 1. - g, 1. - d};
 
   std::vector<cv::Mat> channels1(3);
   std::vector<cv::Mat> channels2(3);
@@ -114,20 +114,20 @@ void alignPicsDebug(const cv::Mat& img1In, const cv::Mat& img2In, IPCsettings& I
   img1 = gammaCorrect(img1, filterSet1.gamma);
   img2 = gammaCorrect(img2, filterSet2.gamma);
 
-  cv::Point2f center((float)img1.cols / 2, (float)img1.rows / 2);
+  cv::Point2f center((f32)img1.cols / 2, (f32)img1.rows / 2);
   bool artificial = true;
   if (artificial)
   {
     // artificial transform for testing
     // img2 = img1.clone();
-    double angle = 70;    // 70;
-    double scale = 1.2;   // 1.2;
-    double shiftX = -950; //-958;
-    double shiftY = 1050; // 1050;
+    f64 angle = 70;    // 70;
+    f64 scale = 1.2;   // 1.2;
+    f64 shiftX = -950; //-958;
+    f64 shiftY = 1050; // 1050;
 
     std::cout << "Artificial parameters:" << std::endl << "Angle: " << angle << std::endl << "Scale: " << scale << std::endl << "ShiftX: " << shiftX << std::endl << "ShiftY: " << shiftY << std::endl;
     cv::Mat R = getRotationMatrix2D(center, angle, scale);
-    cv::Mat T = (cv::Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
+    cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
     warpAffine(img2, img2, T, cv::Size(img1.cols, img1.rows));
     warpAffine(img2, img2, R, cv::Size(img1.cols, img1.rows));
   }
@@ -163,11 +163,11 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
     return;
   }
   // initialize main parameters
-  double artificialShiftRange = IPC_settings1.getcols() / 8;
-  int trialsPerStartPos = 1000;
-  std::vector<double> startFractionX = {0.5};
-  std::vector<double> startFractionY = {0.5};
-  int progress = 0;
+  f64 artificialShiftRange = IPC_settings1.getcols() / 8;
+  i32 trialsPerStartPos = 1000;
+  std::vector<f64> startFractionX = {0.5};
+  std::vector<f64> startFractionY = {0.5};
+  i32 progress = 0;
 
   // load the test picture
   FitsParams params;
@@ -180,19 +180,19 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
   listing << IPC_settings1.getcols() << std::endl;
 
 #pragma omp parallel for
-  for (size_t startPos = 0; startPos < startFractionX.size(); startPos++)
+  for (usize startPos = 0; startPos < startFractionX.size(); startPos++)
   {
     // testing shifts @different picture positions
-    int startX = src1.cols * startFractionX[startPos];
-    int startY = src1.rows * startFractionY[startPos];
+    i32 startX = src1.cols * startFractionX[startPos];
+    i32 startY = src1.rows * startFractionY[startPos];
 #pragma omp parallel for
-    for (int trial = 0; trial < trialsPerStartPos; trial++)
+    for (i32 trial = 0; trial < trialsPerStartPos; trial++)
     {
       // shift entire src2 pic
       cv::Mat src2;
-      double shiftX = (double)trial / trialsPerStartPos * artificialShiftRange;
-      double shiftY = 0;
-      cv::Mat T = (cv::Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
+      f64 shiftX = (f64)trial / trialsPerStartPos * artificialShiftRange;
+      f64 shiftY = 0;
+      cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
       warpAffine(src1, src2, T, cv::Size(src1.cols, src1.rows));
 
       // crop both pics
@@ -214,48 +214,48 @@ void registrationDuelDebug(IPCsettings& IPC_settings1, IPCsettings& IPC_settings
   }
 }
 
-std::tuple<cv::Mat, cv::Mat> calculateFlowMap(const cv::Mat& img1In, const cv::Mat& img2In, IPCsettings& IPC_settings, double qualityRatio)
+std::tuple<cv::Mat, cv::Mat> calculateFlowMap(const cv::Mat& img1In, const cv::Mat& img2In, IPCsettings& IPC_settings, f64 qualityRatio)
 {
   cv::Mat img1 = img1In.clone();
   cv::Mat img2 = img2In.clone();
 
-  int rows = qualityRatio * img1.rows;
-  int cols = qualityRatio * img1.cols;
-  int win = IPC_settings.getcols();
+  i32 rows = qualityRatio * img1.rows;
+  i32 cols = qualityRatio * img1.cols;
+  i32 win = IPC_settings.getcols();
 
   cv::Mat flowX = cv::Mat::zeros(rows, cols, CV_32F);
   cv::Mat flowY = cv::Mat::zeros(rows, cols, CV_32F);
 
-  int pad = win / 2 + 1;
-  volatile int progress = 0;
+  i32 pad = win / 2 + 1;
+  volatile i32 progress = 0;
 
 #pragma omp parallel for
-  for (int r = 0; r < rows; r++)
+  for (i32 r = 0; r < rows; r++)
   {
-    for (int c = 0; c < cols; c++)
+    for (i32 c = 0; c < cols; c++)
     {
-      int r_ = (double)r / qualityRatio;
-      int c_ = (double)c / qualityRatio;
+      i32 r_ = (f64)r / qualityRatio;
+      i32 c_ = (f64)c / qualityRatio;
 
       if (c_ < pad or r_ < pad or c_ > (img1.cols - pad) or r_ > (img1.rows - pad))
       {
-        flowX.at<float>(r, c) = 0;
-        flowY.at<float>(r, c) = 0;
+        flowX.at<f32>(r, c) = 0;
+        flowY.at<f32>(r, c) = 0;
       }
       else
       {
         cv::Mat crop1 = roicrop(img1, c_, r_, win, win);
         cv::Mat crop2 = roicrop(img2, c_, r_, win, win);
         auto shift = phasecorrel(crop1, crop2, IPC_settings);
-        flowX.at<float>(r, c) = shift.x;
-        flowY.at<float>(r, c) = shift.y;
+        flowX.at<f32>(r, c) = shift.x;
+        flowY.at<f32>(r, c) = shift.y;
       }
     }
 
 #pragma omp critical
     {
       progress++;
-      std::cout << "> calculating flow map, " << (double)progress / rows * 100 << "% done." << std::endl;
+      std::cout << "> calculating flow map, " << (f64)progress / rows * 100 << "% done." << std::endl;
     }
   }
   return std::make_tuple(flowX, flowY);

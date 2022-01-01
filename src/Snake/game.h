@@ -5,10 +5,10 @@
 static void SnakeGame()
 {
   bool stop = false;
-  int size = 50;
+  i32 size = 50;
   Map map(size, size);
   Snake snake(map);
-  int c;
+  i32 c;
 
   while (!stop)
   {

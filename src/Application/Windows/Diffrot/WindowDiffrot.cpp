@@ -46,7 +46,7 @@ void WindowDiffrot::showIPC()
   cv::Mat pic1 = roicrop(loadfits(time.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
 
   time.advanceTime(ui.lineEdit_5->text().toDouble() * ui.lineEdit_8->text().toDouble());
-  int predShift = 0;
+  i32 predShift = 0;
   if (ui.checkBox_4->isChecked())
   {
     predShift = predictDiffrotShift(ui.lineEdit_5->text().toDouble(), ui.lineEdit_8->text().toDouble(), params1.R);
@@ -65,24 +65,24 @@ void WindowDiffrot::checkDiskShifts()
   FitsTime time = GetStartFitsTime();
   IPCsettings set = *globals->IPCset;
 
-  int edgeN = 0.025 * 4096;
-  int edgeS = 0.974 * 4096;
-  int edgeW = 0.027 * 4096;
-  int edgeE = 0.975 * 4096;
-  int center = 0.5 * 4096;
+  i32 edgeN = 0.025 * 4096;
+  i32 edgeS = 0.974 * 4096;
+  i32 edgeW = 0.027 * 4096;
+  i32 edgeE = 0.975 * 4096;
+  i32 center = 0.5 * 4096;
 
-  int pics = ui.lineEdit_7->text().toDouble();
-  std::vector<double> shiftsN;
-  std::vector<double> shiftsS;
-  std::vector<double> shiftsW;
-  std::vector<double> shiftsE;
-  std::vector<double> shiftsFX;
-  std::vector<double> shiftsFY;
+  i32 pics = ui.lineEdit_7->text().toDouble();
+  std::vector<f64> shiftsN;
+  std::vector<f64> shiftsS;
+  std::vector<f64> shiftsW;
+  std::vector<f64> shiftsE;
+  std::vector<f64> shiftsFX;
+  std::vector<f64> shiftsFY;
   FitsImage pic1, pic2;
-  int lag1, lag2;
+  i32 lag1, lag2;
   cv::Mat picshow;
 
-  for (int pic = 0; pic < pics; pic++)
+  for (i32 pic = 0; pic < pics; pic++)
   {
     LOG_DEBUG("{} / {} ...", pic + 1, pics);
     time.advanceTime((bool)pic * (ui.lineEdit_6->text().toDouble() - ui.lineEdit_5->text().toDouble()) * ui.lineEdit_8->text().toDouble());
@@ -117,12 +117,12 @@ void WindowDiffrot::checkDiskShifts()
   picsshow[1] = roicrop(picshow, edgeE, center, set.getcols(), set.getrows());
   showimg(picsshow, "pics");
 
-  std::vector<double> iotam(shiftsFX.size());
+  std::vector<f64> iotam(shiftsFX.size());
   std::iota(iotam.begin(), iotam.end(), 0);
-  iotam = (double)(ui.lineEdit_7->text().toDouble() - 1) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / (iotam.size() - 1) * iotam;
-  // Plot1D::Plot(iotam, std::vector<std::vector<double>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]",
+  iotam = (f64)(ui.lineEdit_7->text().toDouble() - 1) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / (iotam.size() - 1) * iotam;
+  // Plot1D::Plot(iotam, std::vector<std::vector<f64>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]",
   // std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
-  // Plot1D::Plot(iotam, std::vector<std::vector<double>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]",
+  // Plot1D::Plot(iotam, std::vector<std::vector<f64>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]",
   // std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
 }
 
@@ -144,11 +144,11 @@ void WindowDiffrot::optimizeDiffrot()
 
   try
   {
-    auto f = [&](const std::vector<double>& args)
+    auto f = [&](const std::vector<f64>& args)
     {
-      int winsize = std::floor(args[5]);
-      int L2size = std::floor(args[2]);
-      int upsampleCoeff = std::floor(args[6]);
+      i32 winsize = std::floor(args[5]);
+      i32 L2size = std::floor(args[2]);
+      i32 upsampleCoeff = std::floor(args[6]);
       winsize = winsize % 2 ? winsize + 1 : winsize;
       L2size = L2size % 2 ? L2size : L2size + 1;
       upsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1;
@@ -164,8 +164,8 @@ void WindowDiffrot::optimizeDiffrot()
       return calculateDiffrotProfile(ipc_opt, time_opt, drset_opt).GetError();
     };
 
-    const int runs = 2;
-    for (int run = 0; run < runs; ++run)
+    const i32 runs = 2;
+    for (i32 run = 0; run < runs; ++run)
     {
       Evolution evo(8);
       evo.mNP = 50;
@@ -221,20 +221,20 @@ void WindowDiffrot::movingPeak()
   ipcset.save = true;
   ipcset.savedir = ui.lineEdit_9->text().toStdString();
   FitsImage pic1, pic2;
-  int lag1, lag2;
+  i32 lag1, lag2;
 
-  const int profiles = 1;
-  const int sy = 0;
+  const i32 profiles = 1;
+  const i32 sy = 0;
   const bool saveimgs = true;
 
-  std::vector<double> dts;
-  std::vector<std::vector<double>> shiftsX(profiles);
+  std::vector<f64> dts;
+  std::vector<std::vector<f64>> shiftsX(profiles);
 
-  for (int profile = 0; profile < profiles; ++profile)
+  for (i32 profile = 0; profile < profiles; ++profile)
   {
     LOG_DEBUG("profile {}/{} ...", profile + 1, profiles);
 
-    for (int dpic = 0; dpic < drset.pics; ++dpic)
+    for (i32 dpic = 0; dpic < drset.pics; ++dpic)
     {
       FitsTime time = starttime;
       time.advanceTime(profile * drset.dSec);
@@ -249,7 +249,7 @@ void WindowDiffrot::movingPeak()
         auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, saveimgs);
 
         if (!profile)
-          dts.push_back((double)dpic * drset.dSec / 60);
+          dts.push_back((f64)dpic * drset.dSec / 60);
 
         shiftsX[profile].push_back(shift.x);
       }

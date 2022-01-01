@@ -1,18 +1,18 @@
 #pragma once
 #include "Core/functionsBaseSTL.h"
 
-unsigned getTupleIndexWithIndex(std::vector<std::tuple<unsigned, double, unsigned>> vec, unsigned index);
+unsigned getTupleIndexWithIndex(std::vector<std::tuple<unsigned, f64, unsigned>> vec, unsigned index);
 
 struct Graph
 {
-  unsigned N;                                  //# of nodes
-  unsigned E = 0;                              //# of edges
-  std::vector<std::vector<double>> edgeMatrix; // connection cost [from][to]
-  std::vector<std::string> nodeNames;          // names of individual nodes in order
+  unsigned N;                               //# of nodes
+  unsigned E = 0;                           //# of edges
+  std::vector<std::vector<f64>> edgeMatrix; // connection cost [from][to]
+  std::vector<std::string> nodeNames;       // names of individual nodes in order
 
   Graph(unsigned N_) : N(N_), edgeMatrix(zerovect2(N_, N_, -1.)), nodeNames(std::vector<std::string>(N_, "unnamed_node")){};
 
-  void addEdge(unsigned from, unsigned to, double cost) // assuming bi-directional edges
+  void addEdge(unsigned from, unsigned to, f64 cost) // assuming bi-directional edges
   {
     edgeMatrix[from][to] = cost;
     edgeMatrix[to][from] = cost;
@@ -21,20 +21,19 @@ struct Graph
 
   std::vector<unsigned> findOptimalPath_Dijkstra(unsigned startIndex, unsigned endIndex)
   {
-    std::vector<std::tuple<unsigned, double, unsigned>> nodes(N); //<node index> <path cost> <via node index>
+    std::vector<std::tuple<unsigned, f64, unsigned>> nodes(N); //<node index> <path cost> <via node index>
     std::vector<unsigned> visitedNodes;
 
     for (unsigned nodeIndex = 0; nodeIndex < N; nodeIndex++) // initialize the nodes in order
     {
-      nodes[nodeIndex] = std::make_tuple(nodeIndex, nodeIndex != startIndex ? std::numeric_limits<double>::max() : 0, startIndex);
+      nodes[nodeIndex] = std::make_tuple(nodeIndex, nodeIndex != startIndex ? std::numeric_limits<f64>::max() : 0, startIndex);
     }
 
     for (unsigned nodeExplore = 0; nodeExplore < N; nodeExplore++) // expand all N nodes (worst-case)
     {
       std::sort(nodes.begin(), nodes.end(),
-          [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right)
-          { return std::get<1>(left) < std::get<1>(right); }); // sorts the nodes according to their path costs
-      std::tuple<unsigned, double, unsigned> currentNode;
+          [](std::tuple<unsigned, f64, unsigned> left, std::tuple<unsigned, f64, unsigned> right) { return std::get<1>(left) < std::get<1>(right); }); // sorts the nodes according to their path costs
+      std::tuple<unsigned, f64, unsigned> currentNode;
       for (unsigned nodeIndex = 0; nodeIndex < N; nodeIndex++)
       {
         if (std::find(visitedNodes.begin(), visitedNodes.end(), std::get<0>(nodes[nodeIndex])) == visitedNodes.end()) // node not yet expanded
@@ -44,7 +43,7 @@ struct Graph
         }
       }
       unsigned currentNodeIndex = std::get<0>(currentNode); // get the expanded node index
-      double currentNodeCost = std::get<1>(currentNode);    // get the expanded node cost
+      f64 currentNodeCost = std::get<1>(currentNode);       // get the expanded node cost
 
       for (unsigned edge = 0; edge < edgeMatrix[currentNodeIndex].size(); edge++) // check all connections to current node
       {
@@ -65,10 +64,9 @@ struct Graph
       if (std::find(visitedNodes.begin(), visitedNodes.end(), endIndex) != visitedNodes.end()) // target end node reached, optimal solution found
       {
         std::sort(nodes.begin(), nodes.end(),
-            [](std::tuple<unsigned, double, unsigned> left, std::tuple<unsigned, double, unsigned> right)
-            { return std::get<0>(left) < std::get<0>(right); }); // sorts the nodes according to their index
+            [](std::tuple<unsigned, f64, unsigned> left, std::tuple<unsigned, f64, unsigned> right) { return std::get<0>(left) < std::get<0>(right); }); // sorts the nodes according to their index
         unsigned backTracingIndex = endIndex;
-        double optimalCost = std::get<1>(nodes[backTracingIndex]);
+        f64 optimalCost = std::get<1>(nodes[backTracingIndex]);
         std::vector<unsigned> optimalPath;
         optimalPath.push_back(endIndex);
         do
@@ -79,7 +77,7 @@ struct Graph
         std::reverse(optimalPath.begin(), optimalPath.end()); // start-to-end
 
         std::cout << std::endl << "> optimal path indices: ";
-        for (size_t i = 0; i < optimalPath.size(); i++)
+        for (usize i = 0; i < optimalPath.size(); i++)
         {
           std::cout << optimalPath[i];
           if (i < optimalPath.size() - 1)
@@ -87,7 +85,7 @@ struct Graph
         }
 
         std::cout << std::endl << "> optimal path node names: ";
-        for (size_t i = 0; i < optimalPath.size(); i++)
+        for (usize i = 0; i < optimalPath.size(); i++)
         {
           std::cout << nodeNames[optimalPath[i]];
           if (i < optimalPath.size() - 1)
@@ -102,6 +100,6 @@ struct Graph
   }
 };
 
-std::ostream& operator<<(std::ostream& out, std::tuple<unsigned, double, unsigned> tuple);
+std::ostream& operator<<(std::ostream& out, std::tuple<unsigned, f64, unsigned> tuple);
 
 void findOptimalGraphPathDebug();

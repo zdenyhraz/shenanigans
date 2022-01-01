@@ -2,12 +2,12 @@
 #include "Core/functionsBaseCV.h"
 #include "Draw/colormap.h"
 
-inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
+inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
-  double colRowRatio = (double)sourceimg.cols / (double)sourceimg.rows;
-  int wCols = (double)wRows * colRowRatio;
+  f64 colRowRatio = (f64)sourceimg.cols / (f64)sourceimg.rows;
+  i32 wCols = (f64)wRows * colRowRatio;
   cv::namedWindow(windowname, cv::WINDOW_NORMAL);
   cv::resizeWindow(windowname, wCols, wRows);
 
@@ -29,10 +29,10 @@ inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool col
   cv::waitKey(1);
 }
 
-inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string windowname, bool color = false, double quantileB = 0, double quantileT = 1, int wRows = 600)
+inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   // 1st image determines the main hconcat height
-  int mainHeight = sourceimgIns[0].rows;
+  i32 mainHeight = sourceimgIns[0].rows;
   std::vector<cv::Mat> sourceimgs;
   sourceimgs.reserve(sourceimgIns.size());
   for (auto& srcimg : sourceimgIns)
@@ -40,7 +40,7 @@ inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string window
     if (!srcimg.empty())
     {
       auto img = srcimg.clone();
-      resize(img, img, cv::Size((double)mainHeight / img.rows * img.cols, mainHeight));
+      resize(img, img, cv::Size((f64)mainHeight / img.rows * img.cols, mainHeight));
       normalize(img, img, 0, 255, cv::NORM_MINMAX);
       img.convertTo(img, CV_8U);
       sourceimgs.emplace_back(img);
@@ -52,7 +52,7 @@ inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string window
   showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void saveimg(std::string path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, double quantileB = 0, double quantileT = 1)
+inline void saveimg(std::string path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat saveimg = sourceimgIn.clone();
 

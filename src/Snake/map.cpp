@@ -17,7 +17,7 @@ cv::Mat Map::Draw(Snake Bob)
   Clear();
   auto& body = Bob.GetBody();
 
-  for (size_t i = 0; i < body.size(); i++)
+  for (usize i = 0; i < body.size(); i++)
   {
     if (i == (body.size() - 1)) // snake head
       m_map.at<cv::Vec3f>(m_map.rows - 1 - body[i].y, body[i].x) = cv::Vec3f(0, 1, 0);

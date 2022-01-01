@@ -17,24 +17,24 @@ public:
     UnexpectedErrorOccured,
   };
 
-  using ObjectiveFunction = const std::function<double(const std::vector<double>&)>&;
+  using ObjectiveFunction = const std::function<f64(const std::vector<f64>&)>&;
   using ValidationFunction = ObjectiveFunction;
 
   struct OptimizationResult
   {
-    std::vector<double> optimum;
+    std::vector<f64> optimum;
     TerminationReason terminationReason = NotTerminated;
-    int functionEvaluations = -1;
-    std::vector<double> bestFitnessProgress;
-    std::vector<std::vector<double>> bestParametersProgress;
-    std::vector<std::vector<double>> evaluatedParameters;
+    i32 functionEvaluations = -1;
+    std::vector<f64> bestFitnessProgress;
+    std::vector<std::vector<f64>> bestParametersProgress;
+    std::vector<std::vector<f64>> evaluatedParameters;
   };
 
-  OptimizationAlgorithm_(int N, const std::string& optname = "default");
+  OptimizationAlgorithm_(i32 N, const std::string& optname = "default");
   virtual ~OptimizationAlgorithm_() = default;
 
   virtual OptimizationResult Optimize(
-      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<double>&) { return 0; }) = 0;
+      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) = 0;
 
   void Mute()
   {
@@ -53,19 +53,19 @@ public:
   }
   void SetPlotObjectiveFunctionLandscape(bool PlotObjectiveFunctionLandscape) { mPlotObjectiveFunctionLandscape = PlotObjectiveFunctionLandscape; }
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
-  void SetPlotObjectiveFunctionLandscapeIterations(int PlotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations; }
+  void SetPlotObjectiveFunctionLandscapeIterations(i32 PlotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetName(const std::string& optname) { mName = optname; }
 
-  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double> baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax, double ymin, double ymax,
+  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64> baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
       const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
-  size_t N = 1;                             // the problem dimension
-  std::vector<double> mLB;                  // lower search space bounds
-  std::vector<double> mUB;                  // upper search space bounds
-  double mOptimalFitness = -Constants::Inf; // satisfactory function value
-  size_t mMaxFunEvals = Constants::IntInf;  // maximum # of function evaluations
-  size_t maxGen = 1000;                     // maximum # of algorithm iterations
+  usize N = 1;                            // the problem dimension
+  std::vector<f64> mLB;                   // lower search space bounds
+  std::vector<f64> mUB;                   // upper search space bounds
+  f64 mOptimalFitness = -Constants::Inf;  // satisfactory function value
+  usize mMaxFunEvals = Constants::IntInf; // maximum # of function evaluations
+  usize maxGen = 1000;                    // maximum # of algorithm iterations
 
 protected:
   static const char* GetTerminationReasonString(const TerminationReason& reason);
@@ -75,7 +75,7 @@ protected:
   bool mFileOutput = false;
   bool mPlotObjectiveFunctionLandscape = false;
   bool mSaveProgress = false;
-  size_t mPlotObjectiveFunctionLandscapeIterations = 51;
+  usize mPlotObjectiveFunctionLandscapeIterations = 51;
   std::string mOutputFileDir;
   std::string mName;
   std::ofstream mOutputFile;
