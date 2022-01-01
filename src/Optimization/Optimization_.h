@@ -6,7 +6,7 @@
 class OptimizationAlgorithm_
 {
 public:
-  enum TerminationReason
+  enum TerminationReason : u8
   {
     NotTerminated = 0,
     OptimalFitnessReached,

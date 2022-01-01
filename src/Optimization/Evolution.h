@@ -4,7 +4,7 @@
 class Evolution : public OptimizationAlgorithm_
 {
 public:
-  enum MutationStrategy
+  enum MutationStrategy : u8
   {
     RAND1,
     RAND2,
@@ -13,14 +13,14 @@ public:
     MutationStrategyCount
   };
 
-  enum CrossoverStrategy
+  enum CrossoverStrategy : u8
   {
     BIN,
     EXP,
     CrossoverStrategyCount
   };
 
-  enum MetaObjectiveFunctionType
+  enum MetaObjectiveFunctionType : u8
   {
     ObjectiveFunctionValue
   };
