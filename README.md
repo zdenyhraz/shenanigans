@@ -1,4 +1,7 @@
 # Zdeny's shenanigans
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6154745e2a534ebe8265cc770986d261)](https://app.codacy.com/gh/zdenyhraz/shenanigans?utm_source=github.com&utm_medium=referral&utm_content=zdenyhraz/shenanigans&utm_campaign=Badge_Grade_Settings)
+
 Zdenek Hrazdira, 2019 / 2020 / 2021
 
 Semi-random PhD funky stuff. Mainly contains calculations for astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, also non-convex optimization, fractals. With [Qt GUI](https://www.qt.io/), #uses [C++17](https://en.cppreference.com/w/cpp/17), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
