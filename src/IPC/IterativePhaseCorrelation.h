@@ -14,26 +14,26 @@ template <bool DebugMode = false, bool CrossCorrelation = false, bool CudaFFT = 
 class IterativePhaseCorrelation
 {
 public:
-  enum class BandpassType
+  enum class BandpassType : u8
   {
     Rectangular,
     Gaussian,
   };
 
-  enum class WindowType
+  enum class WindowType : u8
   {
     Rectangular,
     Hann,
   };
 
-  enum class InterpolationType
+  enum class InterpolationType : u8
   {
     NearestNeighbor,
     Linear,
     Cubic,
   };
 
-  enum class AccuracyType
+  enum class AccuracyType : u8
   {
     Pixel,
     Subpixel,

@@ -106,7 +106,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
 {
   LOG_FUNCTION("Evolution metaoptimization");
 
-  enum MetaParameter
+  enum MetaParameter : u8
   {
     MetaNP,
     MetaCR,
