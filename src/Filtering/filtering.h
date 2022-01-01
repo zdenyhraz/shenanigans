@@ -4,21 +4,21 @@
 
 struct filterSettings
 {
-  double contrast;
-  double brightness;
-  double gamma;
+  f64 contrast;
+  f64 brightness;
+  f64 gamma;
 
-  filterSettings(double contrast_, double brightness_, double gamma_) : contrast(contrast_), brightness(brightness_), gamma(gamma_) {}
+  filterSettings(f64 contrast_, f64 brightness_, f64 gamma_) : contrast(contrast_), brightness(brightness_), gamma(gamma_) {}
 };
 
-cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, double contrast, double brightness);
+cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, f64 contrast, f64 brightness);
 
 cv::Mat histogramEqualize(const cv::Mat& sourceimgIn);
 
-cv::Mat gammaCorrect(const cv::Mat& sourceimgIn, double gamma);
+cv::Mat gammaCorrect(const cv::Mat& sourceimgIn, f64 gamma);
 
 cv::Mat addnoise(const cv::Mat& sourceimgIn);
 
-void addnoise(cv::Mat& img, double stddev);
+void addnoise(cv::Mat& img, f64 stddev);
 
-void showhistogram(const cv::Mat& sourceimgIn, int channels, int minimum = 0, int maximum = 255, std::string winname = "histogram");
+void showhistogram(const cv::Mat& sourceimgIn, i32 channels, i32 minimum = 0, i32 maximum = 255, std::string winname = "histogram");

@@ -6,27 +6,27 @@ using namespace Constants;
 
 namespace Procedural
 {
-inline cv::Mat sinian(int rows, int cols, double rowsFreq, double colsFreq, double rowsShift, double colsShift)
+inline cv::Mat sinian(i32 rows, i32 cols, f64 rowsFreq, f64 colsFreq, f64 rowsShift, f64 colsShift)
 {
   cv::Mat mat = cv::Mat::zeros(rows, cols, CV_32F);
-  for (int r = 0; r < rows; r++)
+  for (i32 r = 0; r < rows; r++)
   {
-    for (int c = 0; c < cols; c++)
+    for (i32 c = 0; c < cols; c++)
     {
-      mat.at<float>(r, c) = sin(colsFreq * TwoPi * ((double)c / (cols - 1) + colsShift)) + sin(rowsFreq * TwoPi * ((double)r / (rows - 1) + rowsShift));
+      mat.at<f32>(r, c) = sin(colsFreq * TwoPi * ((f64)c / (cols - 1) + colsShift)) + sin(rowsFreq * TwoPi * ((f64)r / (rows - 1) + rowsShift));
     }
   }
   return mat;
 }
 
-inline cv::Mat gaussian(int rows, int cols, double rowsSigma, double colsSigma, double rowsShift, double colsShift)
+inline cv::Mat gaussian(i32 rows, i32 cols, f64 rowsSigma, f64 colsSigma, f64 rowsShift, f64 colsShift)
 {
   cv::Mat mat = cv::Mat::zeros(rows, cols, CV_32F);
-  for (int r = 0; r < rows; r++)
+  for (i32 r = 0; r < rows; r++)
   {
-    for (int c = 0; c < cols; c++)
+    for (i32 c = 0; c < cols; c++)
     {
-      mat.at<float>(r, c) = exp(-pow((double)c / (cols - 1) - colsShift, 2) / colsSigma - pow((double)r / (rows - 1) - rowsShift, 2) / rowsSigma);
+      mat.at<f32>(r, c) = exp(-pow((f64)c / (cols - 1) - colsShift, 2) / colsSigma - pow((f64)r / (rows - 1) - rowsShift, 2) / rowsSigma);
     }
   }
   return mat;

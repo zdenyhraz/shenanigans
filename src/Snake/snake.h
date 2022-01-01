@@ -10,10 +10,10 @@ public:
   struct Coordinate
   {
     Coordinate() {}
-    Coordinate(int x_, int y_) : x(x_), y(y_) {}
+    Coordinate(i32 x_, i32 y_) : x(x_), y(y_) {}
 
-    int x = 0;
-    int y = 0;
+    i32 x = 0;
+    i32 y = 0;
 
     bool operator==(const Coordinate& other) { return (x == other.x) and (y == other.y); }
     bool operator!=(const Coordinate& other) { return !(*this == other); }

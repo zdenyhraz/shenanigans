@@ -7,35 +7,35 @@
 
 #ifdef VISUAL_OPTIMIZATION
 
-inline cv::Mat drawFunc2D(std::function<double(vector<double>)> f, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY)
+inline cv::Mat drawFunc2D(std::function<f64(vector<f64>)> f, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 stepsX, i32 stepsY)
 {
   cv::Mat resultMat = cv::Mat::zeros(stepsY, stepsX, CV_32F);
-  int progress = 0;
+  i32 progress = 0;
 
   #pragma omp parallel for
-  for (int r = 0; r < resultMat.rows; ++r)
+  for (i32 r = 0; r < resultMat.rows; ++r)
   {
-    for (int c = 0; c < resultMat.cols; ++c)
+    for (i32 c = 0; c < resultMat.cols; ++c)
     {
-      double x = xmin + (xmax - xmin) / (stepsX - 1) * c;
-      double y = ymax - (ymax - ymin) / (stepsY - 1) * r;
-      resultMat.at<float>(r, c) = f(vector<double>{x, y});
+      f64 x = xmin + (xmax - xmin) / (stepsX - 1) * c;
+      f64 y = ymax - (ymax - ymin) / (stepsY - 1) * r;
+      resultMat.at<f32>(r, c) = f(vector<f64>{x, y});
     }
   #pragma omp critical
     {
       progress++;
-      cout << (double)progress / resultMat.rows * 100 << "% done." << std::endl;
+      cout << (f64)progress / resultMat.rows * 100 << "% done." << std::endl;
     }
   }
   normalize(resultMat, resultMat, 0, 255, cv::NORM_MINMAX);
   return resultMat;
 }
 
-inline void drawPoint2D(const cv::Mat& funcLandscape, cv::Point point, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = cv::Scalar(255 * 0.7, 0, 255 * 0.7))
+inline void drawPoint2D(const cv::Mat& funcLandscape, cv::Point point, f64 stretchFactorX, f64 stretchFactorY, cv::Scalar CrosshairColor = cv::Scalar(255 * 0.7, 0, 255 * 0.7))
 {
   // cv::Scalar(255 * 0.7, 0, 255 * 0.7) - magenta
-  int linePxLength = max(funcLandscape.cols / 120, 1);
-  int thickness = max(funcLandscape.cols / 200, 1);
+  i32 linePxLength = max(funcLandscape.cols / 120, 1);
+  i32 thickness = max(funcLandscape.cols / 200, 1);
   point.x *= stretchFactorX;
   point.y *= stretchFactorY;
   cv::Point NW(point.x - linePxLength, point.y - linePxLength);
@@ -46,27 +46,26 @@ inline void drawPoint2D(const cv::Mat& funcLandscape, cv::Point point, double st
   line(funcLandscape, NE, SW, CrosshairColor, thickness);
 }
 
-inline void drawArrow2D(const cv::Mat& funcLandscape, cv::Point point1, cv::Point point2, double stretchFactorX, double stretchFactorY, cv::Scalar CrosshairColor = cv::Scalar(0, 0, 255))
+inline void drawArrow2D(const cv::Mat& funcLandscape, cv::Point point1, cv::Point point2, f64 stretchFactorX, f64 stretchFactorY, cv::Scalar CrosshairColor = cv::Scalar(0, 0, 255))
 {
   point1.x *= stretchFactorX;
   point1.y *= stretchFactorY;
   point2.x *= stretchFactorX;
   point2.y *= stretchFactorY;
-  int thickness = max(funcLandscape.cols / 400, 1);
+  i32 thickness = max(funcLandscape.cols / 400, 1);
   arrowedLine(funcLandscape, point1, point2, CrosshairColor, thickness);
 }
 
-cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points, double xmin, double xmax, double ymin, double ymax, int stepsX, int stepsY, double stretchFactorX,
-    double stretchFactorY, bool drawArrows)
+cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<f64>>> points, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 stepsX, i32 stepsY, f64 stretchFactorX, f64 stretchFactorY, bool drawArrows)
 {
   cv::Mat resultMat = funcLandscape.clone();
-  for (int run = 0; run < points.size(); run++)
+  for (i32 run = 0; run < points.size(); run++)
   {
     auto colorThisRun = cv::Scalar(rand() % 256, rand() % 256, rand() % 256);
-    for (size_t i = 0; i < points[run].size(); i++)
+    for (usize i = 0; i < points[run].size(); i++)
     {
-      int col1 = (points[run][i][0] - xmin) / (xmax - xmin) * (stepsX - 1);
-      int row1 = stepsY - (points[run][i][1] - ymin) / (ymax - ymin) * (stepsY - 1);
+      i32 col1 = (points[run][i][0] - xmin) / (xmax - xmin) * (stepsX - 1);
+      i32 row1 = stepsY - (points[run][i][1] - ymin) / (ymax - ymin) * (stepsY - 1);
       cv::Point pointik1(col1, row1);
       if (i == 0)
       {
@@ -85,8 +84,8 @@ cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points,
       {
         if (i < (points[run].size() - 1))
         {
-          int col2 = (points[run][i + 1][0] - xmin) / (xmax - xmin) * (stepsX - 1);
-          int row2 = stepsY - (points[run][i + 1][1] - ymin) / (ymax - ymin) * (stepsY - 1);
+          i32 col2 = (points[run][i + 1][0] - xmin) / (xmax - xmin) * (stepsX - 1);
+          i32 row2 = stepsY - (points[run][i + 1][1] - ymin) / (ymax - ymin) * (stepsY - 1);
           cv::Point pointik2(col2, row2);
           drawArrow2D(resultMat, pointik1, pointik2, stretchFactorX, stretchFactorY, colorThisRun);
         }
@@ -96,13 +95,13 @@ cv::Mat drawPath2D(cv::Mat funcLandscape, vector<vector<vector<double>>> points,
   return resultMat;
 }
 
-inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(vector<double>)> f, vector<double> mLB, vector<double> mUB, vector<int> steps, Evolution Evo, PatternSearch Pat,
-    bool logLandscapeOpt, bool optPat, bool optEvo, double quantileB, double quantileT, cv::Mat* landscape)
+inline std::vector<f64> drawFuncLandscapeAndOptimize2D(std::function<f64(vector<f64>)> f, vector<f64> mLB, vector<f64> mUB, vector<i32> steps, Evolution Evo, PatternSearch Pat, bool logLandscapeOpt,
+    bool optPat, bool optEvo, f64 quantileB, f64 quantileT, cv::Mat* landscape)
 {
   cv::Mat optimizedFuncLandscapeCLR = cv::Mat::zeros(steps[0], steps[1], CV_32F);
   cv::Point2i minloc, maxloc;
-  vector<double> minlocArg(2, 0);
-  double stretchFactorX, stretchFactorY;
+  vector<f64> minlocArg(2, 0);
+  f64 stretchFactorX, stretchFactorY;
   cout << "Drawing the function landscape... " << std::endl;
   cv::Mat optimizedFuncLandscapeRAW = drawFunc2D(f, mLB[0], mUB[0], mLB[1], mUB[1], steps[0], steps[1]);
   if (landscape)
@@ -114,14 +113,14 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
   normalize(optimizedFuncLandscapeRAWlog, optimizedFuncLandscapeRAWlog, 0, 255, cv::NORM_MINMAX);
   cv::Mat optimizedFuncLandscapeCLRlog; //= applyColorMap(optimizedFuncLandscapeRAWlog, quantileB, quantileT); // log or not
 
-  double minim, maxim;
+  f64 minim, maxim;
   minMaxLoc(optimizedFuncLandscapeRAW, &minim, &maxim, &minloc, &maxloc);
   minlocArg[0] = mLB[0] + (mUB[0] - mLB[0]) / (steps[0] - 1) * minloc.x;
   minlocArg[1] = mUB[1] - (mUB[1] - mLB[1]) / (steps[1] - 1) * minloc.y;
 
-  int stretchSize = 1001; // odd
-  stretchFactorX = (double)stretchSize / optimizedFuncLandscapeRAW.cols;
-  stretchFactorY = (double)stretchSize / optimizedFuncLandscapeRAW.rows;
+  i32 stretchSize = 1001; // odd
+  stretchFactorX = (f64)stretchSize / optimizedFuncLandscapeRAW.cols;
+  stretchFactorY = (f64)stretchSize / optimizedFuncLandscapeRAW.rows;
   resize(optimizedFuncLandscapeCLR, optimizedFuncLandscapeCLR, cv::Size(stretchSize, stretchSize), 0, 0, cv::INTER_NEAREST);
   resize(optimizedFuncLandscapeCLRlog, optimizedFuncLandscapeCLRlog, cv::Size(stretchSize, stretchSize), 0, 0, cv::INTER_NEAREST);
   drawPoint2D(optimizedFuncLandscapeCLR, minloc, stretchFactorX, stretchFactorY, cv::Scalar(0, 0, 255));
@@ -136,7 +135,7 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
     if (logLandscapeOpt)
       optimizedFuncLandscapeCLR = optimizedFuncLandscapeCLRlog;
 
-    vector<double> resultPat = zerovect(Evo.N), resultEvo = zerovect(Evo.N);
+    vector<f64> resultPat = zerovect(Evo.N), resultEvo = zerovect(Evo.N);
     if (optPat)
     {
       resultPat = Pat.optimize(f);
@@ -184,17 +183,17 @@ inline std::vector<double> drawFuncLandscapeAndOptimize2D(std::function<double(v
 void optimizeWithLandscapeDebug()
 {
   // normal
-  std::function<double(vector<double>)> f = OptimizationTestFunctions::Rosenbrock;
-  vector<double> mLB{-4.5, -4.5};
-  vector<double> mUB{4.5, 4.5}; // odd
-  vector<int> steps{501, 501};  // odd
+  std::function<f64(vector<f64>)> f = OptimizationTestFunctions::Rosenbrock;
+  vector<f64> mLB{-4.5, -4.5};
+  vector<f64> mUB{4.5, 4.5};   // odd
+  vector<i32> steps{501, 501}; // odd
 
   /*
   //meta Evo
-  std::function<double(vector<double>)> f = metaOptFuncEvo;
-  vector<double> mLB{ 15, 0.7, 0.5, 0.5 };
-  vector<double> mUB{ 15, 0.7, 0.5, 0.5 };//odd
-  vector<int> steps{ (int)(2 * pmranges[0] + 1), (int)(2 * pmranges[0] + 1), (int)(2 * pmranges[0] + 1), 3 };//odd
+  std::function<f64(vector<f64>)> f = metaOptFuncEvo;
+  vector<f64> mLB{ 15, 0.7, 0.5, 0.5 };
+  vector<f64> mUB{ 15, 0.7, 0.5, 0.5 };//odd
+  vector<i32> steps{ (i32)(2 * pmranges[0] + 1), (i32)(2 * pmranges[0] + 1), (i32)(2 * pmranges[0] + 1), 3 };//odd
   */
 
   Evolution Evo(mLB.size());

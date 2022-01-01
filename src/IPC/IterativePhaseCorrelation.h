@@ -40,23 +40,23 @@ public:
     SubpixelIterative
   };
 
-  IterativePhaseCorrelation(int rows, int cols = 0, double bandpassL = 0, double bandpassH = 1)
+  IterativePhaseCorrelation(i32 rows, i32 cols = 0, f64 bandpassL = 0, f64 bandpassH = 1)
   {
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
   }
-  IterativePhaseCorrelation(const cv::Size& size, double bandpassL = 0, double bandpassH = 1)
+  IterativePhaseCorrelation(const cv::Size& size, f64 bandpassL = 0, f64 bandpassH = 1)
   {
     SetSize(size);
     SetBandpassParameters(bandpassL, bandpassH);
   }
-  IterativePhaseCorrelation(const cv::Mat& img, double bandpassL = 0, double bandpassH = 1)
+  IterativePhaseCorrelation(const cv::Mat& img, f64 bandpassL = 0, f64 bandpassH = 1)
   {
     SetSize(img.size());
     SetBandpassParameters(bandpassL, bandpassH);
   }
 
-  void SetSize(int rows, int cols = -1)
+  void SetSize(i32 rows, i32 cols = -1)
   {
     mRows = rows;
     mCols = cols > 0 ? cols : rows;
@@ -68,7 +68,7 @@ public:
       UpdateBandpass();
   }
   void SetSize(cv::Size size) { SetSize(size.height, size.width); }
-  void SetBandpassParameters(double bandpassL, double bandpassH)
+  void SetBandpassParameters(f64 bandpassL, f64 bandpassH)
   {
     mBandpassL = clamp(bandpassL, -Constants::Inf, 1); // L from [-inf, 1]
     mBandpassH = clamp(bandpassH, 0, Constants::Inf);  // H from [0, inf]
@@ -79,23 +79,23 @@ public:
     mBandpassType = type;
     UpdateBandpass();
   }
-  void SetL2size(int L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
-  void SetL1ratio(double L1ratio) { mL1ratio = L1ratio; }
-  void SetUpsampleCoeff(int upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
-  void SetMaxIterations(int maxIterations) { mMaxIterations = maxIterations; }
+  void SetL2size(i32 L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
+  void SetL1ratio(f64 L1ratio) { mL1ratio = L1ratio; }
+  void SetUpsampleCoeff(i32 upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
+  void SetMaxIterations(i32 maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetWindowType(WindowType type) { mWindowType = type; }
   void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
   void SetDebugName(const std::string& name) { mDebugName = name; }
 
-  int GetRows() const { return mRows; }
-  int GetCols() const { return mCols; }
-  int GetSize() const { return mRows; }
-  double GetBandpassL() const { return mBandpassL; }
-  double GetBandpassH() const { return mBandpassH; }
-  int GetL2size() const { return mL2size; }
-  double GetL1ratio() const { return mL1ratio; }
-  int GetUpsampleCoeff() const { return mUpsampleCoeff; }
+  i32 GetRows() const { return mRows; }
+  i32 GetCols() const { return mCols; }
+  i32 GetSize() const { return mRows; }
+  f64 GetBandpassL() const { return mBandpassL; }
+  f64 GetBandpassH() const { return mBandpassH; }
+  i32 GetL2size() const { return mL2size; }
+  f64 GetL1ratio() const { return mL1ratio; }
+  i32 GetUpsampleCoeff() const { return mUpsampleCoeff; }
   cv::Mat GetWindow() const { return mWindow; }
   cv::Mat GetBandpass() const { return mBandpass; }
 
@@ -181,7 +181,7 @@ public:
 
     if (mAccuracyType == AccuracyType::Subpixel)
     {
-      int L2size = 5;
+      i32 L2size = 5;
       while (IsOutOfBounds(L3peak, L3, L2size))
         if (!ReduceL2size(L2size))
           return result;
@@ -192,8 +192,8 @@ public:
       return L3peak - L3mid + L2peak - L2mid;
     }
 
-    int L2size = mL2size;
-    double L1ratio = mL1ratio;
+    i32 L2size = mL2size;
+    f64 L1ratio = mL1ratio;
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     while (IsOutOfBounds(L3peak, L3, L2size))
@@ -247,7 +247,7 @@ public:
 
       // L1
       cv::Mat L1;
-      int L1size = GetL1size(L2U, L1ratio);
+      i32 L1size = GetL1size(L2U, L1ratio);
       cv::Point2f L1mid(L1size / 2, L1size / 2);
       cv::Point2f L1peak;
       if constexpr (DebugMode)
@@ -257,7 +257,7 @@ public:
         Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size));
       }
 
-      for (int iter = 0; iter < mMaxIterations; ++iter)
+      for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           break;
@@ -305,31 +305,31 @@ public:
     Fourier::fftshift(img2FT);
     cv::Mat img1FTm = cv::Mat::zeros(img1FT.size(), CV_32F);
     cv::Mat img2FTm = cv::Mat::zeros(img2FT.size(), CV_32F);
-    for (int row = 0; row < img1FT.rows; ++row)
+    for (i32 row = 0; row < img1FT.rows; ++row)
     {
       auto img1FTp = img1FT.ptr<cv::Vec2f>(row);
       auto img2FTp = img2FT.ptr<cv::Vec2f>(row);
-      auto img1FTmp = img1FTm.ptr<float>(row);
-      auto img2FTmp = img2FTm.ptr<float>(row);
-      for (int col = 0; col < img1FT.cols; ++col)
+      auto img1FTmp = img1FTm.ptr<f32>(row);
+      auto img2FTmp = img2FTm.ptr<f32>(row);
+      for (i32 col = 0; col < img1FT.cols; ++col)
       {
-        const float& re1 = img1FTp[col][0];
-        const float& im1 = img1FTp[col][1];
-        const float& re2 = img2FTp[col][0];
-        const float& im2 = img2FTp[col][1];
+        const f32& re1 = img1FTp[col][0];
+        const f32& im1 = img1FTp[col][1];
+        const f32& re2 = img2FTp[col][0];
+        const f32& im2 = img2FTp[col][1];
         img1FTmp[col] = log(sqrt(re1 * re1 + im1 * im1));
         img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
       }
     }
-    cv::Point2f center((float)image1.cols / 2, (float)image1.rows / 2);
-    double maxRadius = std::min(center.y, center.x);
+    cv::Point2f center((f32)image1.cols / 2, (f32)image1.rows / 2);
+    f64 maxRadius = std::min(center.y, center.x);
     warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
     warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
 
     // rotation
     auto shiftR = Calculate(img1FTm, img2FTm);
-    double rotation = -shiftR.y / image1.rows * 360;
-    double scale = exp(shiftR.x * log(maxRadius) / image1.cols);
+    f64 rotation = -shiftR.y / image1.rows * 360;
+    f64 scale = exp(shiftR.x * log(maxRadius) / image1.cols);
     Rotate(image2, -rotation, scale);
 
     // translation
@@ -351,8 +351,8 @@ public:
     return cv::Mat();
   }
 
-  std::tuple<cv::Mat, cv::Mat> CalculateFlow(const cv::Mat& image1, const cv::Mat& image2, float resolution) const { return CalculateFlow(image1.clone(), image2.clone(), resolution); }
-  std::tuple<cv::Mat, cv::Mat> CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, float resolution) const
+  std::tuple<cv::Mat, cv::Mat> CalculateFlow(const cv::Mat& image1, const cv::Mat& image2, f32 resolution) const { return CalculateFlow(image1.clone(), image2.clone(), resolution); }
+  std::tuple<cv::Mat, cv::Mat> CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, f32 resolution) const
   try
   {
     if (image1.size() != image2.size())
@@ -363,15 +363,15 @@ public:
 
     cv::Mat flowX = cv::Mat::zeros(cv::Size(resolution * image1.cols, resolution * image1.rows), CV_32F);
     cv::Mat flowY = cv::Mat::zeros(cv::Size(resolution * image2.cols, resolution * image2.rows), CV_32F);
-    std::atomic<int> progress = 0;
+    std::atomic<i32> progress = 0;
 
 #pragma omp parallel for
-    for (int r = 0; r < flowX.rows; ++r)
+    for (i32 r = 0; r < flowX.rows; ++r)
     {
       if (++progress % (flowX.rows / 20) == 0)
-        LOG_DEBUG("Calculating IPC flow profile ({:.0f}%)", static_cast<float>(progress) / flowX.rows * 100);
+        LOG_DEBUG("Calculating IPC flow profile ({:.0f}%)", static_cast<f32>(progress) / flowX.rows * 100);
 
-      for (int c = 0; c < flowX.cols; ++c)
+      for (i32 c = 0; c < flowX.cols; ++c)
       {
         const cv::Point2i center(c / resolution, r / resolution);
 
@@ -379,8 +379,8 @@ public:
           continue;
 
         const auto shift = Calculate(roicrop(image1, center.x, center.y, mCols, mRows), roicrop(image2, center.x, center.y, mCols, mRows));
-        flowX.at<float>(r, c) = shift.x;
-        flowY.at<float>(r, c) = shift.y;
+        flowX.at<f32>(r, c) = shift.x;
+        flowY.at<f32>(r, c) = shift.y;
       }
     }
 
@@ -429,18 +429,18 @@ public:
     {
       cv::Mat bpR = cv::Mat::zeros(mRows, mCols, CV_32F);
       cv::Mat bpG = cv::Mat::zeros(mRows, mCols, CV_32F);
-      for (int r = 0; r < mRows; ++r)
+      for (i32 r = 0; r < mRows; ++r)
       {
-        for (int c = 0; c < mCols; ++c)
+        for (i32 c = 0; c < mCols; ++c)
         {
-          bpR.at<float>(r, c) = BandpassREquation(r, c);
+          bpR.at<f32>(r, c) = BandpassREquation(r, c);
 
           if (mBandpassL <= 0 and mBandpassH < 1)
-            bpG.at<float>(r, c) = LowpassEquation(r, c);
+            bpG.at<f32>(r, c) = LowpassEquation(r, c);
           else if (mBandpassL > 0 and mBandpassH >= 1)
-            bpG.at<float>(r, c) = HighpassEquation(r, c);
+            bpG.at<f32>(r, c) = HighpassEquation(r, c);
           else if (mBandpassL > 0 and mBandpassH < 1)
-            bpG.at<float>(r, c) = BandpassGEquation(r, c);
+            bpG.at<f32>(r, c) = BandpassGEquation(r, c);
         }
       }
 
@@ -468,18 +468,18 @@ public:
       cv::Mat filterR = cv::Mat::zeros(img.size(), CV_32F);
       cv::Mat filterG = cv::Mat::zeros(img.size(), CV_32F);
 
-      for (int r = 0; r < mRows; ++r)
+      for (i32 r = 0; r < mRows; ++r)
       {
-        for (int c = 0; c < mCols; ++c)
+        for (i32 c = 0; c < mCols; ++c)
         {
-          filterR.at<float>(r, c) = BandpassREquation(r, c);
+          filterR.at<f32>(r, c) = BandpassREquation(r, c);
 
           if (mBandpassL <= 0 and mBandpassH < 1)
-            filterG.at<float>(r, c) = LowpassEquation(r, c);
+            filterG.at<f32>(r, c) = LowpassEquation(r, c);
           else if (mBandpassL > 0 and mBandpassH >= 1)
-            filterG.at<float>(r, c) = HighpassEquation(r, c);
+            filterG.at<f32>(r, c) = HighpassEquation(r, c);
           else if (mBandpassL > 0 and mBandpassH < 1)
-            filterG.at<float>(r, c) = BandpassGEquation(r, c);
+            filterG.at<f32>(r, c) = BandpassGEquation(r, c);
         }
       }
 
@@ -514,7 +514,7 @@ public:
 
       if (1)
       {
-        double noiseStdev = 0.03;
+        f64 noiseStdev = 0.03;
         cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, CV_32F);
         cv::Mat noise2 = cv::Mat::zeros(image2.rows, image2.cols, CV_32F);
         randn(noise1, 0, noiseStdev);
@@ -533,8 +533,8 @@ public:
     LOG_INFO("IPC debug stuff shown");
   }
 
-  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, float maxShift = 2.0, float noiseStdev = 0.01, int itersPerImage = 100,
-      double validationRatio = 0.2, int populationSize = ParameterCount * 7, bool mute = false)
+  void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift = 2.0, f32 noiseStdev = 0.01, i32 itersPerImage = 100, f64 validationRatio = 0.2,
+      i32 populationSize = ParameterCount * 7, bool mute = false)
   try
   {
     if (!mute)
@@ -557,7 +557,7 @@ public:
     const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
 
     std::vector<cv::Point2f> referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore;
-    double objBefore;
+    f64 objBefore;
 
     // before
     if (!mute)
@@ -589,7 +589,7 @@ public:
       const auto shiftsAfter = GetShifts(trainingImagePairs);
       const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
       ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
-      LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
+      LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
       LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
     }
   }
@@ -597,43 +597,43 @@ public:
   {
     LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
   }
-  void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
+  void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
   {
     LOG_FUNCTION("PlotObjectiveFunctionLandscape");
     const auto trainingImages = LoadImages(trainingImagesDirectory);
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
-    const int rows = iters;
-    const int cols = iters;
+    const i32 rows = iters;
+    const i32 cols = iters;
     cv::Mat landscape(rows, cols, CV_32F);
-    const double xmin = -0.25;
-    const double xmax = 0.75;
-    const double ymin = 0.25;
-    const double ymax = 1.25;
-    std::atomic<int> progress = 0;
+    const f64 xmin = -0.25;
+    const f64 xmax = 0.75;
+    const f64 ymin = 0.25;
+    const f64 ymax = 1.25;
+    std::atomic<i32> progress = 0;
 
 #pragma omp parallel for
-    for (int r = 0; r < rows; ++r)
+    for (i32 r = 0; r < rows; ++r)
     {
-      for (int c = 0; c < cols; ++c)
+      for (i32 c = 0; c < cols; ++c)
       {
-        LOG_INFO("Calculating objective function landscape ({:.1f}%)", (float)progress / (rows * cols - 1) * 100);
-        std::vector<double> parameters(ParameterCount);
+        LOG_INFO("Calculating objective function landscape ({:.1f}%)", (f32)progress / (rows * cols - 1) * 100);
+        std::vector<f64> parameters(ParameterCount);
 
         // default
-        parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+        parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
         parameters[BandpassLParameter] = mBandpassL;
         parameters[BandpassHParameter] = mBandpassH;
-        parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
-        parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+        parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
+        parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
         parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
         parameters[L1ratioParameter] = mL1ratio;
 
         // modified
-        parameters[BandpassLParameter] = xmin + (double)c / (cols - 1) * (xmax - xmin);
-        parameters[BandpassHParameter] = ymin + (double)r / (rows - 1) * (ymax - ymin);
+        parameters[BandpassLParameter] = xmin + (f64)c / (cols - 1) * (xmax - xmin);
+        parameters[BandpassHParameter] = ymin + (f64)r / (rows - 1) * (ymax - ymin);
 
-        landscape.at<float>(r, c) = std::log(obj(parameters));
+        landscape.at<f32>(r, c) = std::log(obj(parameters));
         progress++;
       }
     }
@@ -645,31 +645,31 @@ public:
     Plot2D::SetYmax(ymax);
     Plot2D::Plot("IPCdebug2D", landscape);
   }
-  void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters)
+  void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters)
   {
     const auto trainingImages = LoadImages(trainingImagesDirectory);
-    std::vector<double> imageSizes(iters);
-    std::vector<double> accuracy(iters);
-    const double xmin = 16;
-    const double xmax = mRows;
-    std::atomic<int> progress = 0;
+    std::vector<f64> imageSizes(iters);
+    std::vector<f64> accuracy(iters);
+    const f64 xmin = 16;
+    const f64 xmax = mRows;
+    std::atomic<i32> progress = 0;
 
-    for (int i = 0; i < iters; ++i)
+    for (i32 i = 0; i < iters; ++i)
     {
-      LOG_INFO("Calculating image size accuracy dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
-      int imageSize = xmin + (double)i / (iters - 1) * (xmax - xmin);
+      LOG_INFO("Calculating image size accuracy dependence ({:.1f}%)", (f32)progress / (iters - 1) * 100);
+      i32 imageSize = xmin + (f64)i / (iters - 1) * (xmax - xmin);
       imageSize = imageSize % 2 ? imageSize + 1 : imageSize;
       SetSize(imageSize, imageSize);
       const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
       const auto obj = CreateObjectiveFunction(trainingImagePairs);
-      std::vector<double> parameters(ParameterCount);
+      std::vector<f64> parameters(ParameterCount);
 
       // default
-      parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+      parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
       parameters[BandpassLParameter] = mBandpassL;
       parameters[BandpassHParameter] = mBandpassH;
-      parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
-      parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+      parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
+      parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
       parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
       parameters[L1ratioParameter] = mL1ratio;
 
@@ -684,34 +684,34 @@ public:
     // Plot1D::SetYLogarithmic(true);
     Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy);
   }
-  void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
+  void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
   {
     const auto trainingImages = LoadImages(trainingImagesDirectory);
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
 
-    std::vector<double> upsampleCoeff(iters);
-    std::vector<double> accuracy(iters);
-    const double xmin = 1;
-    const double xmax = 35;
-    std::atomic<int> progress = 0;
+    std::vector<f64> upsampleCoeff(iters);
+    std::vector<f64> accuracy(iters);
+    const f64 xmin = 1;
+    const f64 xmax = 35;
+    std::atomic<i32> progress = 0;
 
-    for (int i = 0; i < iters; ++i)
+    for (i32 i = 0; i < iters; ++i)
     {
-      LOG_INFO("Calculating upsample coeffecient accuracy dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
-      std::vector<double> parameters(ParameterCount);
+      LOG_INFO("Calculating upsample coeffecient accuracy dependence ({:.1f}%)", (f32)progress / (iters - 1) * 100);
+      std::vector<f64> parameters(ParameterCount);
 
       // default
-      parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+      parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
       parameters[BandpassLParameter] = mBandpassL;
       parameters[BandpassHParameter] = mBandpassH;
-      parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
-      parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+      parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
+      parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
       parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
       parameters[L1ratioParameter] = mL1ratio;
 
       // modified
-      parameters[UpsampleCoeffParameter] = xmin + (double)i / (iters - 1) * (xmax - xmin);
+      parameters[UpsampleCoeffParameter] = xmin + (f64)i / (iters - 1) * (xmax - xmin);
 
       upsampleCoeff[i] = parameters[UpsampleCoeffParameter];
       accuracy[i] = obj(parameters);
@@ -724,7 +724,7 @@ public:
     Plot1D::SetYLogarithmic(true);
     Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy);
   }
-  void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
+  void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
   {
     if (noiseStdev <= 0.0f)
     {
@@ -733,27 +733,27 @@ public:
     }
 
     const auto trainingImages = LoadImages(trainingImagesDirectory);
-    std::vector<double> noiseStdevs(iters);
-    std::vector<double> accuracy(iters);
-    const double xmin = 0;
-    const double xmax = noiseStdev;
-    std::atomic<int> progress = 0;
+    std::vector<f64> noiseStdevs(iters);
+    std::vector<f64> accuracy(iters);
+    const f64 xmin = 0;
+    const f64 xmax = noiseStdev;
+    std::atomic<i32> progress = 0;
 
 #pragma omp parallel for
-    for (int i = 0; i < iters; ++i)
+    for (i32 i = 0; i < iters; ++i)
     {
-      LOG_INFO("Calculating noise stdev accuracy dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
-      float noise = xmin + (double)i / (iters - 1) * (xmax - xmin);
+      LOG_INFO("Calculating noise stdev accuracy dependence ({:.1f}%)", (f32)progress / (iters - 1) * 100);
+      f32 noise = xmin + (f64)i / (iters - 1) * (xmax - xmin);
       const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noise);
       const auto obj = CreateObjectiveFunction(trainingImagePairs);
-      std::vector<double> parameters(ParameterCount);
+      std::vector<f64> parameters(ParameterCount);
 
       // default
-      parameters[BandpassTypeParameter] = static_cast<int>(mBandpassType);
+      parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
       parameters[BandpassLParameter] = mBandpassL;
       parameters[BandpassHParameter] = mBandpassH;
-      parameters[InterpolationTypeParameter] = static_cast<int>(mInterpolationType);
-      parameters[WindowTypeParameter] = static_cast<int>(mWindowType);
+      parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
+      parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
       parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
       parameters[L1ratioParameter] = mL1ratio;
 
@@ -767,7 +767,7 @@ public:
     Plot1D::SetYlabel("Average pixel error");
     Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy);
   }
-  void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, float maxShift, float noiseStdev, int itersPerImage, int iters) const
+  void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
   {
     if (noiseStdev <= 0.0f)
     {
@@ -775,16 +775,16 @@ public:
       return;
     }
 
-    std::vector<double> noiseStdevs(iters);
-    std::vector<double> optimalBPHs(iters);
-    const double xmin = 0;
-    const double xmax = noiseStdev;
-    int progress = 0;
+    std::vector<f64> noiseStdevs(iters);
+    std::vector<f64> optimalBPHs(iters);
+    const f64 xmin = 0;
+    const f64 xmax = noiseStdev;
+    i32 progress = 0;
 
-    for (int i = 0; i < iters; ++i)
+    for (i32 i = 0; i < iters; ++i)
     {
-      LOG_INFO("Calculating noise stdev optimal BPH dependence ({:.1f}%)", (float)progress / (iters - 1) * 100);
-      float noise = xmin + (double)i / (iters - 1) * (xmax - xmin);
+      LOG_INFO("Calculating noise stdev optimal BPH dependence ({:.1f}%)", (f32)progress / (iters - 1) * 100);
+      f32 noise = xmin + (f64)i / (iters - 1) * (xmax - xmin);
 
       IterativePhaseCorrelation ipc = *this; // copy this
       ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, ParameterCount * 2, true);
@@ -801,15 +801,15 @@ public:
   }
 
 private:
-  int mRows = 0;
-  int mCols = 0;
-  double mBandpassL = 0;
-  double mBandpassH = 1;
-  int mL2size = 11;
-  double mL1ratio = 0.35;
-  double mL1ratioStep = 0.05;
-  int mUpsampleCoeff = 51;
-  int mMaxIterations = 20;
+  i32 mRows = 0;
+  i32 mCols = 0;
+  f64 mBandpassL = 0;
+  f64 mBandpassH = 1;
+  i32 mL2size = 11;
+  f64 mL1ratio = 0.35;
+  f64 mL1ratioStep = 0.05;
+  i32 mUpsampleCoeff = 51;
+  i32 mMaxIterations = 20;
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
@@ -842,21 +842,21 @@ private:
     case BandpassType::Gaussian:
       if (mBandpassL <= 0 and mBandpassH < 1)
       {
-        for (int r = 0; r < mRows; ++r)
-          for (int c = 0; c < mCols; ++c)
-            mBandpass.at<float>(r, c) = LowpassEquation(r, c);
+        for (i32 r = 0; r < mRows; ++r)
+          for (i32 c = 0; c < mCols; ++c)
+            mBandpass.at<f32>(r, c) = LowpassEquation(r, c);
       }
       else if (mBandpassL > 0 and mBandpassH >= 1)
       {
-        for (int r = 0; r < mRows; ++r)
-          for (int c = 0; c < mCols; ++c)
-            mBandpass.at<float>(r, c) = HighpassEquation(r, c);
+        for (i32 r = 0; r < mRows; ++r)
+          for (i32 c = 0; c < mCols; ++c)
+            mBandpass.at<f32>(r, c) = HighpassEquation(r, c);
       }
       else if (mBandpassL > 0 and mBandpassH < 1)
       {
-        for (int r = 0; r < mRows; ++r)
-          for (int c = 0; c < mCols; ++c)
-            mBandpass.at<float>(r, c) = BandpassGEquation(r, c);
+        for (i32 r = 0; r < mRows; ++r)
+          for (i32 c = 0; c < mCols; ++c)
+            mBandpass.at<f32>(r, c) = BandpassGEquation(r, c);
 
         normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
       }
@@ -865,27 +865,27 @@ private:
     case BandpassType::Rectangular:
       if (mBandpassL < mBandpassH)
       {
-        for (int r = 0; r < mRows; ++r)
-          for (int c = 0; c < mCols; ++c)
-            mBandpass.at<float>(r, c) = BandpassREquation(r, c);
+        for (i32 r = 0; r < mRows; ++r)
+          for (i32 c = 0; c < mCols; ++c)
+            mBandpass.at<f32>(r, c) = BandpassREquation(r, c);
       }
       break;
     }
 
     CalculateFrequencyBandpass();
   }
-  float LowpassEquation(int row, int col) const
+  f32 LowpassEquation(i32 row, i32 col) const
   {
     return exp(-1.0 / (2. * std::pow(mBandpassH, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
-  float HighpassEquation(int row, int col) const
+  f32 HighpassEquation(i32 row, i32 col) const
   {
     return 1.0 - exp(-1.0 / (2. * std::pow(mBandpassL, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
-  float BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
-  float BandpassREquation(int row, int col) const
+  f32 BandpassGEquation(i32 row, i32 col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
+  f32 BandpassREquation(i32 row, i32 col) const
   {
-    double r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
+    f64 r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
     return (mBandpassL <= r and r <= mBandpassH) ? 1 : 0;
   }
   void ConvertToUnitFloat(cv::Mat& image) const
@@ -912,9 +912,9 @@ private:
     {
       cv::Mat cps;
       mulSpectrums(dft2, dft1, cps, 0, true);
-      for (int row = 0; row < cps.rows; ++row)
+      for (i32 row = 0; row < cps.rows; ++row)
       {
-        for (int col = 0; col < cps.cols; ++col)
+        for (i32 col = 0; col < cps.cols; ++col)
         {
           // for CCS packed FFT the cps vector is real, not complex
           // calculating magnitude & dividing is non-trivial
@@ -924,15 +924,15 @@ private:
       return cps;
     }
 
-    for (int row = 0; row < dft1.rows; ++row)
+    for (i32 row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec2f>(row);
       auto dft2p = dft2.ptr<cv::Vec2f>(row);
-      for (int col = 0; col < dft1.cols; ++col)
+      for (i32 col = 0; col < dft1.cols; ++col)
       {
-        const float re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
-        const float im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
-        const float mag = sqrt(re * re + im * im);
+        const f32 re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
+        const f32 im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
+        const f32 mag = sqrt(re * re + im * im);
 
         if constexpr (CrossCorrelation)
         {
@@ -988,14 +988,14 @@ private:
   }
   cv::Point2f GetPeakSubpixel(const cv::Mat& mat) const
   {
-    double M = 0;
-    double My = 0;
-    double Mx = 0;
+    f64 M = 0;
+    f64 My = 0;
+    f64 Mx = 0;
 
-    for (int r = 0; r < mat.rows; ++r)
+    for (i32 r = 0; r < mat.rows; ++r)
     {
-      auto matp = mat.ptr<float>(r);
-      for (int c = 0; c < mat.cols; ++c)
+      auto matp = mat.ptr<f32>(r);
+      for (i32 c = 0; c < mat.cols; ++c)
       {
         M += matp[c];
         My += matp[c] * r;
@@ -1010,7 +1010,7 @@ private:
 
     return result;
   }
-  cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, int L2size) const { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
+  cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size) const { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
     cv::Mat L2U;
@@ -1031,27 +1031,27 @@ private:
 
     return L2U;
   }
-  int GetL1size(const cv::Mat& L2U, double L1ratio) const
+  i32 GetL1size(const cv::Mat& L2U, f64 L1ratio) const
   {
-    int L1size = std::floor(L1ratio * L2U.cols);
+    i32 L1size = std::floor(L1ratio * L2U.cols);
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, int L1size) const { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
-  bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, int size) const { return IsOutOfBounds(peak, mat, {size, size}); }
+  cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) const { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+  bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) const { return IsOutOfBounds(peak, mat, {size, size}); }
   bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size) const
   {
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
   bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) const { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
-  bool ReduceL2size(int& L2size) const
+  bool ReduceL2size(i32& L2size) const
   {
     L2size -= 2;
     if constexpr (DebugMode)
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
-  void ReduceL1ratio(double& L1ratio) const
+  void ReduceL1ratio(f64& L1ratio) const
   {
     L1ratio -= mL1ratioStep;
     if constexpr (DebugMode)
@@ -1062,20 +1062,20 @@ private:
     const cv::Vec3f img1clr = {1, 0.5, 0};
     const cv::Vec3f img2clr = {0, 0.5, 1};
 
-    const float gamma1 = 1.0;
-    const float gamma2 = 1.0;
+    const f32 gamma1 = 1.0;
+    const f32 gamma2 = 1.0;
 
     cv::Mat img1c = cv::Mat::zeros(img1.size(), CV_32FC3);
     cv::Mat img2c = cv::Mat::zeros(img2.size(), CV_32FC3);
 
-    for (int row = 0; row < img1.rows; ++row)
+    for (i32 row = 0; row < img1.rows; ++row)
     {
-      auto img1p = img1.ptr<float>(row);
-      auto img2p = img2.ptr<float>(row);
+      auto img1p = img1.ptr<f32>(row);
+      auto img2p = img2.ptr<f32>(row);
       auto img1cp = img1c.ptr<cv::Vec3f>(row);
       auto img2cp = img2c.ptr<cv::Vec3f>(row);
 
-      for (int col = 0; col < img1.cols; ++col)
+      for (i32 col = 0; col < img1.cols; ++col)
       {
         img1cp[col][0] = pow(img1clr[2] * img1p[col], 1. / gamma1);
         img1cp[col][1] = pow(img1clr[1] * img1p[col], 1. / gamma1);
@@ -1129,7 +1129,7 @@ private:
       }
 
       // crop the input image - good for solar images, omits the black borders
-      static constexpr float cropFocusRatio = 0.5;
+      static constexpr f32 cropFocusRatio = 0.5;
       auto image = loadImage(path);
       image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
       images.push_back(image);
@@ -1138,7 +1138,7 @@ private:
     }
     return images;
   }
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, double maxShift, int itersPerImage, double noiseStdev) const
+  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
   {
     for (const auto& image : images)
     {
@@ -1152,12 +1152,12 @@ private:
 
     for (const auto& image : images)
     {
-      for (int i = 0; i < itersPerImage; ++i)
+      for (i32 i = 0; i < itersPerImage; ++i)
       {
         // random shift from a random point
         cv::Point2f shift(rand11() * maxShift, rand11() * maxShift);
         cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
-        cv::Mat T = (cv::Mat_<float>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+        cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
         cv::Mat imageShifted;
         warpAffine(image, imageShifted, T, image.size());
         cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
@@ -1181,7 +1181,7 @@ private:
     }
     return imagePairs;
   }
-  void AddNoise(cv::Mat& image, double noiseStdev) const
+  void AddNoise(cv::Mat& image, f64 noiseStdev) const
   {
     if (noiseStdev <= 0)
       return;
@@ -1190,22 +1190,22 @@ private:
     randn(noise, 0, noiseStdev);
     image += noise;
   }
-  const std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
+  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
   {
-    return [&](const std::vector<double>& params)
+    return [&](const std::vector<f64>& params)
     {
       IterativePhaseCorrelation ipc(mRows, mCols);
-      ipc.SetBandpassType(static_cast<BandpassType>((int)params[BandpassTypeParameter]));
+      ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
       ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
-      ipc.SetInterpolationType(static_cast<InterpolationType>((int)params[InterpolationTypeParameter]));
-      ipc.SetWindowType(static_cast<WindowType>((int)params[WindowTypeParameter]));
+      ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
+      ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
       ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
       ipc.SetL1ratio(params[L1ratioParameter]);
 
       if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
-        return std::numeric_limits<double>::max();
+        return std::numeric_limits<f64>::max();
 
-      double avgerror = 0;
+      f64 avgerror = 0;
       for (const auto& [image1, image2, shift] : imagePairs)
       {
         const auto error = ipc.Calculate(image1, image2) - shift;
@@ -1214,8 +1214,7 @@ private:
       return imagePairs.size() > 0 ? avgerror / imagePairs.size() : 0.0f;
     };
   }
-  std::vector<double> CalculateOptimalParameters(
-      const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int populationSize, bool mute) const
+  std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute) const
   {
     Evolution evo(ParameterCount);
     evo.mNP = populationSize;
@@ -1227,31 +1226,31 @@ private:
     evo.SetConsoleOutput(!mute);
     return evo.Optimize(obj, valid).optimum;
   }
-  void ApplyOptimalParameters(const std::vector<double>& optimalParameters, bool mute)
+  void ApplyOptimalParameters(const std::vector<f64>& optimalParameters, bool mute)
   {
     if (optimalParameters.size() != ParameterCount)
       throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
-    SetBandpassType(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]));
+    SetBandpassType(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
     SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
-    SetInterpolationType(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter]));
-    SetWindowType(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter]));
+    SetInterpolationType(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter]));
+    SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
     SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
     SetL1ratio(optimalParameters[L1ratioParameter]);
 
     if (!mute)
     {
       LOG_INFO("Final IPC BandpassType: {}",
-          BandpassType2String(static_cast<BandpassType>((int)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
+          BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
       LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
       LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
-      LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((int)optimalParameters[InterpolationTypeParameter])));
-      LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((int)optimalParameters[WindowTypeParameter])));
-      LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<int>(optimalParameters[UpsampleCoeffParameter]));
+      LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter])));
+      LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
+      LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
       LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
     }
   }
-  std::string BandpassType2String(BandpassType type, double bandpassL, double bandpassH) const
+  std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const
   {
     switch (type)
     {
@@ -1310,13 +1309,13 @@ private:
   void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
       const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter) const
   {
-    std::vector<double> shiftsXReference, shiftsXReferenceError;
-    std::vector<double> shiftsXPixel, shiftsXPixelError;
-    std::vector<double> shiftsXNonit, shiftsXNonitError;
-    std::vector<double> shiftsXBefore, shiftsXBeforeError;
-    std::vector<double> shiftsXAfter, shiftsXAfterError;
+    std::vector<f64> shiftsXReference, shiftsXReferenceError;
+    std::vector<f64> shiftsXPixel, shiftsXPixelError;
+    std::vector<f64> shiftsXNonit, shiftsXNonitError;
+    std::vector<f64> shiftsXBefore, shiftsXBeforeError;
+    std::vector<f64> shiftsXAfter, shiftsXAfterError;
 
-    for (size_t i = 0; i < shiftsReference.size(); ++i)
+    for (usize i = 0; i < shiftsReference.size(); ++i)
     {
       const auto& referenceShift = shiftsReference[i];
       const auto& shiftPixel = shiftsPixel[i];
@@ -1405,13 +1404,13 @@ private:
 
     return out;
   }
-  double GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts) const
+  f64 GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts) const
   {
     if (shiftsReference.size() != shifts.size())
       throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
 
-    double avgerror = 0;
-    for (size_t i = 0; i < shifts.size(); ++i)
+    f64 avgerror = 0;
+    for (usize i = 0; i < shifts.size(); ++i)
     {
       const auto error = shifts[i] - shiftsReference[i];
       avgerror += sqrt(error.x * error.x + error.y * error.y);
@@ -1420,12 +1419,12 @@ private:
   }
   void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs)
   {
-    const auto& [img1, img2, shift] = imagePairs[static_cast<size_t>(rand01() * imagePairs.size())];
+    const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(rand01() * imagePairs.size())];
     cv::Mat concat;
     hconcat(img1, img2, concat);
     Plot2D::Set("Random image pair");
     Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
     Plot2D::Plot("Random image pair", concat);
   }
-  static double GetFractionalPart(double x) { return abs(x - std::floor(x)); }
+  static f64 GetFractionalPart(f64 x) { return abs(x - std::floor(x)); }
 };

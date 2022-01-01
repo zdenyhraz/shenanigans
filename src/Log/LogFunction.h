@@ -19,20 +19,20 @@ public:
   }
 
 private:
-  static std::string FormatDuration(long long durationms)
+  static std::string FormatDuration(i64 durationms)
   {
-    static constexpr long long kSecondMs = 1000;
-    static constexpr long long kMinuteMs = kSecondMs * 60;
-    static constexpr long long kHourMs = kMinuteMs * 60;
+    static constexpr i64 kSecondMs = 1000;
+    static constexpr i64 kMinuteMs = kSecondMs * 60;
+    static constexpr i64 kHourMs = kMinuteMs * 60;
 
     if (durationms < kSecondMs)
       return fmt::format("{} ms", durationms);
     else if (durationms < kMinuteMs)
-      return fmt::format("{:.2f} s", (double)durationms / kSecondMs);
+      return fmt::format("{:.2f} s", (f64)durationms / kSecondMs);
     else if (durationms < kHourMs)
-      return fmt::format("{:.2f} m", (double)durationms / kMinuteMs);
+      return fmt::format("{:.2f} m", (f64)durationms / kMinuteMs);
     else
-      return fmt::format("{:.2f} h", (double)durationms / kHourMs);
+      return fmt::format("{:.2f} h", (f64)durationms / kHourMs);
   }
 
   std::string mFunName;

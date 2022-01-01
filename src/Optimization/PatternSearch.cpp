@@ -4,51 +4,51 @@
 OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
-  std::vector<double> boundsRange = mUB - mLB;
-  double initialStep = vectorMax(boundsRange) / 4;
+  std::vector<f64> boundsRange = mUB - mLB;
+  f64 initialStep = vectorMax(boundsRange) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
-  std::vector<double> topPoint = zerovect(N, 0.);
-  double topPointFitness = std::numeric_limits<double>::max();
+  std::vector<f64> topPoint = zerovect(N, 0.);
+  f64 topPointFitness = std::numeric_limits<f64>::max();
   // generate all starting points
-  std::vector<std::vector<double>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
-  for (int run = 0; run < multistartMaxCnt; run++)
-    for (size_t indexParam = 0; indexParam < N; indexParam++)
+  std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
+  for (i32 run = 0; run < multistartMaxCnt; run++)
+    for (usize indexParam = 0; indexParam < N; indexParam++)
       mainPointsInitial[run][indexParam] = randr(mLB[indexParam], mUB[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
-  size_t funEvals = 0;
+  usize funEvals = 0;
 #pragma omp parallel for shared(flag)
-  for (int run = 0; run < multistartMaxCnt; run++)
+  for (i32 run = 0; run < multistartMaxCnt; run++)
   {
     if (flag)
       continue;
 
-    size_t funEvalsThisRun = 0;
+    usize funEvalsThisRun = 0;
     // initialize vectors
-    double step = initialStep;
-    std::vector<double> mainPoint = mainPointsInitial[run];
-    double mainPointFitness = obj(mainPoint);
-    std::vector<std::vector<std::vector<double>>> pattern;                                               // N-2-N (N pairs of N-dimensional points)
-    std::vector<std::vector<double>> patternFitness(N, zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
+    f64 step = initialStep;
+    std::vector<f64> mainPoint = mainPointsInitial[run];
+    f64 mainPointFitness = obj(mainPoint);
+    std::vector<std::vector<std::vector<f64>>> pattern;                                            // N-2-N (N pairs of N-dimensional points)
+    std::vector<std::vector<f64>> patternFitness(N, zerovect(2, std::numeric_limits<f64>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
 
-    for (size_t dim = 0; dim < N; dim++)
+    for (usize dim = 0; dim < N; dim++)
     {
       pattern[dim].resize(2);
-      for (int pm = 0; pm < 2; pm++)
+      for (i32 pm = 0; pm < 2; pm++)
         pattern[dim][pm].resize(N);
     }
 
     // main search cycle
-    for (size_t generation = 1; generation < 1e8; generation++)
+    for (usize generation = 1; generation < 1e8; generation++)
     {
       bool smallerStep = true;
       // asign values to pattern vertices - exploration
-      for (size_t dim = 0; dim < N; dim++)
+      for (usize dim = 0; dim < N; dim++)
       {
-        for (int pm = 0; pm < 2; pm++)
+        for (i32 pm = 0; pm < 2; pm++)
         {
           pattern[dim][pm] = mainPoint;
           pattern[dim][pm][dim] += pm == 0 ? step : -step;
@@ -67,10 +67,10 @@ OptimizationAlgorithm_::OptimizationResult PatternSearch::Optimize(ObjectiveFunc
             // LOG_DEBUG  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
             if (maxExploitCnt > 0)
             {
-              double testPointFitness = mainPointFitness;
-              for (int exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
+              f64 testPointFitness = mainPointFitness;
+              for (i32 exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
               {
-                std::vector<double> testPoint = mainPoint;
+                std::vector<f64> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
                 testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
                 testPointFitness = obj(testPoint);

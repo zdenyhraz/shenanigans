@@ -22,11 +22,11 @@ void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filenam
 
   cv::FileStorage fs(path, cv::FileStorage::WRITE);
 
-  std::vector<std::vector<double>> SourceThetas;
-  std::vector<std::vector<double>> SourceShiftsX;
-  std::vector<std::vector<double>> SourceShiftsY;
-  std::vector<std::vector<double>> SourceOmegasX;
-  std::vector<std::vector<double>> SourceOmegasY;
+  std::vector<std::vector<f64>> SourceThetas;
+  std::vector<std::vector<f64>> SourceShiftsX;
+  std::vector<std::vector<f64>> SourceShiftsY;
+  std::vector<std::vector<f64>> SourceOmegasX;
+  std::vector<std::vector<f64>> SourceOmegasY;
   dr->GetVecs2D(SourceThetas, SourceShiftsX, SourceShiftsY, SourceOmegasX, SourceOmegasY);
   fs << "SourceThetas" << SourceThetas;
   fs << "SourceShiftsX" << SourceShiftsX;
@@ -34,8 +34,8 @@ void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filenam
   fs << "SourceOmegasX" << SourceOmegasX;
   fs << "SourceOmegasY" << SourceOmegasY;
 
-  int SourcePics;
-  int SourceStride;
+  i32 SourcePics;
+  i32 SourceStride;
   dr->GetParams(SourcePics, SourceStride);
   fs << "SourcePics" << SourcePics;
   fs << "SourceStride" << SourceStride;
@@ -60,11 +60,11 @@ void LoadDiffrotResultsFromFile(const std::string& path, DiffrotResults* dr)
 
   cv::FileStorage fs(path, cv::FileStorage::READ);
 
-  std::vector<std::vector<double>> SourceThetas;
-  std::vector<std::vector<double>> SourceShiftsX;
-  std::vector<std::vector<double>> SourceShiftsY;
-  std::vector<std::vector<double>> SourceOmegasX;
-  std::vector<std::vector<double>> SourceOmegasY;
+  std::vector<std::vector<f64>> SourceThetas;
+  std::vector<std::vector<f64>> SourceShiftsX;
+  std::vector<std::vector<f64>> SourceShiftsY;
+  std::vector<std::vector<f64>> SourceOmegasX;
+  std::vector<std::vector<f64>> SourceOmegasY;
   fs["SourceThetas"] >> SourceThetas;
   fs["SourceShiftsX"] >> SourceShiftsX;
   fs["SourceShiftsY"] >> SourceShiftsY;
@@ -72,14 +72,14 @@ void LoadDiffrotResultsFromFile(const std::string& path, DiffrotResults* dr)
   fs["SourceOmegasY"] >> SourceOmegasY;
   dr->SetVecs2DRaw(SourceThetas, SourceShiftsX, SourceShiftsY, SourceOmegasX, SourceOmegasY);
 
-  int SourcePics;
-  int SourceStride;
+  i32 SourcePics;
+  i32 SourceStride;
   fs["SourcePics"] >> SourcePics;
   fs["SourceStride"] >> SourceStride;
   dr->SetParamsRaw(SourcePics, SourceStride);
 
-  double L, H;
-  int winsize, L2size;
+  f64 L, H;
+  i32 winsize, L2size;
   // bool applyWindow, applyBandpass;
   fs["BandpassL"] >> L;
   fs["BandpassH"] >> H;
@@ -95,7 +95,7 @@ void LoadDiffrotResultsFromFile(const std::string& path, DiffrotResults* dr)
     LOG_DEBUG("IPC parameters not specified");
 
   if (winsize)
-    LOG_DEBUG("IPC parameters = {}", std::vector<double>{L, H, (double)L2size, 0, 0, (double)winsize});
+    LOG_DEBUG("IPC parameters = {}", std::vector<f64>{L, H, (f64)L2size, 0, 0, (f64)winsize});
 
   dr->calculated = true;
 }

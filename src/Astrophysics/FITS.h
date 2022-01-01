@@ -6,8 +6,8 @@
 #include "Draw/showsave.h"
 
 //.fits parameters
-constexpr int lineBytes = 80;
-constexpr int linesMultiplier = 36;
+constexpr i32 lineBytes = 80;
+constexpr i32 linesMultiplier = 36;
 enum class fitsType : char
 {
   HMI,
@@ -17,17 +17,17 @@ enum class fitsType : char
 
 struct FitsParams
 {
-  double fitsMidX = 0;
-  double fitsMidY = 0;
-  double R = 0;
-  double theta0 = 0;
+  f64 fitsMidX = 0;
+  f64 fitsMidY = 0;
+  f64 R = 0;
+  f64 theta0 = 0;
   bool succload = false;
   bool succParamCorrection = false;
 };
 
 inline void swapbytes(char* input, unsigned length)
 {
-  for (size_t i = 0; i < length; i += 2)
+  for (usize i = 0; i < length; i += 2)
   {
     char temp = std::move(input[i]);
     input[i] = std::move(input[i + 1]);
@@ -65,9 +65,9 @@ private:
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];
-      int fitsSize = 4096, fitsMid = 4096 / 2, fitsSize2 = fitsSize * fitsSize;
-      int linecnt = 0;
-      double pixelarcsec = 1;
+      i32 fitsSize = 4096, fitsMid = 4096 / 2, fitsSize2 = fitsSize * fitsSize;
+      i32 linecnt = 0;
+      f64 pixelarcsec = 1;
 
       while (!streamIN.eof())
       {
@@ -77,7 +77,7 @@ private:
 
         if (sline.find("NAXIS1") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           fitsSize = stoi(snum);
           fitsMid = fitsSize / 2;
@@ -85,31 +85,31 @@ private:
         }
         else if (sline.find("CRPIX1") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           params.fitsMidX = stod(snum) - 1.; // Nasa index od 1
         }
         else if (sline.find("CRPIX2") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           params.fitsMidY = stod(snum) - 1.; // Nasa index od 1
         }
         else if (sline.find("CDELT1") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           pixelarcsec = stod(snum);
         }
         else if (sline.find("RSUN_OBS") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           params.R = stod(snum);
         }
         else if (sline.find("CRLT_OBS") != std::string::npos)
         {
-          std::size_t pos = sline.find("= ");
+          usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
           params.theta0 = stod(snum) / (360. / 2. / Constants::Pi);
         }
@@ -155,7 +155,7 @@ private:
         // fits
         {
           cv::Point2f center(params.fitsMidX, params.fitsMidY);
-          double radius = params.R;
+          f64 radius = params.R;
           cv::Scalar color(0, 0, 65535);
 
           // draw the circle center
@@ -175,7 +175,7 @@ private:
           HoughCircles(img, circlesHough, cv::HOUGH_GRADIENT, 0.2, img.rows, 200, 100, 1900, 2000);
 
           cv::Point2f center(circlesHough[0][0], circlesHough[0][1]);
-          double radius = circlesHough[0][2];
+          f64 radius = circlesHough[0][2];
           cv::Scalar color(0, 65535, 0);
 
           // draw the circle center
@@ -195,7 +195,7 @@ private:
           findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
           cv::Point2f center;
-          float radius;
+          f32 radius;
           cv::Scalar color(65535, 0, 65535);
           minEnclosingCircle(contours[0], center, radius);
 
@@ -234,7 +234,7 @@ private:
 
         // circle
         cv::Point2f center;
-        float radius;
+        f32 radius;
         minEnclosingCircle(contours[0], center, radius);
 
         // only save valid parameters
@@ -259,19 +259,19 @@ private:
 struct FitsTime
 {
 private:
-  int startyear;
-  int startmonth;
-  int startday;
-  int starthour;
-  int startminute;
-  int startsecond;
+  i32 startyear;
+  i32 startmonth;
+  i32 startday;
+  i32 starthour;
+  i32 startminute;
+  i32 startsecond;
 
-  int year;
-  int month;
-  int day;
-  int hour;
-  int minute;
-  int second;
+  i32 year;
+  i32 month;
+  i32 day;
+  i32 hour;
+  i32 minute;
+  i32 second;
 
   std::string dirpath;
 
@@ -342,7 +342,7 @@ public:
     second = startsecond;
   }
 
-  FitsTime(std::string dirpathh, int yearr, int monthh, int dayy, int hourr, int minutee, int secondd)
+  FitsTime(std::string dirpathh, i32 yearr, i32 monthh, i32 dayy, i32 hourr, i32 minutee, i32 secondd)
   {
     dirpath = dirpathh;
     startyear = yearr;
@@ -362,10 +362,10 @@ public:
     return dirpath + yearS + "_" + monthS + "_" + dayS + "__" + hourS + "_" + minuteS + "_" + secondS + "__CONT.fits";
   }
 
-  void advanceTime(int deltasec)
+  void advanceTime(i32 deltasec)
   {
     second += deltasec;
-    int monthdays;
+    i32 monthdays;
     if (month <= 7) // first seven months
     {
       if (month % 2 == 0)
@@ -388,43 +388,43 @@ public:
     // plus
     if (second >= 60)
     {
-      minute += std::floor((double)second / 60.0);
+      minute += std::floor((f64)second / 60.0);
       second %= 60;
     }
     if (minute >= 60)
     {
-      hour += std::floor((double)minute / 60.0);
+      hour += std::floor((f64)minute / 60.0);
       minute %= 60;
     }
     if (hour >= 24)
     {
-      day += std::floor((double)hour / 24.0);
+      day += std::floor((f64)hour / 24.0);
       hour %= 24;
     }
     if (day >= monthdays)
     {
-      month += std::floor((double)day / monthdays);
+      month += std::floor((f64)day / monthdays);
       day %= monthdays;
     }
     // minus
     if (second < 0)
     {
-      minute += std::floor((double)second / 60.0);
+      minute += std::floor((f64)second / 60.0);
       second = 60 + second % 60;
     }
     if (minute < 0)
     {
-      hour += std::floor((double)minute / 60.0);
+      hour += std::floor((f64)minute / 60.0);
       minute = 60 + minute % 60;
     }
     if (hour < 0)
     {
-      day += std::floor((double)hour / 24.0);
+      day += std::floor((f64)hour / 24.0);
       hour = 24 + hour % 24;
     }
     if (day < 0)
     {
-      month += std::floor((double)day / monthdays);
+      month += std::floor((f64)day / monthdays);
       day = monthdays + day % monthdays;
     }
   }
@@ -432,13 +432,13 @@ public:
 
 cv::Mat loadfits(std::string path, FitsParams& params);
 
-void generateFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain);
+void generateFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain);
 
-void generateFitsDownloadUrlSingles(int delta, int pics, std::string urlmain);
+void generateFitsDownloadUrlSingles(i32 delta, i32 pics, std::string urlmain);
 
-void checkFitsDownloadUrlPairs(int delta, int step, int pics, std::string urlmain, std::string pathMasterIn);
+void checkFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain, std::string pathMasterIn);
 
-void loadImageDebug(cv::Mat& activeimg, double gamaa, bool colorr, double quanBot, double quanTop);
+void loadImageDebug(cv::Mat& activeimg, f64 gamaa, bool colorr, f64 quanBot, f64 quanTop);
 
 inline cv::Mat loadImage(std::string path)
 {

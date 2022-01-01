@@ -2,13 +2,13 @@
 #include "Draw/showsave.h"
 #include "fractal.h"
 
-void mouseEventFractal(int event, int x, int y, int flags, void* ptr)
+void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr)
 {
   if (event == cv::EVENT_LBUTTONDOWN)
   {
     Fractalset* set = (Fractalset*)ptr;
-    set->fractalCenter.x = ((double)x / set->fractalWidth) * (set->xmax - set->xmin) + set->xmin;
-    set->fractalCenter.y = -((double)y / set->fractalHeight) * (set->ymax - set->ymin) + set->ymax;
+    set->fractalCenter.x = ((f64)x / set->fractalWidth) * (set->xmax - set->xmin) + set->xmin;
+    set->fractalCenter.y = -((f64)y / set->fractalHeight) * (set->ymax - set->ymin) + set->ymax;
     set->computeDependent();
     computeFractal(*set);
   }
@@ -19,19 +19,19 @@ cv::Mat computeFractal(Fractalset& fractalset)
   using namespace std::complex_literals;
 
   cv::Mat Fractal = cv::Mat::zeros(fractalset.fractalHeight, fractalset.fractalWidth, CV_32F);
-  std::complex<double> startZ = 0. + 0.i;
+  std::complex<f64> startZ = 0. + 0.i;
   std::cout << "Computing Fractal...";
 #pragma omp parallel for
-  for (int r = 0; r < fractalset.fractalHeight; r++)
+  for (i32 r = 0; r < fractalset.fractalHeight; r++)
   {
-    for (int c = 0; c < fractalset.fractalWidth; c++)
+    for (i32 c = 0; c < fractalset.fractalWidth; c++)
     {
-      std::complex<double> C = (double)c / (fractalset.fractalWidth) * (fractalset.xmax - fractalset.xmin) + fractalset.xmin +
-                               1.i * (-(double)r / (fractalset.fractalHeight) * (fractalset.ymax - fractalset.ymin) + fractalset.ymax);
-      std::complex<double> Z = startZ;
-      double M = 0.;
-      int finaliter = 0;
-      for (int iter = 0; iter < fractalset.maxiter; iter++)
+      std::complex<f64> C = (f64)c / (fractalset.fractalWidth) * (fractalset.xmax - fractalset.xmin) + fractalset.xmin +
+                            1.i * (-(f64)r / (fractalset.fractalHeight) * (fractalset.ymax - fractalset.ymin) + fractalset.ymax);
+      std::complex<f64> Z = startZ;
+      f64 M = 0.;
+      i32 finaliter = 0;
+      for (i32 iter = 0; iter < fractalset.maxiter; iter++)
       {
         finaliter++;
         Z = pow(Z, 2) + C; // mandel
@@ -42,11 +42,11 @@ cv::Mat computeFractal(Fractalset& fractalset)
         if (M > fractalset.magnTresh)
           break;
       }
-      Fractal.at<float>(r, c) = (double)finaliter;
+      Fractal.at<f32>(r, c) = (f64)finaliter;
     }
   }
 
-  for (int logiter = 0; logiter < fractalset.sliderLog; logiter++)
+  for (i32 logiter = 0; logiter < fractalset.sliderLog; logiter++)
   {
     Fractal += cv::Scalar::all(1.);
     log(Fractal, Fractal);

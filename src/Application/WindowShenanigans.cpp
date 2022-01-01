@@ -194,9 +194,9 @@ try
   if (0) // fourier inverse coeff test
   {
     cv::Mat fun = cv::Mat::zeros(4, 4, CV_32F);
-    for (int r = 0; r < fun.rows; ++r)
-      for (int c = 0; c < fun.cols; ++c)
-        fun.at<float>(r, c) = r + c;
+    for (i32 r = 0; r < fun.rows; ++r)
+      for (i32 c = 0; c < fun.cols; ++c)
+        fun.at<f32>(r, c) = r + c;
 
     cv::Mat fft = Fourier::fft(fun);
     cv::Mat ifft = Fourier::ifft(fft);
@@ -211,12 +211,12 @@ try
     cv::Mat haarX(1000, 1000, CV_32F);
     cv::Mat haarY(1000, 1000, CV_32F);
 
-    for (int r = 0; r < haarX.rows; ++r)
+    for (i32 r = 0; r < haarX.rows; ++r)
     {
-      for (int c = 0; c < haarX.cols; ++c)
+      for (i32 c = 0; c < haarX.cols; ++c)
       {
-        haarX.at<float>(r, c) = c > haarX.cols / 2 ? 1 : -1;
-        haarY.at<float>(r, c) = r > haarY.rows / 2 ? 1 : -1;
+        haarX.at<f32>(r, c) = c > haarX.cols / 2 ? 1 : -1;
+        haarY.at<f32>(r, c) = r > haarY.rows / 2 ? 1 : -1;
       }
     }
 
@@ -232,11 +232,11 @@ try
   }
   if (0) // ellipse fit optimization
   {
-    const double imgsize = 1000;
-    const double border = 500;
+    const f64 imgsize = 1000;
+    const f64 border = 500;
     cv::Point2f ellipseCenter;
     cv::Size ellipseSize;
-    float ellipseAngle;
+    f32 ellipseAngle;
     cv::Mat ellipseImg;
 
     do
@@ -248,11 +248,11 @@ try
       ellipse(ellipseImg, cv::RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), cv::Scalar(1), -1, cv::LINE_AA);
     } while (sum(ellipseImg)[0] < 1000);
 
-    const auto f = [&](const std::vector<double>& params)
+    const auto f = [&](const std::vector<f64>& params)
     {
       cv::Point2f center(params[0], params[1]);
       cv::Size size(params[2], params[3]);
-      float angle = params[4];
+      f32 angle = params[4];
       cv::Mat img = cv::Mat::zeros(imgsize, imgsize, CV_32F);
       ellipse(img, cv::RotatedRect(center, size, angle), cv::Scalar(1), -1, cv::LINE_AA);
       auto imgDiff = cv::sum(cv::abs(img - ellipseImg))[0] / sum(ellipseImg)[0];
@@ -261,7 +261,7 @@ try
       cenDiff.x = std::abs(cenDiff.x) / img.cols;
       cenDiff.y = std::abs(cenDiff.y) / img.rows;
       const auto cost = imgDiff + cenDiff.x + cenDiff.y + sumDiff;
-      return std::isfinite(cost) ? cost : std::numeric_limits<float>::max();
+      return std::isfinite(cost) ? cost : std::numeric_limits<f32>::max();
     };
 
     Evolution evo(5);
@@ -281,7 +281,7 @@ try
 
     const cv::Point2f calcCenter(res[0], res[1]);
     const cv::Size calcSize(res[2], res[3]);
-    const float calcAngle = res[4];
+    const f32 calcAngle = res[4];
 
     cv::Mat ellipseImgCalculated = cv::Mat::zeros(imgsize, imgsize, CV_32F);
     ellipse(ellipseImgCalculated, cv::RotatedRect(calcCenter, calcSize, calcAngle), cv::Scalar(1), -1, cv::LINE_AA);
@@ -299,13 +299,13 @@ try
         abs(ellipseSize.height - calcSize.height), abs(ellipseAngle - calcAngle));
 
     cv::Mat ellipseImgColor = cv::Mat::zeros(imgsize, imgsize, CV_32FC3);
-    for (int r = 0; r < ellipseImgColor.rows; ++r)
+    for (i32 r = 0; r < ellipseImgColor.rows; ++r)
     {
-      for (int c = 0; c < ellipseImgColor.cols; ++c)
+      for (i32 c = 0; c < ellipseImgColor.cols; ++c)
       {
-        ellipseImgColor.at<cv::Vec3f>(r, c)[0] = ellipseImg.at<float>(r, c);
-        ellipseImgColor.at<cv::Vec3f>(r, c)[1] = ellipseImg.at<float>(r, c);
-        ellipseImgColor.at<cv::Vec3f>(r, c)[2] = ellipseImg.at<float>(r, c);
+        ellipseImgColor.at<cv::Vec3f>(r, c)[0] = ellipseImg.at<f32>(r, c);
+        ellipseImgColor.at<cv::Vec3f>(r, c)[1] = ellipseImg.at<f32>(r, c);
+        ellipseImgColor.at<cv::Vec3f>(r, c)[2] = ellipseImg.at<f32>(r, c);
       }
     }
 
@@ -318,7 +318,7 @@ try
   }
   if (0) // ellipse fit least squares
   {
-    const int size = 100;
+    const i32 size = 100;
     cv::Point2d center(50, 50);
     std::vector<cv::Point2d> points;
     points.push_back({center.x + 10.1, center.y - 0.4});
@@ -326,55 +326,55 @@ try
     points.push_back({center.x + 0.2, center.y - 10.3});
     points.push_back({center.x + -7.1, center.y - 7.3});
 
-    const size_t pointsCount = points.size();
+    const usize pointsCount = points.size();
     cv::Mat img = cv::Mat::zeros(size, size, CV_32F);
 
     for (const auto& point : points)
-      img.at<float>(point.y, point.x) = 1;
+      img.at<f32>(point.y, point.x) = 1;
 
     cv::Mat X(pointsCount, 5, CV_32F);
     cv::Mat Y(pointsCount, 1, CV_32F);
 
-    for (int r = 0; r < X.rows; ++r)
+    for (i32 r = 0; r < X.rows; ++r)
     {
       const auto& pt = points[r];
 
-      for (int c = 0; c < X.cols; ++c)
+      for (i32 c = 0; c < X.cols; ++c)
       {
         if (c == 0)
-          X.at<float>(r, c) = pt.x * pt.y;
+          X.at<f32>(r, c) = pt.x * pt.y;
         else if (c == 1)
-          X.at<float>(r, c) = sqr(pt.y);
+          X.at<f32>(r, c) = sqr(pt.y);
         else if (c == 2)
-          X.at<float>(r, c) = pt.x;
+          X.at<f32>(r, c) = pt.x;
         else if (c == 3)
-          X.at<float>(r, c) = pt.y;
+          X.at<f32>(r, c) = pt.y;
         else if (c == 4)
-          X.at<float>(r, c) = 1;
+          X.at<f32>(r, c) = 1;
       }
-      Y.at<float>(r, 0) = -sqr(pt.x);
+      Y.at<f32>(r, 0) = -sqr(pt.x);
     }
 
     cv::Mat Beta = (X.t() * X).inv() * X.t() * Y;
 
-    float A = 1.;
-    float B = Beta.at<float>(0, 0);
-    float C = Beta.at<float>(1, 0);
-    float D = Beta.at<float>(2, 0);
-    float E = Beta.at<float>(3, 0);
+    f32 A = 1.;
+    f32 B = Beta.at<f32>(0, 0);
+    f32 C = Beta.at<f32>(1, 0);
+    f32 D = Beta.at<f32>(2, 0);
+    f32 E = Beta.at<f32>(3, 0);
 
     // math.stackexchange.com/a/423272
-    float R = 0.5 * std::atan2(B, A - C);
-    float Ar = A * sqr(cos(R)) + B * cos(R) * sin(R) + C * sqr(sin(R));
-    float Cr = A * sqr(sin(R)) - B * cos(R) * sin(R) + C * sqr(cos(R));
-    float Dr = D * cos(R) + E * sin(R);
-    float Er = -D * sin(R) + E * cos(R);
+    f32 R = 0.5 * std::atan2(B, A - C);
+    f32 Ar = A * sqr(cos(R)) + B * cos(R) * sin(R) + C * sqr(sin(R));
+    f32 Cr = A * sqr(sin(R)) - B * cos(R) * sin(R) + C * sqr(cos(R));
+    f32 Dr = D * cos(R) + E * sin(R);
+    f32 Er = -D * sin(R) + E * cos(R);
 
-    float centerXr = -Dr / (2. * Ar);
-    float centerYr = -Er / (2. * Cr);
+    f32 centerXr = -Dr / (2. * Ar);
+    f32 centerYr = -Er / (2. * Cr);
 
-    float centerX = centerXr * cos(R) - centerYr * sin(R);
-    float centerY = centerXr * sin(R) + centerYr * cos(R);
+    f32 centerX = centerXr * cos(R) - centerYr * sin(R);
+    f32 centerY = centerXr * sin(R) + centerYr * cos(R);
 
     Plot2D::Set("ellipse fit");
     Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
@@ -386,22 +386,22 @@ try
   }
   if (0) // complexity estimation test
   {
-    const auto f = [](const std::vector<double>& x)
+    const auto f = [](const std::vector<f64>& x)
     {
-      double g = 0;
+      f64 g = 0;
 
-      for (size_t i = 0; i < 1e7; ++i) // constant portion
+      for (usize i = 0; i < 1e7; ++i) // constant portion
         g += i;
 
-      const int scale = 3;
-      for (size_t i = 0; i < scale; ++i) // scale
-        for (const auto& a : x)          // n^2
+      const i32 scale = 3;
+      for (usize i = 0; i < scale; ++i) // scale
+        for (const auto& a : x)         // n^2
           for (const auto& b : x)
             g += a - b;
 
       return g;
     };
-    EstimateComplexity<double, double>(f);
+    EstimateComplexity<f64, f64>(f);
     return;
   }
   if (0) // sasko DFT test
@@ -439,7 +439,7 @@ try
     cv::Mat img1 = loadImage("../articles/swind/source/1/cropped/crop1.png");
     cv::Mat img2 = loadImage("../articles/swind/source/1/cropped/crop2.png");
 
-    int sajz = 0;
+    i32 sajz = 0;
     cv::Size size(sajz, sajz);
     if (sajz > 0 and img1.size() != size)
     {
@@ -450,7 +450,7 @@ try
     bool crop = true;
     if (crop)
     {
-      int cropsize = 128;
+      i32 cropsize = 128;
       img1 = roicrop(img1, img1.cols * 0.6, img1.rows * 0.63, cropsize, cropsize);
       img2 = roicrop(img2, img2.cols * 0.6, img2.rows * 0.63, cropsize, cropsize);
     }
@@ -467,10 +467,10 @@ try
   if (0) // swind crop
   {
     std::string path = "../articles/swind/source/2";
-    int sizeX = 1500;
-    int sizeY = 1000;
+    i32 sizeX = 1500;
+    i32 sizeY = 1000;
 
-    for (size_t i = 0; i < 11; i++)
+    for (usize i = 0; i < 11; i++)
     {
       auto pic = cv::imread(fmt::format("{}/raw/0{}_calib.PNG", path, i + 1), cv::IMREAD_ANYDEPTH);
       pic = roicrop(pic, 0.33 * pic.cols, 0.69 * pic.rows, sizeX, sizeY);
@@ -482,12 +482,12 @@ try
     // silocary @1675/2200
 
     cv::Point cropfocus(2048, 2048);
-    int cropsize = 1.0 * 4096;
+    i32 cropsize = 1.0 * 4096;
 
     cv::Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
     cv::Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
-    int size = cropsize;
+    i32 size = cropsize;
     cv::resize(img1, img1, cv::Size(size, size));
     cv::resize(img2, img2, cv::Size(size, size));
 
@@ -501,20 +501,20 @@ try
   }
   if (0) // dft vs cuda::dft
   {
-    const int minsize = 16;
-    const int maxsize = 512;
-    const int sizeStep = 10;
-    const int iters = (maxsize - minsize + 1) / sizeStep % 2 ? (maxsize - minsize + 1) / sizeStep : (maxsize - minsize + 1) / sizeStep + 1;
-    const int itersPerSize = 100;
+    const i32 minsize = 16;
+    const i32 maxsize = 512;
+    const i32 sizeStep = 10;
+    const i32 iters = (maxsize - minsize + 1) / sizeStep % 2 ? (maxsize - minsize + 1) / sizeStep : (maxsize - minsize + 1) / sizeStep + 1;
+    const i32 itersPerSize = 100;
     cv::Mat img = loadImage("Resources/test.png");
-    std::vector<double> sizes(iters);
-    std::vector<double> timeCpu(iters);
-    std::vector<double> timeGpu(iters);
+    std::vector<f64> sizes(iters);
+    std::vector<f64> timeCpu(iters);
+    std::vector<f64> timeGpu(iters);
     cv::Mat fft = Fourier::cufft(img); // init
 
-    for (size_t i = 0; i < iters; ++i)
+    for (usize i = 0; i < iters; ++i)
     {
-      int size = minsize + (float)i / (iters - 1) * (maxsize - minsize);
+      i32 size = minsize + (f32)i / (iters - 1) * (maxsize - minsize);
       sizes[i] = size;
       LOG_INFO("{} / {} Calculating FFT speeds for image size {}", i + 1, iters, size);
       cv::Mat resized = roicrop(img, img.cols / 2, img.rows / 2, size, size);
@@ -522,21 +522,21 @@ try
       {
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int it = 0; it < itersPerSize; ++it)
+        for (i32 it = 0; it < itersPerSize; ++it)
           cv::Mat fft_ = Fourier::fft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
-        timeCpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
+        timeCpu[i] = (f64)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
       }
 
       {
         auto start = std::chrono::high_resolution_clock::now();
 
-        for (int it = 0; it < itersPerSize; ++it)
+        for (i32 it = 0; it < itersPerSize; ++it)
           cv::Mat fft_ = Fourier::cufft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
-        timeGpu[i] = (double)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
+        timeGpu[i] = (f64)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
       }
     }
 
@@ -621,13 +621,13 @@ try
   if (0) // non maxima suppression
   {
     cv::Mat img = loadImage("Resources/test.png");
-    float scale = 1.0;
+    f32 scale = 1.0;
     cv::resize(img, img, cv::Size(scale * img.cols, scale * img.rows));
     NonMaximaSuppresion(img);
   }
   if (0) // kirkl test
   {
-    for (int i = 5; i < 21; i += 2)
+    for (i32 i = 5; i < 21; i += 2)
     {
       cv::Mat kirklik;
       cv::resize(kirkl(i), kirklik, cv::Size(999, 999), 0, 0, cv::INTER_NEAREST);
@@ -643,18 +643,18 @@ try
     LOG_ERROR("Input string: {}, params regex: {}", str, std::regex_match(str, paramsRegex));
     std::smatch paramsPieces;
     if (std::regex_match(str, paramsPieces, paramsRegex))
-      for (size_t i = 0; i < paramsPieces.size(); ++i)
+      for (usize i = 0; i < paramsPieces.size(); ++i)
         LOG_ERROR("paramsPieces[{}]: {}", i, paramsPieces[i].str());
 
     std::regex flagsRegex(R"(.+IS_([A-Za-z]+)\[=([A-Za-z]+)\];)");
     LOG_ERROR("Input string: {}, flags regex: {}", str, std::regex_match(str, flagsRegex));
     std::smatch flagsPieces;
     if (std::regex_match(str, flagsPieces, flagsRegex))
-      for (size_t i = 0; i < flagsPieces.size(); ++i)
+      for (usize i = 0; i < flagsPieces.size(); ++i)
         LOG_ERROR("flagsPieces[{}]: {}", i, flagsPieces[i].str());
 
     std::regex e(R"(IS_([A-Za-z]+)\[=([A-Za-z]+)\];)");
-    int submatches[] = {1, 2};
+    i32 submatches[] = {1, 2};
     std::regex_token_iterator<std::string::iterator> rend;
     std::regex_token_iterator<std::string::iterator> flagit(str.begin(), str.end(), e, submatches);
     while (flagit != rend)
@@ -666,32 +666,32 @@ try
   }
   if (0) // rectangular and gaussian abndpass equations
   {
-    int rows = 1000;
-    int cols = 1000;
+    i32 rows = 1000;
+    i32 cols = 1000;
 
     cv::Mat bandpassR = cv::Mat::zeros(rows, cols, CV_32F);
     cv::Mat bandpassG = cv::Mat::zeros(rows, cols, CV_32F);
     cv::Mat gaussL = cv::Mat::zeros(rows, cols, CV_32F);
     cv::Mat gaussH = cv::Mat::zeros(rows, cols, CV_32F);
 
-    float fL = 0.2;
-    float fH = 0.8;
+    f32 fL = 0.2;
+    f32 fH = 0.8;
 
-    float sL = 1.0;
-    float sH = 0.01;
+    f32 sL = 1.0;
+    f32 sH = 0.01;
 
-    for (int r = 0; r < rows; ++r)
+    for (i32 r = 0; r < rows; ++r)
     {
-      for (int c = 0; c < cols; ++c)
+      for (i32 c = 0; c < cols; ++c)
       {
-        float R = sqrt(std::pow(((float)c - cols / 2) / (cols / 2), 2) + std::pow(((float)r - rows / 2) / (rows / 2), 2));
-        bandpassR.at<float>(r, c) = (fL <= R and R <= fH) ? 1 : 0;
+        f32 R = sqrt(std::pow(((f32)c - cols / 2) / (cols / 2), 2) + std::pow(((f32)r - rows / 2) / (rows / 2), 2));
+        bandpassR.at<f32>(r, c) = (fL <= R and R <= fH) ? 1 : 0;
 
-        gaussL.at<float>(r, c) = exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
+        gaussL.at<f32>(r, c) = exp(-std::pow(((f32)c - cols / 2) / (cols / 2), 2) * std::pow(sL, 2) - std::pow(((f32)r - rows / 2) / (rows / 2), 2) * std::pow(sL, 2));
 
-        gaussH.at<float>(r, c) = 1.0 - exp(-std::pow(((float)c - cols / 2) / (cols / 2), 2) / std::pow(sH, 2) - std::pow(((float)r - rows / 2) / (rows / 2), 2) / std::pow(sH, 2));
+        gaussH.at<f32>(r, c) = 1.0 - exp(-std::pow(((f32)c - cols / 2) / (cols / 2), 2) / std::pow(sH, 2) - std::pow(((f32)r - rows / 2) / (rows / 2), 2) / std::pow(sH, 2));
 
-        bandpassG.at<float>(r, c) = gaussL.at<float>(r, c) * gaussH.at<float>(r, c);
+        bandpassG.at<f32>(r, c) = gaussL.at<f32>(r, c) * gaussH.at<f32>(r, c);
       }
     }
 
@@ -711,18 +711,18 @@ try
     ref.convertTo(ref, CV_32F);
 
     cv::Mat out = img.clone();
-    int shiftX = 800;
-    int shiftY = 83;
+    i32 shiftX = 800;
+    i32 shiftY = 83;
 
-    auto MyModulo = [](int a, int b) { return a - a / b * b >= 0 ? a - a / b * b : a - a / b * b + b; };
+    auto MyModulo = [](i32 a, i32 b) { return a - a / b * b >= 0 ? a - a / b * b : a - a / b * b + b; };
 
-    for (int r = 0; r < img.rows; ++r)
+    for (i32 r = 0; r < img.rows; ++r)
     {
-      for (int c = 0; c < img.cols; ++c)
+      for (i32 c = 0; c < img.cols; ++c)
       {
-        int srcrow = MyModulo(r - shiftY, img.rows);
-        int srccol = MyModulo(c - shiftX, img.cols);
-        out.at<float>(r, c) = img.at<float>(srcrow, srccol);
+        i32 srcrow = MyModulo(r - shiftY, img.rows);
+        i32 srccol = MyModulo(c - shiftX, img.cols);
+        out.at<f32>(r, c) = img.at<f32>(srcrow, srccol);
       }
     }
 
@@ -757,18 +757,18 @@ try
   }
   if (0) // plot pen colors
   {
-    int ncurves = 30;
-    int ndata = 100;
+    i32 ncurves = 30;
+    i32 ndata = 100;
 
     auto x = zerovect(ndata);
     auto ys = zerovect2(ncurves, ndata);
 
-    for (int d = 0; d < ndata; d++)
+    for (i32 d = 0; d < ndata; d++)
       x[d] = d;
 
-    for (int c = 0; c < ncurves; c++)
-      for (int d = 0; d < ndata; d++)
-        ys[c][d] = sin((double)d / ndata * Constants::TwoPi + (double)c / ncurves * Constants::Pi);
+    for (i32 c = 0; c < ncurves; c++)
+      for (i32 d = 0; d < ndata; d++)
+        ys[c][d] = sin((f64)d / ndata * Constants::TwoPi + (f64)c / ncurves * Constants::Pi);
 
     // Plot1D::Plot(x, ys, "pen colors");
   }
@@ -786,9 +786,9 @@ try
     cv::Mat img1 = loadImage(path1);
     cv::Mat img2 = loadImage(path2);
 
-    double shiftX = 10.3;
-    double shiftY = -7.2;
-    cv::Mat T = (cv::Mat_<float>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
+    f64 shiftX = 10.3;
+    f64 shiftY = -7.2;
+    cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
     warpAffine(img2, img2, T, cv::Size(img2.cols, img2.rows));
 
     IPCsettings set = *globals->IPCset;
@@ -800,68 +800,68 @@ try
   if (0) // Plot1D + Plot2D test
   {
     // 1D
-    int N = 1000;
+    i32 N = 1000;
     auto X = zerovect(N);
     auto Y1s = zerovect2(3, N, 0.);
     auto Y2s = zerovect2(2, N, 0.);
-    double s1 = rand01();
-    double s2 = rand01();
-    double s3 = rand01();
+    f64 s1 = rand01();
+    f64 s2 = rand01();
+    f64 s3 = rand01();
 
-    for (int x = 0; x < N; x++)
+    for (i32 x = 0; x < N; x++)
     {
       X[x] = x;
 
-      Y1s[0][x] = s1 * 100.0 * sin(Constants::TwoPi * (double)x / N);
-      Y1s[1][x] = s2 * 200.0 * sin(Constants::TwoPi * (double)x / N);
-      Y1s[2][x] = s3 * 500.0 * sin(Constants::TwoPi * (double)x / N);
+      Y1s[0][x] = s1 * 100.0 * sin(Constants::TwoPi * (f64)x / N);
+      Y1s[1][x] = s2 * 200.0 * sin(Constants::TwoPi * (f64)x / N);
+      Y1s[2][x] = s3 * 500.0 * sin(Constants::TwoPi * (f64)x / N);
 
-      Y2s[0][x] = s1 * 1.0 * cos(Constants::TwoPi * (double)x / N);
-      Y2s[1][x] = s2 * 0.5 * cos(Constants::TwoPi * (double)x / N);
+      Y2s[0][x] = s1 * 1.0 * cos(Constants::TwoPi * (f64)x / N);
+      Y2s[1][x] = s2 * 0.5 * cos(Constants::TwoPi * (f64)x / N);
     }
 
     // 2D
-    size_t Ny = 1000;
-    size_t Nx = 1000;
+    usize Ny = 1000;
+    usize Nx = 1000;
     auto Z = zerovect2(Ny, Nx, 0.);
 
-    for (size_t y = 0; y < Ny; y++)
-      for (size_t x = 0; x < Nx; x++)
-        Z[y][x] = sin((double)x * y / Nx / Ny * 100) * rand();
+    for (usize y = 0; y < Ny; y++)
+      for (usize x = 0; x < Nx; x++)
+        Z[y][x] = sin((f64)x * y / Nx / Ny * 100) * rand();
 
     // Plot1D::Plot(X, Y1s, Y2s, "very nice plot", "X", "Y1", "Y2", std::vector<std::string>{"y1a", "y1b", "y1c"}, std::vector<std::string>{"y2a", "y2b"});
     // Plot2D::Plot(Z, "niceplot", "X", "Y", "Z", 0, 1, 0, 1, 2);
   }
   if (0) // 2d poylfit
   {
-    size_t size = 100;
-    size_t size2 = 1000;
-    size_t trials = 500;
-    int degree = 5;
-    std::vector<double> xdata(trials);
-    std::vector<double> ydata(trials);
-    std::vector<double> zdata(trials);
+    usize size = 100;
+    usize size2 = 1000;
+    usize trials = 500;
+    i32 degree = 5;
+    std::vector<f64> xdata(trials);
+    std::vector<f64> ydata(trials);
+    std::vector<f64> zdata(trials);
     std::vector<cv::Point2f> pts(trials);
     cv::Mat pointiky = cv::Mat::zeros(size2, size2, CV_8UC3);
 
     cv::Mat orig = cv::Mat::zeros(size, size, CV_32F);
-    for (size_t r = 0; r < size; r++)
+    for (usize r = 0; r < size; r++)
     {
-      for (size_t c = 0; c < size; c++)
+      for (usize c = 0; c < size; c++)
       {
-        double x = (float)c / 99;
-        double y = (float)r / 99;
-        orig.at<float>(r, c) = sqr(x - 0.75) + sqr(y - 0.25) + 0.1 * sin(0.1 * (x * 99 + y * 99) + 1);
+        f64 x = (f32)c / 99;
+        f64 y = (f32)r / 99;
+        orig.at<f32>(r, c) = sqr(x - 0.75) + sqr(y - 0.25) + 0.1 * sin(0.1 * (x * 99 + y * 99) + 1);
       }
     }
 
-    for (size_t i = 0; i < trials; i++)
+    for (usize i = 0; i < trials; i++)
     {
       xdata[i] = rand01();
       ydata[i] = rand01();
       pts[i] = cv::Point2f(xdata[i], ydata[i]);
       zdata[i] = sqr(xdata[i] - 0.75) + sqr(ydata[i] - 0.25) + 0.1 * sin(0.1 * (xdata[i] * 99 + ydata[i] * 99) + 1);
-      drawPoint(pointiky, static_cast<int>(size2) * pts[i], cv::Scalar(rand() % 256, rand() % 256, rand() % 256), 5, 3);
+      drawPoint(pointiky, static_cast<i32>(size2) * pts[i], cv::Scalar(rand() % 256, rand() % 256, rand() % 256), 5, 3);
     }
 
     cv::Mat fitPoly = polyfit(xdata, ydata, zdata, degree, 0, 1, 0, 1, size, size);
@@ -879,14 +879,14 @@ try
     cv::Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
     cv::Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
 
-    int Rows = img1.rows;
-    int Cols = img1.cols;
-    double BandpassL = 1;
-    double BandpassH = 200;
-    double L1ratio = 0.35;
-    int L2size = 15;
-    int UpsampleCoeff = 51;
-    double DivisionEpsilon = 0;
+    i32 Rows = img1.rows;
+    i32 Cols = img1.cols;
+    f64 BandpassL = 1;
+    f64 BandpassH = 200;
+    f64 L1ratio = 0.35;
+    i32 L2size = 15;
+    i32 UpsampleCoeff = 51;
+    f64 DivisionEpsilon = 0;
     bool SubpixelEstimation = true;
     bool CrossCorrelate = false;
 
@@ -940,8 +940,8 @@ try
   }
   if (0) // 1D / 2D sorted xs interp test
   {
-    std::vector<double> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<double> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    std::vector<f64> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<f64> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     LOG_INFO("Diffrot interp 1D a) {}", DiffrotResults::Interpolate(xs, ys, -1.0));
     LOG_INFO("Diffrot interp 1D b) {}", DiffrotResults::Interpolate(xs, ys, 10.0));
     LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1));
@@ -956,12 +956,12 @@ try
     LOG_INFO("Diffrot interp 1Dr c) {}", DiffrotResults::Interpolate(xsr, ysr, 1));
     LOG_INFO("Diffrot interp 1Dr d) {}", DiffrotResults::Interpolate(xsr, ysr, 1.5));
 
-    std::vector<double> xs1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<double> ys1{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
-    std::vector<double> xs2{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
-    std::vector<double> ys2{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-    std::vector<std::vector<double>> xss = {xs1, xs2};
-    std::vector<std::vector<double>> yss = {ys1, ys2};
+    std::vector<f64> xs1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<f64> ys1{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+    std::vector<f64> xs2{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+    std::vector<f64> ys2{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    std::vector<std::vector<f64>> xss = {xs1, xs2};
+    std::vector<std::vector<f64>> yss = {ys1, ys2};
     LOG_INFO("Diffrot interp 2D a) {}", DiffrotResults::Interpolate(xss, yss, 1.0));
     LOG_INFO("Diffrot interp 2D b) {}", DiffrotResults::Interpolate(xss, yss, -1.0));
     LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
@@ -969,11 +969,11 @@ try
   }
   if (0) // try/catch performance test
   {
-    int N = 1e7;
-    int iters = 10;
-    std::vector<double> vec(N);
+    i32 N = 1e7;
+    i32 iters = 10;
+    std::vector<f64> vec(N);
 
-    for (int iter = 0; iter < iters; ++iter)
+    for (i32 iter = 0; iter < iters; ++iter)
     {
       {
         TIMER("Try/catch -");
@@ -1004,10 +1004,10 @@ try
   }
   if (1) // optimization / metaoptimization
   {
-    const int N = 2;
-    const int runs = 20;
-    const int maxFunEvals = 1000;
-    const float optimalFitness = -Constants::Inf;
+    const i32 N = 2;
+    const i32 runs = 20;
+    const i32 maxFunEvals = 1000;
+    const f32 optimalFitness = -Constants::Inf;
     Evolution Evo(N);
     Evo.mNP = 5 * N;
     Evo.mMutStrat = Evolution::RAND1;

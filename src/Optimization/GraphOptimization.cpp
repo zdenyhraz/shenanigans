@@ -3,16 +3,15 @@
 // PhD work of Zdenek Hrazdira
 // made during 2019
 
-
 #include "GraphOptimization.h"
 
-std::ostream& operator<<(std::ostream& out, std::tuple<unsigned, double, unsigned> tuple)
+std::ostream& operator<<(std::ostream& out, std::tuple<unsigned, f64, unsigned> tuple)
 {
   out << "<" << std::get<0>(tuple) << "," << std::get<1>(tuple) << "," << std::get<2>(tuple) << ">";
   return out;
 }
 
-unsigned getTupleIndexWithIndex(std::vector<std::tuple<unsigned, double, unsigned>> vec, unsigned index)
+unsigned getTupleIndexWithIndex(std::vector<std::tuple<unsigned, f64, unsigned>> vec, unsigned index)
 {
   for (unsigned i = 0; i < vec.size(); i++)
   {

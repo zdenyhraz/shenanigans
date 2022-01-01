@@ -12,15 +12,15 @@
 #include "Log/LogFunction.h"
 #include "Plot/Plot2D.h"
 
-static constexpr int piccnt = 9;                // number of pics
-static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
-static constexpr double dt = 11.8;              // dt seconds temporally adjacent pics
-static constexpr double arrow_scale = 12;
-static constexpr double arrow_thickness = 0.0015;
-static constexpr double text_scale = 0.001;
-static constexpr double text_thickness = arrow_thickness * 1.0;
-static constexpr double text_xoffset = 0.0075;
-static constexpr double text_yoffset = 2 * text_xoffset;
+static constexpr i32 piccnt = 9;             // number of pics
+static constexpr f64 kmpp = 696010. / 378.3; // kilometers per pixel
+static constexpr f64 dt = 11.8;              // dt seconds temporally adjacent pics
+static constexpr f64 arrow_scale = 12;
+static constexpr f64 arrow_thickness = 0.0015;
+static constexpr f64 text_scale = 0.001;
+static constexpr f64 text_thickness = arrow_thickness * 1.0;
+static constexpr f64 text_xoffset = 0.0075;
+static constexpr f64 text_yoffset = 2 * text_xoffset;
 
 enum FeatureType
 {
@@ -31,21 +31,21 @@ enum FeatureType
 struct FeatureMatchData
 {
   FeatureType ftype;
-  double thresh;
-  int matchcnt;
-  double minSpeed;
-  double maxSpeed;
+  f64 thresh;
+  i32 matchcnt;
+  f64 minSpeed;
+  f64 maxSpeed;
   std::string path;
   std::string path1;
   std::string path2;
-  double overlapdistance;
+  f64 overlapdistance;
   bool drawOverlapCircles = false;
-  double ratioThreshold = 0.7;
-  double upscale = 1;
+  f64 ratioThreshold = 0.7;
+  f64 upscale = 1;
   bool surfExtended = false;
   bool surfUpright = false;
-  int nOctaves = 4;
-  int nOctaveLayers = 3;
+  i32 nOctaves = 4;
+  i32 nOctaveLayers = 3;
   bool mask = true;
 };
 
@@ -74,19 +74,19 @@ inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   throw std::runtime_error("Unknown feature type");
 }
 
-inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::Point2f>& points, const std::vector<double>& speeds, const std::vector<double>& directions)
+inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::Point2f>& points, const std::vector<f64>& speeds, const std::vector<f64>& directions)
 {
   std::string pth = path + "features.csv";
   std::ofstream csv(pth, std::ios::out | std::ios::trunc);
   csv << "X,Y,SPD,DIR" << std::endl;
-  for (size_t i = 0; i < points.size(); i++)
+  for (usize i = 0; i < points.size(); i++)
   {
     csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << std::endl;
   }
   LOG_INFO("Feature data exported to {}", pth);
 }
 
-inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<size_t, size_t, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,
+inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,
     const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
@@ -96,15 +96,15 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
   if (data.upscale != 1)
     resize(out, out, cv::Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, cv::INTER_LINEAR);
 
-  double minspd = std::numeric_limits<double>::max();
-  double maxspd = std::numeric_limits<double>::min();
+  f64 minspd = std::numeric_limits<f64>::max();
+  f64 maxspd = std::numeric_limits<f64>::min();
   std::vector<bool> shouldDraw(matches_all.size(), false);
-  std::vector<double> removeSpeeds = {}; // 639, 652
+  std::vector<f64> removeSpeeds = {}; // 639, 652
 
   if (false)
-    for (int r = 0; r < out.rows; ++r)
-      for (int c = 0; c < out.cols; ++c)
-        if (((float)c / img.cols + (float)r / img.rows) / 2 < 0.5)
+    for (i32 r = 0; r < out.rows; ++r)
+      for (i32 c = 0; c < out.cols; ++c)
+        if (((f32)c / img.cols + (f32)r / img.rows) / 2 < 0.5)
           out.at<cv::Vec3b>(r, c) = (out.at<cv::Vec3b>(r, c) + cv::Vec3b(0, 0, 255)) / 2;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
@@ -116,7 +116,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 
     const auto& point = kp1_all[pic][match.queryIdx].pt;
 
-    if (data.mask and (((float)point.x / img.cols + (float)point.y / img.rows) / 2 < 0.5))
+    if (data.mask and (((f32)point.x / img.cols + (f32)point.y / img.rows) / 2 < 0.5))
     {
       LOG_TRACE("Skipping match {}: masked out", idx);
       continue;
@@ -129,8 +129,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     }
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const double spd = magnitude(shift) * kmpp / dt;
-    const double dir = toDegrees(atan2(-shift.y, shift.x));
+    const f64 spd = magnitude(shift) * kmpp / dt;
+    const f64 dir = toDegrees(atan2(-shift.y, shift.x));
 
     if (std::any_of(removeSpeeds.begin(), removeSpeeds.end(), [&](const auto& remspd) { return std::abs(spd - remspd) < 1; }))
       continue;
@@ -147,8 +147,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
       continue;
     }
 
-    static constexpr double kMinDir = -170;
-    static constexpr double kMaxDir = -120;
+    static constexpr f64 kMinDir = -170;
+    static constexpr f64 kMaxDir = -120;
     if (dir < kMinDir or dir > kMaxDir)
     {
       LOG_TRACE("Skipping match {}: direction {:.2f} deg off limits", idx, dir);
@@ -161,7 +161,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     shouldDraw[idx] = true;
   }
 
-  size_t drawcounter = 1;
+  usize drawcounter = 1;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -171,7 +171,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
       continue;
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const double spd = magnitude(shift) * kmpp / dt;
+    const f64 spd = magnitude(shift) * kmpp / dt;
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
     cv::Point2f arrStart = data.upscale * pts.first;
@@ -229,8 +229,8 @@ inline cv::Mat DrawFeatureMatchArrows(
       continue;
 
     const auto pts = GetFeatureMatchPoints(match, kp1, kp2);
-    const double spd = magnitude(GetFeatureMatchShift(match, kp1, kp2));
-    const double diagonal = sqrt(sqr(img.rows) + sqr(img.cols));
+    const f64 spd = magnitude(GetFeatureMatchShift(match, kp1, kp2));
+    const f64 diagonal = sqrt(sqr(img.rows) + sqr(img.cols));
 
     cv::Scalar color = colorMapJet(spd, 0, 0.3 * diagonal);
     arrowedLine(out, pts.first, pts.second, color, 0.002 * out.cols, cv::LINE_AA, 0, 0.1);
@@ -251,7 +251,7 @@ try
   std::vector<std::vector<cv::KeyPoint>> keypoints2_all(piccnt - 1);
 
 #pragma omp parallel for
-  for (int pic = 1; pic < piccnt - 1; pic++)
+  for (i32 pic = 1; pic < piccnt - 1; pic++)
   {
     const std::string path1 = data.path + std::to_string(pic) + ".PNG";
     const std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
@@ -278,7 +278,7 @@ try
     std::vector<cv::DMatch> matches;
     {
       LOG_FUNCTION("Filter matches based on ratio test");
-      for (size_t i = 0; i < knn_matches.size(); i++)
+      for (usize i = 0; i < knn_matches.size(); i++)
         if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
           matches.push_back(knn_matches[i][0]);
     }
@@ -287,7 +287,7 @@ try
     {
       LOG_FUNCTION("Calculate N best matches");
       std::sort(matches.begin(), matches.end(), [&](const cv::DMatch& a, const cv::DMatch& b) { return a.distance < b.distance; });
-      matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (int)matches.size()));
+      matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (i32)matches.size()));
       matches_all[pic] = matches;
     }
 
@@ -300,12 +300,12 @@ try
     }
   }
 
-  std::vector<std::tuple<size_t, size_t, cv::DMatch, bool>> matches_all_serialized;
+  std::vector<std::tuple<usize, usize, cv::DMatch, bool>> matches_all_serialized;
   {
     LOG_FUNCTION("Sort matches from fastest to slowest speeds");
 
-    size_t i = 0;
-    for (size_t pic = 0; pic < piccnt - 1; pic++)
+    usize i = 0;
+    for (usize pic = 0; pic < piccnt - 1; pic++)
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({i++, pic, match, false});
 
@@ -321,7 +321,7 @@ try
           return spd1 > spd2;
         });
 
-    size_t newidx = 0;
+    usize newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)
       idx = newidx++;
   }
@@ -347,7 +347,7 @@ try
           continue;
 
         const auto shift = keypoints1_all[pic][match.queryIdx].pt - keypoints1_all[otherpic][othermatch.queryIdx].pt;
-        const double distance = magnitude(shift);
+        const f64 distance = magnitude(shift);
         otheroverlap = distance < data.overlapdistance;
       }
     }
@@ -391,7 +391,7 @@ try
   std::vector<cv::DMatch> matches;
   {
     LOG_FUNCTION("Filter matches based on ratio test");
-    for (size_t i = 0; i < knn_matches.size(); i++)
+    for (usize i = 0; i < knn_matches.size(); i++)
       if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
         matches.push_back(knn_matches[i][0]);
   }

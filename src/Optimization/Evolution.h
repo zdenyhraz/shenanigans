@@ -25,13 +25,13 @@ public:
     ObjectiveFunctionValue
   };
 
-  Evolution(size_t N, const std::string& optname = "default");
+  Evolution(usize N, const std::string& optname = "default");
   OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid = nullptr) override;
-  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, size_t runsPerObj = 3, size_t maxFunEvals = 10000, double optimalFitness = -Constants::Inf);
+  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, usize runsPerObj = 3, usize maxFunEvals = 10000, f64 optimalFitness = -Constants::Inf);
 
-  size_t mNP = 4;
-  double mF = 0.65;
-  double mCR = 0.90;
+  usize mNP = 4;
+  f64 mF = 0.65;
+  f64 mCR = 0.90;
   MutationStrategy mMutStrat = RAND1;
   CrossoverStrategy mCrossStrat = BIN;
 
@@ -39,54 +39,54 @@ private:
   struct Entity
   {
     Entity() = default;
-    Entity(size_t N);
+    Entity(usize N);
 
-    std::vector<double> params;
-    double fitness;
+    std::vector<f64> params;
+    f64 fitness;
   };
 
   struct Offspring
   {
     Offspring() = default;
-    Offspring(size_t N, size_t nParents);
-    void UpdateDistinctParents(size_t eid, size_t NP);
-    void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR);
+    Offspring(usize N, usize nParents);
+    void UpdateDistinctParents(usize eid, usize NP);
+    void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, f64 CR);
 
-    std::vector<double> params;
-    double fitness;
-    std::vector<size_t> parentIndices;
+    std::vector<f64> params;
+    f64 fitness;
+    std::vector<usize> parentIndices;
     std::vector<bool> crossoverParameters;
   };
 
   struct Population
   {
-    Population(size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, size_t nParents, bool consoleOutput, bool saveProgress);
-    void UpdateDistinctParents(size_t eid);
-    void UpdateCrossoverParameters(size_t eid, CrossoverStrategy crossoverStrategy, double CR);
-    void UpdateOffspring(size_t eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
+    Population(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents, bool consoleOutput, bool saveProgress);
+    void UpdateDistinctParents(usize eid);
+    void UpdateCrossoverParameters(usize eid, CrossoverStrategy crossoverStrategy, f64 CR);
+    void UpdateOffspring(usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB);
     void PerformSelection();
     void UpdateBestEntity();
-    void UpdateTerminationCriterions(double relativeDifferenceThreshold);
+    void UpdateTerminationCriterions(f64 relativeDifferenceThreshold);
     void UpdateProgress();
 
     std::vector<Entity> entities;
     std::vector<Offspring> offspring;
     Entity bestEntity;
-    size_t functionEvaluations;
-    double averageFitness;
-    double previousFitness;
-    double absoluteDifference;
-    double relativeDifference;
-    size_t relativeDifferenceGenerationsOverThreshold;
+    usize functionEvaluations;
+    f64 averageFitness;
+    f64 previousFitness;
+    f64 absoluteDifference;
+    f64 relativeDifference;
+    usize relativeDifferenceGenerationsOverThreshold;
     bool mSaveProgress;
-    std::vector<double> bestFitnessProgress;
-    std::vector<std::vector<double>> bestParametersProgress;
-    std::vector<std::vector<double>> evaluatedParameters;
+    std::vector<f64> bestFitnessProgress;
+    std::vector<std::vector<f64>> bestParametersProgress;
+    std::vector<std::vector<f64>> evaluatedParameters;
 
   private:
-    void InitializePopulation(size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);
+    void InitializePopulation(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB);
     void InitializeBestEntity();
-    void InitializeOffspring(size_t nParents);
+    void InitializeOffspring(usize nParents);
 
     bool mConsoleOutput = true;
   };
@@ -95,18 +95,18 @@ private:
   void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
   void CheckParameters();
-  size_t GetNumberOfParents();
+  usize GetNumberOfParents();
   void InitializeOutputs(ValidationFunction valid);
   void UninitializeOutputs(const Population& population, TerminationReason reason);
-  void UpdateOutputs(size_t generation, const Population& population, ValidationFunction valid);
-  TerminationReason CheckTerminationCriterions(const Population& population, size_t generation);
-  std::string GetOutputFileString(size_t generation, const std::vector<double>& bestEntity, double bestFitness);
+  void UpdateOutputs(usize generation, const Population& population, ValidationFunction valid);
+  TerminationReason CheckTerminationCriterions(const Population& population, usize generation);
+  std::string GetOutputFileString(usize generation, const std::vector<f64>& bestEntity, f64 bestFitness);
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
-  static double averageVectorDistance(std::vector<double>& vec1, std::vector<double>& vec2, std::vector<double>& boundsRange);
-  static bool isDistinct(size_t inpindex, std::vector<size_t>& indices, size_t currindex);
+  static f64 averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& vec2, std::vector<f64>& boundsRange);
+  static bool isDistinct(usize inpindex, std::vector<usize>& indices, usize currindex);
 
-  double mAbsoluteDifferenceThreshold = 1e-10;
-  double mRelativeDifferenceThreshold = 0.9;
-  size_t mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
+  f64 mAbsoluteDifferenceThreshold = 1e-10;
+  f64 mRelativeDifferenceThreshold = 0.9;
+  usize mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
 };

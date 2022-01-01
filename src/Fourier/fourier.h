@@ -94,8 +94,8 @@ inline cv::Mat icufft(cv::Mat& fft, bool packed = false)
 
 inline void fftshift(cv::Mat& mat)
 {
-  int cx = mat.cols / 2;
-  int cy = mat.rows / 2;
+  i32 cx = mat.cols / 2;
+  i32 cy = mat.rows / 2;
   cv::Mat q0(mat, cv::Rect(0, 0, cx, cy));
   cv::Mat q1(mat, cv::Rect(cx, 0, cx, cy));
   cv::Mat q2(mat, cv::Rect(0, cy, cx, cy));
@@ -112,8 +112,8 @@ inline void fftshift(cv::Mat& mat)
 
 inline void ifftshift(cv::Mat& mat)
 {
-  int cx = mat.cols / 2;
-  int cy = mat.rows / 2;
+  i32 cx = mat.cols / 2;
+  i32 cy = mat.rows / 2;
   cv::Mat q0(mat, cv::Rect(0, 0, cx, cy));
   cv::Mat q1(mat, cv::Rect(cx, 0, cx, cy));
   cv::Mat q2(mat, cv::Rect(0, cy, cx, cy));
@@ -144,7 +144,7 @@ inline cv::Mat dupchansz(const cv::Mat& img)
   return out;
 }
 
-inline cv::Mat logmagn(const cv::Mat& img, int logs = 1)
+inline cv::Mat logmagn(const cv::Mat& img, i32 logs = 1)
 {
   cv::Mat mag;
   if (img.channels() > 1)
@@ -157,7 +157,7 @@ inline cv::Mat logmagn(const cv::Mat& img, int logs = 1)
   {
     mag = img.clone();
   }
-  for (int logit = 0; logit < logs; ++logit)
+  for (i32 logit = 0; logit < logs; ++logit)
   {
     mag += cv::Scalar::all(1);
     log(mag, mag);
@@ -184,14 +184,14 @@ inline cv::Mat phase(const cv::Mat& img)
   return phs;
 }
 
-inline cv::Mat fftlogmagn(const cv::Mat& img, int logs = 1)
+inline cv::Mat fftlogmagn(const cv::Mat& img, i32 logs = 1)
 {
   cv::Mat out = fft(img.clone());
   fftshift(out);
   return logmagn(out, logs);
 }
 
-inline cv::Mat ifftlogmagn(const cv::Mat& img, int logs = 1)
+inline cv::Mat ifftlogmagn(const cv::Mat& img, i32 logs = 1)
 {
   cv::Mat out = ifft(dupchansz(img));
   fftshift(out);
@@ -204,8 +204,8 @@ inline cv::Mat ifftlogmagn(const cv::Mat& img, int logs = 1)
 inline cv::Mat quadrantswap(const cv::Mat& sourceimgDFT)
 {
   cv::Mat centeredDFT = sourceimgDFT.clone();
-  int cx = centeredDFT.cols / 2;
-  int cy = centeredDFT.rows / 2;
+  i32 cx = centeredDFT.cols / 2;
+  i32 cy = centeredDFT.rows / 2;
   cv::Mat q1(centeredDFT, cv::Rect(0, 0, cx, cy));
   cv::Mat q2(centeredDFT, cv::Rect(cx, 0, cx, cy));
   cv::Mat q3(centeredDFT, cv::Rect(0, cy, cx, cy));
@@ -225,7 +225,7 @@ inline cv::Mat quadrantswap(const cv::Mat& sourceimgDFT)
 inline cv::Mat fourier(cv::Mat&& img)
 {
   img.convertTo(img, CV_32F);
-  cv::Mat sourceimgcomplex[2] = {cv::Mat_<float>(img), cv::Mat::zeros(img.size(), CV_32F)};
+  cv::Mat sourceimgcomplex[2] = {cv::Mat_<f32>(img), cv::Mat::zeros(img.size(), CV_32F)};
   cv::Mat sourceimgcomplexmerged;
   merge(sourceimgcomplex, 2, sourceimgcomplexmerged);
   dft(sourceimgcomplexmerged, sourceimgcomplexmerged);
@@ -265,25 +265,25 @@ inline cv::Mat fourierinv(const cv::Mat& realIn, const cv::Mat& imagIn)
   return invDFT;
 }
 
-inline cv::Mat edgemask(int rows, int cols)
+inline cv::Mat edgemask(i32 rows, i32 cols)
 {
   cv::Mat edgemask;
   createHanningWindow(edgemask, cv::Size(cols, rows), CV_32F);
   return edgemask;
 }
 
-inline cv::Mat gaussian(int rows, int cols, double stdevYmult, double stdevXmult)
+inline cv::Mat gaussian(i32 rows, i32 cols, f64 stdevYmult, f64 stdevXmult)
 {
   cv::Mat gaussian = cv::Mat::zeros(rows, cols, CV_32F);
-  for (int r = 0; r < rows; r++)
-    for (int c = 0; c < cols; c++)
-      gaussian.at<float>(r, c) = std::exp(-(std::pow(c - cols / 2, 2) / 2 / std::pow((double)cols / stdevXmult, 2) + std::pow(r - rows / 2, 2) / 2 / std::pow((double)rows / stdevYmult, 2)));
+  for (i32 r = 0; r < rows; r++)
+    for (i32 c = 0; c < cols; c++)
+      gaussian.at<f32>(r, c) = std::exp(-(std::pow(c - cols / 2, 2) / 2 / std::pow((f64)cols / stdevXmult, 2) + std::pow(r - rows / 2, 2) / 2 / std::pow((f64)rows / stdevYmult, 2)));
 
   normalize(gaussian, gaussian, 0, 1, cv::NORM_MINMAX);
   return gaussian;
 }
 
-inline cv::Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmult)
+inline cv::Mat laplacian(i32 rows, i32 cols, f64 stdevYmult, f64 stdevXmult)
 {
   cv::Mat laplacian = cv::Mat::ones(rows, cols, CV_32F);
   laplacian = 1 - gaussian(rows, cols, stdevYmult, stdevXmult);
@@ -291,21 +291,21 @@ inline cv::Mat laplacian(int rows, int cols, double stdevYmult, double stdevXmul
   return laplacian;
 }
 
-inline cv::Mat bandpassian(int rows, int cols, double stdevLmult, double stdevHmult)
+inline cv::Mat bandpassian(i32 rows, i32 cols, f64 stdevLmult, f64 stdevHmult)
 {
   cv::Mat bandpassian = gaussian(rows, cols, stdevLmult, stdevLmult).mul(laplacian(rows, cols, 1. / stdevHmult, 1. / stdevHmult));
   normalize(bandpassian, bandpassian, 0, 1, cv::NORM_MINMAX);
   return bandpassian;
 }
 
-inline cv::Mat sinian(int rows, int cols, double frequencyX, double frequencyY)
+inline cv::Mat sinian(i32 rows, i32 cols, f64 frequencyX, f64 frequencyY)
 {
   cv::Mat sinian = cv::Mat::zeros(rows, cols, CV_32F);
-  for (int y = 0; y < rows; y++)
+  for (i32 y = 0; y < rows; y++)
   {
-    for (int x = 0; x < cols; x++)
+    for (i32 x = 0; x < cols; x++)
     {
-      sinian.at<float>(y, x) = std::sin(2 * Constants::Pi * (x * frequencyX + y * frequencyY)); // sin or cos just cahnges the phase spectum
+      sinian.at<f32>(y, x) = std::sin(2 * Constants::Pi * (x * frequencyX + y * frequencyY)); // sin or cos just cahnges the phase spectum
     }
   }
   normalize(sinian, sinian, 0, 1, cv::NORM_MINMAX);

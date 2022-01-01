@@ -21,7 +21,7 @@ void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, std::string ma
     }
     if (expon)
     {
-      for (size_t i = 0; i < 20; i++)
+      for (usize i = 0; i < 20; i++)
       {
         exp(magnitudeimglog, magnitudeimglog);
         normalize(magnitudeimglog, magnitudeimglog, 0, 1, cv::NORM_MINMAX);
@@ -170,14 +170,14 @@ cv::Mat frequencyFilter(const cv::Mat& sourceimg, const cv::Mat& mask)
 }
 
 #ifdef FOURIER_WITH_FFTW
-cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, int fftw)
+cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, i32 fftw)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
   sourceimg.convertTo(sourceimg, CV_32F, 1. / 65535);
   sourceimg.reserve(sourceimg.rows * 2); // space for imaginary part
   if (fftw == 1)                         // fftw slowest version
   {
-    int r, c;
+    i32 r, c;
     fftw_complex* in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
     fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
     fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -185,7 +185,7 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, int fftw)
     {
       for (c = 0; c < sourceimg.cols; c++)
       {
-        in[r * sourceimg.cols + c][0] = sourceimg.at<float>(r, c);
+        in[r * sourceimg.cols + c][0] = sourceimg.at<f32>(r, c);
         in[r * sourceimg.cols + c][1] = 0;
       }
     }
@@ -195,8 +195,8 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, int fftw)
     {
       for (c = 0; c < sourceimg.cols; c++)
       {
-        result2[0].at<float>(r, c) = out[r * sourceimg.cols + c][0];
-        result2[1].at<float>(r, c) = out[r * sourceimg.cols + c][1];
+        result2[0].at<f32>(r, c) = out[r * sourceimg.cols + c][0];
+        result2[1].at<f32>(r, c) = out[r * sourceimg.cols + c][1];
       }
     }
     cv::Mat result;
@@ -208,11 +208,11 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, int fftw)
   }
   if (fftw == 2)
   {
-    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (double*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (f64*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
     cv::Mat result2[2] = {resultRe, resultIm};
     cv::Mat result;
     merge(result2, 2, result);
@@ -223,8 +223,8 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, int fftw)
     fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (double*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
     cv::Mat result2[2] = {resultRe, resultIm};
     cv::Mat result;
     merge(result2, 2, result);

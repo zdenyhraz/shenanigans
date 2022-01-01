@@ -6,7 +6,7 @@ class WindowPlot : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowPlot(std::string name, double colRowRatio, std::function<void(std::string)>& OnClose);
+  WindowPlot(std::string name, f64 colRowRatio, std::function<void(std::string)>& OnClose);
   ~WindowPlot();
 
   Ui::WindowPlot ui;

@@ -4,16 +4,16 @@
 
 namespace Procedural
 {
-inline cv::Mat procedural(int rows, int cols)
+inline cv::Mat procedural(i32 rows, i32 cols)
 {
-  size_t N = 500;
+  usize N = 500;
   cv::Mat mat = cv::Mat::zeros(rows, cols, CV_32F);
 
-  for (size_t i = 0; i < N; i++)
+  for (usize i = 0; i < N; i++)
   {
-    float cx = 0.02 * rand01();
-    float cy = 0.02 * rand01();
-    float ratio = cx / cy;
+    f32 cx = 0.02 * rand01();
+    f32 cy = 0.02 * rand01();
+    f32 ratio = cx / cy;
 
     if (ratio > 5 or ratio < (1. / 5))
       continue;
@@ -28,11 +28,11 @@ inline cv::Mat colorlandscape(const cv::Mat& heightmap)
 {
   cv::Mat mat = cv::Mat::zeros(heightmap.rows, heightmap.cols, CV_32FC3);
 
-  for (int r = 0; r < heightmap.rows; r++)
+  for (i32 r = 0; r < heightmap.rows; r++)
   {
-    for (int c = 0; c < heightmap.cols; c++)
+    for (i32 c = 0; c < heightmap.cols; c++)
     {
-      auto& x = heightmap.at<float>(r, c);
+      auto& x = heightmap.at<f32>(r, c);
 
       if (x < 0.23)
       {

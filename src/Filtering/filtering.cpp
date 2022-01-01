@@ -5,14 +5,14 @@
 #include "Core/functionsBaseSTL.h"
 #include "filtering.h"
 
-cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, double contrast, double brightness)
+cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, f64 contrast, f64 brightness)
 {
   cv::Mat filtered = sourceimg.clone();
   filtered.convertTo(filtered, CV_16U);
   normalize(filtered, filtered, 0, 65535, cv::NORM_MINMAX);
-  for (int r = 0; r < filtered.rows; r++)
+  for (i32 r = 0; r < filtered.rows; r++)
   {
-    for (int c = 0; c < filtered.cols; c++)
+    for (i32 c = 0; c < filtered.cols; c++)
     {
       if (filtered.channels() > 1)
       {
@@ -22,7 +22,7 @@ cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, double contrast, doub
       }
       else
       {
-        filtered.at<ushort>(r, c) = clamp(contrast * ((double)filtered.at<ushort>(r, c) + brightness), 0, 65535);
+        filtered.at<ushort>(r, c) = clamp(contrast * ((f64)filtered.at<ushort>(r, c) + brightness), 0, 65535);
       }
     }
   }
@@ -42,7 +42,7 @@ cv::Mat histogramEqualize(const cv::Mat& sourceimgIn)
   return sourceimg;
 }
 
-cv::Mat gammaCorrect(const cv::Mat& sourceimgIn, double gamma) // returns CV_16UC1/3
+cv::Mat gammaCorrect(const cv::Mat& sourceimgIn, f64 gamma) // returns CV_16UC1/3
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
@@ -67,18 +67,18 @@ cv::Mat addnoise(const cv::Mat& sourceimgIn)
   return noised;
 }
 
-void addnoise(cv::Mat& img, double stddev)
+void addnoise(cv::Mat& img, f64 stddev)
 {
   std::random_device device;
   std::mt19937 generator(device());
-  std::normal_distribution<float> distribution(0, stddev);
+  std::normal_distribution<f32> distribution(0, stddev);
 
-  for (int c = 0; c < img.cols; c++)
-    for (int r = 0; r < img.rows; r++)
-      img.at<float>(r, c) = std::clamp(img.at<float>(r, c) + distribution(generator), 0.f, 1.f);
+  for (i32 c = 0; c < img.cols; c++)
+    for (i32 r = 0; r < img.rows; r++)
+      img.at<f32>(r, c) = std::clamp(img.at<f32>(r, c) + distribution(generator), 0.f, 1.f);
 }
 
-void showhistogram(const cv::Mat& sourceimgIn, int channels, int minimum, int maximum, std::string winname)
+void showhistogram(const cv::Mat& sourceimgIn, i32 channels, i32 minimum, i32 maximum, std::string winname)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
   /// Separate the image in 3 places ( B, G and R )
@@ -93,11 +93,11 @@ void showhistogram(const cv::Mat& sourceimgIn, int channels, int minimum, int ma
   }
 
   /// Establish the number of bins
-  int histSize = 256;
+  i32 histSize = 256;
 
   /// Set the ranges ( for B,G,R) )
-  float range[] = {(float)minimum, (float)maximum};
-  const float* histRange = {range};
+  f32 range[] = {(f32)minimum, (f32)maximum};
+  const f32* histRange = {range};
 
   bool uniform = true;
   bool accumulate = false;
@@ -110,9 +110,9 @@ void showhistogram(const cv::Mat& sourceimgIn, int channels, int minimum, int ma
   calcHist(&bgr_planes[2], 1, 0, cv::Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate);
 
   // Draw the histograms for B, G and R
-  int hist_w = 512;
-  int hist_h = 400;
-  int bin_w = cvRound((double)hist_w / histSize);
+  i32 hist_w = 512;
+  i32 hist_h = 400;
+  i32 bin_w = cvRound((f64)hist_w / histSize);
 
   cv::Mat histImage(hist_h, hist_w, CV_8UC3, cv::Scalar(0, 0, 0));
 
@@ -122,12 +122,12 @@ void showhistogram(const cv::Mat& sourceimgIn, int channels, int minimum, int ma
   normalize(r_hist, r_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
 
   /// Draw for each channel
-  int thickness = 1;
-  for (int i = 1; i < histSize; i++)
+  i32 thickness = 1;
+  for (i32 i = 1; i < histSize; i++)
   {
-    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(b_hist.at<float>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(b_hist.at<float>(i))), cv::Scalar(255, 0, 0), thickness, 8, 0);
-    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(g_hist.at<float>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(g_hist.at<float>(i))), cv::Scalar(0, 255, 0), thickness, 8, 0);
-    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(r_hist.at<float>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(r_hist.at<float>(i))), cv::Scalar(0, 0, 255), thickness, 8, 0);
+    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(b_hist.at<f32>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(b_hist.at<f32>(i))), cv::Scalar(255, 0, 0), thickness, 8, 0);
+    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(g_hist.at<f32>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(g_hist.at<f32>(i))), cv::Scalar(0, 255, 0), thickness, 8, 0);
+    line(histImage, cv::Point2i(bin_w * (i - 1), hist_h - cvRound(r_hist.at<f32>(i - 1))), cv::Point2i(bin_w * (i), hist_h - cvRound(r_hist.at<f32>(i))), cv::Scalar(0, 0, 255), thickness, 8, 0);
   }
 
   /// Display

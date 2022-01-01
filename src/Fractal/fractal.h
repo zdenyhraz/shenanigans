@@ -4,20 +4,20 @@
 
 struct Fractalset
 {
-  double zoom;
-  int sliderZoom;
-  int sliderLog;
-  int sliderMaxiter;
-  int sliderMagntresh;
-  int fractalWidth;
-  int fractalHeight;
+  f64 zoom;
+  i32 sliderZoom;
+  i32 sliderLog;
+  i32 sliderMaxiter;
+  i32 sliderMagntresh;
+  i32 fractalWidth;
+  i32 fractalHeight;
   cv::Point2d fractalCenter;
-  double xmin;
-  double xmax;
-  double ymin;
-  double ymax;
-  double magnTresh;
-  int maxiter;
+  f64 xmin;
+  f64 xmax;
+  f64 ymin;
+  f64 ymax;
+  f64 magnTresh;
+  i32 maxiter;
 
   Fractalset() // constructor
   {
@@ -41,8 +41,8 @@ struct Fractalset
     ymin = fractalCenter.y - zoom;
     ymax = fractalCenter.y + zoom;
     fractalHeight = (ymax - ymin) / (xmax - xmin) * fractalWidth;
-    zoom *= pow(2., ((double)sliderZoom - 50) / 50 * 3.);
-    magnTresh = ((double)sliderMagntresh - 50) / 50 + 2.;
+    zoom *= pow(2., ((f64)sliderZoom - 50) / 50 * 3.);
+    magnTresh = ((f64)sliderMagntresh - 50) / 50 + 2.;
     maxiter = sliderMaxiter;
     // std::cout << "Fractal center: " << fractalCenter.x << " + " << fractalCenter.y << "i, delta_x: " << xmax - xmin << ", eps: " << (xmax - xmin) / fractalWidth << ", zoom: " << zoom << "(" << 1. /
     // zoom << " x)" << std::endl;
@@ -51,4 +51,4 @@ struct Fractalset
 
 cv::Mat computeFractal(Fractalset& fractalset);
 
-void mouseEventFractal(int event, int x, int y, int flags, void* ptr);
+void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr);

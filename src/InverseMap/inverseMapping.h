@@ -2,6 +2,6 @@
 #include "Core/functionsBaseSTL.h"
 #include "Core/functionsBaseCV.h"
 
-std::vector<double> inverseMappingZH(const std::vector<std::vector<double>>& trialInputs, const std::vector<std::vector<double>>& trialOutputs, const std::vector<double>& desiredOutput, int degree = 1);
+std::vector<f64> inverseMappingZH(const std::vector<std::vector<f64>>& trialInputs, const std::vector<std::vector<f64>>& trialOutputs, const std::vector<f64>& desiredOutput, i32 degree = 1);
 
-std::vector<double> inverseMappingTestTransfer(std::vector<double> arg);
+std::vector<f64> inverseMappingTestTransfer(std::vector<f64> arg);
