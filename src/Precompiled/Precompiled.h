@@ -54,6 +54,7 @@
 
 // gtest
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 // custom
 using i8 = int8_t;
