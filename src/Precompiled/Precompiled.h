@@ -27,11 +27,12 @@
 
 // Qt
 #include <QtWidgets>
-#include <QtWidgets>
 #include <QtWidgets/QApplication>
 #include <QPixmap>
 #include <QWidget>
 #include <QCloseEvent>
+#include <QTextBrowser>
+#include <QCoreApplication>
 
 // OpenMP
 #include <omp.h>

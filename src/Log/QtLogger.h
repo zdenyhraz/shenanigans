@@ -1,8 +1,4 @@
 #pragma once
-#include <mutex>
-#include <fmt/format.h>
-#include <QTextBrowser>
-#include <QCoreApplication>
 
 class QtLogger
 {
@@ -85,13 +81,13 @@ private:
 
   void SetTextBrowserInternal(QTextBrowser* textBrowser)
   {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::scoped_lock lock(mMutex);
     mTextBrowser = textBrowser;
   }
 
   void SetLogLevelInternal(LogLevel logLevel)
   {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::scoped_lock lock(mMutex);
     mLogLevel = logLevel;
   }
 
@@ -106,7 +102,7 @@ private:
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::scoped_lock lock(mMutex);
     if (!ShouldLog(logLevel))
       return;
 
