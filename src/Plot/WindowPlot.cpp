@@ -12,10 +12,6 @@ WindowPlot::WindowPlot(std::string name_, f64 colRowRatio, std::function<void(st
   setWindowTitle(QString::fromStdString(name));
 }
 
-WindowPlot::~WindowPlot()
-{
-}
-
 void WindowPlot::closeEvent(QCloseEvent* event)
 {
   OnClose(name);

@@ -28,30 +28,47 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(APP_ICON_RESOURCE_WINDOWS "resources/shenanigans.rc")
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED PATHS C:\\Qt\\5.12.2\\mingw73_64)
 
 # custom
 include_directories("src")
 include_directories("resources")
+get_filename_component(RESOURCES_DIR "resources" ABSOLUTE)
+add_compile_definitions(RESOURCES_DIR=${RESOURCES_DIR})
 
-# the shenanigans executable
-file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.h src/*.cpp src/*.ui src/*.qrc)
-add_executable(shenanigans ${SRC} ${SRC_TEST} ${APP_ICON_RESOURCE_WINDOWS})
+# sources
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
+src/*.ui src/*.rc src/*.qrc
+src/Astrophysics/*.h src/Astrophysics/*.cpp
+src/ComplexityEstimation/*.h src/ComplexityEstimation/*.cpp
+src/Core/*.h src/Core/*.cpp
+src/Draw/*.h src/Draw/*.cpp
+src/Features/*.h src/Features/*.cpp
+src/Filtering/*.h src/Filtering/*.cpp
+src/Fit/*.h src/Fit/*.cpp
+src/Fourier/*.h src/Fourier/*.cpp
+src/Fractal/*.h src/Fractal/*.cpp
+src/InverseMap/*.h src/InverseMap/*.cpp
+src/IPC/*.h src/IPC/*.cpp
+src/Log/*.h src/Log/*.cpp
+src/Optimization/*.h src/Optimization/*.cpp
+src/Plot/*.h src/Plot/*.cpp
+src/Precompiled/*.h src/Precompiled/*.cpp
+src/Procedural/*.h src/Procedural/*.cpp
+src/Sasko/*.h src/Sasko/*.cpp
+src/Snake/*.h src/Snake/*.cpp
+src/Utils/*.h src/Utils/*.cpp
+)
+file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp )
+file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
+
+# shenanigans
+add_executable(shenanigans ${SRC} ${SRC_APP})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only)
 target_precompile_headers(shenanigans PRIVATE src/Precompiled/Precompiled.h)
 
-# the shenanigans_test executable
-file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
-add_executable(shenanigans_test ${SRC_TEST})
+# shenanigans_test
+add_executable(shenanigans_test ${SRC} ${SRC_TEST})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only GTest::gtest_main GTest::gmock)
+target_precompile_headers(shenanigans_test PRIVATE src/Precompiled/Precompiled.h)
 gtest_discover_tests(shenanigans_test)
-
-
-
-
-
-

@@ -52,6 +52,9 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+// gtest
+#include <gtest/gtest.h>
+
 // custom
 using i8 = int8_t;
 using u8 = uint8_t;
