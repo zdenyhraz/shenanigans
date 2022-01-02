@@ -15,8 +15,8 @@
 Semi-random PhD funky stuff. Mainly contains calculations for astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, also non-convex optimization, fractals. With [Qt GUI](https://www.qt.io/), #uses [C++17](https://en.cppreference.com/w/cpp/17), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
 
 ## Article links
-- [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
-- [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
+- 📄 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
+- 📄 [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
 ## The Qt GUI
 <img src="articles/random/gui.PNG" width="100%">
