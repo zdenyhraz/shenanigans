@@ -4,18 +4,18 @@
 TEST(FourierTest, ForwardBackwardConsistencyTest)
 {
   auto img = loadImage("../resources/Shapes/shape.png");
-  EXPECT_EQ(img.depth(), CV_32F);
-  EXPECT_EQ(img.channels(), 1);
+  ASSERT_EQ(img.depth(), CV_32F);
+  ASSERT_EQ(img.channels(), 1);
 
   auto fft = Fourier::fft(img);
-  EXPECT_EQ(fft.size(), img.size());
-  EXPECT_EQ(fft.depth(), img.depth());
-  EXPECT_EQ(fft.channels(), 2);
+  ASSERT_EQ(fft.size(), img.size());
+  ASSERT_EQ(fft.depth(), img.depth());
+  ASSERT_EQ(fft.channels(), 2);
 
   auto ifft = Fourier::ifft(fft);
-  EXPECT_EQ(ifft.size(), img.size());
-  EXPECT_EQ(ifft.depth(), img.depth());
-  EXPECT_EQ(ifft.channels(), img.channels());
+  ASSERT_EQ(ifft.size(), img.size());
+  ASSERT_EQ(ifft.depth(), img.depth());
+  ASSERT_EQ(ifft.channels(), img.channels());
 
   for (i32 r = 0; r < img.rows; ++r)
     for (i32 c = 0; c < img.cols; ++c)
