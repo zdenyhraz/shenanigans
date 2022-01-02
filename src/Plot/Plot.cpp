@@ -1,6 +1,5 @@
 
 #include "Log/Logger.h"
-#include "Application/Windows/Plot/WindowPlot.h"
 #include "Plot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
@@ -19,7 +18,13 @@ QColor Plot::cyan(76.755, 189.975, 237.915);
 QColor Plot::red(161.925, 19.890, 46.920);
 
 std::vector<QPen> Plot::pens{
-    QPen(blue, pt), QPen(orange, pt), QPen(green, pt), QPen(magenta, pt), QPen(red, pt), QPen(black, pt), QPen(cyan, pt),
+    QPen(blue, pt),
+    QPen(orange, pt),
+    QPen(green, pt),
+    QPen(magenta, pt),
+    QPen(red, pt),
+    QPen(black, pt),
+    QPen(cyan, pt),
 };
 
 QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
@@ -57,7 +62,8 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
   return QPoint(w, h);
 }
 
-std::function<void(std::string)> Plot::OnClose = [](std::string name) {
+std::function<void(std::string)> Plot::OnClose = [](std::string name)
+{
   auto idx = plots.find(name);
   if (idx != plots.end())
     plots.erase(idx);
