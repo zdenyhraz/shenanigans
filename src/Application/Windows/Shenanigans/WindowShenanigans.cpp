@@ -1,11 +1,11 @@
 
 #include <regex>
 #include "WindowShenanigans.h"
-#include "Application/Windows/IPC/WindowIPC.h"
-#include "Application/Windows/Diffrot/WindowDiffrot.h"
-#include "Application/Windows/Features/WindowFeatures.h"
-#include "Application/Windows/FITS/WindowFITS.h"
-#include "Application/Windows/Filtering/WindowFiltering.h"
+#include "../IPC/WindowIPC.h"
+#include "../Diffrot/WindowDiffrot.h"
+#include "../Features/WindowFeatures.h"
+#include "../FITS/WindowFITS.h"
+#include "../Filtering/WindowFiltering.h"
 #include "Procedural/procedural.h"
 #include "Snake/game.h"
 #include "Core/functionsBaseSTL.h"
