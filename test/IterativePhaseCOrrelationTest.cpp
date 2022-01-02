@@ -1,21 +1,28 @@
 #include "IPC/IterativePhaseCorrelation.h"
 
-TEST(IterativePhaseCorrelationTest, ZeroShift)
+class IterativePhaseCorrelationTest : public ::testing::Test
 {
-  cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
-  cv::Mat img2 = img1.clone();
+protected:
+  void SetUp() override
+  {
+    mImg1 = loadImage("../resources/Shapes/shape.png");
+    mImg2 = loadImage("../resources/Shapes/shapes.png");
+  }
 
-  IterativePhaseCorrelation ipc(img1);
-  const auto shift = ipc.Calculate(img1, img2);
+  cv::Mat mImg1;
+  cv::Mat mImg2;
+};
+
+TEST_F(IterativePhaseCorrelationTest, ZeroShift)
+{
+  IterativePhaseCorrelation ipc(mImg1);
+  const auto shift = ipc.Calculate(mImg1, mImg1);
   EXPECT_EQ(shift, cv::Point2f(0, 0));
 }
 
-TEST(IterativePhaseCorrelationTest, NonZeroShift)
+TEST_F(IterativePhaseCorrelationTest, NonZeroShift)
 {
-  cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
-  cv::Mat img2 = loadImage("../resources/Shapes/shapes.png");
-
-  IterativePhaseCorrelation ipc(img1);
-  const auto shift = ipc.Calculate(img1, img2);
+  IterativePhaseCorrelation ipc(mImg1);
+  const auto shift = ipc.Calculate(mImg1, mImg2);
   EXPECT_NE(shift, cv::Point2f(0, 0));
 }
