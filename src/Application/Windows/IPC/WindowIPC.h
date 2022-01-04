@@ -13,7 +13,7 @@ private:
   Ui::WindowIPC ui;
   Globals* globals;
 
-private slots:
+public slots:
   void RefreshIPCparameters();
   void RefreshIPCparametersAndExit();
   void Optimize();

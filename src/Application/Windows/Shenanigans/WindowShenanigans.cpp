@@ -161,33 +161,33 @@ try
     addnoise(img1, 0.3);
     addnoise(img2, 0.3);
 
-    IterativePhaseCorrelation<true, true> CC(img1.size(), 0, 0.5);
-    IterativePhaseCorrelation<true, false> PC(img1.size(), 0, 0.5);
+    IterativePhaseCorrelation CC(img1.size(), 0, 0.5);
+    IterativePhaseCorrelation PC(img1.size(), 0, 0.5);
 
     CC.SetDebugName("CC");
     PC.SetDebugName("PC");
 
-    // CC.SetWindowType(IterativePhaseCorrelation<true, true>::WindowType::Rectangular);
-    // PC.SetWindowType(IterativePhaseCorrelation<true, false>::WindowType::Rectangular);
+    // CC.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
+    // PC.SetWindowType(IterativePhaseCorrelation::WindowType::Rectangular);
 
-    // CC.SetBandpassType(IterativePhaseCorrelation<true, true>::BandpassType::Rectangular);
-    // PC.SetBandpassType(IterativePhaseCorrelation<true, false>::BandpassType::Rectangular);
+    // CC.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
+    // PC.SetBandpassType(IterativePhaseCorrelation::BandpassType::Rectangular);
 
-    CC.SetInterpolationType(IterativePhaseCorrelation<true, true>::InterpolationType::Cubic);
-    PC.SetInterpolationType(IterativePhaseCorrelation<true, false>::InterpolationType::Cubic);
+    CC.SetInterpolationType(IterativePhaseCorrelation::InterpolationType::Cubic);
+    PC.SetInterpolationType(IterativePhaseCorrelation::InterpolationType::Cubic);
 
     CC.SetL2size(15);
     PC.SetL2size(15);
 
     if (0)
     {
-      const auto shiftCC = CC.Calculate(img1, img2);
+      const auto shiftCC = CC.Calculate<true, true>(img1, img2);
       LOG_DEBUG("Calculated CC shift: {}", shiftCC);
     }
 
     if (1)
     {
-      const auto shiftPC = PC.Calculate(img1, img2);
+      const auto shiftPC = PC.Calculate<true, false>(img1, img2);
       LOG_DEBUG("Calculated PC shift: {}", shiftPC);
     }
   }
@@ -457,8 +457,8 @@ try
 
     IterativePhaseCorrelation ipc = *globals->IPC;
     ipc.SetSize(img1.rows, img1.cols);
-    // ipc.SetWindowType(IterativePhaseCorrelation<>::WindowType::Hann);
-    // ipc.SetBandpassType(IterativePhaseCorrelation<>::BandpassType::Gaussian);
+    // ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
+    // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
 
     const auto shiftCalc = ipc.Calculate(img1, img2);
     LOG_DEBUG("IPC shift: [{}]", shiftCalc);
@@ -919,9 +919,9 @@ try
     cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
     cv::Mat img2 = loadImage("../resources/Shapes/shapes.png");
 
-    IterativePhaseCorrelation<true, true> ipc(img1.rows, img1.cols, 0.1, 200);
+    IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
 
-    auto shift = ipc.Calculate(img1, img2);
+    auto shift = ipc.Calculate<true, false>(img1, img2);
 
     LOG_INFO("shift = {}", shift);
   }
@@ -1002,7 +1002,7 @@ try
     Fractalset fractalSet;
     computeFractal(fractalSet);
   }
-  if (1) // optimization / metaoptimization
+  if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
     const i32 runs = 20;
@@ -1027,6 +1027,12 @@ try
       Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
+  }
+  if (1) // ipc debug stuff
+  {
+    auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
+    window.show();
+    window.ShowDebugStuff();
   }
 }
 catch (const std::exception& e)

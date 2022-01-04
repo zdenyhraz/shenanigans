@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>745</width>
+    <width>782</width>
     <height>281</height>
    </rect>
   </property>
@@ -17,10 +17,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>9</x>
       <y>30</y>
-      <width>200</width>
-      <height>194</height>
+      <width>201</width>
+      <height>201</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_9">
@@ -346,10 +346,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>463</x>
+      <x>550</x>
       <y>30</y>
-      <width>273</width>
-      <height>178</height>
+      <width>231</width>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_10">
@@ -570,75 +570,21 @@
      <rect>
       <x>220</x>
       <y>30</y>
-      <width>231</width>
+      <width>321</width>
       <height>203</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_7">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_22">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>ALIGN/FLOW</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton_9">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Align RSXY</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Flow</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0" colspan="3">
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="4" column="1">
+       <item row="6" column="1">
         <widget class="QLineEdit" name="lineEdit_19">
          <property name="text">
           <string>0.5</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit_15">
-         <property name="text">
-          <string>../articles/swind/source/1/cropped/crop1.PNG</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_16">
-         <property name="text">
-          <string>../articles/swind/source/1/cropped/crop2.PNG</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_17">
          <property name="text">
           <string>image 1 input file path</string>
@@ -648,10 +594,10 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_20">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_19">
          <property name="text">
-          <string>crop focus % x</string>
+          <string>linear flow input file path</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -659,13 +605,20 @@
         </widget>
        </item>
        <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_15">
+         <property name="text">
+          <string>../articles/swind/source/1/cropped/crop1.PNG</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
         <widget class="QLineEdit" name="lineEdit_17">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_21">
          <property name="text">
           <string>crop focus % y</string>
@@ -675,14 +628,17 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="lineEdit_18">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_20">
          <property name="text">
-          <string>0.5</string>
+          <string>crop focus % x</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_18">
          <property name="text">
           <string>image 2 input file path</string>
@@ -692,13 +648,31 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_19">
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_16">
          <property name="text">
-          <string>linear flow input file path</string>
+          <string>../articles/swind/source/1/cropped/crop2.PNG</string>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="lineEdit_18">
+         <property name="text">
+          <string>0.5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_22">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>ALIGN/FLOW</string>
          </property>
         </widget>
        </item>
@@ -711,24 +685,50 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="5" column="0">
+      <widget class="QPushButton" name="pushButton_6">
+       <property name="text">
+        <string>Align XY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
       <widget class="QPushButton" name="pushButton_7">
        <property name="text">
         <string>Constant flow</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="2" column="2">
       <widget class="QPushButton" name="pushButton_8">
        <property name="text">
         <string>Feature match</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
-      <widget class="QPushButton" name="pushButton_6">
+     <item row="5" column="1">
+      <widget class="QPushButton" name="pushButton_9">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
-        <string>Align XY</string>
+        <string>Align RSXY</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Flow</string>
        </property>
       </widget>
      </item>
@@ -740,7 +740,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>745</width>
+     <width>782</width>
      <height>18</height>
     </rect>
    </property>

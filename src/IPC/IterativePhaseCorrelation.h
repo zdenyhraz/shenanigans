@@ -10,7 +10,6 @@
 #include "Plot/Plot2D.h"
 #include "Plot/Plot1D.h"
 
-template <bool DebugMode = false, bool CrossCorrelation = false, bool CudaFFT = false, bool PackedFFT = false>
 class IterativePhaseCorrelation
 {
 public:
@@ -99,7 +98,13 @@ public:
   cv::Mat GetWindow() const { return mWindow; }
   cv::Mat GetBandpass() const { return mBandpass; }
 
-  cv::Point2f Calculate(const cv::Mat& image1, const cv::Mat& image2) const { return Calculate(image1.clone(), image2.clone()); }
+  template <bool DebugMode = false, bool CrossCorrelation = false>
+  cv::Point2f Calculate(const cv::Mat& image1, const cv::Mat& image2) const
+  {
+    return Calculate<DebugMode, CrossCorrelation>(image1.clone(), image2.clone());
+  }
+
+  template <bool DebugMode = false, bool CrossCorrelation = false>
   cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   try
   {
@@ -159,7 +164,7 @@ public:
       Plot2D::Plot(Fourier::phase(plot2));
     }
 
-    auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
+    auto crosspower = CalculateCrossPowerSpectrum<CrossCorrelation>(std::move(dft1), std::move(dft2));
     ApplyBandpass(crosspower);
 
     cv::Mat L3 = CalculateL3(std::move(crosspower));
@@ -183,7 +188,7 @@ public:
     {
       i32 L2size = 5;
       while (IsOutOfBounds(L3peak, L3, L2size))
-        if (!ReduceL2size(L2size))
+        if (!ReduceL2size<DebugMode>(L2size))
           return result;
 
       cv::Mat L2 = CalculateL2(L3, L3peak, 5);
@@ -197,7 +202,7 @@ public:
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size(L2size))
+      if (!ReduceL2size<DebugMode>(L2size))
         return result;
 
     // L2
@@ -280,7 +285,7 @@ public:
       }
 
       // maximum iterations reached - reduce L1 size by reducing L1ratio
-      ReduceL1ratio(L1ratio);
+      ReduceL1ratio<DebugMode>(L1ratio);
     }
 
     throw std::runtime_error("L1 failed to converge with all L1ratios");
@@ -291,7 +296,13 @@ public:
     return {0, 0};
   }
 
-  cv::Mat Align(const cv::Mat& image1, const cv::Mat& image2) const { return Align(image1.clone(), image2.clone()); }
+  template <bool DebugMode = false, bool CrossCorrelation = false>
+  cv::Mat Align(const cv::Mat& image1, const cv::Mat& image2) const
+  {
+    return Align<DebugMode, CrossCorrelation>(image1.clone(), image2.clone());
+  }
+
+  template <bool DebugMode = false, bool CrossCorrelation = false>
   cv::Mat Align(cv::Mat&& image1, cv::Mat&& image2) const
   try
   {
@@ -299,8 +310,8 @@ public:
     cv::Mat img2W = image2.clone();
     ApplyWindow(img1W);
     ApplyWindow(img2W);
-    cv::Mat img1FT = Fourier::fft(img1W, PackedFFT);
-    cv::Mat img2FT = Fourier::fft(img2W, PackedFFT);
+    cv::Mat img1FT = Fourier::fft(img1W);
+    cv::Mat img2FT = Fourier::fft(img2W);
     Fourier::fftshift(img1FT);
     Fourier::fftshift(img2FT);
     cv::Mat img1FTm = cv::Mat::zeros(img1FT.size(), CV_32F);
@@ -394,10 +405,39 @@ public:
 
   void ShowDebugStuff() const
   {
-    // window
-    if (1)
+    bool debugCalculate = true;
+    bool debugWindow = false;
+    bool debugBandpass = false;
+    bool debugBandpassRinging = false;
+
+    if (debugCalculate)
     {
-      cv::Mat img = roicrop(loadImage("Resources/test.png"), 2048, 2048, mCols, mRows);
+      cv::Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
+      cv::Mat image1 = roicrop(loadImage("../resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
+      cv::Mat image2 = roicrop(loadImage("../resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
+      bool addNoise = false;
+
+      if (addNoise)
+      {
+        f64 noiseStdev = 0.03;
+        cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, CV_32F);
+        cv::Mat noise2 = cv::Mat::zeros(image2.rows, image2.cols, CV_32F);
+        randn(noise1, 0, noiseStdev);
+        randn(noise2, 0, noiseStdev);
+        image1 += noise1;
+        image2 += noise2;
+      }
+
+      auto ipcshift = Calculate<true>(image1, image2);
+
+      LOG_INFO("Input raw shift = {}", rawshift);
+      LOG_INFO("Resulting shift = {}", ipcshift);
+      LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
+    }
+
+    if (debugWindow)
+    {
+      cv::Mat img = roicrop(loadImage("../resources/test.png"), 2048, 2048, mCols, mRows);
       cv::Mat w, imgw;
       createHanningWindow(w, img.size(), CV_32F);
       multiply(img, w, imgw);
@@ -424,8 +464,7 @@ public:
       // Plot2D::Plot(Fourier::fftlogmagn(imgw), "2DImageWindowDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
     }
 
-    // bandpass
-    if (0)
+    if (debugBandpass)
     {
       cv::Mat bpR = cv::Mat::zeros(mRows, mCols, CV_32F);
       cv::Mat bpG = cv::Mat::zeros(mRows, mCols, CV_32F);
@@ -459,10 +498,9 @@ public:
       // Plot2D::Plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
     }
 
-    // bandpass image ringing
-    if (0)
+    if (debugBandpassRinging)
     {
-      cv::Mat img = roicrop(loadImage("Resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+      cv::Mat img = roicrop(loadImage("../resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
       cv::Mat fftR = Fourier::fft(img);
       cv::Mat fftG = Fourier::fft(img);
       cv::Mat filterR = cv::Mat::zeros(img.size(), CV_32F);
@@ -503,31 +541,6 @@ public:
 
       // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
       Plot2D::Plot("IPCdebug2D", imgfG);
-    }
-
-    // 2 pic
-    if (0)
-    {
-      cv::Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
-      cv::Mat image1 = roicrop(loadImage("Resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
-      cv::Mat image2 = roicrop(loadImage("Resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
-
-      if (1)
-      {
-        f64 noiseStdev = 0.03;
-        cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, CV_32F);
-        cv::Mat noise2 = cv::Mat::zeros(image2.rows, image2.cols, CV_32F);
-        randn(noise1, 0, noiseStdev);
-        randn(noise2, 0, noiseStdev);
-        image1 += noise1;
-        image2 += noise2;
-      }
-
-      auto ipcshift = Calculate(image1, image2);
-
-      LOG_INFO("Input raw shift = {}", rawshift);
-      LOG_INFO("Resulting shift = {}", ipcshift);
-      LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
     }
 
     LOG_INFO("IPC debug stuff shown");
@@ -900,30 +913,11 @@ private:
       return;
     multiply(image, mWindow, image);
   }
-  cv::Mat CalculateFourierTransform(cv::Mat&& image) const
-  {
-    if constexpr (CudaFFT)
-      return Fourier::cufft(std::move(image), PackedFFT);
-    return Fourier::fft(std::move(image), PackedFFT);
-  }
+  cv::Mat CalculateFourierTransform(cv::Mat&& image) const { return Fourier::fft(std::move(image)); }
+
+  template <bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
-    if constexpr (PackedFFT)
-    {
-      cv::Mat cps;
-      mulSpectrums(dft2, dft1, cps, 0, true);
-      for (i32 row = 0; row < cps.rows; ++row)
-      {
-        for (i32 col = 0; col < cps.cols; ++col)
-        {
-          // for CCS packed FFT the cps vector is real, not complex
-          // calculating magnitude & dividing is non-trivial
-          // see magSpectrum() & divSpectrums() in OpenCV phaseCorrelate()
-        }
-      }
-      return cps;
-    }
-
     for (i32 row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec2f>(row);
@@ -955,10 +949,7 @@ private:
     if (mBandpassL <= 0 and mBandpassH >= 1)
       return;
 
-    if constexpr (PackedFFT)
-      multiply(crosspower, mFrequencyBandpass(cv::Rect(0, 0, crosspower.cols, crosspower.rows)), crosspower);
-    else
-      multiply(crosspower, mFrequencyBandpass, crosspower);
+    multiply(crosspower, mFrequencyBandpass, crosspower);
   }
   void CalculateFrequencyBandpass()
   {
@@ -967,12 +958,7 @@ private:
   }
   cv::Mat CalculateL3(cv::Mat&& crosspower) const
   {
-    cv::Mat L3;
-    if constexpr (CudaFFT)
-      L3 = Fourier::icufft(std::move(crosspower), PackedFFT);
-    else
-      L3 = Fourier::ifft(std::move(crosspower));
-
+    cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
     return L3;
   }
@@ -1044,6 +1030,7 @@ private:
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
   bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) const { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
+  template <bool DebugMode>
   bool ReduceL2size(i32& L2size) const
   {
     L2size -= 2;
@@ -1051,6 +1038,7 @@ private:
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
+  template <bool DebugMode>
   void ReduceL1ratio(f64& L1ratio) const
   {
     L1ratio -= mL1ratioStep;
@@ -1138,6 +1126,8 @@ private:
     }
     return images;
   }
+
+  template <bool DebugMode = false>
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
   {
     for (const auto& image : images)
