@@ -110,6 +110,12 @@ inline void fftshift(cv::Mat& mat)
   tmp.copyTo(q2);
 }
 
+inline cv::Mat fftshift(cv::Mat&& mat)
+{
+  fftshift(mat);
+  return mat;
+}
+
 inline void ifftshift(cv::Mat& mat)
 {
   i32 cx = mat.cols / 2;

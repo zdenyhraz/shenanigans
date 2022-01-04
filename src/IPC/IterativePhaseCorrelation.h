@@ -165,7 +165,27 @@ public:
     }
 
     auto crosspower = CalculateCrossPowerSpectrum<CrossCorrelation>(std::move(dft1), std::move(dft2));
+    if constexpr (DebugMode)
+    {
+      Plot2D::Set(fmt::format("{} CP log magnitude", mDebugName));
+      // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
+
+      Plot2D::Set(fmt::format("{} CP phase", mDebugName));
+      // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
+    }
     ApplyBandpass(crosspower);
+    if constexpr (DebugMode)
+    {
+      Plot2D::Set(fmt::format("{} CP log magnitude filtered", mDebugName));
+      // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn_filtered.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
+
+      Plot2D::Set(fmt::format("{} CP phase (fake) filtered", mDebugName));
+      // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase_filtered.png", mDebugDirectory, mDebugName));
+      Plot2D::Plot(mBandpass.mul(Fourier::fftshift(Fourier::phase(crosspower))));
+    }
 
     cv::Mat L3 = CalculateL3(std::move(crosspower));
     cv::Point2f L3peak = GetPeak(L3);
@@ -415,7 +435,7 @@ public:
       cv::Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
       cv::Mat image1 = roicrop(loadImage("../resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
       cv::Mat image2 = roicrop(loadImage("../resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
-      bool addNoise = false;
+      bool addNoise = true;
 
       if (addNoise)
       {
@@ -428,7 +448,7 @@ public:
         image2 += noise2;
       }
 
-      auto ipcshift = Calculate<true>(image1, image2);
+      auto ipcshift = Calculate<true, false>(image1, image2);
 
       LOG_INFO("Input raw shift = {}", rawshift);
       LOG_INFO("Resulting shift = {}", ipcshift);
