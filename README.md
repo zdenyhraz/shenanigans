@@ -18,7 +18,10 @@ Semi-random PhD funky stuff. Mainly contains calculations for astrophysics artic
 - 📄 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
 - 📄 [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
-## The Qt GUI
+## Subpixel image registration via iterative phase correlation (gradual 1 pixel shift via bilinear interpolation of a 256x256 image, no noise vs heavy noise)
+<img src="dissertation/refinement/peakshift.gif" width="50%"><img src="dissertation/refinement/peakshift_noise.gif" width="50%">
+
+## The Qt5 GUI
 <img src="articles/random/gui.PNG" width="100%">
 
 ## Visualization of optimizer progress on a given objective function landscape
