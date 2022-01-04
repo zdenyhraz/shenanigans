@@ -440,7 +440,7 @@ void checkFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmai
 
 void loadImageDebug(cv::Mat& activeimg, f64 gamaa, bool colorr, f64 quanBot, f64 quanTop);
 
-inline cv::Mat loadImage(std::string path)
+inline cv::Mat loadImage(const std::string& path)
 {
   if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
     return FitsImage(path).image();

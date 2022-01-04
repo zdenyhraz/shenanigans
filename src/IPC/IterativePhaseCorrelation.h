@@ -84,8 +84,13 @@ public:
   void SetMaxIterations(i32 maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetWindowType(WindowType type) { mWindowType = type; }
-  void SetDebugDirectory(const std::string& dir) { mDebugDirectory = dir; }
-  void SetDebugName(const std::string& name) { mDebugName = name; }
+  void SetDebugDirectory(const std::string& dir) const
+  {
+    mDebugDirectory = dir;
+    if (not std::filesystem::exists(dir))
+      std::filesystem::create_directory(dir);
+  }
+  void SetDebugName(const std::string& name) const { mDebugName = name; }
 
   i32 GetRows() const { return mRows; }
   i32 GetCols() const { return mCols; }
@@ -199,6 +204,15 @@ public:
       Plot2D::Set(fmt::format("{} L3", mDebugName));
       Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
+
+      if (1) // gradual peakshift
+      {
+        auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 5, 5);
+        resize(peakshift, peakshift, peakshift.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
+        Plot2D::Set(fmt::format("{} peakshift", mDebugName));
+        Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
+        Plot2D::Plot(peakshift);
+      }
     }
 
     if (mAccuracyType == AccuracyType::Pixel)
@@ -424,18 +438,25 @@ public:
   }
 
   void ShowDebugStuff() const
+  try
   {
-    bool debugCalculate = true;
+    bool debugShift = false;
+    bool debugGradualShift = true;
     bool debugWindow = false;
     bool debugBandpass = false;
     bool debugBandpassRinging = false;
 
-    if (debugCalculate)
+    if (debugShift)
     {
-      cv::Point2f rawshift(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows);
-      cv::Mat image1 = roicrop(loadImage("../resources/test.png"), 4096 / 2, 4096 / 2, mCols, mRows);
-      cv::Mat image2 = roicrop(loadImage("../resources/test.png"), 4096 / 2 - rawshift.x, 4096 / 2 - rawshift.y, mCols, mRows);
-      bool addNoise = true;
+      std::string path1 = "../resources/AIA/171A.png";
+      std::string path2 = "../resources/AIA/171A.png";
+      bool artificialShift = path1 == path2;
+      cv::Point2f rawshift = artificialShift ? cv::Point2f(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2f(0, 0);
+      cv::Mat image1 = loadImage(path1);
+      cv::Mat image2 = artificialShift ? image1.clone() : loadImage(path2);
+      image1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
+      image2 = roicrop(image2, image2.cols / 2 - rawshift.x, image2.rows / 2 - rawshift.y, mCols, mRows);
+      bool addNoise = false;
 
       if (addNoise)
       {
@@ -450,9 +471,31 @@ public:
 
       auto ipcshift = Calculate<true, false>(image1, image2);
 
-      LOG_INFO("Input raw shift = {}", rawshift);
-      LOG_INFO("Resulting shift = {}", ipcshift);
-      LOG_INFO("Resulting accuracy = {}", ipcshift - rawshift);
+      if (artificialShift)
+        LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
+      else
+        LOG_INFO("Estimate shift = {}", ipcshift);
+    }
+
+    if (debugGradualShift)
+    {
+      SetDebugDirectory("Debug");
+      const cv::Mat image1 = loadImage("../resources/AIA/171A.png");
+      const cv::Mat crop1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
+      cv::Mat image2 = image1.clone();
+      cv::Mat crop2;
+      const i32 iters = 11;
+
+      for (i32 i = 0; i < iters; i++)
+      {
+        SetDebugName(fmt::format("GradualShift{}", i));
+        const cv::Point2f rawshift(static_cast<f32>(i) / (iters - 1), 0);
+        const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., rawshift.x, 0., 1., rawshift.y);
+        warpAffine(image2, image2, T, image2.size());
+        crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
+        const auto ipcshift = Calculate<true, false>(crop1, crop2);
+        LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
+      }
     }
 
     if (debugWindow)
@@ -564,6 +607,14 @@ public:
     }
 
     LOG_INFO("IPC debug stuff shown");
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR("IterativePhaseCorrelation::ShowDebugStuff() error: {}", e.what());
+  }
+  catch (...)
+  {
+    LOG_ERROR("IterativePhaseCorrelation::ShowDebugStuff() error: {}", "Unknown error");
   }
 
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift = 2.0, f32 noiseStdev = 0.01, i32 itersPerImage = 100, f64 validationRatio = 0.2,
@@ -846,8 +897,8 @@ private:
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
-  std::string mDebugDirectory = "Debug";
-  std::string mDebugName = "IPC";
+  mutable std::string mDebugDirectory = "Debug";
+  mutable std::string mDebugName = "IPC";
   mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   cv::Mat mBandpass;
   cv::Mat mFrequencyBandpass;
