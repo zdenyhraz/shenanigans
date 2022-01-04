@@ -205,7 +205,7 @@ public:
       Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(plot);
 
-      if (1) // gradual peakshift
+      if (0) // gradual peakshift
       {
         auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 5, 5);
         resize(peakshift, peakshift, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
