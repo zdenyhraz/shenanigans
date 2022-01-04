@@ -491,7 +491,7 @@ public:
         SetDebugName(fmt::format("GradualShift{}", i));
         const cv::Point2f rawshift(static_cast<f32>(i) / (iters - 1), 0);
         const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., rawshift.x, 0., 1., rawshift.y);
-        warpAffine(image2, image2, T, image2.size());
+        warpAffine(image1, image2, T, image2.size());
         crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
         const auto ipcshift = Calculate<true, false>(crop1, crop2);
         LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
