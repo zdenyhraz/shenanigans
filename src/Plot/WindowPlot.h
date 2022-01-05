@@ -6,7 +6,7 @@ class WindowPlot : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowPlot(std::string name, f64 colRowRatio, std::function<void(std::string)>& OnClose);
+  WindowPlot(const std::string& name, f64 colRowRatio, std::function<void(std::string)>& OnClose);
 
   Ui::WindowPlot ui;
   QCPColorMap* colorMap;
