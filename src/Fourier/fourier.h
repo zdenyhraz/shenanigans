@@ -7,10 +7,10 @@ namespace Fourier
 {
 inline cv::Mat fft(cv::Mat&& img, bool packed = false)
 {
-  if (img.type() != CV_32F)
+  if (img.type() != CV_32F) [[unlikely]]
     img.convertTo(img, CV_32F);
 
-  if (packed)
+  if (packed) [[unlikely]]
     cv::dft(img, img);
   else
     cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);

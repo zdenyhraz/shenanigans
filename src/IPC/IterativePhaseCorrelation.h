@@ -121,13 +121,13 @@ public:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
-    if (image1.size() != image2.size())
+    if (image1.size() != image2.size()) [[unlikely]]
       throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
-    if (image1.size() != cv::Size(mCols, mRows))
+    if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
       throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
-    if (image1.channels() != 1 or image2.channels() != 1)
+    if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
       throw std::runtime_error("Multichannel images are not supported");
 
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
@@ -158,14 +158,14 @@ public:
     if constexpr (DebugMode)
       DebugL3(L3);
 
-    if (mAccuracyType == AccuracyType::Pixel)
+    if (mAccuracyType == AccuracyType::Pixel) [[unlikely]]
       return L3peak - L3mid;
 
-    if (mAccuracyType == AccuracyType::Subpixel)
+    if (mAccuracyType == AccuracyType::Subpixel) [[unlikely]]
     {
       i32 L2size = 5;
       while (IsOutOfBounds(L3peak, L3, L2size))
-        if (!ReduceL2size<DebugMode>(L2size))
+        if (!ReduceL2size<DebugMode>(L2size)) [[unlikely]]
           return result;
 
       cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
@@ -177,7 +177,7 @@ public:
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size))
+      if (!ReduceL2size<DebugMode>(L2size)) [[unlikely]]
         return result;
 
     // L2
@@ -208,7 +208,7 @@ public:
       i32 L1size = GetL1size(L2U.cols, L1ratio);
       cv::Point2f L1mid(L1size / 2, L1size / 2);
       cv::Point2f L1peak;
-      if (L1circle.cols != L1size)
+      if (L1circle.cols != L1size) [[unlikely]]
         L1circle = kirkl(L1size);
 
       if constexpr (DebugMode)
@@ -216,7 +216,7 @@ public:
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
-        if (IsOutOfBounds(L2Upeak, L2U, L1size))
+        if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
           break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
@@ -363,7 +363,7 @@ private:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
-    if (image.type() != CV_32F)
+    if (image.type() != CV_32F) [[unlikely]]
       image.convertTo(image, CV_32F);
 
     if constexpr (Normalize)
@@ -374,7 +374,7 @@ private:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
-    if (mWindowType != WindowType::Rectangular)
+    if (mWindowType != WindowType::Rectangular) [[likely]]
       multiply(image, mWindow, image);
   }
   template <bool DebugMode>
@@ -476,7 +476,7 @@ private:
 
     cv::Point2f result(Mx / M, My / M);
 
-    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows)
+    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows) [[unlikely]]
       return cv::Point2f(mat.cols / 2, mat.rows / 2);
 
     return result;
