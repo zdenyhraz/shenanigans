@@ -119,7 +119,7 @@ public:
   cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   try
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::Calculate");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
     if (image1.size() != image2.size())
       throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
@@ -130,8 +130,8 @@ public:
     if (image1.channels() != 1 or image2.channels() != 1)
       throw std::runtime_error("Multichannel images are not supported");
 
-    ConvertToUnitFloat<CrossCorrelation>(image1);
-    ConvertToUnitFloat<CrossCorrelation>(image2);
+    ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
+    ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
 
     if constexpr (DebugMode)
     {
@@ -146,11 +146,11 @@ public:
       Plot2D::Plot(image2);
     }
 
-    ApplyWindow(image1);
-    ApplyWindow(image2);
+    ApplyWindow<DebugMode>(image1);
+    ApplyWindow<DebugMode>(image2);
 
-    auto dft1 = CalculateFourierTransform(std::move(image1));
-    auto dft2 = CalculateFourierTransform(std::move(image2));
+    auto dft1 = CalculateFourierTransform<DebugMode>(std::move(image1));
+    auto dft2 = CalculateFourierTransform<DebugMode>(std::move(image2));
 
     if constexpr (DebugMode and 0)
     {
@@ -177,7 +177,7 @@ public:
       Plot2D::Plot(Fourier::phase(plot2));
     }
 
-    auto crosspower = CalculateCrossPowerSpectrum<CrossCorrelation>(std::move(dft1), std::move(dft2));
+    auto crosspower = CalculateCrossPowerSpectrum<DebugMode, CrossCorrelation>(std::move(dft1), std::move(dft2));
 
     if constexpr (DebugMode)
     {
@@ -190,8 +190,8 @@ public:
       Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
     }
 
-    cv::Mat L3 = CalculateL3(std::move(crosspower));
-    cv::Point2f L3peak = GetPeak(L3);
+    cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
+    cv::Point2f L3peak = GetPeak<DebugMode>(L3);
     cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
     cv::Point2f result = L3peak - L3mid;
 
@@ -223,7 +223,7 @@ public:
         if (!ReduceL2size<DebugMode>(L2size))
           return result;
 
-      cv::Mat L2 = CalculateL2(L3, L3peak, 5);
+      cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
       cv::Point2f L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
       cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
       return L3peak - L3mid + L2peak - L2mid;
@@ -236,7 +236,7 @@ public:
         return result;
 
     // L2
-    cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
+    cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
     cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
     if constexpr (DebugMode)
     {
@@ -249,7 +249,7 @@ public:
     }
 
     // L2U
-    cv::Mat L2U = CalculateL2U(L2);
+    cv::Mat L2U = CalculateL2U<DebugMode>(L2);
     cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
 
     if constexpr (DebugMode)
@@ -280,7 +280,7 @@ public:
     cv::Mat L1circle = mL1circle.clone();
     while (L1ratio > 0)
     {
-      // LOG_FUNCTION("IterativePhaseCorrelation::IterativeRefinement");
+      LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::IterativeRefinement");
 
       // reset L2U peak position
       cv::Point2f L2Upeak = L2Umid;
@@ -448,10 +448,10 @@ private:
     f64 r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
     return (mBandpassL <= r and r <= mBandpassH) ? 1 : 0;
   }
-  template <bool Normalize = false>
+  template <bool DebugMode, bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::ConvertToUnitFloat");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
     if (image.type() != CV_32F)
       image.convertTo(image, CV_32F);
@@ -459,22 +459,24 @@ private:
     if constexpr (Normalize)
       normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
+  template <bool DebugMode>
   void ApplyWindow(cv::Mat& image) const
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::ApplyWindow");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
     if (mWindowType != WindowType::Rectangular)
       multiply(image, mWindow, image);
   }
+  template <bool DebugMode>
   static cv::Mat CalculateFourierTransform(cv::Mat&& image)
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateFourierTransform");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateFourierTransform");
     return Fourier::fft(std::move(image));
   }
-  template <bool CrossCorrelation>
+  template <bool DebugMode, bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
 
     for (i32 row = 0; row < dft1.rows; ++row)
     {
@@ -504,16 +506,18 @@ private:
     }
     return dft1;
   }
+  template <bool DebugMode>
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL3");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL3");
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
     return L3;
   }
+  template <bool DebugMode>
   static cv::Point2f GetPeak(const cv::Mat& mat)
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::GetPeak");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak;
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
 
@@ -522,7 +526,6 @@ private:
 
     return peak;
   }
-
   template <bool Circular>
   cv::Point2f GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
   {
@@ -568,14 +571,16 @@ private:
 
     return result;
   }
+  template <bool DebugMode>
   static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size)
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL2");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
     return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
   }
+  template <bool DebugMode>
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
-    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL2U");
+    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2U");
 
     cv::Mat L2U;
     switch (mInterpolationType)

@@ -4,17 +4,31 @@
 #include <fmt/format.h>
 #include "Logger.h"
 
-#define LOG_FUNCTION(fun) LogFunction logFunction(fun)
+#define LOG_FUNCTION(funName) LogFunction logFunction(funName)
+#define LOG_FUNCTION_IF(show, funName) LogFunction<show> logFunction(funName)
 
+template <bool Show = true>
 class LogFunction
 {
   using clock = std::chrono::high_resolution_clock;
   using time_point = std::chrono::time_point<clock>;
 
 public:
-  LogFunction(const std::string& funName) : mFunName(funName), mStartTime(clock::now()) { Logger::Function(fmt::format("{} started", mFunName)); }
+  LogFunction(std::string&& funName)
+  {
+    if constexpr (Show)
+    {
+      mStartTime = clock::now();
+      mFunName = std::move(funName);
+      Logger::Function("{} started", mFunName);
+    }
+  }
 
-  ~LogFunction() { Logger::Function(fmt::format("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime))); }
+  ~LogFunction()
+  {
+    if constexpr (Show)
+      Logger::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
+  }
 
 private:
   static std::string FormatDuration(std::chrono::nanoseconds dur)

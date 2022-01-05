@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
 #include <chrono>
 #include <numeric>
 #include <filesystem>

@@ -5,8 +5,8 @@ try
 {
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
-  ApplyWindow(img1W);
-  ApplyWindow(img2W);
+  ApplyWindow<false>(img1W);
+  ApplyWindow<false>(img2W);
   cv::Mat img1FT = Fourier::fft(img1W);
   cv::Mat img2FT = Fourier::fft(img2W);
   Fourier::fftshift(img1FT);
@@ -194,8 +194,8 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> IterativePhaseCorrelation
       cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
       cv::Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
 
-      ConvertToUnitFloat(image1);
-      ConvertToUnitFloat(image2);
+      ConvertToUnitFloat<false>(image1);
+      ConvertToUnitFloat<false>(image2);
 
       AddNoise(image1, noiseStdev);
       AddNoise(image2, noiseStdev);
@@ -751,12 +751,12 @@ void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string&
 void IterativePhaseCorrelation::ShowDebugStuff() const
 try
 {
+  constexpr bool DebugMode = true;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
-  constexpr bool DebugMode = false;
 
   if constexpr (debugShift)
   {
