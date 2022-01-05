@@ -441,9 +441,8 @@ private:
   }
   void ApplyWindow(cv::Mat& image) const
   {
-    if (mWindowType == WindowType::Rectangular)
-      return;
-    multiply(image, mWindow, image);
+    if (mWindowType != WindowType::Rectangular)
+      multiply(image, mWindow, image);
   }
   static cv::Mat CalculateFourierTransform(cv::Mat&& image) { return Fourier::fft(std::move(image)); }
   template <bool CrossCorrelation>
@@ -458,7 +457,7 @@ private:
       {
         const f32 re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
         const f32 im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
-        const f32 mag = sqrt(re * re + im * im);
+        const f32 mag = std::sqrt(re * re + im * im);
         const f32 band = bandp[col];
 
         if constexpr (CrossCorrelation)

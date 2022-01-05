@@ -23,18 +23,20 @@ TEST_F(IterativePhaseCorrelationTest, ZeroShiftCrossCorrel)
   EXPECT_EQ(shift, cv::Point2f(0, 0));
 }
 
-TEST_F(IterativePhaseCorrelationTest, NonZeroShiftPhaseCorrel)
+TEST_F(IterativePhaseCorrelationTest, ShiftPhaseCorrel)
 {
   IterativePhaseCorrelation ipc(mImg1);
   const auto shift = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NE(shift, cv::Point2f(0, 0));
+  EXPECT_NEAR(shift.x, 97, 0.5);
+  EXPECT_NEAR(shift.y, -104, 0.5);
 }
 
-TEST_F(IterativePhaseCorrelationTest, NonZeroShiftCrossCorrel)
+TEST_F(IterativePhaseCorrelationTest, ShiftCrossCorrel)
 {
   IterativePhaseCorrelation ipc(mImg1);
   const auto shift = ipc.Calculate<false, true>(mImg1, mImg2);
-  EXPECT_NE(shift, cv::Point2f(0, 0));
+  EXPECT_NEAR(shift.x, 97, 0.5);
+  EXPECT_NEAR(shift.y, -104, 0.5);
 }
 
 TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputsPhaseCorrel)
