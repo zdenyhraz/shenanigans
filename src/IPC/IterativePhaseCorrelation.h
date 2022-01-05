@@ -212,7 +212,7 @@ public:
         L1circle = kirkl(L1size);
 
       if constexpr (DebugMode)
-        DebugL1B(L2U, L2Upeak, L1size);
+        DebugL1B(L2U, L2Upeak, L1size, L1circle);
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
@@ -226,7 +226,7 @@ public:
         if (AccuracyReached(L1peak, L1mid))
         {
           if constexpr (DebugMode)
-            DebugL1A(L1);
+            DebugL1A(L1, L1circle);
 
           return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
         }
@@ -543,8 +543,8 @@ private:
   void DebugL3(const cv::Mat& L3) const;
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
-  void DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) const;
-  void DebugL1A(const cv::Mat& L1) const;
+  void DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
+  void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
   const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters);

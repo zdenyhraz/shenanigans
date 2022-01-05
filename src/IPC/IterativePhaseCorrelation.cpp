@@ -98,18 +98,18 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   }
 }
 
-void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
   Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size));
+  Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size).mul(L1circle));
 }
 
-void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1) const
+void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1A", mDebugName));
   Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(L1);
+  Plot2D::Plot(L1.mul(L1circle));
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
