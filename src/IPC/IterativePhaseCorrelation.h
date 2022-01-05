@@ -120,8 +120,8 @@ public:
     if (image1.channels() != 1 or image2.channels() != 1)
       throw std::runtime_error("Multichannel images are not supported");
 
-    ConvertToUnitFloat(image1);
-    ConvertToUnitFloat(image2);
+    ConvertToUnitFloat<CrossCorrelation>(image1);
+    ConvertToUnitFloat<CrossCorrelation>(image2);
 
     if constexpr (DebugMode)
     {
@@ -430,10 +430,14 @@ private:
     f64 r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
     return (mBandpassL <= r and r <= mBandpassH) ? 1 : 0;
   }
+  template <bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
     if (image.type() != CV_32F)
       image.convertTo(image, CV_32F);
+
+    if constexpr (Normalize)
+      normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
   void ApplyWindow(cv::Mat& image) const
   {

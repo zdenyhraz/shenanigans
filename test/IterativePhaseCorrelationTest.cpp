@@ -48,7 +48,7 @@ TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputsPhaseCorrel)
 TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputsCrossCorrel)
 {
   IterativePhaseCorrelation ipc(mImg1);
-  const auto normShift = ipc.Calculate(mImg1, mImg2);
+  const auto normShift = ipc.Calculate<false, true>(mImg1, mImg2);
   const auto unnormShift = ipc.Calculate<false, true>(mImg1 * 25.73, mImg2 * 38.14);
-  EXPECT_NE(normShift, unnormShift);
+  EXPECT_EQ(normShift, unnormShift);
 }
