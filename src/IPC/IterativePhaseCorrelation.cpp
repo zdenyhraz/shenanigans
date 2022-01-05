@@ -250,10 +250,10 @@ cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const c
   return (img1c + img2c) / 2;
 }
 
-std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory, bool mute)
+std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory)
 {
-  if (!mute)
-    LOG_INFO("Loading images from '{}'...", imagesDirectory);
+  LOG_FUNCTION("IterativePhaseCorrelation::LoadImages");
+  LOG_INFO("Loading images from '{}'...", imagesDirectory);
 
   if (!std::filesystem::is_directory(imagesDirectory))
     throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
@@ -265,8 +265,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
 
     if (!IsImage(path))
     {
-      if (!mute)
-        LOG_DEBUG("Directory contains a non-image file {}", path);
+      LOG_DEBUG("Directory contains a non-image file {}", path);
       continue;
     }
 
@@ -275,14 +274,15 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
     auto image = loadImage(path);
     image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
     images.push_back(image);
-    if (!mute)
-      LOG_DEBUG("Loaded image {}", path);
+    LOG_DEBUG("Loaded image {}", path);
   }
   return images;
 }
 
 std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::CreateImagePairs");
+
   for (const auto& image : images)
   {
     if (image.rows < mRows + maxShift or image.cols < mCols + maxShift)
@@ -337,6 +337,8 @@ void IterativePhaseCorrelation::AddNoise(cv::Mat& image, f64 noiseStdev)
 
 const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
+
   return [&](const std::vector<f64>& params)
   {
     IterativePhaseCorrelation ipc(mRows, mCols);
@@ -361,21 +363,24 @@ const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::Cre
 }
 
 std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
-    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute)
+    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
   Evolution evo(ParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BPT", "BPL", "BPH", "ITPT", "WINT", "UC", "L1R"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
   evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
-  evo.SetPlotOutput(!mute);
-  evo.SetConsoleOutput(!mute);
+  evo.SetPlotOutput(true);
+  evo.SetConsoleOutput(true);
   return evo.Optimize(obj, valid).optimum;
 }
 
-void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters, bool mute)
+void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::ApplyOptimalParameters");
+
   if (optimalParameters.size() != ParameterCount)
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
@@ -386,17 +391,14 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
-  if (!mute)
-  {
-    LOG_INFO("Final IPC BandpassType: {}",
-        BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
-    LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
-    LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
-    LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter])));
-    LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
-    LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
-    LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
-  }
+  LOG_INFO("Final IPC BandpassType: {}",
+      BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
+  LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
+  LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
+  LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter])));
+  LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
+  LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
+  LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const
@@ -461,6 +463,8 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
 void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
     const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter)
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::ShowOptimizationPlots");
+
   std::vector<f64> shiftsXReference, shiftsXReferenceError;
   std::vector<f64> shiftsXPixel, shiftsXPixelError;
   std::vector<f64> shiftsXNonit, shiftsXNonitError;
@@ -577,6 +581,8 @@ f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2f>
 
 void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs)
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::ShowRandomImagePair");
+
   const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(rand01() * imagePairs.size())];
   cv::Mat concat;
   hconcat(img1, img2, concat);
@@ -591,11 +597,10 @@ f64 IterativePhaseCorrelation::GetFractionalPart(f64 x)
 }
 
 void IterativePhaseCorrelation::Optimize(
-    const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, f64 validationRatio, i32 populationSize, bool mute)
+    const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, f64 validationRatio, i32 populationSize)
 try
 {
-  if (!mute)
-    LOG_FUNCTION("IPC optimization");
+  LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
 
   if (itersPerImage < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
@@ -604,8 +609,8 @@ try
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
-  const auto trainingImages = LoadImages(trainingImagesDirectory, mute);
-  const auto validationImages = LoadImages(validationImagesDirectory, mute);
+  const auto trainingImages = LoadImages(trainingImagesDirectory);
+  const auto validationImages = LoadImages(validationImagesDirectory);
 
   if (trainingImages.empty())
     throw std::runtime_error("Empty training images vector");
@@ -617,36 +622,30 @@ try
   f64 objBefore;
 
   // before
-  if (!mute)
-  {
-    LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
-        trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
-    ShowRandomImagePair(trainingImagePairs);
-    referenceShifts = GetReferenceShifts(trainingImagePairs);
-    shiftsPixel = GetPixelShifts(trainingImagePairs);
-    shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
-    shiftsBefore = GetShifts(trainingImagePairs);
-    objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
-    ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
-  }
+  LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
+      trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
+  ShowRandomImagePair(trainingImagePairs);
+  referenceShifts = GetReferenceShifts(trainingImagePairs);
+  shiftsPixel = GetPixelShifts(trainingImagePairs);
+  shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
+  shiftsBefore = GetShifts(trainingImagePairs);
+  objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
+  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
 
   // opt
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
   const auto valid = CreateObjectiveFunction(validationImagePairs);
-  const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize, mute);
+  const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
-  ApplyOptimalParameters(optimalParameters, mute);
+  ApplyOptimalParameters(optimalParameters);
 
   // after
-  if (!mute)
-  {
-    const auto shiftsAfter = GetShifts(trainingImagePairs);
-    const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-    ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
-    LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
-    LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
-  }
+  const auto shiftsAfter = GetShifts(trainingImagePairs);
+  const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
+  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
+  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+  LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
 {
@@ -655,7 +654,7 @@ catch (const std::exception& e)
 
 void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
 {
-  LOG_FUNCTION("PlotObjectiveFunctionLandscape");
+  LOG_FUNCTION("IterativePhaseCorrelation::PlotObjectiveFunctionLandscape");
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
@@ -704,6 +703,8 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
 
 void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters)
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::PlotImageSizeAccuracyDependence");
+
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   std::vector<f64> imageSizes(iters);
   std::vector<f64> accuracy(iters);
@@ -744,6 +745,8 @@ void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::strin
 
 void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence");
+
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
@@ -785,6 +788,8 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
 
 void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::PlotNoiseAccuracyDependence");
+
   if (noiseStdev <= 0.0f)
   {
     LOG_ERROR("Please set some non-zero positive max noise stdev");
@@ -829,6 +834,8 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
 
 void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence");
+
   if (noiseStdev <= 0.0f)
   {
     LOG_ERROR("Please set some non-zero positive max noise stdev");
@@ -847,7 +854,7 @@ void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string&
     f32 noise = xmin + (f64)i / (iters - 1) * (xmax - xmin);
 
     IterativePhaseCorrelation ipc = *this; // copy this
-    ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, ParameterCount * 2, true);
+    ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, ParameterCount * 2);
 
     noiseStdevs[i] = noise;
     optimalBPHs[i] = ipc.GetBandpassH();
@@ -863,6 +870,8 @@ void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string&
 void IterativePhaseCorrelation::ShowDebugStuff() const
 try
 {
+  LOG_FUNCTION("IterativePhaseCorrelation::ShowDebugStuff()");
+
   constexpr bool DebugMode = true;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
