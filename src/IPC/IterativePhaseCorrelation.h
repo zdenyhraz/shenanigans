@@ -48,6 +48,7 @@ public:
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
   }
+
   void SetSize(i32 rows, i32 cols = -1)
   {
     mRows = rows;
@@ -59,18 +60,22 @@ public:
     if (mBandpass.rows != mRows or mBandpass.cols != mCols)
       UpdateBandpass();
   }
+
   void SetSize(const cv::Size& size) { SetSize(size.height, size.width); }
+
   void SetBandpassParameters(f64 bandpassL, f64 bandpassH)
   {
     mBandpassL = clamp(bandpassL, -Constants::Inf, 1); // L from [-inf, 1]
     mBandpassH = clamp(bandpassH, 0, Constants::Inf);  // H from [0, inf]
     UpdateBandpass();
   }
+
   void SetBandpassType(BandpassType type)
   {
     mBandpassType = type;
     UpdateBandpass();
   }
+
   void SetL2size(i32 L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
   void SetL1ratio(f64 L1ratio) { mL1ratio = L1ratio; }
   void SetUpsampleCoeff(i32 upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
@@ -399,7 +404,6 @@ private:
         normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
       }
       break;
-
     case BandpassType::Rectangular:
       if (mBandpassL < mBandpassH)
       {
@@ -430,7 +434,6 @@ private:
   {
     if (image.type() != CV_32F)
       image.convertTo(image, CV_32F);
-    normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
   void ApplyWindow(cv::Mat& image) const
   {
@@ -439,7 +442,6 @@ private:
     multiply(image, mWindow, image);
   }
   static cv::Mat CalculateFourierTransform(cv::Mat&& image) { return Fourier::fft(std::move(image)); }
-
   template <bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
@@ -520,11 +522,9 @@ private:
     case InterpolationType::NearestNeighbor:
       resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
       break;
-
     case InterpolationType::Linear:
       resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
       break;
-
     case InterpolationType::Cubic:
       resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
       break;
