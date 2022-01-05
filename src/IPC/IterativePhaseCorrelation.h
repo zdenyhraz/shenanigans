@@ -223,7 +223,7 @@ public:
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2f(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
-        if (AccuracyReached(L1peak, L1mid))
+        if (AccuracyReached(L1peak, L1mid)) [[unlikely]]
         {
           if constexpr (DebugMode)
             DebugL1A(L1, L1circle);
