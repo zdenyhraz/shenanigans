@@ -369,7 +369,6 @@ private:
     case WindowType::Rectangular:
       mWindow = cv::Mat::ones(mRows, mCols, CV_32F);
       break;
-
     case WindowType::Hann:
       createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
       break;
