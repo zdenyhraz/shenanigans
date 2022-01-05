@@ -109,7 +109,7 @@ private:
     const auto& [color, name] = mLogLevelSettings[logLevel];
 
     mTextBrowser->setTextColor(color);
-    mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), name, fmt::format(fmt, args...)).c_str());
+    mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), name, fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...))).c_str());
     QCoreApplication::processEvents();
   }
 

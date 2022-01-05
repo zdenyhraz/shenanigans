@@ -174,7 +174,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mCrossStrat = BIN;
   evo.mMaxFunEvals = 5000;
   evo.mLB = {7, 0.1, 0.2, 0, 0};
-  evo.mUB = {30. * N, 1, 1.5, -1e-6 + MutationStrategyCount, -1e-6 + CrossoverStrategyCount};
+  evo.mUB = {30. * N, 1, 1.5, -1e-6 + static_cast<f64>(MutationStrategyCount), -1e-6 + static_cast<f64>(CrossoverStrategyCount)};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
   evo.SetFileOutput(false);
