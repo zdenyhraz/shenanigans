@@ -57,7 +57,7 @@ public:
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
   void SetName(const std::string& optname) { mName = optname; }
 
-  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64> baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
+  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
       const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
   usize N = 1;                            // the problem dimension
