@@ -35,95 +35,10 @@ void WindowDiffrot::showResults()
 
 void WindowDiffrot::showIPC()
 {
-  LOG_INFO("Showimg diffrot profile IPC landscape...");
-  FitsParams params1, params2;
-  IPCsettings set = *globals->IPCset;
-  set.speak = IPCsettings::All;
-  // set.save = true;
-  FitsTime time = GetStartFitsTime();
-
-  LOG_INFO("Loading file '" + time.path() + "'...");
-  cv::Mat pic1 = roicrop(loadfits(time.path(), params1), params1.fitsMidX, params1.fitsMidY, set.getcols(), set.getrows());
-
-  time.advanceTime(ui.lineEdit_5->text().toDouble() * ui.lineEdit_8->text().toDouble());
-  i32 predShift = 0;
-  if (ui.checkBox_4->isChecked())
-  {
-    predShift = predictDiffrotShift(ui.lineEdit_5->text().toDouble(), ui.lineEdit_8->text().toDouble(), params1.R);
-    LOG_DEBUG("Predicted shift used = {}", predShift);
-  }
-
-  LOG_INFO("Loading file '" + time.path() + "'...");
-  cv::Mat pic2 = roicrop(loadfits(time.path(), params1), params1.fitsMidX + predShift, params1.fitsMidY, set.getcols(), set.getrows());
-
-  phasecorrel(pic1, pic2, set);
 }
 
 void WindowDiffrot::checkDiskShifts()
 {
-  LOG_INFO("Checking diffrot disk shifts...");
-  FitsTime time = GetStartFitsTime();
-  IPCsettings set = *globals->IPCset;
-
-  i32 edgeN = 0.025 * 4096;
-  i32 edgeS = 0.974 * 4096;
-  i32 edgeW = 0.027 * 4096;
-  i32 edgeE = 0.975 * 4096;
-  i32 center = 0.5 * 4096;
-
-  i32 pics = ui.lineEdit_7->text().toDouble();
-  std::vector<f64> shiftsN;
-  std::vector<f64> shiftsS;
-  std::vector<f64> shiftsW;
-  std::vector<f64> shiftsE;
-  std::vector<f64> shiftsFX;
-  std::vector<f64> shiftsFY;
-  FitsImage pic1, pic2;
-  i32 lag1, lag2;
-  cv::Mat picshow;
-
-  for (i32 pic = 0; pic < pics; pic++)
-  {
-    LOG_DEBUG("{} / {} ...", pic + 1, pics);
-    time.advanceTime((bool)pic * (ui.lineEdit_6->text().toDouble() - ui.lineEdit_5->text().toDouble()) * ui.lineEdit_8->text().toDouble());
-    loadFitsFuzzy(pic1, time, lag1);
-    time.advanceTime(ui.lineEdit_5->text().toDouble() * ui.lineEdit_8->text().toDouble());
-    loadFitsFuzzy(pic2, time, lag2);
-
-    if (!pic)
-      picshow = pic1.image().clone();
-
-    if (pic1.params().succload and pic2.params().succload)
-    {
-      shiftsN.push_back(phasecorrel(roicrop(pic1.image(), center, edgeN, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeN, set.getcols(), set.getrows()), set).y);
-      shiftsS.push_back(phasecorrel(roicrop(pic1.image(), center, edgeS, set.getcols(), set.getrows()), roicrop(pic2.image(), center, edgeS, set.getcols(), set.getrows()), set).y);
-      shiftsW.push_back(phasecorrel(roicrop(pic1.image(), edgeW, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeW, center, set.getcols(), set.getrows()), set).x);
-      shiftsE.push_back(phasecorrel(roicrop(pic1.image(), edgeE, center, set.getcols(), set.getrows()), roicrop(pic2.image(), edgeE, center, set.getcols(), set.getrows()), set).x);
-      shiftsFX.push_back(pic2.params().fitsMidX - pic1.params().fitsMidX);
-      shiftsFY.push_back(pic2.params().fitsMidY - pic1.params().fitsMidY);
-    }
-  }
-
-  LOG_INFO("<<<<<<<<<<<<<<<<<<   ABSIPC median   /   ABSFITS median   /   ABSDIFF median   >>>>>>>>>>>>>>>>>>>>>");
-  LOG_INFO("Diffrot shifts N = {} / {} / {}", median(abs(shiftsN)), median(abs(shiftsFY)), median(abs(shiftsN - shiftsFY)));
-  LOG_INFO("Diffrot shifts S = {} / {} / {}", median(abs(shiftsS)), median(abs(shiftsFY)), median(abs(shiftsS - shiftsFY)));
-  LOG_INFO("Diffrot shifts W = {} / {} / {}", median(abs(shiftsW)), median(abs(shiftsFX)), median(abs(shiftsW - shiftsFX)));
-  LOG_INFO("Diffrot shifts E = {} / {} / {}", median(abs(shiftsE)), median(abs(shiftsFX)), median(abs(shiftsE - shiftsFX)));
-
-  std::vector<cv::Mat> picsshow(4);
-  picsshow[0] = roicrop(picshow, center, edgeN, set.getcols(), set.getrows());
-  picsshow[3] = roicrop(picshow, center, edgeS, set.getcols(), set.getrows());
-  picsshow[2] = roicrop(picshow, edgeW, center, set.getcols(), set.getrows());
-  picsshow[1] = roicrop(picshow, edgeE, center, set.getcols(), set.getrows());
-  showimg(picsshow, "pics");
-
-  std::vector<f64> iotam(shiftsFX.size());
-  std::iota(iotam.begin(), iotam.end(), 0);
-  iotam = (f64)(ui.lineEdit_7->text().toDouble() - 1) * ui.lineEdit_6->text().toDouble() * 45 / 60 / 60 / 24 / (iotam.size() - 1) * iotam;
-  // Plot1D::Plot(iotam, std::vector<std::vector<f64>>{shiftsFX, shiftsW, shiftsE}, "shiftsX", "time [days]", "45sec shiftX [px]",
-  // std::vector<std::string>{"shifts fits header X", "shifts IPC west edge", "shifts IPC east edge"});
-  // Plot1D::Plot(iotam, std::vector<std::vector<f64>>{shiftsFY, shiftsN, shiftsS}, "shiftsY", "time [days]", "45sec shiftY [px]",
-  // std::vector<std::string>{"shifts fits header Y", "shifts IPC north edge", "shifts IPC south edge"});
 }
 
 void WindowDiffrot::saveDiffrot()
@@ -215,50 +130,6 @@ void WindowDiffrot::video()
 
 void WindowDiffrot::movingPeak()
 {
-  LOG_FUNCTION("MovingPeak");
-  FitsTime starttime = GetStartFitsTime();
-  IPCsettings ipcset = *globals->IPCset;
-  ipcset.save = true;
-  ipcset.savedir = ui.lineEdit_9->text().toStdString();
-  FitsImage pic1, pic2;
-  i32 lag1, lag2;
-
-  const i32 profiles = 1;
-  const i32 sy = 0;
-  const bool saveimgs = true;
-
-  std::vector<f64> dts;
-  std::vector<std::vector<f64>> shiftsX(profiles);
-
-  for (i32 profile = 0; profile < profiles; ++profile)
-  {
-    LOG_DEBUG("profile {}/{} ...", profile + 1, profiles);
-
-    for (i32 dpic = 0; dpic < drset.pics; ++dpic)
-    {
-      FitsTime time = starttime;
-      time.advanceTime(profile * drset.dSec);
-      loadFitsFuzzy(pic1, time, lag1);
-      time.advanceTime(dpic * drset.dSec);
-      loadFitsFuzzy(pic2, time, lag2);
-
-      if (pic1.params().succload and pic2.params().succload)
-      {
-        cv::Mat crop1 = roicrop(pic1.image(), pic1.params().fitsMidX, pic1.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());
-        cv::Mat crop2 = roicrop(pic2.image(), pic2.params().fitsMidX, pic2.params().fitsMidY + sy, ipcset.getcols(), ipcset.getrows());
-        auto shift = phasecorrel(std::move(crop1), std::move(crop2), ipcset, saveimgs);
-
-        if (!profile)
-          dts.push_back((f64)dpic * drset.dSec / 60);
-
-        shiftsX[profile].push_back(shift.x);
-      }
-    }
-  }
-
-  cv::destroyAllWindows();
-
-  // Plot1D::Plot(dts, shiftsX, "shiftsX", "time step [min]", "west-east image shift [px]", {}, Plot::pens, ipcset.savedir + "plot.png");
 }
 
 FitsTime WindowDiffrot::GetStartFitsTime()

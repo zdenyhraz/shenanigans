@@ -134,17 +134,7 @@ public:
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
 
     if constexpr (DebugMode)
-    {
-      Plot2D::Set(fmt::format("{} I1", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
-      Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-      Plot2D::Plot(image1);
-
-      Plot2D::Set(fmt::format("{} I2", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
-      Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-      Plot2D::Plot(image2);
-    }
+      DebugInputImages(image1, image2);
 
     ApplyWindow<DebugMode>(image1);
     ApplyWindow<DebugMode>(image2);
@@ -153,42 +143,12 @@ public:
     auto dft2 = CalculateFourierTransform<DebugMode>(std::move(image2));
 
     if constexpr (DebugMode and 0)
-    {
-      auto plot1 = dft1.clone();
-      Fourier::fftshift(plot1);
-
-      Plot2D::Set(fmt::format("{} DFT1lm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1logmagn.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot1));
-
-      Plot2D::Set(fmt::format("{} DFT1p", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1phase.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::phase(plot1));
-
-      auto plot2 = dft2.clone();
-      Fourier::fftshift(plot2);
-
-      Plot2D::Set(fmt::format("{} DFT2lm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2logmagn.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::logmagn(plot2));
-
-      Plot2D::Set(fmt::format("{} DFT2p", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2phase.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::phase(plot2));
-    }
+      DebugFourierTransforms(dft1, dft2);
 
     auto crosspower = CalculateCrossPowerSpectrum<DebugMode, CrossCorrelation>(std::move(dft1), std::move(dft2));
 
     if constexpr (DebugMode)
-    {
-      Plot2D::Set(fmt::format("{} CP log magnitude", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
-
-      Plot2D::Set(fmt::format("{} CP phase", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
-    }
+      DebugCrossPowerSpectrum(crosspower);
 
     cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
     cv::Point2f L3peak = GetPeak<DebugMode>(L3);
@@ -196,22 +156,7 @@ public:
     cv::Point2f result = L3peak - L3mid;
 
     if constexpr (DebugMode)
-    {
-      auto plot = L3.clone();
-      // normalize(plot, plot, 0, 1, cv::NORM_MINMAX);
-      Plot2D::Set(fmt::format("{} L3", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(plot);
-
-      if (0) // gradual peakshift
-      {
-        auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 5, 5);
-        resize(peakshift, peakshift, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
-        Plot2D::Set(fmt::format("{} peakshift", mDebugName));
-        Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
-        Plot2D::Plot(peakshift);
-      }
-    }
+      DebugL3(L3);
 
     if (mAccuracyType == AccuracyType::Pixel)
       return L3peak - L3mid;
@@ -238,43 +183,16 @@ public:
     // L2
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
     cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
+
     if constexpr (DebugMode)
-    {
-      auto plot = L2.clone();
-      // normalize(plot, plot, 0, 1, cv::NORM_MINMAX);
-      resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
-      Plot2D::Set(fmt::format("{} L2", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(plot);
-    }
+      DebugL2(L2);
 
     // L2U
     cv::Mat L2U = CalculateL2U<DebugMode>(L2);
     cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
 
     if constexpr (DebugMode)
-    {
-      auto plot = L2U.clone();
-      // normalize(plot, plot, 0, 1, cv::NORM_MINMAX);
-      Plot2D::Set(fmt::format("{} L2U", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(plot);
-
-      if (0)
-      {
-        cv::Mat nearest, linear, cubic;
-        resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
-        resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
-        resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
-
-        // Plot2D::SetSavePath("IPCL2UN", mDebugDirectory + "/L2UN.png");
-        Plot2D::Plot("IPCL2UN", nearest);
-        // Plot2D::SetSavePath("IPCL2UL", mDebugDirectory + "/L2UL.png");
-        Plot2D::Plot("IPCL2UL", linear);
-        // Plot2D::SetSavePath("IPCL2UC", mDebugDirectory + "/L2UC.png");
-        Plot2D::Plot("IPCL2UC", cubic);
-      }
-    }
+      DebugL2U(L2, L2U);
 
     f64 L1ratio = mL1ratio;
     cv::Mat L1circle = mL1circle.clone();
@@ -294,11 +212,7 @@ public:
         L1circle = kirkl(L1size);
 
       if constexpr (DebugMode)
-      {
-        Plot2D::Set(fmt::format("{} L1B", mDebugName));
-        Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
-        Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size));
-      }
+        DebugL1B(L2U, L2Upeak, L1size);
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
@@ -312,11 +226,7 @@ public:
         if (AccuracyReached(L1peak, L1mid))
         {
           if constexpr (DebugMode)
-          {
-            Plot2D::Set(fmt::format("{} L1A", mDebugName));
-            Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
-            Plot2D::Plot(L1);
-          }
+            DebugL1A(L1);
 
           return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
         }
@@ -626,23 +536,32 @@ private:
     if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
   }
-  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
-  static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, bool mute = false);
+
+  void DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const;
+  void DebugFourierTransforms(const cv::Mat& dft1, const cv::Mat& dft2) const;
+  void DebugCrossPowerSpectrum(const cv::Mat& crosspower) const;
+  void DebugL3(const cv::Mat& L3) const;
+  void DebugL2(const cv::Mat& L2) const;
+  void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
+  void DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) const;
+  void DebugL1A(const cv::Mat& L1) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
-  static void AddNoise(cv::Mat& image, f64 noiseStdev);
   const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute);
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters, bool mute);
   std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const;
-  static std::string WindowType2String(WindowType type);
-  static std::string InterpolationType2String(InterpolationType type);
+  std::vector<cv::Point2f> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  std::vector<cv::Point2f> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  std::vector<cv::Point2f> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
   static void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
       const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter);
-  std::vector<cv::Point2f> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  std::vector<cv::Point2f> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  std::vector<cv::Point2f> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
   static std::vector<cv::Point2f> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
+  static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, bool mute = false);
+  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute);
+  static std::string WindowType2String(WindowType type);
+  static std::string InterpolationType2String(InterpolationType type);
+  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
   static f64 GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts);
-  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
   static f64 GetFractionalPart(f64 x);
+  static void AddNoise(cv::Mat& image, f64 noiseStdev);
+  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
 };

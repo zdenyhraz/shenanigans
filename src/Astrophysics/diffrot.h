@@ -1,5 +1,4 @@
 #pragma once
-#include "IPC/IPC.h"
 #include "IPC/IterativePhaseCorrelation.h"
 #include "diffrotResults.h"
 

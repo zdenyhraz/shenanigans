@@ -15,7 +15,6 @@
 #include "Optimization/OptimizationTestFunctions.h"
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
-#include "IPC/IPC.h"
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
@@ -772,31 +771,6 @@ try
 
     // Plot1D::Plot(x, ys, "pen colors");
   }
-  if (0) // ipc bandpass & window
-  {
-    IPCsettings set = *globals->IPCset;
-    set.setSize(1000, 1000);
-    set.setBandpassParameters(5, 1);
-    // Plot2D::Plot(set.bandpass, "x", "y", "z", 0, 1, 0, 1);
-  }
-  if (0) // 2pic IPC
-  {
-    std::string path1 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
-    std::string path2 = "C:\\Users\\Zdeny\\Documents\\wp\\cat_gray_glance_154511_3840x2160.jpg";
-    cv::Mat img1 = loadImage(path1);
-    cv::Mat img2 = loadImage(path2);
-
-    f64 shiftX = 10.3;
-    f64 shiftY = -7.2;
-    cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shiftX, 0., 1., shiftY);
-    warpAffine(img2, img2, T, cv::Size(img2.cols, img2.rows));
-
-    IPCsettings set = *globals->IPCset;
-    set.speak = IPCsettings::All;
-    set.setSize(img1.rows, img1.cols);
-
-    phasecorrel(img1, img2, set);
-  }
   if (0) // Plot1D + Plot2D test
   {
     // 1D
@@ -873,46 +847,6 @@ try
     showimg(fitwNn, "fit - weighted nearest neighbors", true);
     showimg(orig, "original", true);
     showimg(pointiky, "trials");
-  }
-  if (0) // new ipc test
-  {
-    cv::Mat img1 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
-    cv::Mat img2 = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
-
-    i32 Rows = img1.rows;
-    i32 Cols = img1.cols;
-    f64 BandpassL = 1;
-    f64 BandpassH = 200;
-    f64 L1ratio = 0.35;
-    i32 L2size = 15;
-    i32 UpsampleCoeff = 51;
-    f64 DivisionEpsilon = 0;
-    bool SubpixelEstimation = true;
-    bool CrossCorrelate = false;
-
-    IPCsettings ipc1(Rows, Cols, BandpassL, BandpassH);
-    ipc1.L1ratio = L1ratio;
-    ipc1.L2size = L2size;
-    ipc1.UC = UpsampleCoeff;
-    ipc1.epsilon = DivisionEpsilon;
-    ipc1.applyWindow = true;
-    ipc1.applyBandpass = true;
-    ipc1.subpixel = SubpixelEstimation;
-    ipc1.crossCorrel = CrossCorrelate;
-
-    IterativePhaseCorrelation ipc2(Rows, Cols, BandpassL, BandpassH);
-
-    auto shift1 = phasecorrel(img1, img2, ipc1);
-    auto shift1n = phasecorrel(img1, img1, ipc1);
-
-    auto shift2 = ipc2.Calculate(img1, img2);
-    auto shift2n = ipc2.Calculate(img1, img1);
-
-    LOG_INFO("shift1 = {}", shift1);
-    LOG_INFO("shift1n = {}", shift1n);
-
-    LOG_INFO("shift2 = {}", shift2);
-    LOG_INFO("shift2n = {}", shift2n);
   }
   if (0) // ipc sign test
   {

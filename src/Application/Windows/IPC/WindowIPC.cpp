@@ -1,8 +1,6 @@
 
 #include "WindowIPC.h"
-#include "Astrophysics/SwindFlow.h"
 #include "Plot/Plot2D.h"
-#include "IPC/ipcAux.h"
 
 WindowIPC::WindowIPC(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
 {
@@ -112,24 +110,6 @@ void WindowIPC::align()
 
 void WindowIPC::alignXY()
 {
-  LOG_DEBUG("Starting IPC image align process(XY)...");
-  RefreshIPCparameters();
-  std::string path1 = ui.lineEdit_15->text().toStdString();
-  std::string path2 = ui.lineEdit_16->text().toStdString();
-  cv::Mat img1 = loadImage(path1);
-  cv::Mat img2 = loadImage(path2);
-
-  i32 sizeX = globals->IPCset->getcols();
-  i32 sizeY = globals->IPCset->getrows();
-  img1 = roicrop(img1, ui.lineEdit_18->text().toDouble() * img1.cols, ui.lineEdit_19->text().toDouble() * img1.rows, sizeX, sizeY);
-  img2 = roicrop(img2, ui.lineEdit_18->text().toDouble() * img2.cols, ui.lineEdit_19->text().toDouble() * img2.rows, sizeX, sizeY);
-
-  IPCsettings set = *globals->IPCset;
-  set.speak = IPCsettings::All;
-
-  showimg(img1, "img1");
-  showimg(img2, "img2");
-  phasecorrel(img1, img2, set);
 }
 
 void WindowIPC::CalculateFlow()
@@ -174,32 +154,10 @@ void WindowIPC::features()
 
 void WindowIPC::linearFlow()
 {
-  LOG_DEBUG("Starting linear solar wind speed calculation...");
-  auto xyi = calculateLinearSwindFlow(*globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
-  auto xshifts = std::get<0>(xyi);
-  auto yshifts = std::get<1>(xyi);
-  auto indices = std::get<2>(xyi);
-
-  LOG_DEBUG("xshifts min = " + std::to_string(vectorMin(xshifts)));
-  LOG_DEBUG("xshifts max = " + std::to_string(vectorMax(xshifts)));
-  LOG_DEBUG("yshifts min = " + std::to_string(vectorMin(yshifts)));
-  LOG_DEBUG("yshifts max = " + std::to_string(vectorMax(yshifts)));
-  LOG_DEBUG("Linear solar wind speed calculated");
 }
 
 void WindowIPC::constantFlow()
 {
-  LOG_DEBUG("Starting constant solar wind speed calculation...");
-  auto xyi = calculateConstantSwindFlow(*globals->IPCset, ui.lineEdit_17->text().toStdString(), ui.lineEdit_18->text().toDouble(), ui.lineEdit_19->text().toDouble());
-  auto xshifts = std::get<0>(xyi);
-  auto yshifts = std::get<1>(xyi);
-  auto indices = std::get<2>(xyi);
-
-  LOG_DEBUG("xshifts min = " + std::to_string(vectorMin(xshifts)));
-  LOG_DEBUG("xshifts max = " + std::to_string(vectorMax(xshifts)));
-  LOG_DEBUG("yshifts min = " + std::to_string(vectorMin(yshifts)));
-  LOG_DEBUG("yshifts max = " + std::to_string(vectorMax(yshifts)));
-  LOG_DEBUG("Constant solar wind speed calculated");
 }
 
 void WindowIPC::ShowDebugStuff()
