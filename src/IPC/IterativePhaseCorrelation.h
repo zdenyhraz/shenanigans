@@ -48,7 +48,6 @@ public:
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
   }
-
   void SetSize(i32 rows, i32 cols = -1)
   {
     mRows = rows;
@@ -144,46 +143,36 @@ public:
       Fourier::fftshift(plot1);
 
       Plot2D::Set(fmt::format("{} DFT1lm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1lm.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1logmagn.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot1));
 
       Plot2D::Set(fmt::format("{} DFT1p", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1p.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT1phase.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot1));
 
       auto plot2 = dft2.clone();
       Fourier::fftshift(plot2);
 
       Plot2D::Set(fmt::format("{} DFT2lm", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2lm.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2logmagn.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::logmagn(plot2));
 
       Plot2D::Set(fmt::format("{} DFT2p", mDebugName));
-      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2p.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_DFT2phase.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::phase(plot2));
     }
 
     auto crosspower = CalculateCrossPowerSpectrum<CrossCorrelation>(std::move(dft1), std::move(dft2));
+
     if constexpr (DebugMode)
     {
       Plot2D::Set(fmt::format("{} CP log magnitude", mDebugName));
-      // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
 
       Plot2D::Set(fmt::format("{} CP phase", mDebugName));
-      // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
+      Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
       Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
-    }
-    ApplyBandpass(crosspower);
-    if constexpr (DebugMode)
-    {
-      Plot2D::Set(fmt::format("{} CP log magnitude filtered", mDebugName));
-      // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn_filtered.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
-
-      Plot2D::Set(fmt::format("{} CP phase (fake) filtered", mDebugName));
-      // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase_filtered.png", mDebugDirectory, mDebugName));
-      Plot2D::Plot(mBandpass.mul(Fourier::fftshift(Fourier::phase(crosspower))));
     }
 
     cv::Mat L3 = CalculateL3(std::move(crosspower));
@@ -354,7 +343,6 @@ private:
   mutable std::string mDebugName = "IPC";
   mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   cv::Mat mBandpass;
-  cv::Mat mFrequencyBandpass;
   cv::Mat mWindow;
 
   enum OptimizedParameters
@@ -422,7 +410,7 @@ private:
       break;
     }
 
-    CalculateFrequencyBandpass();
+    Fourier::ifftshift(mBandpass);
   }
   f32 LowpassEquation(i32 row, i32 col) const
   {
@@ -438,7 +426,7 @@ private:
     f64 r = sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
     return (mBandpassL <= r and r <= mBandpassH) ? 1 : 0;
   }
-  void ConvertToUnitFloat(cv::Mat& image) const
+  static void ConvertToUnitFloat(cv::Mat& image)
   {
     if (image.type() != CV_32F)
       image.convertTo(image, CV_32F);
@@ -450,7 +438,7 @@ private:
       return;
     multiply(image, mWindow, image);
   }
-  cv::Mat CalculateFourierTransform(cv::Mat&& image) const { return Fourier::fft(std::move(image)); }
+  static cv::Mat CalculateFourierTransform(cv::Mat&& image) { return Fourier::fft(std::move(image)); }
 
   template <bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
@@ -459,47 +447,37 @@ private:
     {
       auto dft1p = dft1.ptr<cv::Vec2f>(row);
       auto dft2p = dft2.ptr<cv::Vec2f>(row);
+      auto bandp = mBandpass.ptr<f32>(row);
       for (i32 col = 0; col < dft1.cols; ++col)
       {
         const f32 re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
         const f32 im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
         const f32 mag = sqrt(re * re + im * im);
+        const f32 band = bandp[col];
 
         if constexpr (CrossCorrelation)
         {
           // reuse dft1 memory
-          dft1p[col][0] = re;
-          dft1p[col][1] = im;
+          dft1p[col][0] = re * band;
+          dft1p[col][1] = im * band;
         }
         else
         {
           // reuse dft1 memory
-          dft1p[col][0] = re / mag;
-          dft1p[col][1] = im / mag;
+          dft1p[col][0] = re / mag * band;
+          dft1p[col][1] = im / mag * band;
         }
       }
     }
     return dft1;
   }
-  void ApplyBandpass(cv::Mat& crosspower) const
-  {
-    if (mBandpassL <= 0 and mBandpassH >= 1)
-      return;
-
-    multiply(crosspower, mFrequencyBandpass, crosspower);
-  }
-  void CalculateFrequencyBandpass()
-  {
-    mFrequencyBandpass = Fourier::dupchansc(mBandpass);
-    Fourier::ifftshift(mFrequencyBandpass);
-  }
-  cv::Mat CalculateL3(cv::Mat&& crosspower) const
+  static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
     return L3;
   }
-  cv::Point2f GetPeak(const cv::Mat& mat) const
+  static cv::Point2f GetPeak(const cv::Mat& mat)
   {
     cv::Point2i peak;
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
@@ -509,7 +487,7 @@ private:
 
     return peak;
   }
-  cv::Point2f GetPeakSubpixel(const cv::Mat& mat) const
+  static cv::Point2f GetPeakSubpixel(const cv::Mat& mat)
   {
     f64 M = 0;
     f64 My = 0;
@@ -533,7 +511,7 @@ private:
 
     return result;
   }
-  cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size) const { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
+  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size) { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
     cv::Mat L2U;
@@ -554,21 +532,21 @@ private:
 
     return L2U;
   }
-  i32 GetL1size(const cv::Mat& L2U, f64 L1ratio) const
+  static i32 GetL1size(const cv::Mat& L2U, f64 L1ratio)
   {
     i32 L1size = std::floor(L1ratio * L2U.cols);
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) const { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
-  bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) const { return IsOutOfBounds(peak, mat, {size, size}); }
-  bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size) const
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+  static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
+  static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
-  bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) const { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
+  static bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
   template <bool DebugMode>
-  bool ReduceL2size(i32& L2size) const
+  static bool ReduceL2size(i32& L2size)
   {
     L2size -= 2;
     if constexpr (DebugMode)
@@ -582,363 +560,23 @@ private:
     if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
   }
-  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2)
-  {
-    const cv::Vec3f img1clr = {1, 0.5, 0};
-    const cv::Vec3f img2clr = {0, 0.5, 1};
-
-    const f32 gamma1 = 1.0;
-    const f32 gamma2 = 1.0;
-
-    cv::Mat img1c = cv::Mat::zeros(img1.size(), CV_32FC3);
-    cv::Mat img2c = cv::Mat::zeros(img2.size(), CV_32FC3);
-
-    for (i32 row = 0; row < img1.rows; ++row)
-    {
-      auto img1p = img1.ptr<f32>(row);
-      auto img2p = img2.ptr<f32>(row);
-      auto img1cp = img1c.ptr<cv::Vec3f>(row);
-      auto img2cp = img2c.ptr<cv::Vec3f>(row);
-
-      for (i32 col = 0; col < img1.cols; ++col)
-      {
-        img1cp[col][0] = pow(img1clr[2] * img1p[col], 1. / gamma1);
-        img1cp[col][1] = pow(img1clr[1] * img1p[col], 1. / gamma1);
-        img1cp[col][2] = pow(img1clr[0] * img1p[col], 1. / gamma1);
-
-        img2cp[col][0] = pow(img2clr[2] * img2p[col], 1. / gamma2);
-        img2cp[col][1] = pow(img2clr[1] * img2p[col], 1. / gamma2);
-        img2cp[col][2] = pow(img2clr[0] * img2p[col], 1. / gamma2);
-      }
-    }
-
-    if (gamma1 != 1 or gamma2 != 1)
-    {
-      normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
-      normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
-    }
-
-    return (img1c + img2c) / 2;
-  }
-
-  std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, bool mute = false) const
-  {
-    if (!mute)
-      LOG_INFO("Loading images from '{}'...", imagesDirectory);
-
-    if (!std::filesystem::is_directory(imagesDirectory))
-      throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
-
-    std::vector<cv::Mat> images;
-    for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
-    {
-      const std::string path = entry.path().string();
-
-      if (!IsImage(path))
-      {
-        if (!mute)
-          LOG_DEBUG("Directory contains a non-image file {}", path);
-        continue;
-      }
-
-      // crop the input image - good for solar images, omits the black borders
-      static constexpr f32 cropFocusRatio = 0.5;
-      auto image = loadImage(path);
-      image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
-      images.push_back(image);
-      if (!mute)
-        LOG_DEBUG("Loaded image {}", path);
-    }
-    return images;
-  }
-
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
-  {
-    for (const auto& image : images)
-    {
-      if (image.rows < mRows + maxShift or image.cols < mCols + maxShift)
-        throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
-            mRows + maxShift, mCols + maxShift));
-    }
-
-    std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> imagePairs;
-    imagePairs.reserve(images.size() * itersPerImage);
-
-    for (const auto& image : images)
-    {
-      for (i32 i = 0; i < itersPerImage; ++i)
-      {
-        // random shift from a random point
-        cv::Point2f shift(rand11() * maxShift, rand11() * maxShift);
-        cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
-        cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-        cv::Mat imageShifted;
-        warpAffine(image, imageShifted, T, image.size());
-        cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
-        cv::Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
-
-        ConvertToUnitFloat(image1);
-        ConvertToUnitFloat(image2);
-
-        AddNoise(image1, noiseStdev);
-        AddNoise(image2, noiseStdev);
-
-        imagePairs.push_back({image1, image2, shift});
-
-        if constexpr (0)
-        {
-          cv::Mat hcct;
-          hconcat(image1, image2, hcct);
-          showimg(hcct, fmt::format("IPC optimization pair {}", i));
-        }
-      }
-    }
-    return imagePairs;
-  }
-  void AddNoise(cv::Mat& image, f64 noiseStdev) const
-  {
-    if (noiseStdev <= 0)
-      return;
-
-    cv::Mat noise = cv::Mat::zeros(image.rows, image.cols, CV_32F);
-    randn(noise, 0, noiseStdev);
-    image += noise;
-  }
-  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
-  {
-    return [&](const std::vector<f64>& params)
-    {
-      IterativePhaseCorrelation ipc(mRows, mCols);
-      ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
-      ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
-      ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
-      ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
-      ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
-      ipc.SetL1ratio(params[L1ratioParameter]);
-
-      if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
-        return std::numeric_limits<f64>::max();
-
-      f64 avgerror = 0;
-      for (const auto& [image1, image2, shift] : imagePairs)
-      {
-        const auto error = ipc.Calculate(image1, image2) - shift;
-        avgerror += sqrt(error.x * error.x + error.y * error.y);
-      }
-      return imagePairs.size() > 0 ? avgerror / imagePairs.size() : 0.0f;
-    };
-  }
-  std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute) const
-  {
-    Evolution evo(ParameterCount);
-    evo.mNP = populationSize;
-    evo.mMutStrat = Evolution::RAND1;
-    evo.SetParameterNames({"BPT", "BPL", "BPH", "ITPT", "WINT", "UC", "L1R"});
-    evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
-    evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
-    evo.SetPlotOutput(!mute);
-    evo.SetConsoleOutput(!mute);
-    return evo.Optimize(obj, valid).optimum;
-  }
-  void ApplyOptimalParameters(const std::vector<f64>& optimalParameters, bool mute)
-  {
-    if (optimalParameters.size() != ParameterCount)
-      throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
-
-    SetBandpassType(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
-    SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
-    SetInterpolationType(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter]));
-    SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
-    SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
-    SetL1ratio(optimalParameters[L1ratioParameter]);
-
-    if (!mute)
-    {
-      LOG_INFO("Final IPC BandpassType: {}",
-          BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
-      LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
-      LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
-      LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter])));
-      LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
-      LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
-      LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
-    }
-  }
-  std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const
-  {
-    switch (type)
-    {
-    case BandpassType::Rectangular:
-      if (mBandpassL <= 0 and mBandpassH < 1)
-        return "Rectangular low pass";
-      else if (mBandpassL > 0 and mBandpassH >= 1)
-        return "Rectangular high pass";
-      else if (mBandpassL > 0 and mBandpassH < 1)
-        return "Rectangular band pass";
-      else if (mBandpassL <= 0 and mBandpassH >= 1)
-        return "Rectangular all pass";
-      else
-        throw std::runtime_error("Unknown bandpass type");
-    case BandpassType::Gaussian:
-      if (mBandpassL <= 0 and mBandpassH < 1)
-        return "Gaussian low pass";
-      else if (mBandpassL > 0 and mBandpassH >= 1)
-        return "Gaussian high pass";
-      else if (mBandpassL > 0 and mBandpassH < 1)
-        return "Gausian band pass";
-      else if (mBandpassL <= 0 and mBandpassH >= 1)
-        return "Gaussian all pass";
-      else
-        throw std::runtime_error("Unknown bandpass type");
-    default:
-      throw std::runtime_error("Unknown bandpass type");
-    }
-  }
-  std::string WindowType2String(WindowType type) const
-  {
-    switch (type)
-    {
-    case WindowType::Rectangular:
-      return "Rectangular";
-    case WindowType::Hann:
-      return "Hann";
-    default:
-      throw std::runtime_error("Unknown window type");
-    }
-  }
-  std::string InterpolationType2String(InterpolationType type) const
-  {
-    switch (type)
-    {
-    case InterpolationType::NearestNeighbor:
-      return "NearestNeighbor";
-    case InterpolationType::Linear:
-      return "Linear";
-    case InterpolationType::Cubic:
-      return "Cubic";
-    default:
-      throw std::runtime_error("Unknown interpolation type");
-    }
-  }
-  void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
-      const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter) const
-  {
-    std::vector<f64> shiftsXReference, shiftsXReferenceError;
-    std::vector<f64> shiftsXPixel, shiftsXPixelError;
-    std::vector<f64> shiftsXNonit, shiftsXNonitError;
-    std::vector<f64> shiftsXBefore, shiftsXBeforeError;
-    std::vector<f64> shiftsXAfter, shiftsXAfterError;
-
-    for (usize i = 0; i < shiftsReference.size(); ++i)
-    {
-      const auto& referenceShift = shiftsReference[i];
-      const auto& shiftPixel = shiftsPixel[i];
-      const auto& shiftNonit = shiftsNonit[i];
-      const auto& shiftBefore = shiftsBefore[i];
-
-      shiftsXReference.push_back(referenceShift.x);
-      shiftsXReferenceError.push_back(0.0);
-
-      shiftsXPixel.push_back(shiftPixel.x);
-      shiftsXNonit.push_back(shiftNonit.x);
-      shiftsXBefore.push_back(shiftBefore.x);
-
-      shiftsXPixelError.push_back(shiftPixel.x - referenceShift.x);
-      shiftsXNonitError.push_back(shiftNonit.x - referenceShift.x);
-      shiftsXBeforeError.push_back(shiftBefore.x - referenceShift.x);
-
-      if (i < shiftsAfter.size())
-      {
-        const auto& shiftAfter = shiftsAfter[i];
-
-        shiftsXAfter.push_back(shiftAfter.x);
-        shiftsXAfterError.push_back(shiftAfter.x - referenceShift.x);
-      }
-    }
-
-    Plot1D::Set("IPCshift");
-    Plot1D::SetXlabel("reference shift");
-    Plot1D::SetYlabel("calculated shift");
-    Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
-    Plot1D::SetPens(
-        {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot("IPCshift", shiftsXReference, {shiftsXReference, shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter});
-
-    Plot1D::Set("IPCshifterror");
-    Plot1D::SetXlabel("reference shift");
-    Plot1D::SetYlabel("pixel error");
-    Plot1D::SetYnames({"reference", "pixel", "subpixel", "ipc", "ipc opt"});
-    Plot1D::SetPens(
-        {QPen(Plot::blue, Plot::pt / 2, Qt::DashLine), QPen(Plot::black, Plot::pt / 2, Qt::DashLine), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt)});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError});
-  }
-  std::vector<cv::Point2f> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
-  {
-    std::vector<cv::Point2f> out;
-    out.reserve(imagePairs.size());
-
-    for (const auto& [image1, image2, referenceShift] : imagePairs)
-      out.push_back(Calculate(image1, image2));
-
-    return out;
-  }
-  std::vector<cv::Point2f> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
-  {
-    std::vector<cv::Point2f> out;
-    out.reserve(imagePairs.size());
-
-    mAccuracyType = AccuracyType::Subpixel;
-    for (const auto& [image1, image2, referenceShift] : imagePairs)
-      out.push_back(Calculate(image1, image2));
-    mAccuracyType = AccuracyType::SubpixelIterative;
-
-    return out;
-  }
-  std::vector<cv::Point2f> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
-  {
-    std::vector<cv::Point2f> out;
-    out.reserve(imagePairs.size());
-
-    mAccuracyType = AccuracyType::Pixel;
-    for (const auto& [image1, image2, referenceShift] : imagePairs)
-      out.push_back(Calculate(image1, image2));
-    mAccuracyType = AccuracyType::SubpixelIterative;
-
-    return out;
-  }
-  std::vector<cv::Point2f> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
-  {
-    std::vector<cv::Point2f> out;
-    out.reserve(imagePairs.size());
-
-    for (const auto& [image1, image2, referenceShift] : imagePairs)
-      out.push_back(referenceShift);
-
-    return out;
-  }
-  f64 GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts) const
-  {
-    if (shiftsReference.size() != shifts.size())
-      throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
-
-    f64 avgerror = 0;
-    for (usize i = 0; i < shifts.size(); ++i)
-    {
-      const auto error = shifts[i] - shiftsReference[i];
-      avgerror += sqrt(error.x * error.x + error.y * error.y);
-    }
-    return avgerror / shifts.size();
-  }
-  void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs)
-  {
-    const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(rand01() * imagePairs.size())];
-    cv::Mat concat;
-    hconcat(img1, img2, concat);
-    Plot2D::Set("Random image pair");
-    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-    Plot2D::Plot("Random image pair", concat);
-  }
-  static f64 GetFractionalPart(f64 x) { return abs(x - std::floor(x)); }
+  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
+  static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, bool mute = false);
+  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
+  static void AddNoise(cv::Mat& image, f64 noiseStdev);
+  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize, bool mute);
+  void ApplyOptimalParameters(const std::vector<f64>& optimalParameters, bool mute);
+  std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const;
+  static std::string WindowType2String(WindowType type);
+  static std::string InterpolationType2String(InterpolationType type);
+  static void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
+      const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter);
+  std::vector<cv::Point2f> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  std::vector<cv::Point2f> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  std::vector<cv::Point2f> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  static std::vector<cv::Point2f> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
+  static f64 GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts);
+  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
+  static f64 GetFractionalPart(f64 x);
 };
