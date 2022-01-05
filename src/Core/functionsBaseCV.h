@@ -7,9 +7,15 @@ inline cv::Mat roicrop(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 w, i32 h)
   if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows)
     throw std::runtime_error("roicrop out of bounds");
 
-  cv::Rect roi = cv::Rect(x - w / 2, y - h / 2, w, h);
-  cv::Mat crop = sourceimgIn(roi);
-  return crop.clone();
+  return sourceimgIn(cv::Rect(x - w / 2, y - h / 2, w, h)).clone();
+}
+
+inline cv::Mat roicropref(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 w, i32 h)
+{
+  if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows)
+    throw std::runtime_error("roicrop out of bounds");
+
+  return sourceimgIn(cv::Rect(x - w / 2, y - h / 2, w, h));
 }
 
 inline cv::Mat roicropmid(const cv::Mat& sourceimgIn, i32 w, i32 h)

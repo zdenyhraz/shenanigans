@@ -25,6 +25,5 @@ inline cv::Mat kirkl(i32 rows, i32 cols, unsigned radius)
 
 inline cv::Mat kirklcrop(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 diameter)
 {
-  cv::Mat crop = roicrop(sourceimgIn, x, y, diameter, diameter);
-  return crop.mul(kirkl(diameter));
+  return roicrop(sourceimgIn, x, y, diameter, diameter).mul(kirkl(diameter));
 }

@@ -47,8 +47,8 @@ public:
   {
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
+    UpdateL1circle();
   }
-
   void SetSize(i32 rows, i32 cols = -1)
   {
     mRows = rows;
@@ -60,25 +60,33 @@ public:
     if (mBandpass.rows != mRows or mBandpass.cols != mCols)
       UpdateBandpass();
   }
-
   void SetSize(const cv::Size& size) { SetSize(size.height, size.width); }
-
   void SetBandpassParameters(f64 bandpassL, f64 bandpassH)
   {
     mBandpassL = clamp(bandpassL, -Constants::Inf, 1); // L from [-inf, 1]
     mBandpassH = clamp(bandpassH, 0, Constants::Inf);  // H from [0, inf]
     UpdateBandpass();
   }
-
   void SetBandpassType(BandpassType type)
   {
     mBandpassType = type;
     UpdateBandpass();
   }
-
-  void SetL2size(i32 L2size) { mL2size = L2size % 2 ? L2size : L2size + 1; }
-  void SetL1ratio(f64 L1ratio) { mL1ratio = L1ratio; }
-  void SetUpsampleCoeff(i32 upsampleCoeff) { mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1; }
+  void SetL2size(i32 L2size)
+  {
+    mL2size = L2size % 2 ? L2size : L2size + 1;
+    UpdateL1circle();
+  }
+  void SetL1ratio(f64 L1ratio)
+  {
+    mL1ratio = L1ratio;
+    UpdateL1circle();
+  }
+  void SetUpsampleCoeff(i32 upsampleCoeff)
+  {
+    mUpsampleCoeff = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1;
+    UpdateL1circle();
+  }
   void SetMaxIterations(i32 maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
   void SetWindowType(WindowType type) { mWindowType = type; }
@@ -111,6 +119,8 @@ public:
   cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   try
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::Calculate");
+
     if (image1.size() != image2.size())
       throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
@@ -214,15 +224,13 @@ public:
           return result;
 
       cv::Mat L2 = CalculateL2(L3, L3peak, 5);
-      cv::Point2f L2peak = GetPeakSubpixel(L2);
+      cv::Point2f L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
       cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
       return L3peak - L3mid + L2peak - L2mid;
     }
 
-    i32 L2size = mL2size;
-    f64 L1ratio = mL1ratio;
-
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
+    i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<DebugMode>(L2size))
         return result;
@@ -243,6 +251,7 @@ public:
     // L2U
     cv::Mat L2U = CalculateL2U(L2);
     cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+
     if constexpr (DebugMode)
     {
       auto plot = L2U.clone();
@@ -267,16 +276,23 @@ public:
       }
     }
 
+    f64 L1ratio = mL1ratio;
+    cv::Mat L1circle = mL1circle.clone();
     while (L1ratio > 0)
     {
+      // LOG_FUNCTION("IterativePhaseCorrelation::IterativeRefinement");
+
       // reset L2U peak position
       cv::Point2f L2Upeak = L2Umid;
 
       // L1
       cv::Mat L1;
-      i32 L1size = GetL1size(L2U, L1ratio);
+      i32 L1size = GetL1size(L2U.cols, L1ratio);
       cv::Point2f L1mid(L1size / 2, L1size / 2);
       cv::Point2f L1peak;
+      if (L1circle.cols != L1size)
+        L1circle = kirkl(L1size);
+
       if constexpr (DebugMode)
       {
         Plot2D::Set(fmt::format("{} L1B", mDebugName));
@@ -290,8 +306,8 @@ public:
           break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        L1peak = GetPeakSubpixel(L1);
-        L2Upeak += cv::Point2f(round(L1peak.x - L1mid.x), round(L1peak.y - L1mid.y));
+        L1peak = GetPeakSubpixel<true>(L1, L1circle);
+        L2Upeak += cv::Point2f(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid))
         {
@@ -349,6 +365,7 @@ private:
   mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   cv::Mat mBandpass;
   cv::Mat mWindow;
+  cv::Mat mL1circle;
 
   enum OptimizedParameters
   {
@@ -374,6 +391,8 @@ private:
       break;
     }
   }
+
+  void UpdateL1circle() { mL1circle = kirkl(GetL1size(mL2size * mUpsampleCoeff, mL1ratio)); }
 
   void UpdateBandpass()
   {
@@ -432,6 +451,8 @@ private:
   template <bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::ConvertToUnitFloat");
+
     if (image.type() != CV_32F)
       image.convertTo(image, CV_32F);
 
@@ -440,13 +461,21 @@ private:
   }
   void ApplyWindow(cv::Mat& image) const
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::ApplyWindow");
+
     if (mWindowType != WindowType::Rectangular)
       multiply(image, mWindow, image);
   }
-  static cv::Mat CalculateFourierTransform(cv::Mat&& image) { return Fourier::fft(std::move(image)); }
+  static cv::Mat CalculateFourierTransform(cv::Mat&& image)
+  {
+    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateFourierTransform");
+    return Fourier::fft(std::move(image));
+  }
   template <bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
+
     for (i32 row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec2f>(row);
@@ -477,12 +506,14 @@ private:
   }
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL3");
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
     return L3;
   }
   static cv::Point2f GetPeak(const cv::Mat& mat)
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak;
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
 
@@ -491,20 +522,42 @@ private:
 
     return peak;
   }
-  static cv::Point2f GetPeakSubpixel(const cv::Mat& mat)
+
+  template <bool Circular>
+  cv::Point2f GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
   {
     f64 M = 0;
     f64 My = 0;
     f64 Mx = 0;
 
-    for (i32 r = 0; r < mat.rows; ++r)
+    if constexpr (Circular)
     {
-      auto matp = mat.ptr<f32>(r);
-      for (i32 c = 0; c < mat.cols; ++c)
+      if (L1circle.size() != mat.size())
+        throw std::runtime_error(fmt::format("L1circle size mismatch: {} != {}", L1circle.size(), mat.size()));
+
+      for (i32 r = 0; r < mat.rows; ++r)
       {
-        M += matp[c];
-        My += matp[c] * r;
-        Mx += matp[c] * c;
+        auto matp = mat.ptr<f32>(r);
+        auto circp = L1circle.ptr<f32>(r);
+        for (i32 c = 0; c < mat.cols; ++c)
+        {
+          M += matp[c] * circp[c];
+          My += matp[c] * circp[c] * r;
+          Mx += matp[c] * circp[c] * c;
+        }
+      }
+    }
+    else
+    {
+      for (i32 r = 0; r < mat.rows; ++r)
+      {
+        auto matp = mat.ptr<f32>(r);
+        for (i32 c = 0; c < mat.cols; ++c)
+        {
+          M += matp[c];
+          My += matp[c] * r;
+          Mx += matp[c] * c;
+        }
       }
     }
 
@@ -515,9 +568,15 @@ private:
 
     return result;
   }
-  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size) { return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size); }
+  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size)
+  {
+    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL2");
+    return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
+  }
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
+    // LOG_FUNCTION("IterativePhaseCorrelation::CalculateL2U");
+
     cv::Mat L2U;
     switch (mInterpolationType)
     {
@@ -534,13 +593,13 @@ private:
 
     return L2U;
   }
-  static i32 GetL1size(const cv::Mat& L2U, f64 L1ratio)
+  static i32 GetL1size(i32 L2Usize, f64 L1ratio)
   {
-    i32 L1size = std::floor(L1ratio * L2U.cols);
+    i32 L1size = std::floor(L1ratio * L2Usize);
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) { return kirklcrop(L2U, L2Upeak.x, L2Upeak.y, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {

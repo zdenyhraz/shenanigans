@@ -751,13 +751,14 @@ void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string&
 void IterativePhaseCorrelation::ShowDebugStuff() const
 try
 {
-  bool debugShift = true;
-  bool debugGradualShift = false;
-  bool debugWindow = false;
-  bool debugBandpass = false;
-  bool debugBandpassRinging = false;
+  constexpr bool debugShift = true;
+  constexpr bool debugGradualShift = false;
+  constexpr bool debugWindow = false;
+  constexpr bool debugBandpass = false;
+  constexpr bool debugBandpassRinging = false;
+  constexpr bool DebugMode = false;
 
-  if (debugShift)
+  if constexpr (debugShift)
   {
     std::string path1 = "../resources/AIA/171A.png";
     std::string path2 = "../resources/AIA/171A.png";
@@ -780,7 +781,7 @@ try
       image2 += noise2;
     }
 
-    auto ipcshift = Calculate<true, false>(image1, image2);
+    auto ipcshift = Calculate<DebugMode>(image1, image2);
 
     if (artificialShift)
       LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
@@ -788,7 +789,7 @@ try
       LOG_INFO("Estimate shift = {}", ipcshift);
   }
 
-  if (debugGradualShift)
+  if constexpr (debugGradualShift)
   {
     SetDebugDirectory("Debug");
     const cv::Mat image1 = loadImage("../resources/AIA/171A.png");
@@ -796,11 +797,11 @@ try
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
-    const bool addNoise = true;
+    constexpr bool addNoise = true;
     f64 noiseStdev = 0.03;
     cv::Mat noise1, noise2;
 
-    if (addNoise)
+    if constexpr (addNoise)
     {
       noise1 = cv::Mat::zeros(crop1.rows, crop1.cols, CV_32F);
       noise2 = cv::Mat::zeros(crop1.rows, crop1.cols, CV_32F);
@@ -818,12 +819,12 @@ try
       crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
       if (addNoise)
         crop2 += noise2;
-      const auto ipcshift = Calculate<true, false>(crop1, crop2);
+      const auto ipcshift = Calculate<DebugMode>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
     }
   }
 
-  if (debugWindow)
+  if constexpr (debugWindow)
   {
     cv::Mat img = roicrop(loadImage("../resources/test.png"), 2048, 2048, mCols, mRows);
     cv::Mat w, imgw;
@@ -852,7 +853,7 @@ try
     // Plot2D::Plot(Fourier::fftlogmagn(imgw), "2DImageWindowDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
   }
 
-  if (debugBandpass)
+  if constexpr (debugBandpass)
   {
     cv::Mat bpR = cv::Mat::zeros(mRows, mCols, CV_32F);
     cv::Mat bpG = cv::Mat::zeros(mRows, mCols, CV_32F);
@@ -886,7 +887,7 @@ try
     // Plot2D::Plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
   }
 
-  if (debugBandpassRinging)
+  if constexpr (debugBandpassRinging)
   {
     cv::Mat img = roicrop(loadImage("../resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     cv::Mat fftR = Fourier::fft(img);

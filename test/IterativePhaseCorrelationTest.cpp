@@ -28,8 +28,8 @@ TEST_F(IterativePhaseCorrelationTest, ZeroShiftCrossCorrel)
 TEST_F(IterativePhaseCorrelationTest, ShiftPhaseCorrel)
 {
   const auto shift = mIPC->Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shift.x, 97, 0.5);
-  EXPECT_NEAR(shift.y, -104, 0.5);
+  EXPECT_NEAR(shift.x, 97.011337280273438, 1e-5);
+  EXPECT_NEAR(shift.y, -103.99453735351562, 1e-5);
 }
 
 TEST_F(IterativePhaseCorrelationTest, ShiftCrossCorrel)

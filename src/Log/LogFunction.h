@@ -1,5 +1,7 @@
 #pragma once
-
+#include <chrono>
+#include <string>
+#include <fmt/format.h>
 #include "Logger.h"
 
 #define LOG_FUNCTION(fun) LogFunction logFunction(fun)
@@ -12,27 +14,22 @@ class LogFunction
 public:
   LogFunction(const std::string& funName) : mFunName(funName), mStartTime(clock::now()) { Logger::Function(fmt::format("{} started", mFunName)); }
 
-  ~LogFunction()
-  {
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - mStartTime).count();
-    Logger::Function(fmt::format("{} finished ({})", mFunName, FormatDuration(duration)));
-  }
+  ~LogFunction() { Logger::Function(fmt::format("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime))); }
 
 private:
-  static std::string FormatDuration(i64 durationms)
+  static std::string FormatDuration(std::chrono::nanoseconds dur)
   {
-    static constexpr i64 kSecondMs = 1000;
-    static constexpr i64 kMinuteMs = kSecondMs * 60;
-    static constexpr i64 kHourMs = kMinuteMs * 60;
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
 
-    if (durationms < kSecondMs)
-      return fmt::format("{} ms", durationms);
-    else if (durationms < kMinuteMs)
-      return fmt::format("{:.2f} s", (f64)durationms / kSecondMs);
-    else if (durationms < kHourMs)
-      return fmt::format("{:.2f} m", (f64)durationms / kMinuteMs);
+    if (dur < 1s)
+      return fmt::format("{:.2f} ms", duration<f32, std::milli>(dur).count());
+    else if (dur < 1min)
+      return fmt::format("{:.2f} s", duration<f32>(dur).count());
+    else if (dur < 1h)
+      return fmt::format("{:.2f} min", duration<f32, std::ratio<60>>(dur).count());
     else
-      return fmt::format("{:.2f} h", (f64)durationms / kHourMs);
+      return fmt::format("{:.2f} h", duration<f32, std::ratio<3600>>(dur).count());
   }
 
   std::string mFunName;
