@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/constants.h"
-#include "Core/functionsBaseCV.h"
+#include "Utils/constants.h"
+#include "UtilsCV/functionsBaseCV.h"
 
 inline i32 findNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
 {

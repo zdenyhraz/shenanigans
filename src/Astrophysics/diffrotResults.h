@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/functionsBaseCV.h"
+#include "UtilsCV/functionsBaseCV.h"
 #include "Fit/polyfit.h"
 #include "Fit/trigfit.h"
 #include "Plot/Plot1D.h"

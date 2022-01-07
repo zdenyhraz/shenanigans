@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/functionsBaseSTL.h"
-#include "Core/functionsBaseCV.h"
+#include "Utils/functionsBaseSTL.h"
+#include "UtilsCV/functionsBaseCV.h"
 
 struct filterSettings
 {

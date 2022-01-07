@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowDiffrot.h"
-#include "Core/globals.h"
+#include "Application/WindowData.h"
 #include "Astrophysics/diffrotResults.h"
 #include "Astrophysics/diffrot.h"
 
@@ -9,11 +9,11 @@ class WindowDiffrot : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowDiffrot(QWidget *parent, Globals *globals);
+  WindowDiffrot(QWidget* parent, Globals* globals);
 
 private:
   Ui::WindowDiffrot ui;
-  Globals *globals;
+  Globals* globals;
   DiffrotResults drres;
   DiffrotSettings drset;
 

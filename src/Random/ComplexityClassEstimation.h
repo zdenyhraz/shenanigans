@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/vectmat.h"
+#include "UtilsCV/vectmat.h"
 
 cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
 {

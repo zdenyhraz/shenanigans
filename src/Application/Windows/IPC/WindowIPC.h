@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowIPC.h"
-#include "Core/globals.h"
+#include "Application/WindowData.h"
 
 class WindowIPC : public QMainWindow
 {

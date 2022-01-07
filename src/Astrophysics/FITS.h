@@ -1,9 +1,9 @@
 #pragma once
-#include "Core/functionsBaseSTL.h"
-#include "Core/functionsBaseCV.h"
+#include "Utils/functionsBaseSTL.h"
+#include "UtilsCV/functionsBaseCV.h"
 #include "Filtering/filtering.h"
 #include "Log/logger.h"
-#include "Draw/showsave.h"
+#include "UtilsCV/showsave.h"
 
 //.fits parameters
 constexpr i32 lineBytes = 80;

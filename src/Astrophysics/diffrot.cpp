@@ -1,7 +1,7 @@
 
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
-#include "Utils/vectmat.h"
+#include "UtilsCV/vectmat.h"
 #include "diffrot.h"
 
 DiffrotResults calculateDiffrotProfile(const IterativePhaseCorrelation& ipc, FitsTime& time, const DiffrotSettings& drset)

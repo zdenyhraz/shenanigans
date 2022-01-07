@@ -1,13 +1,13 @@
 #pragma once
 #include <random>
 
-#include "Core/functionsBaseSTL.h"
-#include "Core/functionsBaseCV.h"
+#include "Utils/functionsBaseSTL.h"
+#include "UtilsCV/functionsBaseCV.h"
 #include "Fit/polyfit.h"
 #include "Fit/nnfit.h"
-#include "Draw/combinepics.h"
-#include "Draw/showsave.h"
-#include "Utils/export.h"
+#include "UtilsCV/combinepics.h"
+#include "UtilsCV/showsave.h"
+#include "UtilsCV/export.h"
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"
 #include "Plot/Plot2D.h"

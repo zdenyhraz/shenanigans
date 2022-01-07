@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/functionsBaseCV.h"
-#include "Draw/colormap.h"
+#include "UtilsCV/functionsBaseCV.h"
+#include "UtilsCV/colormap.h"
 
 inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {

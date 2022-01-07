@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/functionsBaseSTL.h"
-#include "Core/functionsBaseCV.h"
+#include "Utils/functionsBaseSTL.h"
+#include "UtilsCV/functionsBaseCV.h"
 #include "Fourier/fourier.h"
 #include "Astrophysics/FITS.h"
 #include "Filtering/filtering.h"
