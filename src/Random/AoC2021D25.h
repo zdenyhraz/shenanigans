@@ -159,6 +159,7 @@ struct Seafloor
 
   std::vector<std::vector<Entity>> currentmap;
   std::vector<std::vector<Entity>> nextmap;
+  cv::Mat pic;
   i32 width = 0;
   i32 height = 0;
   i32 steps = 0;
@@ -286,8 +287,21 @@ struct Seafloor
 
   void Debug()
   {
+    pic = cv::Mat::zeros(height, width, CV_32F);
+    for (i32 r = 0; r < height; r++)
+      for (i32 c = 0; c < width; c++)
+        pic.at<f32>(r, c) = currentmap[r][c];
+
+    if (width < 50 or height < 50)
+      cv::resize(pic, pic, cv::Size(width * 10, height * 10), cv::INTER_NEAREST);
+
+    Plot2D::Set("cucumbers");
+    Plot2D::Plot(pic);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     if (width > 10 or height > 10)
-      return;
+      return; // too long for text output
+
     LOG_DEBUG("Step {}:", steps);
     for (i32 r = 0; r < height; r++)
     {
@@ -296,7 +310,6 @@ struct Seafloor
         line += GetString(currentmap[r][c]);
       LOG_DEBUG("{}", line);
     }
-    LOG_DEBUG("------------");
   }
 };
 
