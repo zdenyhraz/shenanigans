@@ -18,37 +18,37 @@ public:
   static void SetLogLevel(LogLevel logLevel) { Get().SetLogLevelInternal(logLevel); }
 
   template <typename... Args>
-  static void Trace(const std::string_view fmt, Args&&... args)
+  static void Trace(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Trace, fmt, args...);
   }
   template <typename... Args>
-  static void Function(const std::string_view fmt, Args&&... args)
+  static void Function(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Function, fmt, args...);
   }
   template <typename... Args>
-  static void Debug(const std::string_view fmt, Args&&... args)
+  static void Debug(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Debug, fmt, args...);
   }
   template <typename... Args>
-  static void Info(const std::string_view fmt, Args&&... args)
+  static void Info(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Info, fmt, args...);
   }
   template <typename... Args>
-  static void Success(const std::string_view fmt, Args&&... args)
+  static void Success(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Success, fmt, args...);
   }
   template <typename... Args>
-  static void Warning(const std::string_view fmt, Args&&... args)
+  static void Warning(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Warning, fmt, args...);
   }
   template <typename... Args>
-  static void Error(const std::string_view fmt, Args&&... args)
+  static void Error(const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(LogLevel::Error, fmt, args...);
   }
@@ -91,7 +91,7 @@ private:
   }
 
   template <typename... Args>
-  void LogMessage(LogLevel logLevel, const std::string_view fmt, Args&&... args)
+  void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     std::scoped_lock lock(mMutex);
     if (!ShouldLog(logLevel))

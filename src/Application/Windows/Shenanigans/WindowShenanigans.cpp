@@ -18,11 +18,13 @@
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
 #include "Log/Logger.h"
+#include "Fractal/fractal.h"
+#include "Astrophysics/diffrotResults.h"
 #include "Random/procedural.h"
 #include "Random/NonMaximaSuppression.h"
 #include "Random/ComplexityClassEstimation.h"
-#include "Fractal/fractal.h"
-#include "Astrophysics/diffrotResults.h"
+#include "Random/AoC2021D5.h"
+#include "Random/AoC2021D25.h"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 {
@@ -961,11 +963,16 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (1) // ipc debug stuff
+  if (0) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
     window.ShowDebugStuff();
+  }
+  if (1) // AoC2021
+  {
+    // LOG_SUCCESS("AoC2021D5: {}", AoC2021D5());
+    LOG_SUCCESS("AoC2021D5: {}", AoC2021D25::AoC2021D25());
   }
 }
 catch (const std::exception& e)
