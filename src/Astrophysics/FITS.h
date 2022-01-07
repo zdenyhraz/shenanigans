@@ -51,7 +51,7 @@ public:
 private:
   std::tuple<cv::Mat, FitsParams> data;
 
-  inline std::tuple<cv::Mat, FitsParams> loadfits(std::string path)
+  std::tuple<cv::Mat, FitsParams> loadfits(std::string path)
   {
     std::ifstream streamIN(path, std::ios::binary | std::ios::in);
     if (!streamIN)
@@ -430,16 +430,6 @@ public:
   }
 };
 
-cv::Mat loadfits(std::string path, FitsParams& params);
-
-void generateFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain);
-
-void generateFitsDownloadUrlSingles(i32 delta, i32 pics, std::string urlmain);
-
-void checkFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain, std::string pathMasterIn);
-
-void loadImageDebug(cv::Mat& activeimg, f64 gamaa, bool colorr, f64 quanBot, f64 quanTop);
-
 inline cv::Mat loadImage(const std::string& path)
 {
   if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
@@ -451,6 +441,86 @@ inline cv::Mat loadImage(const std::string& path)
   result.convertTo(result, CV_32F);
   normalize(result, result, 0, 1, cv::NORM_MINMAX);
   return result;
+}
+
+inline void generateFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain)
+{
+  std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
+  std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
+  i32 number = stod(stringcislo);
+  urlmain = urlmain.substr(0, posN);
+  for (i32 i = 0; i < pics; i++)
+  {
+    std::string url1 = urlmain + std::to_string(number) + "-" + std::to_string(number);
+    number += delta;
+    std::string url2 = urlmain + std::to_string(number) + "-" + std::to_string(number);
+    urls << url1 << std::endl;
+    if (delta > 0)
+      urls << url2 << std::endl;
+
+    number += step - delta; // step -delta (step od prvni fotky ne od druhe)
+  }
+}
+
+inline void generateFitsDownloadUrlSingles(i32 delta, i32 pics, std::string urlmain)
+{
+  std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
+  std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
+  i32 number = stod(stringcislo);
+  urlmain = urlmain.substr(0, posN);
+  for (i32 i = 0; i < pics; i++)
+  {
+    std::string url = urlmain + std::to_string(number) + "-" + std::to_string(number);
+    urls << url << std::endl;
+    number += delta;
+  }
+}
+
+inline void checkFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain, std::string pathMasterIn)
+{
+  std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_missing.txt", std::ios::out | std::ios::trunc);
+  std::string pathmain = "drms_export.cgi@series=hmi__Ic_45s;record=";
+  usize posR = urlmain.find("record=");
+  usize posN = posR + 7;
+  std::string stringcislo = urlmain.substr(posN, 8); // 8mistne cislo
+  i32 number = stod(stringcislo);
+  urlmain = urlmain.substr(0, posN);
+  for (i32 i = 0; i < pics; i++)
+  {
+    std::string url1 = urlmain + std::to_string(number) + "-" + std::to_string(number);
+    std::string path1 = pathMasterIn + pathmain + std::to_string(number) + "-" + std::to_string(number);
+    number += delta;
+    std::string url2 = urlmain + std::to_string(number) + "-" + std::to_string(number);
+    std::string path2 = pathMasterIn + pathmain + std::to_string(number) + "-" + std::to_string(number);
+
+    std::ifstream stream1(path1, std::ios::binary | std::ios::in);
+    if (!stream1)
+    {
+      LOG_ERROR("File '{}' not found! Adding path to text file ..", path1);
+      urls << url1 << std::endl;
+    }
+    else
+    {
+      LOG_SUCCESS("File '{}' ok", path1);
+    }
+
+    std::ifstream stream2(path2, std::ios::binary | std::ios::in);
+    if (!stream2)
+    {
+      LOG_ERROR("File '{}' not found! Adding path to text file ..", path2);
+      urls << url2 << std::endl;
+    }
+    else
+    {
+      LOG_SUCCESS("File '{}' ok", path2);
+    }
+
+    number += step - delta;
+  }
 }
 
 inline void fitsDownloaderImpl()
