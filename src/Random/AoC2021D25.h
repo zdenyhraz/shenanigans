@@ -297,7 +297,7 @@ struct Seafloor
 
     Plot2D::Set("cucumbers");
     Plot2D::Plot(pic);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (width > 10 or height > 10)
       return; // too long for text output
