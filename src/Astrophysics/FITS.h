@@ -6,8 +6,6 @@
 #include "UtilsCV/showsave.h"
 
 //.fits parameters
-constexpr i32 lineBytes = 80;
-constexpr i32 linesMultiplier = 36;
 enum class fitsType : char
 {
   HMI,
@@ -62,6 +60,8 @@ private:
     else
     {
       // LOG_DEBUG("<loadfits> Loading file '{}'...", path);
+      static constexpr i32 lineBytes = 80;
+      static constexpr i32 linesMultiplier = 36;
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];

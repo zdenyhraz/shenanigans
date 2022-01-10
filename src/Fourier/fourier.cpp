@@ -3,7 +3,7 @@
 #include "fourier.h"
 #include "Plot/Plot2D.h"
 
-void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, std::string magnwindowname, std::string phasewindowname)
+void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, const std::string& magnwindowname, const std::string& phasewindowname)
 {
   cv::Mat DFTimg = DFTimgIn.clone();
   if (DFTimg.channels() == 2)

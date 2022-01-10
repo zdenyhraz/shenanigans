@@ -329,7 +329,7 @@ inline cv::Mat bandpass(const cv::Mat& sourceimgDFTIn, const cv::Mat& bandpassMa
   return sourceimgDFT.mul(filter);
 }
 
-void showfourier(const cv::Mat& DFTimgIn, bool logar = true, bool expon = false, std::string magnwindowname = "FFTmagn", std::string phasewindowname = "FFTphase");
+void showfourier(const cv::Mat& DFTimgIn, bool logar = true, bool expon = false, const std::string& magnwindowname = "FFTmagn", const std::string& phasewindowname = "FFTphase");
 
 cv::Mat convolute(cv::Mat img, cv::Mat PSFimg);
 
