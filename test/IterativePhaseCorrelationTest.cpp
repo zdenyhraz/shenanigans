@@ -62,3 +62,9 @@ TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)
   EXPECT_LT(std::abs(pixelError.x), 0.5);
   EXPECT_LT(std::abs(pixelError.y), 0.5);
 }
+
+TEST_F(IterativePhaseCorrelationTest, BadInputs)
+{
+  EXPECT_THROW(mIPC->Calculate(mImg1, cv::Mat::ones(mImg1.rows + 1, mImg1.cols + 1, CV_32F)), std::runtime_error);
+  EXPECT_THROW(mIPC->Calculate(mImg1, cv::Mat::ones(mImg1.rows, mImg1.cols, CV_32FC3)), std::runtime_error);
+}

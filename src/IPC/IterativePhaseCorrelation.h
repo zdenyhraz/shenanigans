@@ -125,15 +125,14 @@ public:
   cv::Mat GetWindow() const { return mWindow; }
   cv::Mat GetBandpass() const { return mBandpass; }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AT = AccuracyType::SubpixelIterative>
+  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2f Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
-    return Calculate<DebugMode, CrossCorrelation, AT>(image1.clone(), image2.clone());
+    return Calculate<DebugMode, CrossCorrelation, AccuracyT>(image1.clone(), image2.clone());
   }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AT = AccuracyType::SubpixelIterative>
+  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
-  try
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
@@ -170,31 +169,20 @@ public:
     cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
     cv::Point2f L3peak = GetPeak<DebugMode>(L3);
     cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
-    cv::Point2f result = L3peak - L3mid;
     if constexpr (DebugMode)
       DebugL3(L3);
 
-    if constexpr (AT == AccuracyType::Pixel)
-      return L3peak - L3mid;
+    if constexpr (AccuracyT == AccuracyType::Pixel)
+      return GetPixelShift(L3peak, L3mid);
 
-    if constexpr (AT == AccuracyType::Subpixel)
-    {
-      i32 L2size = 5;
-      while (IsOutOfBounds(L3peak, L3, L2size))
-        if (!ReduceL2size<DebugMode>(L2size))
-          return result;
-
-      cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
-      cv::Point2f L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
-      cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
-      return L3peak - L3mid + L2peak - L2mid;
-    }
+    if constexpr (AccuracyT == AccuracyType::Subpixel)
+      return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, 5);
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<DebugMode>(L2size))
-        return result;
+        return L3peak - L3mid;
 
     // L2
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
@@ -249,12 +237,8 @@ public:
       ReduceL1ratio<DebugMode>(L1ratio);
     }
 
-    throw std::runtime_error("L1 failed to converge with all L1ratios");
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("IPC Calculate error: {}", e.what());
-    return {0, 0};
+    // L1 failed to converge with all L1ratios, return non-iterative subpixel shift
+    return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, L2size);
   }
 
   cv::Mat Align(const cv::Mat& image1, const cv::Mat& image2) const { return Align(image1.clone(), image2.clone()); }
@@ -434,12 +418,8 @@ private:
   static cv::Point2f GetPeak(const cv::Mat& mat)
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
-    cv::Point2i peak;
+    cv::Point2i peak(0, 0);
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
-
-    if (peak.x < 0 or peak.y < 0 or peak.x >= mat.cols or peak.y >= mat.rows)
-      return cv::Point2f(0, 0);
-
     return peak;
   }
   template <bool Circular>
@@ -451,9 +431,6 @@ private:
 
     if constexpr (Circular)
     {
-      if (L1circle.size() != mat.size())
-        throw std::runtime_error(fmt::format("L1circle size mismatch: {} != {}", L1circle.size(), mat.size()));
-
       for (i32 r = 0; r < mat.rows; ++r)
       {
         auto matp = mat.ptr<f32>(r);
@@ -543,6 +520,19 @@ private:
     L1ratio -= mL1ratioStep;
     if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
+  }
+  cv::Point2f GetPixelShift(const cv::Point2f& L3peak, const cv::Point2f& L3mid) const { return L3peak - L3mid; }
+  template <bool DebugMode>
+  cv::Point2f GetSubpixelShift(const cv::Mat& L3, const cv::Point2f& L3peak, const cv::Point2f& L3mid, i32 L2size) const
+  {
+    while (IsOutOfBounds(L3peak, L3, L2size))
+      if (!ReduceL2size<DebugMode>(L2size))
+        return L3peak - L3mid;
+
+    cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
+    cv::Point2f L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
+    cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    return L3peak - L3mid + L2peak - L2mid;
   }
 
   void DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const;

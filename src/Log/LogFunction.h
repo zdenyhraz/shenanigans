@@ -31,7 +31,7 @@ public:
   }
 
 private:
-  static std::string FormatDuration(std::chrono::nanoseconds dur)
+  static constexpr std::string FormatDuration(std::chrono::nanoseconds dur)
   {
     using namespace std::chrono;
     using namespace std::chrono_literals;
