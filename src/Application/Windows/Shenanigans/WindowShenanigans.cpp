@@ -28,15 +28,15 @@
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 {
-  // create global data shared within windows
-  globals = std::make_unique<Globals>();
+  // data shared within windows
+  mWindowData = std::make_unique<WindowData>();
 
   // create windows
-  mWindows["ipc"] = std::make_unique<WindowIPC>(this, globals.get());
-  mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, globals.get());
-  mWindows["features"] = std::make_unique<WindowFeatures>(this, globals.get());
-  mWindows["fits"] = std::make_unique<WindowFITS>(this, globals.get());
-  mWindows["filtering"] = std::make_unique<WindowFiltering>(this, globals.get());
+  mWindows["ipc"] = std::make_unique<WindowIPC>(this, mWindowData.get());
+  mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, mWindowData.get());
+  mWindows["features"] = std::make_unique<WindowFeatures>(this, mWindowData.get());
+  mWindows["fits"] = std::make_unique<WindowFITS>(this, mWindowData.get());
+  mWindows["filtering"] = std::make_unique<WindowFiltering>(this, mWindowData.get());
 
   // setup Qt ui - meta compiled
   ui.setupUi(this);
@@ -455,7 +455,7 @@ try
       img2 = roicrop(img2, img2.cols * 0.6, img2.rows * 0.63, cropsize, cropsize);
     }
 
-    IterativePhaseCorrelation ipc = *globals->IPC;
+    IterativePhaseCorrelation ipc = *mWindowData->IPC;
     ipc.SetSize(img1.rows, img1.cols);
     // ipc.SetWindowType(IterativePhaseCorrelation::WindowType::Hann);
     // ipc.SetBandpassType(IterativePhaseCorrelation::BandpassType::Gaussian);
@@ -494,7 +494,7 @@ try
     Shift(img2, -950, 1050);
     Rotate(img2, 70, 1.2);
 
-    IterativePhaseCorrelation ipc = *globals->IPC;
+    IterativePhaseCorrelation ipc = *mWindowData->IPC;
     ipc.SetSize(img1.size());
     cv::Mat aligned = ipc.Align(img1, img2);
     showimg(std::vector<cv::Mat>{img1, img2, aligned}, "align triplet");
@@ -937,7 +937,7 @@ try
     Fractalset fractalSet;
     computeFractal(fractalSet);
   }
-  if (1) // optimization / metaoptimization
+  if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
     const i32 runs = 20;
@@ -963,7 +963,7 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (0) // ipc debug stuff
+  if (1) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();

@@ -2,7 +2,7 @@
 #include "WindowFiltering.h"
 #include "Filtering/HistogramEqualization.h"
 
-WindowFiltering::WindowFiltering(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
+WindowFiltering::WindowFiltering(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(HistogramEqualize()));

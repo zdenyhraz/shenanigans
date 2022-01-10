@@ -8,11 +8,11 @@ class WindowFeatures : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowFeatures(QWidget* parent, Globals* globals);
+  WindowFeatures(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowFeatures ui;
-  Globals* globals;
+  WindowData* mWindowData;
 
 private slots:
   void FeatureMatch();

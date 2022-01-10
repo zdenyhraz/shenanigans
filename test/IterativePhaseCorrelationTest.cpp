@@ -3,13 +3,18 @@
 class IterativePhaseCorrelationTest : public ::testing::Test
 {
 protected:
-  IterativePhaseCorrelationTest()
+  void SetUp() override
   {
     mImg1 = loadImage("../resources/Shapes/shape.png");
+    ASSERT_TRUE(not mImg1.empty());
+
     mIPC = std::make_unique<IterativePhaseCorrelation>(mImg1.size());
+    ASSERT_TRUE(mIPC);
+
     mShift = cv::Point2f(128.638, -67.425);
     cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., mShift.x, 0., 1., mShift.y);
     warpAffine(mImg1, mImg2, T, mImg2.size());
+    ASSERT_TRUE(not mImg2.empty());
   }
 
   cv::Mat mImg1;

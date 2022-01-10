@@ -15,9 +15,9 @@ class IterativePhaseCorrelation
 public:
   enum class BandpassType : u8
   {
-    None,
     Rectangular,
     Gaussian,
+    None,
     BandpassTypeCount // last
   };
 

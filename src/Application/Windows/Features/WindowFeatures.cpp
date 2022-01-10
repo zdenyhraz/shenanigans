@@ -1,7 +1,7 @@
 
 #include "WindowFeatures.h"
 
-WindowFeatures::WindowFeatures(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
+WindowFeatures::WindowFeatures(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(FeatureMatch()));

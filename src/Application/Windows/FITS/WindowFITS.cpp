@@ -1,7 +1,7 @@
 
 #include "WindowFITS.h"
 
-WindowFITS::WindowFITS(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
+WindowFITS::WindowFITS(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {
   ui.setupUi(this);
 

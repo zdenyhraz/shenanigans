@@ -4,7 +4,7 @@
 #include "Astrophysics/diffrotFileIO.h"
 #include "Optimization/Evolution.h"
 
-WindowDiffrot::WindowDiffrot(QWidget* parent, Globals* globals_) : QMainWindow(parent), globals(globals_)
+WindowDiffrot::WindowDiffrot(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {
   ui.setupUi(this);
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(calculateDiffrot()));
@@ -22,7 +22,7 @@ void WindowDiffrot::calculateDiffrot()
 {
   LOG_FUNCTION("CalculateDiffrot");
   FitsTime time = GetStartFitsTime();
-  drres = calculateDiffrotProfile(*globals->IPC, time, drset);
+  drres = calculateDiffrotProfile(*mWindowData->IPC, time, drset);
   showResults();
   saveDiffrot();
 }
@@ -43,7 +43,7 @@ void WindowDiffrot::checkDiskShifts()
 
 void WindowDiffrot::saveDiffrot()
 {
-  SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, globals->IPC.get());
+  SaveDiffrotResultsToFile(ui.lineEdit_9->text().toStdString(), ui.lineEdit_23->text().toStdString(), &drres, mWindowData->IPC.get());
 }
 
 void WindowDiffrot::loadDiffrot()
@@ -124,7 +124,7 @@ void WindowDiffrot::video()
   FitsTime time = GetStartFitsTime();
 
   drset.video = true;
-  calculateDiffrotProfile(*globals->IPC, time, drset);
+  calculateDiffrotProfile(*mWindowData->IPC, time, drset);
   drset.video = false;
 }
 

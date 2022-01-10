@@ -7,11 +7,11 @@ class WindowTemplate : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowTemplate(QWidget* parent, Globals* globals);
+  WindowTemplate(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowTemplate ui;
-  Globals* globals;
+  WindowData* mWindowData;
 
 private slots:
 };

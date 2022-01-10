@@ -9,11 +9,11 @@ class WindowDiffrot : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowDiffrot(QWidget* parent, Globals* globals);
+  WindowDiffrot(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowDiffrot ui;
-  Globals* globals;
+  WindowData* mWindowData;
   DiffrotResults drres;
   DiffrotSettings drset;
 

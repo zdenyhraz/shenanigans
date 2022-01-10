@@ -11,7 +11,7 @@ public:
 
 private:
   Ui::Zdeny_PhD_ShenanigansClass ui;
-  std::unique_ptr<Globals> globals;
+  std::unique_ptr<WindowData> mWindowData;
   std::unordered_map<std::string, std::unique_ptr<QMainWindow>> mWindows;
 
 private slots:

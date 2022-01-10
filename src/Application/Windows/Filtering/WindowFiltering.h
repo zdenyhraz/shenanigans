@@ -7,11 +7,11 @@ class WindowFiltering : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowFiltering(QWidget* parent, Globals* globals);
+  WindowFiltering(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowFiltering ui;
-  Globals* globals;
+  WindowData* mWindowData;
 
 private slots:
   void HistogramEqualize();

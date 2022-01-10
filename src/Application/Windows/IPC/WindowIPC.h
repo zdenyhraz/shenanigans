@@ -7,11 +7,11 @@ class WindowIPC : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowIPC(QWidget* parent, Globals* globals);
+  WindowIPC(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowIPC ui;
-  Globals* globals;
+  WindowData* mWindowData;
 
 public slots:
   void RefreshIPCparameters();

@@ -7,11 +7,11 @@ class WindowFITS : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowFITS(QWidget* parent, Globals* globals);
+  WindowFITS(QWidget* parent, WindowData* mWindowData);
 
 private:
   Ui::WindowFITS ui;
-  Globals* globals;
+  WindowData* mWindowData;
 
 private slots:
   void fitsDownloader();
