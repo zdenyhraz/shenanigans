@@ -366,12 +366,13 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
     const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
-  Evolution evo(ParameterCount);
+  Evolution evo(OptimizedParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPT", "BPL", "BPH", "ITPT", "WINT", "UC", "L1R"});
+  evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
-  evo.mUB = {2, 1.0, 1.5, 3, 2, 51, 0.8};
+  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 51, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   return evo.Optimize(obj, valid).optimum;
@@ -381,7 +382,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
 {
   LOG_FUNCTION("IterativePhaseCorrelation::ApplyOptimalParameters");
 
-  if (optimalParameters.size() != ParameterCount)
+  if (optimalParameters.size() != OptimizedParameterCount)
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
   SetBandpassType(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
@@ -533,10 +534,8 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetNonIterativeShifts(const 
   std::vector<cv::Point2f> out;
   out.reserve(imagePairs.size());
 
-  mAccuracyType = AccuracyType::Subpixel;
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate(image1, image2));
-  mAccuracyType = AccuracyType::SubpixelIterative;
+    out.push_back(Calculate<false, false, AccuracyType::Subpixel>(image1, image2));
 
   return out;
 }
@@ -546,10 +545,8 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetPixelShifts(const std::ve
   std::vector<cv::Point2f> out;
   out.reserve(imagePairs.size());
 
-  mAccuracyType = AccuracyType::Pixel;
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate(image1, image2));
-  mAccuracyType = AccuracyType::SubpixelIterative;
+    out.push_back(Calculate<false, false, AccuracyType::Pixel>(image1, image2));
 
   return out;
 }
@@ -673,7 +670,7 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
     for (i32 c = 0; c < cols; ++c)
     {
       LOG_INFO("Calculating objective function landscape ({:.1f}%)", (f32)progress / (rows * cols - 1) * 100);
-      std::vector<f64> parameters(ParameterCount);
+      std::vector<f64> parameters(OptimizedParameterCount);
 
       // default
       parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
@@ -720,7 +717,7 @@ void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::strin
     SetSize(imageSize, imageSize);
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
-    std::vector<f64> parameters(ParameterCount);
+    std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
     parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
@@ -760,7 +757,7 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
   for (i32 i = 0; i < iters; ++i)
   {
     LOG_INFO("Calculating upsample coeffecient accuracy dependence ({:.1f}%)", (f32)progress / (iters - 1) * 100);
-    std::vector<f64> parameters(ParameterCount);
+    std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
     parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
@@ -810,7 +807,7 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
     f32 noise = xmin + (f64)i / (iters - 1) * (xmax - xmin);
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noise);
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
-    std::vector<f64> parameters(ParameterCount);
+    std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
     parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
@@ -854,7 +851,7 @@ void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string&
     f32 noise = xmin + (f64)i / (iters - 1) * (xmax - xmin);
 
     IterativePhaseCorrelation ipc = *this; // copy this
-    ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, ParameterCount * 2);
+    ipc.Optimize(trainingImagesDirectory, trainingImagesDirectory, 2.0f, noise, itersPerImage, 0.0f, OptimizedParameterCount * 2);
 
     noiseStdevs[i] = noise;
     optimalBPHs[i] = ipc.GetBandpassH();

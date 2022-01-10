@@ -15,14 +15,17 @@ class IterativePhaseCorrelation
 public:
   enum class BandpassType : u8
   {
+    None,
     Rectangular,
     Gaussian,
+    BandpassTypeCount // last
   };
 
   enum class WindowType : u8
   {
     Rectangular,
     Hann,
+    WindowTypeCount // last
   };
 
   enum class InterpolationType : u8
@@ -30,6 +33,7 @@ public:
     NearestNeighbor,
     Linear,
     Cubic,
+    InterpolationTypeCount // last
   };
 
   enum class AccuracyType : u8
@@ -37,6 +41,18 @@ public:
     Pixel,
     Subpixel,
     SubpixelIterative
+  };
+
+  enum OptimizedParameters
+  {
+    BandpassTypeParameter,
+    BandpassLParameter,
+    BandpassHParameter,
+    InterpolationTypeParameter,
+    WindowTypeParameter,
+    UpsampleCoeffParameter,
+    L1ratioParameter,
+    OptimizedParameterCount // last
   };
 
   IterativePhaseCorrelation(i32 rows, i32 cols = 0, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(rows, cols, bandpassL, bandpassH); }
@@ -109,63 +125,63 @@ public:
   cv::Mat GetWindow() const { return mWindow; }
   cv::Mat GetBandpass() const { return mBandpass; }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false>
+  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AT = AccuracyType::SubpixelIterative>
   cv::Point2f Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
-    return Calculate<DebugMode, CrossCorrelation>(image1.clone(), image2.clone());
+    return Calculate<DebugMode, CrossCorrelation, AT>(image1.clone(), image2.clone());
   }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false>
+  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AT = AccuracyType::SubpixelIterative>
   cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   try
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
-    if (image1.size() != image2.size()) [[unlikely]]
-      throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
-
     if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
       throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
+
+    if (image1.size() != image2.size()) [[unlikely]]
+      throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
     if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
       throw std::runtime_error("Multichannel images are not supported");
 
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
-
     if constexpr (DebugMode)
       DebugInputImages(image1, image2);
 
+    // windowing
     ApplyWindow<DebugMode>(image1);
     ApplyWindow<DebugMode>(image2);
 
+    // ffts
     auto dft1 = CalculateFourierTransform<DebugMode>(std::move(image1));
     auto dft2 = CalculateFourierTransform<DebugMode>(std::move(image2));
-
     if constexpr (DebugMode and 0)
       DebugFourierTransforms(dft1, dft2);
 
+    // cross-power
     auto crosspower = CalculateCrossPowerSpectrum<DebugMode, CrossCorrelation>(std::move(dft1), std::move(dft2));
-
     if constexpr (DebugMode)
       DebugCrossPowerSpectrum(crosspower);
 
+    // L3
     cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
     cv::Point2f L3peak = GetPeak<DebugMode>(L3);
     cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
     cv::Point2f result = L3peak - L3mid;
-
     if constexpr (DebugMode)
       DebugL3(L3);
 
-    if (mAccuracyType == AccuracyType::Pixel) [[unlikely]]
+    if constexpr (AT == AccuracyType::Pixel)
       return L3peak - L3mid;
 
-    if (mAccuracyType == AccuracyType::Subpixel) [[unlikely]]
+    if constexpr (AT == AccuracyType::Subpixel)
     {
       i32 L2size = 5;
       while (IsOutOfBounds(L3peak, L3, L2size))
-        if (!ReduceL2size<DebugMode>(L2size)) [[unlikely]]
+        if (!ReduceL2size<DebugMode>(L2size))
           return result;
 
       cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
@@ -177,20 +193,18 @@ public:
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size)) [[unlikely]]
+      if (!ReduceL2size<DebugMode>(L2size))
         return result;
 
     // L2
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
     cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
-
     if constexpr (DebugMode)
       DebugL2(L2);
 
     // L2U
     cv::Mat L2U = CalculateL2U<DebugMode>(L2);
     cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
-
     if constexpr (DebugMode)
       DebugL2U(L2, L2U);
 
@@ -210,7 +224,6 @@ public:
       cv::Point2f L1peak;
       if (L1circle.cols != L1size) [[unlikely]]
         L1circle = kirkl(L1size);
-
       if constexpr (DebugMode)
         DebugL1B(L2U, L2Upeak, L1size, L1circle);
 
@@ -250,7 +263,7 @@ public:
   std::tuple<cv::Mat, cv::Mat> CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, f32 resolution) const;
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift = 2.0, f32 noiseStdev = 0.01, i32 itersPerImage = 100, f64 validationRatio = 0.2,
-      i32 populationSize = ParameterCount * 7);
+      i32 populationSize = OptimizedParameterCount * 7);
   void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters);
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
@@ -272,22 +285,9 @@ private:
   WindowType mWindowType = WindowType::Hann;
   mutable std::string mDebugDirectory = "Debug";
   mutable std::string mDebugName = "IPC";
-  mutable AccuracyType mAccuracyType = AccuracyType::SubpixelIterative;
   cv::Mat mBandpass;
   cv::Mat mWindow;
   cv::Mat mL1circle;
-
-  enum OptimizedParameters
-  {
-    BandpassTypeParameter,
-    BandpassLParameter,
-    BandpassHParameter,
-    InterpolationTypeParameter,
-    WindowTypeParameter,
-    UpsampleCoeffParameter,
-    L1ratioParameter,
-    ParameterCount // last
-  };
 
   void UpdateWindow()
   {
@@ -295,10 +295,12 @@ private:
     {
     case WindowType::Rectangular:
       mWindow = cv::Mat::ones(mRows, mCols, CV_32F);
-      break;
+      return;
     case WindowType::Hann:
       createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
-      break;
+      return;
+    default:
+      return;
     }
   }
 
@@ -307,6 +309,8 @@ private:
   void UpdateBandpass()
   {
     mBandpass = cv::Mat::ones(mRows, mCols, CV_32F);
+    if (mBandpassType == BandpassType::None)
+      return;
 
     switch (mBandpassType)
     {
@@ -340,6 +344,8 @@ private:
             mBandpass.at<f32>(r, c) = BandpassREquation(r, c);
       }
       break;
+    default:
+      return;
     }
 
     Fourier::ifftshift(mBandpass);
@@ -503,6 +509,8 @@ private:
       break;
     case InterpolationType::Cubic:
       resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
+      break;
+    default:
       break;
     }
 
