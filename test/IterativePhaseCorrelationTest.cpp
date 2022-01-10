@@ -18,17 +18,17 @@ protected:
   std::unique_ptr<IterativePhaseCorrelation> mIPC;
 };
 
-TEST_F(IterativePhaseCorrelationTest, ZeroShift)
-{
-  const auto shift = mIPC->Calculate(mImg1, mImg1);
-  EXPECT_EQ(shift, cv::Point2f(0, 0));
-}
-
 TEST_F(IterativePhaseCorrelationTest, Consistency)
 {
   const auto shift1 = mIPC->Calculate(mImg1, mImg1);
   const auto shift2 = mIPC->Calculate(mImg1, mImg1);
   EXPECT_EQ(shift1, shift2);
+}
+
+TEST_F(IterativePhaseCorrelationTest, ZeroShift)
+{
+  const auto shift = mIPC->Calculate(mImg1, mImg1);
+  EXPECT_EQ(shift, cv::Point2f(0, 0));
 }
 
 TEST_F(IterativePhaseCorrelationTest, Shift)
