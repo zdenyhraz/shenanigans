@@ -1,7 +1,7 @@
 #pragma once
-#include "Optimization_.h"
+#include "Optimization.h"
 
-class Evolution : public OptimizationAlgorithm_
+class Evolution : public OptimizationAlgorithm
 {
 public:
   enum MutationStrategy : u8

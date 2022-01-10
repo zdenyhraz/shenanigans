@@ -68,7 +68,7 @@ private:
     return logger;
   }
 
-  bool ShouldLog(LogLevel logLevel) { return mTextBrowser != nullptr and logLevel >= mLogLevel; }
+  bool ShouldLog(LogLevel logLevel) { return mTextBrowser and logLevel >= mLogLevel; }
 
   void SetTextBrowserInternal(QTextBrowser* textBrowser)
   {
@@ -93,12 +93,11 @@ private:
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
-    std::scoped_lock lock(mMutex);
-    if (!ShouldLog(logLevel))
+    if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
+    std::scoped_lock lock(mMutex);
     const auto& [color, name] = mLogLevelSettings[logLevel];
-
     mTextBrowser->setTextColor(color);
     mTextBrowser->append(fmt::format("[{}] [{}] {}", GetCurrentTime(), name, fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...))).c_str());
     QCoreApplication::processEvents();

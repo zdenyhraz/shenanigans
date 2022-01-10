@@ -8,9 +8,9 @@
 #include "Plot/Plot1D.h"
 #include "Evolution.h"
 
-Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm_(N_, optname), mNP(7 * N_){};
+Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N_){};
 
-OptimizationAlgorithm_::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
+OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 try
 {
   if (mConsoleOutput)

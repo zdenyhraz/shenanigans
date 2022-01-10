@@ -48,9 +48,9 @@ WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 
   // set the logging text browser
   QtLogger::SetTextBrowser(ui.textBrowser);
-  // QtLogger::SetLogLevel(QtLogger::LogLevel::Function);
+  QtLogger::SetLogLevel(QtLogger::LogLevel::Function);
 
-  LOG_INFO("Welcome back, my friend.");
+  LOG_SUCCESS("Welcome back, my friend.");
 
   // make signal - slot connections
   connect(ui.actionIPC, SIGNAL(triggered()), this, SLOT(ShowWindowIPC()));
@@ -937,7 +937,7 @@ try
     Fractalset fractalSet;
     computeFractal(fractalSet);
   }
-  if (0) // optimization / metaoptimization
+  if (1) // optimization / metaoptimization
   {
     const i32 N = 2;
     const i32 runs = 20;
@@ -969,7 +969,7 @@ try
     window.show();
     window.ShowDebugStuff();
   }
-  if (1) // AoC2021
+  if (0) // AoC2021
   {
     // LOG_SUCCESS("AoC2021D5: {}", AoC2021D5());
     LOG_SUCCESS("AoC2021D5: {}", AoC2021D25::AoC2021D25());

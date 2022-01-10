@@ -2,16 +2,16 @@
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"
 #include "Plot/Plot2D.h"
-#include "Optimization_.h"
+#include "Optimization.h"
 
-OptimizationAlgorithm_::OptimizationAlgorithm_(i32 N_, const std::string& optname) : N(N_), mName(optname)
+OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
 {
   mLB = zerovect(N, -1.);
   mUB = zerovect(N, 1.);
 }
 
-void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin,
-    f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
+void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
+    const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
 
@@ -185,7 +185,7 @@ void OptimizationAlgorithm_::PlotObjectiveFunctionLandscape(ObjectiveFunction f,
   }
 }
 
-const char* OptimizationAlgorithm_::GetTerminationReasonString(const TerminationReason& reason)
+const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
 {
   switch (reason)
   {

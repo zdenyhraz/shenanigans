@@ -1,7 +1,7 @@
 #pragma once
-#include "Optimization_.h"
+#include "Optimization.h"
 
-struct PatternSearch : public OptimizationAlgorithm_
+struct PatternSearch : public OptimizationAlgorithm
 {
   f64 minStep = 1e-5;
   i32 multistartMaxCnt = 1;
@@ -9,7 +9,7 @@ struct PatternSearch : public OptimizationAlgorithm_
   i32 maxExploitCnt = 0;
   f64 stepReducer = 0.5;
 
-  PatternSearch(i32 N_) : OptimizationAlgorithm_(N_){};
+  PatternSearch(i32 N_) : OptimizationAlgorithm(N_){};
 
   OptimizationResult Optimize(
       ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) override;
