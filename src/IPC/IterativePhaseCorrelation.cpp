@@ -615,18 +615,15 @@ try
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
   const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
 
-  std::vector<cv::Point2f> referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore;
-  f64 objBefore;
-
   // before
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
       trainingImages.size(), validationImages.size(), trainingImagePairs.size(), validationImagePairs.size(), populationSize * trainingImagePairs.size() + validationImagePairs.size(), mCols, mRows);
   ShowRandomImagePair(trainingImagePairs);
-  referenceShifts = GetReferenceShifts(trainingImagePairs);
-  shiftsPixel = GetPixelShifts(trainingImagePairs);
-  shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
-  shiftsBefore = GetShifts(trainingImagePairs);
-  objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
+  const auto referenceShifts = GetReferenceShifts(trainingImagePairs);
+  const auto shiftsPixel = GetPixelShifts(trainingImagePairs);
+  const auto shiftsNonit = GetNonIterativeShifts(trainingImagePairs);
+  const auto shiftsBefore = GetShifts(trainingImagePairs);
+  const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
 
   // opt
