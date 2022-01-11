@@ -13,8 +13,8 @@ static constexpr f64 RadPerSecToDegPerDay = Rad * SecondsInDay;
 static constexpr f64 Inf = std::numeric_limits<f64>::max();
 static constexpr f64 IntInf = std::numeric_limits<i32>::max();
 
-static const std::vector<f64> emptyvect = std::vector<f64>{};
-static const std::vector<std::vector<f64>> emptyvect2 = std::vector<std::vector<f64>>{};
-static const std::string emptystring = "";
-static const std::vector<std::string> emptyvectstring = std::vector<std::string>{};
+static const std::vector<f64> emptyvect;
+static const std::vector<std::vector<f64>> emptyvect2;
+static const std::string emptystring;
+static const std::vector<std::string> emptyvectstring;
 }
