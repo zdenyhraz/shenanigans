@@ -29,6 +29,20 @@ jobs:
         install: mingw-w64-x86_64-toolchain
         msystem: mingw64
         release: false
+    
+    - name: Cache OpenCV
+      id: opencv-cache
+      uses: actions/cache@v2
+      with:
+        path: ./opencv-install
+        key: ${{ runner.os }}-opencv-cache
+
+    - name: Install OpenCV
+      uses: rayandrews/with-opencv-action@v1
+      with:  
+        dir: ./opencv-install
+        cached: ${{ steps.opencv-cache.outputs.cache-hit }}
+        opencv-version: '4.5.1'
           
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
