@@ -205,4 +205,4 @@ const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationR
     return "Unexpected error occured";
   }
   return "Unknown reason";
-};
+}
