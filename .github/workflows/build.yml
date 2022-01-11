@@ -53,6 +53,24 @@ jobs:
         arch: "win64_mingw73"
         dir: "${{github.workspace}}/qt/"
         install-deps: "true"
+        
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v1  # not v2!
+      with:
+        path: ../qt
+        key: ${{ runner.os }}-QtCache
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: "5.12.2"
+        host: "windows"
+        target: "desktop"
+        arch: "win64_mingw73"
+        dir: "${{github.workspace}}/qt/"
+        install-deps: "true"
+        cached: ${{ steps.cache-qt.outputs.cache-hit }}
       
     - name: Configure CMake
       env:
