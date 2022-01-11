@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: 'true'
+        submodules: true
     
     - name: Cache OpenCV
       id: opencv-cache
@@ -28,37 +28,38 @@ jobs:
     - name: Install OpenCV
       uses: rayandrews/with-opencv-action@v1
       with:  
+        opencv-version: '4.5.1'
         dir: ./opencv-install
         cached: ${{ steps.opencv-cache.outputs.cache-hit }}
-        opencv-version: '4.5.1'
 
     - name: Cache Qt
-      id: cache-qt
+      id: qt-cache
       uses: actions/cache@v1  # not v2!
       with:
-        path: ../qt
+        path: ./qt
         key: ${{ runner.os }}-QtCache
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: "5.12.2"
-        dir: "${{github.workspace}}/qt/"
-        install-deps: "true"
-        cached: ${{ steps.cache-qt.outputs.cache-hit }}
+        dir: "./qt"
+        install-deps: true
+        setup-python: false
+        cached: ${{ steps.qt-cache.outputs.cache-hit }}
       
     - name: Configure CMake
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build
 
-    #- name: Build
+    - name: Build
       # Build your program with the given configuration
-      #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    #- name: Test
+    - name: Test
       #working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      #run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}}
       
