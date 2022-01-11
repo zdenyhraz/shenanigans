@@ -25,20 +25,20 @@ jobs:
           opencv-version: '4.0.0'
           
     - uses: msys2/setup-msys2@v2
-        with:
-          install: mingw-w64-x86_64-toolchain
-          msystem: mingw64
-          release: false
+      with:
+        install: mingw-w64-x86_64-toolchain
+        msystem: mingw64
+        release: false
           
     - name: Install Qt
-        uses: jurplel/install-qt-action@v2
-        with:
-          version: "5.12.2"
-          host: "windows"
-          target: "desktop"
-          arch: "win64_mingw73"
-          dir: "${{github.workspace}}/qt/"
-          install-deps: "true"
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: "5.12.2"
+        host: "windows"
+        target: "desktop"
+        arch: "win64_mingw73"
+        dir: "${{github.workspace}}/qt/"
+        install-deps: "true"
       
     - name: Configure CMake
       env:
