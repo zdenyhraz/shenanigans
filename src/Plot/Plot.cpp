@@ -2,6 +2,12 @@
 #include "Plot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
+std::function<void(std::string)> Plot::OnClose = [](std::string name)
+{
+  auto idx = plots.find(name);
+  if (idx != plots.end())
+    plots.erase(idx);
+};
 
 QFont Plot::fontTicks("Newyork", 15);
 QFont Plot::fontLabels("Newyork", 17);
@@ -60,13 +66,6 @@ QPoint Plot::GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name)
   LOG_TRACE("New plot position = [{},{}], plot is in {}. place", w, h, plots.size());
   return QPoint(w, h);
 }
-
-std::function<void(std::string)> Plot::OnClose = [](std::string name)
-{
-  auto idx = plots.find(name);
-  if (idx != plots.end())
-    plots.erase(idx);
-};
 
 void Plot::CloseAll()
 {
