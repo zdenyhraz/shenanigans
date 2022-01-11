@@ -34,7 +34,7 @@ jobs:
 
     - name: Cache Qt
       id: qt-cache
-      uses: actions/cache@v1  # not v2!
+      uses: actions/cache@v2  # not v2!
       with:
         path: ./qt
         key: ${{ runner.os }}-qt-cache

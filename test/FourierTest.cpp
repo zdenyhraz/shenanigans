@@ -1,4 +1,4 @@
-#include "Fourier/fourier.h"
+#include "Fourier/Fourier.h"
 #include "IPC/IterativePhaseCorrelation.h"
 
 TEST(FourierTest, ForwardBackwardConsistencyTest)
