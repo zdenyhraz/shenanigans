@@ -1,9 +1,9 @@
 #pragma once
-#include "Utils/functionsBaseSTL.h"
-#include "UtilsCV/functionsBaseCV.h"
-#include "Fourier/fourier.h"
+#include "Utils/FunctionsBaseSTL.h"
+#include "UtilsCV/FunctionsBaseCV.h"
+#include "Fourier/Fourier.h"
 #include "Astrophysics/FITS.h"
-#include "Filtering/filtering.h"
+#include "Filtering/Filtering.h"
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"
 #include "Optimization/Evolution.h"

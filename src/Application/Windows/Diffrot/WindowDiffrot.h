@@ -1,8 +1,8 @@
 #pragma once
 #include "ui_WindowDiffrot.h"
 #include "Application/WindowData.h"
-#include "Astrophysics/diffrotResults.h"
-#include "Astrophysics/diffrot.h"
+#include "Astrophysics/Diffrotresults.h"
+#include "Astrophysics/Diffrot.h"
 
 class WindowDiffrot : public QMainWindow
 {

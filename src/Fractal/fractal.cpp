@@ -1,6 +1,6 @@
 
-#include "UtilsCV/showsave.h"
-#include "fractal.h"
+#include "UtilsCV/Showsave.h"
+#include "Fractal.h"
 
 void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr)
 {

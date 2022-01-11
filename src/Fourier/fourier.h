@@ -1,7 +1,7 @@
 #pragma once
-#include "Utils/functionsBaseSTL.h"
-#include "UtilsCV/functionsBaseCV.h"
-#include "Utils/constants.h"
+#include "Utils/FunctionsBaseSTL.h"
+#include "UtilsCV/FunctionsBaseCV.h"
+#include "Utils/Constants.h"
 
 namespace Fourier
 {

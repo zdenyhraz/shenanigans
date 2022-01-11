@@ -1,7 +1,7 @@
 #pragma once
-#include "UtilsCV/functionsBaseCV.h"
-#include "Fit/polyfit.h"
-#include "Fit/trigfit.h"
+#include "UtilsCV/FunctionsBaseCV.h"
+#include "Fit/Polyfit.h"
+#include "Fit/Trigfit.h"
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 

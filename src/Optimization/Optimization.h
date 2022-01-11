@@ -1,7 +1,7 @@
 #pragma once
-#include "Utils/functionsBaseSTL.h"
-#include "UtilsCV/functionsBaseCV.h"
-#include "Log/logger.h"
+#include "Utils/FunctionsBaseSTL.h"
+#include "UtilsCV/FunctionsBaseCV.h"
+#include "Log/Logger.h"
 
 class OptimizationAlgorithm
 {

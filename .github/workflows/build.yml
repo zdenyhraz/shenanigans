@@ -1,8 +1,6 @@
 name: build
 
-on:
-  push:
-  pull_request:
+on: [push,pull_request]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -18,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-          submodules: 'true'
+        submodules: 'true'
     
     - name: Cache OpenCV
       id: opencv-cache
@@ -52,7 +50,7 @@ jobs:
     - name: Configure CMake
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
-      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}  -B '${{github.workspace}}'/build
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build
 
     - name: Build
       # Build your program with the given configuration

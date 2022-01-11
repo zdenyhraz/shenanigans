@@ -1,7 +1,7 @@
 
 #include "WindowDiffrot.h"
-#include "Astrophysics/diffrot.h"
-#include "Astrophysics/diffrotFileIO.h"
+#include "Astrophysics/Diffrot.h"
+#include "Astrophysics/Diffrotfileio.h"
 #include "Optimization/Evolution.h"
 
 WindowDiffrot::WindowDiffrot(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)

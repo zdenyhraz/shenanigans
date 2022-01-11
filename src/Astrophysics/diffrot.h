@@ -1,6 +1,6 @@
 #pragma once
 #include "IPC/IterativePhaseCorrelation.h"
-#include "diffrotResults.h"
+#include "Diffrotresults.h"
 
 static constexpr i32 plusminusbufer = 4; // even!
 static constexpr i32 yshow = 1400;       // ipc show y index

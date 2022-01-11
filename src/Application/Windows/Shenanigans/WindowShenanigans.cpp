@@ -6,21 +6,20 @@
 #include "../Features/WindowFeatures.h"
 #include "../FITS/WindowFITS.h"
 #include "../Filtering/WindowFiltering.h"
-#include "Snake/game.h"
-#include "Utils/functionsBaseSTL.h"
-#include "UtilsCV/functionsBaseCV.h"
+#include "Utils/FunctionsBaseSTL.h"
+#include "UtilsCV/FunctionsBaseCV.h"
 #include "Optimization/Evolution.h"
 #include "Optimization/PatternSearch.h"
 #include "Optimization/OptimizationTestFunctions.h"
-#include "Fit/polyfit.h"
-#include "Fit/nnfit.h"
+#include "Fit/Polyfit.h"
+#include "Fit/Nnfit.h"
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
 #include "Log/Logger.h"
-#include "Fractal/fractal.h"
-#include "Astrophysics/diffrotResults.h"
-#include "Random/procedural.h"
+#include "Fractal/Fractal.h"
+#include "Astrophysics/Diffrotresults.h"
+#include "Random/Procedural.h"
 #include "Random/NonMaximaSuppression.h"
 #include "Random/ComplexityClassEstimation.h"
 #include "Random/AoC2021D5.h"
@@ -128,7 +127,6 @@ void WindowShenanigans::UnitTests()
 void WindowShenanigans::Snake()
 {
   LOG_FUNCTION("Play snake");
-  SnakeGame();
 }
 
 void WindowShenanigans::closeEvent(QCloseEvent* event)
