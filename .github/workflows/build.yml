@@ -61,8 +61,5 @@ jobs:
       #working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: | 
-        cd ${{github.workspace}}/build
-        ctest -C ${{env.BUILD_TYPE}}
-        ./shenanigans_test
+      run: (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}})
       
