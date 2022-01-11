@@ -13,22 +13,12 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
       with:
           submodules: 'true'
-          opencv-version: '4.0.0'
-          
-    - uses: msys2/setup-msys2@v2
-      with:
-        install: mingw-w64-x86_64-toolchain
-        msystem: mingw64
-        release: false
     
     - name: Cache OpenCV
       id: opencv-cache
@@ -43,17 +33,7 @@ jobs:
         dir: ./opencv-install
         cached: ${{ steps.opencv-cache.outputs.cache-hit }}
         opencv-version: '4.5.1'
-          
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: "5.12.2"
-        host: "windows"
-        target: "desktop"
-        arch: "win64_mingw73"
-        dir: "${{github.workspace}}/qt/"
-        install-deps: "true"
-        
+
     - name: Cache Qt
       id: cache-qt
       uses: actions/cache@v1  # not v2!
@@ -65,9 +45,6 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         version: "5.12.2"
-        host: "windows"
-        target: "desktop"
-        arch: "win64_mingw73"
         dir: "${{github.workspace}}/qt/"
         install-deps: "true"
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
@@ -75,7 +52,7 @@ jobs:
     - name: Configure CMake
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
-      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "MinGW Makefiles" -B '${{github.workspace}}'/build
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}  -B '${{github.workspace}}'/build
 
     - name: Build
       # Build your program with the given configuration
