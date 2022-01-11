@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Diffrotresults.h"
+#include "DiffrotResults.h"
 
 void SaveDiffrotResultsToFile(const std::string& dir, const std::string& filename, DiffrotResults* dr, IterativePhaseCorrelation* ipc)
 {

@@ -18,7 +18,7 @@
 #include "Filtering/HistogramEqualization.h"
 #include "Log/Logger.h"
 #include "Fractal/Fractal.h"
-#include "Astrophysics/Diffrotresults.h"
+#include "Astrophysics/DiffrotResults.h"
 #include "Random/Procedural.h"
 #include "Random/NonMaximaSuppression.h"
 #include "Random/ComplexityClassEstimation.h"
