@@ -20,7 +20,7 @@ enable_testing()
 include(GoogleTest)
 
 # opencv
-find_package(OpenCV REQUIRED PATHS D:\\include\\opencv\\build\\install-mingw)
+find_package(OpenCV REQUIRED PATHS E:\\Repos\\opencv-4.5.5\\build\\install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # qt

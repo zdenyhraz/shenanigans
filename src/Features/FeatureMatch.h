@@ -1,6 +1,4 @@
 #pragma once
-#include <random>
-
 #include "Utils/FunctionsBaseSTL.h"
 #include "UtilsCV/FunctionsBaseCV.h"
 #include "Fit/Polyfit.h"
@@ -61,12 +59,10 @@ inline std::pair<cv::Point2f, cv::Point2f> GetFeatureMatchPoints(const cv::DMatc
 
 inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const FeatureMatchData& data)
 {
-  // using namespace xfeatures2d;
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return cv::SIFT::create(0, std::max(data.nOctaveLayers, 1), 0, 1e5);
-    // return SURF::create(std::min(data.thresh, 500.), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
+    return cv::xfeatures2d::SURF::create(std::min(data.thresh, 500.), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
   case FeatureType::SIFT:
     return cv::SIFT::create(0, std::max(data.nOctaveLayers, 1), 0, 1e5);
   }
