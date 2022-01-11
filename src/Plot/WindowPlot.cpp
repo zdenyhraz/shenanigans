@@ -1,5 +1,4 @@
-
-#include "Utils/functionsBaseSTL.h"
+#include "Utils/FunctionsBaseSTL.h"
 #include "WindowPlot.h"
 
 WindowPlot::WindowPlot(const std::string& name_, f64 colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)

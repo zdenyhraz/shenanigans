@@ -1,4 +1,3 @@
-
 #include "Log/Logger.h"
 #include "Plot.h"
 
