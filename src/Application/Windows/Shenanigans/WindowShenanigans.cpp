@@ -935,6 +935,41 @@ try
     Fractalset fractalSet;
     computeFractal(fractalSet);
   }
+  if (0) // AoC2021
+  {
+    // LOG_SUCCESS("AoC2021D5: {}", AoC2021D5());
+    LOG_SUCCESS("AoC2021D5: {}", AoC2021D25::AoC2021D25());
+  }
+  if (0) // faims TCGFR plot
+  {
+    static constexpr usize N = 501;
+    static constexpr f64 tempdiffMin = -2;
+    static constexpr f64 tempdiffMax = 7;
+    static constexpr f64 maxtempdiff = 5;
+    static constexpr f64 mintgcfr = 3;
+    static constexpr f64 maxtgcfr = 13.5;
+
+    std::vector<f64> tempdiff(N);
+    std::vector<f64> tcgfr2(N);
+    std::vector<f64> tcgfr3(N);
+
+    for (usize i = 0; i < N; ++i)
+    {
+      tempdiff[i] = tempdiffMin + static_cast<f32>(i) / (N - 1) * (tempdiffMax - tempdiffMin);
+      tcgfr2[i] = mintgcfr + std::pow(std::clamp(tempdiff[i], 0.0, maxtempdiff) / maxtempdiff, 2) * (maxtgcfr - mintgcfr);
+      tcgfr3[i] = mintgcfr + std::pow(std::clamp(tempdiff[i], 0.0, maxtempdiff) / maxtempdiff, 3) * (maxtgcfr - mintgcfr);
+    }
+
+    Plot1D::Set("TCGFR");
+    Plot1D::SetXlabel("Current maximum temperature difference [°C]");
+    Plot1D::SetYlabel("Target cooling gas flow rate [lpm]");
+    Plot1D::SetYmin(0);
+    Plot1D::SetYmax(15);
+    Plot1D::SetYnames({"pow2", "pow3"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::SetSavePath("D:/tfs/faims/tcgfr.png");
+    Plot1D::Plot(tempdiff, {tcgfr2, tcgfr3});
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
@@ -966,11 +1001,6 @@ try
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
     window.ShowDebugStuff();
-  }
-  if (0) // AoC2021
-  {
-    // LOG_SUCCESS("AoC2021D5: {}", AoC2021D5());
-    LOG_SUCCESS("AoC2021D5: {}", AoC2021D25::AoC2021D25());
   }
 }
 catch (const std::exception& e)
