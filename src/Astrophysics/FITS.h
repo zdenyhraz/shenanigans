@@ -26,11 +26,7 @@ struct FitsParams
 inline void swapbytes(char* input, unsigned length)
 {
   for (usize i = 0; i < length; i += 2)
-  {
-    char temp = std::move(input[i]);
-    input[i] = std::move(input[i + 1]);
-    input[i + 1] = std::move(temp);
-  }
+    std::swap(input[i], input[i + 1]);
 }
 
 class FitsImage
@@ -49,10 +45,10 @@ public:
 private:
   std::tuple<cv::Mat, FitsParams> data;
 
-  std::tuple<cv::Mat, FitsParams> loadfits(std::string path)
+  std::tuple<cv::Mat, FitsParams> loadfits(const std::string& path)
   {
-    std::ifstream streamIN(path, std::ios::binary | std::ios::in);
-    if (!streamIN)
+    std::ifstream file(path, std::ios::binary | std::ios::in);
+    if (not file) [[unlikely]]
     {
       LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
       return std::make_tuple(cv::Mat(), FitsParams());
@@ -65,13 +61,15 @@ private:
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];
-      i32 fitsSize = 4096, fitsMid = 4096 / 2, fitsSize2 = fitsSize * fitsSize;
+      i32 fitsSize = 4096;
+      i32 fitsMid = fitsSize / 2;
+      i32 fitsSize2 = fitsSize * fitsSize;
       i32 linecnt = 0;
       f64 pixelarcsec = 1;
 
-      while (!streamIN.eof())
+      while (!file.eof())
       {
-        streamIN.read(&cline[0], lineBytes);
+        file.read(&cline[0], lineBytes);
         linecnt++;
         std::string sline(cline);
 
@@ -125,14 +123,30 @@ private:
       params.R /= pixelarcsec;
 
       // opencv integration
-      cv::Mat mat(fitsSize, fitsSize, CV_16UC1);
-      streamIN.read((char*)mat.data, fitsSize2 * 2);
+      cv::Mat mat(fitsSize, fitsSize, CV_16U);
+      file.read((char*)mat.data, fitsSize2 * 2);
+
+      // no less than 4096*4096*2 bytes should be read
+      if (file.fail()) [[unlikely]]
+        throw std::runtime_error(fmt::format("{} FITS read fail - not enough bytes to read image data", path));
+
+      // there should be no more bytes left
+      if (false and not file.eof()) [[unlikely]]
+      {
+        u32 extraBytes = 0;
+        char c;
+        while (file.get(c))
+          ++extraBytes;
+
+        throw std::runtime_error(fmt::format("{} FITS read fail - more bytes at the end of image data ({})", path, extraBytes));
+      }
+
       swapbytes((char*)mat.data, fitsSize2 * 2);
-      normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
-      warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
-      transpose(mat, mat);
+      //   normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
+      //   warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
+      //   transpose(mat, mat);
       params.succload = true;
-      params.fitsMidX = 4096 - params.fitsMidX; // idk but works
+      params.fitsMidX = fitsSize - params.fitsMidX; // idk but works
 
       if constexpr (0) // debug values
       {

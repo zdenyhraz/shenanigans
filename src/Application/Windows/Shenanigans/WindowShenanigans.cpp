@@ -950,12 +950,14 @@ try
     static constexpr f64 maxtgcfr = 13.5;
 
     std::vector<f64> tempdiff(N);
+    std::vector<f64> tcgfr1(N);
     std::vector<f64> tcgfr2(N);
     std::vector<f64> tcgfr3(N);
 
     for (usize i = 0; i < N; ++i)
     {
       tempdiff[i] = tempdiffMin + static_cast<f32>(i) / (N - 1) * (tempdiffMax - tempdiffMin);
+      tcgfr1[i] = mintgcfr + std::pow(std::clamp(tempdiff[i], 0.0, maxtempdiff) / maxtempdiff, 1) * (maxtgcfr - mintgcfr);
       tcgfr2[i] = mintgcfr + std::pow(std::clamp(tempdiff[i], 0.0, maxtempdiff) / maxtempdiff, 2) * (maxtgcfr - mintgcfr);
       tcgfr3[i] = mintgcfr + std::pow(std::clamp(tempdiff[i], 0.0, maxtempdiff) / maxtempdiff, 3) * (maxtgcfr - mintgcfr);
     }
@@ -965,10 +967,10 @@ try
     Plot1D::SetYlabel("Target cooling gas flow rate [lpm]");
     Plot1D::SetYmin(0);
     Plot1D::SetYmax(15);
-    Plot1D::SetYnames({"pow2", "pow3"});
+    Plot1D::SetYnames({"linear", "pow2", "pow3"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::SetSavePath("D:/tfs/faims/tcgfr.png");
-    Plot1D::Plot(tempdiff, {tcgfr2, tcgfr3});
+    Plot1D::Plot(tempdiff, {tcgfr1, tcgfr2, tcgfr3});
   }
   if (0) // optimization / metaoptimization
   {
@@ -996,11 +998,27 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (1) // ipc debug stuff
+  if (0) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
     window.ShowDebugStuff();
+  }
+  if (1)
+  {
+    cv::Mat img = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    FitsImage fimg("../resources/FITS/HMI.fits");
+
+    Plot2D::Set("HMI.fits");
+    Plot2D::Plot(fimg.image());
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+
+    Plot2D::Set("HMI.png");
+    Plot2D::Plot(img);
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+
+    Plot2D::Set("diff");
+    Plot2D::Plot(cv::abs(fimg.image() - img));
   }
 }
 catch (const std::exception& e)
