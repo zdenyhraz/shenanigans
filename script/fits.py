@@ -3,7 +3,7 @@ from astropy.io import fits
 from matplotlib import pyplot as plt
 from PIL import Image
 
-hdul = fits.open('resources/FITS/HMI.fits')  # open a FITS file
+hdul = fits.open('resources/FITS/HMI.fits', cache=False)  # open a FITS file, URL can also be used, do not cache (throw away download fits files)
 hdul.verify('fix')
 print(hdul)
 

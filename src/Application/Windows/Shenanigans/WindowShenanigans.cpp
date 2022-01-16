@@ -972,21 +972,12 @@ try
     Plot1D::SetSavePath("D:/tfs/faims/tcgfr.png");
     Plot1D::Plot(tempdiff, {tcgfr1, tcgfr2, tcgfr3});
   }
-  if (0) // fits and png comparison
+  if (0) // png imread
   {
-    cv::Mat img = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-    FitsImage fimg("../resources/FITS/HMI.fits");
-
-    Plot2D::Set("HMI.fits");
-    Plot2D::Plot(fimg.image());
+    cv::Mat img1 = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    Plot2D::Set("HMI1.png");
+    Plot2D::Plot(img1);
     Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-    Plot2D::Set("HMI.png");
-    Plot2D::Plot(img);
-    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-    Plot2D::Set("diff");
-    Plot2D::Plot(cv::abs(fimg.image() - img));
   }
   if (0) // optimization / metaoptimization
   {
