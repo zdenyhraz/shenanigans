@@ -972,6 +972,22 @@ try
     Plot1D::SetSavePath("D:/tfs/faims/tcgfr.png");
     Plot1D::Plot(tempdiff, {tcgfr1, tcgfr2, tcgfr3});
   }
+  if (0) // fits and png comparison
+  {
+    cv::Mat img = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    FitsImage fimg("../resources/FITS/HMI.fits");
+
+    Plot2D::Set("HMI.fits");
+    Plot2D::Plot(fimg.image());
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+
+    Plot2D::Set("HMI.png");
+    Plot2D::Plot(img);
+    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+
+    Plot2D::Set("diff");
+    Plot2D::Plot(cv::abs(fimg.image() - img));
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
@@ -998,27 +1014,11 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (0) // ipc debug stuff
+  if (1) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
     window.ShowDebugStuff();
-  }
-  if (1)
-  {
-    cv::Mat img = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-    FitsImage fimg("../resources/FITS/HMI.fits");
-
-    Plot2D::Set("HMI.fits");
-    Plot2D::Plot(fimg.image());
-    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-    Plot2D::Set("HMI.png");
-    Plot2D::Plot(img);
-    Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-
-    Plot2D::Set("diff");
-    Plot2D::Plot(cv::abs(fimg.image() - img));
   }
 }
 catch (const std::exception& e)

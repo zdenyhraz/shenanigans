@@ -16,7 +16,7 @@ for line in hdr:
 
 
 print("---------- Data ----------")
-fitsdata = hdul[0].data  # assume the first extension is an image
+fitsdata = np.transpose(np.rot90(hdul[0].data))  # assume the first extension is an image
 print(np.sqrt(fitsdata.size))
 print("Value at [1000,1000]: {}".format(fitsdata[1000, 1000]))
 print("Value at [1001,1001]: {}".format(fitsdata[1001, 1001]))

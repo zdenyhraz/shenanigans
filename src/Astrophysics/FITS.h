@@ -61,25 +61,21 @@ private:
       FitsParams params;
       bool ENDfound = false;
       char cline[lineBytes];
-      i32 fitsSize = 4096;
-      i32 fitsMid = fitsSize / 2;
-      i32 fitsSize2 = fitsSize * fitsSize;
+      i32 size = 4096;
       i32 linecnt = 0;
       f64 pixelarcsec = 1;
 
       while (!file.eof())
       {
         file.read(&cline[0], lineBytes);
-        linecnt++;
+        ++linecnt;
         std::string sline(cline);
 
         if (sline.find("NAXIS1") != std::string::npos)
         {
           usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
-          fitsSize = stoi(snum);
-          fitsMid = fitsSize / 2;
-          fitsSize2 = fitsSize * fitsSize;
+          size = stoi(snum);
         }
         else if (sline.find("CRPIX1") != std::string::npos)
         {
@@ -119,154 +115,152 @@ private:
         if (ENDfound and (linecnt % linesMultiplier == 0))
           break;
       }
-
       params.R /= pixelarcsec;
 
-      // opencv integration
-      cv::Mat mat(fitsSize, fitsSize, CV_16U);
-      file.read((char*)mat.data, fitsSize2 * 2);
+      cv::Mat mat(size, size, CV_16U);
 
-      // no less than 4096*4096*2 bytes should be read
-      if (file.fail()) [[unlikely]]
-        throw std::runtime_error(fmt::format("{} FITS read fail - not enough bytes to read image data", path));
-
-      // there should be no more bytes left
-      if (false and not file.eof()) [[unlikely]]
-      {
-        u32 extraBytes = 0;
-        char c;
-        while (file.get(c))
-          ++extraBytes;
-
-        throw std::runtime_error(fmt::format("{} FITS read fail - more bytes at the end of image data ({})", path, extraBytes));
-      }
-
-      swapbytes((char*)mat.data, fitsSize2 * 2);
-      //   normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
-      //   warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(fitsMid, fitsMid), 90, 1.0), cv::Size(fitsSize, fitsSize));
-      //   transpose(mat, mat);
+      file.read((char*)mat.data, size * size * 2);
+      swapbytes((char*)mat.data, size * size * 2);
+      AlignImage(mat);
       params.succload = true;
-      params.fitsMidX = fitsSize - params.fitsMidX; // idk but works
+      params.fitsMidX = size - params.fitsMidX; // idk but works
 
-      if constexpr (0) // debug values
-      {
-        auto [mmin, mmax] = minMaxMat(mat);
-        LOG_INFO("min/max mat {}/{}", mmin, mmax);
-        cv::Mat xd = mat.clone();
-        cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
-        circle(xd, cv::Point(fitsMid, fitsMid), params.R, cv::Scalar(0, 0, 65535), 5);
-        showimg(xd, "xd");
-      }
+      // normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
 
-      if constexpr (0) // debug circles
-      {
-        cv::Mat img = mat.clone();
-        cv::Mat imgc;
-        normalize(img, img, 0, 255, cv::NORM_MINMAX);
-        img.convertTo(img, CV_8U);
-        cvtColor(img, imgc, cv::COLOR_GRAY2BGR);
+      if constexpr (0)
+        DebugValues(mat, params);
 
-        // fits
-        {
-          cv::Point2f center(params.fitsMidX, params.fitsMidY);
-          f64 radius = params.R;
-          cv::Scalar color(0, 0, 65535);
+      if constexpr (0)
+        DebugCircles(mat, params);
 
-          // draw the circle center
-          circle(imgc, center, 1, color, -1);
-          // draw the circle outline
-          circle(imgc, center, radius, color, 1, cv::LINE_AA);
-
-          // draw the image center
-          circle(imgc, cv::Point2f(4096 / 2, 4096 / 2), 1, cv::Scalar(65535, 0, 0), -1);
-
-          LOG_INFO("Fits center / radius: {} / {}", center, radius);
-        }
-
-        // hough
-        {
-          std::vector<cv::Vec3f> circlesHough;
-          HoughCircles(img, circlesHough, cv::HOUGH_GRADIENT, 0.2, img.rows, 200, 100, 1900, 2000);
-
-          cv::Point2f center(circlesHough[0][0], circlesHough[0][1]);
-          f64 radius = circlesHough[0][2];
-          cv::Scalar color(0, 65535, 0);
-
-          // draw the circle center
-          circle(imgc, center, 1, color, -1);
-          // draw the circle outline
-          circle(imgc, center, radius, color, 1, cv::LINE_AA);
-
-          LOG_INFO("Hough center / radius: {} / {}", center, radius);
-        }
-
-        // min enclosing circle
-        {
-          cv::Mat canny_output;
-          Canny(img, canny_output, 50, 200);
-
-          std::vector<std::vector<cv::Point>> contours;
-          findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-
-          cv::Point2f center;
-          f32 radius;
-          cv::Scalar color(65535, 0, 65535);
-          minEnclosingCircle(contours[0], center, radius);
-
-          // draw the circle center
-          circle(imgc, center, 1, color, -1);
-          // draw the circle outline
-          circle(imgc, center, radius, color, 1, cv::LINE_AA);
-
-          LOG_INFO("Canny enclosing center / radius: {} / {}", center, radius);
-        }
-
-        if constexpr (0) // show
-        {
-          showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
-          showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
-          showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
-          showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
-          showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
-        }
-      }
-
-      if constexpr (0) // fits midX / midY / R correction by canny + find contours + enclosing circle
-      {
-        // 8-bit input
-        cv::Mat img = mat.clone();
-        normalize(img, img, 0, 255, cv::NORM_MINMAX);
-        img.convertTo(img, CV_8U);
-
-        // canny
-        cv::Mat canny_output;
-        Canny(img, canny_output, 50, 200);
-
-        // contours
-        std::vector<std::vector<cv::Point>> contours;
-        findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-
-        // circle
-        cv::Point2f center;
-        f32 radius;
-        minEnclosingCircle(contours[0], center, radius);
-
-        // only save valid parameters
-        if (radius > 1900 and radius < 2000 and center.x > 2030 and center.x < 2070 and center.y > 2030 and center.y < 2070)
-        {
-          params.fitsMidX = center.x;
-          params.fitsMidY = center.y;
-          params.R = radius;
-          params.succParamCorrection = true;
-        }
-        else
-          LOG_ERROR("<loadfits> Subpixel parameter correction invalid - center / radius: {} / {}", center, radius);
-      }
+      if constexpr (0)
+        DebugContours(mat, params);
       else
         params.succParamCorrection = true;
 
       return std::make_tuple(mat, params);
     }
+  }
+
+  void AlignImage(cv::Mat& mat) const
+  {
+    warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(mat.cols / 2, mat.rows / 2), 90, 1.0), cv::Size(mat.cols, mat.rows));
+    transpose(mat, mat);
+  }
+
+  void DebugValues(const cv::Mat& mat, const FitsParams& params) const
+  {
+    auto [mmin, mmax] = minMaxMat(mat);
+    LOG_INFO("min/max mat {}/{}", mmin, mmax);
+    cv::Mat xd = mat.clone();
+    cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
+    circle(xd, cv::Point(mat.cols / 2, mat.rows / 2), params.R, cv::Scalar(0, 0, 65535), 5);
+    showimg(xd, "xd");
+  }
+
+  void DebugCircles(const cv::Mat& mat, const FitsParams& params) const
+  {
+    cv::Mat img = mat.clone();
+    cv::Mat imgc;
+    normalize(img, img, 0, 255, cv::NORM_MINMAX);
+    img.convertTo(img, CV_8U);
+    cvtColor(img, imgc, cv::COLOR_GRAY2BGR);
+
+    // fits
+    {
+      cv::Point2f center(params.fitsMidX, params.fitsMidY);
+      f64 radius = params.R;
+      cv::Scalar color(0, 0, 65535);
+
+      // draw the circle center
+      circle(imgc, center, 1, color, -1);
+      // draw the circle outline
+      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+
+      // draw the image center
+      circle(imgc, cv::Point2f(mat.cols / 2, mat.rows / 2), 1, cv::Scalar(65535, 0, 0), -1);
+
+      LOG_INFO("Fits center / radius: {} / {}", center, radius);
+    }
+
+    // hough
+    {
+      std::vector<cv::Vec3f> circlesHough;
+      HoughCircles(img, circlesHough, cv::HOUGH_GRADIENT, 0.2, img.rows, 200, 100, 1900, 2000);
+
+      cv::Point2f center(circlesHough[0][0], circlesHough[0][1]);
+      f64 radius = circlesHough[0][2];
+      cv::Scalar color(0, 65535, 0);
+
+      // draw the circle center
+      circle(imgc, center, 1, color, -1);
+      // draw the circle outline
+      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+
+      LOG_INFO("Hough center / radius: {} / {}", center, radius);
+    }
+
+    // min enclosing circle
+    {
+      cv::Mat canny_output;
+      Canny(img, canny_output, 50, 200);
+
+      std::vector<std::vector<cv::Point>> contours;
+      findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+      cv::Point2f center;
+      f32 radius;
+      cv::Scalar color(65535, 0, 65535);
+      minEnclosingCircle(contours[0], center, radius);
+
+      // draw the circle center
+      circle(imgc, center, 1, color, -1);
+      // draw the circle outline
+      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+
+      LOG_INFO("Canny enclosing center / radius: {} / {}", center, radius);
+    }
+
+    if constexpr (0) // show
+    {
+      showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
+      showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
+      showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
+      showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
+      showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
+    }
+  }
+
+  void DebugContours(const cv::Mat& mat, FitsParams& params) const
+  {
+    // 8-bit input
+    cv::Mat img = mat.clone();
+    normalize(img, img, 0, 255, cv::NORM_MINMAX);
+    img.convertTo(img, CV_8U);
+
+    // canny
+    cv::Mat canny_output;
+    Canny(img, canny_output, 50, 200);
+
+    // contours
+    std::vector<std::vector<cv::Point>> contours;
+    findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+    // circle
+    cv::Point2f center;
+    f32 radius;
+    minEnclosingCircle(contours[0], center, radius);
+
+    // only save valid parameters
+    if (radius > 1900 and radius < 2000 and center.x > 2030 and center.x < 2070 and center.y > 2030 and center.y < 2070)
+    {
+      params.fitsMidX = center.x;
+      params.fitsMidY = center.y;
+      params.R = radius;
+      params.succParamCorrection = true;
+    }
+    else
+      LOG_ERROR("<loadfits> Subpixel parameter correction invalid - center / radius: {} / {}", center, radius);
   }
 };
 
