@@ -1,5 +1,5 @@
-build/
-.vscode/
-data/
+build/*
+.vscode/*
+data/*
 !data/test/
 !data/test/*
