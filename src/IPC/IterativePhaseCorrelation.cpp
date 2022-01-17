@@ -98,7 +98,7 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   }
 }
 
-void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size, const cv::Mat& L1circle) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
   Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
@@ -141,7 +141,7 @@ try
       img2FTmp[col] = log(sqrt(re2 * re2 + im2 * im2));
     }
   }
-  cv::Point2f center((f32)image1.cols / 2, (f32)image1.rows / 2);
+  cv::Point2d center((f32)image1.cols / 2, (f32)image1.rows / 2);
   f64 maxRadius = std::min(center.y, center.x);
   warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
   warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
@@ -279,7 +279,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
   return images;
 }
 
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
+std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CreateImagePairs");
 
@@ -290,7 +290,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> IterativePhaseCorrelation
           mRows + maxShift, mCols + maxShift));
   }
 
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> imagePairs;
+  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
   imagePairs.reserve(images.size() * itersPerImage);
 
   for (const auto& image : images)
@@ -298,7 +298,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> IterativePhaseCorrelation
     for (i32 i = 0; i < itersPerImage; ++i)
     {
       // random shift from a random point
-      cv::Point2f shift(rand11() * maxShift, rand11() * maxShift);
+      cv::Point2d shift(rand11() * maxShift, rand11() * maxShift);
       cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
       cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
@@ -335,7 +335,7 @@ void IterativePhaseCorrelation::AddNoise(cv::Mat& image, f64 noiseStdev)
   image += noise;
 }
 
-const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
+const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
 
@@ -461,8 +461,8 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   }
 }
 
-void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
-    const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter)
+void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
+    const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
 {
   LOG_FUNCTION("IterativePhaseCorrelation::ShowOptimizationPlots");
 
@@ -518,9 +518,9 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
   Plot1D::Plot("IPCshifterror", shiftsXReference, {shiftsXReferenceError, shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError});
 }
 
-std::vector<cv::Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
-  std::vector<cv::Point2f> out;
+  std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
@@ -529,9 +529,9 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetShifts(const std::vector<
   return out;
 }
 
-std::vector<cv::Point2f> IterativePhaseCorrelation::GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
-  std::vector<cv::Point2f> out;
+  std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
@@ -540,9 +540,9 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetNonIterativeShifts(const 
   return out;
 }
 
-std::vector<cv::Point2f> IterativePhaseCorrelation::GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
-  std::vector<cv::Point2f> out;
+  std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
@@ -551,9 +551,9 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetPixelShifts(const std::ve
   return out;
 }
 
-std::vector<cv::Point2f> IterativePhaseCorrelation::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs)
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
-  std::vector<cv::Point2f> out;
+  std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
@@ -562,7 +562,7 @@ std::vector<cv::Point2f> IterativePhaseCorrelation::GetReferenceShifts(const std
   return out;
 }
 
-f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts)
+f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts)
 {
   if (shiftsReference.size() != shifts.size())
     throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
@@ -576,7 +576,7 @@ f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2f>
   return avgerror / shifts.size();
 }
 
-void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs)
+void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   LOG_FUNCTION("IterativePhaseCorrelation::ShowRandomImagePair");
 
@@ -878,7 +878,7 @@ try
     std::string path1 = "../resources/AIA/171A.png";
     std::string path2 = "../resources/AIA/171A.png";
     bool artificialShift = path1 == path2;
-    cv::Point2f rawshift = artificialShift ? cv::Point2f(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2f(0, 0);
+    cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
     cv::Mat image1 = loadImage(path1);
     cv::Mat image2 = artificialShift ? image1.clone() : loadImage(path2);
     image1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
@@ -928,7 +928,7 @@ try
     for (i32 i = 0; i < iters; i++)
     {
       SetDebugName(fmt::format("GradualShift{}", i));
-      const cv::Point2f rawshift(static_cast<f32>(i) / (iters - 1), 0);
+      const cv::Point2d rawshift(static_cast<f32>(i) / (iters - 1), 0);
       const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., rawshift.x, 0., 1., rawshift.y);
       warpAffine(image1, image2, T, image2.size());
       crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);

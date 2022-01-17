@@ -12,7 +12,7 @@ public:
 
     const auto ids = GenerateIds(idstart);
     const auto ystep = yfov / (ysize - 1);
-    const auto xpred = 0;
+    const auto xpred = 0.;
     const auto tstep = idstep * 45;
 
     for (i32 x = 0; x < xsize; ++x)
@@ -32,7 +32,7 @@ public:
         const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
         const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
 
-#pragma omp parallel for
+        //#pragma omp parallel for
         for (i32 y = 0; y < ysize; ++y)
         {
           const auto yshift = ystep * (y - ysize / 2);
@@ -43,12 +43,17 @@ public:
           auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
           auto crop2 = roicrop(image2, header2.xcenter + xpred, header2.ycenter + yshift, wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-          const auto omegax = std::asin(shift.x / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
-          const auto omegay = (theta - std::asin(std::sin(theta) - shift.y / R)) / tstep * Constants::RadPerSecToDegPerDay;
+
+          const auto shiftx = std::clamp(shift.x + xpred, 0., 1.);
+          const auto shifty = std::clamp(shift.y, -0.1, 0.1);
+          const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
+          const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
+
+          // LOG_DEBUG("s: {}, ox: {:.1f}, oy: {:.1f}", shift, omegax, omegay);
 
           thetas.at<f64>(y, xsize - 1 - x) = theta;
-          shifts.at<cv::Vec2d>(y, xsize - 1 - x) = {shift.x + xpred, shift.y};
-          omegas.at<cv::Vec2d>(y, xsize - 1 - x) = {omegax, omegay};
+          shifts.at<cv::Vec2d>(y, xsize - 1 - x) = cv::Vec2d(shiftx, shifty);
+          omegas.at<cv::Vec2d>(y, xsize - 1 - x) = cv::Vec2d(omegax, omegay);
         }
       }
       catch (const std::exception& e)
@@ -64,16 +69,6 @@ public:
     Plot2D::Plot(_shifts[0]);
     Plot2D::Set("shiftsy");
     Plot2D::Plot(_shifts[1]);
-
-    cv::Mat _omegas[2];
-    cv::split(omegas, _omegas);
-    Plot2D::Set("omegasx");
-    Plot2D::Plot(_omegas[0]);
-    Plot2D::Set("omegasy");
-    Plot2D::Plot(_omegas[1]);
-
-    Plot2D::Set("thetas");
-    Plot2D::Plot(thetas);
 
     // theta-interpolated values
     const auto ithetas = GetInterpolatedThetas(thetas);

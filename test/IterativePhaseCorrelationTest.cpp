@@ -11,7 +11,7 @@ protected:
     mIPC = std::make_unique<IterativePhaseCorrelation>(mImg1.size());
     ASSERT_TRUE(mIPC);
 
-    mShift = cv::Point2f(128.638, -67.425);
+    mShift = cv::Point2d(128.638, -67.425);
     cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., mShift.x, 0., 1., mShift.y);
     warpAffine(mImg1, mImg2, T, mImg2.size());
     ASSERT_TRUE(not mImg2.empty());
@@ -19,7 +19,7 @@ protected:
 
   cv::Mat mImg1;
   cv::Mat mImg2;
-  cv::Point2f mShift;
+  cv::Point2d mShift;
   std::unique_ptr<IterativePhaseCorrelation> mIPC;
 };
 
@@ -39,7 +39,7 @@ TEST_F(IterativePhaseCorrelationTest, Consistency)
 TEST_F(IterativePhaseCorrelationTest, ZeroShift)
 {
   const auto shift = mIPC->Calculate(mImg1, mImg1);
-  EXPECT_EQ(shift, cv::Point2f(0, 0));
+  EXPECT_EQ(shift, cv::Point2d(0, 0));
 }
 
 TEST_F(IterativePhaseCorrelationTest, Shift)

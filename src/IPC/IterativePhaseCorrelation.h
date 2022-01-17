@@ -126,13 +126,13 @@ public:
   cv::Mat GetBandpass() const { return mBandpass; }
 
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
-  cv::Point2f Calculate(const cv::Mat& image1, const cv::Mat& image2) const
+  cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
     return Calculate<DebugMode, CrossCorrelation, AccuracyT>(image1.clone(), image2.clone());
   }
 
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
-  cv::Point2f Calculate(cv::Mat&& image1, cv::Mat&& image2) const
+  cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
@@ -167,8 +167,8 @@ public:
 
     // L3
     cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
-    cv::Point2f L3peak = GetPeak<DebugMode>(L3);
-    cv::Point2f L3mid(L3.cols / 2, L3.rows / 2);
+    cv::Point2d L3peak = GetPeak<DebugMode>(L3);
+    cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
     if constexpr (DebugMode)
       DebugL3(L3);
 
@@ -186,13 +186,13 @@ public:
 
     // L2
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
-    cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
     if constexpr (DebugMode)
       DebugL2(L2);
 
     // L2U
     cv::Mat L2U = CalculateL2U<DebugMode>(L2);
-    cv::Point2f L2Umid(L2U.cols / 2, L2U.rows / 2);
+    cv::Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
     if constexpr (DebugMode)
       DebugL2U(L2, L2U);
 
@@ -203,13 +203,13 @@ public:
       LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::IterativeRefinement");
 
       // reset L2U peak position
-      cv::Point2f L2Upeak = L2Umid;
+      cv::Point2d L2Upeak = L2Umid;
 
       // L1
       cv::Mat L1;
       i32 L1size = GetL1size(L2U.cols, L1ratio);
-      cv::Point2f L1mid(L1size / 2, L1size / 2);
-      cv::Point2f L1peak;
+      cv::Point2d L1mid(L1size / 2, L1size / 2);
+      cv::Point2d L1peak;
       if (L1circle.cols != L1size) [[unlikely]]
         L1circle = kirkl(L1size);
       if constexpr (DebugMode)
@@ -222,7 +222,7 @@ public:
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
-        L2Upeak += cv::Point2f(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
+        L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid)) [[unlikely]]
         {
@@ -415,7 +415,7 @@ private:
     return L3;
   }
   template <bool DebugMode>
-  static cv::Point2f GetPeak(const cv::Mat& mat)
+  static cv::Point2d GetPeak(const cv::Mat& mat)
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak(0, 0);
@@ -423,7 +423,7 @@ private:
     return peak;
   }
   template <bool Circular>
-  cv::Point2f GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
+  cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
   {
     f64 M = 0;
     f64 My = 0;
@@ -457,15 +457,15 @@ private:
       }
     }
 
-    cv::Point2f result(Mx / M, My / M);
+    cv::Point2d result(Mx / M, My / M);
 
     if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows) [[unlikely]]
-      return cv::Point2f(mat.cols / 2, mat.rows / 2);
+      return cv::Point2d(mat.cols / 2, mat.rows / 2);
 
     return result;
   }
   template <bool DebugMode>
-  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2f& L3peak, i32 L2size)
+  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, i32 L2size)
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
     return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
@@ -499,13 +499,13 @@ private:
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
-  static bool AccuracyReached(const cv::Point2f& L1peak, const cv::Point2f& L1mid) { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
+  static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
   template <bool DebugMode>
   static bool ReduceL2size(i32& L2size)
   {
@@ -521,17 +521,17 @@ private:
     if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
   }
-  cv::Point2f GetPixelShift(const cv::Point2f& L3peak, const cv::Point2f& L3mid) const { return L3peak - L3mid; }
+  cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) const { return L3peak - L3mid; }
   template <bool DebugMode>
-  cv::Point2f GetSubpixelShift(const cv::Mat& L3, const cv::Point2f& L3peak, const cv::Point2f& L3mid, i32 L2size) const
+  cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<DebugMode>(L2size))
         return L3peak - L3mid;
 
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, 5);
-    cv::Point2f L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
-    cv::Point2f L2mid(L2.cols / 2, L2.rows / 2);
+    cv::Point2d L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
+    cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
     return L3peak - L3mid + L2peak - L2mid;
   }
 
@@ -541,25 +541,25 @@ private:
   void DebugL3(const cv::Mat& L3) const;
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
-  void DebugL1B(const cv::Mat& L2U, const cv::Point2f& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
+  void DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
   void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const;
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
-  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
+  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
+  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters);
   std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const;
-  std::vector<cv::Point2f> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  std::vector<cv::Point2f> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  std::vector<cv::Point2f> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs) const;
-  static void ShowOptimizationPlots(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shiftsPixel, const std::vector<cv::Point2f>& shiftsNonit,
-      const std::vector<cv::Point2f>& shiftsBefore, const std::vector<cv::Point2f>& shiftsAfter);
-  static std::vector<cv::Point2f> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
+  std::vector<cv::Point2d> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  std::vector<cv::Point2d> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  std::vector<cv::Point2d> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
+      const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter);
+  static std::vector<cv::Point2d> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
   static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
   static std::string WindowType2String(WindowType type);
   static std::string InterpolationType2String(InterpolationType type);
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
-  static f64 GetAverageAccuracy(const std::vector<cv::Point2f>& shiftsReference, const std::vector<cv::Point2f>& shifts);
+  static f64 GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts);
   static f64 GetFractionalPart(f64 x);
   static void AddNoise(cv::Mat& image, f64 noiseStdev);
-  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2f>>& imagePairs);
+  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
 };
