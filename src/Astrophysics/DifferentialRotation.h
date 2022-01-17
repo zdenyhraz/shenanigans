@@ -20,7 +20,7 @@ public:
       try
       {
         const auto& [id1, id2] = ids[x];
-        LOG_DEBUG("[{:.1f}% {} / {}] Calculating diffrot profile {} - {} ...", static_cast<f64>(x) / (xsize - 1) * 100, x + 1, xsize, id1, id2);
+        LOG_DEBUG("[{:>5.1f}% {} / {}] Calculating diffrot profile {} - {} ...", static_cast<f64>(x) / (xsize - 1) * 100, x + 1, xsize, id1, id2);
 
         const std::string path1 = fmt::format("{}/{}.png", dataPath, id1);
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
