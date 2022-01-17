@@ -5,22 +5,25 @@ class DifferentialRotation
 public:
   void Calculate(const std::string& dataPath, i32 idstart) const
   {
-    IterativePhaseCorrelation ipc(wysize, wxsize, 0, 1);
+    IterativePhaseCorrelation ipc(wysize, wxsize, 0, 0.6);
     cv::Mat thetas = cv::Mat::zeros(ysize, xsize, CV_64FC1);
     cv::Mat shifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
     cv::Mat omegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
+    std::vector<cv::Point2d> fitsshifts(xsize, cv::Point2d(0., 0.));
 
     const auto ids = GenerateIds(idstart);
     const auto ystep = yfov / (ysize - 1);
     const auto xpred = 0.;
     const auto tstep = idstep * 45;
+    std::atomic<i32> progress = -1;
 
+#pragma omp parallel for
     for (i32 x = 0; x < xsize; ++x)
-    {
       try
       {
+        ++progress;
         const auto& [id1, id2] = ids[x];
-        LOG_DEBUG("[{:>5.1f}% {} / {}] Calculating diffrot profile {} - {} ...", static_cast<f64>(x) / (xsize - 1) * 100, x + 1, xsize, id1, id2);
+        LOG_DEBUG("[{:>5.1f}% {} / {}] Calculating diffrot profile {} - {} ...", static_cast<f64>(progress) / (xsize - 1) * 100, progress + 1, xsize, id1, id2);
 
         const std::string path1 = fmt::format("{}/{}.png", dataPath, id1);
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
@@ -31,14 +34,14 @@ public:
         const auto image2 = cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
         const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
         const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
+        fitsshifts[x] = cv::Point2d(header2.xcenter - header1.xcenter, header2.ycenter - header1.ycenter);
 
-        //#pragma omp parallel for
         for (i32 y = 0; y < ysize; ++y)
         {
           const auto yshift = ystep * (y - ysize / 2);
           const auto theta0 = (header1.theta0 + header2.theta0) / 2;
           const auto R = (header1.R + header2.R) / 2;
-          const auto theta = std::asin((ystep * (f64)(ysize / 2 - y)) / R) + theta0;
+          const auto theta = std::asin((f64)(ystep * (f64)(ysize / 2 - y)) / R) + theta0;
 
           auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
           auto crop2 = roicrop(image2, header2.xcenter + xpred, header2.ycenter + yshift, wxsize, wysize);
@@ -61,7 +64,6 @@ public:
         LOG_WARNING("DifferentialRotation::Calculate error: {} - skipping ...", e.what());
         continue;
       }
-    }
 
     cv::Mat _shifts[2];
     cv::split(shifts, _shifts);
@@ -69,6 +71,20 @@ public:
     Plot2D::Plot(_shifts[0]);
     Plot2D::Set("shiftsy");
     Plot2D::Plot(_shifts[1]);
+
+    std::vector<f64> x(xsize);
+    std::vector<f64> fitsshiftsx(xsize);
+    std::vector<f64> fitsshiftsy(xsize);
+    for (i32 i = 0; i < xsize; ++i)
+    {
+      x[i] = i;
+      fitsshiftsx[i] = fitsshifts[i].x;
+      fitsshiftsy[i] = fitsshifts[i].y;
+    }
+    Plot1D::Set("fitsshiftsx");
+    Plot1D::Plot(x, fitsshiftsx);
+    Plot1D::Set("fitsshiftsy");
+    Plot1D::Plot(x, fitsshiftsy);
 
     // theta-interpolated values
     const auto ithetas = GetInterpolatedThetas(thetas);
@@ -131,8 +147,8 @@ private:
 
   i32 idstep = 1;    // id step
   i32 idstride = 25; // id stride
-  i32 xsize = 30;    // 2500;  // x size
-  i32 ysize = 31;    // 851;   // y size
+  i32 xsize = 100;   // 2500;  // x size
+  i32 ysize = 101;   // 851;   // y size
   i32 yfov = 3400;   // y FOV
   i32 wxsize = 64;   // window x size
   i32 wysize = 64;   // window y size
