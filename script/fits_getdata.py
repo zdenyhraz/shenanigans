@@ -46,8 +46,8 @@ def DownloadAndSaveFITS(url, path):
 
 
 def SaveDataStatistics(stats, dir):
-  statistics_path = "{}/stats.json".format(dir)
-  print("[Finished] Writing data stats to {} ...".format(statistics_path))
+  statistics_path = "{}/statistics.json".format(dir)
+  print("[Finished] Writing data statistics to {} ...".format(statistics_path))
   open(statistics_path, 'w').write(json.dumps(stats, indent=2, default=str))
 
 
