@@ -2,6 +2,7 @@ import sys
 import getopt
 import json
 import os
+import datetime
 import numpy as np
 from astropy.io import fits
 from PIL import Image
@@ -44,35 +45,41 @@ def DownloadAndSaveFITS(url, path):
   SaveFITSHeader(fimg, path)  # save FITS header as json
 
 
+def SaveDataStatistics(stats, dir):
+  statistics_path = "{}/stats.json".format(dir)
+  print("[Finished] Writing data stats to {} ...".format(statistics_path))
+  open(statistics_path, 'w').write(json.dumps(stats, indent=2, default=str))
+
+
 def ParseArguments():
   try:
-    options = {}
+    parameters = {}
     opts, args = getopt.getopt(sys.argv[1:], "", ["name=", "outputdir=",
                                "idstart=", "idstep=", "idstride=", "idcount="])
 
     for opt, arg in opts:
       if opt == "--name":
-        options["name"] = arg
+        parameters["name"] = arg
       if opt == "--outputdir":
-        options["outputdir"] = arg
+        parameters["outputdir"] = arg
       if opt == "--idstart":
-        options["idstart"] = arg
+        parameters["idstart"] = arg
       if opt == "--idstep":
-        options["idstep"] = arg
+        parameters["idstep"] = arg
       if opt == "--idstride":
-        options["idstride"] = arg
+        parameters["idstride"] = arg
       if opt == "--idcount":
-        options["idcount"] = arg
+        parameters["idcount"] = arg
 
-    # required options
-    options["name"]
-    options["outputdir"]
-    options["idstart"]
-    options["idstep"]
-    options["idstride"]
-    options["idcount"]
+    # required parameters
+    parameters["name"]
+    parameters["outputdir"]
+    parameters["idstart"]
+    parameters["idstep"]
+    parameters["idstride"]
+    parameters["idcount"]
 
-    return options
+    return parameters
 
   except Exception as error:
     print("Failed to process command line arguments {}: {} missing".format(sys.argv[1:], error))
@@ -80,29 +87,32 @@ def ParseArguments():
 
 
 if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month" --outputdir "data" --idstart 18982248 --idstep 1 --idstride 25 --idcount 4
-  options = ParseArguments()
-  idstart = int(options["idstart"])
-  idstep = int(options["idstep"])
-  idcount = int(options["idcount"])
-  idstride = int(options["idstride"])
-  dir = "{}/{}".format(options["outputdir"], options["name"])
+  parameters = ParseArguments()
+  stats = {"parameters": parameters}
+  dir = "{}/{}".format(parameters["outputdir"], parameters["name"])
+  id = int(parameters["idstart"])
+  missing = []
   i = 0
-  id = idstart
 
   if not os.path.isdir(dir):
     print("[Init] Creating {} directory ...".format(dir))
     os.makedirs(dir)
 
-  while i < idcount:
+  stats["download_start"] = datetime.datetime.now()
+  while i < int(parameters["idcount"]):
     try:
       if i != 0:
-        id += idstride - idstep if idstride != 0 and i % 2 == 0 else idstep
+        id += int(parameters["idstride"]) - int(parameters["idstep"]) if int(parameters["idstride"]
+                                                                             ) != 0 and i % 2 == 0 else int(parameters["idstep"])
       i += 1
-
       url = GenerateFITSUrl(id)
       path = "{}/{}".format(dir, id)
-      print("[{} / {}] Processing file {} ...".format(i, idcount, path))
+      print("[{} / {}] Processing file {} ...".format(i, int(parameters["idcount"]), path))
       DownloadAndSaveFITS(url=url, path=path)
     except Exception as error:
       print("Failed to process file {}: {}".format(path, error))
+      missing.append(id)
       continue
+  stats["download_end"] = datetime.datetime.now()
+  stats['missing'] = missing
+  SaveDataStatistics(stats, dir)
