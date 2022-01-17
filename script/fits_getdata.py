@@ -86,7 +86,7 @@ def ParseArguments():
     sys.exit(1)
 
 
-if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
+if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
   parameters = ParseArguments()
   stats = {"parameters": parameters}
   dir = "{}/{}".format(parameters["outputdir"], parameters["name"])
@@ -107,7 +107,8 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month"
       i += 1
       url = GenerateFITSUrl(id)
       path = "{}/{}".format(dir, id)
-      print("[{} / {}] Processing file {} ...".format(i, int(parameters["idcount"]), path))
+      print("[{:.1f}%: {} / {}] Processing file {} ...".format(i/int(parameters["idcount"]),
+            i, int(parameters["idcount"]), path))
       DownloadAndSaveFITS(url=url, path=path)
     except Exception as error:
       print("Failed to process file {}: {}".format(path, error))
