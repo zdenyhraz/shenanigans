@@ -58,6 +58,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+// json
+#include <nlohmann/json.hpp>
+
 // custom
 using i8 = int8_t;
 using u8 = uint8_t;
@@ -71,6 +74,7 @@ using f32 = float;
 using f64 = double;
 using f128 = long double;
 using usize = size_t;
+namespace json = nlohmann;
 
 #include "Log/Logger.h"
 #include "Log/LogFunction.h"
