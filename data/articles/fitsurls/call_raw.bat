@@ -1,0 +1,1 @@
+wget -i processedurls_raw.txt -P D:\SDOpics\Calm2020stride25plus

@@ -3,3 +3,7 @@ build/*
 data/*
 !data/test/
 !data/test/*
+!data/articles/
+!data/articles/*
+!data/dissertation/
+!data/dissertation/*
