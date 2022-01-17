@@ -86,7 +86,7 @@ def ParseArguments():
     sys.exit(1)
 
 
-if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month" --outputdir "data" --idstart 18982248 --idstep 1 --idstride 25 --idcount 4
+if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
   parameters = ParseArguments()
   stats = {"parameters": parameters}
   dir = "{}/{}".format(parameters["outputdir"], parameters["name"])
@@ -102,8 +102,8 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month"
   while i < int(parameters["idcount"]):
     try:
       if i != 0:
-        id += int(parameters["idstride"]) - int(parameters["idstep"]) if int(parameters["idstride"]
-                                                                             ) != 0 and i % 2 == 0 else int(parameters["idstep"])
+        id += int(parameters["idstride"]) - int(parameters["idstep"]
+                                                ) if int(parameters["idstride"]) != 0 and i % 2 == 0 else int(parameters["idstep"])
       i += 1
       url = GenerateFITSUrl(id)
       path = "{}/{}".format(dir, id)
