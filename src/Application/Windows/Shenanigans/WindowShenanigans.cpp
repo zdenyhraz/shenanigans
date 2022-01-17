@@ -19,6 +19,7 @@
 #include "Log/Logger.h"
 #include "Fractal/Fractal.h"
 #include "Astrophysics/DiffrotResults.h"
+#include "Astrophysics/DifferentialRotation.h"
 #include "Random/Procedural.h"
 #include "Random/NonMaximaSuppression.h"
 #include "Random/ComplexityClassEstimation.h"
@@ -1005,11 +1006,16 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (1) // ipc debug stuff
+  if (0) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
     window.ShowDebugStuff();
+  }
+  if (1) // new diffrot
+  {
+    DifferentialRotation diffrot;
+    diffrot.Calculate("../data/diffrot_month_5000", 18933122);
   }
 }
 catch (const std::exception& e)

@@ -93,7 +93,7 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_
   id = int(parameters["idstart"])
   missing = []
   i = 0
-
+  stats["command"] = sys.argv
   stats["download_start"] = datetime.datetime.now()
   if not os.path.isdir(dir):
     print("[Init] Creating {} directory ...".format(dir))
