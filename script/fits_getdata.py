@@ -126,12 +126,12 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_
         continue
 
     stats["download_end"] = datetime.datetime.now()
-    stats["missing"] = missing
     stats["finished"] = True
+    stats["missing"] = missing
     SaveDataStatistics(stats, dir)
 
   except KeyboardInterrupt:
     stats["download_end"] = datetime.datetime.now()
-    stats["missing"] = missing
     stats["finished"] = False
+    stats["missing"] = missing
     SaveDataStatistics(stats, dir)
