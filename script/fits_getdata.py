@@ -94,26 +94,34 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_
   missing = []
   i = 0
 
+  stats["download_start"] = datetime.datetime.now()
   if not os.path.isdir(dir):
     print("[Init] Creating {} directory ...".format(dir))
     os.makedirs(dir)
 
-  stats["download_start"] = datetime.datetime.now()
   while i < int(parameters["idcount"]):
     try:
       if i != 0:
         id += int(parameters["idstride"]) - int(parameters["idstep"]
                                                 ) if int(parameters["idstride"]) != 0 and i % 2 == 0 else int(parameters["idstep"])
       i += 1
-      url = GenerateFITSUrl(id)
+
       path = "{}/{}".format(dir, id)
-      print("[{:.1f}%: {} / {}] Processing file {} ...".format(i/int(parameters["idcount"]),
+      if os.path.exists("{}.png".format(path)) and os.path.exists("{}.json".format(path)):
+        print("[{:.1f}%: {} / {}] File {} already exists, skipping ...".format(float(i)/int(parameters["idcount"]*100),
+                                                                               i, int(parameters["idcount"]), path))
+        continue
+
+      url = GenerateFITSUrl(id)
+      print("[{:.1f}%: {} / {}] Processing file {} ...".format(float(i)/int(parameters["idcount"]*100),
             i, int(parameters["idcount"]), path))
       DownloadAndSaveFITS(url=url, path=path)
+
     except Exception as error:
       print("Failed to process file {}: {}".format(path, error))
       missing.append(id)
       continue
+
   stats["download_end"] = datetime.datetime.now()
   stats['missing'] = missing
   SaveDataStatistics(stats, dir)
