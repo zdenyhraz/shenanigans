@@ -1,2 +1,0 @@
-- Luccy-Richardson iterative deconvolution + PSF dll 
-- vazeny merge pics podle intenzity pred nafe - nafe extension

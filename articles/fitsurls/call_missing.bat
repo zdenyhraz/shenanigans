@@ -1,1 +1,0 @@
-wget -i processedurls_missing.txt -P D:\SDOpics\Calm2020stride25plus
