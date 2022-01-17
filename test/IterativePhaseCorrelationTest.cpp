@@ -39,7 +39,8 @@ TEST_F(IterativePhaseCorrelationTest, Consistency)
 TEST_F(IterativePhaseCorrelationTest, ZeroShift)
 {
   const auto shift = mIPC->Calculate(mImg1, mImg1);
-  EXPECT_EQ(shift, cv::Point2d(0, 0));
+  EXPECT_NEAR(shift.x, 0, 1e-7);
+  EXPECT_NEAR(shift.y, 0, 1e-7);
 }
 
 TEST_F(IterativePhaseCorrelationTest, Shift)
@@ -53,7 +54,8 @@ TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputs)
 {
   const auto normShift = mIPC->Calculate(mImg1, mImg2);
   const auto unnormShift = mIPC->Calculate(mImg1 * 25.73, mImg2 * 38.14);
-  EXPECT_EQ(normShift, unnormShift);
+  EXPECT_NEAR(normShift.x, unnormShift.x, 1e-7);
+  EXPECT_NEAR(normShift.y, unnormShift.y, 1e-7);
 }
 
 TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)
