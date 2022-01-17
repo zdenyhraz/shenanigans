@@ -6,8 +6,8 @@ public:
   void Calculate(const std::string& dataPath, i32 idstart) const
   {
     IterativePhaseCorrelation ipc(wysize, wxsize, 0, 1);
-    cv::Mat shifts = cv::Mat::zeros(ysize, xsize, CV_32FC2);
     cv::Mat thetas = cv::Mat::zeros(ysize, xsize, CV_32FC1);
+    cv::Mat shifts = cv::Mat::zeros(ysize, xsize, CV_32FC2);
     cv::Mat omegas = cv::Mat::zeros(ysize, xsize, CV_32FC2);
 
     const auto ids = GenerateIds(idstart);
@@ -42,14 +42,11 @@ public:
         omegas.at<cv::Vec2f>(y, xsize - 1 - x) = {static_cast<f32>(omegax), static_cast<f32>(omegay)};
       }
     }
-    cv::Mat o[2];
-    cv::split(omegas, o);
 
-    Plot2D::Set("omegasX");
-    Plot2D::Plot(o[0]);
-
-    Plot2D::Set("omegasY");
-    Plot2D::Plot(o[1]);
+    // theta-interpolated values
+    const auto ithetas = GetInterpolatedThetas(thetas);
+    cv::Mat ishifts = cv::Mat::zeros(ysize, xsize, CV_32FC2);
+    cv::Mat iomegas = cv::Mat::zeros(ysize, xsize, CV_32FC2);
   }
 
 private:
@@ -85,6 +82,22 @@ private:
       id += idstride;
     }
     return ids;
+  }
+
+  std::vector<f32> GetInterpolatedThetas(const cv::Mat& thetas) const
+  {
+    f32 ithetamax = 1;  // lowest N latitude
+    f32 ithetamin = -1; // highest S latitude
+    for (i32 x = 0; x < xsize; ++x)
+    {
+      ithetamax = std::min(ithetamax, thetas.at<f32>(0, x));
+      ithetamin = std::max(ithetamin, thetas.at<f32>(ysize - 1, x));
+    }
+    std::vector<f32> ithetas(ysize);
+    f32 ithetastep = (ithetamax - ithetamin) / (ysize - 1);
+    for (i32 y = 0; y < ysize; ++y)
+      ithetas[y] = ithetamax - ithetastep * y;
+    return ithetas;
   }
 
   i32 idstep = 1;    // id step
