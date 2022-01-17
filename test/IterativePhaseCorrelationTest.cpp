@@ -5,7 +5,7 @@ class IterativePhaseCorrelationTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    mImg1 = loadImage("../data/test/shape.png");
+    mImg1 = loadImage("../test/data/shape.png");
     ASSERT_TRUE(not mImg1.empty());
 
     mIPC = std::make_unique<IterativePhaseCorrelation>(mImg1.size());
