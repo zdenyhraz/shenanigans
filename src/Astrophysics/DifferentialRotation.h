@@ -67,38 +67,44 @@ public:
         continue;
       }
 
-    cv::Mat _shifts[2];
-    cv::Mat _omegas[2];
-    cv::split(shifts, _shifts);
-    cv::split(omegas, _omegas);
-    Plot2D::Set("shiftsx");
-    Plot2D::Plot(_shifts[0]);
-    Plot2D::Set("shiftsy");
-    Plot2D::Plot(_shifts[1]);
-    Plot2D::Set("thetas");
-    Plot2D::Plot(thetas);
-    Plot2D::Set("omegasx");
-    Plot2D::Plot(_omegas[0]);
-    Plot2D::Set("omegasy");
-    Plot2D::Plot(_omegas[1]);
-
-    std::vector<f64> plotx(xsize);
-    std::vector<f64> fshiftsx(xsize);
-    std::vector<f64> fshiftsy(xsize);
-    for (i32 i = 0; i < xsize; ++i)
+    if constexpr (1) // 2D plots
     {
-      plotx[i] = i;
-      fshiftsx[i] = fshifts[i].x;
-      fshiftsy[i] = fshifts[i].y;
+      cv::Mat _shifts[2];
+      cv::Mat _omegas[2];
+      cv::split(shifts, _shifts);
+      cv::split(omegas, _omegas);
+      Plot2D::Set("shiftsx");
+      Plot2D::Plot(_shifts[0]);
+      Plot2D::Set("shiftsy");
+      Plot2D::Plot(_shifts[1]);
+      Plot2D::Set("thetas");
+      Plot2D::Plot(thetas);
+      Plot2D::Set("omegasx");
+      Plot2D::Plot(_omegas[0]);
+      Plot2D::Set("omegasy");
+      Plot2D::Plot(_omegas[1]);
     }
-    Plot1D::Set("fits shifts");
-    Plot1D::SetYnames({"fits shift x", "fits shift y"});
-    Plot1D::Plot(plotx, {fshiftsx, fshiftsy});
+
+    if constexpr (1) // 1D plots
+    {
+      std::vector<f64> plotx(xsize);
+      std::vector<f64> fshiftsx(xsize);
+      std::vector<f64> fshiftsy(xsize);
+      for (i32 i = 0; i < xsize; ++i)
+      {
+        plotx[i] = i;
+        fshiftsx[i] = fshifts[i].x;
+        fshiftsy[i] = fshifts[i].y;
+      }
+      Plot1D::Set("fits shifts");
+      Plot1D::SetYnames({"fits shift x", "fits shift y"});
+      Plot1D::Plot(plotx, {fshiftsx, fshiftsy});
+    }
 
     // theta-interpolated values
-    const auto ithetas = GetInterpolatedThetas(thetas);
-    cv::Mat ishifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
-    cv::Mat iomegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
+    // const auto ithetas = GetInterpolatedThetas(thetas);
+    // cv::Mat ishifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
+    // cv::Mat iomegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
   }
 
 private:
