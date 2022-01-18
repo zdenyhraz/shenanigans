@@ -9,7 +9,7 @@ public:
     cv::Mat thetas = cv::Mat::zeros(ysize, xsize, CV_64FC1);
     cv::Mat shifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
     cv::Mat omegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
-    std::vector<cv::Point2d> fitsshifts(xsize, cv::Point2d(0., 0.));
+    std::vector<cv::Point2d> fshifts(xsize, cv::Point2d(0., 0.));
 
     const auto ids = GenerateIds(idstart);
     const auto ystep = yfov / (ysize - 1);
@@ -42,7 +42,7 @@ public:
         const auto theta0 = (header1.theta0 + header2.theta0) / 2;
         const auto R = (header1.R + header2.R) / 2;
         const auto xindex = xsize - 1 - x;
-        fitsshifts[xindex] = cv::Point2d(header2.xcenter - header1.xcenter, header2.ycenter - header1.ycenter);
+        fshifts[xindex] = cv::Point2d(header2.xcenter - header1.xcenter, header2.ycenter - header1.ycenter);
 
         for (i32 y = 0; y < ysize; ++y)
         {
@@ -68,24 +68,32 @@ public:
       }
 
     cv::Mat _shifts[2];
+    cv::Mat _omegas[2];
     cv::split(shifts, _shifts);
+    cv::split(omegas, _omegas);
     Plot2D::Set("shiftsx");
     Plot2D::Plot(_shifts[0]);
     Plot2D::Set("shiftsy");
     Plot2D::Plot(_shifts[1]);
+    Plot2D::Set("thetas");
+    Plot2D::Plot(thetas);
+    Plot2D::Set("omegasx");
+    Plot2D::Plot(_omegas[0]);
+    Plot2D::Set("omegasy");
+    Plot2D::Plot(_omegas[1]);
 
-    std::vector<f64> x(xsize);
-    std::vector<f64> fitsshiftsx(xsize);
-    std::vector<f64> fitsshiftsy(xsize);
+    std::vector<f64> plotx(xsize);
+    std::vector<f64> fshiftsx(xsize);
+    std::vector<f64> fshiftsy(xsize);
     for (i32 i = 0; i < xsize; ++i)
     {
-      x[i] = i;
-      fitsshiftsx[i] = fitsshifts[i].x;
-      fitsshiftsy[i] = fitsshifts[i].y;
+      plotx[i] = i;
+      fshiftsx[i] = fshifts[i].x;
+      fshiftsy[i] = fshifts[i].y;
     }
-    Plot1D::Set("fitsshifts");
+    Plot1D::Set("fits shifts");
     Plot1D::SetYnames({"fits shift x", "fits shift y"});
-    Plot1D::Plot(x, {fitsshiftsx, fitsshiftsy});
+    Plot1D::Plot(plotx, {fshiftsx, fshiftsy});
 
     // theta-interpolated values
     const auto ithetas = GetInterpolatedThetas(thetas);
