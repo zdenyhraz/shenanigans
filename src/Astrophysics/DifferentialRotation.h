@@ -21,42 +21,44 @@ public:
     for (i32 x = 0; x < xsize; ++x)
       try
       {
-        ++progress;
+        const auto logprogress = static_cast<f64>(progress.fetch_add(1, std::memory_order_relaxed)) + 1.;
         const auto& [id1, id2] = ids[x];
-        LOG_DEBUG("[{:>5.1f}% {} / {}] Calculating diffrot profile {} - {} ...", static_cast<f64>(progress) / (xsize - 1) * 100, progress + 1, xsize, id1, id2);
-
         const std::string path1 = fmt::format("{}/{}.png", dataPath, id1);
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
-        if (not std::filesystem::exists(path1) or not std::filesystem::exists(path2))
-          throw std::runtime_error(fmt::format("Could not load images {} - {}", id1, id2));
+        if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
+        {
+          LOG_DEBUG("[{:>5.1f}% {} / {}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+        }
+        else [[unlikely]]
+        {
+          LOG_WARNING("[{:>5.1f}% {} / {}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+          continue;
+        }
 
         const auto image1 = cv::imread(path1, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
         const auto image2 = cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
         const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
         const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
-        fitsshifts[x] = cv::Point2d(header2.xcenter - header1.xcenter, header2.ycenter - header1.ycenter);
+        const auto theta0 = (header1.theta0 + header2.theta0) / 2;
+        const auto R = (header1.R + header2.R) / 2;
+        const auto xindex = xsize - 1 - x;
+        fitsshifts[xindex] = cv::Point2d(header2.xcenter - header1.xcenter, header2.ycenter - header1.ycenter);
 
         for (i32 y = 0; y < ysize; ++y)
         {
           const auto yshift = ystep * (y - ysize / 2);
-          const auto theta0 = (header1.theta0 + header2.theta0) / 2;
-          const auto R = (header1.R + header2.R) / 2;
           const auto theta = std::asin((f64)(ystep * (f64)(ysize / 2 - y)) / R) + theta0;
-
           auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
           auto crop2 = roicrop(image2, header2.xcenter + xpred, header2.ycenter + yshift, wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-
           const auto shiftx = std::clamp(shift.x + xpred, 0., 1.);
           const auto shifty = std::clamp(shift.y, -0.1, 0.1);
           const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
           const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
 
-          // LOG_DEBUG("s: {}, ox: {:.1f}, oy: {:.1f}", shift, omegax, omegay);
-
-          thetas.at<f64>(y, xsize - 1 - x) = theta;
-          shifts.at<cv::Vec2d>(y, xsize - 1 - x) = cv::Vec2d(shiftx, shifty);
-          omegas.at<cv::Vec2d>(y, xsize - 1 - x) = cv::Vec2d(omegax, omegay);
+          thetas.at<f64>(y, xindex) = theta;
+          shifts.at<cv::Vec2d>(y, xindex) = cv::Vec2d(shiftx, shifty);
+          omegas.at<cv::Vec2d>(y, xindex) = cv::Vec2d(omegax, omegay);
         }
       }
       catch (const std::exception& e)
@@ -81,10 +83,9 @@ public:
       fitsshiftsx[i] = fitsshifts[i].x;
       fitsshiftsy[i] = fitsshifts[i].y;
     }
-    Plot1D::Set("fitsshiftsx");
-    Plot1D::Plot(x, fitsshiftsx);
-    Plot1D::Set("fitsshiftsy");
-    Plot1D::Plot(x, fitsshiftsy);
+    Plot1D::Set("fitsshifts");
+    Plot1D::SetYnames({"fits shift x", "fits shift y"});
+    Plot1D::Plot(x, {fitsshiftsx, fitsshiftsy});
 
     // theta-interpolated values
     const auto ithetas = GetInterpolatedThetas(thetas);
@@ -122,7 +123,7 @@ private:
     for (i32 x = 0; x < xsize; ++x)
     {
       ids[x] = {id, id + idstep};
-      id += idstride;
+      id += idstride != 0 ? idstride : idstep;
     }
     return ids;
   }
@@ -145,11 +146,11 @@ private:
     return ithetas;
   }
 
-  i32 idstep = 1;    // id step
-  i32 idstride = 25; // id stride
-  i32 xsize = 100;   // 2500;  // x size
-  i32 ysize = 101;   // 851;   // y size
-  i32 yfov = 3400;   // y FOV
-  i32 wxsize = 64;   // window x size
-  i32 wysize = 64;   // window y size
+  i32 idstep = 1;   // id step
+  i32 idstride = 0; // id stride
+  i32 xsize = 300;  // 2500;  // x size
+  i32 ysize = 301;  // 851;   // y size
+  i32 yfov = 3400;  // y FOV
+  i32 wxsize = 64;  // window x size
+  i32 wysize = 64;  // window y size
 };
