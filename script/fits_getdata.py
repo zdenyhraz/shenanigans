@@ -85,8 +85,9 @@ def ParseArguments():
     print("Failed to process command line arguments {}: {} missing".format(sys.argv[1:], error))
     sys.exit(1)
 
-
-if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
+# py .\script\fits_getdata.py --name "diffrot_day_2500" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 0 --idcount 2500
+# py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
+if __name__ == "__main__":  
   try:
     parameters = ParseArguments()
     dir = "{}/{}".format(parameters["outputdir"], parameters["name"])
@@ -111,12 +112,12 @@ if __name__ == "__main__":  # py .\script\fits_getdata.py --name "diffrot_month_
 
         path = "{}/{}".format(dir, id)
         if os.path.exists("{}.png".format(path)) and os.path.exists("{}.json".format(path)):
-          print("[{:.1f}%: {} / {}] File {} already exists, skipping ...".format(i/int(parameters["idcount"]*100),
+          print("[{:.1f}%: {} / {}] File {} already exists, skipping ...".format(float(i*100)/int(parameters["idcount"]),
                                                                                  i, int(parameters["idcount"]), path))
           continue
 
         url = GenerateFITSUrl(id)
-        print("[{:.1f}%: {} / {}] Processing file {} ...".format(i/int(parameters["idcount"]*100),
+        print("[{:.1f}%: {} / {}] Processing file {} ...".format(float(i*100)/int(parameters["idcount"]),
               i, int(parameters["idcount"]), path))
         DownloadAndSaveFITS(url=url, path=path)
 
