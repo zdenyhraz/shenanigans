@@ -74,7 +74,8 @@ public:
         continue;
       }
 
-    // Save(data, ipc, dataPath);
+    if (xsize > 500)
+      Save(data, ipc, dataPath);
     Plot(data);
   }
   catch (const std::exception& e)
@@ -276,16 +277,13 @@ private:
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx)}, {GetXAverage(data.shiftsy)});
 
-    // average omegas x / y
+    // average omegas x
     Plot1D::Set("avgomegasx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetY2label("average omega y [deg/day]");
     Plot1D::SetYnames({"avgomega x", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
-    Plot1D::SetY2names({"avgomega y"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(
-        Constants::Rad * thetas, {GetXAverage(data.omegasx), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)}, {GetXAverage(data.omegasy)});
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.omegasx), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
 
     // shifts x
     Plot2D::Set("shiftsx");
@@ -300,19 +298,6 @@ private:
     Plot2D::SetZlabel("shifts x [px]");
     Plot2D::Plot(data.shiftsx);
 
-    // shifts y
-    Plot2D::Set("shiftsy");
-    Plot2D::SetColRowRatio(1.5);
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::SetXmin(times.front());
-    Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(thetas.back() * Constants::Rad);
-    Plot2D::SetYmax(thetas.front() * Constants::Rad);
-    Plot2D::SetXlabel("time [days]");
-    Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("shifts y [px]");
-    Plot2D::Plot(data.shiftsy);
-
     // omegas x
     Plot2D::Set("omegasx");
     Plot2D::SetColRowRatio(1.5);
@@ -326,7 +311,20 @@ private:
     Plot2D::SetZlabel("omegas x [px]");
     Plot2D::Plot(data.omegasx);
 
-    // omegas x
+    // shifts y
+    Plot2D::Set("shiftsy");
+    Plot2D::SetColRowRatio(1.5);
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::SetXmin(times.front());
+    Plot2D::SetXmax(times.back());
+    Plot2D::SetYmin(thetas.back() * Constants::Rad);
+    Plot2D::SetYmax(thetas.front() * Constants::Rad);
+    Plot2D::SetXlabel("time [days]");
+    Plot2D::SetYlabel("latitude [deg]");
+    Plot2D::SetZlabel("shifts y [px]");
+    Plot2D::Plot(data.shiftsy);
+
+    // omegas y
     Plot2D::Set("omegasy");
     Plot2D::SetColRowRatio(1.5);
     Plot2D::ShowAxisLabels(true);
@@ -410,7 +408,7 @@ private:
 
   i32 idstep = 1;   // id step
   i32 idstride = 0; // id stride
-  i32 xsize = 1000; // x size - 2500
+  i32 xsize = 24;   // x size - 2500
   i32 ysize = 851;  // y size - 851
   i32 yfov = 3400;  // y FOV [px]
   i32 cadence = 45; // SDO/HMI cadence [s]
