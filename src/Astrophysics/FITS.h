@@ -123,7 +123,7 @@ private:
       swapbytes((char*)mat.data, size * size * 2);
       AlignImage(mat);
       params.succload = true;
-      params.fitsMidX = size - params.fitsMidX; // idk but works
+      params.fitsMidX = size - 1 - params.fitsMidX;
 
       // normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
 
