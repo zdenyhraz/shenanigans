@@ -155,8 +155,8 @@ private:
 
   std::vector<f64> GetTimesInDays(i32 tstep, i32 tstride) const
   {
-    std::vector<f64> times(xsize); // [days]
-    f64 time = 0;                  // [s]
+    std::vector<f64> times(xsize);
+    f64 time = 0;
     for (i32 i = 0; i < xsize; ++i)
     {
       times[i] = time / 60 / 60 / 24;
@@ -167,11 +167,11 @@ private:
 
   static i32 FindFirstLowerIndex(const cv::Mat& thetas, i32 x, f64 itheta)
   {
-    for (i32 y = 0; y < thetas.rows; ++y)
-      if (itheta <= thetas.at<f64>(y, x))
-        return y;
+    for (i32 y = 1; y < thetas.rows; ++y)
+      if (itheta > thetas.at<f64>(y, x))
+        return y - 1;
 
-    throw std::runtime_error(fmt::format("Could not find theta higher than {:.1f}", itheta));
+    throw std::runtime_error(fmt::format("Could not find theta smaller than {:.1f}", itheta));
   }
 
   static cv::Mat Interpolate(const cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
