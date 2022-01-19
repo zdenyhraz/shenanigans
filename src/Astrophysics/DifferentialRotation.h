@@ -4,6 +4,7 @@ class DifferentialRotation
 {
 public:
   void Calculate(const std::string& dataPath, i32 idstart) const
+  try
   {
     IterativePhaseCorrelation ipc(wysize, wxsize, 0, 0.6);
     DifferentialRotationData data(xsize, ysize);
@@ -71,6 +72,10 @@ public:
 
     Plot(data);
   }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR("DifferentialRotation::Calculate error: {}", e.what());
+  }
 
 private:
   struct ImageHeader
@@ -135,6 +140,10 @@ private:
       ithetamin = std::max(ithetamin, thetas.at<f64>(ysize - 1, x));
       ithetamax = std::min(ithetamax, thetas.at<f64>(0, x));
     }
+
+    if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
+      throw std::runtime_error("Failed to calculate interpolated thetas");
+
     LOG_DEBUG("iTheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
 
     std::vector<f64> ithetas(ysize);
@@ -156,10 +165,40 @@ private:
     return times;
   }
 
+  static i32 FindFirstLowerIndex(const cv::Mat& thetas, i32 x, f64 itheta)
+  {
+    for (i32 y = 0; y < thetas.rows; ++y)
+      if (itheta <= thetas.at<f64>(y, x))
+        return y;
+
+    throw std::runtime_error(fmt::format("Could not find theta higher than {:.1f}", itheta));
+  }
+
+  static cv::Mat Interpolate(const cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
+  {
+    cv::Mat ivals = cv::Mat::zeros(vals.rows, vals.cols, CV_64F);
+    for (i32 x = 0; x < vals.cols; ++x)
+    {
+      for (i32 y = 0; y < vals.rows; ++y)
+      {
+        const auto theta = ithetas[y];
+        const auto iL = FindFirstLowerIndex(thetas, x, theta);
+        const auto iH = iL + 1;
+        const auto thetaL = thetas.at<f64>(iL, x);
+        const auto thetaH = thetas.at<f64>(iH, x);
+        const auto valL = vals.at<f64>(iL, x);
+        const auto valH = vals.at<f64>(iH, x);
+        const f64 t = (theta - thetaL) / (thetaH - thetaL);
+        ivals.at<f64>(y, x) = std::lerp(valL, valH, t);
+      }
+    }
+    return ivals;
+  }
+
   void Plot(const DifferentialRotationData& data) const
   {
     // theta-interpolated values
-    const auto ithetas = GetInterpolatedThetas(data.thetas);
+    const auto thetas = GetInterpolatedThetas(data.thetas);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence);
     // cv::Mat ishifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
     // cv::Mat iomegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
@@ -177,12 +216,23 @@ private:
     Plot2D::ShowAxisLabels(true);
     Plot2D::SetXmin(times.front());
     Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(ithetas.back() * Constants::Rad);
-    Plot2D::SetYmax(ithetas.front() * Constants::Rad);
+    Plot2D::SetYmin(thetas.back() * Constants::Rad);
+    Plot2D::SetYmax(thetas.front() * Constants::Rad);
     Plot2D::SetXlabel("time [days]");
     Plot2D::SetYlabel("latitude [deg]");
     Plot2D::SetZlabel("shiftsx [px]");
     Plot2D::Plot(data.shiftsx);
+
+    Plot2D::Set("ishiftsx");
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::SetXmin(times.front());
+    Plot2D::SetXmax(times.back());
+    Plot2D::SetYmin(thetas.back() * Constants::Rad);
+    Plot2D::SetYmax(thetas.front() * Constants::Rad);
+    Plot2D::SetXlabel("time [days]");
+    Plot2D::SetYlabel("latitude [deg]");
+    Plot2D::SetZlabel("ishiftsx [px]");
+    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas));
   }
 
   static constexpr i32 cadence = 45; // SDO/HMI cadence [s]
