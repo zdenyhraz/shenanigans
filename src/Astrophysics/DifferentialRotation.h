@@ -6,14 +6,18 @@ public:
   void Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
+    LOG_FUNCTION("DifferentialRotation::Calculate");
     DifferentialRotationData data(xsize, ysize);
     std::atomic<i32> progress = -1;
-    const auto ids = GenerateIds(idstart);
     const auto ystep = yfov / (ysize - 1);
     const auto tstep = idstep * cadence;
     const auto xpred = 0.;
     const auto wxsize = ipc.GetCols();
     const auto wysize = ipc.GetRows();
+    const auto shiftxmax = 1.5 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(0.);
+    const auto shiftxmin = 0.7 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(1.);
+    const auto shiftymax = 0.08;
+    const auto ids = GenerateIds(idstart);
 
 #pragma omp parallel for
     for (i32 x = 0; x < xsize; ++x)
@@ -52,16 +56,16 @@ public:
           auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
           auto crop2 = roicrop(image2, header2.xcenter + xpred, header2.ycenter + yshift, wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-          const auto shiftx = std::clamp(shift.x + xpred, 0., 1.);
-          const auto shifty = std::clamp(shift.y, -0.1, 0.1);
+          const auto shiftx = std::clamp(shift.x + xpred, shiftxmin, shiftxmax);
+          const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
           const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
           const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
 
-          data.thetas.at<f64>(y, xindex) = theta;
-          data.shiftsx.at<f64>(y, xindex) = shiftx;
-          data.shiftsy.at<f64>(y, xindex) = shifty;
-          data.omegasx.at<f64>(y, xindex) = omegax;
-          data.omegasy.at<f64>(y, xindex) = omegay;
+          data.thetas.at<f32>(y, xindex) = theta;
+          data.shiftsx.at<f32>(y, xindex) = shiftx;
+          data.shiftsy.at<f32>(y, xindex) = shifty;
+          data.omegasx.at<f32>(y, xindex) = omegax;
+          data.omegasy.at<f32>(y, xindex) = omegay;
         }
       }
       catch (const std::exception& e)
@@ -70,12 +74,24 @@ public:
         continue;
       }
 
+    // Save(data, ipc, dataPath);
     Plot(data);
-    Save(data, dataPath);
   }
   catch (const std::exception& e)
   {
     LOG_ERROR("DifferentialRotation::Calculate error: {}", e.what());
+  }
+
+  void LoadAndShow(const std::string& path)
+  try
+  {
+    LOG_FUNCTION("DifferentialRotation::LoadAndShow");
+    const auto data = Load(path);
+    Plot(data);
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
 private:
@@ -91,11 +107,11 @@ private:
   {
     DifferentialRotationData(i32 xsize, i32 ysize)
     {
-      thetas = cv::Mat::zeros(ysize, xsize, CV_64F);
-      shiftsx = cv::Mat::zeros(ysize, xsize, CV_64F);
-      shiftsy = cv::Mat::zeros(ysize, xsize, CV_64F);
-      omegasx = cv::Mat::zeros(ysize, xsize, CV_64F);
-      omegasy = cv::Mat::zeros(ysize, xsize, CV_64F);
+      thetas = cv::Mat::zeros(ysize, xsize, CV_32F);
+      shiftsx = cv::Mat::zeros(ysize, xsize, CV_32F);
+      shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
+      omegasx = cv::Mat::zeros(ysize, xsize, CV_32F);
+      omegasy = cv::Mat::zeros(ysize, xsize, CV_32F);
       fshiftsx.resize(xsize);
       fshiftsy.resize(xsize);
       theta0s.resize(xsize);
@@ -138,8 +154,8 @@ private:
     f64 ithetamax = std::numeric_limits<f64>::infinity();  // lowest N latitude
     for (i32 x = 0; x < xsize; ++x)
     {
-      ithetamin = std::max(ithetamin, thetas.at<f64>(ysize - 1, x));
-      ithetamax = std::min(ithetamax, thetas.at<f64>(0, x));
+      ithetamin = std::max(ithetamin, static_cast<f64>(thetas.at<f32>(ysize - 1, x)));
+      ithetamax = std::min(ithetamax, static_cast<f64>(thetas.at<f32>(0, x)));
     }
 
     if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
@@ -169,15 +185,15 @@ private:
   static i32 FindFirstLowerIndex(const cv::Mat& thetas, i32 x, f64 itheta)
   {
     for (i32 y = 1; y < thetas.rows; ++y)
-      if (itheta >= thetas.at<f64>(y, x))
+      if (itheta >= thetas.at<f32>(y, x))
         return y - 1;
 
     return thetas.rows - 2;
   }
 
-  static cv::Mat Interpolate(const cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
+  static void Interpolate(cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
   {
-    cv::Mat ivals = cv::Mat::zeros(vals.rows, vals.cols, CV_64F);
+    cv::Mat ivals = cv::Mat::zeros(vals.rows, vals.cols, CV_32F);
     for (i32 x = 0; x < vals.cols; ++x)
     {
       for (i32 y = 0; y < vals.rows; ++y)
@@ -185,15 +201,15 @@ private:
         const auto theta = ithetas[y];
         const auto iL = FindFirstLowerIndex(thetas, x, theta);
         const auto iH = iL + 1;
-        const auto thetaL = thetas.at<f64>(iL, x);
-        const auto thetaH = thetas.at<f64>(iH, x);
-        const auto valL = vals.at<f64>(iL, x);
-        const auto valH = vals.at<f64>(iH, x);
+        const auto thetaL = thetas.at<f32>(iL, x);
+        const auto thetaH = thetas.at<f32>(iH, x);
+        const f64 valL = vals.at<f32>(iL, x);
+        const f64 valH = vals.at<f32>(iH, x);
         const f64 t = (theta - thetaL) / (thetaH - thetaL);
-        ivals.at<f64>(y, x) = std::lerp(valL, valH, t);
+        ivals.at<f32>(y, x) = std::lerp(valL, valH, t);
       }
     }
-    return ivals;
+    vals = ivals;
   }
 
   static std::vector<f64> GetXAverage(const cv::Mat& vals)
@@ -202,7 +218,7 @@ private:
 
     for (i32 y = 0; y < vals.rows; ++y)
       for (i32 x = 0; x < vals.cols; ++x)
-        avgs[y] += vals.at<f64>(y, x);
+        avgs[y] += vals.at<f32>(y, x);
 
     for (i32 y = 0; y < vals.rows; ++y)
       avgs[y] /= vals.cols;
@@ -210,19 +226,35 @@ private:
     return avgs;
   }
 
+  static f64 GetPredictedOmega(f64 theta, f64 A, f64 B, f64 C) { return A + B * std::pow(std::sin(theta), 2) + C * std::pow(std::sin(theta), 4); }
+
   static std::vector<f64> GetPredictedOmegas(const std::vector<f64>& thetas, f64 A, f64 B, f64 C)
   {
     std::vector<f64> omegas(thetas.size(), 0.);
     for (usize i = 0; i < thetas.size(); ++i)
-      omegas[i] = A + B * std::pow(std::sin(thetas[i]), 2) + C * std::pow(std::sin(thetas[i]), 4);
+      omegas[i] = GetPredictedOmega(thetas[i], A, B, C);
     return omegas;
   }
 
-  void Plot(const DifferentialRotationData& data) const
+  void Plot(const DifferentialRotationData& rawdata) const
   {
-    // theta-interpolated values
-    const auto thetas = GetInterpolatedThetas(data.thetas);
+    LOG_FUNCTION("DifferentialRotation::Plot");
+    const auto thetas = GetInterpolatedThetas(rawdata.thetas);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence);
+    auto data = rawdata;
+
+    // apply median blur
+    const i32 medsize = 5;
+    cv::medianBlur(data.shiftsx, data.shiftsx, medsize);
+    cv::medianBlur(data.shiftsy, data.shiftsy, medsize);
+    cv::medianBlur(data.omegasx, data.omegasx, medsize);
+    cv::medianBlur(data.omegasy, data.omegasy, medsize);
+
+    // apply theta-interpolation
+    Interpolate(data.shiftsx, data.thetas, thetas);
+    Interpolate(data.shiftsy, data.thetas, thetas);
+    Interpolate(data.omegasx, data.thetas, thetas);
+    Interpolate(data.omegasy, data.thetas, thetas);
 
     // fits params
     Plot1D::Set("fits params");
@@ -234,22 +266,26 @@ private:
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(times, {data.fshiftsx, data.fshiftsy}, {Constants::Rad * data.theta0s});
 
-    // average shifts x
+    // average shifts x / y
     Plot1D::Set("avgshiftsx");
     Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average shiftx [px]");
-    Plot1D::SetYnames({"avgshift x", "iavgshift x"});
+    Plot1D::SetYlabel("average shift x [px]");
+    Plot1D::SetY2label("average shift y [px]");
+    Plot1D::SetYnames({"avgshift x"});
+    Plot1D::SetY2names({"avgshift y"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx), GetXAverage(Interpolate(data.shiftsx, data.thetas, thetas))});
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx)}, {GetXAverage(data.shiftsy)});
 
-    // average omegas x
+    // average omegas x / y
     Plot1D::Set("avgomegasx");
     Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average omegax [deg/day]");
-    Plot1D::SetYnames({"avgomega x", "iavgomega x", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetYlabel("average omega x [deg/day]");
+    Plot1D::SetY2label("average omega y [deg/day]");
+    Plot1D::SetYnames({"avgomega x", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetY2names({"avgomega y"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * thetas,
-        {GetXAverage(data.omegasx), GetXAverage(Interpolate(data.omegasx, data.thetas, thetas)), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+    Plot1D::Plot(
+        Constants::Rad * thetas, {GetXAverage(data.omegasx), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)}, {GetXAverage(data.omegasy)});
 
     // shifts x
     Plot2D::Set("shiftsx");
@@ -261,8 +297,21 @@ private:
     Plot2D::SetYmax(thetas.front() * Constants::Rad);
     Plot2D::SetXlabel("time [days]");
     Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("shiftsx [px]");
-    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas));
+    Plot2D::SetZlabel("shifts x [px]");
+    Plot2D::Plot(data.shiftsx);
+
+    // shifts y
+    Plot2D::Set("shiftsy");
+    Plot2D::SetColRowRatio(1.5);
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::SetXmin(times.front());
+    Plot2D::SetXmax(times.back());
+    Plot2D::SetYmin(thetas.back() * Constants::Rad);
+    Plot2D::SetYmax(thetas.front() * Constants::Rad);
+    Plot2D::SetXlabel("time [days]");
+    Plot2D::SetYlabel("latitude [deg]");
+    Plot2D::SetZlabel("shifts y [px]");
+    Plot2D::Plot(data.shiftsy);
 
     // omegas x
     Plot2D::Set("omegasx");
@@ -274,24 +323,53 @@ private:
     Plot2D::SetYmax(thetas.front() * Constants::Rad);
     Plot2D::SetXlabel("time [days]");
     Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("omegasx [px]");
-    Plot2D::Plot(Interpolate(data.omegasx, data.thetas, thetas));
+    Plot2D::SetZlabel("omegas x [px]");
+    Plot2D::Plot(data.omegasx);
+
+    // omegas x
+    Plot2D::Set("omegasy");
+    Plot2D::SetColRowRatio(1.5);
+    Plot2D::ShowAxisLabels(true);
+    Plot2D::SetXmin(times.front());
+    Plot2D::SetXmax(times.back());
+    Plot2D::SetYmin(thetas.back() * Constants::Rad);
+    Plot2D::SetYmax(thetas.front() * Constants::Rad);
+    Plot2D::SetXlabel("time [days]");
+    Plot2D::SetYlabel("latitude [deg]");
+    Plot2D::SetZlabel("omegas y [px]");
+    Plot2D::Plot(data.omegasy);
   }
 
-  void Save(const DifferentialRotationData& data, const std::string& dataPath) const
+  void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation& ipc, const std::string& dataPath) const
   {
+    LOG_FUNCTION("DifferentialRotation::Save");
+
     char buf[50];
     const auto tm = std::time(nullptr);
     std::strftime(buf, sizeof(buf), "%Y_%b_%d_%H_%M_%S", std::localtime(&tm));
-    cv::FileStorage file(fmt::format("{}/diffrot_{}.json", dataPath, buf), cv::FileStorage::WRITE);
+    std::string path = fmt::format("{}/diffrot_{}.json", dataPath, buf);
+    LOG_DEBUG("Saving differential rotation results to {} ...", path);
+    cv::FileStorage file(path, cv::FileStorage::WRITE);
 
+    // diffrot params
     file << "idstep" << idstep;
     file << "idstride" << idstride;
     file << "xsize" << xsize;
     file << "ysize" << ysize;
     file << "yfov" << yfov;
     file << "cadence" << cadence;
-
+    // ipc params
+    file << "wxsize" << ipc.GetCols();
+    file << "wysize" << ipc.GetRows();
+    file << "bandpassL" << ipc.GetBandpassL();
+    file << "bandpassH" << ipc.GetBandpassH();
+    file << "L2size" << ipc.GetL2size();
+    file << "L1ratio" << ipc.GetL1ratio();
+    file << "UpsampleCoeff" << ipc.GetUpsampleCoeff();
+    file << "BandpassType" << ipc.GetBandpassType();
+    file << "WindowType" << ipc.GetWindowType();
+    file << "InterpolationType" << ipc.GetInterpolationType();
+    // diffrot data
     file << "thetas" << data.thetas;
     file << "shiftsx" << data.shiftsx;
     file << "shiftsy" << data.shiftsy;
@@ -305,6 +383,9 @@ private:
 
   DifferentialRotationData Load(const std::string& path)
   {
+    LOG_FUNCTION("DifferentialRotation::Load");
+
+    LOG_DEBUG("Loading differential rotation data {}", path);
     cv::FileStorage file(path, cv::FileStorage::READ);
     file["idstep"] >> idstep;
     file["idstride"] >> idstride;
@@ -329,8 +410,8 @@ private:
 
   i32 idstep = 1;   // id step
   i32 idstride = 0; // id stride
-  i32 xsize = 24;   // x size - 2500
-  i32 ysize = 201;  // y size - 851
+  i32 xsize = 1000; // x size - 2500
+  i32 ysize = 851;  // y size - 851
   i32 yfov = 3400;  // y FOV [px]
   i32 cadence = 45; // SDO/HMI cadence [s]
 };

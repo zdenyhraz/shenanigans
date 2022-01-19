@@ -128,6 +128,9 @@ public:
   i32 GetUpsampleCoeff() const { return mUpsampleCoeff; }
   cv::Mat GetWindow() const { return mWindow; }
   cv::Mat GetBandpass() const { return mBandpass; }
+  BandpassType GetBandpassType() const { return mBandpassType; }
+  WindowType GetWindowType() const { return mWindowType; }
+  InterpolationType GetInterpolationType() const { return mInterpolationType; }
 
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
