@@ -71,6 +71,7 @@ public:
       }
 
     Plot(data);
+    Save(data, dataPath);
   }
   catch (const std::exception& e)
   {
@@ -277,10 +278,59 @@ private:
     Plot2D::Plot(Interpolate(data.omegasx, data.thetas, thetas));
   }
 
-  static constexpr i32 cadence = 45; // SDO/HMI cadence [s]
-  i32 idstep = 1;                    // id step
-  i32 idstride = 0;                  // id stride
-  i32 xsize = 24;                    // x size - 2500
-  i32 ysize = 201;                   // y size - 851
-  i32 yfov = 3400;                   // y FOV [px]
+  void Save(const DifferentialRotationData& data, const std::string& dataPath) const
+  {
+    char buf[50];
+    const auto tm = std::time(nullptr);
+    std::strftime(buf, sizeof(buf), "%Y_%b_%d_%H_%M_%S", std::localtime(&tm));
+    cv::FileStorage file(fmt::format("{}/diffrot_{}.json", dataPath, buf), cv::FileStorage::WRITE);
+
+    file << "idstep" << idstep;
+    file << "idstride" << idstride;
+    file << "xsize" << xsize;
+    file << "ysize" << ysize;
+    file << "yfov" << yfov;
+    file << "cadence" << cadence;
+
+    file << "thetas" << data.thetas;
+    file << "shiftsx" << data.shiftsx;
+    file << "shiftsy" << data.shiftsy;
+    file << "omegasx" << data.omegasx;
+    file << "omegasy" << data.omegasy;
+    file << "fshiftsx" << data.fshiftsx;
+    file << "fshiftsy" << data.fshiftsy;
+    file << "theta0s" << data.theta0s;
+    file << "Rs" << data.Rs;
+  }
+
+  DifferentialRotationData Load(const std::string& path)
+  {
+    cv::FileStorage file(path, cv::FileStorage::READ);
+    file["idstep"] >> idstep;
+    file["idstride"] >> idstride;
+    file["xsize"] >> xsize;
+    file["ysize"] >> ysize;
+    file["yfov"] >> yfov;
+    file["cadence"] >> cadence;
+
+    DifferentialRotationData data(xsize, ysize);
+    file["thetas"] >> data.thetas;
+    file["shiftsx"] >> data.shiftsx;
+    file["shiftsy"] >> data.shiftsy;
+    file["omegasx"] >> data.omegasx;
+    file["omegasy"] >> data.omegasy;
+    file["fshiftsx"] >> data.fshiftsx;
+    file["fshiftsy"] >> data.fshiftsy;
+    file["theta0s"] >> data.theta0s;
+    file["Rs"] >> data.Rs;
+
+    return data;
+  }
+
+  i32 idstep = 1;   // id step
+  i32 idstride = 0; // id stride
+  i32 xsize = 24;   // x size - 2500
+  i32 ysize = 201;  // y size - 851
+  i32 yfov = 3400;  // y FOV [px]
+  i32 cadence = 45; // SDO/HMI cadence [s]
 };
