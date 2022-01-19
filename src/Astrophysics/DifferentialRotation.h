@@ -3,7 +3,26 @@
 class DifferentialRotation
 {
 public:
-  void Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
+  struct DifferentialRotationData
+  {
+    DifferentialRotationData(i32 xsize, i32 ysize)
+    {
+      thetas = cv::Mat::zeros(ysize, xsize, CV_32F);
+      shiftsx = cv::Mat::zeros(ysize, xsize, CV_32F);
+      shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
+      omegasx = cv::Mat::zeros(ysize, xsize, CV_32F);
+      omegasy = cv::Mat::zeros(ysize, xsize, CV_32F);
+      fshiftsx.resize(xsize);
+      fshiftsy.resize(xsize);
+      theta0s.resize(xsize);
+      Rs.resize(xsize);
+    }
+
+    cv::Mat thetas, shiftsx, shiftsy, omegasx, omegasy;
+    std::vector<f64> fshiftsx, fshiftsy, theta0s, Rs;
+  };
+
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
     LOG_FUNCTION("DifferentialRotation::Calculate");
@@ -76,11 +95,15 @@ public:
 
     if (xsize > 50)
       Save(data, ipc, dataPath);
+
     Plot(data);
+
+    return data;
   }
   catch (const std::exception& e)
   {
     LOG_ERROR("DifferentialRotation::Calculate error: {}", e.what());
+    return DifferentialRotationData(xsize, ysize);
   }
 
   void LoadAndShow(const std::string& path)
@@ -95,10 +118,11 @@ public:
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
-  void Optimize(IterativePhaseCorrelation& ipc, i32 populationSize) const
+  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 populationSize) const
   {
-    const auto f = [](const IterativePhaseCorrelation& _ipc)
+    const auto f = [&](const IterativePhaseCorrelation& _ipc)
     {
+      const auto data = Calculate(_ipc, dataPath, idstart);
       // calc diffrot profile
       // calc polyfit
       // calc average polyfit difference from predicted shift
@@ -115,25 +139,6 @@ private:
     f64 ycenter; // [px]
     f64 theta0;  // [rad]
     f64 R;       // [px]
-  };
-
-  struct DifferentialRotationData
-  {
-    DifferentialRotationData(i32 xsize, i32 ysize)
-    {
-      thetas = cv::Mat::zeros(ysize, xsize, CV_32F);
-      shiftsx = cv::Mat::zeros(ysize, xsize, CV_32F);
-      shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
-      omegasx = cv::Mat::zeros(ysize, xsize, CV_32F);
-      omegasy = cv::Mat::zeros(ysize, xsize, CV_32F);
-      fshiftsx.resize(xsize);
-      fshiftsy.resize(xsize);
-      theta0s.resize(xsize);
-      Rs.resize(xsize);
-    }
-
-    cv::Mat thetas, shiftsx, shiftsy, omegasx, omegasy;
-    std::vector<f64> fshiftsx, fshiftsy, theta0s, Rs;
   };
 
   ImageHeader GetHeader(const std::string& path) const
