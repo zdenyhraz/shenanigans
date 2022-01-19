@@ -3,17 +3,17 @@
 class DifferentialRotation
 {
 public:
-  void Calculate(const std::string& dataPath, i32 idstart) const
+  void Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
-    IterativePhaseCorrelation ipc(wysize, wxsize, 0, 0.6);
     DifferentialRotationData data(xsize, ysize);
     std::atomic<i32> progress = -1;
-
     const auto ids = GenerateIds(idstart);
     const auto ystep = yfov / (ysize - 1);
     const auto tstep = idstep * cadence;
     const auto xpred = 0.;
+    const auto wxsize = ipc.GetCols();
+    const auto wysize = ipc.GetRows();
 
 #pragma omp parallel for
     for (i32 x = 0; x < xsize; ++x)
@@ -209,12 +209,21 @@ private:
     return avgs;
   }
 
+  static std::vector<f64> GetPredictedOmegas(const std::vector<f64>& thetas, f64 A, f64 B, f64 C)
+  {
+    std::vector<f64> omegas(thetas.size(), 0.);
+    for (usize i = 0; i < thetas.size(); ++i)
+      omegas[i] = A + B * std::pow(std::sin(thetas[i]), 2) + C * std::pow(std::sin(thetas[i]), 4);
+    return omegas;
+  }
+
   void Plot(const DifferentialRotationData& data) const
   {
     // theta-interpolated values
     const auto thetas = GetInterpolatedThetas(data.thetas);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence);
 
+    // fits params
     Plot1D::Set("fits params");
     Plot1D::SetXlabel("time [days]");
     Plot1D::SetYlabel("fits shift [px]");
@@ -224,6 +233,7 @@ private:
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(times, {data.fshiftsx, data.fshiftsy}, {Constants::Rad * data.theta0s});
 
+    // average shifts x
     Plot1D::Set("avgshiftsx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average shiftx [px]");
@@ -231,7 +241,18 @@ private:
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx), GetXAverage(Interpolate(data.shiftsx, data.thetas, thetas))});
 
+    // average omegas x
+    Plot1D::Set("avgomegasx");
+    Plot1D::SetXlabel("latitude [deg]");
+    Plot1D::SetYlabel("average omegax [deg/day]");
+    Plot1D::SetYnames({"avgomega x", "iavgomega x", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::Plot(Constants::Rad * thetas,
+        {GetXAverage(data.omegasx), GetXAverage(Interpolate(data.omegasx, data.thetas, thetas)), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+
+    // shifts x
     Plot2D::Set("shiftsx");
+    Plot2D::SetColRowRatio(1.5);
     Plot2D::ShowAxisLabels(true);
     Plot2D::SetXmin(times.front());
     Plot2D::SetXmax(times.back());
@@ -240,9 +261,11 @@ private:
     Plot2D::SetXlabel("time [days]");
     Plot2D::SetYlabel("latitude [deg]");
     Plot2D::SetZlabel("shiftsx [px]");
-    Plot2D::Plot(data.shiftsx);
+    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas));
 
-    Plot2D::Set("ishiftsx");
+    // omegas x
+    Plot2D::Set("omegasx");
+    Plot2D::SetColRowRatio(1.5);
     Plot2D::ShowAxisLabels(true);
     Plot2D::SetXmin(times.front());
     Plot2D::SetXmax(times.back());
@@ -250,19 +273,14 @@ private:
     Plot2D::SetYmax(thetas.front() * Constants::Rad);
     Plot2D::SetXlabel("time [days]");
     Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("ishiftsx [px]");
-    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas));
-
-    Plot2D::Set("ishiftsx-shiftsx");
-    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas) - data.shiftsx);
+    Plot2D::SetZlabel("omegasx [px]");
+    Plot2D::Plot(Interpolate(data.omegasx, data.thetas, thetas));
   }
 
   static constexpr i32 cadence = 45; // SDO/HMI cadence [s]
   i32 idstep = 1;                    // id step
   i32 idstride = 0;                  // id stride
-  i32 xsize = 200;                   // x size - 2500
-  i32 ysize = 851;                   // y size - 851
+  i32 xsize = 24;                    // x size - 2500
+  i32 ysize = 201;                   // y size - 851
   i32 yfov = 3400;                   // y FOV [px]
-  i32 wxsize = 64;                   // window x size [px]
-  i32 wysize = 64;                   // window y size [px]
 };

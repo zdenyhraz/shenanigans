@@ -105,7 +105,11 @@ public:
   }
   void SetMaxIterations(i32 maxIterations) { mMaxIterations = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mInterpolationType = interpolationType; }
-  void SetWindowType(WindowType type) { mWindowType = type; }
+  void SetWindowType(WindowType type)
+  {
+    mWindowType = type;
+    UpdateWindow();
+  }
   void SetDebugDirectory(const std::string& dir) const
   {
     mDebugDirectory = dir;

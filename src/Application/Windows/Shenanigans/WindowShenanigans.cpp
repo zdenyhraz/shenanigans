@@ -1014,8 +1014,7 @@ try
   }
   if (1) // new diffrot
   {
-    DifferentialRotation diffrot;
-    diffrot.Calculate("../data/diffrot_day_2500", 18933122);
+    DifferentialRotation().Calculate(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
   }
 }
 catch (const std::exception& e)
