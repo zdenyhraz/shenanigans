@@ -144,7 +144,7 @@ private:
     if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
       throw std::runtime_error("Failed to calculate interpolated thetas");
 
-    LOG_DEBUG("iTheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
+    LOG_DEBUG("itheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
 
     std::vector<f64> ithetas(ysize);
     f64 ithetastep = (ithetamax - ithetamin) / (ysize - 1);
@@ -168,10 +168,10 @@ private:
   static i32 FindFirstLowerIndex(const cv::Mat& thetas, i32 x, f64 itheta)
   {
     for (i32 y = 1; y < thetas.rows; ++y)
-      if (itheta > thetas.at<f64>(y, x))
+      if (itheta >= thetas.at<f64>(y, x))
         return y - 1;
 
-    throw std::runtime_error(fmt::format("Could not find theta smaller than {:.1f}", itheta));
+    return thetas.rows - 2;
   }
 
   static cv::Mat Interpolate(const cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
@@ -195,13 +195,25 @@ private:
     return ivals;
   }
 
+  static std::vector<f64> GetXAverage(const cv::Mat& vals)
+  {
+    std::vector<f64> avgs(vals.rows, 0.);
+
+    for (i32 y = 0; y < vals.rows; ++y)
+      for (i32 x = 0; x < vals.cols; ++x)
+        avgs[y] += vals.at<f64>(y, x);
+
+    for (i32 y = 0; y < vals.rows; ++y)
+      avgs[y] /= vals.cols;
+
+    return avgs;
+  }
+
   void Plot(const DifferentialRotationData& data) const
   {
     // theta-interpolated values
     const auto thetas = GetInterpolatedThetas(data.thetas);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence);
-    // cv::Mat ishifts = cv::Mat::zeros(ysize, xsize, CV_64FC2);
-    // cv::Mat iomegas = cv::Mat::zeros(ysize, xsize, CV_64FC2);
 
     Plot1D::Set("fits params");
     Plot1D::SetXlabel("time [days]");
@@ -211,6 +223,13 @@ private:
     Plot1D::SetY2names({"theta0"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(times, {data.fshiftsx, data.fshiftsy}, {Constants::Rad * data.theta0s});
+
+    Plot1D::Set("avgshiftsx");
+    Plot1D::SetXlabel("latitude [deg]");
+    Plot1D::SetYlabel("average shiftx [px]");
+    Plot1D::SetYnames({"avgshift x", "iavgshift x"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx), GetXAverage(Interpolate(data.shiftsx, data.thetas, thetas))});
 
     Plot2D::Set("shiftsx");
     Plot2D::ShowAxisLabels(true);
@@ -233,13 +252,16 @@ private:
     Plot2D::SetYlabel("latitude [deg]");
     Plot2D::SetZlabel("ishiftsx [px]");
     Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas));
+
+    Plot2D::Set("ishiftsx-shiftsx");
+    Plot2D::Plot(Interpolate(data.shiftsx, data.thetas, thetas) - data.shiftsx);
   }
 
   static constexpr i32 cadence = 45; // SDO/HMI cadence [s]
   i32 idstep = 1;                    // id step
   i32 idstride = 0;                  // id stride
-  i32 xsize = 50;                    // x size - 2500
-  i32 ysize = 51;                    // y size - 851
+  i32 xsize = 200;                   // x size - 2500
+  i32 ysize = 851;                   // y size - 851
   i32 yfov = 3400;                   // y FOV [px]
   i32 wxsize = 64;                   // window x size [px]
   i32 wysize = 64;                   // window y size [px]
