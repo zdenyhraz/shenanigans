@@ -378,11 +378,42 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   return evo.Optimize(obj, valid).optimum;
 }
 
+std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
+{
+  LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
+  const auto f = [&](const std::vector<f64>& params)
+  {
+    IterativePhaseCorrelation ipc(static_cast<i32>(params[OptimizedParameterCount])); // hack for size parameter
+    ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
+    ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
+    ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
+    ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
+    ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
+    ipc.SetL1ratio(params[L1ratioParameter]);
+
+    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
+      return std::numeric_limits<f64>::max();
+
+    return obj(ipc);
+  };
+
+  Evolution evo(OptimizedParameterCount + 1);
+  evo.mNP = populationSize;
+  evo.mMutStrat = Evolution::RAND1;
+  evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R", "SIZE"});
+  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1, 16};
+  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 51, 0.8, 128};
+  evo.SetPlotOutput(true);
+  evo.SetConsoleOutput(true);
+  return evo.Optimize(f, nullptr).optimum;
+}
+
 void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
 {
   LOG_FUNCTION("IterativePhaseCorrelation::ApplyOptimalParameters");
 
-  if (optimalParameters.size() != OptimizedParameterCount)
+  if (optimalParameters.size() < OptimizedParameterCount)
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
   SetBandpassType(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
@@ -391,6 +422,8 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
+  if (optimalParameters.size() > OptimizedParameterCount)
+    SetSize(static_cast<i32>(optimalParameters[OptimizedParameterCount]));
 
   LOG_INFO("Final IPC BandpassType: {}",
       BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
@@ -400,31 +433,33 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
   LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
   LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
+  if (optimalParameters.size() > OptimizedParameterCount)
+    LOG_INFO("Final IPC size: {:.0f}", static_cast<i32>(optimalParameters[OptimizedParameterCount]));
 }
 
-std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const
+std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH)
 {
   switch (type)
   {
   case BandpassType::Rectangular:
-    if (mBandpassL <= 0 and mBandpassH < 1)
+    if (bandpassL <= 0 and bandpassH < 1)
       return "Rectangular low pass";
-    else if (mBandpassL > 0 and mBandpassH >= 1)
+    else if (bandpassL > 0 and bandpassH >= 1)
       return "Rectangular high pass";
-    else if (mBandpassL > 0 and mBandpassH < 1)
+    else if (bandpassL > 0 and bandpassH < 1)
       return "Rectangular band pass";
-    else if (mBandpassL <= 0 and mBandpassH >= 1)
+    else if (bandpassL <= 0 and bandpassH >= 1)
       return "Rectangular all pass";
     else
       throw std::runtime_error("Unknown bandpass type");
   case BandpassType::Gaussian:
-    if (mBandpassL <= 0 and mBandpassH < 1)
+    if (bandpassL <= 0 and bandpassH < 1)
       return "Gaussian low pass";
-    else if (mBandpassL > 0 and mBandpassH >= 1)
+    else if (bandpassL > 0 and bandpassH >= 1)
       return "Gaussian high pass";
-    else if (mBandpassL > 0 and mBandpassH < 1)
+    else if (bandpassL > 0 and bandpassH < 1)
       return "Gausian band pass";
-    else if (mBandpassL <= 0 and mBandpassH >= 1)
+    else if (bandpassL <= 0 and bandpassH >= 1)
       return "Gaussian all pass";
     else
       throw std::runtime_error("Unknown bandpass type");
@@ -638,6 +673,26 @@ try
   const auto shiftsAfter = GetShifts(trainingImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
+  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+  LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
+}
+
+void IterativePhaseCorrelation::Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
+try
+{
+  LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
+  const auto optimalParameters = CalculateOptimalParameters(obj, populationSize);
+  if (optimalParameters.empty())
+    throw std::runtime_error("Optimization failed");
+
+  const auto objBefore = obj(*this);
+  ApplyOptimalParameters(optimalParameters);
+  const auto objAfter = obj(*this);
+
   LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }

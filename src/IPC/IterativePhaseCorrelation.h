@@ -52,14 +52,14 @@ public:
     WindowTypeParameter,
     UpsampleCoeffParameter,
     L1ratioParameter,
-    OptimizedParameterCount // last
+    OptimizedParameterCount, // last
   };
 
-  IterativePhaseCorrelation(i32 rows, i32 cols = 0, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(rows, cols, bandpassL, bandpassH); }
+  IterativePhaseCorrelation(i32 rows, i32 cols = -1, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(rows, cols, bandpassL, bandpassH); }
   IterativePhaseCorrelation(const cv::Size& size, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(size.height, size.width, bandpassL, bandpassH); }
   IterativePhaseCorrelation(const cv::Mat& img, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(img.rows, img.cols, bandpassL, bandpassH); }
 
-  void Initialize(i32 rows, i32 cols, f64 bandpassL = 0, f64 bandpassH = 1)
+  void Initialize(i32 rows, i32 cols, f64 bandpassL, f64 bandpassH)
   {
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
@@ -255,11 +255,15 @@ public:
   void ShowDebugStuff() const;
   void Optimize(const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift = 2.0, f32 noiseStdev = 0.01, i32 itersPerImage = 100, f64 validationRatio = 0.2,
       i32 populationSize = OptimizedParameterCount * 7);
+  void Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize = OptimizedParameterCount * 7);
   void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters);
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
+  static std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH);
+  static std::string InterpolationType2String(InterpolationType type);
+  static std::string WindowType2String(WindowType type);
 
 private:
   i32 mRows = 0;
@@ -553,7 +557,6 @@ private:
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
   const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters);
-  std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH) const;
   std::vector<cv::Point2d> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::vector<cv::Point2d> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::vector<cv::Point2d> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
@@ -562,8 +565,7 @@ private:
   static std::vector<cv::Point2d> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
   static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
-  static std::string WindowType2String(WindowType type);
-  static std::string InterpolationType2String(InterpolationType type);
+  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize);
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
   static f64 GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts);
   static f64 GetFractionalPart(f64 x);

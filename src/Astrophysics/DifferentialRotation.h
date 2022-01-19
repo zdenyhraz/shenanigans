@@ -74,7 +74,7 @@ public:
         continue;
       }
 
-    if (xsize > 500)
+    if (xsize > 50)
       Save(data, ipc, dataPath);
     Plot(data);
   }
@@ -93,6 +93,19 @@ public:
   catch (const std::exception& e)
   {
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
+  }
+
+  void Optimize(IterativePhaseCorrelation& ipc, i32 populationSize) const
+  {
+    const auto f = [](const IterativePhaseCorrelation& _ipc)
+    {
+      // calc diffrot profile
+      // calc polyfit
+      // calc average polyfit difference from predicted shift
+      return 0.;
+    };
+
+    ipc.Optimize(f, populationSize);
   }
 
 private:
@@ -364,9 +377,9 @@ private:
     file << "L2size" << ipc.GetL2size();
     file << "L1ratio" << ipc.GetL1ratio();
     file << "UpsampleCoeff" << ipc.GetUpsampleCoeff();
-    file << "BandpassType" << ipc.GetBandpassType();
-    file << "WindowType" << ipc.GetWindowType();
-    file << "InterpolationType" << ipc.GetInterpolationType();
+    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType(), ipc.GetBandpassL(), ipc.GetBandpassH());
+    file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
+    file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
     // diffrot data
     file << "thetas" << data.thetas;
     file << "shiftsx" << data.shiftsx;
@@ -408,7 +421,7 @@ private:
 
   i32 idstep = 1;   // id step
   i32 idstride = 0; // id stride
-  i32 xsize = 24;   // x size - 2500
+  i32 xsize = 51;   // x size - 2500
   i32 ysize = 851;  // y size - 851
   i32 yfov = 3400;  // y FOV [px]
   i32 cadence = 45; // SDO/HMI cadence [s]
