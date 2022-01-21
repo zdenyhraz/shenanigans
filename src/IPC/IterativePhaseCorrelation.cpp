@@ -447,23 +447,9 @@ std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f6
   switch (type)
   {
   case BandpassType::Rectangular:
-    if (bandpassL <= 0 and bandpassH < 1)
-      return "Rectangular low pass";
-    else if (bandpassL > 0 and bandpassH >= 1)
-      return "Rectangular high pass";
-    else if (bandpassL > 0 and bandpassH < 1)
-      return "Rectangular band pass";
-    else
-      return "Rectangular";
+    return "Rectangular";
   case BandpassType::Gaussian:
-    if (bandpassL <= 0 and bandpassH < 1)
-      return "Gaussian low pass";
-    else if (bandpassL > 0 and bandpassH >= 1)
-      return "Gaussian high pass";
-    else if (bandpassL > 0 and bandpassH < 1)
-      return "Gausian band pass";
-    else
-      return "Gaussian";
+    return "Gaussian";
   case BandpassType::None:
     return "None";
   default:
