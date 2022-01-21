@@ -153,6 +153,7 @@ public:
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
     const auto [dataBefore, thetas] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
     ipc.Optimize(f, popsize);
+    SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
     const auto [dataAfter, _] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
 
     Plot1D::Set("Diffrot opt");
@@ -437,19 +438,47 @@ private:
     file << "Rs" << data.Rs;
   }
 
+  void SaveOptimizedParameters(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  {
+    LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
+    char buf[50];
+    const auto tm = std::time(nullptr);
+    std::strftime(buf, sizeof(buf), "%Y_%b_%d_%H_%M_%S", std::localtime(&tm));
+    std::string path = fmt::format("{}/diffrot_ipcopt_{}.json", dataPath, buf);
+    LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", path);
+
+    cv::FileStorage file(path, cv::FileStorage::WRITE);
+    // diffrot opt params
+    file << "xsizeopt" << xsizeopt;
+    file << "ysizeopt" << ysizeopt;
+    file << "popsize" << popsize;
+    // ipc params
+    file << "wxsize" << ipc.GetCols();
+    file << "wysize" << ipc.GetRows();
+    file << "bandpassL" << ipc.GetBandpassL();
+    file << "bandpassH" << ipc.GetBandpassH();
+    file << "L2size" << ipc.GetL2size();
+    file << "L1ratio" << ipc.GetL1ratio();
+    file << "UpsampleCoeff" << ipc.GetUpsampleCoeff();
+    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType(), ipc.GetBandpassL(), ipc.GetBandpassH());
+    file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
+    file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
+  }
+
   DifferentialRotationData Load(const std::string& path)
   {
     LOG_FUNCTION("DifferentialRotation::Load");
-
     LOG_DEBUG("Loading differential rotation data {}", path);
+
     cv::FileStorage file(path, cv::FileStorage::READ);
+    // diffrot params
     file["xsize"] >> xsize;
     file["ysize"] >> ysize;
     file["idstep"] >> idstep;
     file["idstride"] >> idstride;
     file["yfov"] >> yfov;
     file["cadence"] >> cadence;
-
+    // diffrot data
     DifferentialRotationData data(xsize, ysize);
     file["thetas"] >> data.thetas;
     file["shiftsx"] >> data.shiftsx;
