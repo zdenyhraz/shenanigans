@@ -215,17 +215,19 @@ private:
       while (data.thetas.at<f32>(0, xindex2) == 0.0f and xindex2 < data.thetas.cols - 1)
         ++xindex2;
 
+      const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
+
       for (i32 y = 0; y < data.thetas.rows; ++y)
       {
-        data.fshiftsx[x] = std::lerp(data.fshiftsx[xindex1], data.fshiftsx[xindex2], 0.5);
-        data.fshiftsy[x] = std::lerp(data.fshiftsy[xindex1], data.fshiftsy[xindex2], 0.5);
-        data.theta0s[x] = std::lerp(data.theta0s[xindex1], data.theta0s[xindex2], 0.5);
-        data.Rs[x] = std::lerp(data.Rs[xindex1], data.Rs[xindex2], 0.5);
-        data.thetas.at<f32>(y, x) = std::lerp(data.thetas.at<f32>(y, xindex1), data.thetas.at<f32>(y, xindex2), 0.5f);
-        data.shiftsx.at<f32>(y, x) = std::lerp(data.shiftsx.at<f32>(y, xindex1), data.shiftsx.at<f32>(y, xindex2), 0.5f);
-        data.shiftsy.at<f32>(y, x) = std::lerp(data.shiftsy.at<f32>(y, xindex1), data.shiftsy.at<f32>(y, xindex2), 0.5f);
-        data.omegasx.at<f32>(y, x) = std::lerp(data.omegasx.at<f32>(y, xindex1), data.omegasx.at<f32>(y, xindex2), 0.5f);
-        data.omegasy.at<f32>(y, x) = std::lerp(data.omegasy.at<f32>(y, xindex1), data.omegasy.at<f32>(y, xindex2), 0.5f);
+        data.fshiftsx[x] = std::lerp(data.fshiftsx[xindex1], data.fshiftsx[xindex2], t);
+        data.fshiftsy[x] = std::lerp(data.fshiftsy[xindex1], data.fshiftsy[xindex2], t);
+        data.theta0s[x] = std::lerp(data.theta0s[xindex1], data.theta0s[xindex2], t);
+        data.Rs[x] = std::lerp(data.Rs[xindex1], data.Rs[xindex2], t);
+        data.thetas.at<f32>(y, x) = std::lerp(data.thetas.at<f32>(y, xindex1), data.thetas.at<f32>(y, xindex2), static_cast<f32>(t));
+        data.shiftsx.at<f32>(y, x) = std::lerp(data.shiftsx.at<f32>(y, xindex1), data.shiftsx.at<f32>(y, xindex2), static_cast<f32>(t));
+        data.shiftsy.at<f32>(y, x) = std::lerp(data.shiftsy.at<f32>(y, xindex1), data.shiftsy.at<f32>(y, xindex2), static_cast<f32>(t));
+        data.omegasx.at<f32>(y, x) = std::lerp(data.omegasx.at<f32>(y, xindex1), data.omegasx.at<f32>(y, xindex2), static_cast<f32>(t));
+        data.omegasy.at<f32>(y, x) = std::lerp(data.omegasy.at<f32>(y, xindex1), data.omegasy.at<f32>(y, xindex2), static_cast<f32>(t));
       }
     }
   }
@@ -247,7 +249,7 @@ private:
     if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
       throw std::runtime_error("Failed to calculate interpolated thetas");
 
-    LOG_DEBUG("InterpolatedTheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
+    // LOG_DEBUG("InterpolatedTheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
 
     std::vector<f64> ithetas(thetas.rows);
     f64 ithetastep = (ithetamax - ithetamin) / (thetas.rows - 1);
