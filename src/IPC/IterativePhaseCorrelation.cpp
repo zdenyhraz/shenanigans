@@ -439,7 +439,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
   LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
   if (optimalParameters.size() > OptimizedParameterCount) // hack for size parameter
-    LOG_INFO("Final IPC size: {:.0f}", static_cast<i32>(optimalParameters[OptimizedParameterCount]));
+    LOG_INFO("Final IPC size: {}", static_cast<i32>(optimalParameters[OptimizedParameterCount]));
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH)
@@ -454,7 +454,7 @@ std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f6
     else if (bandpassL > 0 and bandpassH < 1)
       return "Rectangular band pass";
     else
-      return "Rectangular all pass";
+      return "Rectangular";
   case BandpassType::Gaussian:
     if (bandpassL <= 0 and bandpassH < 1)
       return "Gaussian low pass";
@@ -463,7 +463,9 @@ std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f6
     else if (bandpassL > 0 and bandpassH < 1)
       return "Gausian band pass";
     else
-      return "Gaussian all pass";
+      return "Gaussian";
+  case BandpassType::None:
+    return "None";
   default:
     return "Unknown";
   }
