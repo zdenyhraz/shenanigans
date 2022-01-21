@@ -696,7 +696,7 @@ try
   ApplyOptimalParameters(optimalParameters);
   const auto objAfter = obj(*this);
 
-  LOG_INFO("Average improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+  LOG_INFO("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)

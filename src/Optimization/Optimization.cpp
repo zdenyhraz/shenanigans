@@ -15,7 +15,7 @@ OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname)
   for (usize i = 0; i < N; ++i)
   {
     mParameterNames[i] = fmt::format("param{}", i);
-    mParameterValueToNameFunctions[i] = [](f64 val) { return fmt::format("{:.2e}", val); };
+    mParameterValueToNameFunctions[i] = [](f64 val) { return fmt::format("{:.1e}", val); };
   }
 }
 
