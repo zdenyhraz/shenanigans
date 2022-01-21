@@ -68,7 +68,7 @@ try
     termReason = UnexpectedErrorOccured;
   }
 
-  UninitializeOutputs(population, termReason);
+  UninitializeOutputs(population, termReason, gen);
   OptimizationResult result;
   result.optimum = population.bestEntity.params;
   result.functionEvaluations = population.functionEvaluations;
@@ -422,20 +422,20 @@ void Evolution::UpdateOutputs(usize gen, const Population& population, Validatio
   }
 }
 
-void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason)
+void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason, usize generation)
 try
 {
   if (mFileOutput)
   {
     fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
-    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness));
+    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(generation, population.bestEntity.params, population.bestEntity.fitness));
     mOutputFile.close();
   }
 
   if (mConsoleOutput)
   {
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(0, population.bestEntity.params, population.bestEntity.fitness));
+    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(generation, population.bestEntity.params, population.bestEntity.fitness));
   }
 }
 catch (const std::exception& e)
@@ -733,8 +733,6 @@ void Evolution::Population::InitializeBestEntity()
     LOG_FUNCTION("Best entity search");
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
-  if (mConsoleOutput)
-    LOG_INFO("Initial population best entity: ({:.2e}) {}", bestEntity.fitness, bestEntity.params);
 }
 
 Evolution::Entity::Entity(usize N)

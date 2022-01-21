@@ -399,6 +399,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(const std
 
   Evolution evo(OptimizedParameterCount + 1); // hack for size parameter
   evo.mNP = populationSize;
+  evo.maxGen = 5;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R", "SIZE"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1, 16};

@@ -97,7 +97,7 @@ private:
   void CheckParameters();
   usize GetNumberOfParents();
   void InitializeOutputs(ValidationFunction valid);
-  void UninitializeOutputs(const Population& population, TerminationReason reason);
+  void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
   void UpdateOutputs(usize generation, const Population& population, ValidationFunction valid);
   TerminationReason CheckTerminationCriterions(const Population& population, usize generation);
   std::string GetOutputFileString(usize generation, const std::vector<f64>& bestEntity, f64 bestFitness);
