@@ -1014,7 +1014,7 @@ try
   }
   if (1) // new diffrot
   {
-    static constexpr i32 xsize = 50;
+    static constexpr i32 xsize = 1000;
     static constexpr i32 ysize = 51;
     static constexpr i32 idstep = 1;
     static constexpr i32 idstride = 0;
@@ -1022,9 +1022,38 @@ try
     static constexpr i32 cadence = 45;
     DifferentialRotation diffrot(xsize, ysize, idstep, idstride, yfov, cadence);
 
-    // diffrot.Calculate(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
-    //  diffrot.LoadAndShow("../data/diffrot_day_2500/diffrot.json");
-    diffrot.Optimize(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
+    diffrot.Calculate(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
+    // diffrot.LoadAndShow("../data/diffrot_day_2500/diffrot.json");
+    // diffrot.Optimize(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
+  }
+  if (0) // lexa roll question
+  {
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> distrib(1, 100);
+    u64 samples = 1e9;
+    u64 win1 = 0;
+    u64 win2 = 0;
+    u64 win3 = 0;
+
+    for (u64 n = 0; n < samples; ++n)
+    {
+      const auto roll1 = distrib(rng) + 50; // strong enemy
+      const auto roll2 = distrib(rng);      // normal enemy
+      const auto roll3 = distrib(rng);      // me
+
+      if (roll1 > roll2 and roll1 > roll3)
+        win1++;
+
+      if (roll2 > roll1 and roll2 > roll3)
+        win2++;
+
+      if (roll3 > roll1 and roll3 > roll2)
+        win3++;
+    }
+
+    LOG_DEBUG("Roll win1: {}%, win2: {}%, win3: {}%, sum: {}%", static_cast<f64>(win1) * 100 / samples, static_cast<f64>(win2) * 100 / samples, static_cast<f64>(win3) * 100 / samples,
+        static_cast<f64>(win1 + win2 + win3) * 100 / samples);
   }
 }
 catch (const std::exception& e)

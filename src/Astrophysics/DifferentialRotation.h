@@ -293,7 +293,7 @@ private:
     DifferentialRotationData data = rawdata;
 
     // apply median blur
-    const i32 medsize = 5;
+    static constexpr i32 medsize = 3;
     cv::medianBlur(data.shiftsx, data.shiftsx, medsize);
     cv::medianBlur(data.shiftsy, data.shiftsy, medsize);
     cv::medianBlur(data.omegasx, data.omegasx, medsize);
