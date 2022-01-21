@@ -30,7 +30,7 @@ public:
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart)
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
@@ -90,11 +90,11 @@ public:
           const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
           const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
 
-          data.thetas.template at<f32>(y, xindex) = theta;
-          data.shiftsx.template at<f32>(y, xindex) = shiftx;
-          data.shiftsy.template at<f32>(y, xindex) = shifty;
-          data.omegasx.template at<f32>(y, xindex) = omegax;
-          data.omegasy.template at<f32>(y, xindex) = omegay;
+          data.thetas.at<f32>(y, xindex) = theta;
+          data.shiftsx.at<f32>(y, xindex) = shiftx;
+          data.shiftsy.at<f32>(y, xindex) = shifty;
+          data.omegasx.at<f32>(y, xindex) = omegax;
+          data.omegasy.at<f32>(y, xindex) = omegay;
         }
       }
       catch (const std::exception& e)
@@ -103,6 +103,8 @@ public:
           LOG_WARNING("DifferentialRotation::Calculate error: {} - skipping ...", e.what());
         continue;
       }
+
+    FixMissingData(data);
 
     if constexpr (not Managed)
       Save(data, ipc, dataPath);
@@ -200,20 +202,52 @@ private:
     return ids;
   }
 
+  static void FixMissingData(DifferentialRotationData& data)
+  {
+    // fix missing data by interpolation
+    for (i32 x = 0; x < data.thetas.cols; ++x)
+    {
+      auto xindex1 = std::max(x - 1, 0);
+      while (data.thetas.at<f32>(0, xindex1) == 0.0f and xindex1 > 0)
+        --xindex1;
+
+      auto xindex2 = std::min(x + 1, data.thetas.cols - 1);
+      while (data.thetas.at<f32>(0, xindex2) == 0.0f and xindex2 < data.thetas.cols - 1)
+        ++xindex2;
+
+      for (i32 y = 0; y < data.thetas.rows; ++y)
+      {
+        data.fshiftsx[x] = std::lerp(data.fshiftsx[xindex1], data.fshiftsx[xindex2], 0.5);
+        data.fshiftsy[x] = std::lerp(data.fshiftsy[xindex1], data.fshiftsy[xindex2], 0.5);
+        data.theta0s[x] = std::lerp(data.theta0s[xindex1], data.theta0s[xindex2], 0.5);
+        data.Rs[x] = std::lerp(data.Rs[xindex1], data.Rs[xindex2], 0.5);
+        data.thetas.at<f32>(y, x) = std::lerp(data.thetas.at<f32>(y, xindex1), data.thetas.at<f32>(y, xindex2), 0.5f);
+        data.shiftsx.at<f32>(y, x) = std::lerp(data.shiftsx.at<f32>(y, xindex1), data.shiftsx.at<f32>(y, xindex2), 0.5f);
+        data.shiftsy.at<f32>(y, x) = std::lerp(data.shiftsy.at<f32>(y, xindex1), data.shiftsy.at<f32>(y, xindex2), 0.5f);
+        data.omegasx.at<f32>(y, x) = std::lerp(data.omegasx.at<f32>(y, xindex1), data.omegasx.at<f32>(y, xindex2), 0.5f);
+        data.omegasy.at<f32>(y, x) = std::lerp(data.omegasy.at<f32>(y, xindex1), data.omegasy.at<f32>(y, xindex2), 0.5f);
+      }
+    }
+  }
+
   static std::vector<f64> GetInterpolatedThetas(const cv::Mat& thetas)
   {
     f64 ithetamin = -std::numeric_limits<f64>::infinity(); // highest S latitude
     f64 ithetamax = std::numeric_limits<f64>::infinity();  // lowest N latitude
     for (i32 x = 0; x < thetas.cols; ++x)
     {
-      ithetamin = std::max(ithetamin, static_cast<f64>(thetas.at<f32>(thetas.rows - 1, x)));
-      ithetamax = std::min(ithetamax, static_cast<f64>(thetas.at<f32>(0, x)));
+      const auto minval = thetas.at<f32>(thetas.rows - 1, x);
+      const auto maxval = thetas.at<f32>(0, x);
+      if (minval == 0 and maxval == 0) [[unlikely]]
+        continue;
+      ithetamin = std::max(ithetamin, static_cast<f64>(minval));
+      ithetamax = std::min(ithetamax, static_cast<f64>(maxval));
     }
 
     if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
       throw std::runtime_error("Failed to calculate interpolated thetas");
 
-    // LOG_DEBUG("itheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
+    LOG_DEBUG("InterpolatedTheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
 
     std::vector<f64> ithetas(thetas.rows);
     f64 ithetastep = (ithetamax - ithetamin) / (thetas.rows - 1);
