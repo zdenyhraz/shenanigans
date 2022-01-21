@@ -23,7 +23,7 @@ public:
 
   enum class WindowType : u8
   {
-    Rectangular,
+    None,
     Hann,
     WindowTypeCount // last
   };
@@ -288,9 +288,6 @@ private:
   {
     switch (mWindowType)
     {
-    case WindowType::Rectangular:
-      mWindow = cv::Mat::ones(mRows, mCols, CV_32F);
-      return;
     case WindowType::Hann:
       createHanningWindow(mWindow, cv::Size(mCols, mRows), CV_32F);
       return;
@@ -375,7 +372,7 @@ private:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
-    if (mWindowType != WindowType::Rectangular) [[likely]]
+    if (mWindowType != WindowType::None)
       multiply(image, mWindow, image);
   }
   template <bool DebugMode>

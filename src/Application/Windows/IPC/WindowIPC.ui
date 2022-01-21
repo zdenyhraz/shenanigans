@@ -86,7 +86,7 @@
        <item row="0" column="3">
         <widget class="QLineEdit" name="lineEdit_4">
          <property name="text">
-          <string>51</string>
+          <string>31</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -239,6 +239,11 @@
            <string>Gaussian</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="1" column="0">
@@ -284,7 +289,7 @@
          </property>
          <item>
           <property name="text">
-           <string>Rectangular</string>
+           <string>None</string>
           </property>
          </item>
          <item>

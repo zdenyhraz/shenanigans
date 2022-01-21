@@ -1,3 +1,4 @@
+#pragma once
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Fit/Polyfit.h"
 
@@ -129,12 +130,8 @@ public:
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
-  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
+  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    static constexpr i32 xsizeopt = 20;
-    static constexpr i32 ysizeopt = 51;
-    const i32 popsize = std::max(std::thread::hardware_concurrency(), 6u);
-
     const auto f = [&](const IterativePhaseCorrelation& _ipc)
     {
       DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);

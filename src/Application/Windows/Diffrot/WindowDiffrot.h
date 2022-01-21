@@ -1,8 +1,7 @@
 #pragma once
 #include "ui_WindowDiffrot.h"
 #include "Application/WindowData.h"
-#include "Astrophysics/DiffrotResults.h"
-#include "Astrophysics/Diffrot.h"
+#include "Astrophysics/DifferentialRotation.h"
 
 class WindowDiffrot : public QMainWindow
 {
@@ -14,19 +13,11 @@ public:
 private:
   Ui::WindowDiffrot ui;
   WindowData* mWindowData;
-  DiffrotResults drres;
-  DiffrotSettings drset;
+  DifferentialRotation GetDifferentialRotation();
+  i32 GetIdstart();
 
 private slots:
-  void calculateDiffrot();
-  void showResults();
-  void showIPC();
-  void checkDiskShifts();
-  void saveDiffrot();
-  void loadDiffrot();
-  void optimizeDiffrot();
-  void UpdateDrset();
-  void video();
-  void movingPeak();
-  FitsTime GetStartFitsTime();
+  void Calculate();
+  void Load();
+  void Optimize();
 };
