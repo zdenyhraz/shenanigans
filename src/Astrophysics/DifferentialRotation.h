@@ -137,14 +137,17 @@ public:
       DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
       const auto rawdata = diffrot.Calculate<true>(_ipc, dataPath, idstart);
       const auto [data, thetas] = PostProcessData(rawdata);
-      const auto omegaxfit = polyfit(thetas, GetXAverage(data.omegasx), 2);
       const auto predfit = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
+      const auto omegasx = GetXAverage(data.omegasx);
+      const auto omegasxfit = polyfit(thetas, omegasx, 2);
 
       f32 ret = 0;
-      for (usize i = 0; i < omegaxfit.size(); ++i)
-        ret += std::pow(omegaxfit[i] - predfit[i], 2);
-
-      return ret / omegaxfit.size();
+      for (usize i = 0; i < omegasxfit.size(); ++i)
+      {
+        ret += std::pow(omegasxfit[i] - predfit[i], 2);       // ipc fit - pred fit diff
+        ret += 0.5 * std::pow(omegasx[i] - omegasxfit[i], 2); // ipc - fit diff
+      }
+      return ret / omegasxfit.size();
     };
 
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
@@ -335,9 +338,10 @@ private:
     Plot1D::Set("avgomegasx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"avgomega x", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.omegasx), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+    Plot1D::Plot(Constants::Rad * thetas,
+        {GetXAverage(data.omegasx), polyfit(thetas, GetXAverage(data.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
 
     // shifts x
     Plot2D::Set("shiftsx");
