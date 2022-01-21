@@ -28,11 +28,11 @@ public:
     std::vector<f64> fshiftsx, fshiftsy, theta0s, Rs;
   };
 
-  template <bool SaveData, bool PlotData, bool LogData>
+  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
   DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart)
   try
   {
-    LOG_FUNCTION_IF(LogData, "DifferentialRotation::Calculate");
+    LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
     DifferentialRotationData data(xsize, ysize);
     std::atomic<i32> progress = -1;
     const auto ystep = yfov / (ysize - 1);
@@ -45,7 +45,7 @@ public:
     const auto shiftymax = 0.08;
     const auto ids = GenerateIds(idstart);
 
-    //#pragma omp parallel for
+#pragma omp parallel for if (not Managed)
     for (i32 x = 0; x < xsize; ++x)
       try
       {
@@ -55,12 +55,12 @@ public:
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
         if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
         {
-          if constexpr (LogData)
+          if constexpr (not Managed)
             LOG_DEBUG("[{:>3.0f}%: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
         }
         else [[unlikely]]
         {
-          if constexpr (LogData)
+          if constexpr (not Managed)
             LOG_WARNING("[{:>3.0f}%: {} / {}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
           continue;
         }
@@ -98,15 +98,15 @@ public:
       }
       catch (const std::exception& e)
       {
-        if constexpr (LogData)
+        if constexpr (not Managed)
           LOG_WARNING("DifferentialRotation::Calculate error: {} - skipping ...", e.what());
         continue;
       }
 
-    if constexpr (SaveData)
+    if constexpr (not Managed)
       Save(data, ipc, dataPath);
 
-    if constexpr (PlotData)
+    if constexpr (not Managed)
       Plot(data);
 
     return data;
@@ -131,14 +131,14 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   {
-    static constexpr i32 xsizeopt = 1;
+    static constexpr i32 xsizeopt = 20;
     static constexpr i32 ysizeopt = 51;
-    static constexpr i32 popsize = 6;
+    const i32 popsize = std::max(std::thread::hardware_concurrency(), 6u);
 
     const auto f = [&](const IterativePhaseCorrelation& _ipc)
     {
       DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-      const auto rawdata = diffrot.Calculate<false, false, false>(_ipc, dataPath, idstart);
+      const auto rawdata = diffrot.Calculate<true>(_ipc, dataPath, idstart);
       const auto [data, thetas] = PostProcessData(rawdata);
       const auto omegaxfit = polyfit(thetas, GetXAverage(data.omegasx), 2);
       const auto predfit = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
@@ -151,9 +151,9 @@ public:
     };
 
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    const auto [dataBefore, thetas] = PostProcessData(diffrot.Calculate<false, false, false>(ipc, dataPath, idstart));
+    const auto [dataBefore, thetas] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
     ipc.Optimize(f, popsize);
-    const auto [dataAfter, _] = PostProcessData(diffrot.Calculate<false, false, false>(ipc, dataPath, idstart));
+    const auto [dataAfter, _] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
 
     Plot1D::Set("Diffrot opt");
     Plot1D::SetXlabel("latitude [deg]");

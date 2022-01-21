@@ -372,7 +372,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
   evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 51, 0.8};
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 31, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   return evo.Optimize(obj, valid).optimum;
@@ -403,7 +403,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(const std
   evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R", "SIZE"});
   evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1, 16};
   evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 51, 0.8, 128};
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 31, 0.8, 128};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction(0, [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val), 0., 1.); });

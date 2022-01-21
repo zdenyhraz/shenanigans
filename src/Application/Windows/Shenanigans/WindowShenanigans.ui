@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>907</width>
-    <height>273</height>
+    <width>1129</width>
+    <height>271</height>
    </rect>
   </property>
   <property name="palette">
@@ -168,7 +168,7 @@
      <rect>
       <x>212</x>
       <y>4</y>
-      <width>691</width>
+      <width>911</width>
       <height>231</height>
      </rect>
     </property>
@@ -226,7 +226,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>907</width>
+     <width>1129</width>
      <height>18</height>
     </rect>
    </property>
