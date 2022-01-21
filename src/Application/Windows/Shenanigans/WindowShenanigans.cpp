@@ -1014,9 +1014,17 @@ try
   }
   if (1) // new diffrot
   {
-    DifferentialRotation diffrot;
-    diffrot.Calculate(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
-    // diffrot.LoadAndShow("../data/diffrot_day_2500/diffrot.json");
+    static constexpr i32 xsize = 50;
+    static constexpr i32 ysize = 51;
+    static constexpr i32 idstep = 1;
+    static constexpr i32 idstride = 0;
+    static constexpr i32 yfov = 3400;
+    static constexpr i32 cadence = 45;
+    DifferentialRotation diffrot(xsize, ysize, idstep, idstride, yfov, cadence);
+
+    // diffrot.Calculate(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
+    //  diffrot.LoadAndShow("../data/diffrot_day_2500/diffrot.json");
+    diffrot.Optimize(*mWindowData->IPC, "../data/diffrot_day_2500", 18933122);
   }
 }
 catch (const std::exception& e)

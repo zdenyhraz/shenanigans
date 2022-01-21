@@ -470,23 +470,10 @@ std::string Evolution::GetOutputFileString(usize gen, const std::vector<f64>& be
   std::string value;
   value += fmt::format("Gen {} ({:.2e}) [", gen, bestFitness);
 
-  for (usize i = 0; i < bestEntity.size(); ++i)
-  {
-    if (mParameterNames.size() > i)
-    {
-      if (i < bestEntity.size() - 1)
-        value += fmt::format("{}: {:.2f}, ", mParameterNames[i], bestEntity[i]);
-      else
-        value += fmt::format("{}: {:.2f}]", mParameterNames[i], bestEntity[i]);
-    }
-    else
-    {
-      if (i < bestEntity.size() - 1)
-        value += fmt::format("param{}: {:.2f}, ", i, bestEntity[i]);
-      else
-        value += fmt::format("param{}: {:.2f}]", i, bestEntity[i]);
-    }
-  }
+  for (usize param = 0; param < bestEntity.size(); ++param)
+    value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](bestEntity[param]));
+
+  value += "]";
   return value;
 }
 

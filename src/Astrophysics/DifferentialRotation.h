@@ -1,8 +1,14 @@
 #include "IPC/IterativePhaseCorrelation.h"
+#include "Fit/Polyfit.h"
 
 class DifferentialRotation
 {
 public:
+  DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
+      : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
+  {
+  }
+
   struct DifferentialRotationData
   {
     DifferentialRotationData(i32 xsize, i32 ysize)
@@ -12,20 +18,21 @@ public:
       shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
       omegasx = cv::Mat::zeros(ysize, xsize, CV_32F);
       omegasy = cv::Mat::zeros(ysize, xsize, CV_32F);
-      fshiftsx.resize(xsize);
-      fshiftsy.resize(xsize);
-      theta0s.resize(xsize);
-      Rs.resize(xsize);
+      fshiftsx = std::vector<f64>(xsize, 0.);
+      fshiftsy = std::vector<f64>(xsize, 0.);
+      theta0s = std::vector<f64>(xsize, 0.);
+      Rs = std::vector<f64>(xsize, 0.);
     }
 
     cv::Mat thetas, shiftsx, shiftsy, omegasx, omegasy;
     std::vector<f64> fshiftsx, fshiftsy, theta0s, Rs;
   };
 
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
+  template <bool SaveData, bool PlotData, bool LogData>
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart)
   try
   {
-    LOG_FUNCTION("DifferentialRotation::Calculate");
+    LOG_FUNCTION_IF(LogData, "DifferentialRotation::Calculate");
     DifferentialRotationData data(xsize, ysize);
     std::atomic<i32> progress = -1;
     const auto ystep = yfov / (ysize - 1);
@@ -38,7 +45,7 @@ public:
     const auto shiftymax = 0.08;
     const auto ids = GenerateIds(idstart);
 
-#pragma omp parallel for
+    //#pragma omp parallel for
     for (i32 x = 0; x < xsize; ++x)
       try
       {
@@ -48,11 +55,13 @@ public:
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
         if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
         {
-          LOG_DEBUG("[{:>3.0f}%: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+          if constexpr (LogData)
+            LOG_DEBUG("[{:>3.0f}%: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
         }
         else [[unlikely]]
         {
-          LOG_WARNING("[{:>3.0f}%: {} / {}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+          if constexpr (LogData)
+            LOG_WARNING("[{:>3.0f}%: {} / {}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
           continue;
         }
 
@@ -80,30 +89,32 @@ public:
           const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
           const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
 
-          data.thetas.at<f32>(y, xindex) = theta;
-          data.shiftsx.at<f32>(y, xindex) = shiftx;
-          data.shiftsy.at<f32>(y, xindex) = shifty;
-          data.omegasx.at<f32>(y, xindex) = omegax;
-          data.omegasy.at<f32>(y, xindex) = omegay;
+          data.thetas.template at<f32>(y, xindex) = theta;
+          data.shiftsx.template at<f32>(y, xindex) = shiftx;
+          data.shiftsy.template at<f32>(y, xindex) = shifty;
+          data.omegasx.template at<f32>(y, xindex) = omegax;
+          data.omegasy.template at<f32>(y, xindex) = omegay;
         }
       }
       catch (const std::exception& e)
       {
-        LOG_WARNING("DifferentialRotation::Calculate error: {} - skipping ...", e.what());
+        if constexpr (LogData)
+          LOG_WARNING("DifferentialRotation::Calculate error: {} - skipping ...", e.what());
         continue;
       }
 
-    if (xsize > 50)
+    if constexpr (SaveData)
       Save(data, ipc, dataPath);
 
-    Plot(data);
+    if constexpr (PlotData)
+      Plot(data);
 
     return data;
   }
   catch (const std::exception& e)
   {
     LOG_ERROR("DifferentialRotation::Calculate error: {}", e.what());
-    return DifferentialRotationData(xsize, ysize);
+    return DifferentialRotationData(0, 0);
   }
 
   void LoadAndShow(const std::string& path)
@@ -118,18 +129,39 @@ public:
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
-  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 populationSize) const
+  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   {
+    static constexpr i32 xsizeopt = 1;
+    static constexpr i32 ysizeopt = 51;
+    static constexpr i32 popsize = 6;
+
     const auto f = [&](const IterativePhaseCorrelation& _ipc)
     {
-      const auto data = Calculate(_ipc, dataPath, idstart);
-      // calc diffrot profile
-      // calc polyfit
-      // calc average polyfit difference from predicted shift
-      return 0.;
+      DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
+      const auto rawdata = diffrot.Calculate<false, false, false>(_ipc, dataPath, idstart);
+      const auto [data, thetas] = PostProcessData(rawdata);
+      const auto omegaxfit = polyfit(thetas, GetXAverage(data.omegasx), 2);
+      const auto predfit = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
+
+      f32 ret = 0;
+      for (usize i = 0; i < omegaxfit.size(); ++i)
+        ret += std::pow(omegaxfit[i] - predfit[i], 2);
+
+      return ret / omegaxfit.size();
     };
 
-    ipc.Optimize(f, populationSize);
+    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
+    const auto [dataBefore, thetas] = PostProcessData(diffrot.Calculate<false, false, false>(ipc, dataPath, idstart));
+    ipc.Optimize(f, popsize);
+    const auto [dataAfter, _] = PostProcessData(diffrot.Calculate<false, false, false>(ipc, dataPath, idstart));
+
+    Plot1D::Set("Diffrot opt");
+    Plot1D::SetXlabel("latitude [deg]");
+    Plot1D::SetYlabel("average omega x [deg/day]");
+    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "avgomega x opt", "avgomega x opt fit", "Derek A. Lamb (2017)"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(dataBefore.omegasx), polyfit(thetas, GetXAverage(dataBefore.omegasx), 2), GetXAverage(dataAfter.omegasx),
+                                              polyfit(thetas, GetXAverage(dataAfter.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615)});
   }
 
 private:
@@ -141,7 +173,7 @@ private:
     f64 R;       // [px]
   };
 
-  ImageHeader GetHeader(const std::string& path) const
+  static ImageHeader GetHeader(const std::string& path)
   {
     std::ifstream file(path);
     json::json j;
@@ -167,29 +199,29 @@ private:
     return ids;
   }
 
-  std::vector<f64> GetInterpolatedThetas(const cv::Mat& thetas) const
+  static std::vector<f64> GetInterpolatedThetas(const cv::Mat& thetas)
   {
     f64 ithetamin = -std::numeric_limits<f64>::infinity(); // highest S latitude
     f64 ithetamax = std::numeric_limits<f64>::infinity();  // lowest N latitude
-    for (i32 x = 0; x < xsize; ++x)
+    for (i32 x = 0; x < thetas.cols; ++x)
     {
-      ithetamin = std::max(ithetamin, static_cast<f64>(thetas.at<f32>(ysize - 1, x)));
+      ithetamin = std::max(ithetamin, static_cast<f64>(thetas.at<f32>(thetas.rows - 1, x)));
       ithetamax = std::min(ithetamax, static_cast<f64>(thetas.at<f32>(0, x)));
     }
 
     if (ithetamin == -std::numeric_limits<f64>::infinity() or ithetamax == std::numeric_limits<f64>::infinity())
       throw std::runtime_error("Failed to calculate interpolated thetas");
 
-    LOG_DEBUG("itheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
+    // LOG_DEBUG("itheta min / max: {:.1f} / {:.1f}", ithetamin * Constants::Rad, ithetamax * Constants::Rad);
 
-    std::vector<f64> ithetas(ysize);
-    f64 ithetastep = (ithetamax - ithetamin) / (ysize - 1);
-    for (i32 y = 0; y < ysize; ++y)
+    std::vector<f64> ithetas(thetas.rows);
+    f64 ithetastep = (ithetamax - ithetamin) / (thetas.rows - 1);
+    for (i32 y = 0; y < thetas.rows; ++y)
       ithetas[y] = ithetamax - ithetastep * y;
     return ithetas;
   }
 
-  std::vector<f64> GetTimesInDays(i32 tstep, i32 tstride) const
+  static std::vector<f64> GetTimesInDays(i32 tstep, i32 tstride, i32 xsize)
   {
     std::vector<f64> times(xsize);
     f64 time = 0;
@@ -255,12 +287,10 @@ private:
     return omegas;
   }
 
-  void Plot(const DifferentialRotationData& rawdata) const
+  static std::tuple<DifferentialRotationData, std::vector<f64>> PostProcessData(const DifferentialRotationData& rawdata)
   {
-    LOG_FUNCTION("DifferentialRotation::Plot");
     const auto thetas = GetInterpolatedThetas(rawdata.thetas);
-    const auto times = GetTimesInDays(idstep * cadence, idstride * cadence);
-    auto data = rawdata;
+    DifferentialRotationData data = rawdata;
 
     // apply median blur
     const i32 medsize = 5;
@@ -274,6 +304,15 @@ private:
     Interpolate(data.shiftsy, data.thetas, thetas);
     Interpolate(data.omegasx, data.thetas, thetas);
     Interpolate(data.omegasy, data.thetas, thetas);
+
+    return {data, thetas};
+  }
+
+  void Plot(const DifferentialRotationData& rawdata) const
+  {
+    LOG_FUNCTION("DifferentialRotation::Plot");
+    const auto [data, thetas] = PostProcessData(rawdata);
+    const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
 
     // fits params
     Plot1D::Set("fits params");
@@ -368,10 +407,10 @@ private:
     cv::FileStorage file(path, cv::FileStorage::WRITE);
 
     // diffrot params
-    file << "idstep" << idstep;
-    file << "idstride" << idstride;
     file << "xsize" << xsize;
     file << "ysize" << ysize;
+    file << "idstep" << idstep;
+    file << "idstride" << idstride;
     file << "yfov" << yfov;
     file << "cadence" << cadence;
     // ipc params
@@ -403,10 +442,10 @@ private:
 
     LOG_DEBUG("Loading differential rotation data {}", path);
     cv::FileStorage file(path, cv::FileStorage::READ);
-    file["idstep"] >> idstep;
-    file["idstride"] >> idstride;
     file["xsize"] >> xsize;
     file["ysize"] >> ysize;
+    file["idstep"] >> idstep;
+    file["idstride"] >> idstride;
     file["yfov"] >> yfov;
     file["cadence"] >> cadence;
 
@@ -424,10 +463,10 @@ private:
     return data;
   }
 
-  i32 idstep = 1;   // id step
-  i32 idstride = 0; // id stride
-  i32 xsize = 51;   // x size - 2500
-  i32 ysize = 851;  // y size - 851
-  i32 yfov = 3400;  // y FOV [px]
-  i32 cadence = 45; // SDO/HMI cadence [s]
+  i32 xsize = 2500;
+  i32 ysize = 851;
+  i32 idstep = 1;
+  i32 idstride = 25;
+  i32 yfov = 3400;
+  i32 cadence = 45;
 };

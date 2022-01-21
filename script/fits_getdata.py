@@ -85,9 +85,13 @@ def ParseArguments():
     print("Failed to process command line arguments {}: {} missing".format(sys.argv[1:], error))
     sys.exit(1)
 
-# py .\script\fits_getdata.py --name "diffrot_day_2500" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 0 --idcount 2500
-# py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
-if __name__ == "__main__":  
+
+# D) py .\script\fits_getdata.py --name "diffrot_day_2500" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 0 --idcount 2500
+# M) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
+# M1) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 1000
+# M2) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18945622 --idstep 1 --idstride 25 --idcount 2000
+# M3) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18970622 --idstep 1 --idstride 25 --idcount 2000
+if __name__ == "__main__":
   try:
     parameters = ParseArguments()
     dir = "{}/{}".format(parameters["outputdir"], parameters["name"])

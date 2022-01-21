@@ -8,6 +8,15 @@ OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname)
 {
   mLB = zerovect(N, -1.);
   mUB = zerovect(N, 1.);
+  mParameterNames = std::vector<std::string>(N, "");
+  mParameterValueToNameFunctions = std::vector<std::function<std::string(f64)>>(N, nullptr);
+
+  // default, can be overridden by the user
+  for (usize i = 0; i < N; ++i)
+  {
+    mParameterNames[i] = fmt::format("param{}", i);
+    mParameterValueToNameFunctions[i] = [](f64 val) { return fmt::format("{:.2e}", val); };
+  }
 }
 
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,

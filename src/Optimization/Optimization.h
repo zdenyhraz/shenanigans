@@ -55,6 +55,24 @@ public:
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
   void SetPlotObjectiveFunctionLandscapeIterations(i32 PlotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations; }
   void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
+  void SetParameterValueToNameFunction(usize ParameterIndex, const std::function<std::string(f64)>& fun)
+  {
+    if (ParameterIndex < N)
+      mParameterValueToNameFunctions[ParameterIndex] = fun;
+  };
+
+  void SetParameterValueToNameFunction(const std::string& ParameterName, const std::function<std::string(f64)>& fun)
+  {
+
+    const auto it = std::find(mParameterNames.begin(), mParameterNames.end(), ParameterName);
+    if (it == mParameterNames.end())
+    {
+      LOG_WARNING("Parameter name {} not defined, ignoring value to name function", ParameterName);
+      return;
+    }
+
+    mParameterValueToNameFunctions[it - mParameterNames.begin()] = fun;
+  };
   void SetName(const std::string& optname) { mName = optname; }
 
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
@@ -80,4 +98,5 @@ protected:
   std::string mName;
   std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
+  std::vector<std::function<std::string(f64)>> mParameterValueToNameFunctions;
 };
