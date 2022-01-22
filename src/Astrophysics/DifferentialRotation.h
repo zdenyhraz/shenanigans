@@ -44,6 +44,8 @@ public:
     const auto shiftxmax = 1.5 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(0.);
     const auto shiftxmin = 0.7 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(1.);
     const auto shiftymax = 0.08;
+    // const auto omegaxmax;
+    // const auto omegaxmin;
     const auto ids = GenerateIds(idstart);
 
 #pragma omp parallel for if (not Managed)
@@ -270,15 +272,21 @@ private:
     // fix missing data by interpolation
     for (i32 x = 0; x < data.thetas.cols; ++x)
     {
+      if (data.thetas.at<f32>(0, x) != 0.0f) // no need to fix, data not missing
+        continue;
+
+      // find first non-missing previous data
       auto xindex1 = std::max(x - 1, 0);
       while (data.thetas.at<f32>(0, xindex1) == 0.0f and xindex1 > 0)
         --xindex1;
 
+      // find first non-missing next data
       auto xindex2 = std::min(x + 1, data.thetas.cols - 1);
       while (data.thetas.at<f32>(0, xindex2) == 0.0f and xindex2 < data.thetas.cols - 1)
         ++xindex2;
 
       const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
+      LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {} ...", xindex1, x, xindex2, t);
 
       for (i32 y = 0; y < data.thetas.rows; ++y)
       {
