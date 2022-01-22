@@ -38,14 +38,11 @@ public:
     std::atomic<i32> progress = -1;
     const auto ystep = yfov / (ysize - 1);
     const auto tstep = idstep * cadence;
-    const auto xpred = 0.;
     const auto wxsize = ipc.GetCols();
     const auto wysize = ipc.GetRows();
-    const auto shiftxmax = 1.5 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(0.);
-    const auto shiftxmin = 0.7 * std::sin(GetPredictedOmega(0, 14.296, -1.847, -2.615) * tstep / Constants::RadPerSecToDegPerDay) * 1936 * std::cos(1.);
+    const auto shiftxmin = 0.05 * idstep;
+    const auto shiftxmax = 0.3 * idstep;
     const auto shiftymax = 0.08;
-    // const auto omegaxmax;
-    // const auto omegaxmin;
     const auto ids = GenerateIds(idstart);
 
 #pragma omp parallel for if (not Managed)
@@ -84,12 +81,13 @@ public:
         {
           const auto yshift = ystep * (y - ysize / 2);
           const auto theta = std::asin((f64)(-yshift) / R) + theta0;
+          const auto omegaxpred = GetPredictedOmega(theta, 14.296, -1.847, -2.615);
           auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
-          auto crop2 = roicrop(image2, header2.xcenter + xpred, header2.ycenter + yshift, wxsize, wysize);
+          auto crop2 = roicrop(image2, header2.xcenter, header2.ycenter + yshift, wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
-          const auto shiftx = std::clamp(shift.x + xpred, shiftxmin, shiftxmax);
+          const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
-          const auto omegax = std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay;
+          const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay, 0.7 * omegaxpred, 1.3 * omegaxpred);
           const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
 
           data.thetas.at<f32>(y, xindex) = theta;
