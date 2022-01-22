@@ -40,8 +40,8 @@ public:
     const auto tstep = idstep * cadence;
     const auto wxsize = ipc.GetCols();
     const auto wysize = ipc.GetRows();
-    const auto shiftxmin = 0.05 * idstep;
-    const auto shiftxmax = 0.3 * idstep;
+    const auto shiftxmin = 0.01 * idstep;
+    const auto shiftxmax = 0.4 * idstep;
     const auto shiftymax = 0.08;
     const auto ids = GenerateIds(idstart);
 
@@ -284,7 +284,7 @@ private:
         ++xindex2;
 
       const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
-      LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {} ...", xindex1, x, xindex2, t);
+      LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
 
       for (i32 y = 0; y < data.thetas.rows; ++y)
       {
