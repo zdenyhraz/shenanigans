@@ -57,12 +57,12 @@ public:
         if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
         {
           if constexpr (not Managed)
-            LOG_DEBUG("[{:>3.0f}%: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+            LOG_DEBUG("[{:>3.0f}%: {:>4} / {:>4}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
         }
         else [[unlikely]]
         {
           if constexpr (not Managed)
-            LOG_WARNING("[{:>3.0f}%: {} / {}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+            LOG_WARNING("[{:>3.0f}%: {:>4} / {:>4}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
           continue;
         }
 
@@ -221,7 +221,7 @@ public:
     showimg(image, "meridian curve", false, 0, 1, 1200);
     saveimg(fmt::format("{}/meridian_curve.png", dataPath), image);
 
-    Plot1D::Set("omegasx");
+    Plot1D::Set("meridian curve omegasx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("omega x [deg/day]");
     Plot1D::SetYnames({"Derek A. Lamb (2017)", "Howard et al. (1983)"});
