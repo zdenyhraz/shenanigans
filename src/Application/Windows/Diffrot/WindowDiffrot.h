@@ -13,11 +13,13 @@ public:
 private:
   Ui::WindowDiffrot ui;
   WindowData* mWindowData;
-  DifferentialRotation GetDifferentialRotation();
+  DifferentialRotation GetDifferentialRotation(i32 xsizeoverride = 0);
+  std::string GetDataPath();
   i32 GetIdstart();
 
 private slots:
   void Calculate();
   void Load();
   void Optimize();
+  void PlotMeridianCurve();
 };

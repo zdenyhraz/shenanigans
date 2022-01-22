@@ -19,14 +19,14 @@ public:
       shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
       omegasx = cv::Mat::zeros(ysize, xsize, CV_32F);
       omegasy = cv::Mat::zeros(ysize, xsize, CV_32F);
-      fshiftsx = std::vector<f64>(xsize, 0.);
-      fshiftsy = std::vector<f64>(xsize, 0.);
+      fshiftx = std::vector<f64>(xsize, 0.);
+      fshifty = std::vector<f64>(xsize, 0.);
       theta0s = std::vector<f64>(xsize, 0.);
       Rs = std::vector<f64>(xsize, 0.);
     }
 
     cv::Mat thetas, shiftsx, shiftsy, omegasx, omegasy;
-    std::vector<f64> fshiftsx, fshiftsy, theta0s, Rs;
+    std::vector<f64> fshiftx, fshifty, theta0s, Rs;
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
@@ -73,8 +73,8 @@ public:
         const auto theta0 = (header1.theta0 + header2.theta0) / 2;
         const auto R = (header1.R + header2.R) / 2;
         const auto xindex = xsize - 1 - x;
-        data.fshiftsx[xindex] = header2.xcenter - header1.xcenter;
-        data.fshiftsy[xindex] = header2.ycenter - header1.ycenter;
+        data.fshiftx[xindex] = header2.xcenter - header1.xcenter;
+        data.fshifty[xindex] = header2.ycenter - header1.ycenter;
         data.theta0s[xindex] = theta0;
         data.Rs[xindex] = R;
 
@@ -110,7 +110,7 @@ public:
       Save(data, ipc, dataPath);
 
     if constexpr (not Managed)
-      Plot(data);
+      Plot(data, dataPath, idstart);
 
     return data;
   }
@@ -120,12 +120,12 @@ public:
     return DifferentialRotationData(0, 0);
   }
 
-  void LoadAndShow(const std::string& path)
+  void LoadAndShow(const std::string& path, const std::string& dataPath, i32 idstart)
   try
   {
     LOG_FUNCTION("DifferentialRotation::LoadAndShow");
     const auto data = Load(path);
-    Plot(data);
+    Plot(data, dataPath, idstart);
   }
   catch (const std::exception& e)
   {
@@ -167,6 +167,69 @@ public:
                                               polyfit(thetas, GetXAverage(dataAfter.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615)});
   }
 
+  static std::tuple<DifferentialRotationData, std::vector<f64>> PostProcessData(const DifferentialRotationData& rawdata)
+  {
+    const auto thetas = GetInterpolatedThetas(rawdata.thetas);
+    DifferentialRotationData data = rawdata;
+
+    // apply median blur
+    static constexpr i32 medsize = 3;
+    cv::medianBlur(data.shiftsx, data.shiftsx, medsize);
+    cv::medianBlur(data.shiftsy, data.shiftsy, medsize);
+    cv::medianBlur(data.omegasx, data.omegasx, medsize);
+    cv::medianBlur(data.omegasy, data.omegasy, medsize);
+
+    // apply theta-interpolation
+    Interpolate(data.shiftsx, data.thetas, thetas);
+    Interpolate(data.shiftsy, data.thetas, thetas);
+    Interpolate(data.omegasx, data.thetas, thetas);
+    Interpolate(data.omegasy, data.thetas, thetas);
+
+    return {data, thetas};
+  }
+
+  static void PlotMeridianCurve(const DifferentialRotationData& data, const std::vector<f64>& thetas, const std::string& dataPath, i32 idstart, f64 timestep)
+  {
+    const auto imagegrs = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
+    const auto R = header.R;              // [px]
+    const auto theta0 = header.theta0;    // [rad]
+    const auto fxcenter = header.xcenter; // [px]
+    const auto fycenter = header.ycenter; // [px]
+    // const auto omegasx = GetXAverage(data.omegasx);                          // [deg/day]
+    const auto omegasx = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615); // [deg/day]
+    std::vector<cv::Point2d> mcpts(thetas.size());                           // [px,px]
+
+    for (usize y = 0; y < thetas.size(); ++y)
+    {
+      const f64 mcx = fxcenter + R * std::cos(thetas[y]) * std::sin(omegasx[y] * timestep / Constants::Rad);
+      const f64 mcy = fycenter - R * std::sin(thetas[y] - theta0);
+      mcpts[y] = cv::Point2d(mcx, mcy);
+    }
+
+    cv::Mat image;
+    cv::cvtColor(imagegrs, image, cv::COLOR_GRAY2RGB);
+    const auto thickness = 13;
+    const auto color = 65535. / 255 * cv::Scalar(0., 255., 255.);
+    for (usize y = 0; y < mcpts.size() - 1; ++y)
+    {
+      const auto pt1 = mcpts[y];
+      const auto pt2 = mcpts[y + 1];
+      cv::line(image, pt1, pt2, color, thickness, cv::LINE_AA);
+    }
+
+    showimg(image, "meridian curve", false, 0, 1, 1200);
+    saveimg(fmt::format("{}/meridian_curve.png", dataPath), image);
+
+    Plot1D::Set("omegasx");
+    Plot1D::SetXlabel("latitude [deg]");
+    Plot1D::SetYlabel("omega x [deg/day]");
+    Plot1D::SetYnames({"Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::SetSavePath(fmt::format("{}/meridian_curve_omega.png", dataPath));
+    Plot1D::Plot(Constants::Rad * thetas, {GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+  }
+
 private:
   struct ImageHeader
   {
@@ -190,9 +253,9 @@ private:
     return header;
   }
 
-  std::vector<std::tuple<i32, i32>> GenerateIds(i32 idstart) const
+  std::vector<std::pair<i32, i32>> GenerateIds(i32 idstart) const
   {
-    std::vector<std::tuple<i32, i32>> ids(xsize);
+    std::vector<std::pair<i32, i32>> ids(xsize);
     i32 id = idstart;
     for (i32 x = 0; x < xsize; ++x)
     {
@@ -219,8 +282,8 @@ private:
 
       for (i32 y = 0; y < data.thetas.rows; ++y)
       {
-        data.fshiftsx[x] = std::lerp(data.fshiftsx[xindex1], data.fshiftsx[xindex2], t);
-        data.fshiftsy[x] = std::lerp(data.fshiftsy[xindex1], data.fshiftsy[xindex2], t);
+        data.fshiftx[x] = std::lerp(data.fshiftx[xindex1], data.fshiftx[xindex2], t);
+        data.fshifty[x] = std::lerp(data.fshifty[xindex1], data.fshifty[xindex2], t);
         data.theta0s[x] = std::lerp(data.theta0s[xindex1], data.theta0s[xindex2], t);
         data.Rs[x] = std::lerp(data.Rs[xindex1], data.Rs[xindex2], t);
         data.thetas.at<f32>(y, x) = std::lerp(data.thetas.at<f32>(y, xindex1), data.thetas.at<f32>(y, xindex2), static_cast<f32>(t));
@@ -324,32 +387,13 @@ private:
     return omegas;
   }
 
-  static std::tuple<DifferentialRotationData, std::vector<f64>> PostProcessData(const DifferentialRotationData& rawdata)
-  {
-    const auto thetas = GetInterpolatedThetas(rawdata.thetas);
-    DifferentialRotationData data = rawdata;
-
-    // apply median blur
-    static constexpr i32 medsize = 3;
-    cv::medianBlur(data.shiftsx, data.shiftsx, medsize);
-    cv::medianBlur(data.shiftsy, data.shiftsy, medsize);
-    cv::medianBlur(data.omegasx, data.omegasx, medsize);
-    cv::medianBlur(data.omegasy, data.omegasy, medsize);
-
-    // apply theta-interpolation
-    Interpolate(data.shiftsx, data.thetas, thetas);
-    Interpolate(data.shiftsy, data.thetas, thetas);
-    Interpolate(data.omegasx, data.thetas, thetas);
-    Interpolate(data.omegasy, data.thetas, thetas);
-
-    return {data, thetas};
-  }
-
-  void Plot(const DifferentialRotationData& rawdata) const
+  void Plot(const DifferentialRotationData& rawdata, const std::string& dataPath, i32 idstart) const
   {
     LOG_FUNCTION("DifferentialRotation::Plot");
     const auto [data, thetas] = PostProcessData(rawdata);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
+
+    PlotMeridianCurve(data, thetas, dataPath, idstart, 27);
 
     // fits params
     Plot1D::Set("fits params");
@@ -359,7 +403,7 @@ private:
     Plot1D::SetYnames({"fits shift x", "fits shift y"});
     Plot1D::SetY2names({"theta0"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(times, {data.fshiftsx, data.fshiftsy}, {Constants::Rad * data.theta0s});
+    Plot1D::Plot(times, {data.fshiftx, data.fshifty}, {Constants::Rad * data.theta0s});
 
     // average shifts x / y
     Plot1D::Set("avgshiftsx");
@@ -468,8 +512,8 @@ private:
     file << "shiftsy" << data.shiftsy;
     file << "omegasx" << data.omegasx;
     file << "omegasy" << data.omegasy;
-    file << "fshiftsx" << data.fshiftsx;
-    file << "fshiftsy" << data.fshiftsy;
+    file << "fshiftx" << data.fshiftx;
+    file << "fshifty" << data.fshifty;
     file << "theta0s" << data.theta0s;
     file << "Rs" << data.Rs;
   }
@@ -521,8 +565,8 @@ private:
     file["shiftsy"] >> data.shiftsy;
     file["omegasx"] >> data.omegasx;
     file["omegasy"] >> data.omegasy;
-    file["fshiftsx"] >> data.fshiftsx;
-    file["fshiftsy"] >> data.fshiftsy;
+    file["fshiftx"] >> data.fshiftx;
+    file["fshifty"] >> data.fshifty;
     file["theta0s"] >> data.theta0s;
     file["Rs"] >> data.Rs;
 

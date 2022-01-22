@@ -2,7 +2,7 @@
 #include "UtilsCV/FunctionsBaseCV.h"
 #include "UtilsCV/Colormap.h"
 
-inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
@@ -29,7 +29,7 @@ inline void showimg(const cv::Mat& sourceimgIn, std::string windowname, bool col
   cv::waitKey(1);
 }
 
-inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   // 1st image determines the main hconcat height
   i32 mainHeight = sourceimgIns[0].rows;
@@ -52,7 +52,7 @@ inline void showimg(const std::vector<cv::Mat>& sourceimgIns, std::string window
   showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void saveimg(std::string path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
+inline void saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat saveimg = sourceimgIn.clone();
 
