@@ -56,9 +56,9 @@ void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
   Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(plot);
 
-  if (0) // gradual peakshift
+  if (1) // gradual peakshift
   {
-    auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 5, 5);
+    auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 7, 7);
     resize(peakshift, peakshift, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
     Plot2D::Set(fmt::format("{} peakshift", mDebugName));
     Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
@@ -920,8 +920,8 @@ try
 
   if constexpr (debugShift)
   {
-    std::string path1 = "../resources/AIA/171A.png";
-    std::string path2 = "../resources/AIA/171A.png";
+    std::string path1 = "../data/AIA/171A.png";
+    std::string path2 = "../data/AIA/171A.png";
     bool artificialShift = path1 == path2;
     cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
     cv::Mat image1 = loadImage(path1);
@@ -951,14 +951,15 @@ try
 
   if constexpr (debugGradualShift)
   {
-    SetDebugDirectory("Debug");
-    const cv::Mat image1 = loadImage("../resources/AIA/171A.png");
+    SetDebugDirectory("../data/peakshift");
+    const cv::Mat image1 = loadImage("../data/AIA/171A.png");
     const cv::Mat crop1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
+    const f64 totalshift = 2.;
     constexpr bool addNoise = true;
-    f64 noiseStdev = 0.03;
+    const f64 noiseStdev = 0.01;
     cv::Mat noise1, noise2;
 
     if constexpr (addNoise)
@@ -973,7 +974,7 @@ try
     for (i32 i = 0; i < iters; i++)
     {
       SetDebugName(fmt::format("GradualShift{}", i));
-      const cv::Point2d rawshift(static_cast<f32>(i) / (iters - 1), 0);
+      const cv::Point2d rawshift(totalshift * i / (iters - 1), 0);
       const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., rawshift.x, 0., 1., rawshift.y);
       warpAffine(image1, image2, T, image2.size());
       crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
@@ -986,7 +987,7 @@ try
 
   if constexpr (debugWindow)
   {
-    cv::Mat img = roicrop(loadImage("../resources/test.png"), 2048, 2048, mCols, mRows);
+    cv::Mat img = roicrop(loadImage("../data/test.png"), 2048, 2048, mCols, mRows);
     cv::Mat w, imgw;
     createHanningWindow(w, img.size(), CV_32F);
     multiply(img, w, imgw);
@@ -1049,7 +1050,7 @@ try
 
   if constexpr (debugBandpassRinging)
   {
-    cv::Mat img = roicrop(loadImage("../resources/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+    cv::Mat img = roicrop(loadImage("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     cv::Mat fftR = Fourier::fft(img);
     cv::Mat fftG = Fourier::fft(img);
     cv::Mat filterR = cv::Mat::zeros(img.size(), CV_32F);

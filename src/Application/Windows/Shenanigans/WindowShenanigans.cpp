@@ -1033,7 +1033,7 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (0) // ipc debug stuff
+  if (1) // ipc debug stuff
   {
     auto& window = dynamic_cast<WindowIPC&>(*mWindows["ipc"]);
     window.show();
