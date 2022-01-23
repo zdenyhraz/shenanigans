@@ -498,7 +498,7 @@ try
     cv::Mat aligned = ipc.Align(img1, img2);
     showimg(std::vector<cv::Mat>{img1, img2, aligned}, "align triplet");
   }
-  if (0) // dft vs cuda::dft
+  if (0) // dft vs gpu::dft
   {
     const i32 minsize = 16;
     const i32 maxsize = 512;

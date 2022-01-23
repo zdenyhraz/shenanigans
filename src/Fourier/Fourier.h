@@ -24,52 +24,25 @@ inline cv::Mat ifft(cv::Mat&& fft)
   return fft;
 }
 
-inline cv::Mat cufft(cv::Mat&& img, bool packed = false)
+inline cv::Mat cufft(cv::Mat&& img)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  // cuda::GpuMat imgGpu;
-
-  if (packed)
-  {
-    LOG_ERROR("cufft packed input channels: {}", img.channels());
-    // imgGpu.upload(img);
-    // cuda::dft(imgGpu, imgGpu, imgGpu.size());
-    // imgGpu.download(img);
-    LOG_ERROR("cufft packed output channels: {}", img.channels());
-    return img;
-  }
-  else
-  {
-    cv::Mat planes[] = {img, cv::Mat::zeros(img.size(), CV_32F)};
-    merge(planes, 2, img);
-    // imgGpu.upload(img);
-    // cuda::dft(imgGpu, imgGpu, imgGpu.size());
-    // imgGpu.download(img);
-    return img;
-  }
+  // gpu::GpuMat imgGpu;
+  // imgGpu.upload(img);
+  // gpu::dft(imgGpu, imgGpu, imgGpu.size());
+  // imgGpu.download(img);
+  return img;
 }
 
-inline cv::Mat icufft(cv::Mat&& fft, bool packed = false)
+inline cv::Mat icufft(cv::Mat&& fft)
 {
-  // cuda::GpuMat fftGpu;
+  // gpu::GpuMat fftGpu;
   // fftGpu.upload(fft);
-
-  if (packed)
-  {
-    // cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
-    // fftGpu.download(fft);
-    return fft;
-  }
-  else
-  {
-    // cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE);
-    // fftGpu.download(fft);
-    cv::Mat out;
-    extractChannel(fft, out, 0);
-    return out;
-  }
+  // gpu::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
+  // fftGpu.download(fft);
+  return fft;
 }
 
 inline cv::Mat fft(cv::Mat& img, bool packed = false)
@@ -82,14 +55,14 @@ inline cv::Mat ifft(cv::Mat& fft)
   return ifft(fft.clone());
 }
 
-inline cv::Mat cufft(cv::Mat& img, bool packed = false)
+inline cv::Mat cufft(cv::Mat& img)
 {
-  return cufft(img.clone(), packed);
+  return cufft(img.clone());
 }
 
-inline cv::Mat icufft(cv::Mat& fft, bool packed = false)
+inline cv::Mat icufft(cv::Mat& fft)
 {
-  return icufft(fft.clone(), packed);
+  return icufft(fft.clone());
 }
 
 inline void fftshift(cv::Mat& mat)
