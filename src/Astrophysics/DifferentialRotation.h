@@ -275,8 +275,6 @@ private:
 
       // find first non-missing previous data
       auto xindex1 = std::max(x - 1, 0);
-      while (data.thetas.at<f32>(0, xindex1) == 0.0f and xindex1 > 0)
-        --xindex1;
 
       // find first non-missing next data
       auto xindex2 = std::min(x + 1, data.thetas.cols - 1);
