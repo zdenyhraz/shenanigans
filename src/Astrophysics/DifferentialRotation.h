@@ -485,10 +485,7 @@ private:
   {
     LOG_FUNCTION("DifferentialRotation::Save");
 
-    char buf[50];
-    const auto tm = std::time(nullptr);
-    std::strftime(buf, sizeof(buf), "%Y_%b_%d_%H_%M_%S", std::localtime(&tm));
-    std::string path = fmt::format("{}/diffrot_{}.json", dataPath, buf);
+    std::string path = fmt::format("{}/diffrot.json", dataPath);
     LOG_DEBUG("Saving differential rotation results to {} ...", path);
     cv::FileStorage file(path, cv::FileStorage::WRITE);
 
@@ -525,10 +522,7 @@ private:
   void SaveOptimizedParameters(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
-    char buf[50];
-    const auto tm = std::time(nullptr);
-    std::strftime(buf, sizeof(buf), "%Y_%b_%d_%H_%M_%S", std::localtime(&tm));
-    std::string path = fmt::format("{}/diffrot_ipcopt_{}.json", dataPath, buf);
+    std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
     LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", path);
 
     cv::FileStorage file(path, cv::FileStorage::WRITE);

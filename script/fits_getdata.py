@@ -88,11 +88,6 @@ def ParseArguments():
 
 # D) py .\script\fits_getdata.py --name "diffrot_day_2500" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 0 --idcount 2500
 # M) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 5000
-# M1) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18933122 --idstep 1 --idstride 25 --idcount 1000
-# M2) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18945622 --idstep 1 --idstride 25 --idcount 1000
-# M2) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18958122 --idstep 1 --idstride 25 --idcount 1000
-# M3) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18970622 --idstep 1 --idstride 25 --idcount 1000
-# M3) py .\script\fits_getdata.py --name "diffrot_month_5000" --outputdir "data" --idstart 18983122 --idstep 1 --idstride 25 --idcount 1000
 
 if __name__ == "__main__":
   try:
