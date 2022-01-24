@@ -2,7 +2,6 @@
 
 <p align="center">
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/linux.yml/badge.svg?branch=master"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/windows.yml/badge.svg?branch=master"/></a>
 <a href="https://www.codacy.com/gh/zdenyhraz/shenanigans/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdenyhraz/shenanigans&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master" alt="CodeFactor" /></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/zdenyhraz/shenanigans"></a>
