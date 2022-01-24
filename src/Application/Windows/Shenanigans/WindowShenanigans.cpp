@@ -509,7 +509,7 @@ try
     std::vector<f64> sizes(iters);
     std::vector<f64> timeCpu(iters);
     std::vector<f64> timeGpu(iters);
-    cv::Mat fft = Fourier::cufft(img); // init
+    cv::Mat fft = Fourier::gpufft(img); // init
 
     for (usize i = 0; i < iters; ++i)
     {
@@ -532,7 +532,7 @@ try
         auto start = std::chrono::high_resolution_clock::now();
 
         for (i32 it = 0; it < itersPerSize; ++it)
-          cv::Mat fft_ = Fourier::cufft(resized);
+          cv::Mat fft_ = Fourier::gpufft(resized);
 
         auto end = std::chrono::high_resolution_clock::now();
         timeGpu[i] = (f64)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / itersPerSize;
@@ -549,8 +549,8 @@ try
   if (0) // cuda
   {
     cv::Mat img = loadImage("Resources/test.png");
-    cv::Mat fft, fftpacked, cufft, cufftpacked;
-    cv::Mat TB, TBpacked, cuTB, cuTBpacked;
+    cv::Mat fft, fftpacked, gpufft;
+    cv::Mat TB, TBpacked, cuTB;
     bool cpu = 1;
     bool gpu = 0;
 
@@ -568,15 +568,9 @@ try
     }
     if (gpu)
     {
-      LOG_FUNCTION("cufft");
-      cufft = Fourier::cufft(img);
-      cuTB = Fourier::icufft(cufft);
-    }
-    if (gpu)
-    {
-      LOG_FUNCTION("cufftpacked");
-      cufftpacked = Fourier::cufft(img, true);
-      cuTBpacked = Fourier::icufft(cufftpacked, true);
+      LOG_FUNCTION("gpufft");
+      gpufft = Fourier::gpufft(img);
+      cuTB = Fourier::gpuifft(gpufft);
     }
     if (cpu)
     {
@@ -591,15 +585,11 @@ try
     if (gpu)
     {
       Plot2D::Plot("cuimg", img);
-      Plot2D::Plot("cufft logmagn", Fourier::logmagn(cufft));
+      Plot2D::Plot("gpufft logmagn", Fourier::logmagn(gpufft));
       Plot2D::Plot("cuTB", cuTB);
-
-      Plot2D::Plot("cuimgsym", img);
-      Plot2D::Plot("cufftpacked logmagn", Fourier::logmagn(cufftpacked));
-      Plot2D::Plot("cuTBpacked", cuTBpacked);
     }
 
-    // Plot2D::Plot("cufft-fft logmagn absdiff", abs(Fourier::logmagn(cufft) - Fourier::logmagn(fft)));
+    // Plot2D::Plot("gpufft-fft logmagn absdiff", abs(Fourier::logmagn(gpufft) - Fourier::logmagn(fft)));
     // Plot2D::Plot("cuTB-TB absdiff", abs(cuTB - TB));
   }
   if (0) // log levels

@@ -24,7 +24,7 @@ inline cv::Mat ifft(cv::Mat&& fft)
   return fft;
 }
 
-inline cv::Mat cufft(cv::Mat&& img)
+inline cv::Mat gpufft(cv::Mat&& img)
 {
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
@@ -36,7 +36,7 @@ inline cv::Mat cufft(cv::Mat&& img)
   return img;
 }
 
-inline cv::Mat icufft(cv::Mat&& fft)
+inline cv::Mat gpuifft(cv::Mat&& fft)
 {
   // gpu::GpuMat fftGpu;
   // fftGpu.upload(fft);
@@ -55,14 +55,14 @@ inline cv::Mat ifft(cv::Mat& fft)
   return ifft(fft.clone());
 }
 
-inline cv::Mat cufft(cv::Mat& img)
+inline cv::Mat gpufft(cv::Mat& img)
 {
-  return cufft(img.clone());
+  return gpufft(img.clone());
 }
 
-inline cv::Mat icufft(cv::Mat& fft)
+inline cv::Mat gpuifft(cv::Mat& fft)
 {
-  return icufft(fft.clone());
+  return gpuifft(fft.clone());
 }
 
 inline void fftshift(cv::Mat& mat)

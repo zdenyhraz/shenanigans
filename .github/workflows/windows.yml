@@ -1,0 +1,57 @@
+name: windows
+
+on: [push,pull_request]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    
+    - name: OpenCV Cache
+      id: opencv-cache
+      uses: actions/cache@v2
+      with:
+        path: ./opencv-install
+        key: ${{ runner.os }}-opencv-cache
+
+    - name: OpenCV Install
+      uses: rayandrews/with-opencv-action@v1
+      with:  
+        opencv-version: '4.5.1'
+        dir: ./opencv-install
+        cached: ${{ steps.opencv-cache.outputs.cache-hit }}
+
+    - name: Qt Cache
+      id: qt-cache
+      uses: actions/cache@v2
+      with:
+        path: ./qt
+        key: ${{ runner.os }}-qt-cache
+
+    - name: Qt Install
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: "5.12.2"
+        dir: "./qt"
+        install-deps: true
+        setup-python: false
+        cached: ${{ steps.qt-cache.outputs.cache-hit }}
+      
+    - name: Configure
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}})
+      
