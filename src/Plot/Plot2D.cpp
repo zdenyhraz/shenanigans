@@ -59,7 +59,10 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
   windowPlot->show();
 
   if (mSavepath.length() > 0)
+  {
+    LOG_DEBUG("Saving plot to {} ...", mSavepath);
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
+  }
 }
 
 void Plot2D::Initialize(int xcnt, int ycnt)

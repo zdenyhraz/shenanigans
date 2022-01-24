@@ -3,10 +3,15 @@ project(shenanigans)
 
 # cpp
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wfatal-errors -Wall -Wextra -Wpedantic -Wshadow") # warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp") # optimizations
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX") # warnings
+else ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
+endif()
 
 # fmt
 add_subdirectory(external/fmt)
@@ -36,9 +41,6 @@ find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED PATHS C:\\Qt\
 
 # custom
 include_directories("src")
-include_directories("resources")
-get_filename_component(RESOURCES_DIR "resources" ABSOLUTE)
-add_compile_definitions(RESOURCES_DIR=${RESOURCES_DIR})
 
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
