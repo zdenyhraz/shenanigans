@@ -2,16 +2,15 @@
 #include "Plot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
-std::function<void(std::string)> Plot::OnClose = [](std::string name)
-{
+std::function<void(std::string)> Plot::OnClose = [](std::string name) {
   auto idx = plots.find(name);
   if (idx != plots.end())
     plots.erase(idx);
 };
 
-QFont Plot::fontTicks("Newyork", 15);
-QFont Plot::fontLabels("Newyork", 17);
-QFont Plot::fontLegend("Newyork", 13);
+QFont Plot::fontTicks("Newyork", 11);
+QFont Plot::fontLabels("Newyork", 13);
+QFont Plot::fontLegend("Newyork", 9);
 double Plot::pt = 3.0;
 QColor Plot::black(50, 50, 50);
 QColor Plot::blue(0, 113.9850, 188.9550);
