@@ -42,7 +42,7 @@ WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
   ui.setupUi(this);
 
   // show the logo
-  QPixmap pm("Resources/logo.png");
+  QPixmap pm("../data/app/logo.png");
   ui.label_2->setPixmap(pm);
   ui.label_2->setScaledContents(true);
 
@@ -154,8 +154,8 @@ try
   LOG_FUNCTION("RandomShit");
   if (0) // CC/PC dizertacka pics
   {
-    cv::Mat img1 = loadImage("Resources/shapef.png");
-    cv::Mat img2 = loadImage("Resources/shapesf.png");
+    cv::Mat img1 = loadImage("../data/shapef.png");
+    cv::Mat img2 = loadImage("../data/shapesf.png");
 
     addnoise(img1, 0.3);
     addnoise(img2, 0.3);
@@ -247,8 +247,7 @@ try
       ellipse(ellipseImg, cv::RotatedRect(ellipseCenter, ellipseSize, ellipseAngle), cv::Scalar(1), -1, cv::LINE_AA);
     } while (sum(ellipseImg)[0] < 1000);
 
-    const auto f = [&](const std::vector<f64>& params)
-    {
+    const auto f = [&](const std::vector<f64>& params) {
       cv::Point2f center(params[0], params[1]);
       cv::Size size(params[2], params[3]);
       f32 angle = params[4];
@@ -385,8 +384,7 @@ try
   }
   if (0) // complexity estimation test
   {
-    const auto f = [](const std::vector<f64>& x)
-    {
+    const auto f = [](const std::vector<f64>& x) {
       f64 g = 0;
 
       for (usize i = 0; i < 1e7; ++i) // constant portion
@@ -405,7 +403,7 @@ try
   }
   if (0) // sasko DFT test
   {
-    cv::Mat img1 = roicropmid(loadImage("Resources/test.png"), 1000, 1000);
+    cv::Mat img1 = roicropmid(loadImage("../data/test.png"), 1000, 1000);
     cv::Mat img2;
     flip(img1, img2, 1);
     rotate(img2, img2, cv::ROTATE_90_COUNTERCLOCKWISE);
@@ -483,8 +481,8 @@ try
     cv::Point cropfocus(2048, 2048);
     i32 cropsize = 1.0 * 4096;
 
-    cv::Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
-    cv::Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    cv::Mat img1 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    cv::Mat img2 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
     i32 size = cropsize;
     cv::resize(img1, img1, cv::Size(size, size));
@@ -505,7 +503,7 @@ try
     const i32 sizeStep = 10;
     const i32 iters = (maxsize - minsize + 1) / sizeStep % 2 ? (maxsize - minsize + 1) / sizeStep : (maxsize - minsize + 1) / sizeStep + 1;
     const i32 itersPerSize = 100;
-    cv::Mat img = loadImage("Resources/test.png");
+    cv::Mat img = loadImage("../data/AIA/171A.png");
     std::vector<f64> sizes(iters);
     std::vector<f64> timeCpu(iters);
     std::vector<f64> timeGpu(iters);
@@ -548,7 +546,7 @@ try
   }
   if (0) // cuda
   {
-    cv::Mat img = loadImage("Resources/test.png");
+    cv::Mat img = loadImage("../data/test.png");
     cv::Mat fft, fftpacked, gpufft;
     cv::Mat TB, TBpacked, cuTB;
     bool cpu = 1;
@@ -609,7 +607,7 @@ try
   }
   if (0) // non maxima suppression
   {
-    cv::Mat img = loadImage("Resources/test.png");
+    cv::Mat img = loadImage("../data/test.png");
     f32 scale = 1.0;
     cv::resize(img, img, cv::Size(scale * img.cols, scale * img.rows));
     NonMaximaSuppresion(img);
@@ -721,7 +719,7 @@ try
   }
   if (0) // histogram equalize
   {
-    cv::Mat img = cv::imread("Resources/test.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat img = cv::imread("../data/test.png", cv::IMREAD_GRAYSCALE);
     normalize(img, img, 0, 255, cv::NORM_MINMAX);
     img.convertTo(img, CV_8UC1);
     cv::resize(img, img, cv::Size(500, 500));
@@ -737,7 +735,7 @@ try
   if (0) // ipc optimize test
   {
     IterativePhaseCorrelation ipc(256, 256);
-    ipc.Optimize("Resources/", "Resources/", 0.3, 0.01, 11);
+    ipc.Optimize("../data/", "../data/", 0.3, 0.01, 11);
   }
   if (0) // plot from csv file
   {
@@ -840,8 +838,8 @@ try
   }
   if (0) // ipc sign test
   {
-    cv::Mat img1 = loadImage("../resources/Shapes/shape.png");
-    cv::Mat img2 = loadImage("../resources/Shapes/shapes.png");
+    cv::Mat img1 = loadImage("../../data/Shapes/shape.png");
+    cv::Mat img2 = loadImage("../../data/Shapes/shapes.png");
 
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
 
@@ -965,7 +963,7 @@ try
   }
   if (0) // png imread
   {
-    cv::Mat img1 = cv::imread("../resources/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    cv::Mat img1 = cv::imread("../../data/FITS/HMI.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
     Plot2D::Set("HMI1.png");
     Plot2D::Plot(img1);
     Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);

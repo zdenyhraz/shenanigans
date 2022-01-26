@@ -3,23 +3,20 @@
 class IterativePhaseCorrelationTest : public ::testing::Test
 {
 protected:
+  IterativePhaseCorrelationTest() : mImg1(loadImage("../test/data/shape.png")), mIPC(std::make_unique<IterativePhaseCorrelation>(mImg1.size())) {}
+
   void SetUp() override
   {
-    mImg1 = loadImage("../test/data/shape.png");
-    ASSERT_TRUE(not mImg1.empty());
-
-    mIPC = std::make_unique<IterativePhaseCorrelation>(mImg1.size());
-    ASSERT_TRUE(mIPC);
-
-    mShift = cv::Point2d(128.638, -67.425);
     cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., mShift.x, 0., 1., mShift.y);
     warpAffine(mImg1, mImg2, T, mImg2.size());
+    ASSERT_TRUE(not mImg1.empty());
     ASSERT_TRUE(not mImg2.empty());
   }
 
+  const cv::Point2d mShift = cv::Point2d(128.638, -67.425);
+  static constexpr f64 mTolerance = 1e6;
   cv::Mat mImg1;
   cv::Mat mImg2;
-  cv::Point2d mShift;
   std::unique_ptr<IterativePhaseCorrelation> mIPC;
 };
 
@@ -39,8 +36,8 @@ TEST_F(IterativePhaseCorrelationTest, Consistency)
 TEST_F(IterativePhaseCorrelationTest, ZeroShift)
 {
   const auto shift = mIPC->Calculate(mImg1, mImg1);
-  EXPECT_NEAR(shift.x, 0, 1e-7);
-  EXPECT_NEAR(shift.y, 0, 1e-7);
+  EXPECT_NEAR(shift.x, 0, mTolerance);
+  EXPECT_NEAR(shift.y, 0, mTolerance);
 }
 
 TEST_F(IterativePhaseCorrelationTest, Shift)
@@ -54,8 +51,8 @@ TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputs)
 {
   const auto normShift = mIPC->Calculate(mImg1, mImg2);
   const auto unnormShift = mIPC->Calculate(mImg1 * 25.73, mImg2 * 38.14);
-  EXPECT_NEAR(normShift.x, unnormShift.x, 1e-7);
-  EXPECT_NEAR(normShift.y, unnormShift.y, 1e-7);
+  EXPECT_NEAR(normShift.x, unnormShift.x, mTolerance);
+  EXPECT_NEAR(normShift.y, unnormShift.y, mTolerance);
 }
 
 TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)

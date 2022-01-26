@@ -92,8 +92,8 @@ void WindowIPC::align()
   cv::Point cropfocus(2048, 2048);
   i32 cropsize = 1.0 * 4096;
 
-  cv::Mat img1 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
-  cv::Mat img2 = roicrop(loadImage("Resources/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img1 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img2 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
   i32 size = cropsize;
   cv::resize(img1, img1, cv::Size(size, size));

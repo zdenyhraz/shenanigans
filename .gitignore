@@ -2,6 +2,9 @@ build/*
 .vscode/*
 data/*
 
+!data/app/
+!data/app/*
+
 !data/articles/
 !data/articles/*
 

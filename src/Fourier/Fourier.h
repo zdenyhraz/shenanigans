@@ -7,11 +7,11 @@ namespace Fourier
 {
 inline cv::Mat fft(cv::Mat&& img, bool packed = false)
 {
-  if (img.type() != CV_32F) [[unlikely]]
-    img.convertTo(img, CV_32F);
+  if (img.type() != CV_32F)
+    [[unlikely]] img.convertTo(img, CV_32F);
 
-  if (packed) [[unlikely]]
-    cv::dft(img, img);
+  if (packed)
+    [[unlikely]] cv::dft(img, img);
   else
     cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);
 
@@ -29,19 +29,19 @@ inline cv::Mat gpufft(cv::Mat&& img)
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
-  // gpu::GpuMat imgGpu;
-  // imgGpu.upload(img);
-  // gpu::dft(imgGpu, imgGpu, imgGpu.size());
-  // imgGpu.download(img);
+  cv::cuda::GpuMat imgGpu;
+  imgGpu.upload(img);
+  cv::cuda::dft(imgGpu, imgGpu, imgGpu.size());
+  imgGpu.download(img);
   return img;
 }
 
 inline cv::Mat gpuifft(cv::Mat&& fft)
 {
-  // gpu::GpuMat fftGpu;
-  // fftGpu.upload(fft);
-  // gpu::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
-  // fftGpu.download(fft);
+  cv::cuda::GpuMat fftGpu;
+  fftGpu.upload(fft);
+  cv::cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
+  fftGpu.download(fft);
   return fft;
 }
 

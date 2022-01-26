@@ -143,14 +143,14 @@ public:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
-    if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
-      throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
+    if (image1.size() != cv::Size(mCols, mRows))
+      [[unlikely]] throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
-    if (image1.size() != image2.size()) [[unlikely]]
-      throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+    if (image1.size() != image2.size())
+      [[unlikely]] throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
-    if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
-      throw std::runtime_error("Multichannel images are not supported");
+    if (image1.channels() != 1 or image2.channels() != 1)
+      [[unlikely]] throw std::runtime_error("Multichannel images are not supported");
 
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
@@ -217,27 +217,28 @@ public:
       i32 L1size = GetL1size(L2U.cols, L1ratio);
       cv::Point2d L1mid(L1size / 2, L1size / 2);
       cv::Point2d L1peak;
-      if (L1circle.cols != L1size) [[unlikely]]
-        L1circle = kirkl(L1size);
+      if (L1circle.cols != L1size)
+        [[unlikely]] L1circle = kirkl(L1size);
       if constexpr (DebugMode)
         DebugL1B(L2U, L2Upeak, L1size, L1circle);
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
-        if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
-          break;
+        if (IsOutOfBounds(L2Upeak, L2U, L1size))
+          [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
-        if (AccuracyReached(L1peak, L1mid)) [[unlikely]]
-        {
-          if constexpr (DebugMode)
-            DebugL1A(L1, L1circle);
+        if (AccuracyReached(L1peak, L1mid))
+          [[unlikely]]
+          {
+            if constexpr (DebugMode)
+              DebugL1A(L1, L1circle);
 
-          return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
-        }
+            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
+          }
       }
 
       // maximum iterations reached - reduce L1 size by reducing L1ratio
@@ -278,7 +279,7 @@ private:
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
-  mutable std::string mDebugDirectory = "Debug";
+  mutable std::string mDebugDirectory = "../data/debug";
   mutable std::string mDebugName = "IPC";
   cv::Mat mBandpass;
   cv::Mat mWindow;
@@ -361,8 +362,8 @@ private:
   {
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
-    if (image.type() != CV_32F) [[unlikely]]
-      image.convertTo(image, CV_32F);
+    if (image.type() != CV_32F)
+      [[unlikely]] image.convertTo(image, CV_32F);
 
     if constexpr (Normalize)
       normalize(image, image, 0, 1, cv::NORM_MINMAX);
@@ -467,8 +468,8 @@ private:
 
     cv::Point2d result(Mx / M, My / M);
 
-    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows) [[unlikely]]
-      return cv::Point2d(mat.cols / 2, mat.rows / 2);
+    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows)
+      [[unlikely]] return cv::Point2d(mat.cols / 2, mat.rows / 2);
 
     return result;
   }
