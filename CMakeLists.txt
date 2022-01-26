@@ -17,6 +17,10 @@ endif()
 add_subdirectory(external/fmt)
 include_directories("external/fmt/include")
 
+# scnlib
+add_subdirectory(external/scnlib)
+include_directories("external/scnlib/include")
+
 # gtest
 add_subdirectory(external/gtest)
 include_directories("external/gtest/googletest/include")
@@ -70,11 +74,11 @@ file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
 
 # shenanigans
 add_executable(shenanigans ${SRC} ${SRC_APP})
-target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only nlohmann_json::nlohmann_json)
+target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json)
 target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
 
 # shenanigans_test
 add_executable(shenanigans_test ${SRC} ${SRC_TEST})
-target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock)
+target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock)
 target_precompile_headers(shenanigans_test PRIVATE src/Precompiled.h)
 gtest_discover_tests(shenanigans_test)

@@ -193,13 +193,12 @@ public:
   {
     const auto imagegrs = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
     const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
-    const auto R = header.R;              // [px]
-    const auto theta0 = header.theta0;    // [rad]
-    const auto fxcenter = header.xcenter; // [px]
-    const auto fycenter = header.ycenter; // [px]
-    // const auto omegasx = GetXAverage(data.omegasx);                          // [deg/day]
-    const auto omegasx = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615); // [deg/day]
-    std::vector<cv::Point2d> mcpts(thetas.size());                           // [px,px]
+    const auto R = header.R;                                                                                                        // [px]
+    const auto theta0 = header.theta0;                                                                                              // [rad]
+    const auto fxcenter = header.xcenter;                                                                                           // [px]
+    const auto fycenter = header.ycenter;                                                                                           // [px]
+    const auto omegasx = data.omegasx.cols >= 500 ? GetXAverage(data.omegasx) : GetPredictedOmegas(thetas, 14.296, -1.847, -2.615); // [deg/day]
+    std::vector<cv::Point2d> mcpts(thetas.size());                                                                                  // [px,px]
 
     for (usize y = 0; y < thetas.size(); ++y)
     {
@@ -247,10 +246,10 @@ private:
     file >> j;
 
     ImageHeader header;
-    header.xcenter = (j["NAXIS1"].get<f64>()) - (j["CRPIX1"].get<f64>()); // x is flipped, 4095 - fits index from 1
-    header.ycenter = j["CRPIX2"].get<f64>() - 1;                          // fits index from 1
-    header.theta0 = j["CRLT_OBS"].get<f64>() / Constants::Rad;            // convert from deg to rad
-    header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // arcsec / arcsec per pixel
+    header.xcenter = (j["NAXIS1"].get<f64>()) - (j["CRPIX1"].get<f64>()); // [py] (x is flipped, 4095 - fits index from 1)
+    header.ycenter = j["CRPIX2"].get<f64>() - 1;                          // [px] (fits index from 1)
+    header.theta0 = j["CRLT_OBS"].get<f64>() / Constants::Rad;            // [rad] (convert from deg to rad)
+    header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // [px] (arcsec / arcsec per pixel)
     return header;
   }
 
@@ -386,7 +385,7 @@ private:
 
   static std::vector<f64> GetPredictedOmegas(const std::vector<f64>& thetas, f64 A, f64 B, f64 C)
   {
-    std::vector<f64> omegas(thetas.size(), 0.);
+    std::vector<f64> omegas(thetas.size());
     for (usize i = 0; i < thetas.size(); ++i)
       omegas[i] = GetPredictedOmega(thetas[i], A, B, C);
     return omegas;
@@ -405,7 +404,7 @@ private:
     Plot1D::SetXlabel("time [days]");
     Plot1D::SetYlabel("fits shift [px]");
     Plot1D::SetY2label("theta0 [deg]");
-    Plot1D::SetYnames({"fits shift x", "fits shift y"});
+    Plot1D::SetYnames({"center shift x", "center shift y"});
     Plot1D::SetY2names({"theta0"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(times, {data.fshiftx, data.fshifty}, {Constants::Rad * data.theta0s});

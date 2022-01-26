@@ -308,7 +308,7 @@
      <item row="1" column="0" colspan="2">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>../data/diffrot_day_2500/diffrot.json</string>
+        <string>../data/diffrot_month_5000/diffrot.json</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
