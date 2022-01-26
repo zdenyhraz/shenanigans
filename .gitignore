@@ -1,6 +1,5 @@
-build/*
-.vscode/*
-data/*
+build/**
+data/**
 
 !data/app/**
 !data/articles/**
