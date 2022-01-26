@@ -29,19 +29,23 @@ inline cv::Mat gpufft(cv::Mat&& img)
   if (img.type() != CV_32F)
     img.convertTo(img, CV_32F);
 
+  /*
   cv::cuda::GpuMat imgGpu;
   imgGpu.upload(img);
   cv::cuda::dft(imgGpu, imgGpu, imgGpu.size());
   imgGpu.download(img);
+  */
   return img;
 }
 
 inline cv::Mat gpuifft(cv::Mat&& fft)
 {
+  /*
   cv::cuda::GpuMat fftGpu;
   fftGpu.upload(fft);
   cv::cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
   fftGpu.download(fft);
+  */
   return fft;
 }
 

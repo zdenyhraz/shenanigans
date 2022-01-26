@@ -46,8 +46,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/xfeatures2d.hpp>
-#include <opencv2/core/cuda.hpp>
-#include <opencv2/cudaarithm.hpp>
+//#include <opencv2/core/cuda.hpp>
+//#include <opencv2/cudaarithm.hpp>
 
 // QCustomPlot
 #include "Plot/qcustomplot.h"
