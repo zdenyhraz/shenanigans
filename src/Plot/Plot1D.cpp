@@ -51,7 +51,7 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
 
   if (mSavepath.length() > 0)
   {
-    LOG_DEBUG("Saving plot to {} ...", mSavepath);
+    LOG_DEBUG("Saving plot to {} ...", std::filesystem::canonical(mSavepath));
     plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
 }
@@ -92,7 +92,7 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
 
   if (mSavepath.length() > 0)
   {
-    LOG_DEBUG("Saving plot to {} ...", mSavepath);
+    LOG_DEBUG("Saving plot to {} ...", std::filesystem::canonical(mSavepath));
     plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
 }

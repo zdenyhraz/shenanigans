@@ -53,17 +53,19 @@ public:
         const auto& [id1, id2] = ids[x];
         const std::string path1 = fmt::format("{}/{}.png", dataPath, id1);
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
-        if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
-        {
-          if constexpr (not Managed)
-            LOG_DEBUG("[{:>3.0f}%: {:>4} / {:>4}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
-        }
-        else [[unlikely]]
-        {
-          if constexpr (not Managed)
-            LOG_WARNING("[{:>3.0f}%: {:>4} / {:>4}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
-          continue;
-        }
+        if (std::filesystem::exists(path1) and std::filesystem::exists(path2))
+          [[likely]]
+          {
+            if constexpr (not Managed)
+              LOG_DEBUG("[{:>3.0f}%: {:>4} / {:>4}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+          }
+        else
+          [[unlikely]]
+          {
+            if constexpr (not Managed)
+              LOG_WARNING("[{:>3.0f}%: {:>4} / {:>4}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+            continue;
+          }
 
         const auto image1 = cv::imread(path1, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
         const auto image2 = cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
@@ -134,8 +136,7 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    const auto f = [&](const IterativePhaseCorrelation& _ipc)
-    {
+    const auto f = [&](const IterativePhaseCorrelation& _ipc) {
       DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
       const auto rawdata = diffrot.Calculate<true>(_ipc, dataPath, idstart);
       const auto [data, thetas] = PostProcessData(rawdata);
@@ -307,8 +308,8 @@ private:
     {
       const auto minval = thetas.at<f32>(thetas.rows - 1, x);
       const auto maxval = thetas.at<f32>(0, x);
-      if (minval == 0 and maxval == 0) [[unlikely]]
-        continue;
+      if (minval == 0 and maxval == 0)
+        [[unlikely]] continue;
       ithetamin = std::max(ithetamin, static_cast<f64>(minval));
       ithetamax = std::min(ithetamax, static_cast<f64>(maxval));
     }
@@ -486,7 +487,7 @@ private:
     LOG_FUNCTION("DifferentialRotation::Save");
 
     std::string path = fmt::format("{}/diffrot.json", dataPath);
-    LOG_DEBUG("Saving differential rotation results to {} ...", path);
+    LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::canonical(path));
     cv::FileStorage file(path, cv::FileStorage::WRITE);
 
     // diffrot params
@@ -523,7 +524,7 @@ private:
   {
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
     std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
-    LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", path);
+    LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::canonical(path));
 
     cv::FileStorage file(path, cv::FileStorage::WRITE);
     // diffrot opt params
