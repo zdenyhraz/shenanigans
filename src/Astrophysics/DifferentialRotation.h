@@ -57,13 +57,13 @@ public:
           [[likely]]
           {
             if constexpr (not Managed)
-              LOG_DEBUG("[{:>3.0f}%: {:>4} / {:>4}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+              LOG_DEBUG("[{:>3.0f}% :: {:>4} / {:>4}] Calculating diffrot profile {} - {} ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
           }
         else
           [[unlikely]]
           {
             if constexpr (not Managed)
-              LOG_WARNING("[{:>3.0f}%: {:>4} / {:>4}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
+              LOG_WARNING("[{:>3.0f}% :: {:>4} / {:>4}] Could not load images {} - {}, skipping ...", logprogress / (xsize - 1) * 100, logprogress + 1, xsize, id1, id2);
             continue;
           }
 
