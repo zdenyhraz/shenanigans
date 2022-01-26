@@ -7,3 +7,6 @@
 [submodule "external/json"]
 	path = external/json
 	url = https://github.com/nlohmann/json.git
+[submodule "external/scnlib"]
+	path = external/scnlib
+	url = https://github.com/eliaskosunen/scnlib.git
