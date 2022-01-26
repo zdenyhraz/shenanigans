@@ -76,5 +76,5 @@ inline void saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bi
   }
 
   imwrite(path, saveimg);
-  LOG_DEBUG("Saved image to {}", path);
+  LOG_DEBUG("Saved image to {}", std::filesystem::weakly_canonical(path));
 }

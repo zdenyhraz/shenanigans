@@ -487,7 +487,7 @@ private:
     LOG_FUNCTION("DifferentialRotation::Save");
 
     std::string path = fmt::format("{}/diffrot.json", dataPath);
-    LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::canonical(path));
+    LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path));
     cv::FileStorage file(path, cv::FileStorage::WRITE);
 
     // diffrot params
@@ -524,7 +524,7 @@ private:
   {
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
     std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
-    LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::canonical(path));
+    LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::weakly_canonical(path));
 
     cv::FileStorage file(path, cv::FileStorage::WRITE);
     // diffrot opt params

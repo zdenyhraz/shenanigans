@@ -60,7 +60,7 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
 
   if (mSavepath.length() > 0)
   {
-    LOG_DEBUG("Saving plot to {} ...", std::filesystem::canonical(mSavepath));
+    LOG_DEBUG("Saving plot to {} ...", std::filesystem::weakly_canonical(mSavepath));
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
 }

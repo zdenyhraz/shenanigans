@@ -79,7 +79,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
   {
     csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << std::endl;
   }
-  LOG_INFO("Feature data exported to {}", pth);
+  LOG_INFO("Feature data exported to {}", std::filesystem::weakly_canonical(pth));
 }
 
 inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,
@@ -305,17 +305,15 @@ try
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({i++, pic, match, false});
 
-    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(),
-        [&](const auto& a, const auto& b)
-        {
-          const auto& [idx1, pic1, match1, ignore1] = a;
-          const auto& [idx2, pic2, match2, ignore2] = b;
-          const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
-          const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-          const auto spd1 = magnitude(shift1);
-          const auto spd2 = magnitude(shift2);
-          return spd1 > spd2;
-        });
+    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(), [&](const auto& a, const auto& b) {
+      const auto& [idx1, pic1, match1, ignore1] = a;
+      const auto& [idx2, pic2, match2, ignore2] = b;
+      const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
+      const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
+      const auto spd1 = magnitude(shift1);
+      const auto spd2 = magnitude(shift2);
+      return spd1 > spd2;
+    });
 
     usize newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)
