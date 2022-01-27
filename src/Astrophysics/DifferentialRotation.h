@@ -139,9 +139,7 @@ public:
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
     auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto thetas = PostProcessData(dataBefore);
-    const auto predfit1 = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
-    const auto predfit2 = GetPredictedOmegas(thetas, 14.192, -1.70, -2.36);
-
+    const auto predfit = GetVectorAverage({GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
     const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
       DifferentialRotation diffrotopt(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
       auto dataopt = diffrotopt.Calculate<true>(ipcopt, dataPath, idstart);
@@ -149,11 +147,10 @@ public:
       const auto omegasx = GetXAverage(dataopt.omegasx);
       const auto omegasxfit = polyfit(thetas, omegasx, 2);
 
-      f32 ret = 0;
+      f64 ret = 0;
       for (usize i = 0; i < omegasxfit.size(); ++i)
       {
-        const auto predfit = (predfit1[i] + predfit2[i]) / 2;
-        ret += 0.8 * std::pow(omegasxfit[i] - predfit, 2);    // pred fit diff
+        ret += 0.8 * std::pow(omegasxfit[i] - predfit[i], 2); // pred fit diff
         ret += 0.2 * std::pow(omegasx[i] - omegasxfit[i], 2); // variance
       }
       return ret / omegasxfit.size();
@@ -385,6 +382,23 @@ private:
       avgs[y] /= vals.cols;
 
     return avgs;
+  }
+
+  static std::vector<f64> GetVectorAverage(const std::vector<std::vector<f64>>& vecs)
+  {
+    if (not vecs.size() or not vecs[0].size())
+      throw std::invalid_argument("Invalid GetVectorAverage argument");
+
+    std::vector<f64> avg(vecs[0].size());
+
+    for (usize v = 0; v < vecs.size(); ++v)
+      for (usize i = 0; i < vecs[v].size(); ++i)
+        avg[i] += vecs[v][i];
+
+    for (usize i = 0; i < avg.size(); ++i)
+      avg[i] /= vecs.size();
+
+    return avg;
   }
 
   static f64 GetPredictedOmega(f64 theta, f64 A, f64 B, f64 C) { return A + B * std::pow(std::sin(theta), 2) + C * std::pow(std::sin(theta), 4); }
