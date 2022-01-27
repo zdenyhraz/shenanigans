@@ -50,7 +50,7 @@ public:
       try
       {
         const auto logprogress = static_cast<f64>(progress.fetch_add(1, std::memory_order_relaxed)) + 1.;
-        const auto& [id1, id2] = ids[x];
+        const auto [id1, id2] = ids[x];
         const std::string path1 = fmt::format("{}/{}.png", dataPath, id1);
         const std::string path2 = fmt::format("{}/{}.png", dataPath, id2);
         if (std::filesystem::exists(path1) and std::filesystem::exists(path2))
@@ -126,7 +126,7 @@ public:
   try
   {
     LOG_FUNCTION("DifferentialRotation::LoadAndShow");
-    const auto data = Load(path);
+    auto data = Load(path);
     Plot(data, dataPath, idstart);
   }
   catch (const std::exception& e)
@@ -136,42 +136,48 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    const auto f = [&](const IterativePhaseCorrelation& _ipc) {
-      DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-      const auto rawdata = diffrot.Calculate<true>(_ipc, dataPath, idstart);
-      const auto [data, thetas] = PostProcessData(rawdata);
-      const auto predfit = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
-      const auto omegasx = GetXAverage(data.omegasx);
+    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
+    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    const auto thetas = PostProcessData(dataBefore);
+    const auto predfit1 = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615);
+    const auto predfit2 = GetPredictedOmegas(thetas, 14.192, -1.70, -2.36);
+
+    const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
+      DifferentialRotation diffrotopt(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
+      auto dataopt = diffrotopt.Calculate<true>(ipcopt, dataPath, idstart);
+      std::ignore = PostProcessData(dataopt);
+      const auto omegasx = GetXAverage(dataopt.omegasx);
       const auto omegasxfit = polyfit(thetas, omegasx, 2);
 
       f32 ret = 0;
       for (usize i = 0; i < omegasxfit.size(); ++i)
       {
-        ret += std::pow(omegasxfit[i] - predfit[i], 2);       // ipc fit - pred fit diff
-        ret += 0.5 * std::pow(omegasx[i] - omegasxfit[i], 2); // ipc - fit diff
+        const auto predfit = (predfit1[i] + predfit2[i]) / 2;
+        ret += 0.8 * std::pow(omegasxfit[i] - predfit, 2);    // pred fit diff
+        ret += 0.2 * std::pow(omegasx[i] - omegasxfit[i], 2); // variance
       }
       return ret / omegasxfit.size();
     };
 
-    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    const auto [dataBefore, thetas] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
-    ipc.Optimize(f, popsize);
+    ipc.Optimize(obj, popsize);
     SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
-    const auto [dataAfter, _] = PostProcessData(diffrot.Calculate<true>(ipc, dataPath, idstart));
+
+    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    std::ignore = PostProcessData(dataAfter);
 
     Plot1D::Set("Diffrot opt");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "avgomega x opt", "avgomega x opt fit", "Derek A. Lamb (2017)"});
+    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "avgomega x opt", "avgomega x opt fit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(dataBefore.omegasx), polyfit(thetas, GetXAverage(dataBefore.omegasx), 2), GetXAverage(dataAfter.omegasx),
-                                              polyfit(thetas, GetXAverage(dataAfter.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615)});
+    Plot1D::Plot(
+        Constants::Rad * thetas, {GetXAverage(dataBefore.omegasx), polyfit(thetas, GetXAverage(dataBefore.omegasx), 2), GetXAverage(dataAfter.omegasx),
+                                     polyfit(thetas, GetXAverage(dataAfter.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
   }
 
-  static std::tuple<DifferentialRotationData, std::vector<f64>> PostProcessData(const DifferentialRotationData& rawdata)
+  static std::vector<f64> PostProcessData(DifferentialRotationData& data)
   {
-    const auto thetas = GetInterpolatedThetas(rawdata.thetas);
-    DifferentialRotationData data = rawdata;
+    const auto thetas = GetInterpolatedThetas(data.thetas);
 
     // apply median blur
     static constexpr i32 medsize = 3;
@@ -181,12 +187,13 @@ public:
     cv::medianBlur(data.omegasy, data.omegasy, medsize);
 
     // apply theta-interpolation
-    Interpolate(data.shiftsx, data.thetas, thetas);
-    Interpolate(data.shiftsy, data.thetas, thetas);
-    Interpolate(data.omegasx, data.thetas, thetas);
-    Interpolate(data.omegasy, data.thetas, thetas);
+    cv::Mat temp = cv::Mat::zeros(data.shiftsx.rows, data.shiftsx.cols, CV_32F);
+    Interpolate(data.shiftsx, data.thetas, thetas, temp);
+    Interpolate(data.shiftsy, data.thetas, thetas, temp);
+    Interpolate(data.omegasx, data.thetas, thetas, temp);
+    Interpolate(data.omegasy, data.thetas, thetas, temp);
 
-    return {data, thetas};
+    return thetas;
   }
 
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::vector<f64>& thetas, const std::string& dataPath, i32 idstart, f64 timestep)
@@ -346,9 +353,8 @@ private:
     return thetas.rows - 2;
   }
 
-  static void Interpolate(cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas)
+  static void Interpolate(cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas, cv::Mat& temp)
   {
-    cv::Mat ivals = cv::Mat::zeros(vals.rows, vals.cols, CV_32F);
     for (i32 x = 0; x < vals.cols; ++x)
     {
       for (i32 y = 0; y < vals.rows; ++y)
@@ -361,10 +367,10 @@ private:
         const f64 valL = vals.at<f32>(iL, x);
         const f64 valH = vals.at<f32>(iH, x);
         const f64 t = (theta - thetaL) / (thetaH - thetaL);
-        ivals.at<f32>(y, x) = std::lerp(valL, valH, t);
+        temp.at<f32>(y, x) = std::lerp(valL, valH, t);
       }
     }
-    vals = ivals;
+    vals = temp.clone();
   }
 
   static std::vector<f64> GetXAverage(const cv::Mat& vals)
@@ -391,10 +397,10 @@ private:
     return omegas;
   }
 
-  void Plot(const DifferentialRotationData& rawdata, const std::string& dataPath, i32 idstart) const
+  void Plot(DifferentialRotationData& data, const std::string& dataPath, i32 idstart) const
   {
     LOG_FUNCTION("DifferentialRotation::Plot");
-    const auto [data, thetas] = PostProcessData(rawdata);
+    const auto thetas = PostProcessData(data);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
 
     PlotMeridianCurve(data, thetas, dataPath, idstart, 27);

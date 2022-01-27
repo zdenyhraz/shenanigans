@@ -553,17 +553,18 @@ private:
   void DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
   void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
-  const std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  IterativePhaseCorrelation CreateIPCFromParams(const std::vector<f64>& params) const;
+  std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const;
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters);
   std::vector<cv::Point2d> GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::vector<cv::Point2d> GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::vector<cv::Point2d> GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
+  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
   static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
       const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter);
   static std::vector<cv::Point2d> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize);
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
   static f64 GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts);
   static f64 GetFractionalPart(f64 x);

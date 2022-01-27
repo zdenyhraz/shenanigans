@@ -52,8 +52,8 @@ void WindowDiffrot::Optimize()
 
 void WindowDiffrot::PlotMeridianCurve()
 {
-  const auto rawdata = GetDifferentialRotation(1).Calculate<true>(*mWindowData->IPC, GetDataPath(), GetIdstart());
-  const auto [procdata, thetas] = DifferentialRotation::PostProcessData(rawdata);
+  auto rawdata = GetDifferentialRotation(1).Calculate<true>(*mWindowData->IPC, GetDataPath(), GetIdstart());
+  const auto thetas = DifferentialRotation::PostProcessData(rawdata);
   const auto timestep = ui.lineEdit_15->text().toDouble(); // [days]
-  DifferentialRotation::PlotMeridianCurve(procdata, thetas, GetDataPath(), GetIdstart(), timestep);
+  DifferentialRotation::PlotMeridianCurve(rawdata, thetas, GetDataPath(), GetIdstart(), timestep);
 }

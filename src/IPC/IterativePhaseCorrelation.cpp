@@ -283,6 +283,13 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CreateImagePairs");
 
+  if (maxShift <= 0)
+    throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
+  if (itersPerImage < 1)
+    throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
+  if (noiseStdev < 0)
+    throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
+
   for (const auto& image : images)
   {
     if (image.rows < mRows + maxShift or image.cols < mCols + maxShift)
@@ -335,19 +342,23 @@ void IterativePhaseCorrelation::AddNoise(cv::Mat& image, f64 noiseStdev)
   image += noise;
 }
 
-const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
+IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const std::vector<f64>& params) const
+{
+  IterativePhaseCorrelation ipc(mRows, mCols);
+  ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
+  ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
+  ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
+  ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
+  ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
+  ipc.SetL1ratio(params[L1ratioParameter]);
+  return ipc;
+}
+
+std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
-
-  return [&](const std::vector<f64>& params)
-  {
-    IterativePhaseCorrelation ipc(mRows, mCols);
-    ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
-    ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
-    ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
-    ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
-    ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
-    ipc.SetL1ratio(params[L1ratioParameter]);
+  return [&](const std::vector<f64>& params) {
+    const auto ipc = CreateIPCFromParams(params);
 
     if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
@@ -358,7 +369,20 @@ const std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::Cre
       const auto error = ipc.Calculate(image1, image2) - shift;
       avgerror += sqrt(error.x * error.x + error.y * error.y);
     }
-    return imagePairs.size() > 0 ? avgerror / imagePairs.size() : 0.0f;
+    return avgerror / imagePairs.size();
+  };
+}
+
+std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const
+{
+  LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
+  return [&](const std::vector<f64>& params) {
+    const auto ipc = CreateIPCFromParams(params);
+
+    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
+      return std::numeric_limits<f64>::max();
+
+    return obj(ipc);
   };
 }
 
@@ -366,6 +390,10 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
     const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
 {
   LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
+
+  if (populationSize < 4)
+    throw std::runtime_error(fmt::format("Invalid population size ({})", populationSize));
+
   Evolution evo(OptimizedParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
@@ -375,44 +403,11 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
       static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 31, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
-  return evo.Optimize(obj, valid).optimum;
-}
-
-std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
-{
-  LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
-  const auto f = [&](const std::vector<f64>& params)
-  {
-    IterativePhaseCorrelation ipc(static_cast<i32>(params[OptimizedParameterCount])); // hack for size parameter
-    ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
-    ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
-    ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
-    ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
-    ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
-    ipc.SetL1ratio(params[L1ratioParameter]);
-
-    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
-      return std::numeric_limits<f64>::max();
-
-    return obj(ipc);
-  };
-
-  Evolution evo(OptimizedParameterCount + 1); // hack for size parameter
-  evo.mNP = populationSize;
-  // evo.maxGen = 5;
-  evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R", "SIZE"});
-  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1, 16};
-  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 31, 0.8, 128};
-  evo.SetPlotOutput(true);
-  evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction(0, [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val), 0., 1.); });
   evo.SetParameterValueToNameFunction(3, [](f64 val) { return InterpolationType2String(static_cast<InterpolationType>((i32)val)); });
   evo.SetParameterValueToNameFunction(4, [](f64 val) { return WindowType2String(static_cast<WindowType>((i32)val)); });
   evo.SetParameterValueToNameFunction(5, [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
-  evo.SetParameterValueToNameFunction(7, [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
-  return evo.Optimize(f, nullptr).optimum;
+  return evo.Optimize(obj, valid).optimum;
 }
 
 void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
@@ -428,8 +423,6 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
-  if (optimalParameters.size() > OptimizedParameterCount) // hack for size parameter
-    SetSize(static_cast<i32>(optimalParameters[OptimizedParameterCount]));
 
   LOG_INFO("Final IPC BandpassType: {}",
       BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
@@ -439,8 +432,6 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
   LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
   LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
-  if (optimalParameters.size() > OptimizedParameterCount) // hack for size parameter
-    LOG_INFO("Final IPC size: {}", static_cast<i32>(optimalParameters[OptimizedParameterCount]));
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH)
@@ -623,13 +614,7 @@ void IterativePhaseCorrelation::Optimize(
 try
 {
   LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
-
-  if (itersPerImage < 1)
-    throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
-  if (maxShift <= 0)
-    throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
-  if (noiseStdev < 0)
-    throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
+  LOG_DEBUG("Optimizing IPC for size [{}, {}]", mCols, mRows);
 
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto validationImages = LoadImages(validationImagesDirectory);
@@ -675,7 +660,10 @@ void IterativePhaseCorrelation::Optimize(const std::function<f64(const Iterative
 try
 {
   LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
-  const auto optimalParameters = CalculateOptimalParameters(obj, populationSize);
+  LOG_DEBUG("Optimizing IPC for size [{}, {}]", mCols, mRows);
+
+  const auto objf = CreateObjectiveFunction(obj);
+  const auto optimalParameters = CalculateOptimalParameters(objf, nullptr, populationSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
 
