@@ -15,33 +15,33 @@
 
 Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm implementations for various applied mathematics / astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, non-convex optimization. With C++ [Qt](https://www.qt.io/) GUI, #uses [C++20](https://en.cppreference.com/w/cpp/20), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
 
-## Article links
+### Article links
 - 📌 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
 - 🪐 [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
-## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) (gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 64x64 image, no noise vs heavy noise)
+### Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) (gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 64x64 image, no noise vs heavy noise)
 <img src="data/dissertation/refinement/peakshift.gif" width="50%"><img src="data/dissertation/refinement/peakshift_noise.gif" width="50%">
 
-## [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
+### [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
 <p align="center">
 <img src="data/articles/diffrot/pics/gif/1.gif" width="43%">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="data/articles/diffrot/pics/gif/2.gif" width="43%">
 </p>
 
-## The [Qt5](https://www.qt.io/) GUI
+### The [Qt5](https://www.qt.io/) GUI
 <img src="data/articles/random/gui.PNG" width="100%">
 
-## Visualization of [optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress on a given objective function landscape
+### Visualization of [optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress on a given objective function landscape
 <img src="data/articles/optim/rosenbrock_paths.png" width="100%">
 
-## Visualization of *meta*-[optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress and optimization improvement on a given *meta*-objective function landscape
+### Visualization of *meta*-[optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress and optimization improvement on a given *meta*-objective function landscape
 <img src="data/articles/optim/metaopt_paths.png" width="100%">
 
-## Adaptive [histogram equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization)
+### Adaptive [histogram equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization)
 <img src="data/articles/random/aheq.PNG" width="100%">
 
-## [Convolution theorem](https://en.wikipedia.org/wiki/Convolution_theorem) aware frequency domain image filtering
+### [Convolution theorem](https://en.wikipedia.org/wiki/Convolution_theorem) aware frequency domain image filtering
 <img src="data/dissertation/bandpass/2DBandpassRingRIDFT.png" width="32%"> <img src="data/dissertation/bandpass/2DBandpassImageR.png" width="32%"> <img src="data/dissertation/bandpass/2DBandpassImageG.png" width="32%">
 
-## Modeling of the [windowing effect](https://en.wikipedia.org/wiki/Window_function) on the [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
+### Modeling of the [windowing effect](https://en.wikipedia.org/wiki/Window_function) on the [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
 <img src="data/dissertation/window/1DWindows.png" width="47%"> <img src="data/dissertation/window/1DWindowsDFT.png" width="47%">
 <img src="data/dissertation/window/2DWindowDFTR.png" width="32%"> <img src="data/dissertation/window/2DImageDFT.png" width="32%">  <img src="data/dissertation/window/2DImageWindowDFT.png" width="32%"> 
