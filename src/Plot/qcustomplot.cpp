@@ -13726,7 +13726,7 @@ QCPGraph* QCustomPlot::graph(int index) const
   }
   else
   {
-    qDebug() << Q_FUNC_INFO << "index out of bounds:" << index;
+    // qDebug() << Q_FUNC_INFO << "index out of bounds:" << index;
     return 0;
   }
 }
