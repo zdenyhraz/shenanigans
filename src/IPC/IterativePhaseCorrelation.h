@@ -262,7 +262,7 @@ public:
   void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const;
-  static std::string BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH);
+  static std::string BandpassType2String(BandpassType type);
   static std::string InterpolationType2String(InterpolationType type);
   static std::string WindowType2String(WindowType type);
 

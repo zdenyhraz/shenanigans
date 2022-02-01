@@ -524,7 +524,7 @@ private:
     file << "L2size" << ipc.GetL2size();
     file << "L1ratio" << ipc.GetL1ratio();
     file << "UpsampleCoeff" << ipc.GetUpsampleCoeff();
-    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType(), ipc.GetBandpassL(), ipc.GetBandpassH());
+    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType());
     file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
     file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
     // diffrot data
@@ -558,7 +558,7 @@ private:
     file << "L2size" << ipc.GetL2size();
     file << "L1ratio" << ipc.GetL1ratio();
     file << "UpsampleCoeff" << ipc.GetUpsampleCoeff();
-    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType(), ipc.GetBandpassL(), ipc.GetBandpassH());
+    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType());
     file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
     file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
   }

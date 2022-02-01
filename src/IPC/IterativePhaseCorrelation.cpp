@@ -403,7 +403,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
       static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 31, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
-  evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val), 0., 1.); });
+  evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val)); });
   evo.SetParameterValueToNameFunction("BPL", [](f64 val) { return fmt::format("{:.2f}", val); });
   evo.SetParameterValueToNameFunction("BPH", [](f64 val) { return fmt::format("{:.2f}", val); });
   evo.SetParameterValueToNameFunction("INT", [](f64 val) { return InterpolationType2String(static_cast<InterpolationType>((i32)val)); });
@@ -427,7 +427,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
-  LOG_SUCCESS("Final IPC BandpassType: {}", BandpassType2String(GetBandpassType(), GetBandpassL(), GetBandpassH()));
+  LOG_SUCCESS("Final IPC BandpassType: {}", BandpassType2String(GetBandpassType()));
   LOG_SUCCESS("Final IPC BandpassL: {:.2f}", GetBandpassL());
   LOG_SUCCESS("Final IPC BandpassH: {:.2f}", GetBandpassH());
   LOG_SUCCESS("Final IPC InterpolationType: {}", InterpolationType2String(GetInterpolationType()));
@@ -436,7 +436,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   LOG_SUCCESS("Final IPC L1ratio: {:.2f}", GetL1ratio());
 }
 
-std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH)
+std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type)
 {
   switch (type)
   {
