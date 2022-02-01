@@ -118,8 +118,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     MetaParameterCount
   };
 
-  const auto GetMetaParameterString = [](MetaParameter metaParameter)
-  {
+  const auto GetMetaParameterString = [](MetaParameter metaParameter) {
     switch (metaParameter)
     {
     case MetaNP:
@@ -137,8 +136,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     }
   };
 
-  const auto metaObj = [&](const std::vector<f64>& metaparams)
-  {
+  const auto metaObj = [&](const std::vector<f64>& metaparams) {
     f64 retval = 0;
 
     for (usize run = 0; run < runsPerObj; run++)
@@ -294,12 +292,12 @@ try
     Plot1D::Clear();
     Plot1D::SetXlabel("generation");
     Plot1D::SetYlabel("objective function value");
-    Plot1D::SetY2label("best-average relative difference");
+    Plot1D::SetY2label("best-average relative difference [%]");
     if (valid)
       Plot1D::SetYnames({"obj", "valid"});
     else
       Plot1D::SetYnames({"obj"});
-    Plot1D::SetY2names({"reldiff"});
+    Plot1D::SetY2names({"%diff"});
     Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
     Plot1D::SetYLogarithmic(true);
   }
@@ -410,15 +408,15 @@ void Evolution::UpdateOutputs(usize gen, const Population& population, Validatio
       fmt::print(mOutputFile, "{}\n", message);
 
     if (mConsoleOutput)
-      LOG_INFO("{}, reldif : {:.2f}, absdif : {:.2e}", message, population.relativeDifference, population.absoluteDifference);
+      LOG_DEBUG("{}, diff: {:.2f}% ({:.2e})", message, population.relativeDifference * 100, population.absoluteDifference);
   }
 
   if (mPlotOutput)
   {
     if (valid)
-      Plot1D::Plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference});
+      Plot1D::Plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
     else
-      Plot1D::Plot(gen, population.bestEntity.fitness, {population.relativeDifference});
+      Plot1D::Plot(gen, population.bestEntity.fitness, {population.relativeDifference * 100});
   }
 }
 
@@ -455,8 +453,7 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   if (population.functionEvaluations >= mMaxFunEvals) // maximum function evaluations exhausted
     return MaximumFunctionEvaluationsReached;
 
-  if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness - no
-                                                                                                                    // improvement (relative)
+  if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness
     return NoImprovementReachedRel;
 
   if (population.absoluteDifference < mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)

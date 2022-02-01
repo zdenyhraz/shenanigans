@@ -397,16 +397,19 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   Evolution evo(OptimizedParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BPT", "BPL", "BPH", "INTT", "WINT", "UC", "L1R"});
-  evo.mLB = {0, -.5, 0.0, 0, 0, 11, 0.1};
-  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-6, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-6,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-6, 31, 0.8};
+  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "UC", "L1R"});
+  evo.mLB = {0, -0.5, 0.0, 0, 0, 11, 0.1};
+  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 31, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
-  evo.SetParameterValueToNameFunction(0, [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val), 0., 1.); });
-  evo.SetParameterValueToNameFunction(3, [](f64 val) { return InterpolationType2String(static_cast<InterpolationType>((i32)val)); });
-  evo.SetParameterValueToNameFunction(4, [](f64 val) { return WindowType2String(static_cast<WindowType>((i32)val)); });
-  evo.SetParameterValueToNameFunction(5, [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
+  evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val), 0., 1.); });
+  evo.SetParameterValueToNameFunction("BPL", [](f64 val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("BPH", [](f64 val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("INT", [](f64 val) { return InterpolationType2String(static_cast<InterpolationType>((i32)val)); });
+  evo.SetParameterValueToNameFunction("WIN", [](f64 val) { return WindowType2String(static_cast<WindowType>((i32)val)); });
+  evo.SetParameterValueToNameFunction("UC", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
+  evo.SetParameterValueToNameFunction("L1R", [](f64 val) { return fmt::format("{:.2f}", val); });
   return evo.Optimize(obj, valid).optimum;
 }
 
@@ -424,14 +427,13 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
-  LOG_INFO("Final IPC BandpassType: {}",
-      BandpassType2String(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]), optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]));
-  LOG_INFO("Final IPC BandpassL: {:.2f}", optimalParameters[BandpassLParameter]);
-  LOG_INFO("Final IPC BandpassH: {:.2f}", optimalParameters[BandpassHParameter]);
-  LOG_INFO("Final IPC InterpolationType: {}", InterpolationType2String(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter])));
-  LOG_INFO("Final IPC WindowType: {}", WindowType2String(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter])));
-  LOG_INFO("Final IPC UpsampleCoeff: {}", static_cast<i32>(optimalParameters[UpsampleCoeffParameter]));
-  LOG_INFO("Final IPC L1ratio: {:.2f}", optimalParameters[L1ratioParameter]);
+  LOG_SUCCESS("Final IPC BandpassType: {}", BandpassType2String(GetBandpassType(), GetBandpassL(), GetBandpassH()));
+  LOG_SUCCESS("Final IPC BandpassL: {:.2f}", GetBandpassL());
+  LOG_SUCCESS("Final IPC BandpassH: {:.2f}", GetBandpassH());
+  LOG_SUCCESS("Final IPC InterpolationType: {}", InterpolationType2String(GetInterpolationType()));
+  LOG_SUCCESS("Final IPC WindowType: {}", WindowType2String(GetWindowType()));
+  LOG_SUCCESS("Final IPC UpsampleCoeff: {}", GetUpsampleCoeff());
+  LOG_SUCCESS("Final IPC L1ratio: {:.2f}", GetL1ratio());
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f64 bandpassL, f64 bandpassH)
@@ -439,9 +441,9 @@ std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type, f6
   switch (type)
   {
   case BandpassType::Rectangular:
-    return "Rectangular";
+    return "Rect";
   case BandpassType::Gaussian:
-    return "Gaussian";
+    return "Gauss";
   case BandpassType::None:
     return "None";
   default:
@@ -467,7 +469,7 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   switch (type)
   {
   case InterpolationType::NearestNeighbor:
-    return "NearestNeighbor";
+    return "NN";
   case InterpolationType::Linear:
     return "Linear";
   case InterpolationType::Cubic:

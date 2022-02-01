@@ -60,19 +60,15 @@ public:
     if (ParameterIndex < N)
       mParameterValueToNameFunctions[ParameterIndex] = fun;
   };
-
   void SetParameterValueToNameFunction(const std::string& ParameterName, const std::function<std::string(f64)>& fun)
   {
+    for (usize i = 0; i < N; ++i)
+      if (mParameterNames[i] == ParameterName)
+        return SetParameterValueToNameFunction(i, fun);
 
-    const auto it = std::find(mParameterNames.begin(), mParameterNames.end(), ParameterName);
-    if (it == mParameterNames.end())
-    {
-      LOG_WARNING("Parameter name {} not defined, ignoring value to name function", ParameterName);
-      return;
-    }
+    LOG_WARNING("Parameter name {} not defined, ignoring value -> name function", ParameterName);
+  }
 
-    mParameterValueToNameFunctions[it - mParameterNames.begin()] = fun;
-  };
   void SetName(const std::string& optname) { mName = optname; }
 
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
