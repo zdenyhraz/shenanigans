@@ -32,6 +32,7 @@
 
 // matplotlib
 #include <matplotlibcpp.h>
+namespace plt = matplotlibcpp;
 
 // Qt
 #include <QtWidgets>

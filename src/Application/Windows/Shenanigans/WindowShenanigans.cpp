@@ -995,6 +995,34 @@ try
     LOG_DEBUG("Roll win1: {}%, win2: {}%, win3: {}%, sum: {}%", static_cast<f64>(win1) * 100 / samples, static_cast<f64>(win2) * 100 / samples, static_cast<f64>(win3) * 100 / samples,
         static_cast<f64>(win1 + win2 + win3) * 100 / samples);
   }
+  if (0) // matplotlib
+  {
+    usize n = 1000;
+    std::vector<f64> x, y1, y2;
+    x.reserve(n);
+    y1.reserve(n);
+    y2.reserve(n);
+
+    plt::figure_size(1200, 780);
+    plt::title("title xd");
+    plt::xlabel("x hehe");
+    plt::ylabel("y hehe");
+    plt::legend();
+    // plt::xlim(0., 0.7 * n);
+
+    for (usize i = 0; i < n; ++i)
+    {
+      x.push_back(i);
+      y1.push_back(sin(6. * 2. * Constants::Pi / n * i));
+      y2.push_back(cos(6. * 2. * Constants::Pi / n * i));
+
+      plt::plot(x, y1, {{"color", "blue"}, {"linestyle", "--"}, {"label", "y1"}});
+      plt::plot(x, y2, {{"color", "green"}, {"linestyle", "--"}, {"label", "y2"}});
+      plt::show(false); // show the figure instead of saving it
+    }
+
+    // plt::savefig("standard.pdf"); // save the figure
+  }
   if (1) // optimization / metaoptimization
   {
     const i32 N = 2;
