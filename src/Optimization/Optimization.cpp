@@ -1,6 +1,6 @@
 
-#include "Log/Logger.h"
-#include "Log/LogFunction.h"
+#include "Logger/Logger.h"
+#include "Logger/LogFunction.h"
 #include "Plot/Plot2D.h"
 #include "Optimization.h"
 
@@ -96,16 +96,14 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   const cv::Scalar pointColorMin(minVal + pointColorRangeMultiplierMin * (maxVal - minVal));
   const cv::Scalar pointColorMinLog(minValLog + pointColorRangeMultiplierMin * (maxValLog - minValLog));
 
-  const auto GetPoint = [&](const std::vector<f64>& parameters)
-  {
+  const auto GetPoint = [&](const std::vector<f64>& parameters) {
     cv::Point point;
     point.x = (parameters[xParamIndex] - xmin) / (xmax - xmin) * cols;
     point.y = rows - 1 - (parameters[yParamIndex] - ymin) / (ymax - ymin) * rows;
     return point;
   };
 
-  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
-  {
+  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) {
     const cv::Point pointOffset1(size, size);
     const cv::Point pointOffset2(size, -size);
 
@@ -115,14 +113,12 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
 
   const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) { circle(mat, point, size, color, thickness, cv::LINE_AA); };
 
-  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness)
-  {
+  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness) {
     line(mat, point1, point2, color, thickness, cv::LINE_AA);
     // arrowedLine(mat, point1, point2, color, thickness, cv::LINE_AA);
   };
 
-  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
-  {
+  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) {
     DrawPoint(mat, point, color, size, thickness);
     DrawCircle(mat, point, color, 1.9 * size, thickness);
   };

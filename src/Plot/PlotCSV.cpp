@@ -1,4 +1,4 @@
-#include "Log/Logger.h"
+#include "Logger/Logger.h"
 #include "Plot1D.h"
 #include "PlotCSV.h"
 

@@ -16,7 +16,7 @@
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Plot/PlotCSV.h"
 #include "Filtering/HistogramEqualization.h"
-#include "Log/Logger.h"
+#include "Logger/Logger.h"
 #include "Fractal/Fractal.h"
 #include "Astrophysics/DiffrotResults.h"
 #include "Astrophysics/DifferentialRotation.h"

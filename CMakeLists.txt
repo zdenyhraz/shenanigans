@@ -64,7 +64,7 @@ src/Fourier/*.h src/Fourier/*.cpp
 src/Fractal/*.h src/Fractal/*.cpp
 src/InverseMap/*.h src/InverseMap/*.cpp
 src/IPC/*.h src/IPC/*.cpp
-src/Log/*.h src/Log/*.cpp
+src/Logger/*.h src/Logger/*.cpp
 src/Optimization/*.h src/Optimization/*.cpp
 src/Plot/*.h src/Plot/*.cpp
 src/Precompiled/*.h src/Precompiled/*.cpp

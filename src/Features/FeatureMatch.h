@@ -6,8 +6,8 @@
 #include "UtilsCV/Combinepics.h"
 #include "UtilsCV/Showsave.h"
 #include "UtilsCV/Export.h"
-#include "Log/Logger.h"
-#include "Log/LogFunction.h"
+#include "Logger/Logger.h"
+#include "Logger/LogFunction.h"
 #include "Plot/Plot2D.h"
 
 static constexpr i32 piccnt = 9;             // number of pics

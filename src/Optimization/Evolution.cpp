@@ -3,8 +3,8 @@
 #include <fmt/ostream.h>
 
 #include "Plot/Plot.h"
-#include "Log/Logger.h"
-#include "Log/LogFunction.h"
+#include "Logger/Logger.h"
+#include "Logger/LogFunction.h"
 #include "Plot/Plot1D.h"
 #include "Evolution.h"
 

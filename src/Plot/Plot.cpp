@@ -1,4 +1,4 @@
-#include "Log/Logger.h"
+#include "Logger/Logger.h"
 #include "Plot.h"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;

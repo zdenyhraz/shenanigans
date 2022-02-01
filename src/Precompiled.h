@@ -85,8 +85,8 @@ using f128 = long double;
 using usize = size_t;
 namespace json = nlohmann;
 
-#include "Log/Logger.h"
-#include "Log/LogFunction.h"
+#include "Logger/Logger.h"
+#include "Logger/LogFunction.h"
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
 #include "Utils/Constants.h"

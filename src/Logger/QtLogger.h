@@ -58,8 +58,8 @@ private:
 
   struct LogLevelSettings
   {
-    QColor color;
-    std::string name;
+    QColor color = QColor(255, 255, 255);
+    bool italic = false;
   };
 
   static QtLogger& Get()
@@ -93,18 +93,19 @@ private:
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
-    if (not ShouldLog(logLevel)) [[unlikely]]
-      return;
+    if (not ShouldLog(logLevel))
+      [[unlikely]] return;
 
     std::scoped_lock lock(mMutex);
-    const auto& [color, name] = mLogLevelSettings[logLevel];
-    mTextBrowser->setTextColor(color);
+    const auto& settings = mLogLevelSettings[logLevel];
+    mTextBrowser->setTextColor(settings.color);
+    mTextBrowser->setFontItalic(settings.italic);
     mTextBrowser->append(fmt::format("[{}] {}", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...))).c_str());
     QCoreApplication::processEvents();
   }
 
   QTextBrowser* mTextBrowser = nullptr;
   LogLevel mLogLevel = LogLevel::Function;
-  std::unordered_map<LogLevel, LogLevelSettings> mLogLevelSettings;
+  std::map<LogLevel, LogLevelSettings> mLogLevelSettings;
   std::mutex mMutex;
 };

@@ -2,7 +2,7 @@
 #include "Utils/FunctionsBaseSTL.h"
 #include "UtilsCV/FunctionsBaseCV.h"
 #include "Filtering/Filtering.h"
-#include "Log/Logger.h"
+#include "Logger/Logger.h"
 #include "UtilsCV/Showsave.h"
 
 //.fits parameters
@@ -48,11 +48,12 @@ private:
   std::tuple<cv::Mat, FitsParams> loadfits(const std::string& path)
   {
     std::ifstream file(path, std::ios::binary | std::ios::in);
-    if (not file) [[unlikely]]
-    {
-      LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
-      return std::make_tuple(cv::Mat(), FitsParams());
-    }
+    if (not file)
+      [[unlikely]]
+      {
+        LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
+        return std::make_tuple(cv::Mat(), FitsParams());
+      }
     else
     {
       // LOG_DEBUG("<loadfits> Loading file '{}'...", path);
