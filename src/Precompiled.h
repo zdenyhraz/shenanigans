@@ -27,6 +27,12 @@
 #include <stdexcept>
 #include <cstdint>
 
+// OpenMP
+#include <omp.h>
+
+// matplotlib
+#include <matplotlibcpp.h>
+
 // Qt
 #include <QtWidgets>
 #include <QtWidgets/QApplication>
@@ -36,8 +42,8 @@
 #include <QTextBrowser>
 #include <QCoreApplication>
 
-// OpenMP
-#include <omp.h>
+// QCustomPlot
+#include "Plot/qcustomplot.h"
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -48,9 +54,6 @@
 #include <opencv2/xfeatures2d.hpp>
 //#include <opencv2/core/cuda.hpp>
 //#include <opencv2/cudaarithm.hpp>
-
-// QCustomPlot
-#include "Plot/qcustomplot.h"
 
 // fmt
 #include <fmt/format.h>
