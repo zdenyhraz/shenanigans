@@ -144,13 +144,13 @@ public:
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows))
-      [[unlikely]] throw std::runtime_error(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
+      [[unlikely]] throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
     if (image1.size() != image2.size())
-      [[unlikely]] throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+      [[unlikely]] throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
     if (image1.channels() != 1 or image2.channels() != 1)
-      [[unlikely]] throw std::runtime_error("Multichannel images are not supported");
+      [[unlikely]] throw std::invalid_argument("Multichannel images are not supported");
 
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
     ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
