@@ -13,7 +13,7 @@
 <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans">
 </p>
 
-Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm implementations for various applied mathematics / astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, non-convex optimization. With C++ [Qt](https://www.qt.io/) GUI, #uses [C++20](https://en.cppreference.com/w/cpp/20), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
+Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm implementations for various applied mathematics / astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, non-convex optimization. With C++ [Qt](https://www.qt.io/) GUI, #uses [C++20](https://en.cppreference.com/w/cpp/20), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [Matplotlib](https://matplotlib.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
 
 ## Article links
 - 📌 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
