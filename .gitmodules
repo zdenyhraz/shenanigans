@@ -10,3 +10,6 @@
 [submodule "external/scnlib"]
 	path = external/scnlib
 	url = https://github.com/eliaskosunen/scnlib.git
+[submodule "external/matplotlib"]
+	path = external/matplotlib
+	url = https://github.com/lava/matplotlib-cpp.git
