@@ -13,3 +13,6 @@
 [submodule "external/matplotlib"]
 	path = external/matplotlib
 	url = https://github.com/lava/matplotlib-cpp.git
+[submodule "external/flamegraph"]
+	path = external/flamegraph
+	url = https://github.com/brendangregg/FlameGraph.git
