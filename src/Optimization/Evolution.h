@@ -100,7 +100,7 @@ private:
   void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
   void UpdateOutputs(usize generation, const Population& population, ValidationFunction valid);
   TerminationReason CheckTerminationCriterions(const Population& population, usize generation);
-  std::string GetOutputFileString(usize generation, const std::vector<f64>& bestEntity, f64 bestFitness);
+  std::string GetOutputString(usize generation, const Population& population);
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
   static f64 averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& vec2, std::vector<f64>& boundsRange);

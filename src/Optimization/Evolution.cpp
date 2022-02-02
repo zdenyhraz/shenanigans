@@ -402,13 +402,11 @@ void Evolution::UpdateOutputs(usize gen, const Population& population, Validatio
 {
   if (population.bestEntity.fitness < population.previousFitness)
   {
-    const auto message = GetOutputFileString(gen, population.bestEntity.params, population.bestEntity.fitness);
-
     if (mFileOutput)
-      fmt::print(mOutputFile, "{}\n", message);
+      fmt::print(mOutputFile, "{}\n", GetOutputString(gen, population));
 
     if (mConsoleOutput)
-      LOG_DEBUG("{}, diff: {:.2f}% ({:.2e})", message, population.relativeDifference * 100, population.absoluteDifference);
+      LOG_DEBUG(GetOutputString(gen, population));
   }
 
   if (mPlotOutput)
@@ -426,14 +424,14 @@ try
   if (mFileOutput)
   {
     fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
-    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputFileString(generation, population.bestEntity.params, population.bestEntity.fitness));
+    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputString(generation, population));
     mOutputFile.close();
   }
 
   if (mConsoleOutput)
   {
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_SUCCESS("Evolution result: {}", GetOutputFileString(generation, population.bestEntity.params, population.bestEntity.fitness));
+    LOG_SUCCESS("Evolution result: {}", GetOutputString(generation, population));
   }
 }
 catch (const std::exception& e)
@@ -462,15 +460,12 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   return NotTerminated;
 }
 
-std::string Evolution::GetOutputFileString(usize gen, const std::vector<f64>& bestEntity, f64 bestFitness)
+std::string Evolution::GetOutputString(usize gen, const Population& population)
 {
-  std::string value;
-  value += fmt::format("Gen {} ({:.2e}) [", gen, bestFitness);
-
-  for (usize param = 0; param < bestEntity.size(); ++param)
-    value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](bestEntity[param]));
-
-  value += "]";
+  std::string value = fmt::format("Gen {} ({:.2e}) [", gen, population.bestEntity.fitness);
+  for (usize param = 0; param < population.bestEntity.params.size(); ++param)
+    value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](population.bestEntity.params[param]));
+  value += fmt::format("] diff: {:.2f}% ({:.2e})", population.relativeDifference * 100, population.absoluteDifference);
   return value;
 }
 
@@ -487,7 +482,7 @@ const char* Evolution::GetMutationStrategyString(MutationStrategy strategy)
   case BEST2:
     return "BEST2";
   default:
-    throw std::runtime_error("Unknown mutation strategy");
+    return "Unknown";
   }
 }
 
@@ -500,7 +495,7 @@ const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
   case EXP:
     return "EXP";
   default:
-    throw std::runtime_error("Unknown crossover strategy");
+    return "Unknown";
   }
 }
 
