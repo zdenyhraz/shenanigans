@@ -1,6 +1,7 @@
 #pragma once
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Fit/Polyfit.h"
+#include "UtilsCV/ImageCache.h"
 
 class DifferentialRotation
 {
@@ -30,7 +31,7 @@ public:
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, std::optional<std::reference_wrapper<ImageCache>> cache = std::nullopt) const
   try
   {
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
@@ -67,8 +68,8 @@ public:
             continue;
           }
 
-        const auto image1 = cv::imread(path1, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-        const auto image2 = cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+        const auto image1 = cache ? cache->get().Get(path1) : cv::imread(path1, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+        const auto image2 = cache ? cache->get().Get(path2) : cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
         const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
         const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
         const auto theta0 = (header1.theta0 + header2.theta0) / 2;
@@ -136,13 +137,15 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
+    ImageCache cache;
+    cache.SetCapacity(50);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
     const auto thetas = PostProcessData(dataBefore);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
     const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
       DifferentialRotation diffrotopt(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-      auto dataopt = diffrotopt.Calculate<true>(ipcopt, dataPath, idstart);
+      auto dataopt = diffrotopt.Calculate<true>(ipcopt, dataPath, idstart, cache);
       std::ignore = PostProcessData(dataopt);
       const auto omegasx = GetXAverage(dataopt.omegasx);
       const auto omegasxfit = polyfit(thetas, omegasx, 2);
@@ -159,7 +162,7 @@ public:
     ipc.Optimize(obj, popsize);
     SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
 
-    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
     std::ignore = PostProcessData(dataAfter);
 
     Plot1D::Set("Diffrot opt");
