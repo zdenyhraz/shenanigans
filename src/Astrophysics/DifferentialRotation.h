@@ -138,7 +138,7 @@ public:
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     ImageCache cache;
-    cache.SetCapacity(50);
+    cache.Reserve(idstride ? xsizeopt * 2 : xsizeopt + 1);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
     auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
     const auto thetas = PostProcessData(dataBefore);

@@ -31,8 +31,10 @@ public:
 
   void SetCapacity(usize capacity) { mCapacity = capacity; }
 
+  void Reserve(usize capacity) { mData.reserve(capacity); }
+
 private:
-  usize mCapacity = 50;
+  usize mCapacity = 100;
   std::unordered_map<std::string, cv::Mat> mData;
   std::mutex mMutex;
 };
