@@ -274,7 +274,7 @@ private:
   i32 mL2size = 11;
   f64 mL1ratio = 0.35;
   f64 mL1ratioStep = 0.05;
-  i32 mUpsampleCoeff = 51;
+  i32 mUpsampleCoeff = 15;
   i32 mMaxIterations = 20;
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;

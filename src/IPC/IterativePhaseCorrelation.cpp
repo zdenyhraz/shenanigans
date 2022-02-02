@@ -398,9 +398,9 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "UC", "L1R"});
-  evo.mLB = {0, -0.5, 0.0, 0, 0, 11, 0.1};
+  evo.mLB = {0, -0.5, 0.0, 0, 0, 3, 0.1};
   evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 31, 0.8};
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 15, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val)); });

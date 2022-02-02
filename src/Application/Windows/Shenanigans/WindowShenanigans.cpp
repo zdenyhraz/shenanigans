@@ -1025,6 +1025,17 @@ try
     // plt::savefig("standard.pdf"); // save the figure
     */
   }
+  if (1) // ipc perf test
+  {
+    auto ipc = *mWindowData->IPC;
+    const auto img = cv::imread("../test/data/shape.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    const auto crop1 = roicrop(img, img.cols / 2, img.rows / 2, ipc.GetCols(), ipc.GetRows());
+    const auto crop2 = roicrop(img, img.cols / 2 + 1, img.rows / 2 + 1, ipc.GetCols(), ipc.GetRows());
+    usize n = 1000;
+    for (usize i = 0; i < n; ++i)
+      std::ignore = ipc.Calculate(crop1, crop2);
+    return;
+  }
   if (1) // optimization / metaoptimization
   {
     const i32 N = 2;
