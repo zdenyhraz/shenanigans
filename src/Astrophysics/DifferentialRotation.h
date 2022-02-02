@@ -6,8 +6,6 @@
 class DifferentialRotation
 {
 public:
-  using ImageCache = DataCache<std::string, cv::Mat>;
-
   DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
   {
@@ -33,7 +31,7 @@ public:
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, std::optional<std::reference_wrapper<ImageCache>> cache = std::nullopt) const
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
@@ -70,8 +68,8 @@ public:
             continue;
           }
 
-        const auto image1 = cache ? cache->get().Get(path1) : cv::imread(path1, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-        const auto image2 = cache ? cache->get().Get(path2) : cv::imread(path2, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+        const auto image1 = cache.Get(path1);
+        const auto image2 = cache.Get(path2);
         const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
         const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
         const auto theta0 = (header1.theta0 + header2.theta0) / 2;
@@ -139,15 +137,13 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    ImageCache cache([](const std::string& path) { return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH); });
-    cache.Reserve(idstride ? xsizeopt * 2 : xsizeopt + 1);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
+    diffrot.cache.Reserve(idstride ? xsizeopt * 2 : xsizeopt + 1);
+    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto thetas = PostProcessData(dataBefore);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
     const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
-      DifferentialRotation diffrotopt(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-      auto dataopt = diffrotopt.Calculate<true>(ipcopt, dataPath, idstart, cache);
+      auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
       std::ignore = PostProcessData(dataopt);
       const auto omegasx = GetXAverage(dataopt.omegasx);
       const auto omegasxfit = polyfit(thetas, omegasx, 2);
@@ -164,7 +160,7 @@ public:
     ipc.Optimize(obj, popsize);
     SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
 
-    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
+    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
     std::ignore = PostProcessData(dataAfter);
 
     Plot1D::Set("Diffrot opt");
@@ -596,6 +592,7 @@ private:
     return data;
   }
 
+  mutable DataCache<std::string, cv::Mat> cache{[](const std::string& path) { return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH); }};
   i32 xsize = 2500;
   i32 ysize = 851;
   i32 idstep = 1;
