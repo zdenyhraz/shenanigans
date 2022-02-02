@@ -1025,7 +1025,7 @@ try
     // plt::savefig("standard.pdf"); // save the figure
     */
   }
-  if (1) // ipc perf test
+  if (0) // ipc perf test
   {
     auto ipc = *mWindowData->IPC;
     const auto img = cv::imread("../test/data/shape.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
@@ -1034,7 +1034,6 @@ try
     usize n = 1000;
     for (usize i = 0; i < n; ++i)
       std::ignore = ipc.Calculate(crop1, crop2);
-    return;
   }
   if (1) // optimization / metaoptimization
   {
