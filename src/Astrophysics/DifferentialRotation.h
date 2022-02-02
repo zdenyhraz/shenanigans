@@ -1,11 +1,13 @@
 #pragma once
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Fit/Polyfit.h"
-#include "UtilsCV/ImageCache.h"
+#include "Utils/DataCache.h"
 
 class DifferentialRotation
 {
 public:
+  using ImageCache = DataCache<std::string, cv::Mat>;
+
   DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
   {
@@ -137,7 +139,7 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    ImageCache cache;
+    ImageCache cache([](const std::string& path) { return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH); });
     cache.Reserve(idstride ? xsizeopt * 2 : xsizeopt + 1);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
     auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart, cache);
