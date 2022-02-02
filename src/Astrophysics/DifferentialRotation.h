@@ -1,6 +1,7 @@
 #pragma once
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Fit/Polyfit.h"
+#include "Fit/Trigfit.h"
 #include "Utils/DataCache.h"
 
 class DifferentialRotation
@@ -9,7 +10,7 @@ public:
   DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
   {
-    if (idstride)
+    if (idstride > 0)
     {
       // images are not reused with non-zero stride
       imageCache.SetCapacity(0);
@@ -144,7 +145,7 @@ public:
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    const usize ids = idstride ? xsizeopt * 2 : xsizeopt + 1;
+    const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
 
@@ -175,11 +176,11 @@ public:
     Plot1D::Set("Diffrot opt");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "avgomega x opt", "avgomega x opt fit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetYnames({"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(
-        Constants::Rad * thetas, {GetXAverage(dataBefore.omegasx), polyfit(thetas, GetXAverage(dataBefore.omegasx), 2), GetXAverage(dataAfter.omegasx),
-                                     polyfit(thetas, GetXAverage(dataAfter.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+        Constants::Rad * thetas, {GetXAverage(dataBefore.omegasx), GetXAverage(dataAfter.omegasx), polyfit(thetas, GetXAverage(dataAfter.omegasx), 2),
+                                     sin2sin4fit(thetas, GetXAverage(dataAfter.omegasx)), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
   }
 
   static std::vector<f64> PostProcessData(DifferentialRotationData& data)
@@ -455,8 +456,8 @@ private:
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average shift x [px]");
     Plot1D::SetY2label("average shift y [px]");
-    Plot1D::SetYnames({"avgshift x"});
-    Plot1D::SetY2names({"avgshift y"});
+    Plot1D::SetYnames({"ipc x"});
+    Plot1D::SetY2names({"ipc y"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.shiftsx)}, {GetXAverage(data.shiftsy)});
 
@@ -464,10 +465,10 @@ private:
     Plot1D::Set("avgomegasx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"avgomega x", "avgomega x fit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetYnames({"ipc", "ipc polyfit", "ipc trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * thetas,
-        {GetXAverage(data.omegasx), polyfit(thetas, GetXAverage(data.omegasx), 2), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.omegasx), polyfit(thetas, GetXAverage(data.omegasx), 2), sin2sin4fit(thetas, GetXAverage(data.omegasx)),
+                                              GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
 
     // shifts x
     Plot2D::Set("shiftsx");
