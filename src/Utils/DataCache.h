@@ -43,6 +43,7 @@ public:
   {
     std::scoped_lock lock(mMutex);
     mData.reserve(capacity);
+    mCapacity = std::max(mCapacity, capacity);
   }
 
 private:

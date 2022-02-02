@@ -9,6 +9,12 @@ public:
   DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
   {
+    if (idstride)
+    {
+      // images are not reused with non-zero stride
+      imageCache.SetCapacity(0);
+      headerCache.SetCapacity(0);
+    }
   }
 
   struct DifferentialRotationData
@@ -201,29 +207,40 @@ public:
   {
     const auto imagegrs = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
     const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
-    const auto R = header.R;                                                                                                        // [px]
-    const auto theta0 = header.theta0;                                                                                              // [rad]
-    const auto fxcenter = header.xcenter;                                                                                           // [px]
-    const auto fycenter = header.ycenter;                                                                                           // [px]
-    const auto omegasx = data.omegasx.cols >= 500 ? GetXAverage(data.omegasx) : GetPredictedOmegas(thetas, 14.296, -1.847, -2.615); // [deg/day]
-    std::vector<cv::Point2d> mcpts(thetas.size());                                                                                  // [px,px]
+    const auto R = header.R;                                               // [px]
+    const auto theta0 = header.theta0;                                     // [rad]
+    const auto fxcenter = header.xcenter;                                  // [px]
+    const auto fycenter = header.ycenter;                                  // [px]
+    const auto omegasx = GetXAverage(data.omegasx);                        // [deg/day]
+    const auto predx = GetPredictedOmegas(thetas, 14.296, -1.847, -2.615); // [deg/day]
+    std::vector<cv::Point2d> mcpts(thetas.size());                         // [px,px]
+    std::vector<cv::Point2d> mcptspred(thetas.size());                     // [px,px]
 
     for (usize y = 0; y < thetas.size(); ++y)
     {
       const f64 mcx = fxcenter + R * std::cos(thetas[y]) * std::sin(omegasx[y] * timestep / Constants::Rad);
       const f64 mcy = fycenter - R * std::sin(thetas[y] - theta0);
       mcpts[y] = cv::Point2d(mcx, mcy);
+
+      const f64 mcxpred = fxcenter + R * std::cos(thetas[y]) * std::sin(predx[y] * timestep / Constants::Rad);
+      const f64 mcypred = fycenter - R * std::sin(thetas[y] - theta0);
+      mcptspred[y] = cv::Point2d(mcxpred, mcypred);
     }
 
     cv::Mat image;
     cv::cvtColor(imagegrs, image, cv::COLOR_GRAY2RGB);
     const auto thickness = 13;
-    const auto color = 65535. / 255 * cv::Scalar(0., 255., 255.);
+    const auto color = 65535. / 255 * cv::Scalar(50., 205., 50.);
+    const auto colorpred = 65535. / 255 * cv::Scalar(255., 0, 255.);
     for (usize y = 0; y < mcpts.size() - 1; ++y)
     {
       const auto pt1 = mcpts[y];
       const auto pt2 = mcpts[y + 1];
       cv::line(image, pt1, pt2, color, thickness, cv::LINE_AA);
+
+      const auto pt1pred = mcptspred[y];
+      const auto pt2pred = mcptspred[y + 1];
+      cv::line(image, pt1pred, pt2pred, colorpred, thickness, cv::LINE_AA);
     }
 
     showimg(image, "meridian curve", false, 0, 1, 1200);
@@ -232,10 +249,10 @@ public:
     Plot1D::Set("meridian curve omegasx");
     Plot1D::SetXlabel("latitude [deg]");
     Plot1D::SetYlabel("omega x [deg/day]");
-    Plot1D::SetYnames({"Derek A. Lamb (2017)", "Howard et al. (1983)"});
+    Plot1D::SetYnames({"ipc", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::SetSavePath(fmt::format("{}/meridian_curve_omega.png", dataPath));
-    Plot1D::Plot(Constants::Rad * thetas, {GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
+    Plot1D::Plot(Constants::Rad * thetas, {GetXAverage(data.omegasx), GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
   }
 
 private:
