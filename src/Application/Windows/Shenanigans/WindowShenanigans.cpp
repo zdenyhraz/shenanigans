@@ -997,6 +997,7 @@ try
   }
   if (0) // matplotlib
   {
+    /*
     usize n = 1000;
     std::vector<f64> x, y1, y2;
     x.reserve(n);
@@ -1022,6 +1023,7 @@ try
     }
 
     // plt::savefig("standard.pdf"); // save the figure
+    */
   }
   if (1) // optimization / metaoptimization
   {

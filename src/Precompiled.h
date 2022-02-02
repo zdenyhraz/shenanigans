@@ -31,8 +31,8 @@
 #include <omp.h>
 
 // matplotlib
-#include <matplotlibcpp.h>
-namespace plt = matplotlibcpp;
+//#include <matplotlibcpp.h>
+// namespace plt = matplotlibcpp;
 
 // Qt
 #include <QtWidgets>
