@@ -155,8 +155,8 @@ public:
       f64 ret = 0;
       for (usize i = 0; i < omegasxfit.size(); ++i)
       {
-        ret += 0.75 * std::pow(omegasxfit[i] - predfit[i], 2); // pred fit diff
-        ret += 0.25 * std::pow(omegasx[i] - omegasxfit[i], 2); // variance
+        ret += 0.75 * std::pow(omegasxfit[i] - predfit[i], 2); // minimize pred fit diff
+        ret += 0.25 * std::pow(omegasx[i] - omegasxfit[i], 2); // minimize variance
       }
       return ret / omegasxfit.size();
     };
