@@ -70,18 +70,6 @@ inline auto zerovect2(i32 N, i32 M, T value = 0.)
   return std::vector<std::vector<T>>(N, zerovect(M, value));
 }
 
-template <typename T = f64>
-inline auto zerovect3(i32 N, i32 M, i32 O, T value = 0.)
-{
-  return std::vector<std::vector<std::vector<T>>>(N, zerovect2(M, O, value));
-}
-
-template <typename T = f64>
-inline auto zerovect4(i32 N, i32 M, i32 O, i32 P, T value = 0.)
-{
-  return std::vector<std::vector<std::vector<std::vector<T>>>>(N, zerovect3(M, O, P, value));
-}
-
 template <typename T>
 inline std::string to_string(const std::vector<T>& vec)
 {
