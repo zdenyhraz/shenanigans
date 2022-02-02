@@ -33,8 +33,8 @@ add_subdirectory(external/json)
 include_directories("external/json/include")
 
 # matplotlib
-find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
-include_directories("external/matplotlib")
+# find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+# include_directories("external/matplotlib")
 
 # opencv
 find_package(OpenCV REQUIRED PATHS E:\\Repos\\opencv-4.5.5\\build\\install)
