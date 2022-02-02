@@ -68,10 +68,10 @@ public:
             continue;
           }
 
-        const auto image1 = cache.Get(path1);
-        const auto image2 = cache.Get(path2);
-        const auto header1 = GetHeader(fmt::format("{}/{}.json", dataPath, id1));
-        const auto header2 = GetHeader(fmt::format("{}/{}.json", dataPath, id2));
+        const auto image1 = imageCache.Get(path1);
+        const auto image2 = imageCache.Get(path2);
+        const auto header1 = headerCache.Get(fmt::format("{}/{}.json", dataPath, id1));
+        const auto header2 = headerCache.Get(fmt::format("{}/{}.json", dataPath, id2));
         const auto theta0 = (header1.theta0 + header2.theta0) / 2;
         const auto R = (header1.R + header2.R) / 2;
         const auto xindex = xsize - 1 - x;
@@ -138,7 +138,10 @@ public:
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
-    diffrot.cache.Reserve(idstride ? xsizeopt * 2 : xsizeopt + 1);
+    const usize ids = idstride ? xsizeopt * 2 : xsizeopt + 1;
+    diffrot.imageCache.Reserve(ids);
+    diffrot.headerCache.Reserve(ids);
+
     auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto thetas = PostProcessData(dataBefore);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(thetas, 14.296, -1.847, -2.615), GetPredictedOmegas(thetas, 14.192, -1.70, -2.36)});
@@ -592,7 +595,8 @@ private:
     return data;
   }
 
-  mutable DataCache<std::string, cv::Mat> cache{[](const std::string& path) { return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH); }};
+  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) { return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH); }};
+  mutable DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
   i32 xsize = 2500;
   i32 ysize = 851;
   i32 idstep = 1;
