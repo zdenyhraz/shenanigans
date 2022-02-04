@@ -115,6 +115,7 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1cir
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
 try
 {
+  OPTICK_EVENT();
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
   ApplyWindow<false>(img1W);
@@ -174,6 +175,7 @@ catch (const std::exception& e)
 std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation::CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, f32 resolution) const
 try
 {
+  OPTICK_EVENT();
   if (image1.size() != image2.size())
     throw std::runtime_error(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
@@ -213,6 +215,7 @@ catch (const std::exception& e)
 
 cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const cv::Mat& img2)
 {
+  OPTICK_EVENT();
   const cv::Vec3f img1clr = {1, 0.5, 0};
   const cv::Vec3f img2clr = {0, 0.5, 1};
 
@@ -252,6 +255,7 @@ cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const c
 
 std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::LoadImages");
   LOG_INFO("Loading images from '{}'...", imagesDirectory);
 
@@ -281,6 +285,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
 
 std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::CreateImagePairs");
 
   if (maxShift <= 0)
@@ -334,6 +339,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
 
 void IterativePhaseCorrelation::AddNoise(cv::Mat& image, f64 noiseStdev)
 {
+  OPTICK_EVENT();
   if (noiseStdev <= 0)
     return;
 
@@ -344,6 +350,7 @@ void IterativePhaseCorrelation::AddNoise(cv::Mat& image, f64 noiseStdev)
 
 IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const std::vector<f64>& params) const
 {
+  OPTICK_EVENT();
   IterativePhaseCorrelation ipc(mRows, mCols);
   ipc.SetBandpassType(static_cast<BandpassType>((i32)params[BandpassTypeParameter]));
   ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
@@ -356,6 +363,7 @@ IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const s
 
 std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
   return [&](const std::vector<f64>& params) {
     const auto ipc = CreateIPCFromParams(params);
@@ -375,6 +383,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObj
 
 std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::CreateObjectiveFunction");
   return [&](const std::vector<f64>& params) {
     const auto ipc = CreateIPCFromParams(params);
@@ -389,6 +398,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObj
 std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
     const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::CalculateOptimalParameters");
 
   if (populationSize < 4)
@@ -415,6 +425,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
 
 void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::ApplyOptimalParameters");
 
   if (optimalParameters.size() < OptimizedParameterCount)
@@ -482,6 +493,7 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
 void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
     const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::ShowOptimizationPlots");
 
   std::vector<f64> shiftsXReference, shiftsXReferenceError;
@@ -538,6 +550,7 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
+  OPTICK_EVENT();
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
@@ -549,6 +562,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
+  OPTICK_EVENT();
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
@@ -560,6 +574,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation::GetNonIterativeShifts(const 
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
+  OPTICK_EVENT();
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
@@ -571,6 +586,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation::GetPixelShifts(const std::ve
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
+  OPTICK_EVENT();
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
@@ -582,6 +598,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation::GetReferenceShifts(const std
 
 f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts)
 {
+  OPTICK_EVENT();
   if (shiftsReference.size() != shifts.size())
     throw std::runtime_error("Reference shift vector has different size than calculated shift vector");
 
@@ -596,6 +613,7 @@ f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2d>
 
 void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::ShowRandomImagePair");
 
   const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(rand01() * imagePairs.size())];
@@ -615,6 +633,7 @@ void IterativePhaseCorrelation::Optimize(
     const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, f64 validationRatio, i32 populationSize)
 try
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", mCols, mRows);
 
@@ -661,6 +680,7 @@ catch (const std::exception& e)
 void IterativePhaseCorrelation::Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
 try
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::Optimize");
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", mCols, mRows);
 
@@ -683,6 +703,7 @@ catch (const std::exception& e)
 
 void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("IterativePhaseCorrelation::PlotObjectiveFunctionLandscape");
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);

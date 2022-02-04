@@ -19,6 +19,7 @@ Plot1D& Plot1D::GetPlot(const std::string& mName)
 
 void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
 {
+  OPTICK_EVENT();
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
@@ -58,6 +59,7 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
 
 void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
 {
+  OPTICK_EVENT();
   int y1cnt = y1s.size();
   int y2cnt = y2s.size();
   int ycnt = y1cnt + y2cnt;
@@ -99,6 +101,7 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
 
 void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
 {
+  OPTICK_EVENT();
   auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {

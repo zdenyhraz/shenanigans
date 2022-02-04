@@ -20,6 +20,7 @@ Plot2D& Plot2D::GetPlot(const std::string& mName)
 
 void Plot2D::PlotCore(const cv::Mat& z)
 {
+  OPTICK_EVENT();
   std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
 
   if (z.depth() != CV_32F)
@@ -42,6 +43,7 @@ void Plot2D::PlotCore(const cv::Mat& z)
 
 void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
 {
+  OPTICK_EVENT();
   Initialize(z[0].size(), z.size());
   auto& windowPlot = Plot::plots[mName];
   windowPlot->colorMap->data()->setSize(z[0].size(), z.size());
@@ -67,6 +69,7 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
 
 void Plot2D::Initialize(int xcnt, int ycnt)
 {
+  OPTICK_EVENT();
   auto idx = Plot::plots.find(mName);
   if (idx != Plot::plots.end())
   {

@@ -444,7 +444,6 @@ private:
   template <bool Circular>
   cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
   {
-    OPTICK_EVENT();
     if constexpr (Circular)
     {
       cv::Moments m = cv::moments(mat.mul(L1circle));
@@ -493,11 +492,7 @@ private:
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size)
-  {
-    OPTICK_EVENT();
-    return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size);
-  }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {

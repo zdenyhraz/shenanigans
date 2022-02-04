@@ -15,6 +15,7 @@ Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorit
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 try
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
   {
     LOG_FUNCTION("Evolution optimization");
@@ -37,6 +38,7 @@ try
   {
     while (termReason == NotTerminated)
     {
+      OPTICK_EVENT("Evolution generation");
       gen++;
 #pragma omp parallel for
       for (usize eid = 0; eid < mNP; ++eid)
@@ -106,6 +108,7 @@ catch (...)
 
 void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, usize runsPerObj, usize maxFunEvals, f64 optimalFitness)
 {
+  OPTICK_EVENT();
   LOG_FUNCTION("Evolution metaoptimization");
 
   enum MetaParameter : u8
@@ -277,6 +280,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
 void Evolution::InitializeOutputs(ValidationFunction valid)
 try
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Output initialization");
 
@@ -310,6 +314,7 @@ catch (const std::exception& e)
 void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 try
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Objective function normality check");
 
@@ -346,6 +351,7 @@ catch (const std::exception& e)
 void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
 try
 {
+  OPTICK_EVENT();
   if (!valid)
     return;
 
@@ -378,6 +384,7 @@ catch (const std::exception& e)
 
 void Evolution::CheckBounds()
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Objective function parameter bounds check");
 
@@ -391,6 +398,7 @@ void Evolution::CheckBounds()
 
 void Evolution::CheckParameters()
 {
+  OPTICK_EVENT();
   if (mMutStrat == MutationStrategyCount)
     throw std::runtime_error("Invalid mutation strategy");
 
@@ -400,6 +408,7 @@ void Evolution::CheckParameters()
 
 void Evolution::UpdateOutputs(usize gen, const Population& population, ValidationFunction valid)
 {
+  OPTICK_EVENT();
   if (population.bestEntity.fitness < population.previousFitness)
   {
     if (mFileOutput)
@@ -421,6 +430,7 @@ void Evolution::UpdateOutputs(usize gen, const Population& population, Validatio
 void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason, usize generation)
 try
 {
+  OPTICK_EVENT();
   if (mFileOutput)
   {
     fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
@@ -462,6 +472,7 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
 
 std::string Evolution::GetOutputString(usize gen, const Population& population)
 {
+  OPTICK_EVENT();
   std::string value = fmt::format("Gen {} ({:.2e}) [", gen, population.bestEntity.fitness);
   for (usize param = 0; param < population.bestEntity.params.size(); ++param)
     value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](population.bestEntity.params[param]));
@@ -519,6 +530,7 @@ usize Evolution::GetNumberOfParents()
 Evolution::Population::Population(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents, bool consoleOutput, bool saveProgress)
 try
 {
+  OPTICK_EVENT();
   functionEvaluations = 0;
   relativeDifferenceGenerationsOverThreshold = 0;
   mConsoleOutput = consoleOutput;
@@ -542,16 +554,19 @@ catch (const std::exception& e)
 
 void Evolution::Population::UpdateDistinctParents(usize eid)
 {
+  OPTICK_EVENT();
   offspring[eid].UpdateDistinctParents(eid, entities.size());
 }
 
 void Evolution::Population::UpdateCrossoverParameters(usize eid, CrossoverStrategy crossoverStrategy, f64 CR)
 {
+  OPTICK_EVENT();
   offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR);
 }
 
 void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB)
 {
+  OPTICK_EVENT();
   auto& newoffspring = offspring[eid];
   newoffspring.params = entities[eid].params;
   for (usize pid = 0; pid < newoffspring.params.size(); pid++)
@@ -608,6 +623,7 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
 
 void Evolution::Population::PerformSelection()
 {
+  OPTICK_EVENT();
   for (usize eid = 0; eid < entities.size(); ++eid)
   {
     if (offspring[eid].fitness <= entities[eid].fitness)
@@ -620,6 +636,7 @@ void Evolution::Population::PerformSelection()
 
 void Evolution::Population::UpdateBestEntity()
 {
+  OPTICK_EVENT();
   averageFitness = 0;
   previousFitness = bestEntity.fitness;
   for (usize eid = 0; eid < entities.size(); ++eid)
@@ -633,6 +650,7 @@ void Evolution::Population::UpdateBestEntity()
 
 void Evolution::Population::UpdateTerminationCriterions(f64 relativeDifferenceThreshold)
 {
+  OPTICK_EVENT();
   absoluteDifference = averageFitness - bestEntity.fitness;
   relativeDifference = bestEntity.fitness / averageFitness;
 
@@ -644,6 +662,7 @@ void Evolution::Population::UpdateTerminationCriterions(f64 relativeDifferenceTh
 
 void Evolution::Population::UpdateProgress()
 {
+  OPTICK_EVENT();
   if (!mSaveProgress)
     return;
 
@@ -653,6 +672,7 @@ void Evolution::Population::UpdateProgress()
 
 void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB)
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Population initialization");
   entities = zerovect(NP, Entity(N));
@@ -709,6 +729,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
 
 void Evolution::Population::InitializeOffspring(usize nParents)
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Offspring initialization");
   offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
@@ -721,6 +742,7 @@ void Evolution::Population::InitializeOffspring(usize nParents)
 
 void Evolution::Population::InitializeBestEntity()
 {
+  OPTICK_EVENT();
   if (mConsoleOutput)
     LOG_FUNCTION("Best entity search");
   bestEntity = Entity(entities[0].params.size());
@@ -743,6 +765,7 @@ Evolution::Offspring::Offspring(usize N, usize nParents)
 
 void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
 {
+  OPTICK_EVENT();
   for (auto& idx : parentIndices)
   {
     usize idxTst = rand() % NP;
@@ -754,6 +777,7 @@ void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
 
 void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, f64 CR)
 {
+  OPTICK_EVENT();
   crossoverParameters = zerovect(params.size(), false);
 
   switch (crossoverStrategy)
@@ -792,6 +816,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
 
 f64 Evolution::averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& vec2, std::vector<f64>& boundsRange)
 {
+  OPTICK_EVENT();
   f64 result = 0;
   for (usize i = 0; i < vec1.size(); i++)
     result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // normalize -> 0 to 1
@@ -802,6 +827,7 @@ f64 Evolution::averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& v
 
 bool Evolution::isDistinct(usize inpindex, std::vector<usize>& indices, usize currindex)
 {
+  OPTICK_EVENT();
   bool isdist = true;
   for (auto& idx : indices)
   {

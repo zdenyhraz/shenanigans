@@ -7,6 +7,7 @@ public:
 
   const Value Get(const Key& key)
   {
+    OPTICK_EVENT();
     std::scoped_lock lock(mMutex);
 
     if (mData.contains(key))
@@ -41,6 +42,7 @@ public:
 
   void Reserve(usize capacity)
   {
+    OPTICK_EVENT();
     std::scoped_lock lock(mMutex);
     mData.reserve(capacity);
     mCapacity = std::max(mCapacity, capacity);
