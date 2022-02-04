@@ -19,3 +19,4 @@
 [submodule "external/optick"]
 	path = external/optick
 	url = https://github.com/bombomby/optick.git
+	ignore = dirty
