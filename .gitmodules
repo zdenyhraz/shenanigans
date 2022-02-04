@@ -16,3 +16,6 @@
 [submodule "external/flamegraph"]
 	path = external/flamegraph
 	url = https://github.com/brendangregg/FlameGraph.git
+[submodule "external/optick"]
+	path = external/optick
+	url = https://github.com/bombomby/optick.git

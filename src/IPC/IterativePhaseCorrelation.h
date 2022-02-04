@@ -135,12 +135,14 @@ public:
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
+    OPTICK_EVENT();
     return Calculate<DebugMode, CrossCorrelation, AccuracyT>(image1.clone(), image2.clone());
   }
 
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows))
@@ -207,6 +209,7 @@ public:
     cv::Mat L1circle = mL1circle.clone();
     while (L1ratio > 0)
     {
+      OPTICK_EVENT("IterativeRefinement");
       LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::IterativeRefinement");
 
       // reset L2U peak position
@@ -224,6 +227,7 @@ public:
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
+        OPTICK_EVENT("IterativeRefinementIteration");
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           [[unlikely]] break;
 
@@ -360,6 +364,7 @@ private:
   template <bool DebugMode, bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
     if (image.type() != CV_32F)
@@ -371,6 +376,7 @@ private:
   template <bool DebugMode>
   void ApplyWindow(cv::Mat& image) const
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
     if (mWindowType != WindowType::None)
@@ -379,12 +385,14 @@ private:
   template <bool DebugMode>
   static cv::Mat CalculateFourierTransform(cv::Mat&& image)
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateFourierTransform");
     return Fourier::fft(std::move(image));
   }
   template <bool DebugMode, bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
 
     for (i32 row = 0; row < dft1.rows; ++row)
@@ -418,6 +426,7 @@ private:
   template <bool DebugMode>
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL3");
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
@@ -426,6 +435,7 @@ private:
   template <bool DebugMode>
   static cv::Point2d GetPeak(const cv::Mat& mat)
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak(0, 0);
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
@@ -434,54 +444,29 @@ private:
   template <bool Circular>
   cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
   {
-    f64 M = 0;
-    f64 My = 0;
-    f64 Mx = 0;
-
+    OPTICK_EVENT();
     if constexpr (Circular)
     {
-      for (i32 r = 0; r < mat.rows; ++r)
-      {
-        auto matp = mat.ptr<f32>(r);
-        auto circp = L1circle.ptr<f32>(r);
-        for (i32 c = 0; c < mat.cols; ++c)
-        {
-          M += matp[c] * circp[c];
-          My += matp[c] * circp[c] * r;
-          Mx += matp[c] * circp[c] * c;
-        }
-      }
+      cv::Moments m = cv::moments(mat.mul(L1circle));
+      return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
     }
     else
     {
-      for (i32 r = 0; r < mat.rows; ++r)
-      {
-        auto matp = mat.ptr<f32>(r);
-        for (i32 c = 0; c < mat.cols; ++c)
-        {
-          M += matp[c];
-          My += matp[c] * r;
-          Mx += matp[c] * c;
-        }
-      }
+      cv::Moments m = cv::moments(mat);
+      return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
     }
-
-    cv::Point2d result(Mx / M, My / M);
-
-    if (result.x < 0 or result.y < 0 or result.x >= mat.cols or result.y >= mat.rows)
-      [[unlikely]] return cv::Point2d(mat.cols / 2, mat.rows / 2);
-
-    return result;
   }
   template <bool DebugMode>
   static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, i32 L2size)
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
     return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
   }
   template <bool DebugMode>
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
+    OPTICK_EVENT();
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2U");
 
     cv::Mat L2U;
@@ -508,7 +493,11 @@ private:
     L1size = L1size % 2 ? L1size : L1size + 1;
     return L1size;
   }
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size)
+  {
+    OPTICK_EVENT();
+    return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size);
+  }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {
@@ -534,6 +523,7 @@ private:
   template <bool DebugMode>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
+    OPTICK_EVENT();
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<DebugMode>(L2size))
         return L3peak - L3mid;

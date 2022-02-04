@@ -70,6 +70,9 @@
 // json
 #include <nlohmann/json.hpp>
 
+// optick
+#include <optick.h>
+
 // custom
 using i8 = int8_t;
 using u8 = uint8_t;

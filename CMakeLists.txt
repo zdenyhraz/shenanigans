@@ -32,6 +32,9 @@ include(GoogleTest)
 add_subdirectory(external/json)
 include_directories("external/json/include")
 
+# optick
+include_directories("external/optick/src")
+
 # matplotlib
 # find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
 # include_directories("external/matplotlib")
@@ -73,16 +76,17 @@ src/Sasko/*.h src/Sasko/*.cpp
 src/Snake/*.h src/Snake/*.cpp
 src/Utils/*.h src/Utils/*.cpp
 )
+file(GLOB_RECURSE SRC_EXTERNAL CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
 file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp )
 file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
 
 # shenanigans
-add_executable(shenanigans ${SRC} ${SRC_APP})
+add_executable(shenanigans ${SRC} ${SRC_EXTERNAL} ${SRC_APP} )
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json) # Python3::Python Python3::Module Python3::NumPy
 target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
 
 # shenanigans_test
-add_executable(shenanigans_test ${SRC} ${SRC_TEST})
+add_executable(shenanigans_test ${SRC} ${SRC_EXTERNAL} ${SRC_TEST})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock) # Python3::Python Python3::Module Python3::NumPy
 target_precompile_headers(shenanigans_test PRIVATE src/Precompiled.h)
 gtest_discover_tests(shenanigans_test)
