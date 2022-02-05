@@ -6,12 +6,12 @@ set(CMAKE_CXX_STANDARD 20)
 
 # compiler
 if (MSVC)
-  add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp) # optimizations
-  add_compile_options(/Wall /WX) # warnings
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp") # optimizations
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX") # warnings
 else ()
-  add_compile_options(-march=native -fopenmp) # optimizations
-  add_compile_options(-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow) # warnings
-  add_compile_options(-Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes) # excluded warnings
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
 endif()
 
 # ignore warnings from external sources

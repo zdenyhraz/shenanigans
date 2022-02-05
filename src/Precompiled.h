@@ -91,12 +91,12 @@ namespace json = nlohmann;
     // use FrameMark for frames (at the end of each frame)
     // use ZoneScoped once per scope (automatic name)
     // use ZoneScopedN once per scope (user-supplied name)
-    // use ZoneNamed for scopes inside ZoneScoped scope (user-supplied name)
+    // use ZoneNamedN for scopes inside ZoneScoped scope (user-supplied name)
     // bool parameter of ZoneNamed can turn it on/off
     #define PROFILE_APP(name)
     #define PROFILE_FRAME FrameMark
     #define PROFILE_FUNCTION ZoneScoped
-    #define PROFILE_SCOPE(name) ZoneNamed(name, true)
+    #define PROFILE_SCOPE(name) ZoneNamedN(name, #name, true)
   #else
     #include <optick.h>
     #define PROFILE_APP(name) OPTICK_APP(name)
@@ -106,7 +106,9 @@ namespace json = nlohmann;
   #endif
 #else
   #define PROFILE_APP(name)
-  #define PROFILE_EVENT(name)
+  #define PROFILE_FRAME
+  #define PROFILE_FUNCTION
+  #define PROFILE_SCOPE(name)
 #endif
 
 #include "Logger/Logger.h"
