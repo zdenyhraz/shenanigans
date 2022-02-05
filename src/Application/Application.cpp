@@ -3,7 +3,7 @@
 int main(int argc, char** argv)
 try
 {
-  OPTICK_APP("Shenanigans");
+  PROFILE_APP("Shenanigans");
   srand(time(0));
   qputenv("QT_SCALE_FACTOR", "2.0");
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

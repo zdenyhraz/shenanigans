@@ -10,7 +10,7 @@ public:
   DifferentialRotation(i32 xsize_ = 2500, i32 ysize_ = 851, i32 idstep_ = 1, i32 idstride_ = 25, i32 yfov_ = 3400, i32 cadence_ = 45)
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), yfov(yfov_), cadence(cadence_)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     if (idstride > 0)
     {
       // images are not reused with non-zero stride
@@ -23,7 +23,7 @@ public:
   {
     DifferentialRotationData(i32 xsize, i32 ysize)
     {
-      OPTICK_EVENT();
+      PROFILE_EVENT();
       thetas = cv::Mat::zeros(ysize, xsize, CV_32F);
       shiftsx = cv::Mat::zeros(ysize, xsize, CV_32F);
       shiftsy = cv::Mat::zeros(ysize, xsize, CV_32F);
@@ -43,7 +43,7 @@ public:
   DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   try
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
     DifferentialRotationData data(xsize, ysize);
     std::atomic<i32> progress = -1;
@@ -136,7 +136,7 @@ public:
   void LoadAndShow(const std::string& path, const std::string& dataPath, i32 idstart)
   try
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION("DifferentialRotation::LoadAndShow");
     auto data = Load(path);
     Plot(data, dataPath, idstart);
@@ -148,7 +148,7 @@ public:
 
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, yfov, cadence);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
     diffrot.imageCache.Reserve(ids);
@@ -190,7 +190,7 @@ public:
 
   static std::vector<f64> PostProcessData(DifferentialRotationData& data)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     const auto thetas = GetInterpolatedThetas(data.thetas);
 
     // apply median blur
@@ -212,7 +212,7 @@ public:
 
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::vector<f64>& thetas, const std::string& dataPath, i32 idstart, f64 timestep)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     const auto imagegrs = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
     const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
     const auto R = header.R;                                               // [px]
@@ -274,7 +274,7 @@ private:
 
   static ImageHeader GetHeader(const std::string& path)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     std::ifstream file(path);
     json::json j;
     file >> j;
@@ -289,7 +289,7 @@ private:
 
   std::vector<std::pair<i32, i32>> GenerateIds(i32 idstart) const
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     std::vector<std::pair<i32, i32>> ids(xsize);
     i32 id = idstart;
     for (i32 x = 0; x < xsize; ++x)
@@ -302,7 +302,7 @@ private:
 
   static void FixMissingData(DifferentialRotationData& data)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     // fix missing data by interpolation
     for (i32 x = 0; x < data.thetas.cols; ++x)
     {
@@ -337,7 +337,7 @@ private:
 
   static std::vector<f64> GetInterpolatedThetas(const cv::Mat& thetas)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     f64 ithetamin = -std::numeric_limits<f64>::infinity(); // highest S latitude
     f64 ithetamax = std::numeric_limits<f64>::infinity();  // lowest N latitude
     for (i32 x = 0; x < thetas.cols; ++x)
@@ -385,7 +385,7 @@ private:
 
   static void Interpolate(cv::Mat& vals, const cv::Mat& thetas, const std::vector<f64>& ithetas, cv::Mat& temp)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     for (i32 x = 0; x < vals.cols; ++x)
     {
       for (i32 y = 0; y < vals.rows; ++y)
@@ -406,7 +406,7 @@ private:
 
   static std::vector<f64> GetXAverage(const cv::Mat& vals)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     std::vector<f64> avgs(vals.rows, 0.);
 
     for (i32 y = 0; y < vals.rows; ++y)
@@ -421,7 +421,7 @@ private:
 
   static std::vector<f64> GetVectorAverage(const std::vector<std::vector<f64>>& vecs)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     if (not vecs.size() or not vecs[0].size())
       throw std::invalid_argument("Invalid GetVectorAverage argument");
 
@@ -441,7 +441,7 @@ private:
 
   static std::vector<f64> GetPredictedOmegas(const std::vector<f64>& thetas, f64 A, f64 B, f64 C)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     std::vector<f64> omegas(thetas.size());
     for (usize i = 0; i < thetas.size(); ++i)
       omegas[i] = GetPredictedOmega(thetas[i], A, B, C);
@@ -450,7 +450,7 @@ private:
 
   void Plot(DifferentialRotationData& data, const std::string& dataPath, i32 idstart) const
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION("DifferentialRotation::Plot");
     const auto thetas = PostProcessData(data);
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
@@ -541,7 +541,7 @@ private:
 
   void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation& ipc, const std::string& dataPath) const
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION("DifferentialRotation::Save");
 
     std::string path = fmt::format("{}/diffrot.json", dataPath);
@@ -580,7 +580,7 @@ private:
 
   void SaveOptimizedParameters(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
     std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
     LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::weakly_canonical(path));
@@ -605,7 +605,7 @@ private:
 
   DifferentialRotationData Load(const std::string& path)
   {
-    OPTICK_EVENT();
+    PROFILE_EVENT();
     LOG_FUNCTION("DifferentialRotation::Load");
     LOG_DEBUG("Loading differential rotation data {}", path);
 

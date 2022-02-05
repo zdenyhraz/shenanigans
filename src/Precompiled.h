@@ -70,9 +70,6 @@
 // json
 #include <nlohmann/json.hpp>
 
-// optick
-#include <optick.h>
-
 // custom
 using i8 = int8_t;
 using u8 = uint8_t;
@@ -87,6 +84,15 @@ using f64 = double;
 using f128 = long double;
 using usize = size_t;
 namespace json = nlohmann;
+
+#ifdef ENABLE_PROFILING
+  #include <optick.h>
+  #define PROFILE_APP(name) OPTICK_APP(name)
+  #define PROFILE_EVENT(name) OPTICK_EVENT(name)
+#else
+  #define PROFILE_APP(name)
+  #define PROFILE_EVENT(name)
+#endif
 
 #include "Logger/Logger.h"
 #include "Logger/LogFunction.h"

@@ -4,6 +4,7 @@ project(shenanigans)
 # cpp
 set(CMAKE_CXX_STANDARD 20)
 
+# compiler
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp") # optimizations
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX") # warnings
@@ -12,6 +13,16 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
 endif()
+
+# variables
+if(NOT CI)
+  set(ENABLE_PROFILING ON)
+endif()
+
+# status messages
+message(STATUS "CI: " ${CI})  
+message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
+message(STATUS "ENABLE_MATPLOTLIB: " ${ENABLE_MATPLOTLIB})
 
 # fmt
 add_subdirectory(external/fmt)
@@ -33,14 +44,18 @@ add_subdirectory(external/json)
 include_directories("external/json/include")
 
 # optick
-include_directories("external/optick/src")
+if(ENABLE_PROFILING)
+  include_directories("external/optick/src")
+endif()
 
 # matplotlib
-# find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
-# include_directories("external/matplotlib")
+if(ENABLE_MATPLOTLIB)
+  find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+  include_directories("external/matplotlib")
+endif()
 
 # opencv
-find_package(OpenCV REQUIRED PATHS E:\\Repos\\opencv-4.5.5\\build\\install)
+find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # qt
@@ -48,7 +63,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED PATHS C:\\Qt\\5.12.2\\mingw73_64)
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 
 # custom
 include_directories("src")
@@ -76,17 +91,36 @@ src/Sasko/*.h src/Sasko/*.cpp
 src/Snake/*.h src/Snake/*.cpp
 src/Utils/*.h src/Utils/*.cpp
 )
-file(GLOB_RECURSE SRC_EXTERNAL CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
 file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp )
 file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
 
-# shenanigans
-add_executable(shenanigans ${SRC} ${SRC_EXTERNAL} ${SRC_APP} )
-target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json) # Python3::Python Python3::Module Python3::NumPy
-target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
+# targets
+add_executable(shenanigans)
+add_executable(shenanigans_test)
 
-# shenanigans_test
-add_executable(shenanigans_test ${SRC} ${SRC_EXTERNAL} ${SRC_TEST})
-target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock) # Python3::Python Python3::Module Python3::NumPy
+if(ENABLE_PROFILING)
+  file(GLOB_RECURSE SRC_PROFILE CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_PROFILE})
+  target_sources(shenanigans_test PRIVATE ${SRC_PROFILE})
+  add_compile_definitions(ENABLE_PROFILING)
+endif()
+
+# sources
+target_sources(shenanigans PRIVATE ${SRC} ${SRC_APP})
+target_sources(shenanigans_test PRIVATE ${SRC} ${SRC_TEST})
+
+# libraries
+target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json)
+target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock)
+
+if(ENABLE_MATPLOTLIB)
+  target_link_libraries(shenanigans PRIVATE Python3::Python Python3::Module Python3::NumPy)
+  target_link_libraries(shenanigans_test PRIVATE Python3::Python Python3::Module Python3::NumPy)
+endif()
+
+# precompiled headers
+target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
 target_precompile_headers(shenanigans_test PRIVATE src/Precompiled.h)
+
+# test
 gtest_discover_tests(shenanigans_test)
