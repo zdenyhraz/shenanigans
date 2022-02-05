@@ -23,19 +23,31 @@ set(ENABLE_MATPLOTLIB OFF)
 if(NOT CI)
   set(ENABLE_PROFILING ON)
 endif()
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 # status messages
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
 message(STATUS "ENABLE_MATPLOTLIB: " ${ENABLE_MATPLOTLIB})
 
+# targets
+add_executable(shenanigans)
+add_executable(shenanigans_test)
+
 # fmt
 add_subdirectory(external/fmt)
 include_directories("external/fmt/include")
+target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
+target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 
 # scnlib
 add_subdirectory(external/scnlib)
 include_directories("external/scnlib/include")
+target_link_libraries(shenanigans PRIVATE scn::scn)
+target_link_libraries(shenanigans_test PRIVATE scn::scn)
 
 # gtest
 add_subdirectory(external/gtest)
@@ -43,34 +55,53 @@ include_directories("external/gtest/googletest/include")
 include_directories("external/gtest/googlemock/include")
 enable_testing()
 include(GoogleTest)
+target_link_libraries(shenanigans_test PRIVATE GTest::gtest_main GTest::gmock)
 
 # json
 add_subdirectory(external/json)
 include_directories("external/json/include")
+target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
 if(ENABLE_PROFILING)
+  # general
+  add_compile_definitions(ENABLE_PROFILING)
+
   # optick
   include_directories("external/optick/src")
+  file(GLOB_RECURSE SRC_OPTICK CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_OPTICK})
+  target_sources(shenanigans_test PRIVATE ${SRC_OPTICK})
+  
   # tracy
   include_directories("external/tracy")
+  add_compile_definitions(TRACY_ENABLE)
+  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
+  file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/TracyClient.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_TRACY})
+  target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
+  target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
+  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # matplotlib
 if(ENABLE_MATPLOTLIB)
   find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
   include_directories("external/matplotlib")
+  target_link_libraries(shenanigans PRIVATE Python3::Python Python3::Module Python3::NumPy)
+  target_link_libraries(shenanigans_test PRIVATE Python3::Python Python3::Module Python3::NumPy)
 endif()
 
 # opencv
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
+target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 
 # qt
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
+target_link_libraries(shenanigans PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
+target_link_libraries(shenanigans_test PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
 
 # custom
 include_directories("src")
@@ -98,42 +129,18 @@ src/Sasko/*.h src/Sasko/*.cpp
 src/Snake/*.h src/Snake/*.cpp
 src/Utils/*.h src/Utils/*.cpp
 )
-file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp )
+target_sources(shenanigans PRIVATE ${SRC})
+target_sources(shenanigans_test PRIVATE ${SRC})
+
+# app sources
+file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp)
+target_sources(shenanigans PRIVATE ${SRC_APP})
+
+# test sources
 file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
-
-# targets
-add_executable(shenanigans)
-add_executable(shenanigans_test)
-
-if(ENABLE_PROFILING)
-  file(GLOB_RECURSE SRC_PROFILE CONFIGURE_DEPENDS
-  external/tracy/TracyClient.cpp
-  external/optick/src/*.h external/optick/src/*.cpp)
-  add_compile_definitions(ENABLE_PROFILING)
-  add_compile_definitions(TRACY_ENABLE)
-  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
-  target_sources(shenanigans PRIVATE ${SRC_PROFILE})
-  target_sources(shenanigans_test PRIVATE ${SRC_PROFILE})
-  target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
-  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
-endif()
-
-# sources
-target_sources(shenanigans PRIVATE ${SRC} ${SRC_APP})
-target_sources(shenanigans_test PRIVATE ${SRC} ${SRC_TEST})
-
-# libraries
-target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json)
-target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS} Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport fmt::fmt-header-only scn::scn nlohmann_json::nlohmann_json GTest::gtest_main GTest::gmock)
-
-if(ENABLE_MATPLOTLIB)
-  target_link_libraries(shenanigans PRIVATE Python3::Python Python3::Module Python3::NumPy)
-  target_link_libraries(shenanigans_test PRIVATE Python3::Python Python3::Module Python3::NumPy)
-endif()
+target_sources(shenanigans_test PRIVATE ${SRC_TEST})
+gtest_discover_tests(shenanigans_test)
 
 # precompiled headers
 target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
 target_precompile_headers(shenanigans_test PRIVATE src/Precompiled.h)
-
-# test
-gtest_discover_tests(shenanigans_test)
