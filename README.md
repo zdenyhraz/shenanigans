@@ -52,11 +52,13 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 
 ### Profiling with [Optick](https://github.com/bombomby/optick)
 - run the app with `ENABLE_PROFILING` defined
-- optick file is created when app terminates
-- run the Optick GUI app (only on Windows) and import the optick file from `build/`
+- trace file is created when app terminates
+- run the Optick GUI app (only on Windows) and import the trace file from `build/`
 
 ### Profiling with [Tracy](https://github.com/wolfpld/tracy)
+- install the required libraries `sudo apt-get -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
+- build the profiler via `make release -j12` in `./external/tracy/profiler/build/unix/`
 - run the app with `ENABLE_PROFILING` defined
-- run the 
-- run `./external/tracy/profiler/build/unix/Tracy-release` and import the tracy file
+- run `script/tracy.sh` or `./external/tracy/profiler/build/unix/Tracy-release` and click connect
+- save the trace file if needed
 
