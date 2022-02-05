@@ -54,6 +54,7 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 - run the app with `ENABLE_PROFILING` defined
 - trace file is created when app terminates
 - run the Optick GUI app (only on Windows) and import the trace file from `build/`
+<img src="data/readme/optick.png" width="100%">
 
 ### Profiling with [Tracy](https://github.com/wolfpld/tracy)
 - install the required libraries `sudo apt-get -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
@@ -61,4 +62,5 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 - run the app with `ENABLE_PROFILING` defined
 - run `script/tracy.sh` or `./external/tracy/profiler/build/unix/Tracy-release` and click connect
 - save the trace file if needed
+<img src="data/readme/tracy.png" width="100%">
 
