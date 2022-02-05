@@ -45,3 +45,18 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 ## Modeling of the [windowing effect](https://en.wikipedia.org/wiki/Window_function) on the [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
 <img src="data/dissertation/window/1DWindows.png" width="47%"> <img src="data/dissertation/window/1DWindowsDFT.png" width="47%">
 <img src="data/dissertation/window/2DWindowDFTR.png" width="32%"> <img src="data/dissertation/window/2DImageDFT.png" width="32%">  <img src="data/dissertation/window/2DImageWindowDFT.png" width="32%"> 
+
+## Profiling
+### Profiling with [Valgrind](https://valgrind.org/) / [Callgrind](https://valgrind.org/docs/manual/cl-manual.html) / [Kcachegrind](http://kcachegrind.sourceforge.net/html/Documentation.html)
+- run `./script/kcachegrind.sh`
+
+### Profiling with [Optick](https://github.com/bombomby/optick)
+- run the app with `ENABLE_PROFILING` defined
+- optick file is created when app terminates
+- run the Optick GUI app (only on Windows) and import the optick file from `build/`
+
+### Profiling with [Tracy](https://github.com/wolfpld/tracy)
+- run the app with `ENABLE_PROFILING` defined
+- run the 
+- run `./external/tracy/profiler/build/unix/Tracy-release` and import the tracy file
+

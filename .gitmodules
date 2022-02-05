@@ -19,7 +19,6 @@
 [submodule "external/optick"]
 	path = external/optick
 	url = https://github.com/bombomby/optick.git
-	ignore = dirty
 [submodule "external/tracy"]
 	path = external/tracy
 	url = https://github.com/wolfpld/tracy.git

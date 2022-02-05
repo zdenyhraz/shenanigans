@@ -86,9 +86,15 @@ using usize = size_t;
 namespace json = nlohmann;
 
 #ifdef ENABLE_PROFILING
-  #include <optick.h>
-  #define PROFILE_APP(name) OPTICK_APP(name)
-  #define PROFILE_EVENT(name) OPTICK_EVENT(name)
+  #ifdef TRACY_ENABLE
+    #include <Tracy.hpp>
+    #define PROFILE_APP(name)
+    #define PROFILE_EVENT(name) ZoneScoped // or ZoneScopedN for named
+  #else
+    #include <optick.h>
+    #define PROFILE_APP(name) OPTICK_APP(name)
+    #define PROFILE_EVENT(name) OPTICK_EVENT(name)
+  #endif
 #else
   #define PROFILE_APP(name)
   #define PROFILE_EVENT(name)

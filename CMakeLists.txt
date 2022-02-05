@@ -14,13 +14,18 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
 endif()
 
+# ignore warnings from external sources
+file(GLOB_RECURSE SRC_EXTERNAL "external/*.h" "external/*.hpp" "external/*.c" "external/*.cpp")
+set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
+
 # variables
+set(ENABLE_MATPLOTLIB OFF)
 if(NOT CI)
   set(ENABLE_PROFILING ON)
 endif()
 
 # status messages
-message(STATUS "CI: " ${CI})  
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
 message(STATUS "ENABLE_MATPLOTLIB: " ${ENABLE_MATPLOTLIB})
 
@@ -43,9 +48,11 @@ include(GoogleTest)
 add_subdirectory(external/json)
 include_directories("external/json/include")
 
-# optick
 if(ENABLE_PROFILING)
+  # optick
   include_directories("external/optick/src")
+  # tracy
+  include_directories("external/tracy")
 endif()
 
 # matplotlib
@@ -99,10 +106,16 @@ add_executable(shenanigans)
 add_executable(shenanigans_test)
 
 if(ENABLE_PROFILING)
-  file(GLOB_RECURSE SRC_PROFILE CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
+  file(GLOB_RECURSE SRC_PROFILE CONFIGURE_DEPENDS
+  external/tracy/TracyClient.cpp
+  external/optick/src/*.h external/optick/src/*.cpp)
+  add_compile_definitions(ENABLE_PROFILING)
+  add_compile_definitions(TRACY_ENABLE)
+  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
   target_sources(shenanigans PRIVATE ${SRC_PROFILE})
   target_sources(shenanigans_test PRIVATE ${SRC_PROFILE})
-  add_compile_definitions(ENABLE_PROFILING)
+  target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
+  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # sources
