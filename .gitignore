@@ -2,7 +2,11 @@
 build/**
 data/**
 
-!data/app/**
-!data/articles/**
-!data/dissertation/**
-!data/readme/**
+!data/app/
+!data/app/*
+!data/articles/
+!data/articles/*
+!data/dissertation/
+!data/dissertation/*
+!data/readme/
+!data/readme/*
