@@ -19,14 +19,16 @@ file(GLOB_RECURSE SRC_EXTERNAL "external/*.h" "external/*.hpp" "external/*.c" "e
 set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
 
 # variables
-set(ENABLE_MATPLOTLIB OFF)
-if(NOT CI)
-  set(ENABLE_PROFILING ON)
-endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(ENABLE_MATPLOTLIB OFF)
+set(ENABLE_TRACY ON)
+set(ENABLE_OPTICK OFF)
+if(NOT CI)
+  set(ENABLE_PROFILING ON)
+endif()
 
 # status messages
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
@@ -64,24 +66,26 @@ target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
 if(ENABLE_PROFILING)
-  # general
+  if(ENABLE_OPTICK)
+    # optick 
+    include_directories("external/optick/src")
+    file(GLOB_RECURSE SRC_OPTICK CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
+    target_sources(shenanigans PRIVATE ${SRC_OPTICK})
+    target_sources(shenanigans_test PRIVATE ${SRC_OPTICK})
+  endif()
+  if(ENABLE_TRACY)
+    # tracy
+    include_directories("external/tracy")
+    add_compile_definitions(TRACY_ENABLE)
+    add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
+    add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
+    file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
+    target_sources(shenanigans PRIVATE ${SRC_TRACY})
+    target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
+    target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
+    target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
+  endif()
   add_compile_definitions(ENABLE_PROFILING)
-
-  # optick
-  include_directories("external/optick/src")
-  file(GLOB_RECURSE SRC_OPTICK CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
-  target_sources(shenanigans PRIVATE ${SRC_OPTICK})
-  target_sources(shenanigans_test PRIVATE ${SRC_OPTICK})
-  
-  # tracy
-  include_directories("external/tracy")
-  add_compile_definitions(TRACY_ENABLE)
-  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
-  file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/TracyClient.cpp)
-  target_sources(shenanigans PRIVATE ${SRC_TRACY})
-  target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
-  target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
-  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # matplotlib

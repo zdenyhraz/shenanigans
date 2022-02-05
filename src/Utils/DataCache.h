@@ -7,7 +7,7 @@ public:
 
   const Value Get(const Key& key)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     std::scoped_lock lock(mMutex);
 
     if (mData.contains(key))
@@ -20,6 +20,7 @@ public:
 
     if (mData.size() < mCapacity)
     {
+      PROFILE_SCOPE(GetData);
       mData[key] = mGetDataFunction(key);
       LOG_DEBUG("ImageCache::Get added {} to cache (capacity {}/{})", key, mData.size(), mCapacity);
       return mData[key];
@@ -30,6 +31,7 @@ public:
 
   void Clear()
   {
+    PROFILE_FUNCTION;
     std::scoped_lock lock(mMutex);
     mData.clear();
   }
@@ -42,7 +44,7 @@ public:
 
   void Reserve(usize capacity)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     std::scoped_lock lock(mMutex);
     mData.reserve(capacity);
     mCapacity = std::max(mCapacity, capacity);

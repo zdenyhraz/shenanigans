@@ -135,14 +135,14 @@ public:
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     return Calculate<DebugMode, CrossCorrelation, AccuracyT>(image1.clone(), image2.clone());
   }
 
   template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows))
@@ -209,7 +209,7 @@ public:
     cv::Mat L1circle = mL1circle.clone();
     while (L1ratio > 0)
     {
-      PROFILE_EVENT("IterativeRefinement");
+      PROFILE_SCOPE(IterativeRefinement);
       LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::IterativeRefinement");
 
       // reset L2U peak position
@@ -227,7 +227,7 @@ public:
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
-        PROFILE_EVENT("IterativeRefinementIteration");
+        PROFILE_SCOPE(IterativeRefinementIteration);
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           [[unlikely]] break;
 
@@ -364,7 +364,7 @@ private:
   template <bool DebugMode, bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
     if (image.type() != CV_32F)
@@ -376,7 +376,7 @@ private:
   template <bool DebugMode>
   void ApplyWindow(cv::Mat& image) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
     if (mWindowType != WindowType::None)
@@ -385,14 +385,14 @@ private:
   template <bool DebugMode>
   static cv::Mat CalculateFourierTransform(cv::Mat&& image)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateFourierTransform");
     return Fourier::fft(std::move(image));
   }
   template <bool DebugMode, bool CrossCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
 
     for (i32 row = 0; row < dft1.rows; ++row)
@@ -426,7 +426,7 @@ private:
   template <bool DebugMode>
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL3");
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
@@ -435,7 +435,7 @@ private:
   template <bool DebugMode>
   static cv::Point2d GetPeak(const cv::Mat& mat)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak(0, 0);
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
@@ -458,14 +458,14 @@ private:
   template <bool DebugMode>
   static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, i32 L2size)
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
     return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
   }
   template <bool DebugMode>
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2U");
 
     cv::Mat L2U;
@@ -518,7 +518,7 @@ private:
   template <bool DebugMode>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
-    PROFILE_EVENT();
+    PROFILE_FUNCTION;
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<DebugMode>(L2size))
         return L3peak - L3mid;

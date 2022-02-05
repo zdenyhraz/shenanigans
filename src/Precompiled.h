@@ -88,12 +88,15 @@ namespace json = nlohmann;
 #ifdef ENABLE_PROFILING
   #ifdef TRACY_ENABLE
     #include <Tracy.hpp>
+    // use FrameMark for frames
     #define PROFILE_APP(name)
-    #define PROFILE_EVENT(name) ZoneScoped // or ZoneScopedN for named
+    #define PROFILE_FUNCTION ZoneScoped
+    #define PROFILE_SCOPE(name) ZoneNamedN(name, #name, true) // ZoneScoped/ZoneScopedN/ZoneNamedN
   #else
     #include <optick.h>
     #define PROFILE_APP(name) OPTICK_APP(name)
-    #define PROFILE_EVENT(name) OPTICK_EVENT(name)
+    #define PROFILE_FUNCTION OPTICK_EVENT()
+    #define PROFILE_SCOPE(name) OPTICK_EVENT(name)
   #endif
 #else
   #define PROFILE_APP(name)
