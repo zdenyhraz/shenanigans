@@ -5,13 +5,13 @@ project(shenanigans)
 set(CMAKE_CXX_STANDARD 20)
 
 # compiler
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp") # optimizations
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX") # warnings
+if (MSVC)
+  add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp) # optimizations
+  add_compile_options(/Wall /WX) # warnings
 else ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes") # excluded warnings
+  add_compile_options(-march=native -fopenmp) # optimizations
+  add_compile_options(-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow) # warnings
+  add_compile_options(-Wno-unused-parameter -Wno-deprecated-enum-enum-conversion -Wno-attributes) # excluded warnings
 endif()
 
 # ignore warnings from external sources
@@ -24,10 +24,15 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(ENABLE_MATPLOTLIB OFF)
+set(ENABLE_PROFILING ON)
 set(ENABLE_TRACY ON)
 set(ENABLE_OPTICK OFF)
-if(NOT CI)
+
+# variables for CI
+if(CI)
   set(ENABLE_PROFILING ON)
+  add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
 
 # status messages
