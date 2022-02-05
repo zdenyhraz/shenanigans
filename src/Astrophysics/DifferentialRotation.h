@@ -197,7 +197,7 @@ public:
 
     {
       // apply median blur
-      PROFILE_SCOPE(MedianBlur);
+      PROFILE_SCOPE(ApplyMedianBlur);
       static constexpr i32 medsize = 3;
       cv::medianBlur(data.shiftsx, data.shiftsx, medsize);
       cv::medianBlur(data.shiftsy, data.shiftsy, medsize);
@@ -205,12 +205,15 @@ public:
       cv::medianBlur(data.omegasy, data.omegasy, medsize);
     }
 
-    // apply theta-interpolation
-    cv::Mat temp = cv::Mat::zeros(data.shiftsx.rows, data.shiftsx.cols, CV_32F);
-    Interpolate(data.shiftsx, data.thetas, thetas, temp);
-    Interpolate(data.shiftsy, data.thetas, thetas, temp);
-    Interpolate(data.omegasx, data.thetas, thetas, temp);
-    Interpolate(data.omegasy, data.thetas, thetas, temp);
+    {
+      // apply theta-interpolation
+      PROFILE_SCOPE(ApplyInterpolation);
+      cv::Mat temp = cv::Mat::zeros(data.shiftsx.rows, data.shiftsx.cols, CV_32F);
+      Interpolate(data.shiftsx, data.thetas, thetas, temp);
+      Interpolate(data.shiftsy, data.thetas, thetas, temp);
+      Interpolate(data.omegasx, data.thetas, thetas, temp);
+      Interpolate(data.omegasy, data.thetas, thetas, temp);
+    }
 
     return thetas;
   }
