@@ -27,10 +27,13 @@ set(ENABLE_MATPLOTLIB OFF)
 set(ENABLE_PROFILING ON)
 set(ENABLE_TRACY ON)
 set(ENABLE_OPTICK OFF)
+set(ENABLE_SANITIZER OFF)
 
-# variables for CI
 if(CI)
-  set(ENABLE_PROFILING ON)
+  set(ENABLE_PROFILING OFF)
+endif()
+
+if(ENABLE_SANITIZER)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
