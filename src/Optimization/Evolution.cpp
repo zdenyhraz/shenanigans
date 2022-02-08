@@ -814,7 +814,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   }
 }
 
-f64 Evolution::averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& vec2, std::vector<f64>& boundsRange)
+f64 Evolution::averageVectorDistance(const std::vector<f64>& vec1, const std::vector<f64>& vec2, const std::vector<f64>& boundsRange)
 {
   PROFILE_FUNCTION;
   f64 result = 0;
@@ -825,7 +825,7 @@ f64 Evolution::averageVectorDistance(std::vector<f64>& vec1, std::vector<f64>& v
   return result;
 }
 
-bool Evolution::isDistinct(usize inpindex, std::vector<usize>& indices, usize currindex)
+bool Evolution::isDistinct(usize inpindex, const std::vector<usize>& indices, usize currindex)
 {
   PROFILE_FUNCTION;
   bool isdist = true;

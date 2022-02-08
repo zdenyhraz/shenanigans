@@ -1,0 +1,1 @@
+Checks: '*,-clang-diagnostic-error,-llvm-include-order,-llvm-header-guard'
