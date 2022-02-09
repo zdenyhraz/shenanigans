@@ -10,7 +10,6 @@
 <a href="https://github.com/zdenyhraz/shenanigans/search?l=c%2B%2B"><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/zdenyhraz/shenanigans">
-<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans">
 </p>
 
 Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm implementations for various applied mathematics / astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, image registration, non-convex optimization. With C++ [Qt](https://www.qt.io/) GUI, #uses [C++20](https://en.cppreference.com/w/cpp/20), [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [Matplotlib](https://matplotlib.org/), [fmt](https://fmt.dev/latest/index.html), [QCustomPlot](https://www.qcustomplot.com/), [spdlog](https://github.com/gabime/spdlog), [optick](https://github.com/bombomby/optick), [CUDA](https://developer.nvidia.com/cuda-toolkit). ***Examples below.***
