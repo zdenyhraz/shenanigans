@@ -49,13 +49,13 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
 
   plot->replot();
   windowPlot->show();
+  QCoreApplication::processEvents();
 
-  if (mSavepath.length() > 0)
+  if (not mSavepath.empty())
   {
     LOG_DEBUG("Saving plot to {} ...", std::filesystem::weakly_canonical(mSavepath));
     plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
-  QCoreApplication::processEvents();
 }
 
 void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s)
@@ -92,13 +92,13 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
 
   plot->replot();
   windowPlot->show();
+  QCoreApplication::processEvents();
 
-  if (mSavepath.length() > 0)
+  if (not mSavepath.empty())
   {
     LOG_DEBUG("Saving plot to {} ...", std::filesystem::weakly_canonical(mSavepath));
     plot->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
-  QCoreApplication::processEvents();
 }
 
 void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
@@ -203,7 +203,6 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
     plot->yAxis2->setVisible(true);
 
   windowPlot->show();
-  QCoreApplication::processEvents();
 }
 
 void Plot1D::ClearCore()

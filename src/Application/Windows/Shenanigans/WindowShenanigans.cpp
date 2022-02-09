@@ -1050,7 +1050,7 @@ try
       Plot1D::Plot(x, {y1, y2});
     }
   }
-  if (1) // 2D plot animation
+  if (0) // 2D plot animation
   {
     i32 n = 1000;
     i32 nt = 500;
@@ -1067,7 +1067,6 @@ try
 
       Plot2D::Plot(mat);
     }
-    return;
   }
   if (1) // optimization / metaoptimization
   {

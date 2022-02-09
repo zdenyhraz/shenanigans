@@ -21,7 +21,7 @@ Plot2D& Plot2D::GetPlot(const std::string& mName)
 void Plot2D::PlotCore(const cv::Mat& z)
 {
   PROFILE_FUNCTION;
-  std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols, 0.);
+  std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols);
 
   if (z.depth() != CV_32F)
   {
@@ -59,13 +59,13 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
   windowPlot->colorScale->rescaleDataRange(false);
   windowPlot->ui.widget->replot();
   windowPlot->show();
+  QCoreApplication::processEvents();
 
-  if (mSavepath.length() > 0)
+  if (not mSavepath.empty())
   {
     LOG_DEBUG("Saving plot to {} ...", std::filesystem::weakly_canonical(mSavepath));
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
-  QCoreApplication::processEvents();
 }
 
 void Plot2D::Initialize(int xcnt, int ycnt)
@@ -115,9 +115,7 @@ void Plot2D::Initialize(int xcnt, int ycnt)
   plot->yAxis->setLabelFont(Plot::fontLabels);
   plot->yAxis->setRangeReversed(false);
   colorScale->axis()->setLabelFont(Plot::fontLabels);
-
   windowPlot->show();
-  QCoreApplication::processEvents();
 }
 
 void Plot2D::ClearCore()
