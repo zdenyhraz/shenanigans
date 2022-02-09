@@ -1035,6 +1035,40 @@ try
     for (usize i = 0; i < n; ++i)
       std::ignore = ipc.Calculate(crop1, crop2);
   }
+  if (0) // 1D plot animation
+  {
+    u32 n = 1000;
+
+    Plot1D::Set("Test1D");
+    Plot1D::SetYnames({"y1", "y2"});
+
+    for (u32 i = 0; i < n; ++i)
+    {
+      f64 x = (f64)i / (n - 1);
+      f64 y1 = std::sin(8 * 6.28 * x) * std::abs(std::cos(6.28 * x));
+      f64 y2 = std::cos(8 * 6.28 * x) * std::abs(std::cos(6.28 * x));
+      Plot1D::Plot(x, {y1, y2});
+    }
+  }
+  if (1) // 2D plot animation
+  {
+    i32 n = 1000;
+    i32 nt = 500;
+    cv::Mat mat = cv::Mat::zeros(n, n, CV_32F);
+    Plot2D::Set("Test2D");
+
+    for (i32 t = 0; t < nt; ++t)
+    {
+      mat.at<f32>(0, 0) = -1;
+      mat.at<f32>(0, 1) = 1;
+      for (i32 r = 0; r < n; ++r)
+        for (i32 c = 2; c < n; ++c)
+          mat.at<f32>(r, c) = std::sin(20. * (f32)r / n) * std::sin(20. * (f32)c / n) * std::sin(20. * (f32)t / nt);
+
+      Plot2D::Plot(mat);
+    }
+    return;
+  }
   if (1) // optimization / metaoptimization
   {
     const i32 N = 2;

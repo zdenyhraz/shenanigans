@@ -65,6 +65,7 @@ void Plot2D::PlotCore(const std::vector<std::vector<double>>& z)
     LOG_DEBUG("Saving plot to {} ...", std::filesystem::weakly_canonical(mSavepath));
     windowPlot->ui.widget->savePng(QString::fromStdString(mSavepath), 0, 0, 3, -1);
   }
+  QCoreApplication::processEvents();
 }
 
 void Plot2D::Initialize(int xcnt, int ycnt)
