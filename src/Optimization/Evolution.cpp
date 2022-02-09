@@ -423,7 +423,7 @@ void Evolution::UpdateOutputs(usize gen, const Population& population, Validatio
     if (valid)
       Plot1D::Plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
     else
-      Plot1D::Plot(gen, population.bestEntity.fitness, {population.relativeDifference * 100});
+      Plot1D::Plot(gen, population.bestEntity.fitness, population.relativeDifference * 100);
   }
 }
 

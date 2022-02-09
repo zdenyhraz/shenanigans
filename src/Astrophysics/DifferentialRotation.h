@@ -54,6 +54,7 @@ public:
     const auto shiftxmin = 0.01 * idstep;
     const auto shiftxmax = 0.4 * idstep;
     const auto shiftymax = 0.08;
+    const auto fshiftmax = 0.1;
     const auto ids = GenerateIds(idstart);
 
 #pragma omp parallel for if (not Managed)
@@ -91,6 +92,9 @@ public:
         data.theta0s[xindex] = theta0;
         data.Rs[xindex] = R;
 
+        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax)
+          [[unlikely]] continue;
+
         for (i32 y = 0; y < ysize; ++y)
         {
           PROFILE_SCOPE(CalculateMeridianShift);
@@ -119,7 +123,7 @@ public:
         continue;
       }
 
-    FixMissingData(data);
+    FixMissingData<Managed>(data);
 
     if constexpr (not Managed)
       Save(data, ipc, dataPath);
@@ -168,8 +172,8 @@ public:
       f64 ret = 0;
       for (usize i = 0; i < omegasxfit.size(); ++i)
       {
-        ret += 0.8 * std::pow(omegasxfit[i] - predfit[i], 2); // minimize pred fit diff
-        ret += 0.2 * std::pow(omegasx[i] - omegasxfit[i], 2); // minimize variance
+        ret += 0.7 * std::pow(omegasxfit[i] - predfit[i], 2); // minimize pred fit diff
+        ret += 0.3 * std::pow(omegasx[i] - omegasxfit[i], 2); // minimize variance
       }
       return ret / omegasxfit.size();
     };
@@ -308,6 +312,7 @@ private:
     return ids;
   }
 
+  template <bool Managed>
   static void FixMissingData(DifferentialRotationData& data)
   {
     PROFILE_FUNCTION;
@@ -326,7 +331,9 @@ private:
         ++xindex2;
 
       const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
-      LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
+
+      if constexpr (not Managed)
+        LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
 
       for (i32 y = 0; y < data.thetas.rows; ++y)
       {
