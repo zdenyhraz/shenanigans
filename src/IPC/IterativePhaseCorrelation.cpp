@@ -101,6 +101,7 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
 void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Mat& L1circle, const cv::Point2d& L3shift) const
 {
   cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
+  cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
@@ -113,6 +114,7 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const c
 void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const
 {
   cv::Mat mat = L1.clone();
+  cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
@@ -132,6 +134,7 @@ void IterativePhaseCorrelation::DrawCross(cv::Mat& mat, const cv::Point& point)
 {
   cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y - mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y + mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
   cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y + mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y - mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
+  // cv::circle(mat, point, mat.cols / 20, cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
