@@ -233,14 +233,13 @@ public:
           [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        L1peak = GetPeakSubpixel<true>(L1, L1circle);
-        L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
-
         if constexpr (DebugMode)
         {
-          DebugL1A(L1, L1circle);
+          DebugL1A(L1, L1circle, L3peak - L3mid, L2Upeak - L2Umid);
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        L1peak = GetPeakSubpixel<true>(L1, L1circle);
+        L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid))
           [[unlikely]] { return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff; }
@@ -271,6 +270,7 @@ public:
   static std::string InterpolationType2String(InterpolationType type);
   static std::string WindowType2String(WindowType type);
   static void DrawCrosshairs(cv::Mat& mat);
+  static void DrawCross(cv::Mat& mat, const cv::Point& point);
 
 private:
   i32 mRows = 0;
@@ -281,7 +281,7 @@ private:
   f64 mL1ratio = 0.35;
   f64 mL1ratioStep = 0.05;
   i32 mUpsampleCoeff = 15;
-  i32 mMaxIterations = 20;
+  i32 mMaxIterations = 10;
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
@@ -539,7 +539,7 @@ private:
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
   void DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
-  void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const;
+  void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
   IterativePhaseCorrelation CreateIPCFromParams(const std::vector<f64>& params) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;

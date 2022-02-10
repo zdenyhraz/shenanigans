@@ -109,11 +109,12 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2d& 
   Plot2D::Plot(mat);
 }
 
-void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const
+void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const
 {
   cv::Mat mat = L1.clone();
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
 
   Plot2D::Set(fmt::format("{} L1A", mDebugName));
   // Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
@@ -124,6 +125,12 @@ void IterativePhaseCorrelation::DrawCrosshairs(cv::Mat& mat)
 {
   cv::line(mat, cv::Point(mat.cols / 2, 0), cv::Point(mat.cols / 2, mat.rows - 1), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
   cv::line(mat, cv::Point(0, mat.rows / 2), cv::Point(mat.cols - 1, mat.rows / 2), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
+}
+
+void IterativePhaseCorrelation::DrawCross(cv::Mat& mat, const cv::Point& point)
+{
+  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y - mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y + mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
+  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y + mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y - mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
@@ -937,7 +944,7 @@ try
   LOG_FUNCTION("IterativePhaseCorrelation::ShowDebugStuff()");
 
   constexpr bool DebugMode = true;
-  constexpr bool addNoise = true;
+  constexpr bool addNoise = false;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
@@ -950,6 +957,7 @@ try
     const std::string path2 = "../data/AIA/171A.png";
     const bool artificialShift = path1 == path2;
     const cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
+    SetDebugTrueShift(rawshift);
     cv::Mat image1 = loadImage(path1);
     cv::Mat image2 = artificialShift ? image1.clone() : loadImage(path2);
     image1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
