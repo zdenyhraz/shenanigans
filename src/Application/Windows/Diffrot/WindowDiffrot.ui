@@ -77,7 +77,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_14">
        <property name="text">
-        <string>151</string>
+        <string>101</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -169,7 +169,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_9">
        <property name="text">
-        <string>151</string>
+        <string>101</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -219,7 +219,7 @@
      <item row="4" column="0">
       <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>yfov</string>
+        <string>thetamax</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -229,7 +229,7 @@
      <item row="4" column="1">
       <widget class="QLineEdit" name="lineEdit_12">
        <property name="text">
-        <string>3400</string>
+        <string>50</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

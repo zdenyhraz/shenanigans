@@ -16,9 +16,9 @@ DifferentialRotation WindowDiffrot::GetDifferentialRotation(i32 xsizeoverride)
   const i32 ysize = ui.lineEdit_9->text().toInt();
   const i32 idstep = ui.lineEdit_10->text().toInt();
   const i32 idstride = ui.lineEdit_11->text().toInt();
-  const i32 yfov = ui.lineEdit_12->text().toInt();
+  const f64 thetamax = ui.lineEdit_12->text().toDouble() / Constants::Rad;
   const i32 cadence = ui.lineEdit_13->text().toInt();
-  return DifferentialRotation(xsize, ysize, idstep, idstride, yfov, cadence);
+  return DifferentialRotation(xsize, ysize, idstep, idstride, thetamax, cadence);
 }
 
 std::string WindowDiffrot::GetDataPath()
@@ -53,7 +53,7 @@ void WindowDiffrot::Optimize()
 void WindowDiffrot::PlotMeridianCurve()
 {
   auto rawdata = GetDifferentialRotation(1).Calculate<true>(*mWindowData->IPC, GetDataPath(), GetIdstart());
-  const auto thetas = DifferentialRotation::PostProcessData(rawdata);
+  rawdata.PostProcess();
   const auto timestep = ui.lineEdit_15->text().toDouble(); // [days]
-  DifferentialRotation::PlotMeridianCurve(rawdata, thetas, GetDataPath(), GetIdstart(), timestep);
+  DifferentialRotation::PlotMeridianCurve(rawdata, GetDataPath(), GetIdstart(), timestep);
 }
