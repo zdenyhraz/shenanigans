@@ -11,9 +11,8 @@ public:
       : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), thetamax(thetamax_), cadence(cadence_)
   {
     PROFILE_FUNCTION;
-    if (idstride > 0)
+    if (idstride > 0) // images are not reused with non-zero stride
     {
-      // images are not reused with non-zero stride
       imageCache.SetCapacity(0);
       headerCache.SetCapacity(0);
     }
@@ -42,7 +41,6 @@ public:
       const auto thetastep = thetamax * 2 / (ysize - 1);
       for (usize i = 0; i < theta.size(); ++i)
         theta[i] = thetamax - i * thetastep;
-      LOG_DEBUG("thetamax: {}, thetastep: {}", thetamax, thetastep);
       return theta;
     }
 
@@ -122,8 +120,8 @@ public:
           PROFILE_SCOPE(CalculateMeridianShift);
           const auto theta = data.theta[y];
           const auto yshift = -R * std::sin(theta - theta0);
-          auto crop1 = roicrop(image1, header1.xcenter, header1.ycenter + yshift, wxsize, wysize);
-          auto crop2 = roicrop(image2, header2.xcenter, header2.ycenter + yshift, wxsize, wysize);
+          auto crop1 = roicrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
+          auto crop2 = roicrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
@@ -144,6 +142,7 @@ public:
       }
 
     FixMissingData<Managed>(data);
+    data.PostProcess();
 
     if constexpr (not Managed)
       Save(data, ipc, dataPath);
@@ -175,13 +174,11 @@ public:
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
 
-    auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
-    dataBefore.PostProcess();
+    const auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
     const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
-      auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
-      dataopt.PostProcess();
-      const auto omegax = GetXAverage(dataopt.omegax);
+      const auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
+      const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
 
       f64 ret = 0;
@@ -196,8 +193,7 @@ public:
     ipc.Optimize(obj, popsize);
     SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
 
-    auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
-    dataAfter.PostProcess();
+    const auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
 
     Plot1D::Set("Diffrot opt");
     Plot1D::SetXlabel("latitude [deg]");
@@ -205,7 +201,7 @@ public:
     Plot1D::SetYnames({"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(Constants::Rad * dataAfter.theta,
-        {GetXAverage(dataBefore.omegax), GetXAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetXAverage(dataAfter.omegax), 2), sin2sin4fit(dataAfter.theta, GetXAverage(dataAfter.omegax)),
+        {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2), sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)),
             GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)});
   }
 
@@ -218,7 +214,7 @@ public:
     const auto theta0 = header.theta0;                                         // [rad]
     const auto fxcenter = header.xcenter;                                      // [px]
     const auto fycenter = header.ycenter;                                      // [px]
-    const auto omegax = GetXAverage(data.omegax);                              // [deg/day]
+    const auto omegax = GetRowAverage(data.omegax);                            // [deg/day]
     const auto predx = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615); // [deg/day]
     std::vector<cv::Point2d> mcpts(data.theta.size());                         // [px,px]
     std::vector<cv::Point2d> mcptspred(data.theta.size());                     // [px,px]
@@ -259,7 +255,7 @@ public:
     Plot1D::SetYnames({"ipc", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::SetSavePath(fmt::format("{}/meridian_curve_omega.png", dataPath));
-    Plot1D::Plot(Constants::Rad * data.theta, {GetXAverage(data.omegax), GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
+    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegax), GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
   }
 
 private:
@@ -347,7 +343,7 @@ private:
     return times;
   }
 
-  static std::vector<f64> GetXAverage(const cv::Mat& vals)
+  static std::vector<f64> GetRowAverage(const cv::Mat& vals)
   {
     PROFILE_FUNCTION;
     std::vector<f64> avgs(vals.rows, 0.);
@@ -365,9 +361,6 @@ private:
   static std::vector<f64> GetVectorAverage(const std::vector<std::vector<f64>>& vecs)
   {
     PROFILE_FUNCTION;
-    if (not vecs.size() or not vecs[0].size())
-      throw std::invalid_argument("Invalid GetVectorAverage argument");
-
     std::vector<f64> avg(vecs[0].size());
 
     for (usize v = 0; v < vecs.size(); ++v)
@@ -393,9 +386,7 @@ private:
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Plot");
-    data.PostProcess();
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
-
     PlotMeridianCurve(data, dataPath, idstart, 27);
 
     // fits params
@@ -416,7 +407,7 @@ private:
     Plot1D::SetYnames({"ipc x"});
     Plot1D::SetY2names({"ipc y"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * data.theta, {GetXAverage(data.shiftx)}, {GetXAverage(data.shifty)});
+    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.shiftx)}, {GetRowAverage(data.shifty)});
 
     // average omegas x
     Plot1D::Set("avgomegax");
@@ -424,7 +415,7 @@ private:
     Plot1D::SetYlabel("average omega x [deg/day]");
     Plot1D::SetYnames({"ipc", "ipc polyfit", "ipc trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * data.theta, {GetXAverage(data.omegax), polyfit(data.theta, GetXAverage(data.omegax), 2), sin2sin4fit(data.theta, GetXAverage(data.omegax)),
+    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegax), polyfit(data.theta, GetRowAverage(data.omegax), 2), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
                                                   GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
 
     // shifts x
