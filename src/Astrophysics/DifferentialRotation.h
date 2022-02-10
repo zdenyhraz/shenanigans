@@ -208,12 +208,8 @@ public:
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, i32 idstart, f64 timestep)
   {
     PROFILE_FUNCTION;
-    const auto imagegrs = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    const auto image = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
     const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
-    const auto R = header.R;                                                   // [px]
-    const auto theta0 = header.theta0;                                         // [rad]
-    const auto fxcenter = header.xcenter;                                      // [px]
-    const auto fycenter = header.ycenter;                                      // [px]
     const auto omegax = GetRowAverage(data.omegax);                            // [deg/day]
     const auto predx = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615); // [deg/day]
     std::vector<cv::Point2d> mcpts(data.theta.size());                         // [px,px]
@@ -221,17 +217,17 @@ public:
 
     for (usize y = 0; y < data.theta.size(); ++y)
     {
-      const f64 mcx = fxcenter + R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / Constants::Rad);
-      const f64 mcy = fycenter - R * std::sin(data.theta[y] - theta0);
+      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / Constants::Rad);
+      const f64 mcy = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcpts[y] = cv::Point2d(mcx, mcy);
 
-      const f64 mcxpred = fxcenter + R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Constants::Rad);
-      const f64 mcypred = fycenter - R * std::sin(data.theta[y] - theta0);
+      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Constants::Rad);
+      const f64 mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptspred[y] = cv::Point2d(mcxpred, mcypred);
     }
 
-    cv::Mat image;
-    cv::cvtColor(imagegrs, image, cv::COLOR_GRAY2RGB);
+    cv::Mat imageclr;
+    cv::cvtColor(image, imageclr, cv::COLOR_GRAY2RGB);
     const auto thickness = 13;
     const auto color = 65535. / 255 * cv::Scalar(50., 205., 50.);
     const auto colorpred = 65535. / 255 * cv::Scalar(255., 0, 255.);
@@ -239,15 +235,15 @@ public:
     {
       const auto pt1 = mcpts[y];
       const auto pt2 = mcpts[y + 1];
-      cv::line(image, pt1, pt2, color, thickness, cv::LINE_AA);
+      cv::line(imageclr, pt1, pt2, color, thickness, cv::LINE_AA);
 
       const auto pt1pred = mcptspred[y];
       const auto pt2pred = mcptspred[y + 1];
-      cv::line(image, pt1pred, pt2pred, colorpred, thickness, cv::LINE_AA);
+      cv::line(imageclr, pt1pred, pt2pred, colorpred, thickness, cv::LINE_AA);
     }
 
-    showimg(image, "meridian curve", false, 0, 1, 1200);
-    saveimg(fmt::format("{}/meridian_curve.png", dataPath), image);
+    showimg(imageclr, "meridian curve", false, 0, 1, 1200);
+    saveimg(fmt::format("{}/meridian_curve.png", dataPath), imageclr);
   }
 
 private:

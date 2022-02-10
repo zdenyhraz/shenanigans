@@ -3,12 +3,12 @@
 void IterativePhaseCorrelation::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
 {
   Plot2D::Set(fmt::format("{} I1", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
   Plot2D::Plot(image1);
 
   Plot2D::Set(fmt::format("{} I2", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
   Plot2D::Plot(image2);
 }
@@ -19,33 +19,33 @@ void IterativePhaseCorrelation::DebugFourierTransforms(const cv::Mat& dft1, cons
   Fourier::fftshift(plot1);
 
   Plot2D::Set(fmt::format("{} DFT1lm", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_DFT1logmagn.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT1logmagn.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::logmagn(plot1));
 
   Plot2D::Set(fmt::format("{} DFT1p", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_DFT1phase.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT1phase.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::phase(plot1));
 
   auto plot2 = dft2.clone();
   Fourier::fftshift(plot2);
 
   Plot2D::Set(fmt::format("{} DFT2lm", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_DFT2logmagn.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT2logmagn.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::logmagn(plot2));
 
   Plot2D::Set(fmt::format("{} DFT2p", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_DFT2phase.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT2phase.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::phase(plot2));
 }
 
 void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
   Plot2D::Set(fmt::format("{} CP log magnitude", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
 
   Plot2D::Set(fmt::format("{} CP phase", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
 }
 
@@ -53,7 +53,7 @@ void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
 {
   auto plot = L3.clone();
   Plot2D::Set(fmt::format("{} L3", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(plot);
 
   if (1) // gradual peakshift
@@ -61,7 +61,7 @@ void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
     auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 7, 7);
     resize(peakshift, peakshift, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
     Plot2D::Set(fmt::format("{} peakshift", mDebugName));
-    Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
+    // Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
     Plot2D::Plot(peakshift);
   }
 }
@@ -71,7 +71,7 @@ void IterativePhaseCorrelation::DebugL2(const cv::Mat& L2) const
   auto plot = L2.clone();
   resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
   Plot2D::Set(fmt::format("{} L2", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(plot);
 }
 
@@ -79,7 +79,7 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
 {
   auto plot = L2U.clone();
   Plot2D::Set(fmt::format("{} L2U", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(plot);
 
   if (0)
@@ -89,11 +89,11 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
     resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
     resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
 
-    Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
+    // Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
     Plot2D::Plot("IPCL2UN", nearest);
-    Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
+    // Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
     Plot2D::Plot("IPCL2UL", linear);
-    Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
+    // Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
     Plot2D::Plot("IPCL2UC", cubic);
   }
 }
@@ -101,14 +101,14 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
 void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size).mul(L1circle));
 }
 
 void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1A", mDebugName));
-  Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(L1.mul(L1circle));
 }
 
@@ -410,7 +410,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "UC", "L1R"});
   evo.mLB = {0, -0.5, 0.0, 0, 0, 3, 0.1};
   evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 31, 0.8};
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 51, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val)); });
@@ -931,17 +931,17 @@ try
 
   if constexpr (debugShift)
   {
-    std::string path1 = "../data/AIA/171A.png";
-    std::string path2 = "../data/AIA/171A.png";
-    bool artificialShift = path1 == path2;
-    cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
+    const std::string path1 = "../data/AIA/171A.png";
+    const std::string path2 = "../data/AIA/171A.png";
+    const bool artificialShift = path1 == path2;
+    static constexpr bool addNoise = true;
+    const cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
     cv::Mat image1 = loadImage(path1);
     cv::Mat image2 = artificialShift ? image1.clone() : loadImage(path2);
     image1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
     image2 = roicrop(image2, image2.cols / 2 - rawshift.x, image2.rows / 2 - rawshift.y, mCols, mRows);
-    bool addNoise = false;
 
-    if (addNoise)
+    if constexpr (addNoise)
     {
       f64 noiseStdev = 0.03;
       cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, CV_32F);
@@ -1012,10 +1012,10 @@ try
     // +
     // "/1DWindowsDFT.png");
 
-    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
+    // // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
     Plot2D::Plot("IPCdebug2D", img);
 
-    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
+    // // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
     Plot2D::Plot("IPCdebug2D", imgw);
 
     // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
@@ -1097,10 +1097,10 @@ try
     normalize(imgfR, imgfR, 0.0, 1.0, cv::NORM_MINMAX);
     normalize(imgfG, imgfG, 0.0, 1.0, cv::NORM_MINMAX);
 
-    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
+    // // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::Plot("IPCdebug2D", imgfR);
 
-    // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
+    // // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageG.png");
     Plot2D::Plot("IPCdebug2D", imgfG);
   }
 

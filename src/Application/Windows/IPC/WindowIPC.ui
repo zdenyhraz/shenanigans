@@ -86,7 +86,7 @@
        <item row="0" column="3">
         <widget class="QLineEdit" name="lineEdit_4">
          <property name="text">
-          <string>31</string>
+          <string>51</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

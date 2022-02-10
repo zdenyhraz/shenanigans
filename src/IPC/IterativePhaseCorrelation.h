@@ -235,14 +235,14 @@ public:
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
-        if (AccuracyReached(L1peak, L1mid))
-          [[unlikely]]
-          {
-            if constexpr (DebugMode)
-              DebugL1A(L1, L1circle);
+        if constexpr (DebugMode)
+        {
+          DebugL1A(L1, L1circle);
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
 
-            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
-          }
+        if (AccuracyReached(L1peak, L1mid))
+          [[unlikely]] { return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff; }
       }
 
       // maximum iterations reached - reduce L1 size by reducing L1ratio
