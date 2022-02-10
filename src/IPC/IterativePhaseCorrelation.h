@@ -270,7 +270,7 @@ public:
   static std::string BandpassType2String(BandpassType type);
   static std::string InterpolationType2String(InterpolationType type);
   static std::string WindowType2String(WindowType type);
-  static cv::Mat DrawCrosshairs(const cv::Mat& mat);
+  static void DrawCrosshairs(cv::Mat& mat);
 
 private:
   i32 mRows = 0;
