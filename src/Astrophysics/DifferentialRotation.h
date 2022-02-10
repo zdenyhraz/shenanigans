@@ -126,7 +126,7 @@ public:
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
           const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
-          const auto omegay = (theta - std::asin(std::sin(theta) - shifty / R)) / tstep * Constants::RadPerSecToDegPerDay;
+          const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * Constants::RadPerSecToDegPerDay;
 
           data.shiftx.at<f32>(y, xindex) = shiftx;
           data.shifty.at<f32>(y, xindex) = shifty;
@@ -248,14 +248,6 @@ public:
 
     showimg(image, "meridian curve", false, 0, 1, 1200);
     saveimg(fmt::format("{}/meridian_curve.png", dataPath), image);
-
-    Plot1D::Set("meridian curve omegax");
-    Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("omega x [deg/day]");
-    Plot1D::SetYnames({"ipc", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::SetSavePath(fmt::format("{}/meridian_curve_omega.png", dataPath));
-    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegax), GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
   }
 
 private:
@@ -417,6 +409,14 @@ private:
     Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
     Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegax), polyfit(data.theta, GetRowAverage(data.omegax), 2), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
                                                   GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
+
+    // average omegas y
+    Plot1D::Set("avgomegay");
+    Plot1D::SetXlabel("latitude [deg]");
+    Plot1D::SetYlabel("average omega y [deg/day]");
+    Plot1D::SetYnames({"ipc", "ipc polyfit"});
+    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
+    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)});
 
     // shifts x
     Plot2D::Set("shiftx");
