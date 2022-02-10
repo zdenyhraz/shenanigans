@@ -98,11 +98,12 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   }
 }
 
-void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Mat& L1circle, const cv::Point2d& L3shift) const
 {
-  cv::Mat mat = CalculateL1(L2U, L2Upeak, L1size).clone();
+  cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
 
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
   // Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));

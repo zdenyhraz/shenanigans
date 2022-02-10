@@ -224,7 +224,7 @@ public:
       if (L1circle.cols != L1size)
         [[unlikely]] L1circle = kirkl(L1size);
       if constexpr (DebugMode)
-        DebugL1B(L2U, L2Upeak, L1size, L1circle);
+        DebugL1B(L2U, L1size, L1circle, L3peak - L3mid);
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
@@ -538,7 +538,7 @@ private:
   void DebugL3(const cv::Mat& L3) const;
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
-  void DebugL1B(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size, const cv::Mat& L1circle) const;
+  void DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Mat& L1circle, const cv::Point2d& L3shift) const;
   void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
   IterativePhaseCorrelation CreateIPCFromParams(const std::vector<f64>& params) const;
