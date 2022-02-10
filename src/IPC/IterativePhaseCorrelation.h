@@ -117,6 +117,7 @@ public:
       std::filesystem::create_directory(dir);
   }
   void SetDebugName(const std::string& name) const { mDebugName = name; }
+  void SetDebugTrueShift(const cv::Point2d& shift) const { mDebugTrueShift = shift; }
 
   i32 GetRows() const { return mRows; }
   i32 GetCols() const { return mCols; }
@@ -269,6 +270,7 @@ public:
   static std::string BandpassType2String(BandpassType type);
   static std::string InterpolationType2String(InterpolationType type);
   static std::string WindowType2String(WindowType type);
+  static cv::Mat DrawCrosshairs(const cv::Mat& mat);
 
 private:
   i32 mRows = 0;
@@ -283,11 +285,12 @@ private:
   BandpassType mBandpassType = BandpassType::Gaussian;
   InterpolationType mInterpolationType = InterpolationType::Linear;
   WindowType mWindowType = WindowType::Hann;
-  mutable std::string mDebugDirectory = "../data/debug";
-  mutable std::string mDebugName = "IPC";
   cv::Mat mBandpass;
   cv::Mat mWindow;
   cv::Mat mL1circle;
+  mutable std::string mDebugDirectory = "../data/debug";
+  mutable std::string mDebugName = "IPC";
+  mutable cv::Point2d mDebugTrueShift;
 
   void UpdateWindow()
   {

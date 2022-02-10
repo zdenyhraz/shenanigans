@@ -102,14 +102,22 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, const cv::Point2d& 
 {
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
   // Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(CalculateL1(L2U, L2Upeak, L1size).mul(L1circle));
+  Plot2D::Plot(DrawCrosshairs(CalculateL1(L2U, L2Upeak, L1size).mul(L1circle)));
 }
 
 void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle) const
 {
   Plot2D::Set(fmt::format("{} L1A", mDebugName));
   // Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(L1.mul(L1circle));
+  Plot2D::Plot(DrawCrosshairs(L1.mul(L1circle)));
+}
+
+cv::Mat IterativePhaseCorrelation::DrawCrosshairs(const cv::Mat& image)
+{
+  cv::Mat mat = image.clone();
+  cv::line(mat, cv::Point(mat.cols / 2, 0), cv::Point(mat.cols / 2, mat.rows - 1), cv::Scalar(0.0f), 1, cv::LINE_AA);
+  cv::line(mat, cv::Point(0, mat.rows / 2), cv::Point(mat.cols - 1, mat.rows / 2), cv::Scalar(0.0f), 1, cv::LINE_AA);
+  return mat;
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
