@@ -277,9 +277,9 @@ private:
   i32 mCols = 0;
   f64 mBandpassL = 0;
   f64 mBandpassH = 1;
-  i32 mL2size = 11;
-  f64 mL1ratio = 0.35;
-  f64 mL1ratioStep = 0.05;
+  i32 mL2size = 7;
+  f64 mL1ratio = 0.5;
+  f64 mL1ratioStep = 0.1;
   i32 mUpsampleCoeff = 15;
   i32 mMaxIterations = 10;
   BandpassType mBandpassType = BandpassType::Gaussian;

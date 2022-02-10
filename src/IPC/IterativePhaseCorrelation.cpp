@@ -953,19 +953,22 @@ try
 
   if constexpr (debugShift)
   {
-    const std::string path1 = "../data/AIA/171A.png";
-    const std::string path2 = "../data/AIA/171A.png";
-    const bool artificialShift = path1 == path2;
-    const cv::Point2d rawshift = artificialShift ? cv::Point2d(rand11() * 0.25 * mCols, rand11() * 0.25 * mRows) : cv::Point2d(0, 0);
-    SetDebugTrueShift(rawshift);
-    cv::Mat image1 = loadImage(path1);
-    cv::Mat image2 = artificialShift ? image1.clone() : loadImage(path2);
-    image1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
-    image2 = roicrop(image2, image2.cols / 2 - rawshift.x, image2.rows / 2 - rawshift.y, mCols, mRows);
+    cv::Mat image = cv::imread("../data/AIA/171A.png", cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    image.convertTo(image, CV_32F);
+    cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
+    const f64 shiftmax = 10.;
+    cv::Point2d shift(rand11() * shiftmax, rand11() * shiftmax);
+    cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
+    cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+    cv::Mat imageShifted;
+    warpAffine(image, imageShifted, T, image.size());
+    cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
+    cv::Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
+    SetDebugTrueShift(shift);
 
     if constexpr (addNoise)
     {
-      f64 noiseStdev = 0.01;
+      const f64 noiseStdev = 0.01;
       cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, CV_32F);
       cv::Mat noise2 = cv::Mat::zeros(image2.rows, image2.cols, CV_32F);
       randn(noise1, 0, noiseStdev);
@@ -975,11 +978,7 @@ try
     }
 
     auto ipcshift = Calculate<DebugMode>(image1, image2);
-
-    if (artificialShift)
-      LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
-    else
-      LOG_INFO("Estimate shift = {}", ipcshift);
+    LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
   }
 
   if constexpr (debugGradualShift)
