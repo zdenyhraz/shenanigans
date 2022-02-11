@@ -285,7 +285,7 @@
   </action>
   <action name="actionIPC">
    <property name="text">
-    <string>Iterative Phase Correlation</string>
+    <string>IPC</string>
    </property>
   </action>
   <action name="actionMandelbrot">

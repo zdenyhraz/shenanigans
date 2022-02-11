@@ -31,7 +31,7 @@
      </font>
     </property>
     <property name="text">
-     <string>DIFFERENTIAL ROTATION MEASUREMENT</string>
+     <string>DIFFROT</string>
     </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">

@@ -345,7 +345,7 @@
      </font>
     </property>
     <property name="text">
-     <string>ITERATIVE PHASE CORRELATION</string>
+     <string>IPC</string>
     </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">
@@ -397,7 +397,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="lineEdit_10">
          <property name="text">
-          <string>../resources/AIA</string>
+          <string>../data/AIA</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -414,7 +414,7 @@
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_11">
          <property name="text">
-          <string>../resources/AIA</string>
+          <string>../data/AIA</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -503,7 +503,7 @@
        <item row="4" column="1">
         <widget class="QLineEdit" name="lineEdit_21">
          <property name="text">
-          <string>5</string>
+          <string>12</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
