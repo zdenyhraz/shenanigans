@@ -214,6 +214,7 @@ public:
     const auto predx = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615); // [deg/day]
     std::vector<cv::Point2d> mcpts(data.theta.size());                         // [px,px]
     std::vector<cv::Point2d> mcptspred(data.theta.size());                     // [px,px]
+    std::vector<cv::Point2d> mcptsz(data.theta.size());                        // [px,px]
 
     for (usize y = 0; y < data.theta.size(); ++y)
     {
@@ -224,26 +225,41 @@ public:
       const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Constants::Rad);
       const f64 mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptspred[y] = cv::Point2d(mcxpred, mcypred);
+
+      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / Constants::Rad);
+      const f64 mcyz = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
+      mcptsz[y] = cv::Point2d(mcxz, mcyz);
     }
 
-    cv::Mat imageclr;
+    cv::Mat imageclr, imageclrz;
     cv::cvtColor(image, imageclr, cv::COLOR_GRAY2RGB);
+    cv::cvtColor(image, imageclrz, cv::COLOR_GRAY2RGB);
     const auto thickness = 13;
     const auto color = 65535. / 255 * cv::Scalar(50., 205., 50.);
     const auto colorpred = 65535. / 255 * cv::Scalar(255., 0, 255.);
     for (usize y = 0; y < mcpts.size() - 1; ++y)
     {
-      const auto pt1 = mcpts[y];
-      const auto pt2 = mcpts[y + 1];
-      cv::line(imageclr, pt1, pt2, color, thickness, cv::LINE_AA);
+      if (data.omegax.cols > 10)
+      {
+        const auto pt1 = mcpts[y];
+        const auto pt2 = mcpts[y + 1];
+        cv::line(imageclr, pt1, pt2, color, thickness, cv::LINE_AA);
+      }
 
       const auto pt1pred = mcptspred[y];
       const auto pt2pred = mcptspred[y + 1];
       cv::line(imageclr, pt1pred, pt2pred, colorpred, thickness, cv::LINE_AA);
+
+      const auto pt1z = mcptsz[y];
+      const auto pt2z = mcptsz[y + 1];
+      cv::line(imageclrz, pt1z, pt2z, colorpred, thickness, cv::LINE_AA);
     }
 
     showimg(imageclr, "meridian curve", false, 0, 1, 1200);
-    saveimg(fmt::format("{}/meridian_curve.png", dataPath), imageclr);
+    showimg(imageclrz, "meridian curve zero", false, 0, 1, 1200);
+
+    saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
+    saveimg(fmt::format("{}/meridian_curve_zero.png", "../data/debug"), imageclrz, false, imageclrz.size() / 6);
   }
 
 private:

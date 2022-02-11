@@ -107,7 +107,7 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const c
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
 
   Plot2D::Set(fmt::format("{} L1B", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
+  Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(mat);
 }
 
@@ -120,7 +120,7 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1cir
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
 
   Plot2D::Set(fmt::format("{} L1A", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
+  Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
   Plot2D::Plot(mat);
 }
 
