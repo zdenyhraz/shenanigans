@@ -3,7 +3,7 @@
 class IterativePhaseCorrelationTest : public ::testing::Test
 {
 protected:
-  IterativePhaseCorrelationTest() : mImg1(loadImage("../test/data/shape.png")), mIPC(std::make_unique<IterativePhaseCorrelation>(mImg1.size())) {}
+  IterativePhaseCorrelationTest() : mImg1(LoadUnitFloatImage("../test/data/shape.png")), mIPC(std::make_unique<IterativePhaseCorrelation>(mImg1.size())) {}
 
   void SetUp() override
   {

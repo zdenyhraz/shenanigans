@@ -1,8 +1,5 @@
 #pragma once
 #include "Fourier/Fourier.h"
-#include "Astrophysics/FITS.h"
-#include "Filtering/Filtering.h"
-#include "Optimization/Evolution.h"
 
 class IterativePhaseCorrelation
 {

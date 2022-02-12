@@ -4,16 +4,16 @@
 
 inline cv::Mat roicrop(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 w, i32 h)
 {
-  if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows) [[unlikely]]
-    throw std::runtime_error("roicrop out of bounds");
+  if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows)
+    [[unlikely]] throw std::runtime_error("roicrop out of bounds");
 
   return sourceimgIn(cv::Rect(x - w / 2, y - h / 2, w, h)).clone();
 }
 
 inline cv::Mat roicropref(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 w, i32 h)
 {
-  if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows) [[unlikely]]
-    throw std::runtime_error("roicrop out of bounds");
+  if (x < 0 or y < 0 or x - w / 2 < 0 or y - h / 2 < 0 or x + w / 2 > sourceimgIn.cols or y + h / 2 > sourceimgIn.rows)
+    [[unlikely]] throw std::runtime_error("roicrop out of bounds");
 
   return sourceimgIn(cv::Rect(x - w / 2, y - h / 2, w, h));
 }
@@ -62,8 +62,8 @@ inline cv::Point2f findCentroid(const cv::Mat& sourceimg)
 
   cv::Point2f ret(Mx / M, My / M);
 
-  if (ret.x < 0 or ret.y < 0 or ret.x > sourceimg.cols or ret.y > sourceimg.rows) [[unlikely]]
-    return cv::Point2f(sourceimg.cols / 2, sourceimg.rows / 2);
+  if (ret.x < 0 or ret.y < 0 or ret.x > sourceimg.cols or ret.y > sourceimg.rows)
+    [[unlikely]] return cv::Point2f(sourceimg.cols / 2, sourceimg.rows / 2);
   else
     return ret;
 }
@@ -123,6 +123,14 @@ inline void Rotate(cv::Mat& image, f32 rot, f32 scale = 1)
   cv::Point2f center((f32)image.cols / 2, (f32)image.rows / 2);
   cv::Mat R = getRotationMatrix2D(center, rot, scale);
   warpAffine(image, image, R, image.size());
+}
+
+inline cv::Mat LoadUnitFloatImage(const std::string& path)
+{
+  cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+  mat.convertTo(mat, CV_32F);
+  normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
+  return mat;
 }
 
 template <>

@@ -1,4 +1,5 @@
 #include "IterativePhaseCorrelation.h"
+#include "Optimization/Evolution.h"
 
 void IterativePhaseCorrelation::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
 {
@@ -300,7 +301,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
 
     // crop the input image - good for solar images, omits the black borders
     static constexpr f32 cropFocusRatio = 0.5;
-    auto image = loadImage(path);
+    auto image = LoadUnitFloatImage(path);
     image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
     images.push_back(image);
     LOG_DEBUG("Loaded image {}", path);
@@ -988,7 +989,7 @@ try
   if constexpr (debugGradualShift)
   {
     SetDebugDirectory("../data/peakshift");
-    const cv::Mat image1 = loadImage("../data/AIA/171A.png");
+    const cv::Mat image1 = LoadUnitFloatImage("../data/AIA/171A.png");
     const cv::Mat crop1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
@@ -1022,7 +1023,7 @@ try
 
   if constexpr (debugWindow)
   {
-    cv::Mat img = roicrop(loadImage("../data/test.png"), 2048, 2048, mCols, mRows);
+    cv::Mat img = roicrop(LoadUnitFloatImage("../data/test.png"), 2048, 2048, mCols, mRows);
     cv::Mat w, imgw;
     createHanningWindow(w, img.size(), CV_32F);
     multiply(img, w, imgw);
@@ -1085,7 +1086,7 @@ try
 
   if constexpr (debugBandpassRinging)
   {
-    cv::Mat img = roicrop(loadImage("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+    cv::Mat img = roicrop(LoadUnitFloatImage("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     cv::Mat fftR = Fourier::fft(img);
     cv::Mat fftG = Fourier::fft(img);
     cv::Mat filterR = cv::Mat::zeros(img.size(), CV_32F);

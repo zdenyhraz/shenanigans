@@ -13,6 +13,7 @@
 #include "Fit/Nnfit.h"
 #include "IPC/IterativePhaseCorrelation.h"
 #include "Plot/PlotCSV.h"
+#include "Filtering/Filtering.h"
 #include "Filtering/HistogramEqualization.h"
 #include "Fractal/Fractal.h"
 #include "Astrophysics/DiffrotResults.h"
@@ -151,8 +152,8 @@ try
   LOG_FUNCTION("RandomShit");
   if (0) // CC/PC dizertacka pics
   {
-    cv::Mat img1 = loadImage("../data/shapef.png");
-    cv::Mat img2 = loadImage("../data/shapesf.png");
+    cv::Mat img1 = LoadUnitFloatImage("../data/shapef.png");
+    cv::Mat img2 = LoadUnitFloatImage("../data/shapesf.png");
 
     addnoise(img1, 0.3);
     addnoise(img2, 0.3);
@@ -400,7 +401,7 @@ try
   }
   if (0) // sasko DFT test
   {
-    cv::Mat img1 = roicropmid(loadImage("../data/test.png"), 1000, 1000);
+    cv::Mat img1 = roicropmid(LoadUnitFloatImage("../data/test.png"), 1000, 1000);
     cv::Mat img2;
     flip(img1, img2, 1);
     rotate(img2, img2, cv::ROTATE_90_COUNTERCLOCKWISE);
@@ -430,8 +431,8 @@ try
   }
   if (0) // ipc shift test
   {
-    cv::Mat img1 = loadImage("../articles/swind/source/1/cropped/crop1.png");
-    cv::Mat img2 = loadImage("../articles/swind/source/1/cropped/crop2.png");
+    cv::Mat img1 = LoadUnitFloatImage("../articles/swind/source/1/cropped/crop1.png");
+    cv::Mat img2 = LoadUnitFloatImage("../articles/swind/source/1/cropped/crop2.png");
 
     i32 sajz = 0;
     cv::Size size(sajz, sajz);
@@ -478,8 +479,8 @@ try
     cv::Point cropfocus(2048, 2048);
     i32 cropsize = 1.0 * 4096;
 
-    cv::Mat img1 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
-    cv::Mat img2 = roicrop(loadImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    cv::Mat img1 = roicrop(LoadUnitFloatImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+    cv::Mat img2 = roicrop(LoadUnitFloatImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
     i32 size = cropsize;
     cv::resize(img1, img1, cv::Size(size, size));
@@ -500,7 +501,7 @@ try
     const i32 sizeStep = 10;
     const i32 iters = (maxsize - minsize + 1) / sizeStep % 2 ? (maxsize - minsize + 1) / sizeStep : (maxsize - minsize + 1) / sizeStep + 1;
     const i32 itersPerSize = 100;
-    cv::Mat img = loadImage("../data/AIA/171A.png");
+    cv::Mat img = LoadUnitFloatImage("../data/AIA/171A.png");
     std::vector<f64> sizes(iters);
     std::vector<f64> timeCpu(iters);
     std::vector<f64> timeGpu(iters);
@@ -543,7 +544,7 @@ try
   }
   if (0) // cuda
   {
-    cv::Mat img = loadImage("../data/test.png");
+    cv::Mat img = LoadUnitFloatImage("../data/test.png");
     cv::Mat fft, fftpacked, gpufft;
     cv::Mat TB, TBpacked, cuTB;
     bool cpu = 1;
@@ -604,7 +605,7 @@ try
   }
   if (0) // non maxima suppression
   {
-    cv::Mat img = loadImage("../data/test.png");
+    cv::Mat img = LoadUnitFloatImage("../data/test.png");
     f32 scale = 1.0;
     cv::resize(img, img, cv::Size(scale * img.cols, scale * img.rows));
     NonMaximaSuppresion(img);
@@ -835,8 +836,8 @@ try
   }
   if (0) // ipc sign test
   {
-    cv::Mat img1 = loadImage("../../data/Shapes/shape.png");
-    cv::Mat img2 = loadImage("../../data/Shapes/shapes.png");
+    cv::Mat img1 = LoadUnitFloatImage("../../data/Shapes/shape.png");
+    cv::Mat img2 = LoadUnitFloatImage("../../data/Shapes/shapes.png");
 
     IterativePhaseCorrelation ipc(img1.rows, img1.cols, 0.1, 200);
 
@@ -846,15 +847,15 @@ try
   }
   if (0) // loadfits test
   {
-    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
-    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
-    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_07__CONT.fits");
-    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_52__CONT.fits");
-    loadImage("D:\\SDOpics\\Calm2020stride25\\2020_02_02__13_16_08__CONT.fits");
+    LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_00_22__CONT.fits");
+    LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_01_07__CONT.fits");
+    LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_07__CONT.fits");
+    LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_01__00_19_52__CONT.fits");
+    LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_02_02__13_16_08__CONT.fits");
   }
   if (0) // loadfits test 2
   {
-    auto pic = loadImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
+    auto pic = LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
     showimg(pic, "pic");
   }
   if (0) // 1D / 2D sorted xs interp test

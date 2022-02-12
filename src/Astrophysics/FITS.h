@@ -435,19 +435,6 @@ public:
   }
 };
 
-inline cv::Mat loadImage(const std::string& path)
-{
-  if (path.find(".fits") != std::string::npos or path.find(".fts") != std::string::npos)
-    return FitsImage(path).image();
-
-  cv::Mat result = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  if (result.empty())
-    throw std::runtime_error(fmt::format("Could not load image '{}'", path));
-  result.convertTo(result, CV_32F);
-  normalize(result, result, 0, 1, cv::NORM_MINMAX);
-  return result;
-}
-
 inline void generateFitsDownloadUrlPairs(i32 delta, i32 step, i32 pics, std::string urlmain)
 {
   std::ofstream urls("D:\\MainOutput\\Fits_urls\\processedurls_raw.txt", std::ios::out | std::ios::trunc);

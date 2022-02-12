@@ -1,5 +1,6 @@
 
 #include "WindowFITS.h"
+#include "Astrophysics/FITS.h"
 
 WindowFITS::WindowFITS(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {
