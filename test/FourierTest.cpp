@@ -1,7 +1,7 @@
 #include "Fourier/Fourier.h"
 #include "IPC/IterativePhaseCorrelation.h"
 
-TEST(FourierTest, ForwardBackwardConsistencyTest)
+TEST(FourierTest, ForwardInverseConsistency)
 {
   auto img = loadImage("../test/data/shape.png");
   ASSERT_EQ(img.depth(), CV_32F);

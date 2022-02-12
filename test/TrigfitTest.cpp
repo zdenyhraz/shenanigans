@@ -1,6 +1,6 @@
-#include "Fit/Polyfit.h"
+#include "Fit/Trigfit.h"
 
-TEST(PolyfitTest, Fit)
+TEST(TrigfitTest, Fit)
 {
   const i32 n = 101;
   const f64 c0 = 3.23, c1 = -2.56, c2 = 1.65;
@@ -8,17 +8,17 @@ TEST(PolyfitTest, Fit)
 
   for (i32 i = 0; i < n; ++i)
   {
-    x[i] = static_cast<f64>(i) / (n - 1);
-    y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
+    x[i] = static_cast<f64>(i) / (n - 1) * 6.28;
+    y[i] = c0 + c1 * std::pow(std::sin(x[i]), 2) + c2 * std::pow(std::sin(x[i]), 4);
   }
 
-  const auto fy = polyfit(x, y, 2);
+  const auto fy = sin2sin4fit(x, y);
   ASSERT_EQ(fy.size(), n);
   for (i32 i = 0; i < n; ++i)
     ASSERT_NEAR(fy[i], y[i], 1e-5);
 }
 
-TEST(PolyfitTest, Coeffs)
+TEST(TrigfitTest, Coeffs)
 {
   const i32 n = 101;
   const f64 c0 = 3.23, c1 = -2.56, c2 = 1.65;
@@ -26,11 +26,11 @@ TEST(PolyfitTest, Coeffs)
 
   for (i32 i = 0; i < n; ++i)
   {
-    x[i] = static_cast<f64>(i) / (n - 1);
-    y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
+    x[i] = static_cast<f64>(i) / (n - 1) * 6.28;
+    y[i] = c0 + c1 * std::pow(std::sin(x[i]), 2) + c2 * std::pow(std::sin(x[i]), 4);
   }
 
-  const auto fc = polyfitCoeffs(x, y, 2);
+  const auto fc = sin2sin4fitCoeffs(x, y);
   ASSERT_EQ(fc.size(), 3);
   ASSERT_NEAR(fc[0], c0, 1e-4);
   ASSERT_NEAR(fc[1], c1, 1e-4);

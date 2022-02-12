@@ -1065,6 +1065,24 @@ try
       Plot2D::Plot(mat);
     }
   }
+  if (0) // polyfit / trigfit test
+  {
+    i32 n = 101;
+    f64 c0 = 3.23, c1 = 2.56, c2 = 1.65;
+    std::vector<f64> x(n), y(n);
+
+    for (i32 i = 0; i < n; ++i)
+    {
+      x[i] = static_cast<f64>(i) / (n - 1) * 6.28;
+      y[i] = c0 + c1 * std::pow(std::sin(x[i]), 2) + c2 * std::pow(std::sin(x[i]), 4);
+    }
+
+    const auto fy = sin2sin4fit(x, y);
+    Plot1D::Set("Polyfit test");
+    Plot1D::SetYnames({"y", "y fit"});
+    Plot1D::SetY2names({"f fit - y"});
+    Plot1D::Plot(x, {y, fy}, {fy - y});
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
