@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowFeatures.h"
-#include "Application/WindowData.h"
+#include "Application/Windows/WindowData.h"
 #include "Features/FeatureMatch.h"
 
 class WindowFeatures : public QMainWindow

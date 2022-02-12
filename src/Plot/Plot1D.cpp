@@ -1,4 +1,3 @@
-#include "Logger/Logger.h"
 #include "Plot1D.h"
 
 std::unordered_map<std::string, Plot1D> Plot1D::mPlots;

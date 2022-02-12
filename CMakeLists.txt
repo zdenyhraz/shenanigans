@@ -115,12 +115,19 @@ find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 target_link_libraries(shenanigans PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
 target_link_libraries(shenanigans_test PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
 
+# qcustomplot
+include_directories("external/qcustomplot")
+file(GLOB_RECURSE SRC_QCUSTOMPLOT CONFIGURE_DEPENDS external/qcustomplot/qcustomplot.h external/qcustomplot/qcustomplot.cpp)
+target_sources(shenanigans PRIVATE ${SRC_QCUSTOMPLOT})
+target_sources(shenanigans_test PRIVATE ${SRC_QCUSTOMPLOT})
+
 # custom
 include_directories("src")
 
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
 src/*.ui src/*.rc src/*.qrc
+src/Application/Windows/*.h src/Application/Windows/*.cpp
 src/Astrophysics/*.h src/Astrophysics/*.cpp
 src/ComplexityEstimation/*.h src/ComplexityEstimation/*.cpp
 src/Core/*.h src/Core/*.cpp
@@ -145,7 +152,7 @@ target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 
 # app sources
-file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/*.h src/Application/*.cpp)
+file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/Application.cpp)
 target_sources(shenanigans PRIVATE ${SRC_APP})
 
 # test sources

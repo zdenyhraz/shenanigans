@@ -1,7 +1,4 @@
 
-#include "Logger/Logger.h"
-#include "Logger/LogFunction.h"
-#include "Plot/Plot2D.h"
 #include "Optimization.h"
 
 OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)

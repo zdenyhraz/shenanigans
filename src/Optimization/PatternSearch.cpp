@@ -1,5 +1,4 @@
 #include "PatternSearch.h"
-#include "Plot/Plot1D.h"
 
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {

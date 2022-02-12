@@ -1,14 +1,8 @@
 #pragma once
-#include "Utils/FunctionsBaseSTL.h"
-#include "UtilsCV/FunctionsBaseCV.h"
 #include "Fourier/Fourier.h"
 #include "Astrophysics/FITS.h"
 #include "Filtering/Filtering.h"
-#include "Logger/Logger.h"
-#include "Logger/LogFunction.h"
 #include "Optimization/Evolution.h"
-#include "Plot/Plot2D.h"
-#include "Plot/Plot1D.h"
 
 class IterativePhaseCorrelation
 {

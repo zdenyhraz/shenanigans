@@ -1,11 +1,4 @@
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
-#include "Plot/Plot.h"
-#include "Logger/Logger.h"
-#include "Logger/LogFunction.h"
-#include "Plot/Plot1D.h"
 #include "Evolution.h"
 
 Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N_)

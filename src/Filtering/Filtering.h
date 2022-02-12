@@ -1,6 +1,4 @@
 #pragma once
-#include "Utils/FunctionsBaseSTL.h"
-#include "UtilsCV/FunctionsBaseCV.h"
 
 struct filterSettings
 {

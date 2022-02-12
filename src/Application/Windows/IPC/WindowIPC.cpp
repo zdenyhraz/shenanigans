@@ -1,6 +1,5 @@
 
 #include "WindowIPC.h"
-#include "Plot/Plot2D.h"
 
 WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {

@@ -1,9 +1,5 @@
 #pragma once
-#include "Utils/FunctionsBaseSTL.h"
-#include "UtilsCV/FunctionsBaseCV.h"
 #include "Filtering/Filtering.h"
-#include "Logger/Logger.h"
-#include "UtilsCV/Showsave.h"
 
 //.fits parameters
 enum class fitsType : char

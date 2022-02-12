@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowShenanigans.h"
-#include "Application/WindowData.h"
+#include "Application/Windows/WindowData.h"
 
 class WindowShenanigans : public QMainWindow
 {

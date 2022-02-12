@@ -1,6 +1,4 @@
 
-#include "Plot/Plot1D.h"
-#include "Plot/Plot2D.h"
 #include "UtilsCV/Vectmat.h"
 #include "Diffrot.h"
 

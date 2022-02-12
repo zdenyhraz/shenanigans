@@ -1,7 +1,5 @@
 
-#include "UtilsCV/Showsave.h"
 #include "Fourier.h"
-#include "Plot/Plot2D.h"
 
 void showfourier(const cv::Mat& DFTimgIn, bool logar, bool expon, const std::string& magnwindowname, const std::string& phasewindowname)
 {

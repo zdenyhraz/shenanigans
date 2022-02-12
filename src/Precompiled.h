@@ -44,7 +44,7 @@
 #include <QCoreApplication>
 
 // QCustomPlot
-#include "Plot/qcustomplot.h"
+#include <qcustomplot.h>
 
 // OpenCV
 #include <opencv2/opencv.hpp>

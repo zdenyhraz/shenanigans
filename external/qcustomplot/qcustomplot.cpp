@@ -1,8 +1,3 @@
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#pragma GCC diagnostic ignored "-Wextra"
-#pragma GCC diagnostic ignored "-Wpedantic"
-#pragma GCC diagnostic ignored "-Wshadow"
 /***************************************************************************
 **                                                                        **
 **  QCustomPlot, an easy to use, modern plotting widget for Qt            **
@@ -30809,4 +30804,3 @@ QPen QCPItemBracket::mainPen() const
   return mSelected ? mSelectedPen : mPen;
 }
 /* end of 'src/items/item-bracket.cpp' */
-#pragma GCC diagnostic pop

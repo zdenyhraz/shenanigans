@@ -12,7 +12,6 @@
 #include <queue>
 #include <functional>
 #include <vector>
-#include "Logger/Logger.h"
 #include "Constants.h"
 
 #define TIMER(name) std::unique_ptr<Timer> t = std::make_unique<Timer>(name);

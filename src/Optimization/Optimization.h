@@ -1,7 +1,4 @@
 #pragma once
-#include "Utils/FunctionsBaseSTL.h"
-#include "UtilsCV/FunctionsBaseCV.h"
-#include "Logger/Logger.h"
 
 class OptimizationAlgorithm
 {

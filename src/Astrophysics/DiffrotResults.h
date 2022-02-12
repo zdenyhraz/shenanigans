@@ -2,8 +2,6 @@
 #include "UtilsCV/FunctionsBaseCV.h"
 #include "Fit/Polyfit.h"
 #include "Fit/Trigfit.h"
-#include "Plot/Plot1D.h"
-#include "Plot/Plot2D.h"
 
 inline f64 predictDiffrotProfile(f64 theta, f64 A, f64 B, f64 C = 0)
 {

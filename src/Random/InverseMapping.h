@@ -1,6 +1,4 @@
 #pragma once
-#include "Utils/FunctionsBaseSTL.h"
-#include "UtilsCV/FunctionsBaseCV.h"
 
 std::vector<f64> inverseMappingZH(const std::vector<std::vector<f64>>& trialInputs, const std::vector<std::vector<f64>>& trialOutputs, const std::vector<f64>& desiredOutput, i32 degree)
 {

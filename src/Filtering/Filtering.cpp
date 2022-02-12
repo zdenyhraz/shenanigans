@@ -1,8 +1,4 @@
 
-#include <random>
-
-#include "UtilsCV/Showsave.h"
-#include "Utils/FunctionsBaseSTL.h"
 #include "Filtering.h"
 
 cv::Mat filterContrastBrightness(const cv::Mat& sourceimg, f64 contrast, f64 brightness)

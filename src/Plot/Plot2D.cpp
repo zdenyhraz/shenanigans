@@ -1,5 +1,3 @@
-#include "Logger/Logger.h"
-#include "Utils/FunctionsBaseSTL.h"
 #include "Plot2D.h"
 
 std::map<std::string, Plot2D> Plot2D::mPlots;
