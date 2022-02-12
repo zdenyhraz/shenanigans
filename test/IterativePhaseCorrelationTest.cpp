@@ -13,7 +13,7 @@ protected:
     ASSERT_TRUE(not mImg2.empty());
   }
 
-  const cv::Point2d mShift = cv::Point2d(128.638, -67.425);
+  const cv::Point2d mShift = cv::Point2d(38.638, -67.425);
   static constexpr f64 mTolerance = 1e6;
   cv::Mat mImg1;
   cv::Mat mImg2;
