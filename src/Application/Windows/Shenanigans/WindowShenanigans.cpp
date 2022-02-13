@@ -1113,14 +1113,17 @@ try
     std::vector<double> y2(n);
     std::vector<double> y3(n);
     std::vector<double> y4(n);
+    cv::Mat z = cv::Mat::zeros(n, n, CV_32F);
 
-    for (i32 i = 0; i < n; ++i)
+    for (i32 r = 0; r < n; ++r)
     {
-      x[i] = static_cast<f64>(i) / (n - 1) * 6.28;
-      y[i] = std::sin(x[i]);
-      y2[i] = std::cos(x[i]) * 5;
-      y3[i] = std::exp(x[i]);
-      y4[i] = std::exp(x[i]) + 120;
+      x[r] = static_cast<f64>(r) / (n - 1) * 6.28;
+      y[r] = std::sin(x[r]);
+      y2[r] = std::cos(x[r]) * 5;
+      y3[r] = std::exp(x[r]);
+      y4[r] = std::exp(x[r]) + 120;
+      for (i32 c = 0; c < n; ++c)
+        z.at<f32>(r, c) = r + c;
     }
 
     Plt::Plot("plot1", {.x = x, .y = y, .title = "x/y"});
@@ -1128,7 +1131,7 @@ try
     Plt::Plot("plot3", {.x = x, .ys = {y, y2}, .label_ys = {"y", "y2"}, .title = "x/ys"});
     Plt::Plot(
         "plot4", {.x = x, .ys = {y, y2}, .y2s = {y3, y4}, .label_ys = {"y", "y2"}, .label_y2s = {"y3", "y4"}, .linestyle_ys = {"b-", "g-"}, .linestyle_y2s = {"r--", "k-."}, .title = "x/ys+y2s"});
-
+    Plt::Plot("plot5", {.z = z, .xlabel = "x", .ylabel = "y", .zlabel = "z", .title = "aww yiss"});
     return;
   }
   if (0) // optimization / metaoptimization

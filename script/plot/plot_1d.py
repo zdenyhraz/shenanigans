@@ -17,7 +17,6 @@ if y2s:
     lines += ax2.plot(x, y2s[i], linestyle_y2s[i] if len(linestyle_y2s) >
                       i else "", label=label_y2s[i] if len(label_y2s) > i else "")
 
-
 if xlabel:
   ax1.set_xlabel(xlabel)
 if ylabel:
@@ -29,7 +28,6 @@ if title:
 if label_y or label_ys or label_y2 or label_y2s:
   labels = [line.get_label() for line in lines]
   plt.legend(lines, labels)
-
 
 plt.draw()
 plt.pause(1e-9)
