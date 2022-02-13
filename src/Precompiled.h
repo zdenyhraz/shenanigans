@@ -116,6 +116,7 @@ namespace py = pybind11;
 #include "Logger/LogFunction.h"
 #include "Plot/Plot1D.h"
 #include "Plot/Plot2D.h"
+#include "Plot/PyPlot.h"
 #include "Utils/Constants.h"
 #include "Utils/FunctionsBaseSTL.h"
 #include "UtilsCV/FunctionsBaseCV.h"

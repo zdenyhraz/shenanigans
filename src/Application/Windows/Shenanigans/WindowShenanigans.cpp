@@ -1084,7 +1084,7 @@ try
     Plot1D::SetY2names({"f fit - y"});
     Plot1D::Plot(x, {y, fy}, {fy - y});
   }
-  if (1) // pybind+matplotlib test
+  if (0) // pybind+matplotlib test
   {
     i32 n = 101;
     std::vector<double> x(n);
@@ -1098,36 +1098,35 @@ try
       y2[i] = std::cos(x[i]) * 1000;
     }
 
-    using namespace py::literals;
     py::dict locals;
     locals["x"] = x;
     locals["y1"] = y1;
     locals["y2"] = y2;
 
-    py::exec(R"(
-    import matplotlib.pyplot as plt
-    plt.figure()
-    plt.plot(x)
-    plt.draw() 
-    plt.pause(1e-9)
-    )",
-        py::globals(), locals);
+    py::eval_file("../script/plot/plot.py", locals);
+  }
+  if (1) // pybind+matplotlib wrap test
+  {
+    i32 n = 101;
+    std::vector<double> x(n);
+    std::vector<double> y(n);
+    std::vector<double> y2(n);
+    std::vector<double> y3(n);
+    std::vector<double> y4(n);
 
-    py::exec(R"(
-    import matplotlib.pyplot as plt
+    for (i32 i = 0; i < n; ++i)
+    {
+      x[i] = static_cast<f64>(i) / (n - 1) * 6.28;
+      y[i] = std::sin(x[i]);
+      y2[i] = std::cos(x[i]) * 5;
+      y3[i] = std::exp(x[i]);
+      y4[i] = std::exp(x[i]) + 120;
+    }
 
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
-    ax1.plot(x, y1, 'g-')
-    ax2.plot(x, y2, 'b-')
-    ax1.set_xlabel('X data')
-    ax1.set_ylabel('Y1 data', color='g')
-    ax2.set_ylabel('Y2 data', color='b')
-
-    plt.draw() 
-    plt.pause(1e-9)
-    )",
-        py::globals(), locals);
+    Plt::Plot("plot", {.x = x, .y = y, .title = "x/y"});
+    Plt::Plot("plot", {.x = x, .y = y, .y2 = y2, .label_y = "y", .label_y2 = "y2", .title = "x/y+y2"});
+    Plt::Plot("plot", {.x = x, .ys = {y, y2}, .label_ys = {"y", "y2"}, .title = "x/ys"});
+    Plt::Plot("plot", {.x = x, .ys = {y, y2}, .y2s = {y3, y4}, .label_ys = {"y", "y2"}, .label_y2s = {"y3", "y4"}, .title = "x/ys+y2s"});
 
     return;
   }
