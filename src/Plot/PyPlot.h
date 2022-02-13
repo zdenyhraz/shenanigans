@@ -16,4 +16,10 @@ public:
   };
 
   static void Plot(std::string&& name, Data&& data);
+
+private:
+  inline static std::unordered_map<std::string, u32> mPlotIds;
+  inline static u32 mId = 0;
+
+  static py::dict GetScopeData(const std::string& name, const Data& data);
 };

@@ -1123,10 +1123,11 @@ try
       y4[i] = std::exp(x[i]) + 120;
     }
 
-    Plt::Plot("plot", {.x = x, .y = y, .title = "x/y"});
-    Plt::Plot("plot", {.x = x, .y = y, .y2 = y2, .label_y = "y", .label_y2 = "y2", .title = "x/y+y2"});
-    Plt::Plot("plot", {.x = x, .ys = {y, y2}, .label_ys = {"y", "y2"}, .title = "x/ys"});
-    Plt::Plot("plot", {.x = x, .ys = {y, y2}, .y2s = {y3, y4}, .label_ys = {"y", "y2"}, .label_y2s = {"y3", "y4"}, .linestyle_ys = {"b-", "g-"}, .linestyle_y2s = {"r--", "k-."}, .title = "x/ys+y2s"});
+    Plt::Plot("plot1", {.x = x, .y = y, .title = "x/y"});
+    Plt::Plot("plot2", {.x = x, .y = y, .y2 = y2, .label_y = "y", .label_y2 = "y2", .title = "x/y+y2"});
+    Plt::Plot("plot3", {.x = x, .ys = {y, y2}, .label_ys = {"y", "y2"}, .title = "x/ys"});
+    Plt::Plot(
+        "plot4", {.x = x, .ys = {y, y2}, .y2s = {y3, y4}, .label_ys = {"y", "y2"}, .label_y2s = {"y3", "y4"}, .linestyle_ys = {"b-", "g-"}, .linestyle_y2s = {"r--", "k-."}, .title = "x/ys+y2s"});
 
     return;
   }

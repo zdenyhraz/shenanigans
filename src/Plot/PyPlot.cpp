@@ -2,7 +2,16 @@
 
 void Plt::Plot(std::string&& name, Data&& data)
 {
+  if (not mPlotIds.contains(name))
+    mPlotIds[name] = mId++;
+
+  py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
+}
+
+py::dict Plt::GetScopeData(const std::string& name, const Data& data)
+{
   py::dict scope;
+  scope["id"] = mPlotIds[name];
   scope["x"] = data.x;
   scope["y"] = data.y;
   scope["y2"] = data.y2;
@@ -22,5 +31,5 @@ void Plt::Plot(std::string&& name, Data&& data)
   scope["linestyle_ys"] = data.linestyle_ys;
   scope["linestyle_y2s"] = data.linestyle_y2s;
 
-  py::eval_file(fmt::format("../script/plot/{}.py", name), scope);
+  return scope;
 }
