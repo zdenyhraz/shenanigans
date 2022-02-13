@@ -30,6 +30,7 @@ public:
     std::string title;
   };
 
+  static void Initialize();
   static void Plot(std::string&& name, Data1D&& data);
   static void Plot(std::string&& name, Data2D&& data);
 
