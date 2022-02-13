@@ -5,15 +5,17 @@ ax2 = ax1.twinx() if (y2 or y2s) else None
 lines = []
 
 if y:
-  lines += ax1.plot(x, y, label=label_y if label_y else "")
+  lines += ax1.plot(x, y, linestyle_y, label=label_y if label_y else "")
 if y2:
-  lines += ax2.plot(x, y2, label=label_y2 if label_y2 else "")
+  lines += ax2.plot(x, y2, linestyle_y2, label=label_y2 if label_y2 else "")
 if ys:
   for i in range(0, len(ys)):
-    lines += ax1.plot(x, ys[i], label=label_ys[i] if len(label_ys) > i else "")
+    lines += ax1.plot(x, ys[i], linestyle_ys[i] if len(linestyle_ys) >
+                      i else "", label=label_ys[i] if len(label_ys) > i else "")
 if y2s:
   for i in range(0, len(y2s)):
-    lines += ax2.plot(x, y2s[i], label=label_y2s[i] if len(label_y2s) > i else "")
+    lines += ax2.plot(x, y2s[i], linestyle_y2s[i] if len(linestyle_y2s) >
+                      i else "", label=label_y2s[i] if len(label_y2s) > i else "")
 
 
 if xlabel:
