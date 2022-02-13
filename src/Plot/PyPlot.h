@@ -1,6 +1,6 @@
 #pragma once
 
-class Plt
+class PyPlot
 {
 public:
   struct Data1D
@@ -19,6 +19,7 @@ public:
   {
     cv::Mat z;
     std::string xlabel = "x", ylabel = "y", zlabel = "z";
+    f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
     std::string title;
   };
 

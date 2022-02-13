@@ -1,7 +1,13 @@
 import matplotlib.pyplot as plt
-
 fig, ax1 = plt.subplots(num=id)
+if fig.get_size_inches()[1] < 6:
+  fig.set_size_inches(fig.get_size_inches()*1.5)
+
+# fig.clf()
+ax1.clear()
 ax2 = ax1.twinx() if (y2 or y2s) else None
+if ax2:
+  ax2.clear()
 lines = []
 
 if y:

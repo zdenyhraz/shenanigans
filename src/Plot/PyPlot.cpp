@@ -1,24 +1,24 @@
 #include "PyPlot.h"
 
-void Plt::Plot(std::string&& name, Data1D&& data)
+void PyPlot::Plot(std::string&& name, Data1D&& data)
 {
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
 }
 
-void Plt::Plot(std::string&& name, Data2D&& data)
+void PyPlot::Plot(std::string&& name, Data2D&& data)
 {
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
 }
 
-void Plt::CheckIfPlotExists(const std::string& name)
+void PyPlot::CheckIfPlotExists(const std::string& name)
 {
   if (not mPlotIds.contains(name))
     mPlotIds[name] = mId++;
 }
 
-py::dict Plt::GetScopeData(const std::string& name, const Data1D& data)
+py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 {
   py::dict scope;
   scope["id"] = mPlotIds[name];
@@ -43,7 +43,7 @@ py::dict Plt::GetScopeData(const std::string& name, const Data1D& data)
   return scope;
 }
 
-py::dict Plt::GetScopeData(const std::string& name, const Data2D& data)
+py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
 {
   auto z = zerovect2(data.z.rows, data.z.cols, 0.0f);
   for (i32 r = 0; r < data.z.rows; ++r)
@@ -56,6 +56,10 @@ py::dict Plt::GetScopeData(const std::string& name, const Data2D& data)
   scope["xlabel"] = data.xlabel;
   scope["ylabel"] = data.ylabel;
   scope["zlabel"] = data.zlabel;
+  scope["xmin"] = data.xmin;
+  scope["xmax"] = data.xmax;
+  scope["ymin"] = data.ymin;
+  scope["ymax"] = data.ymax;
   scope["title"] = data.title;
 
   return scope;
