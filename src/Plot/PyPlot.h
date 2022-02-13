@@ -22,8 +22,10 @@ public:
   struct Data2D
   {
     cv::Mat z;
-    std::string xlabel = "x", ylabel = "y", zlabel = "z";
     f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
+    std::string xlabel = "x", ylabel = "y", zlabel = "z";
+    bool interp = true;
+    f64 aspectratio = 1;
     std::string title;
   };
 

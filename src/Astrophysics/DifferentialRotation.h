@@ -203,6 +203,14 @@ public:
     Plot1D::Plot(Constants::Rad * dataAfter.theta,
         {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2), sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)),
             GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)});
+
+    PyPlot::Plot("Diffrot opt",
+        {.x = Constants::Rad * dataAfter.theta,
+            .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
+                sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
+            .xlabel = "latitude [deg]",
+            .ylabel = "average omega x [deg/day]",
+            .label_ys = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"}});
   }
 
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, i32 idstart, f64 timestep)
@@ -257,9 +265,8 @@ public:
 
     showimg(imageclr, "meridian curve", false, 0, 1, 1200);
     showimg(imageclrz, "meridian curve zero", false, 0, 1, 1200);
-
-    saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
-    saveimg(fmt::format("{}/meridian_curve_zero.png", "../data/debug"), imageclrz, false, imageclrz.size() / 6);
+    // saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
+    // saveimg(fmt::format("{}/meridian_curve_zero.png", "../data/debug"), imageclrz, false, imageclrz.size() / 6);
   }
 
 private:
@@ -393,94 +400,47 @@ private:
     const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
     PlotMeridianCurve(data, dataPath, idstart, 27);
 
-    // fits params
-    Plot1D::Set("fits params");
-    Plot1D::SetXlabel("time [days]");
-    Plot1D::SetYlabel("fits shift [px]");
-    Plot1D::SetY2label("theta0 [deg]");
-    Plot1D::SetYnames({"center shift x", "center shift y"});
-    Plot1D::SetY2names({"theta0"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(times, {data.fshiftx, data.fshifty}, {Constants::Rad * data.theta0});
+    PyPlot::Plot("fits params", {.x = times,
+                                    .ys = {data.fshiftx, data.fshifty},
+                                    .y2s = {Constants::Rad * data.theta0},
+                                    .xlabel = "time [days]",
+                                    .ylabel = "fits shift [px]",
+                                    .y2label = "theta0 [deg]",
+                                    .label_ys = {"center shift x", "center shift y"},
+                                    .label_y2s = {"theta0"}});
+    PyPlot::Plot("avgshift x", {.x = Constants::Rad * data.theta,
+                                   .y = GetRowAverage(data.shiftx),
+                                   .y2 = GetRowAverage(data.shifty),
+                                   .xlabel = "latitude [deg]",
+                                   .ylabel = "average shift x [px]",
+                                   .y2label = "average shift y [px]",
+                                   .label_y = "ipc x",
+                                   .label_y2 = "ipc y"});
+    PyPlot::Plot("avgomega x", {
+                                   .x = Constants::Rad * data.theta,
+                                   .ys = {GetRowAverage(data.omegax), polyfit(data.theta, GetRowAverage(data.omegax), 2), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
+                                       GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
+                                   .xlabel = "latitude [deg]",
+                                   .ylabel = "average omega x [deg/day]",
+                                   .label_ys = {"ipc", "ipc polyfit", "ipc trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+                               });
+    PyPlot::Plot("avgomega y", {
+                                   .x = Constants::Rad * data.theta,
+                                   .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
+                                   .xlabel = "latitude [deg]",
+                                   .ylabel = "average omega x [deg/day]",
+                                   .label_ys = {"ipc", "ipc polyfit"},
+                               });
 
-    // average shifts x / y
-    Plot1D::Set("avgshiftx");
-    Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average shift x [px]");
-    Plot1D::SetY2label("average shift y [px]");
-    Plot1D::SetYnames({"ipc x"});
-    Plot1D::SetY2names({"ipc y"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.shiftx)}, {GetRowAverage(data.shifty)});
-
-    // average omegas x
-    Plot1D::Set("avgomegax");
-    Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"ipc", "ipc polyfit", "ipc trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegax), polyfit(data.theta, GetRowAverage(data.omegax), 2), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
-                                                  GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)});
-
-    // average omegas y
-    Plot1D::Set("avgomegay");
-    Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average omega y [deg/day]");
-    Plot1D::SetYnames({"ipc", "ipc polyfit"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * data.theta, {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)});
-
-    // shifts x
-    Plot2D::Set("shiftx");
-    Plot2D::SetColRowRatio(1.5);
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::SetXmin(times.front());
-    Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(data.theta.back() * Constants::Rad);
-    Plot2D::SetYmax(data.theta.front() * Constants::Rad);
-    Plot2D::SetXlabel("time [days]");
-    Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("shifts x [px]");
-    Plot2D::Plot(data.shiftx);
-
-    // omegas x
-    Plot2D::Set("omegax");
-    Plot2D::SetColRowRatio(1.5);
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::SetXmin(times.front());
-    Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(data.theta.back() * Constants::Rad);
-    Plot2D::SetYmax(data.theta.front() * Constants::Rad);
-    Plot2D::SetXlabel("time [days]");
-    Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("omegas x [px]");
-    Plot2D::Plot(data.omegax);
-
-    // shifts y
-    Plot2D::Set("shifty");
-    Plot2D::SetColRowRatio(1.5);
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::SetXmin(times.front());
-    Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(data.theta.back() * Constants::Rad);
-    Plot2D::SetYmax(data.theta.front() * Constants::Rad);
-    Plot2D::SetXlabel("time [days]");
-    Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("shifts y [px]");
-    Plot2D::Plot(data.shifty);
-
-    // omegas y
-    Plot2D::Set("omegay");
-    Plot2D::SetColRowRatio(1.5);
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::SetXmin(times.front());
-    Plot2D::SetXmax(times.back());
-    Plot2D::SetYmin(data.theta.back() * Constants::Rad);
-    Plot2D::SetYmax(data.theta.front() * Constants::Rad);
-    Plot2D::SetXlabel("time [days]");
-    Plot2D::SetYlabel("latitude [deg]");
-    Plot2D::SetZlabel("omegas y [px]");
-    Plot2D::Plot(data.omegay);
+    const f64 xmin = times.front(), xmax = times.back();
+    const f64 ymin = data.theta.back() * Constants::Rad, ymax = data.theta.front() * Constants::Rad;
+    const std::string xlabel = "time [days]";
+    const std::string ylabel = "latitude [deg]";
+    const f64 aspectratio = 2;
+    PyPlot::Plot("shift x", {.z = data.shiftx, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "shift x [px]", .aspectratio = aspectratio});
+    PyPlot::Plot("omega x", {.z = data.omegax, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega x [px]", .aspectratio = aspectratio});
+    PyPlot::Plot("shift y", {.z = data.shifty, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "shift y [px]", .aspectratio = aspectratio});
+    PyPlot::Plot("omega y", {.z = data.omegay, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega y [px]", .aspectratio = aspectratio});
   }
 
   void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation& ipc, const std::string& dataPath) const

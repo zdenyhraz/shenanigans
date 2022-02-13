@@ -1105,7 +1105,7 @@ try
 
     py::eval_file("../script/plot/plot.py", locals);
   }
-  if (1) // pybind+matplotlib wrap test
+  if (0) // pybind+matplotlib wrap test
   {
     i32 n = 101;
     std::vector<f64> x(n);
@@ -1139,8 +1139,7 @@ try
                               .linestyle_ys = {"-", "--"},
                               .linestyle_y2s = {"-.", "-"},
                               .title = "x/ys+y2s"});
-    PyPlot::Plot("plot5", {.z = z, .xlabel = "x", .ylabel = "y", .zlabel = "z", .xmin = -1, .xmax = 12, .ymin = -1, .ymax = 1, .title = "aww yiss"});
-    return;
+    PyPlot::Plot("plot5", {.z = z, .xmin = -1, .xmax = 12, .ymin = -1, .ymax = 1, .xlabel = "x", .ylabel = "y", .zlabel = "z", .title = "aww yiss"});
   }
   if (0) // optimization / metaoptimization
   {

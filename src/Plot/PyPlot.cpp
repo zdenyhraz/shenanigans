@@ -43,7 +43,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["xlabel"] = data.xlabel;
   scope["ylabel"] = data.ylabel;
   scope["y2label"] = data.y2label;
-  scope["title"] = data.title;
+  scope["title"] = not data.title.empty() ? data.title : name;
   scope["label_y"] = data.label_y;
   scope["label_y2"] = data.label_y2;
   scope["label_ys"] = data.label_ys;
@@ -78,7 +78,9 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   scope["xmax"] = data.xmax;
   scope["ymin"] = data.ymin;
   scope["ymax"] = data.ymax;
-  scope["title"] = data.title;
+  scope["interp"] = data.interp;
+  scope["aspectratio"] = data.aspectratio;
+  scope["title"] = not data.title.empty() ? data.title : name;
 
   return scope;
 }

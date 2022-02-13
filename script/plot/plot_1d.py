@@ -1,10 +1,25 @@
 import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 22})
-#plt.rcParams.update({'font.family': 'Newyork'})
+
+FONT_SCALE = 2.2
+SMALL_SIZE = 8*FONT_SCALE
+MEDIUM_SIZE = 10*FONT_SCALE
+BIGGER_SIZE = 12*FONT_SCALE
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 fig = plt.figure(num=id)
-if fig.get_size_inches()[1] < 6:
-  fig.set_size_inches(fig.get_size_inches()*2)
+fig.canvas.set_window_title(title)
+
+if fig.get_figheight() < 5:
+  fig.set_figheight(fig.get_figheight()*2)
+  fig.set_figwidth(fig.get_figwidth()*2*aspectratio)
+
 fig.clf()
 ax1 = fig.subplots()
 ax2 = ax1.twinx() if (y2 or y2s) else None
