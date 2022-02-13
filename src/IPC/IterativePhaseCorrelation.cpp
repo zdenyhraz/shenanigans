@@ -360,6 +360,12 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
       }
     }
   }
+
+  std::sort(imagePairs.begin(), imagePairs.end(), [](const auto& a, const auto& b) {
+    const auto& [img1a, img2a, shifta] = a;
+    const auto& [img1b, img2b, shiftb] = b;
+    return shifta.x < shiftb.x;
+  });
   return imagePairs;
 }
 
@@ -564,6 +570,13 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot(shiftsXReference, {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference});
 
+  PyPlot::Plot("IPCshift", {.x = shiftsXReference,
+                               .ys = {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference},
+                               .xlabel = "reference shift [px]",
+                               .ylabel = "calculated shift [px]",
+                               .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
+                               .linestyle_ys = {"k-", "r-", "m-", "g-", "b-"}});
+
   Plot1D::Set("IPCshift error");
   Plot1D::SetSavePath("../data/debug/ipc_opt_error.png");
   Plot1D::SetXlabel("reference shift [px]");
@@ -572,6 +585,13 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
   Plot1D::SetPens({QPen(Plot::black, Plot::pt), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt), QPen(Plot::blue, Plot::pt)});
   Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
   Plot1D::Plot(shiftsXReference, {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError});
+
+  PyPlot::Plot("IPCshift error", {.x = shiftsXReference,
+                                     .ys = {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError},
+                                     .xlabel = "reference shift [px]",
+                                     .ylabel = "error [px]",
+                                     .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
+                                     .linestyle_ys = {"k-", "r-", "m-", "g-", "b-"}});
 }
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const

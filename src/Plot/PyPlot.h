@@ -2,6 +2,7 @@
 
 class PyPlot
 {
+  // colors: tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
 public:
   struct Data1D
   {
@@ -10,7 +11,9 @@ public:
     std::string xlabel = "x", ylabel = "y", y2label = "y2"; // plot labels
     std::string label_y = "y", label_y2 = "y2";             // data labels
     std::vector<std::string> label_ys, label_y2s;           // multi data labels
-    std::string linestyle_y, linestyle_y2;                  // line styles
+    std::string color_y, color_y2;                          // line colors
+    std::vector<std::string> color_ys, color_y2s;           // line colors
+    std::string linestyle_y = "-", linestyle_y2 = "-";      // line styles
     std::vector<std::string> linestyle_ys, linestyle_y2s;   // multi line styles
     std::string title;                                      // plot title
   };

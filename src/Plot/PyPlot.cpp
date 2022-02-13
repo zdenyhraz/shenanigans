@@ -1,15 +1,25 @@
 #include "PyPlot.h"
 
 void PyPlot::Plot(std::string&& name, Data1D&& data)
+try
 {
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
 }
+catch (const std::exception& e)
+{
+  LOG_ERROR("PyPlot::Plot error: {}", e.what());
+}
 
 void PyPlot::Plot(std::string&& name, Data2D&& data)
+try
 {
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("PyPlot::Plot error: {}", e.what());
 }
 
 void PyPlot::CheckIfPlotExists(const std::string& name)
@@ -35,6 +45,10 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["label_y2"] = data.label_y2;
   scope["label_ys"] = data.label_ys;
   scope["label_y2s"] = data.label_y2s;
+  scope["color_y"] = data.color_y;
+  scope["color_y2"] = data.color_y2;
+  scope["color_ys"] = data.color_ys;
+  scope["color_y2s"] = data.color_y2s;
   scope["linestyle_y"] = data.linestyle_y;
   scope["linestyle_y2"] = data.linestyle_y2;
   scope["linestyle_ys"] = data.linestyle_ys;
