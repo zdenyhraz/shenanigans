@@ -58,5 +58,6 @@ if label_y or label_ys or label_y2 or label_y2s:
   labels = [line.get_label() for line in lines]
   plt.legend(lines, labels)
 
+fig.tight_layout()
 plt.draw()
 plt.pause(1e-9)

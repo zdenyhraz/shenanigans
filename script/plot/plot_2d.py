@@ -22,8 +22,7 @@ if fig.get_figheight() < 5:
 
 plt.clf()
 plt.jet()
-plt.imshow(z, extent=[xmin, xmax, ymin, ymax], interpolation='bilinear' if interp else 'none',
-           aspect='auto')
+plt.imshow(z, extent=[xmin, xmax, ymin, ymax], interpolation='bilinear' if interp else 'none', aspect='auto')
 cbar = plt.colorbar()
 
 if xlabel:
@@ -35,5 +34,6 @@ if zlabel:
 if title:
   plt.title(title)
 
+fig.tight_layout()
 plt.draw()
 plt.pause(1e-9)

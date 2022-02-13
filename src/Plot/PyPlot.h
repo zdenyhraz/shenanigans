@@ -16,6 +16,7 @@ public:
     std::vector<std::string> color_ys, color_y2s;           // line colors
     std::string linestyle_y = "-", linestyle_y2 = "-";      // line styles
     std::vector<std::string> linestyle_ys, linestyle_y2s;   // multi line styles
+    f64 aspectratio = 1;                                    // aspect ratio
     std::string title;                                      // plot title
   };
 

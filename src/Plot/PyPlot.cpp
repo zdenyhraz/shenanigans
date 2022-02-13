@@ -43,7 +43,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["xlabel"] = data.xlabel;
   scope["ylabel"] = data.ylabel;
   scope["y2label"] = data.y2label;
-  scope["title"] = not data.title.empty() ? data.title : name;
   scope["label_y"] = data.label_y;
   scope["label_y2"] = data.label_y2;
   scope["label_ys"] = data.label_ys;
@@ -56,6 +55,8 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["linestyle_y2"] = data.linestyle_y2;
   scope["linestyle_ys"] = data.linestyle_ys;
   scope["linestyle_y2s"] = data.linestyle_y2s;
+  scope["aspectratio"] = data.aspectratio;
+  scope["title"] = not data.title.empty() ? data.title : name;
 
   return scope;
 }
