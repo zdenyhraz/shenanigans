@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
+
+    - uses: actions/setup-python@v2
     
     - name: OpenCV Cache
       id: opencv-cache
