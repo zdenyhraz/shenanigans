@@ -1123,7 +1123,7 @@ try
       y3[r] = std::exp(x[r]) + rand01() * 100;
       y4[r] = std::exp(x[r]) + 120 + rand01() * 100;
       for (i32 c = 0; c < n; ++c)
-        z.at<f32>(r, c) = r + c + rand01() * 10;
+        z.at<f32>(r, c) = r + c + rand01() * 100;
     }
 
     PyPlot::Plot("plot1", {.x = x, .y = y, .title = "x/y"});
