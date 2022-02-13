@@ -3,6 +3,7 @@
 void PyPlot::Plot(std::string&& name, Data1D&& data)
 try
 {
+  PROFILE_FUNCTION;
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
 }
@@ -14,6 +15,7 @@ catch (const std::exception& e)
 void PyPlot::Plot(std::string&& name, Data2D&& data)
 try
 {
+  PROFILE_FUNCTION;
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
 }
@@ -30,6 +32,7 @@ void PyPlot::CheckIfPlotExists(const std::string& name)
 
 py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 {
+  PROFILE_FUNCTION;
   py::dict scope;
   scope["id"] = mPlotIds[name];
   scope["x"] = data.x;
@@ -59,6 +62,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 
 py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
 {
+  PROFILE_FUNCTION;
   auto z = zerovect2(data.z.rows, data.z.cols, 0.0f);
   for (i32 r = 0; r < data.z.rows; ++r)
     for (i32 c = 0; c < data.z.cols; ++c)

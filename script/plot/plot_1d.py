@@ -19,15 +19,17 @@ if y2:
                     linestyle=linestyle_y2, label=label_y2, linewidth=4)
 if ys:
   for i in range(0, len(ys)):
-    lines += ax1.plot(x, ys[i],
-                      color=color_ys[i] if len(color_ys) > i else next(color_cycle)['color'], linestyle=linestyle_ys
-                      [i] if len(linestyle_ys) > i else '-', label=label_ys[i] if len(label_ys) > i else '', linewidth=4)
+    if len(ys[i]) > 0:
+      lines += ax1.plot(x, ys[i],
+                        color=color_ys[i] if len(color_ys) > i else next(color_cycle)['color'], linestyle=linestyle_ys
+                        [i] if len(linestyle_ys) > i else '-', label=label_ys[i] if len(label_ys) > i else '', linewidth=4)
 if y2s:
   for i in range(0, len(y2s)):
-    lines += ax2.plot(x, y2s[i],
-                      color=color_y2s[i] if len(color_y2s) > i else next(color_cycle)['color'],
-                      linestyle=linestyle_y2s[i] if len(linestyle_y2s) > i else '-', label=label_y2s[i]
-                      if len(label_y2s) > i else '', linewidth=4)
+    if len(y2s[i]) > 0:
+      lines += ax2.plot(x, y2s[i],
+                        color=color_y2s[i] if len(color_y2s) > i else next(color_cycle)['color'],
+                        linestyle=linestyle_y2s[i] if len(linestyle_y2s) > i else '-', label=label_y2s[i]
+                        if len(label_y2s) > i else '', linewidth=4)
 
 if xlabel:
   ax1.set_xlabel(xlabel)

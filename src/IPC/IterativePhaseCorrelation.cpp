@@ -575,7 +575,7 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
                                .xlabel = "reference shift [px]",
                                .ylabel = "calculated shift [px]",
                                .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
-                               .linestyle_ys = {"k-", "r-", "m-", "g-", "b-"}});
+                               .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 
   Plot1D::Set("IPCshift error");
   Plot1D::SetSavePath("../data/debug/ipc_opt_error.png");
@@ -591,7 +591,7 @@ void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Poin
                                      .xlabel = "reference shift [px]",
                                      .ylabel = "error [px]",
                                      .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
-                                     .linestyle_ys = {"k-", "r-", "m-", "g-", "b-"}});
+                                     .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 }
 
 std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
