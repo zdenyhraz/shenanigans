@@ -4,7 +4,8 @@ int main(int argc, char** argv)
 try
 {
   PROFILE_APP("Shenanigans");
-  srand(time(0));
+  py::scoped_interpreter guard{};
+  std::srand(std::time(nullptr));
   qputenv("QT_SCALE_FACTOR", "2.0");
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

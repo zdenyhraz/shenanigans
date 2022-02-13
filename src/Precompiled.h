@@ -30,9 +30,9 @@
 // OpenMP
 #include <omp.h>
 
-// matplotlib
-//#include <matplotlibcpp.h>
-// namespace plt = matplotlibcpp;
+// pybind11
+#include <pybind11/embed.h>
+#include <pybind11/stl.h>
 
 // Qt
 #include <QtWidgets>
@@ -84,6 +84,7 @@ using f64 = double;
 using f128 = long double;
 using usize = size_t;
 namespace json = nlohmann;
+namespace py = pybind11;
 
 #ifdef ENABLE_PROFILING
   #ifdef TRACY_ENABLE

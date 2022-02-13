@@ -23,7 +23,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(ENABLE_MATPLOTLIB OFF)
 set(ENABLE_PROFILING ON)
 set(ENABLE_TRACY ON)
 set(ENABLE_OPTICK OFF)
@@ -41,11 +40,18 @@ endif()
 # status messages
 message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
-message(STATUS "ENABLE_MATPLOTLIB: " ${ENABLE_MATPLOTLIB})
 
 # targets
 add_executable(shenanigans)
 add_executable(shenanigans_test)
+
+# pybind11
+find_package(PythonLibs REQUIRED)
+add_subdirectory(external/pybind11)
+include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories("external/pybind11/include")
+target_link_libraries(shenanigans PRIVATE pybind11::embed)
+target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
 
 # fmt
 add_subdirectory(external/fmt)
@@ -94,14 +100,6 @@ if(ENABLE_PROFILING)
     target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
   endif()
   add_compile_definitions(ENABLE_PROFILING)
-endif()
-
-# matplotlib
-if(ENABLE_MATPLOTLIB)
-  find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
-  include_directories("external/matplotlib")
-  target_link_libraries(shenanigans PRIVATE Python3::Python Python3::Module Python3::NumPy)
-  target_link_libraries(shenanigans_test PRIVATE Python3::Python Python3::Module Python3::NumPy)
 endif()
 
 # opencv

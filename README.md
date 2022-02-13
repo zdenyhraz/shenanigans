@@ -48,7 +48,7 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 
 ## Profiling
 ### Profiling with [Valgrind](https://valgrind.org/) / [Callgrind](https://valgrind.org/docs/manual/cl-manual.html) / [Kcachegrind](http://kcachegrind.sourceforge.net/html/Documentation.html)
-- run `./script/kcachegrind.sh`
+- run `./script/perf/kcachegrind.sh`
 
 ### Profiling with [Optick](https://github.com/bombomby/optick)
 - run the app with `ENABLE_PROFILING` defined
@@ -60,7 +60,7 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 - install the required libraries `sudo apt-get -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
 - build the profiler via `make release -j12` in `./external/tracy/profiler/build/unix/`
 - run the app with `ENABLE_PROFILING` defined
-- run `script/tracy.sh` or `./external/tracy/profiler/build/unix/Tracy-release` and click connect
+- run `script/perf/tracy.sh` or `./external/tracy/profiler/build/unix/Tracy-release` and click connect
 - save the trace file if needed
 <img src="data/readme/tracy.png" width="100%">
 
