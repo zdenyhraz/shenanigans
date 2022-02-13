@@ -2,7 +2,8 @@
 
 class PyPlot
 {
-  // colors: tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
+  // colors: b, g, r, c, m, y, k, w, tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
+  // for all colors see https://matplotlib.org/stable/gallery/color/named_colors.html
 public:
   struct Data1D
   {

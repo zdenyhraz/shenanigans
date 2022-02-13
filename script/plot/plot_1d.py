@@ -8,16 +8,15 @@ if fig.get_size_inches()[1] < 6:
 fig.clf()
 ax1 = fig.subplots()
 ax2 = ax1.twinx() if (y2 or y2s) else None
-lines = []
 color_cycle = ax1._get_lines.prop_cycler
-
+lines = []
 
 if y:
   lines += ax1.plot(x, y, color=color_y if color_y else next(color_cycle)['color'],
-                    linestyle=linestyle_y, label=label_y if label_y else '', linewidth=4)
+                    linestyle=linestyle_y, label=label_y, linewidth=4)
 if y2:
   lines += ax2.plot(x, y2, color=color_y2 if color_y2 else next(color_cycle)['color'],
-                    linestyle=linestyle_y2, label=label_y2 if label_y2 else '', linewidth=4)
+                    linestyle=linestyle_y2, label=label_y2, linewidth=4)
 if ys:
   for i in range(0, len(ys)):
     lines += ax1.plot(x, ys[i],

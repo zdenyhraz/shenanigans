@@ -1137,7 +1137,7 @@ try
                               .color_ys = {"tab:blue", "tab:orange"},
                               .color_y2s = {"tab:green", "tab:purple"},
                               .linestyle_ys = {"-", "--"},
-                              .linestyle_y2s = {"-.", ":"},
+                              .linestyle_y2s = {"-.", "-"},
                               .title = "x/ys+y2s"});
     PyPlot::Plot("plot5", {.z = z, .xlabel = "x", .ylabel = "y", .zlabel = "z", .xmin = -1, .xmax = 12, .ymin = -1, .ymax = 1, .title = "aww yiss"});
     return;
