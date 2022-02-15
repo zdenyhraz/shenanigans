@@ -15,4 +15,4 @@ jobs:
       run: sudo apt-get install -y clang-tidy
 
     - name: Run clang-tidy
-      run: find src/ -iname *.h -o -iname *.cpp | xargs clang-format -style=file
+      run: clang-format -style=file *.cpp *.h
