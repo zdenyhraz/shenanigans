@@ -3,7 +3,7 @@ class DataCache
 {
 public:
   using GetDataFunction = std::function<Value(const Key&)>;
-  DataCache(const GetDataFunction& getDataFunction) : mGetDataFunction(getDataFunction) {}
+  explicit DataCache(const GetDataFunction& getDataFunction) : mGetDataFunction(getDataFunction) {}
 
   const Value Get(const Key& key)
   {

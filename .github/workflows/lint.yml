@@ -29,3 +29,16 @@ jobs:
       run: | 
         cppcheck --std=c++20 --enable=all -I external/ --report-progress --output-file=cppcheck_report.txt src/
         cat cppcheck_report.txt
+  
+  cpplint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2
+    - uses: BSFishy/pip-action@v1
+      with:
+        packages: cpplint
+
+    - name: Run cpplint
+      run: find src/ -name '*.h' -o -name '*.cpp' | xargs cpplint --quiet

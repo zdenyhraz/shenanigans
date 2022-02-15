@@ -96,7 +96,7 @@ void WindowShenanigans::Exit()
 void WindowShenanigans::About()
 {
   QMessageBox msgBox;
-  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\n� Zdenek Hrazdira");
+  msgBox.setText("All these shenanigans were created during my PhD studies.\n\nHave fun,\nZdenek Hrazdira");
   msgBox.exec();
 }
 

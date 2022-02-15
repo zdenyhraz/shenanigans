@@ -40,7 +40,6 @@ inline cv::Mat combinePics(const cv::Mat& img1In, const cv::Mat& img2In, Combine
   }
   case COMBINE_BIN:
   {
-
     break;
   }
   }
