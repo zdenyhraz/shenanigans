@@ -2,6 +2,8 @@
 build/**
 data/**
 
+cppcheck_report.*
+
 !data/app/
 !data/app/*
 !data/articles/
