@@ -9,8 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: false
 
     - name: Install clang-tidy
       run: sudo apt-get install -y clang-tidy
@@ -18,3 +16,36 @@ jobs:
     - name: Run clang-tidy
       working-directory: ${{github.workspace}}
       run: find src/ -name '*.h' -o -name '*.cpp' | xargs clang-tidy --format-style=file
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install cppcheck
+      run: sudo apt-get install cppcheck
+
+    - name: Run cppcheck
+      working-directory: ${{github.workspace}}
+      run: cppcheck src/
+  
+  cppcheck-action:
+    name: cppcheck-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+          
+      - name: cppcheck
+        uses: deep5050/cppcheck-action@main
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          
+      - name: publish report    
+        uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          BRANCH_NAME: 'master'
