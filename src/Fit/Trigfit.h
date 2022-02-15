@@ -1,5 +1,4 @@
 #pragma once
-#include "UtilsCV/FunctionsBaseCV.h"
 
 inline std::vector<f64> sin2sin4fit(const std::vector<f64>& xdata, const std::vector<f64>& ydata)
 {

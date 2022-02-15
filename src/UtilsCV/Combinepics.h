@@ -1,6 +1,5 @@
 #pragma once
-#include "UtilsCV/FunctionsBaseCV.h"
-#include "UtilsCV/Colormap.h"
+#include "Colormap.h"
 
 enum CombineType
 {

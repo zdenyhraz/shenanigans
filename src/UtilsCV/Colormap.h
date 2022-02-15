@@ -1,5 +1,4 @@
 #pragma once
-#include "UtilsCV/FunctionsBaseCV.h"
 
 inline std::tuple<f32, f32, f32> colorMapJET(f32 x, f32 caxisMin = 0, f32 caxisMax = 1, f32 val = 1)
 {

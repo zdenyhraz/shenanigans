@@ -1,5 +1,4 @@
 #pragma once
-#include "UtilsCV/FunctionsBaseCV.h"
 
 inline cv::Mat vectToMat(std::vector<f64>& vec)
 {

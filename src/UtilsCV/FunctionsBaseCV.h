@@ -1,6 +1,4 @@
 #pragma once
-#include "opencv2/opencv.hpp"
-#include "Utils/FunctionsBaseSTL.h"
 
 inline cv::Mat roicrop(const cv::Mat& sourceimgIn, i32 x, i32 y, i32 w, i32 h)
 {
