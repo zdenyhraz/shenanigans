@@ -1,0 +1,21 @@
+name: lint
+
+on: [push,pull_request]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: false
+        
+    - name: Run clang-tidy
+      uses: HorstBaerbel/action-clang-tidy@1.2
+      with:
+        scandir: '.'
+        builddir: 'build'
+        excludedirs: 'external'
+        extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+        cmakeoptions: ''

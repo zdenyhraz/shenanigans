@@ -1,4 +1,4 @@
-name: linux
+name: build/test
 
 on: [push,pull_request]
 
