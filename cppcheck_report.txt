@@ -1,0 +1,311 @@
+external/qcustomplot/qcustomplot.cpp:0:0: information: Too many #ifdef configurations - cppcheck only checks 12 of 15 configurations. Use --force to check all configurations. [toomanyconfigs]
+
+^
+external/qcustomplot/qcustomplot.h:208:1: error: There is an unknown macro here somewhere. Configuration is required. If Q_DECLARE_FLAGS is a macro then please configure it. [unknownMacro]
+Q_DECLARE_FLAGS(MarginSides, MarginSide)
+^
+src/Application/Application.cpp:4:1: error: syntax error: keyword 'try' is not allowed in global scope [syntaxError]
+try
+^
+src/Application/Windows/Diffrot/WindowDiffrot.cpp:4:59: style:inconclusive: Function 'WindowDiffrot' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowDiffrot::WindowDiffrot(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                          ^
+src/Application/Windows/Diffrot/WindowDiffrot.h:11:46: note: Function 'WindowDiffrot' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowDiffrot(QWidget* parent, WindowData* mWindowData);
+                                             ^
+src/Application/Windows/Diffrot/WindowDiffrot.cpp:4:59: note: Function 'WindowDiffrot' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowDiffrot::WindowDiffrot(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                          ^
+src/Application/Windows/FITS/WindowFITS.cpp:5:53: style:inconclusive: Function 'WindowFITS' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowFITS::WindowFITS(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                    ^
+src/Application/Windows/FITS/WindowFITS.h:10:43: note: Function 'WindowFITS' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowFITS(QWidget* parent, WindowData* mWindowData);
+                                          ^
+src/Application/Windows/FITS/WindowFITS.cpp:5:53: note: Function 'WindowFITS' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowFITS::WindowFITS(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                    ^
+src/Application/Windows/Features/WindowFeatures.cpp:4:61: style:inconclusive: Function 'WindowFeatures' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowFeatures::WindowFeatures(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                            ^
+src/Application/Windows/Features/WindowFeatures.h:11:47: note: Function 'WindowFeatures' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowFeatures(QWidget* parent, WindowData* mWindowData);
+                                              ^
+src/Application/Windows/Features/WindowFeatures.cpp:4:61: note: Function 'WindowFeatures' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowFeatures::WindowFeatures(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                            ^
+src/Application/Windows/Filtering/WindowFiltering.cpp:5:63: style:inconclusive: Function 'WindowFiltering' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowFiltering::WindowFiltering(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                              ^
+src/Application/Windows/Filtering/WindowFiltering.h:10:48: note: Function 'WindowFiltering' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowFiltering(QWidget* parent, WindowData* mWindowData);
+                                               ^
+src/Application/Windows/Filtering/WindowFiltering.cpp:5:63: note: Function 'WindowFiltering' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowFiltering::WindowFiltering(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                              ^
+src/Application/Windows/IPC/WindowIPC.cpp:4:51: style:inconclusive: Function 'WindowIPC' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                  ^
+src/Application/Windows/IPC/WindowIPC.h:10:42: note: Function 'WindowIPC' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowIPC(QWidget* parent, WindowData* mWindowData);
+                                         ^
+src/Application/Windows/IPC/WindowIPC.cpp:4:51: note: Function 'WindowIPC' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                  ^
+src/Application/Windows/IPC/WindowIPC.cpp:88:21: style: Variable 'path1' is assigned a value that is never used. [unreadVariable]
+  std::string path1 = ui.lineEdit_15->text().toStdString();
+                    ^
+src/Application/Windows/IPC/WindowIPC.cpp:89:21: style: Variable 'path2' is assigned a value that is never used. [unreadVariable]
+  std::string path2 = ui.lineEdit_16->text().toStdString();
+                    ^
+src/Application/Windows/IPC/WindowIPC.cpp:150:16: style: Variable 'img1' is assigned a value that is never used. [unreadVariable]
+  cv::Mat img1 = LoadUnitFloatImage(path1);
+               ^
+src/Application/Windows/IPC/WindowIPC.cpp:151:16: style: Variable 'img2' is assigned a value that is never used. [unreadVariable]
+  cv::Mat img2 = LoadUnitFloatImage(path2);
+               ^
+src/Application/Windows/Plot/WindowPlot.cpp:3:43: style:inconclusive: Function 'WindowPlot' argument 1 names different: declaration 'name' definition 'name_'. [funcArgNamesDifferent]
+WindowPlot::WindowPlot(const std::string& name_, f64 colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)
+                                          ^
+src/Application/Windows/Plot/WindowPlot.h:9:33: note: Function 'WindowPlot' argument 1 names different: declaration 'name' definition 'name_'.
+  WindowPlot(const std::string& name, f64 colRowRatio, std::function<void(std::string)>& OnClose);
+                                ^
+src/Application/Windows/Plot/WindowPlot.cpp:3:43: note: Function 'WindowPlot' argument 1 names different: declaration 'name' definition 'name_'.
+WindowPlot::WindowPlot(const std::string& name_, f64 colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)
+                                          ^
+src/Application/Windows/Plot/WindowPlot.cpp:3:101: style:inconclusive: Function 'WindowPlot' argument 3 names different: declaration 'OnClose' definition 'OnClose_'. [funcArgNamesDifferent]
+WindowPlot::WindowPlot(const std::string& name_, f64 colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)
+                                                                                                    ^
+src/Application/Windows/Plot/WindowPlot.h:9:90: note: Function 'WindowPlot' argument 3 names different: declaration 'OnClose' definition 'OnClose_'.
+  WindowPlot(const std::string& name, f64 colRowRatio, std::function<void(std::string)>& OnClose);
+                                                                                         ^
+src/Application/Windows/Plot/WindowPlot.cpp:3:101: note: Function 'WindowPlot' argument 3 names different: declaration 'OnClose' definition 'OnClose_'.
+WindowPlot::WindowPlot(const std::string& name_, f64 colRowRatio, std::function<void(std::string)>& OnClose_) : QMainWindow(), name(name_), OnClose(OnClose_)
+                                                                                                    ^
+src/Application/Windows/Shenanigans/WindowShenanigans.cpp:149:1: error: syntax error: keyword 'try' is not allowed in global scope [syntaxError]
+try
+^
+src/Application/Windows/Template/WindowTemplate.cpp:4:61: style:inconclusive: Function 'WindowTemplate' argument 2 names different: declaration 'mWindowData' definition 'windowData'. [funcArgNamesDifferent]
+WindowTemplate::WindowTemplate(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                            ^
+src/Application/Windows/Template/WindowTemplate.h:10:47: note: Function 'WindowTemplate' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+  WindowTemplate(QWidget* parent, WindowData* mWindowData);
+                                              ^
+src/Application/Windows/Template/WindowTemplate.cpp:4:61: note: Function 'WindowTemplate' argument 2 names different: declaration 'mWindowData' definition 'windowData'.
+WindowTemplate::WindowTemplate(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
+                                                            ^
+src/Fourier/Fourier.h:269:13: style: Redundant initialization for 'laplacian'. The initialized value is overwritten before it is read. [redundantInitialization]
+  laplacian = 1 - gaussian(rows, cols, stdevYmult, stdevXmult);
+            ^
+src/Fourier/Fourier.h:268:21: note: laplacian is initialized
+  cv::Mat laplacian = cv::Mat::ones(rows, cols, CV_32F);
+                    ^
+src/Fourier/Fourier.h:269:13: note: laplacian is overwritten
+  laplacian = 1 - gaussian(rows, cols, stdevYmult, stdevXmult);
+            ^
+src/Fourier/Fourier.cpp:91:9: style: Redundant initialization for 'denom'. The initialized value is overwritten before it is read. [redundantInitialization]
+  denom = csq + dsq;
+        ^
+src/Fourier/Fourier.cpp:86:17: note: denom is initialized
+  cv::Mat denom = cv::Mat::zeros(a.size(), CV_32F);
+                ^
+src/Fourier/Fourier.cpp:91:9: note: denom is overwritten
+  denom = csq + dsq;
+        ^
+src/Fourier/Fourier.cpp:127:9: style: Redundant initialization for 'denom'. The initialized value is overwritten before it is read. [redundantInitialization]
+  denom = csq + dsq;
+        ^
+src/Fourier/Fourier.cpp:122:17: note: denom is initialized
+  cv::Mat denom = cv::Mat::zeros(a.size(), CV_32F);
+                ^
+src/Fourier/Fourier.cpp:127:9: note: denom is overwritten
+  denom = csq + dsq;
+        ^
+src/Fourier/Fourier.cpp:132:7: style: Redundant initialization for 'SNR'. The initialized value is overwritten before it is read. [redundantInitialization]
+  SNR = cv::Scalar::all(1.) / 1e-13;
+      ^
+src/Fourier/Fourier.cpp:131:15: note: SNR is initialized
+  cv::Mat SNR = cv::Mat::zeros(DFT2.size(), CV_32F);
+              ^
+src/Fourier/Fourier.cpp:132:7: note: SNR is overwritten
+  SNR = cv::Scalar::all(1.) / 1e-13;
+      ^
+src/Fourier/Fourier.cpp:50:27: style:inconclusive: Function 'convolute' argument 1 names different: declaration 'img' definition 'sourceimg'. [funcArgNamesDifferent]
+cv::Mat convolute(cv::Mat sourceimg, cv::Mat PSFimg)
+                          ^
+src/Fourier/Fourier.h:308:27: note: Function 'convolute' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat convolute(cv::Mat img, cv::Mat PSFimg);
+                          ^
+src/Fourier/Fourier.cpp:50:27: note: Function 'convolute' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat convolute(cv::Mat sourceimg, cv::Mat PSFimg)
+                          ^
+src/Fourier/Fourier.cpp:73:29: style:inconclusive: Function 'deconvolute' argument 1 names different: declaration 'img' definition 'sourceimg'. [funcArgNamesDifferent]
+cv::Mat deconvolute(cv::Mat sourceimg, cv::Mat PSFimg)
+                            ^
+src/Fourier/Fourier.h:310:29: note: Function 'deconvolute' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat deconvolute(cv::Mat img, cv::Mat PSFimg);
+                            ^
+src/Fourier/Fourier.cpp:73:29: note: Function 'deconvolute' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat deconvolute(cv::Mat sourceimg, cv::Mat PSFimg)
+                            ^
+src/Fourier/Fourier.cpp:109:42: style:inconclusive: Function 'deconvoluteWiener' argument 1 names different: declaration 'img' definition 'sourceimg'. [funcArgNamesDifferent]
+cv::Mat deconvoluteWiener(const cv::Mat& sourceimg, const cv::Mat& PSFimg)
+                                         ^
+src/Fourier/Fourier.h:312:42: note: Function 'deconvoluteWiener' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat deconvoluteWiener(const cv::Mat& img, const cv::Mat& PSFimg);
+                                         ^
+src/Fourier/Fourier.cpp:109:42: note: Function 'deconvoluteWiener' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat deconvoluteWiener(const cv::Mat& sourceimg, const cv::Mat& PSFimg)
+                                         ^
+src/Fourier/Fourier.cpp:148:40: style:inconclusive: Function 'frequencyFilter' argument 1 names different: declaration 'img' definition 'sourceimg'. [funcArgNamesDifferent]
+cv::Mat frequencyFilter(const cv::Mat& sourceimg, const cv::Mat& mask)
+                                       ^
+src/Fourier/Fourier.h:314:40: note: Function 'frequencyFilter' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat frequencyFilter(const cv::Mat& img, const cv::Mat& mask);
+                                       ^
+src/Fourier/Fourier.cpp:148:40: note: Function 'frequencyFilter' argument 1 names different: declaration 'img' definition 'sourceimg'.
+cv::Mat frequencyFilter(const cv::Mat& sourceimg, const cv::Mat& mask)
+                                       ^
+src/Fractal/Fractal.h:23:5: performance: Variable 'zoom' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    zoom = 1.;
+    ^
+src/Fractal/Fractal.h:24:5: performance: Variable 'sliderZoom' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    sliderZoom = 50;
+    ^
+src/Fractal/Fractal.h:25:5: performance: Variable 'sliderLog' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    sliderLog = 1;
+    ^
+src/Fractal/Fractal.h:26:5: performance: Variable 'sliderMaxiter' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    sliderMaxiter = 1000;
+    ^
+src/Fractal/Fractal.h:27:5: performance: Variable 'sliderMagntresh' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    sliderMagntresh = 50;
+    ^
+src/Fractal/Fractal.h:28:5: performance: Variable 'fractalWidth' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    fractalWidth = 1000;
+    ^
+src/Fractal/Fractal.h:31:5: performance: Variable 'magnTresh' is assigned in constructor body. Consider performing initialization in initialization list. [useInitializationList]
+    magnTresh = 2.;
+    ^
+src/Fractal/Fractal.cpp:8:23: style: C-style pointer casting [cstyleCast]
+    Fractalset* set = (Fractalset*)ptr;
+                      ^
+src/IPC/IterativePhaseCorrelation.cpp:142:1: error: syntax error: keyword 'try' is not allowed in global scope [syntaxError]
+try
+^
+src/Logger/QtLogger.h:71:8: style:inconclusive: Technically the member function 'QtLogger::ShouldLog' can be const. [functionConst]
+  bool ShouldLog(LogLevel logLevel) { return mTextBrowser and logLevel >= mLogLevel; }
+       ^
+src/Optimization/Evolution.cpp:9:1: error: syntax error: keyword 'try' is not allowed in global scope [syntaxError]
+try
+^
+src/Optimization/GraphOptimization.h:12:3: style: Struct 'Graph' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+  Graph(unsigned N_) : N(N_), edgeMatrix(zerovect2(N_, N_, -1.)), nodeNames(std::vector<std::string>(N_, "unnamed_node")) {}
+  ^
+src/Optimization/Optimization.cpp:4:50: style:inconclusive: Function 'OptimizationAlgorithm' argument 1 names different: declaration 'N' definition 'N_'. [funcArgNamesDifferent]
+OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
+                                                 ^
+src/Optimization/Optimization.h:30:29: note: Function 'OptimizationAlgorithm' argument 1 names different: declaration 'N' definition 'N_'.
+  OptimizationAlgorithm(i32 N, const std::string& optname = "default");
+                            ^
+src/Optimization/Optimization.cpp:4:50: note: Function 'OptimizationAlgorithm' argument 1 names different: declaration 'N' definition 'N_'.
+OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
+                                                 ^
+src/Optimization/PatternSearch.h:12:3: style: Struct 'PatternSearch' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+  PatternSearch(i32 N_) : OptimizationAlgorithm(N_) {}
+  ^
+src/Plot/Plot1D.h:61:3: style: Class 'Plot1D' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+  Plot1D(const std::string& name);
+  ^
+src/Plot/Plot1D.cpp:171:13: style: Redundant initialization for 'graph'. The initialized value is overwritten before it is read. [redundantInitialization]
+      graph = plot->graph(i);
+            ^
+src/Plot/Plot1D.cpp:166:16: note: graph is initialized
+    auto graph = plot->graph(i);
+               ^
+src/Plot/Plot1D.cpp:171:13: note: graph is overwritten
+      graph = plot->graph(i);
+            ^
+src/Plot/Plot1D.cpp:10:44: style:inconclusive: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'. [funcArgNamesDifferent]
+Plot1D& Plot1D::GetPlot(const std::string& mName)
+                                           ^
+src/Plot/Plot1D.h:57:45: note: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'.
+  static Plot1D& GetPlot(const std::string& name = mCurrentPlot);
+                                            ^
+src/Plot/Plot1D.cpp:10:44: note: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'.
+Plot1D& Plot1D::GetPlot(const std::string& mName)
+                                           ^
+src/Plot/Plot1D.cpp:13:33: performance: Searching before insertion is not necessary. [stlFindInsert]
+    mPlots.emplace(mName, Plot1D(mName));
+                                ^
+src/Plot/Plot2D.h:31:3: style: Class 'Plot2D' has a constructor with 1 argument that is not explicit. [noExplicitConstructor]
+  Plot2D(const std::string& name);
+  ^
+src/Plot/Plot2D.cpp:10:44: style:inconclusive: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'. [funcArgNamesDifferent]
+Plot2D& Plot2D::GetPlot(const std::string& mName)
+                                           ^
+src/Plot/Plot2D.h:27:45: note: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'.
+  static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
+                                            ^
+src/Plot/Plot2D.cpp:10:44: note: Function 'GetPlot' argument 1 names different: declaration 'name' definition 'mName'.
+Plot2D& Plot2D::GetPlot(const std::string& mName)
+                                           ^
+src/Plot/Plot2D.cpp:13:33: performance: Searching before insertion is not necessary. [stlFindInsert]
+    mPlots.emplace(mName, Plot2D(mName));
+                                ^
+src/Plot/PlotCSV.cpp:13:24: style: Variable 'plotname' is assigned a value that is never used. [unreadVariable]
+  std::string plotname = std::string("csv plot ") + std::to_string(counter);
+                       ^
+src/Plot/PlotCSV.cpp:14:22: style: Variable 'ylabel' is assigned a value that is never used. [unreadVariable]
+  std::string ylabel = "";
+                     ^
+src/Plot/PyPlot.cpp:9:1: error: syntax error: keyword 'try' is not allowed in global scope [syntaxError]
+try
+^
+src/Plot/Plot.cpp:68:0: style: The function 'CloseAll' is never used. [unusedFunction]
+
+^
+src/Optimization/Optimization.cpp:190:0: style: The function 'GetTerminationReasonString' is never used. [unusedFunction]
+
+^
+test/IterativePhaseCorrelationTest.cpp:8:0: style: The function 'SetUp' is never used. [unusedFunction]
+
+^
+src/Filtering/Filtering.cpp:54:0: style: The function 'addnoise' is never used. [unusedFunction]
+
+^
+src/Application/Windows/Plot/WindowPlot.cpp:13:0: style: The function 'closeEvent' is never used. [unusedFunction]
+
+^
+src/Fourier/Fourier.cpp:50:0: style: The function 'convolute' is never used. [unusedFunction]
+
+^
+src/Fourier/Fourier.cpp:73:0: style: The function 'deconvolute' is never used. [unusedFunction]
+
+^
+src/Fourier/Fourier.cpp:109:0: style: The function 'deconvoluteWiener' is never used. [unusedFunction]
+
+^
+src/Filtering/Filtering.cpp:4:0: style: The function 'filterContrastBrightness' is never used. [unusedFunction]
+
+^
+src/Optimization/GraphOptimization.cpp:26:0: style: The function 'findOptimalGraphPathDebug' is never used. [unusedFunction]
+
+^
+src/Fourier/Fourier.cpp:171:0: style: The function 'fourierFFTW' is never used. [unusedFunction]
+
+^
+src/Fourier/Fourier.cpp:148:0: style: The function 'frequencyFilter' is never used. [unusedFunction]
+
+^
+src/Filtering/Filtering.cpp:41:0: style: The function 'gammaCorrect' is never used. [unusedFunction]
+
+^
+src/Filtering/Filtering.cpp:29:0: style: The function 'histogramEqualize' is never used. [unusedFunction]
+
+^
+src/Filtering/Filtering.cpp:77:0: style: The function 'showhistogram' is never used. [unusedFunction]
+
+^
+nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingInclude]
+
