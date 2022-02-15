@@ -48,7 +48,7 @@ public:
     {
       PROFILE_FUNCTION;
 
-      // apply median blur
+      // apply median blur - can be iterative with increasing size
       static constexpr i32 medsize = 3;
       cv::medianBlur(shiftx, shiftx, medsize);
       cv::medianBlur(shifty, shifty, medsize);
@@ -194,15 +194,6 @@ public:
     SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
 
     const auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
-
-    Plot1D::Set("Diffrot opt");
-    Plot1D::SetXlabel("latitude [deg]");
-    Plot1D::SetYlabel("average omega x [deg/day]");
-    Plot1D::SetYnames({"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(Constants::Rad * dataAfter.theta,
-        {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2), sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)),
-            GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)});
 
     PyPlot::Plot("Diffrot opt",
         {.x = Constants::Rad * dataAfter.theta,

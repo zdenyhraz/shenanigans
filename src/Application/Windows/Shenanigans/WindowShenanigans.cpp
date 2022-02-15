@@ -16,7 +16,6 @@
 #include "Filtering/Filtering.h"
 #include "Filtering/HistogramEqualization.h"
 #include "Fractal/Fractal.h"
-#include "Astrophysics/DiffrotResults.h"
 #include "Astrophysics/DifferentialRotation.h"
 #include "Random/Procedural.h"
 #include "Random/NonMaximaSuppression.h"
@@ -857,35 +856,6 @@ try
   {
     auto pic = LoadUnitFloatImage("D:\\SDOpics\\Calm2020stride25\\2020_01_02__18_49_52__CONT.fits");
     showimg(pic, "pic");
-  }
-  if (0) // 1D / 2D sorted xs interp test
-  {
-    std::vector<f64> xs{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<f64> ys{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-    LOG_INFO("Diffrot interp 1D a) {}", DiffrotResults::Interpolate(xs, ys, -1.0));
-    LOG_INFO("Diffrot interp 1D b) {}", DiffrotResults::Interpolate(xs, ys, 10.0));
-    LOG_INFO("Diffrot interp 1D c) {}", DiffrotResults::Interpolate(xs, ys, 1));
-    LOG_INFO("Diffrot interp 1D d) {}", DiffrotResults::Interpolate(xs, ys, 1.5));
-
-    auto xsr = xs;
-    auto ysr = ys;
-    std::reverse(xsr.begin(), xsr.end());
-    std::reverse(ysr.begin(), ysr.end());
-    LOG_INFO("Diffrot interp 1Dr a) {}", DiffrotResults::Interpolate(xsr, ysr, -1.0));
-    LOG_INFO("Diffrot interp 1Dr b) {}", DiffrotResults::Interpolate(xsr, ysr, 10.0));
-    LOG_INFO("Diffrot interp 1Dr c) {}", DiffrotResults::Interpolate(xsr, ysr, 1));
-    LOG_INFO("Diffrot interp 1Dr d) {}", DiffrotResults::Interpolate(xsr, ysr, 1.5));
-
-    std::vector<f64> xs1{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    std::vector<f64> ys1{0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
-    std::vector<f64> xs2{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
-    std::vector<f64> ys2{10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-    std::vector<std::vector<f64>> xss = {xs1, xs2};
-    std::vector<std::vector<f64>> yss = {ys1, ys2};
-    LOG_INFO("Diffrot interp 2D a) {}", DiffrotResults::Interpolate(xss, yss, 1.0));
-    LOG_INFO("Diffrot interp 2D b) {}", DiffrotResults::Interpolate(xss, yss, -1.0));
-    LOG_INFO("Diffrot interp 2D c) {}", DiffrotResults::Interpolate(xss, yss, 1.5));
-    LOG_INFO("Diffrot interp 2D d) {}", DiffrotResults::Interpolate(xss, yss, 1.75));
   }
   if (0) // try/catch performance test
   {
