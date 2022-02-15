@@ -6,7 +6,7 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build-and-test:
+  build/test:
     runs-on: ubuntu-latest
 
     steps:
