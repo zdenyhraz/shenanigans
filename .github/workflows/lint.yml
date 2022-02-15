@@ -5,6 +5,7 @@ on: [push,pull_request]
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
     - uses: actions/checkout@v2
