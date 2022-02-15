@@ -21,21 +21,21 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./opencv-install
-        key: ${{ runner.os }}-opencv-cache
+        key: ${{runner.os}}-opencv-cache
 
     - name: Install OpenCV
       uses: rayandrews/with-opencv-action@v1
       with:  
         opencv-version: '4.5.1'
         dir: ./opencv-install
-        cached: ${{ steps.opencv-cache.outputs.cache-hit }}
+        cached: ${{steps.opencv-cache.outputs.cache-hit}}
 
     - name: Cache Qt
       id: qt-cache
       uses: actions/cache@v2
       with:
         path: ./qt
-        key: ${{ runner.os }}-qt-cache
+        key: ${{runner.os}}-qt-cache
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -44,7 +44,7 @@ jobs:
         dir: "./qt"
         install-deps: true
         setup-python: false
-        cached: ${{ steps.qt-cache.outputs.cache-hit }}
+        cached: ${{steps.qt-cache.outputs.cache-hit}}
       
     - name: Configure
       env:
