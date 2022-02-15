@@ -28,7 +28,7 @@ private:
   static std::map<std::string, Plot2D> mPlots;
   static std::string mCurrentPlot;
 
-  Plot2D(const std::string& name);
+  explicit Plot2D(const std::string& name);
   void PlotCore(const cv::Mat& z);
   void PlotCore(const std::vector<std::vector<double>>& z);
   void Initialize(int xcnt, int ycnt);

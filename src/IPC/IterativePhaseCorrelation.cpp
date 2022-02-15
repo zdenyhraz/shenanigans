@@ -321,12 +321,9 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
   if (noiseStdev < 0)
     throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStdev));
 
-  for (const auto& image : images)
-  {
-    if (image.rows < mRows + maxShift or image.cols < mCols + maxShift)
-      throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", image.rows, image.cols,
-          mRows + maxShift, mCols + maxShift));
-  }
+  if (const auto badimage = std::find_if(images.begin(), images.end(), [&](const auto& image) { return image.rows < mRows + maxShift or image.cols < mCols + maxShift; }); badimage != images.end())
+    throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", badimage->rows,
+        badimage->cols, mRows + maxShift, mCols + maxShift));
 
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
   imagePairs.reserve(images.size() * itersPerImage);

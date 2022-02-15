@@ -7,13 +7,13 @@ Plot2D::Plot2D(const std::string& name) : mName(name)
 {
 }
 
-Plot2D& Plot2D::GetPlot(const std::string& mName)
+Plot2D& Plot2D::GetPlot(const std::string& name)
 {
-  if (mPlots.count(mName) == 0)
-    mPlots.emplace(mName, Plot2D(mName));
+  if (mPlots.count(name) == 0)
+    mPlots.emplace(name, Plot2D(name));
 
-  mCurrentPlot = mName;
-  return mPlots.at(mName);
+  mCurrentPlot = name;
+  return mPlots.at(name);
 }
 
 void Plot2D::PlotCore(const cv::Mat& z)

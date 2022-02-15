@@ -19,3 +19,6 @@ AlwaysBreakTemplateDeclarations: Yes
 AlignAfterOpenBracket: DontAlign
 IncludeBlocks: Preserve
 AllowShortIfStatementsOnASingleLine: Never
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 2
+BreakConstructorInitializers: AfterColon

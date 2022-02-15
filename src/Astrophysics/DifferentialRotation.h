@@ -7,8 +7,8 @@
 class DifferentialRotation
 {
 public:
-  DifferentialRotation(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_)
-      : xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), thetamax(thetamax_), cadence(cadence_)
+  DifferentialRotation(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_) :
+    xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), thetamax(thetamax_), cadence(cadence_)
   {
     PROFILE_FUNCTION;
     if (idstride > 0) // images are not reused with non-zero stride
@@ -20,19 +20,17 @@ public:
 
   struct DifferentialRotationData
   {
-    DifferentialRotationData(i32 xsize, i32 ysize, f64 thetamax)
+    DifferentialRotationData(i32 xsize, i32 ysize, f64 thetamax) :
+      shiftx(cv::Mat::zeros(ysize, xsize, CV_32F)),
+      shifty(cv::Mat::zeros(ysize, xsize, CV_32F)),
+      omegax(cv::Mat::zeros(ysize, xsize, CV_32F)),
+      omegay(cv::Mat::zeros(ysize, xsize, CV_32F)),
+      theta(GenerateTheta(ysize, thetamax)),
+      fshiftx(std::vector<f64>(xsize, 0.)),
+      fshifty(std::vector<f64>(xsize, 0.)),
+      theta0(std::vector<f64>(xsize, 0.)),
+      R(std::vector<f64>(xsize, 0.))
     {
-      PROFILE_FUNCTION;
-      shiftx = cv::Mat::zeros(ysize, xsize, CV_32F);
-      shifty = cv::Mat::zeros(ysize, xsize, CV_32F);
-      omegax = cv::Mat::zeros(ysize, xsize, CV_32F);
-      omegay = cv::Mat::zeros(ysize, xsize, CV_32F);
-
-      theta = GenerateTheta(ysize, thetamax);
-      fshiftx = std::vector<f64>(xsize, 0.);
-      fshifty = std::vector<f64>(xsize, 0.);
-      theta0 = std::vector<f64>(xsize, 0.);
-      R = std::vector<f64>(xsize, 0.);
     }
 
     static std::vector<f64> GenerateTheta(i32 ysize, f64 thetamax)

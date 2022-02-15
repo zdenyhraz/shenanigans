@@ -28,7 +28,7 @@ class Timer // benchmarking struct
   static constexpr auto tse(const tp& tmp) { return std::chrono::time_point_cast<dur>(tmp).time_since_epoch().count(); }
 
 public:
-  Timer(const std::string& name) : name(name), stp(clock::now()) {}
+  explicit Timer(const std::string& name) : name(name), stp(clock::now()) {}
   ~Timer() { LOG_INFO("{} took {} ms", name, tse(clock::now()) - tse(stp)); }
 };
 
@@ -229,7 +229,7 @@ inline f64 median(const std::vector<T>& vec)
   return result[result.size() / 2];
 }
 
-inline bool vectorLess(std::vector<f64>& left, std::vector<f64>& right)
+inline bool vectorLess(const std::vector<f64>& left, const std::vector<f64>& right)
 {
   f64 L = 0, R = 0;
   for (usize i = 0; i < left.size(); i++)
@@ -380,7 +380,7 @@ inline void exportToMATLAB(const std::vector<std::vector<f64>>& Zdata, f64 xmin,
       listing << Zdata[r][c] << std::endl;
 }
 
-inline void makeDir(std::string path, std::string dirname)
+inline void makeDir(const std::string& path, const std::string& dirname)
 {
   std::filesystem::create_directory(path + "//" + dirname);
 }

@@ -27,7 +27,7 @@ public:
     std::vector<std::vector<f64>> evaluatedParameters;
   };
 
-  OptimizationAlgorithm(i32 N, const std::string& optname = "default");
+  explicit OptimizationAlgorithm(i32 N, const std::string& optname = "default");
   virtual ~OptimizationAlgorithm() = default;
 
   virtual OptimizationResult Optimize(

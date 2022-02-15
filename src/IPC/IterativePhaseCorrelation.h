@@ -46,9 +46,9 @@ public:
     OptimizedParameterCount, // last
   };
 
-  IterativePhaseCorrelation(i32 rows, i32 cols = -1, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(rows, cols, bandpassL, bandpassH); }
-  IterativePhaseCorrelation(const cv::Size& size, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(size.height, size.width, bandpassL, bandpassH); }
-  IterativePhaseCorrelation(const cv::Mat& img, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(img.rows, img.cols, bandpassL, bandpassH); }
+  explicit IterativePhaseCorrelation(i32 rows, i32 cols = -1, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(rows, cols, bandpassL, bandpassH); }
+  explicit IterativePhaseCorrelation(const cv::Size& size, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(size.height, size.width, bandpassL, bandpassH); }
+  explicit IterativePhaseCorrelation(const cv::Mat& img, f64 bandpassL = 0, f64 bandpassH = 1) { Initialize(img.rows, img.cols, bandpassL, bandpassH); }
 
   void Initialize(i32 rows, i32 cols, f64 bandpassL, f64 bandpassH)
   {
@@ -436,7 +436,7 @@ private:
     return peak;
   }
   template <bool Circular>
-  cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle) const
+  static cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle)
   {
     if constexpr (Circular)
     {
@@ -508,7 +508,7 @@ private:
     if constexpr (DebugMode)
       LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
   }
-  cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) const { return L3peak - L3mid; }
+  static cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) { return L3peak - L3mid; }
   template <bool DebugMode>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {

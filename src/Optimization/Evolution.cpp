@@ -1,7 +1,7 @@
 
 #include "Evolution.h"
 
-Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N_)
+Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N)
 {
 }
 
@@ -399,24 +399,24 @@ void Evolution::CheckParameters()
     throw std::runtime_error("Invalid crossover strategy");
 }
 
-void Evolution::UpdateOutputs(usize gen, const Population& population, ValidationFunction valid)
+void Evolution::UpdateOutputs(usize generation, const Population& population, ValidationFunction valid)
 {
   PROFILE_FUNCTION;
   if (population.bestEntity.fitness < population.previousFitness)
   {
     if (mFileOutput)
-      fmt::print(mOutputFile, "{}\n", GetOutputString(gen, population));
+      fmt::print(mOutputFile, "{}\n", GetOutputString(generation, population));
 
     if (mConsoleOutput)
-      LOG_DEBUG(GetOutputString(gen, population));
+      LOG_DEBUG(GetOutputString(generation, population));
   }
 
   if (mPlotOutput)
   {
     if (valid)
-      Plot1D::Plot(gen, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
+      Plot1D::Plot(generation, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
     else
-      Plot1D::Plot(gen, population.bestEntity.fitness, population.relativeDifference * 100);
+      Plot1D::Plot(generation, population.bestEntity.fitness, population.relativeDifference * 100);
   }
 }
 
@@ -463,10 +463,10 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   return NotTerminated;
 }
 
-std::string Evolution::GetOutputString(usize gen, const Population& population)
+std::string Evolution::GetOutputString(usize generation, const Population& population)
 {
   PROFILE_FUNCTION;
-  std::string value = fmt::format("Gen {} ({:.2e}) [", gen, population.bestEntity.fitness);
+  std::string value = fmt::format("Gen {} ({:.2e}) [", generation, population.bestEntity.fitness);
   for (usize param = 0; param < population.bestEntity.params.size(); ++param)
     value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](population.bestEntity.params[param]));
   value += fmt::format("] diff: {:.2f}% ({:.2e})", population.relativeDifference * 100, population.absoluteDifference);
@@ -684,9 +684,6 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
 
       for (usize pid = 0; pid < N; pid++) // generate initial entity
         entities[eid].params[pid] = randr(LB[pid], UB[pid]);
-
-      if (distincEntityMaxTrials < 1)
-        break;
 
       for (usize eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
