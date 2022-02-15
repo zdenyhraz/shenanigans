@@ -17,4 +17,4 @@ jobs:
 
     - name: Run clang-tidy
       working-directory: ${{github.workspace}}
-      run: /usr/bin/clang-format -style=file *.cpp *.h
+      run: find src/ -name '*.h' -o -name '*.cpp' | xargs clang-tidy --format-style=file
