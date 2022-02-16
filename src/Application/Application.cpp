@@ -3,8 +3,6 @@
 int main(int argc, char** argv)
 try
 {
-  PROFILE_APP("Shenanigans");
-
   std::srand(std::time(nullptr));
   py::scoped_interpreter guard{};
   PyPlot::Initialize();

@@ -24,8 +24,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(ENABLE_PROFILING ON)
-set(ENABLE_TRACY ON)
-set(ENABLE_OPTICK OFF)
 set(ENABLE_SANITIZER OFF)
 
 if(CI)
@@ -74,25 +72,16 @@ target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
 if(ENABLE_PROFILING)
-  if(ENABLE_OPTICK)
-    # optick 
-    include_directories("external/optick/src")
-    file(GLOB_RECURSE SRC_OPTICK CONFIGURE_DEPENDS external/optick/src/*.h external/optick/src/*.cpp)
-    target_sources(shenanigans PRIVATE ${SRC_OPTICK})
-    target_sources(shenanigans_test PRIVATE ${SRC_OPTICK})
-  endif()
-  if(ENABLE_TRACY)
-    # tracy
-    include_directories("external/tracy")
-    add_compile_definitions(TRACY_ENABLE)
-    add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
-    add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
-    file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
-    target_sources(shenanigans PRIVATE ${SRC_TRACY})
-    target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
-    target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
-    target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
-  endif()
+  # tracy
+  include_directories("external/tracy")
+  add_compile_definitions(TRACY_ENABLE)
+  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
+  add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
+  file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_TRACY})
+  target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
+  target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
+  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
   add_compile_definitions(ENABLE_PROFILING)
 endif()
 
