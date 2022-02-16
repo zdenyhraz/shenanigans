@@ -3,17 +3,17 @@ name: lint
 on: [push,pull_request]
 
 jobs:
-  clang-tidy:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-    - uses: actions/checkout@v2
+  # clang-tidy:
+  #   runs-on: ubuntu-latest
+  #   continue-on-error: true
+  #   steps:
+  #   - uses: actions/checkout@v2
 
-    - name: Install clang-tidy
-      run: sudo apt-get install -y clang-tidy
+  #   - name: Install clang-tidy
+  #     run: sudo apt-get install -y clang-tidy
 
-    - name: Run clang-tidy
-      run: find src/ -name '*.h' -o -name '*.cpp' | xargs clang-tidy --format-style=file
+  #   - name: Run clang-tidy
+  #     run: find src/ -name '*.h' -o -name '*.cpp' | xargs clang-tidy --format-style=file
 
   cppcheck:
     runs-on: ubuntu-latest
