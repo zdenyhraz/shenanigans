@@ -25,10 +25,7 @@ jobs:
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
-      run: cppcheck --std=c++20 --enable=all -I external/ --error-exitcode=123 --output-file=cppcheck_report.txt src/
-    
-    - name: Log cppcheck
-      run: cat cppcheck_report.txt
+      run: cppcheck --std=c++20 --enable=all -I external/ --error-exitcode=123 src/
 
   cpplint:
     runs-on: ubuntu-latest
