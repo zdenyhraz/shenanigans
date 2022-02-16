@@ -59,12 +59,6 @@ include_directories("external/fmt/include")
 target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 
-# scnlib
-add_subdirectory(external/scnlib)
-include_directories("external/scnlib/include")
-target_link_libraries(shenanigans PRIVATE scn::scn)
-target_link_libraries(shenanigans_test PRIVATE scn::scn)
-
 # gtest
 add_subdirectory(external/gtest)
 include_directories("external/gtest/googletest/include")

@@ -60,9 +60,6 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-// scnlib
-#include <scn/scn.h>
-
 // gtest
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
