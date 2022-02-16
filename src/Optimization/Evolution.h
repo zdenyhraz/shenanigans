@@ -39,7 +39,7 @@ private:
   struct Entity
   {
     Entity() = default;
-    Entity(usize N);
+    explicit Entity(usize N);
 
     std::vector<f64> params;
     f64 fitness;

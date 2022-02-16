@@ -58,7 +58,7 @@ private:
   static std::unordered_map<std::string, Plot1D> mPlots;
   static std::string mCurrentPlot;
 
-  Plot1D(const std::string& name);
+  explicit Plot1D(const std::string& name);
   void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s = {});
   void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s = {});
   void Initialize(int ycnt, int y1cnt, int y2cnt, bool clear);

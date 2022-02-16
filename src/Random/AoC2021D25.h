@@ -5,7 +5,7 @@ namespace AoC2021D25
 
 struct Seafloor
 {
-  Seafloor(const std::string& str) { Parse(str); };
+  explicit Seafloor(const std::string& str) { Parse(str); };
 
   enum Entity : u8
   {

@@ -7,7 +7,7 @@ class WindowShenanigans : public QMainWindow
   Q_OBJECT
 
 public:
-  WindowShenanigans(QWidget* parent = Q_NULLPTR);
+  explicit WindowShenanigans(QWidget* parent = Q_NULLPTR);
 
 private:
   Ui::Zdeny_PhD_ShenanigansClass ui;
