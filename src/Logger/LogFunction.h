@@ -14,7 +14,7 @@ class LogFunction
   using time_point = std::chrono::time_point<clock>;
 
 public:
-  LogFunction(std::string&& funName)
+  explicit LogFunction(std::string&& funName)
   {
     if constexpr (Show)
     {

@@ -176,8 +176,8 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, i32 fftw)
   if (fftw == 1)                         // fftw slowest version
   {
     i32 r, c;
-    fftw_complex* in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
-    fftw_complex* out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols);
+    fftw_complex* in = reinterpret_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols));
+    fftw_complex* out = reinterpret_cast<fftw_complex*>(fftw_malloc(sizeof(fftw_complex) * sourceimg.rows * sourceimg.cols));
     fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
     for (r = 0; r < sourceimg.rows; r++)
     {
@@ -206,11 +206,11 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, i32 fftw)
   }
   if (fftw == 2)
   {
-    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, (f64*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_r2c_2d(sourceimg.rows, sourceimg.cols, reinterpret_cast<f64>(sourceimg.data), reinterpret_cast<fftw_complex*>(sourceimg.data), FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, reinterpret_cast<f64>(sourceimg.data), sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, reinterpret_cast<f64>(sourceimg.data) + 1, sourceimg.cols * sizeof(fftw_complex));
     cv::Mat result2[2] = {resultRe, resultIm};
     cv::Mat result;
     merge(result2, 2, result);
@@ -218,11 +218,11 @@ cv::Mat fourierFFTW(const cv::Mat& sourceimgIn, i32 fftw)
   }
   if (fftw == 3)
   {
-    fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, (fftw_complex*)sourceimg.data, (fftw_complex*)sourceimg.data, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_2d(sourceimg.rows, sourceimg.cols, reinterpret_cast<fftw_complex*>(sourceimg.data), reinterpret_cast<fftw_complex*>(sourceimg.data), FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
-    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data, sourceimg.cols * sizeof(fftw_complex));
-    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, (f64*)sourceimg.data + 1, sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultRe = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, reinterpret_cast<f64>(sourceimg.data), sourceimg.cols * sizeof(fftw_complex));
+    cv::Mat resultIm = cv::Mat(sourceimg.rows, sourceimg.cols, CV_32F, reinterpret_cast<f64>(sourceimg.data) + 1, sourceimg.cols * sizeof(fftw_complex));
     cv::Mat result2[2] = {resultRe, resultIm};
     cv::Mat result;
     merge(result2, 2, result);

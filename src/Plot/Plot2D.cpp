@@ -76,7 +76,7 @@ void Plot2D::Initialize(int xcnt, int ycnt)
     return;
   }
 
-  double colRowRatio = mColRowRatio == 0 ? (double)xcnt / ycnt : mColRowRatio;
+  double colRowRatio = mColRowRatio == 0 ? static_cast<f64>(xcnt) / ycnt : mColRowRatio;
   if (mShowAxisLabels)
     colRowRatio *= 1.1;
   Plot::plots[mName] = std::make_unique<WindowPlot>(mName, colRowRatio, Plot::OnClose);

@@ -30,9 +30,9 @@ class FitsImage
 public:
   FitsImage() {}
 
-  FitsImage(std::string path) { data = loadfits(path); }
+  explicit FitsImage(const std::string& path) : data(loadfits(path)) {}
 
-  void reload(std::string path) { data = loadfits(path); }
+  void reload(const std::string& path) { data = loadfits(path); }
 
   const cv::Mat& image() const { return std::get<0>(data); }
 
@@ -41,7 +41,7 @@ public:
 private:
   std::tuple<cv::Mat, FitsParams> data;
 
-  std::tuple<cv::Mat, FitsParams> loadfits(const std::string& path)
+  static std::tuple<cv::Mat, FitsParams> loadfits(const std::string& path)
   {
     std::ifstream file(path, std::ios::binary | std::ios::in);
     if (not file)
@@ -116,8 +116,8 @@ private:
 
       cv::Mat mat(size, size, CV_16U);
 
-      file.read((char*)mat.data, size * size * 2);
-      swapbytes((char*)mat.data, size * size * 2);
+      file.read(reinterpret_cast<char*>(mat.data), size * size * 2);
+      swapbytes(reinterpret_cast<char*>(mat.data), size * size * 2);
       AlignImage(mat);
       params.succload = true;
       params.fitsMidX = size - 1 - params.fitsMidX;
@@ -139,13 +139,13 @@ private:
     }
   }
 
-  void AlignImage(cv::Mat& mat) const
+  static void AlignImage(cv::Mat& mat)
   {
     warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(mat.cols / 2, mat.rows / 2), 90, 1.0), cv::Size(mat.cols, mat.rows));
     transpose(mat, mat);
   }
 
-  void DebugValues(const cv::Mat& mat, const FitsParams& params) const
+  static void DebugValues(const cv::Mat& mat, const FitsParams& params)
   {
     auto [mmin, mmax] = minMaxMat(mat);
     LOG_INFO("min/max mat {}/{}", mmin, mmax);
@@ -155,7 +155,7 @@ private:
     showimg(xd, "xd");
   }
 
-  void DebugCircles(const cv::Mat& mat, const FitsParams& params) const
+  static void DebugCircles(const cv::Mat& mat, const FitsParams& params)
   {
     cv::Mat img = mat.clone();
     cv::Mat imgc;
@@ -228,7 +228,7 @@ private:
     }
   }
 
-  void DebugContours(const cv::Mat& mat, FitsParams& params) const
+  static void DebugContours(const cv::Mat& mat, FitsParams& params)
   {
     // 8-bit input
     cv::Mat img = mat.clone();
@@ -347,7 +347,7 @@ public:
     second = startsecond;
   }
 
-  FitsTime(std::string dirpathh, i32 yearr, i32 monthh, i32 dayy, i32 hourr, i32 minutee, i32 secondd)
+  FitsTime(const std::string& dirpathh, i32 yearr, i32 monthh, i32 dayy, i32 hourr, i32 minutee, i32 secondd)
   {
     dirpath = dirpathh;
     startyear = yearr;

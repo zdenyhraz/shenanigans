@@ -785,10 +785,9 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   }
   case CrossoverStrategy::EXP:
   {
-    usize L = 0;
-    do
-      L++; // at least one param undergoes crossover
-    while ((rand01() < CR) and (L < params.size()));
+    usize L = 1; // at least one param undergoes crossover
+    while ((rand01() < CR) and (L < params.size()))
+      L++;
 
     usize pid = rand() % params.size();
     for (usize i = 0; i < L; i++)

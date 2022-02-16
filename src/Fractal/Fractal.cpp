@@ -5,7 +5,7 @@ void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr)
 {
   if (event == cv::EVENT_LBUTTONDOWN)
   {
-    Fractalset* set = (Fractalset*)ptr;
+    Fractalset* set = reinterpret_cast<Fractalset*>(ptr);
     set->fractalCenter.x = ((f64)x / set->fractalWidth) * (set->xmax - set->xmin) + set->xmin;
     set->fractalCenter.y = -((f64)y / set->fractalHeight) * (set->ymax - set->ymin) + set->ymax;
     set->computeDependent();
