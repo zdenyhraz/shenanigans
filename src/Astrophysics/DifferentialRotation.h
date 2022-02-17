@@ -46,12 +46,13 @@ public:
     {
       PROFILE_FUNCTION;
 
-      // apply median blur - can be iterative with increasing size
-      static constexpr i32 medsize = 3;
-      cv::medianBlur(shiftx, shiftx, medsize);
-      cv::medianBlur(shifty, shifty, medsize);
-      cv::medianBlur(omegax, omegax, medsize);
-      cv::medianBlur(omegay, omegay, medsize);
+      for (auto medsize : {3, 5})
+      {
+        cv::medianBlur(shiftx, shiftx, medsize);
+        cv::medianBlur(shifty, shifty, medsize);
+        cv::medianBlur(omegax, omegax, medsize);
+        cv::medianBlur(omegay, omegay, medsize);
+      }
     }
 
     cv::Mat shiftx, shifty, omegax, omegay;
@@ -253,9 +254,7 @@ public:
     }
 
     showimg(imageclr, "meridian curve", false, 0, 1, 1200);
-    showimg(imageclrz, "meridian curve zero", false, 0, 1, 1200);
     // saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
-    // saveimg(fmt::format("{}/meridian_curve_zero.png", "../data/debug"), imageclrz, false, imageclrz.size() / 6);
   }
 
 private:
@@ -407,11 +406,11 @@ private:
                                    .label_y2 = "ipc y"});
     PyPlot::Plot("avgomega x", {
                                    .x = Constants::Rad * data.theta,
-                                   .ys = {GetRowAverage(data.omegax), polyfit(data.theta, GetRowAverage(data.omegax), 2), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
+                                   .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
                                        GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
                                    .xlabel = "latitude [deg]",
                                    .ylabel = "average omega x [deg/day]",
-                                   .label_ys = {"ipc", "ipc polyfit", "ipc trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+                                   .label_ys = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
                                });
     PyPlot::Plot("avgomega y", {
                                    .x = Constants::Rad * data.theta,
