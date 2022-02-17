@@ -448,6 +448,8 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   if (optimalParameters.size() < OptimizedParameterCount)
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
+  const auto thisBefore = *this;
+
   SetBandpassType(static_cast<BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
   SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
   SetInterpolationType(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter]));
@@ -455,13 +457,13 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
-  LOG_SUCCESS("Final IPC BandpassType: {}", BandpassType2String(GetBandpassType()));
-  LOG_SUCCESS("Final IPC BandpassL: {:.2f}", GetBandpassL());
-  LOG_SUCCESS("Final IPC BandpassH: {:.2f}", GetBandpassH());
-  LOG_SUCCESS("Final IPC InterpolationType: {}", InterpolationType2String(GetInterpolationType()));
-  LOG_SUCCESS("Final IPC WindowType: {}", WindowType2String(GetWindowType()));
-  LOG_SUCCESS("Final IPC UpsampleCoeff: {}", GetUpsampleCoeff());
-  LOG_SUCCESS("Final IPC L1ratio: {:.2f}", GetL1ratio());
+  LOG_SUCCESS("Final IPC BandpassType: {} -> {}", thisBefore.BandpassType2String(GetBandpassType()), BandpassType2String(GetBandpassType()));
+  LOG_SUCCESS("Final IPC BandpassL: {:.2f} -> {:.2f}", thisBefore.GetBandpassL(), GetBandpassL());
+  LOG_SUCCESS("Final IPC BandpassH: {:.2f} -> {:.2f}", thisBefore.GetBandpassH(), GetBandpassH());
+  LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", thisBefore.InterpolationType2String(GetInterpolationType()), InterpolationType2String(GetInterpolationType()));
+  LOG_SUCCESS("Final IPC WindowType: {} -> {}", thisBefore.WindowType2String(GetWindowType()), WindowType2String(GetWindowType()));
+  LOG_SUCCESS("Final IPC UpsampleCoeff: {} -> {}", thisBefore.GetUpsampleCoeff(), GetUpsampleCoeff());
+  LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", thisBefore.GetL1ratio(), GetL1ratio());
 }
 
 std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type)
@@ -676,6 +678,8 @@ try
 
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
   const auto validationImagePairs = CreateImagePairs(validationImages, maxShift, validationRatio * itersPerImage, noiseStdev);
+  const auto obj = CreateObjectiveFunction(trainingImagePairs);
+  const auto valid = CreateObjectiveFunction(validationImagePairs);
 
   // before
   LOG_INFO("Running Iterative Phase Correlation parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated",
@@ -689,23 +693,30 @@ try
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
 
   // opt
-  const auto obj = CreateObjectiveFunction(trainingImagePairs);
-  const auto valid = CreateObjectiveFunction(validationImagePairs);
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
-  ApplyOptimalParameters(optimalParameters);
 
   // after
-  const auto shiftsAfter = GetShifts(trainingImagePairs);
+  auto thisAfter = *this;
+  thisAfter.ApplyOptimalParameters(optimalParameters);
+  const auto shiftsAfter = thisAfter.GetShifts(trainingImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
   LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+
+  if (objAfter > objBefore)
+  {
+    LOG_WARNING("Objective function value not improved, parameters unchanged");
+    return;
+  }
+
+  ApplyOptimalParameters(optimalParameters);
+  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
+  LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
 void IterativePhaseCorrelation::Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
@@ -721,15 +732,23 @@ try
     throw std::runtime_error("Optimization failed");
 
   const auto objBefore = obj(*this);
-  ApplyOptimalParameters(optimalParameters);
-  const auto objAfter = obj(*this);
-
+  auto thisAfter = *this;
+  thisAfter.ApplyOptimalParameters(optimalParameters);
+  const auto objAfter = obj(thisAfter);
   LOG_INFO("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+
+  if (objAfter > objBefore)
+  {
+    LOG_WARNING("Objective function value not improved, parameters unchanged");
+    return;
+  }
+
+  ApplyOptimalParameters(optimalParameters);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("An error occured during Iterative Phase Correlation parameter optimization: {}", e.what());
+  LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
 void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f32 maxShift, f32 noiseStdev, i32 itersPerImage, i32 iters) const

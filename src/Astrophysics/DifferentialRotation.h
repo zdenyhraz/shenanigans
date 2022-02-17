@@ -144,7 +144,8 @@ public:
     data.PostProcess();
 
     if constexpr (not Managed)
-      Save(data, ipc, dataPath);
+      if (xsize > 100)
+        Save(data, ipc, fmt::format("{}/proc", dataPath));
 
     if constexpr (not Managed)
       Plot(data, dataPath, idstart);
@@ -168,7 +169,13 @@ public:
   void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
-    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence);
+    LOG_FUNCTION("DifferentialRotation::Optimize");
+    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over hte entire time span
+    LOG_INFO("Optimization xsize: {}", xsizeopt);
+    LOG_INFO("Optimization ysize: {}", ysizeopt);
+    LOG_INFO("Optimization popsize: {}", popsize);
+    LOG_INFO("Optimization idstride: {}", idstrideopt);
+    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstrideopt, thetamax, cadence);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
@@ -190,8 +197,8 @@ public:
     };
 
     ipc.Optimize(obj, popsize);
-    SaveOptimizedParameters(ipc, dataPath, xsizeopt, ysizeopt, popsize);
-
+    if (xsizeopt >= 100)
+      SaveOptimizedParameters(ipc, fmt::format("{}/proc", dataPath), xsizeopt, ysizeopt, popsize);
     const auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
 
     PyPlot::Plot("Diffrot opt",

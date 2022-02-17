@@ -109,3 +109,23 @@ inline void Rotate(cv::Mat& image, f32 rot, f32 scale = 1)
   cv::Mat R = getRotationMatrix2D(center, rot, scale);
   warpAffine(image, image, R, image.size());
 }
+
+template <typename T>
+inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance)
+{
+  if (mat1.size() != mat2.size())
+    return false;
+  if (mat1.channels() != mat2.channels())
+    return false;
+  if (mat1.depth() != mat2.depth())
+    return false;
+  if (mat1.type() != mat2.type())
+    return false;
+
+  for (i32 r = 0; r < mat1.rows; ++r)
+    for (i32 c = 0; c < mat1.cols; ++c)
+      if (static_cast<f64>(std::abs(mat1.at<T>(r, c) - mat2.at<T>(r, c))) > tolerance)
+        return false;
+
+  return true;
+}

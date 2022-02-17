@@ -14,7 +14,7 @@ protected:
   }
 
   const cv::Point2d mShift = cv::Point2d(38.638, -67.425);
-  static constexpr f64 mTolerance = 1e6;
+  static constexpr f64 kTolerance = 1e6;
   cv::Mat mImg1;
   cv::Mat mImg2;
   std::unique_ptr<IterativePhaseCorrelation> mIPC;
@@ -36,8 +36,8 @@ TEST_F(IterativePhaseCorrelationTest, Consistency)
 TEST_F(IterativePhaseCorrelationTest, ZeroShift)
 {
   const auto shift = mIPC->Calculate(mImg1, mImg1);
-  EXPECT_NEAR(shift.x, 0, mTolerance);
-  EXPECT_NEAR(shift.y, 0, mTolerance);
+  EXPECT_NEAR(shift.x, 0, kTolerance);
+  EXPECT_NEAR(shift.y, 0, kTolerance);
 }
 
 TEST_F(IterativePhaseCorrelationTest, Shift)
@@ -51,8 +51,8 @@ TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputs)
 {
   const auto normShift = mIPC->Calculate(mImg1, mImg2);
   const auto unnormShift = mIPC->Calculate(mImg1 * 25.73, mImg2 * 38.14);
-  EXPECT_NEAR(normShift.x, unnormShift.x, mTolerance);
-  EXPECT_NEAR(normShift.y, unnormShift.y, mTolerance);
+  EXPECT_NEAR(normShift.x, unnormShift.x, kTolerance);
+  EXPECT_NEAR(normShift.y, unnormShift.y, kTolerance);
 }
 
 TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)
