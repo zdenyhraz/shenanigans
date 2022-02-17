@@ -1,8 +1,4 @@
 #pragma once
-#include "Fit/Polyfit.h"
-#include "Fit/Nnfit.h"
-#include "UtilsCV/Combinepics.h"
-#include "UtilsCV/Export.h"
 
 static constexpr i32 piccnt = 9;             // number of pics
 static constexpr f64 kmpp = 696010. / 378.3; // kilometers per pixel

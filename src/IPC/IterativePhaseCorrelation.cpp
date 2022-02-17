@@ -125,19 +125,6 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1cir
   Plot2D::Plot(mat);
 }
 
-void IterativePhaseCorrelation::DrawCrosshairs(cv::Mat& mat)
-{
-  cv::line(mat, cv::Point(mat.cols / 2, 0), cv::Point(mat.cols / 2, mat.rows - 1), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-  cv::line(mat, cv::Point(0, mat.rows / 2), cv::Point(mat.cols - 1, mat.rows / 2), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-}
-
-void IterativePhaseCorrelation::DrawCross(cv::Mat& mat, const cv::Point& point)
-{
-  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y - mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y + mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y + mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y - mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-  // cv::circle(mat, point, mat.cols / 20, cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-}
-
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
 try
 {
@@ -293,7 +280,8 @@ std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& im
   {
     const std::string path = entry.path().string();
 
-    if (!IsImage(path))
+    if (not(path.find(".png") != std::string::npos or path.find(".PNG") != std::string::npos or path.find(".jpg") != std::string::npos or path.find(".JPG") != std::string::npos ||
+            path.find(".jpeg") != std::string::npos or path.find(".JPEG") != std::string::npos or path.find(".fits") != std::string::npos or path.find(".FITS") != std::string::npos))
     {
       LOG_DEBUG("Directory contains a non-image file {}", path);
       continue;

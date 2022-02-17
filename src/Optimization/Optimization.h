@@ -71,12 +71,12 @@ public:
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
       const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
-  usize N = 1;                            // the problem dimension
-  std::vector<f64> mLB;                   // lower search space bounds
-  std::vector<f64> mUB;                   // upper search space bounds
-  f64 mOptimalFitness = -Constants::Inf;  // satisfactory function value
-  usize mMaxFunEvals = Constants::IntInf; // maximum # of function evaluations
-  usize maxGen = 1000;                    // maximum # of algorithm iterations
+  usize N = 1;                                            // the problem dimension
+  std::vector<f64> mLB;                                   // lower search space bounds
+  std::vector<f64> mUB;                                   // upper search space bounds
+  f64 mOptimalFitness = -std::numeric_limits<f64>::max(); // satisfactory function value
+  usize mMaxFunEvals = std::numeric_limits<i32>::max();   // maximum # of function evaluations
+  usize maxGen = 1000;                                    // maximum # of algorithm iterations
 
 protected:
   static const char* GetTerminationReasonString(const TerminationReason& reason);

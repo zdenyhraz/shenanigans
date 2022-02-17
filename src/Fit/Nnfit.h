@@ -3,7 +3,7 @@
 inline i32 findNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
 {
   i32 idx = 0;
-  f64 mindist = Constants::Inf;
+  f64 mindist = std::numeric_limits<f64>::max();
   f64 dist;
   for (usize i = 0; i < pts.size(); i++)
   {

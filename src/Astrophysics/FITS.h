@@ -19,7 +19,7 @@ struct FitsParams
   bool succParamCorrection = false;
 };
 
-inline void swapbytes(char* input, unsigned length)
+inline void swapbytes(char* input, u32 length)
 {
   for (usize i = 0; i < length; i += 2)
     std::swap(input[i], input[i + 1]);

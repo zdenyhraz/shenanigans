@@ -1,36 +1,4 @@
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <stdint.h>
-#include <string>
-#include <chrono>
-#include <numeric>
-#include <time.h>
-#include <math.h>
-#include <omp.h>
-#include <filesystem>
-#include <queue>
-#include <functional>
-#include <vector>
-#include "Constants.h"
-
-#define TIMER(name) std::unique_ptr<Timer> t = std::make_unique<Timer>(name);
-
-class Timer // benchmarking struct
-{
-public:
-  using clock = std::chrono::high_resolution_clock;
-  using tp = std::chrono::time_point<clock>;
-  using dur = std::chrono::milliseconds;
-
-  std::string name;
-  tp stp;
-
-  static constexpr auto tse(const tp& tmp) { return std::chrono::time_point_cast<dur>(tmp).time_since_epoch().count(); }
-
-  explicit Timer(const std::string& name) : name(name), stp(clock::now()) {}
-  ~Timer() { LOG_INFO("{} took {} ms", name, tse(clock::now()) - tse(stp)); }
-};
 
 inline f64 rand01()
 {
@@ -67,59 +35,6 @@ template <typename T = f64>
 inline auto zerovect2(i32 N, i32 M, T value = 0.)
 {
   return std::vector<std::vector<T>>(N, zerovect(M, value));
-}
-
-template <typename T>
-inline std::string to_string(const std::vector<T>& vec)
-{
-  std::stringstream out;
-  out << "[";
-  for (usize i = 0; i < vec.size(); i++)
-  {
-    out << vec[i];
-    if (i < vec.size() - 1)
-      out << ", ";
-  }
-  out << "]";
-  return out.str();
-}
-
-template <typename T>
-inline std::ostream& operator<<(std::ostream& out, const std::vector<T>& vec)
-{
-  out << "[";
-  for (usize i = 0; i < vec.size(); i++)
-  {
-    out << vec[i];
-    if (i < vec.size() - 1)
-      out << ", ";
-  }
-  out << "]";
-  return out;
-}
-
-template <typename T>
-inline std::ostream& operator<<(std::ostream& out, const std::vector<std::vector<T>>& vec)
-{
-  for (i32 r = 0; r < vec.size(); r++)
-  {
-    out << "[";
-    for (i32 c = 0; c < vec[r].size(); c++)
-    {
-      out << vec[r][c];
-      if (c < vec[r].size() - 1)
-        out << ", ";
-    }
-    out << "]\n";
-  }
-  return out;
-}
-
-inline std::ostream& operator<<(std::ostream& out, const std::vector<std::string>& vec)
-{
-  for (usize i = 0; i < vec.size(); i++)
-    out << vec[i] << "\n";
-  return out;
 }
 
 template <typename T>
@@ -265,7 +180,7 @@ inline T vectorMin(const std::vector<T>& input)
 }
 
 template <typename T>
-inline T arrayMax(T* input, unsigned size)
+inline T arrayMax(T* input, u32 size)
 {
   T arrmax = input[0];
   for (usize i = 0; i < size; i++)
@@ -277,7 +192,7 @@ inline T arrayMax(T* input, unsigned size)
 }
 
 template <typename T>
-inline T arrayMin(T* input, unsigned size)
+inline T arrayMin(T* input, u32 size)
 {
   T arrmin = input[0];
   for (usize i = 0; i < size; i++)
@@ -310,11 +225,6 @@ inline std::string currentTime()
   return buf;
 }
 
-inline f64 speedTest(f64 x)
-{
-  return pow(asin(x * x) + floor(x) * (x - 123.4) + 3.14 * cos(atan(1. / x)), 0.123456);
-}
-
 inline f64 gaussian1D(f64 x, f64 amp, f64 mu, f64 sigma)
 {
   return amp * exp(-0.5 * pow((x - mu) / sigma, 2));
@@ -327,11 +237,10 @@ constexpr i32 factorial(i32 n)
 
 inline void linreg(i32 n, const std::vector<f64>& x, const std::vector<f64>& y, f64& k, f64& q)
 {
-  f64 sumx = 0.;  /* sum of x                      */
-  f64 sumx2 = 0.; /* sum of x**2                   */
-  f64 sumxy = 0.; /* sum of x * y                  */
-  f64 sumy = 0.;  /* sum of y                      */
-  f64 sumy2 = 0.; /* sum of y**2                   */
+  f64 sumx = 0.;
+  f64 sumx2 = 0.;
+  f64 sumxy = 0.;
+  f64 sumy = 0.;
 
   for (usize i = 0; i < n; i++)
   {
@@ -339,7 +248,6 @@ inline void linreg(i32 n, const std::vector<f64>& x, const std::vector<f64>& y, 
     sumx2 += sqr(x[i]);
     sumxy += x[i] * y[i];
     sumy += y[i];
-    sumy2 += sqr(y[i]);
   }
 
   f64 denom = (n * sumx2 - sqr(sumx));
@@ -361,28 +269,6 @@ inline f64 linregPosition(i32 n, const std::vector<f64>& x, const std::vector<f6
   f64 k, q;
   linreg(n, x, y, k, q);
   return k * x_ + q;
-}
-
-inline void exportToMATLAB(const std::vector<f64>& Ydata, f64 xmin, f64 xmax, std::string path)
-{
-  std::ofstream listing(path, std::ios::out | std::ios::trunc);
-  listing << xmin << "," << xmax << std::endl;
-  for (auto& y : Ydata)
-    listing << y << std::endl;
-}
-
-inline void exportToMATLAB(const std::vector<std::vector<f64>>& Zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, std::string path)
-{
-  std::ofstream listing(path, std::ios::out | std::ios::trunc);
-  listing << xmin << "," << xmax << "," << ymin << "," << ymax << std::endl;
-  for (i32 r = 0; r < Zdata.size(); r++)
-    for (i32 c = 0; c < Zdata[0].size(); c++)
-      listing << Zdata[r][c] << std::endl;
-}
-
-inline void makeDir(const std::string& path, const std::string& dirname)
-{
-  std::filesystem::create_directory(path + "//" + dirname);
 }
 
 inline std::vector<f64> iota(i32 first, i32 size)
@@ -487,12 +373,6 @@ inline std::vector<f64> toRadians(const std::vector<f64>& vecdeg)
   return vecrad;
 }
 
-inline std::string to_stringp(f64 val, i32 prec)
-{
-  std::string vals = std::to_string(val);
-  return vals.substr(0, vals.find(".") + prec + 1);
-}
-
 inline std::vector<f64> removeQuantileOutliers(const std::vector<f64>& vec, f64 quanB, f64 quanT)
 {
   auto out = vec;
@@ -566,47 +446,3 @@ inline std::vector<f64> getStandardDeviationsVertical(const std::vector<std::vec
   }
   return stdevs;
 }
-
-inline bool IsImage(const std::string& path)
-{
-  return (path.find(".png") != std::string::npos or path.find(".PNG") != std::string::npos or path.find(".jpg") != std::string::npos or path.find(".JPG") != std::string::npos ||
-          path.find(".jpeg") != std::string::npos or path.find(".JPEG") != std::string::npos or path.find(".fits") != std::string::npos or path.find(".FITS") != std::string::npos);
-}
-
-inline std::vector<f64> GetIota(i32 length, f64 maximum)
-{
-  std::vector<f64> out(length);
-  for (usize i = 0; i < length; ++i)
-    out[i] = (f64)i / (length - 1) * maximum;
-  return out;
-}
-
-inline std::vector<f64> Slice(const std::vector<f64>& vec, usize begin, usize end)
-{
-  if (begin > vec.size() - 1 or end > vec.size() - 1 or begin >= end)
-    return {};
-
-  return std::vector<f64>(vec.begin() + begin, vec.begin() + end);
-}
-
-template <typename T>
-struct fmt::formatter<std::vector<T>>
-{
-  template <typename ParseContext>
-  constexpr auto parse(ParseContext& ctx)
-  {
-    return ctx.begin();
-  }
-
-  template <typename FormatContext>
-  constexpr auto format(const std::vector<T>& vec, FormatContext& ctx)
-  {
-    if (vec.empty())
-      return fmt::format_to(ctx.out(), "[]");
-
-    fmt::format_to(ctx.out(), "[");
-    for (usize i = 0; i < vec.size() - 1; ++i)
-      fmt::format_to(ctx.out(), "{}, ", vec[i]);
-    return fmt::format_to(ctx.out(), "{}]", vec[vec.size() - 1]);
-  }
-};

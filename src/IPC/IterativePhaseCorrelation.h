@@ -70,8 +70,8 @@ public:
   void SetSize(const cv::Size& size) { SetSize(size.height, size.width); }
   void SetBandpassParameters(f64 bandpassL, f64 bandpassH)
   {
-    mBandpassL = clamp(bandpassL, -Constants::Inf, 1); // L from [-inf, 1]
-    mBandpassH = clamp(bandpassH, 0, Constants::Inf);  // H from [0, inf]
+    mBandpassL = clamp(bandpassL, -std::numeric_limits<f64>::max(), 1); // L from [-inf, 1]
+    mBandpassH = clamp(bandpassH, 0, std::numeric_limits<f64>::max());  // H from [0, inf]
     UpdateBandpass();
   }
   void SetBandpassType(BandpassType type)
@@ -260,8 +260,6 @@ public:
   static std::string BandpassType2String(BandpassType type);
   static std::string InterpolationType2String(InterpolationType type);
   static std::string WindowType2String(WindowType type);
-  static void DrawCrosshairs(cv::Mat& mat);
-  static void DrawCross(cv::Mat& mat, const cv::Point& point);
 
 private:
   i32 mRows = 0;

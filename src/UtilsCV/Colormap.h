@@ -1,23 +1,5 @@
 #pragma once
 
-inline std::tuple<f32, f32, f32> colorMapJET(f32 x, f32 caxisMin = 0, f32 caxisMax = 1, f32 val = 1)
-{
-  if (x == 0)
-    return std::make_tuple(0., 0., 0.);
-
-  f32 B, G, R;
-  f32 sh = 0.125 * (caxisMax - caxisMin);
-  f32 start = caxisMin;
-  f32 mid = caxisMin + 0.5 * (caxisMax - caxisMin);
-  f32 end = caxisMax;
-
-  B = (x > (start + sh)) ? clamp(-val / 2 / sh * x + val / 2 / sh * (mid + sh), 0, val) : (x < start ? val / 2 : clamp(val / 2 / sh * x + val / 2 - val / 2 / sh * start, 0, val));
-  G = (x < mid) ? clamp(val / 2 / sh * x - val / 2 / sh * (start + sh), 0, val) : clamp(-val / 2 / sh * x + val / 2 / sh * (end - sh), 0, val);
-  R = (x < (end - sh)) ? clamp(val / 2 / sh * x - val / 2 / sh * (mid - sh), 0, val) : (x > end ? val / 2 : clamp(-val / 2 / sh * x + val / 2 + val / 2 / sh * end, 0, val));
-
-  return std::make_tuple(B, G, R);
-}
-
 inline cv::Scalar colorMapJet(f32 x, f32 caxisMin = 0, f32 caxisMax = 1, f32 val = 255)
 {
   f32 B, G, R;
@@ -123,11 +105,10 @@ inline cv::Mat applyQuantileColorMap(const cv::Mat& sourceimgIn, f64 quantileB =
     for (i32 c = 0; c < sourceimgOutCLR.cols; c++)
     {
       f32 x = sourceimg.at<f32>(r, c);
-      f32 B, G, R;
-      std::tie(B, G, R) = colorMapJET(x, caxisMin, caxisMax);
-      sourceimgOutCLR.at<cv::Vec3f>(r, c)[0] = B;
-      sourceimgOutCLR.at<cv::Vec3f>(r, c)[1] = G;
-      sourceimgOutCLR.at<cv::Vec3f>(r, c)[2] = R;
+      const auto clr = colorMapJet(x, caxisMin, caxisMax);
+      sourceimgOutCLR.at<cv::Vec3f>(r, c)[0] = clr[0];
+      sourceimgOutCLR.at<cv::Vec3f>(r, c)[1] = clr[1];
+      sourceimgOutCLR.at<cv::Vec3f>(r, c)[2] = clr[2];
     }
   }
   return sourceimgOutCLR;

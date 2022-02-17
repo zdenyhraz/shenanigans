@@ -604,13 +604,13 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
   {
     if (mConsoleOutput)
       LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
-    newoffspring.fitness = Constants::Inf;
+    newoffspring.fitness = std::numeric_limits<f64>::max();
   }
   catch (...)
   {
     if (mConsoleOutput)
       LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
-    newoffspring.fitness = Constants::Inf;
+    newoffspring.fitness = std::numeric_limits<f64>::max();
   }
 }
 
@@ -742,7 +742,7 @@ void Evolution::Population::InitializeBestEntity()
 Evolution::Entity::Entity(usize N)
 {
   params.resize(N);
-  fitness = Constants::Inf;
+  fitness = std::numeric_limits<f64>::max();
 }
 
 Evolution::Offspring::Offspring(usize N, usize nParents)
@@ -750,7 +750,7 @@ Evolution::Offspring::Offspring(usize N, usize nParents)
   params.resize(N);
   parentIndices.resize(nParents);
   crossoverParameters.resize(N);
-  fitness = Constants::Inf;
+  fitness = std::numeric_limits<f64>::max();
 }
 
 void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)

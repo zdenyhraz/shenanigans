@@ -180,7 +180,7 @@ try
     const i32 N = 2;
     const i32 runs = 20;
     const i32 maxFunEvals = 1000;
-    const f32 optimalFitness = -Constants::Inf;
+    const f32 optimalFitness = -std::numeric_limits<f64>::max();
     Evolution Evo(N);
     Evo.mNP = 5 * N;
     Evo.mMutStrat = Evolution::RAND1;
