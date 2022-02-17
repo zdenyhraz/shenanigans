@@ -1,4 +1,4 @@
-#include <string>
+#pragma once
 
 namespace AoC2021D25
 {

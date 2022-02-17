@@ -1,5 +1,3 @@
-
-#include <regex>
 #include "WindowShenanigans.h"
 #include "../IPC/WindowIPC.h"
 #include "../Diffrot/WindowDiffrot.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
+inline std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
 {
   cv::Mat gradM = cv::Mat::zeros(img.size(), CV_32F);
   cv::Mat gradA = cv::Mat::zeros(img.size(), CV_32F);
@@ -19,7 +19,7 @@ std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
   return {gradM, gradA};
 }
 
-std::tuple<i32, i32, i32, i32> GetTwoPairs(f32 angle, i32 r, i32 c, const std::vector<cv::Point2f>& relativePoints)
+inline std::tuple<i32, i32, i32, i32> GetTwoPairs(f32 angle, i32 r, i32 c, const std::vector<cv::Point2f>& relativePoints)
 {
   f32 mind = std::numeric_limits<f32>::max();
   f32 mindangle = 0;
@@ -58,7 +58,7 @@ std::tuple<i32, i32, i32, i32> GetTwoPairs(f32 angle, i32 r, i32 c, const std::v
   return {r1, c1, r2, c2};
 }
 
-cv::Mat NonMaximaSuppresion(const cv::Mat& img)
+inline cv::Mat NonMaximaSuppresion(const cv::Mat& img)
 {
   auto [gradM, gradA] = CalculateGradient(img);
   cv::Mat out = cv::Mat::zeros(gradM.size(), CV_32F);

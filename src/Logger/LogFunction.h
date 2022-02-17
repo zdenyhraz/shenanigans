@@ -1,7 +1,4 @@
 #pragma once
-#include <chrono>
-#include <string>
-#include <fmt/format.h>
 #include "Logger.h"
 
 #define LOG_FUNCTION(funName) LogFunction logFunction(funName)

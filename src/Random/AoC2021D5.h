@@ -1,4 +1,4 @@
-#include <string>
+#pragma once
 
 u64 AoC2021D5()
 {
