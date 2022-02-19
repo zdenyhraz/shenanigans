@@ -5,10 +5,10 @@ data/**
 cppcheck_report.*
 
 !data/app/
-!data/app/*
+!data/app/**
 !data/articles/
-!data/articles/*
+!data/articles/**
 !data/dissertation/
-!data/dissertation/*
+!data/dissertation/**
 !data/readme/
-!data/readme/*
+!data/readme/**
