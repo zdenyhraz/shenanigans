@@ -921,8 +921,8 @@ try
 
   constexpr bool DebugMode = true;
   constexpr bool addNoise = false;
-  constexpr bool debugShift = false;
-  constexpr bool debugGradualShift = true;
+  constexpr bool debugShift = true;
+  constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;

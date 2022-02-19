@@ -515,9 +515,9 @@ private:
   template <bool DebugMode>
   void ReduceL1ratio(f64& L1ratio) const
   {
-    L1ratio -= mL1ratioStep;
     if constexpr (DebugMode)
-      LOG_WARNING("L1 did not converge - reducing L1ratio to {:.2f}", L1ratio);
+      LOG_WARNING("L1 did not converge - reducing L1ratio: {:.2f} -> {:.2f}", L1ratio, L1ratio - mL1ratioStep);
+    L1ratio -= mL1ratioStep;
   }
   static cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) { return L3peak - L3mid; }
   template <bool DebugMode>
