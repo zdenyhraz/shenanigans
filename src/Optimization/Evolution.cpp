@@ -3,6 +3,7 @@
 
 Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N)
 {
+  PROFILE_FUNCTION;
 }
 
 OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)

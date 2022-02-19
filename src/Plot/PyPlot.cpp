@@ -69,10 +69,12 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
 {
   PROFILE_FUNCTION;
-  auto z = zerovect2(data.z.rows, data.z.cols, 0.0f);
-  for (i32 r = 0; r < data.z.rows; ++r)
-    for (i32 c = 0; c < data.z.cols; ++c)
-      z[r][c] = data.z.at<f32>(r, c);
+  cv::Mat mz = data.z.clone();
+  mz.convertTo(mz, CV_32F);
+  auto z = zerovect2(mz.rows, mz.cols, 0.0f);
+  for (i32 r = 0; r < mz.rows; ++r)
+    for (i32 c = 0; c < mz.cols; ++c)
+      z[r][c] = mz.at<f32>(r, c);
 
   py::dict scope;
   scope["id"] = mPlotIds[name];

@@ -111,7 +111,7 @@ inline void Rotate(cv::Mat& image, f32 rot, f32 scale = 1)
 }
 
 template <typename T>
-inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance)
+inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
 {
   if (mat1.size() != mat2.size())
     return false;

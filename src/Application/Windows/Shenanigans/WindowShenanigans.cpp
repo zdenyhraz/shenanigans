@@ -136,43 +136,6 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  if (1) // pybind+matplotlib wrap test
-  {
-    i32 n = 101;
-    std::vector<f64> x(n);
-    std::vector<f64> y(n);
-    std::vector<f64> y2(n);
-    std::vector<f64> y3(n);
-    std::vector<f64> y4(n);
-    cv::Mat z = cv::Mat::zeros(n, n, CV_32F);
-
-    for (i32 r = 0; r < n; ++r)
-    {
-      x[r] = static_cast<f64>(r) / (n - 1) * 6.28;
-      y[r] = std::sin(x[r]) + 0.2 * rand01();
-      y2[r] = std::cos(x[r]) * 5 + rand01();
-      y3[r] = std::exp(x[r]) + rand01() * 100;
-      y4[r] = std::exp(x[r]) + 120 + rand01() * 100;
-      for (i32 c = 0; c < n; ++c)
-        z.at<f32>(r, c) = r + c + rand01() * 100;
-    }
-
-    PyPlot::Plot("plot1", {.x = x, .y = y, .title = "x/y"});
-    PyPlot::Plot("plot2", {.x = x, .y = y, .y2 = y2, .label_y = "y", .label_y2 = "y2", .title = "x/y+y2"});
-    PyPlot::Plot("plot3", {.x = x, .ys = {y, y2}, .label_ys = {"y", "y2"}, .title = "x/ys"});
-    PyPlot::Plot("plot4", {.x = x,
-                              .ys = {y, y2},
-                              .y2s = {y3, y4},
-                              .label_ys = {"y", "y2"},
-                              .label_y2s = {"y3", "y4"},
-                              .color_ys = {"tab:blue", "tab:orange"},
-                              .color_y2s = {"tab:green", "tab:purple"},
-                              .linestyle_ys = {"-", "--"},
-                              .linestyle_y2s = {"-.", "-"},
-                              .title = "x/ys+y2s"});
-    PyPlot::Plot("plot5", {.z = z, .xmin = -1, .xmax = 12, .ymin = -1, .ymax = 1, .xlabel = "x", .ylabel = "y", .zlabel = "z", .aspectratio = 2, .title = "aww yiss"});
-    return;
-  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;

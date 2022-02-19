@@ -52,12 +52,14 @@ public:
 
   void Initialize(i32 rows, i32 cols, f64 bandpassL, f64 bandpassH)
   {
+    PROFILE_FUNCTION;
     SetSize(rows, cols);
     SetBandpassParameters(bandpassL, bandpassH);
     UpdateL1circle();
   }
   void SetSize(i32 rows, i32 cols = -1)
   {
+    PROFILE_FUNCTION;
     mRows = rows;
     mCols = cols > 0 ? cols : rows;
 
@@ -225,10 +227,7 @@ public:
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (DebugMode)
-        {
           DebugL1A(L1, L1circle, L3peak - L3mid, L2Upeak - L2Umid);
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
@@ -283,6 +282,7 @@ private:
 
   void UpdateWindow()
   {
+    PROFILE_FUNCTION;
     switch (mWindowType)
     {
     case WindowType::Hann:
@@ -293,10 +293,15 @@ private:
     }
   }
 
-  void UpdateL1circle() { mL1circle = kirkl(GetL1size(mL2size * mUpsampleCoeff, mL1ratio)); }
+  void UpdateL1circle()
+  {
+    PROFILE_FUNCTION;
+    mL1circle = kirkl(GetL1size(mL2size * mUpsampleCoeff, mL1ratio));
+  }
 
   void UpdateBandpass()
   {
+    PROFILE_FUNCTION;
     mBandpass = cv::Mat::ones(mRows, mCols, CV_32F);
     if (mBandpassType == BandpassType::None)
       return;
@@ -436,6 +441,7 @@ private:
   template <bool Circular>
   static cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle)
   {
+    PROFILE_FUNCTION;
     if constexpr (Circular)
     {
       cv::Moments m = cv::moments(mat.mul(L1circle));
@@ -464,13 +470,13 @@ private:
     switch (mInterpolationType)
     {
     case InterpolationType::NearestNeighbor:
-      resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
+      cv::resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
       break;
     case InterpolationType::Linear:
-      resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
+      cv::resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
       break;
     case InterpolationType::Cubic:
-      resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
+      cv::resize(L2, L2U, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
       break;
     default:
       break;
@@ -490,7 +496,7 @@ private:
   {
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
-  static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return abs(L1peak.x - L1mid.x) < 0.5 and abs(L1peak.y - L1mid.y) < 0.5; }
+  static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
   template <bool DebugMode>
   static bool ReduceL2size(i32& L2size)
   {

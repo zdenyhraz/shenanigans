@@ -10,16 +10,19 @@ inline cv::Mat roicropref(const cv::Mat& mat, i32 x, i32 y, i32 w, i32 h)
 
 inline cv::Mat roicrop(const cv::Mat& mat, i32 x, i32 y, i32 w, i32 h)
 {
+  PROFILE_FUNCTION;
   return roicropref(mat, x, y, w, h).clone();
 }
 
 inline cv::Mat roicropmid(const cv::Mat& mat, i32 w, i32 h)
 {
+  PROFILE_FUNCTION;
   return roicrop(mat, mat.cols / 2, mat.rows / 2, w, h);
 }
 
 inline cv::Mat kirkl(i32 rows, i32 cols, u32 radius)
 {
+  PROFILE_FUNCTION;
   cv::Mat kirkl = cv::Mat::zeros(rows, cols, CV_32F);
   for (i32 r = 0; r < rows; r++)
     for (i32 c = 0; c < cols; c++)
@@ -35,5 +38,6 @@ inline cv::Mat kirkl(u32 size)
 
 inline cv::Mat kirklcrop(const cv::Mat& mat, i32 x, i32 y, i32 diameter)
 {
+  PROFILE_FUNCTION;
   return roicrop(mat, x, y, diameter, diameter).mul(kirkl(diameter));
 }

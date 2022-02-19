@@ -273,6 +273,18 @@ private:
     f64 R;       // [px]
   };
 
+  i32 xsize = 2500;
+  i32 ysize = 101;
+  i32 idstep = 1;
+  i32 idstride = 25;
+  f64 thetamax = 50. / Constants::Rad;
+  i32 cadence = 45;
+  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
+    PROFILE_SCOPE(Imread);
+    return cv::imread(path, cv::IMREAD_UNCHANGED);
+  }};
+  mutable DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
+
   static ImageHeader GetHeader(const std::string& path)
   {
     PROFILE_FUNCTION;
@@ -530,17 +542,4 @@ private:
 
     return data;
   }
-
-  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
-    PROFILE_SCOPE(Imread);
-    return cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  }};
-  mutable DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
-
-  i32 xsize = 2500;
-  i32 ysize = 101;
-  i32 idstep = 1;
-  i32 idstride = 25;
-  f64 thetamax = 50. / Constants::Rad;
-  i32 cadence = 45;
 };
