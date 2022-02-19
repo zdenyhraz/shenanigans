@@ -217,7 +217,7 @@ public:
       if (L1circle.cols != L1size)
         [[unlikely]] L1circle = kirkl(L1size);
       if constexpr (DebugMode)
-        DebugL1B(L2U, L1size, L1circle, L3peak - L3mid);
+        DebugL1B(L2U, L1size, L3peak - L3mid);
 
       for (i32 iter = 0; iter < mMaxIterations; ++iter)
       {
@@ -227,12 +227,17 @@ public:
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (DebugMode)
-          DebugL1A(L1, L1circle, L3peak - L3mid, L2Upeak - L2Umid);
+          DebugL1A(L1, L3peak - L3mid, L2Upeak - L2Umid);
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid))
-          [[unlikely]] { return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff; }
+          [[unlikely]]
+          {
+            if constexpr (DebugMode)
+              DebugL1A(L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, true);
+            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUpsampleCoeff;
+          }
       }
 
       // maximum iterations reached - reduce L1 size by reducing L1ratio
@@ -278,6 +283,7 @@ private:
   cv::Mat mL1circle;
   mutable std::string mDebugDirectory = "../data/debug";
   mutable std::string mDebugName = "IPC";
+  mutable i32 mDebugIndex = 0;
   mutable cv::Point2d mDebugTrueShift;
 
   void UpdateWindow()
@@ -533,8 +539,8 @@ private:
   void DebugL3(const cv::Mat& L3) const;
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
-  void DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Mat& L1circle, const cv::Point2d& L3shift) const;
-  void DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const;
+  void DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const;
+  void DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last = false) const;
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
   IterativePhaseCorrelation CreateIPCFromParams(const std::vector<f64>& params) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;

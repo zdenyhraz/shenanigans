@@ -22,7 +22,8 @@ if zlabel:
   cbar.set_label(zlabel)
 if title:
   plt.title(title)
-
+if save:
+  plt.savefig(save, bbox_inches='tight')
 
 plt.set_cmap(cmap)
 plt.tight_layout()

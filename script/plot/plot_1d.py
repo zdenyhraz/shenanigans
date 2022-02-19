@@ -44,6 +44,8 @@ if title:
 if label_y or label_ys or label_y2 or label_y2s:
   labels = [line.get_label() for line in lines]
   plt.legend(lines, labels)
+if save:
+  plt.savefig(save, bbox_inches='tight')
 
 plt.tight_layout()
 plt.draw()

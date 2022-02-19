@@ -17,6 +17,7 @@ public:
     std::string linestyle_y = "-", linestyle_y2 = "-";      // line styles
     std::vector<std::string> linestyle_ys, linestyle_y2s;   // multi line styles
     f64 aspectratio = 1;                                    // aspect ratio
+    std::string save;                                       // save path
     std::string title;                                      // plot title
   };
 
@@ -28,6 +29,7 @@ public:
     bool interp = false;
     f64 aspectratio = 1;
     std::string cmap = "jet";
+    std::string save;
     std::string title;
   };
 

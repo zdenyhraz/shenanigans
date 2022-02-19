@@ -61,6 +61,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["linestyle_ys"] = data.linestyle_ys;
   scope["linestyle_y2s"] = data.linestyle_y2s;
   scope["aspectratio"] = data.aspectratio;
+  scope["save"] = data.save;
   scope["title"] = not data.title.empty() ? data.title : name;
 
   return scope;
@@ -89,6 +90,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   scope["interp"] = data.interp;
   scope["aspectratio"] = data.aspectratio;
   scope["cmap"] = data.cmap;
+  scope["save"] = data.save;
   scope["title"] = not data.title.empty() ? data.title : name;
 
   return scope;

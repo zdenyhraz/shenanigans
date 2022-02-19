@@ -28,7 +28,7 @@ void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspowe
 
 void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
 {
-  PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3.clone()});
+  PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
 }
 
 void IterativePhaseCorrelation::DebugL2(const cv::Mat& L2) const
@@ -55,24 +55,28 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   }
 }
 
-void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Mat& L1circle, const cv::Point2d& L3shift) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const
 {
   cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(L1circle);
+  mat = mat.mul(kirkl(mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
-  PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat});
+  cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
+  PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex)});
 }
 
-void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const
+void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last) const
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(L1circle);
+  mat = mat.mul(kirkl(mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
+  cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat});
+  if (last)
+    PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex)});
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
@@ -919,8 +923,8 @@ try
 
   constexpr bool DebugMode = true;
   constexpr bool addNoise = false;
-  constexpr bool debugShift = true;
-  constexpr bool debugGradualShift = false;
+  constexpr bool debugShift = false;
+  constexpr bool debugGradualShift = true;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
@@ -952,14 +956,14 @@ try
     }
 
     auto ipcshift = Calculate<DebugMode>(image1, image2);
-    LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
+    LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
   }
 
   if constexpr (debugGradualShift)
   {
-    SetDebugDirectory("../data/peakshift");
+    SetDebugDirectory("../data/peakshift/new");
     const cv::Mat image1 = LoadUnitFloatImage("../data/AIA/171A.png");
-    const cv::Mat crop1 = roicrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
+    const cv::Mat crop1 = roicropmid(image1, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
@@ -975,18 +979,18 @@ try
       randn(noise2, 0, noiseStdev);
       crop1 += noise1;
     }
-
     for (i32 i = 0; i < iters; i++)
     {
-      SetDebugName(fmt::format("GradualShift{}", i));
-      const cv::Point2d rawshift(totalshift * i / (iters - 1), 0);
-      const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., rawshift.x, 0., 1., rawshift.y);
+      mDebugIndex = i;
+      const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
+      const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image1, image2, T, image2.size());
-      crop2 = roicrop(image2, image2.cols / 2, image2.rows / 2, mCols, mRows);
+      crop2 = roicropmid(image2, mCols, mRows);
       if (addNoise)
         crop2 += noise2;
+      SetDebugTrueShift(shift);
       const auto ipcshift = Calculate<DebugMode>(crop1, crop2);
-      LOG_INFO("Artificial shift = {} / Estimate shift = {} / Error = {}", rawshift, ipcshift, ipcshift - rawshift);
+      LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
     }
   }
 

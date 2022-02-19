@@ -21,8 +21,8 @@ Semi-random funky stuff, maily for my PhD. Contains calculations and algorithm i
 - 📌 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
 - 🪐 [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
-## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) (gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 64x64 image, no noise vs heavy noise)
-<img src="data/dissertation/refinement/peakshift.gif" width="50%"><img src="data/dissertation/refinement/peakshift_noise.gif" width="50%">
+## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) (gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 128x128 image, standard vs [IPC](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7))
+<img src="data/dissertation/refinement/peakshift_L1B.gif" width="50%"><img src="data/dissertation/refinement/peakshift_L1A.gif" width="50%">
 
 ## [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
 <p align="center">
