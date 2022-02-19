@@ -63,7 +63,7 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const c
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
   cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex)});
+  PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last) const
@@ -74,9 +74,7 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat});
-  if (last)
-    PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex)});
+  PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
@@ -981,7 +979,7 @@ try
     }
     for (i32 i = 0; i < iters; i++)
     {
-      mDebugIndex = i;
+      SetDebugIndex(i);
       const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
       const cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image1, image2, T, image2.size());

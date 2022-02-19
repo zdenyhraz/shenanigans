@@ -110,6 +110,7 @@ public:
       std::filesystem::create_directory(dir);
   }
   void SetDebugName(const std::string& name) const { mDebugName = name; }
+  void SetDebugIndex(i32 index) const { mDebugIndex = index; }
   void SetDebugTrueShift(const cv::Point2d& shift) const { mDebugTrueShift = shift; }
 
   i32 GetRows() const { return mRows; }
@@ -281,8 +282,8 @@ private:
   cv::Mat mBandpass;
   cv::Mat mWindow;
   cv::Mat mL1circle;
-  mutable std::string mDebugDirectory = "../data/debug";
   mutable std::string mDebugName = "IPC";
+  mutable std::string mDebugDirectory;
   mutable i32 mDebugIndex = 0;
   mutable cv::Point2d mDebugTrueShift;
 
