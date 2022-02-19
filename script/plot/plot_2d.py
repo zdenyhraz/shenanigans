@@ -8,8 +8,10 @@ if fig.get_figheight() < 5:
   fig.set_figwidth(fig.get_figwidth()*2*aspectratio)
 
 plt.clf()
-plt.jet()
-im = plt.imshow(z, extent=[xmin, xmax, ymin, ymax], interpolation='bilinear' if interp else 'none', aspect='auto')
+im = plt.imshow(z,
+                extent=[xmin, xmax, ymin, ymax],
+                interpolation='bilinear' if interp else 'none',
+                aspect='auto')
 cbar = plt.colorbar(im)
 
 if xlabel:
@@ -21,6 +23,8 @@ if zlabel:
 if title:
   plt.title(title)
 
+
+plt.set_cmap(cmap)
 plt.tight_layout()
 plt.draw()
 plt.pause(1e-9)

@@ -3,85 +3,44 @@
 
 void IterativePhaseCorrelation::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
 {
-  Plot2D::Set(fmt::format("{} I1", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", mDebugDirectory, mDebugName));
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot(image1);
-
-  Plot2D::Set(fmt::format("{} I2", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", mDebugDirectory, mDebugName));
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot(image2);
+  PyPlot::Plot(fmt::format("{} I1", mDebugName), {.z = image1, .cmap = "gray"});
+  PyPlot::Plot(fmt::format("{} I2", mDebugName), {.z = image2, .cmap = "gray"});
 }
 
 void IterativePhaseCorrelation::DebugFourierTransforms(const cv::Mat& dft1, const cv::Mat& dft2) const
 {
   auto plot1 = dft1.clone();
   Fourier::fftshift(plot1);
-
-  Plot2D::Set(fmt::format("{} DFT1lm", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT1logmagn.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::logmagn(plot1));
-
-  Plot2D::Set(fmt::format("{} DFT1p", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT1phase.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::phase(plot1));
+  PyPlot::Plot(fmt::format("{} DFT1lm", mDebugName), {.z = Fourier::logmagn(plot1)});
+  PyPlot::Plot(fmt::format("{} DFT1p", mDebugName), {.z = Fourier::phase(plot1)});
 
   auto plot2 = dft2.clone();
   Fourier::fftshift(plot2);
-
-  Plot2D::Set(fmt::format("{} DFT2lm", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT2logmagn.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::logmagn(plot2));
-
-  Plot2D::Set(fmt::format("{} DFT2p", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_DFT2phase.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::phase(plot2));
+  PyPlot::Plot(fmt::format("{} DFT2lm", mDebugName), {.z = Fourier::logmagn(plot2)});
+  PyPlot::Plot(fmt::format("{} DFT2p", mDebugName), {.z = Fourier::phase(plot2)});
 }
 
 void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
-  Plot2D::Set(fmt::format("{} CP log magnitude", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_CPlogmagn.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::fftshift(Fourier::logmagn(crosspower)));
-
-  Plot2D::Set(fmt::format("{} CP phase", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_CPphase.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(Fourier::fftshift(Fourier::phase(crosspower)));
+  PyPlot::Plot(fmt::format("{} CP log magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::logmagn(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower)), .cmap = "hsv"});
 }
 
 void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
 {
-  auto plot = L3.clone();
-  Plot2D::Set(fmt::format("{} L3", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L3.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(plot);
-
-  if (0) // gradual peakshift
-  {
-    auto peakshift = roicrop(L3, L3.cols / 2, L3.rows / 2, 7, 7);
-    resize(peakshift, peakshift, cv::Size(512, 512), 0, 0, cv::INTER_CUBIC);
-    Plot2D::Set(fmt::format("{} peakshift", mDebugName));
-    // Plot2D::SetSavePath(fmt::format("{}/{}_peakshift.png", mDebugDirectory, mDebugName));
-    Plot2D::Plot(peakshift);
-  }
+  PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3.clone()});
 }
 
 void IterativePhaseCorrelation::DebugL2(const cv::Mat& L2) const
 {
   auto plot = L2.clone();
   resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
-  Plot2D::Set(fmt::format("{} L2", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L2.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(plot);
+  PyPlot::Plot(fmt::format("{} L2", mDebugName), {.z = plot});
 }
 
 void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const
 {
-  auto plot = L2U.clone();
-  Plot2D::Set(fmt::format("{} L2U", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L2U.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(plot);
+  PyPlot::Plot(fmt::format("{} L2U", mDebugName), {.z = L2U});
 
   if (0)
   {
@@ -90,12 +49,9 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
     resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
     resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
 
-    // Plot2D::SetSavePath(mDebugDirectory + "/L2UN.png");
-    Plot2D::Plot("IPCL2UN", nearest);
-    // Plot2D::SetSavePath(mDebugDirectory + "/L2UL.png");
-    Plot2D::Plot("IPCL2UL", linear);
-    // Plot2D::SetSavePath(mDebugDirectory + "/L2UC.png");
-    Plot2D::Plot("IPCL2UC", cubic);
+    PyPlot::Plot("IPCL2UN", {.z = nearest});
+    PyPlot::Plot("IPCL2UL", {.z = linear});
+    PyPlot::Plot("IPCL2UC", {.z = cubic});
   }
 }
 
@@ -106,10 +62,7 @@ void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const c
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
-
-  Plot2D::Set(fmt::format("{} L1B", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L1B.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(mat);
+  PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat});
 }
 
 void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1circle, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift) const
@@ -119,10 +72,7 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Mat& L1cir
   mat = mat.mul(L1circle);
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
-
-  Plot2D::Set(fmt::format("{} L1A", mDebugName));
-  // Plot2D::SetSavePath(fmt::format("{}/{}_L1A.png", mDebugDirectory, mDebugName));
-  Plot2D::Plot(mat);
+  PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat});
 }
 
 cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
@@ -655,11 +605,6 @@ void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple
   Plot2D::Set("Random image pair");
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
   Plot2D::Plot("Random image pair", concat);
-}
-
-f64 IterativePhaseCorrelation::GetFractionalPart(f64 x)
-{
-  return abs(x - std::floor(x));
 }
 
 void IterativePhaseCorrelation::Optimize(

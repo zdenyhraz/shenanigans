@@ -88,6 +88,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   scope["ymax"] = data.ymax;
   scope["interp"] = data.interp;
   scope["aspectratio"] = data.aspectratio;
+  scope["cmap"] = data.cmap;
   scope["title"] = not data.title.empty() ? data.title : name;
 
   return scope;

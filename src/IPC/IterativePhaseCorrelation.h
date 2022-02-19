@@ -550,7 +550,6 @@ private:
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
   static f64 GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts);
-  static f64 GetFractionalPart(f64 x);
   static void AddNoise(cv::Mat& image, f64 noiseStdev);
   static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
 };
