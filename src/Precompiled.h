@@ -26,7 +26,6 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <cstdint>
-#include <span>
 #include <initializer_list>
 
 // OpenMP
