@@ -20,6 +20,7 @@
 #include "Random/ComplexityClassEstimation.h"
 #include "Random/AoC2021D5.h"
 #include "Random/AoC2021D25.h"
+#include "Utils/Profiler.h"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 {

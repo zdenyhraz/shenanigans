@@ -451,12 +451,12 @@ private:
     PROFILE_FUNCTION;
     if constexpr (Circular)
     {
-      cv::Moments m = cv::moments(mat.mul(L1circle));
+      const auto m = cv::moments(mat.mul(L1circle));
       return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
     }
     else
     {
-      cv::Moments m = cv::moments(mat);
+      const auto m = cv::moments(mat);
       return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
     }
   }

@@ -30,27 +30,22 @@ inline std::string to_string(const cv::Point2d& point)
   return std::string("[" + std::to_string(point.x) + "," + std::to_string(point.y) + "]");
 }
 
-inline cv::Point2f findCentroid(const cv::Mat& sourceimg)
+inline cv::Point2d findCentroid(const cv::Mat& mat)
 {
-  f64 M = 0.0;
-  f64 My = 0.0;
-  f64 Mx = 0.0;
-  for (i32 r = 0; r < sourceimg.rows; r++)
+  f32 m00 = 0, m10 = 0, m01 = 0;
+  for (i32 r = 0; r < mat.rows; ++r)
   {
-    for (i32 c = 0; c < sourceimg.cols; c++)
+    const auto matp = mat.ptr<f32>(r);
+    for (i32 c = 0; c < mat.cols; ++c)
     {
-      M += sourceimg.at<f32>(r, c);
-      My += (f64)r * sourceimg.at<f32>(r, c);
-      Mx += (f64)c * sourceimg.at<f32>(r, c);
+      const auto val = matp[c];
+      m00 += val;
+      m10 += val * c;
+      m01 += val * r;
     }
   }
 
-  cv::Point2f ret(Mx / M, My / M);
-
-  if (ret.x < 0 or ret.y < 0 or ret.x > sourceimg.cols or ret.y > sourceimg.rows)
-    [[unlikely]] return cv::Point2f(sourceimg.cols / 2, sourceimg.rows / 2);
-  else
-    return ret;
+  return cv::Point2d(static_cast<f64>(m10) / m00, static_cast<f64>(m01) / m00);
 }
 
 inline cv::Point2d median(std::vector<cv::Point2d>& vec)
