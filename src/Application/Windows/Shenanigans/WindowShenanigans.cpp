@@ -17,10 +17,9 @@
 #include "Astrophysics/DifferentialRotation.h"
 #include "Random/Procedural.h"
 #include "Random/NonMaximaSuppression.h"
-#include "Random/ComplexityClassEstimation.h"
 #include "Random/AoC2021D5.h"
 #include "Random/AoC2021D25.h"
-#include "Utils/Profiler.h"
+#include "UtilsCV/Profiler.h"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
 {
@@ -137,6 +136,20 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
+  if (0) // function profiling / complexity estimation
+  {
+    const std::function<cv::Point2d(const cv::Mat&)> f1 = [](const auto& mat) { return findCentroid(mat); };
+    const std::function<cv::Point2d(const cv::Mat&)> f2 = [](const auto& mat) {
+      const auto m = cv::moments(mat);
+      return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
+    };
+    const std::function<cv::Mat(usize)> gi = [](usize size) {
+      cv::Mat mat = cv::Mat::ones(size, size, CV_32F);
+      return mat;
+    };
+
+    Profiler::Profile({f1, f2}, gi, {.nmin = 16, .nmax = 256, .nstep = 8, .iters = 1000, .labels = {"find centroid mine", "find centroid opencv"}});
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;

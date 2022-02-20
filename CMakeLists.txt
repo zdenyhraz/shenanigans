@@ -110,24 +110,18 @@ file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
 src/*.ui src/*.rc src/*.qrc
 src/Application/Windows/*.h src/Application/Windows/*.cpp
 src/Astrophysics/*.h src/Astrophysics/*.cpp
-src/ComplexityEstimation/*.h src/ComplexityEstimation/*.cpp
-src/Core/*.h src/Core/*.cpp
-src/Draw/*.h src/Draw/*.cpp
 src/Features/*.h src/Features/*.cpp
 src/Filtering/*.h src/Filtering/*.cpp
 src/Fit/*.h src/Fit/*.cpp
 src/Fourier/*.h src/Fourier/*.cpp
 src/Fractal/*.h src/Fractal/*.cpp
-src/InverseMap/*.h src/InverseMap/*.cpp
 src/IPC/*.h src/IPC/*.cpp
 src/Logger/*.h src/Logger/*.cpp
 src/Optimization/*.h src/Optimization/*.cpp
 src/Plot/*.h src/Plot/*.cpp
-src/Precompiled/*.h src/Precompiled/*.cpp
-src/Procedural/*.h src/Procedural/*.cpp
-src/Sasko/*.h src/Sasko/*.cpp
-src/Snake/*.h src/Snake/*.cpp
+src/Random/*.h src/Random/*.cpp
 src/Utils/*.h src/Utils/*.cpp
+src/UtilsCV/*.h src/UtilsCV/*.cpp
 )
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})

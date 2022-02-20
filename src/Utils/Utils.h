@@ -446,3 +446,11 @@ inline std::vector<f64> getStandardDeviationsVertical(const std::vector<std::vec
   }
   return stdevs;
 }
+
+inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
+{
+  if (Y.rows != X.rows)
+    throw std::runtime_error("Data count mismatch");
+
+  return (X.t() * X).inv() * X.t() * Y;
+}

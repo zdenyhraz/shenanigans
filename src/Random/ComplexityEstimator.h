@@ -1,16 +1,8 @@
 #pragma once
 #include "UtilsCV/Vectmat.h"
 
-cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
-{
-  if (Y.rows != X.rows)
-    throw std::runtime_error("Data count mismatch");
-
-  return (X.t() * X).inv() * X.t() * Y;
-}
-
 template <typename I, typename O>
-void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, usize nMin = 1000, usize nMax = 10000, usize nIters = 21, usize timeIters = 3)
+inline void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, usize nMin = 1000, usize nMax = 10000, usize nIters = 21, usize timeIters = 3)
 {
   using clock = std::chrono::high_resolution_clock;
   using time_unit = std::chrono::nanoseconds;
