@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <initializer_list>
+#include <span>
 
 // OpenMP
 #include <omp.h>
