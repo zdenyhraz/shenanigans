@@ -102,18 +102,20 @@ inline std::vector<f64> meanVertical(const std::vector<std::vector<f64>>& vec)
   return meansV;
 }
 
+template <typename T>
 inline std::vector<f64> GetRow(const cv::Mat& mat, i32 row)
 {
   std::vector<f64> out(mat.cols);
   for (i32 c = 0; c < mat.cols; ++c)
-    out[c] = mat.at<f64>(row, c);
+    out[c] = mat.at<T>(row, c);
   return out;
 }
 
+template <typename T>
 inline std::vector<f64> GetCol(const cv::Mat& mat, i32 col)
 {
   std::vector<f64> out(mat.rows);
   for (i32 r = 0; r < mat.rows; ++r)
-    out[r] = mat.at<f64>(r, col);
+    out[r] = mat.at<T>(r, col);
   return out;
 }

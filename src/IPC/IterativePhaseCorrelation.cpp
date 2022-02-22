@@ -1,5 +1,6 @@
 #include "IterativePhaseCorrelation.h"
 #include "Optimization/Evolution.h"
+#include "UtilsCV/Vectmat.h"
 
 void IterativePhaseCorrelation::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
 {
@@ -23,7 +24,10 @@ void IterativePhaseCorrelation::DebugFourierTransforms(const cv::Mat& dft1, cons
 void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
   PyPlot::Plot(fmt::format("{} CP log magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::logmagn(crosspower))});
-  PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower)), .cmap = "hsv"});
+  PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
+      {.ys = {GetRow<f32>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<f32>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
+          .label_ys = {"x", "y"}});
 }
 
 void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const

@@ -271,11 +271,10 @@ inline f64 linregPosition(i32 n, const std::vector<f64>& x, const std::vector<f6
   return k * x_ + q;
 }
 
-inline std::vector<f64> iota(i32 first, i32 size)
+inline std::vector<f64> Iota(i32 first, i32 size)
 {
   std::vector<f64> vec(size);
-  for (usize i = 0; i < vec.size(); i++)
-    vec[i] = first + i;
+  std::iota(vec.begin(), vec.end(), first);
   return vec;
 }
 

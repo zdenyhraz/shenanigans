@@ -39,8 +39,13 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 {
   PROFILE_FUNCTION;
   py::dict scope;
+  if (data.x.empty())
+  {
+    std::vector<f64> x(not data.y.empty() ? data.y.size() : data.ys.size());
+    std::iota(x.begin(), x.end(), 0);
+  }
   scope["id"] = mPlotIds[name];
-  scope["x"] = data.x;
+  scope["x"] = not data.x.empty() ? data.x : Iota(0, not data.y.empty() ? data.y.size() : data.ys[0].size());
   scope["y"] = data.y;
   scope["y2"] = data.y2;
   scope["ys"] = data.ys;
