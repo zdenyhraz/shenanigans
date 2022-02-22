@@ -2,6 +2,7 @@
 
 void PyPlot::Initialize()
 {
+  PROFILE_FUNCTION;
   py::eval_file("../script/plot/plot_init.py");
 }
 
