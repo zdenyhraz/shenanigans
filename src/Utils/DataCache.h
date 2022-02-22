@@ -7,6 +7,8 @@ public:
   using GetDataFunction = std::function<Value(const Key&)>;
   explicit DataCache(const GetDataFunction& getDataFunction) : mGetDataFunction(getDataFunction) {}
 
+  void SetGetDataFunction(const GetDataFunction& getDataFunction) { mGetDataFunction = getDataFunction; }
+
   const Value Get(const Key& key)
   {
     PROFILE_FUNCTION;

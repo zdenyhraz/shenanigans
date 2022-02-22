@@ -178,6 +178,10 @@ public:
     LOG_INFO("Optimization idstride: {}", idstrideopt);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstrideopt, thetamax, cadence);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
+    diffrot.imageCache.SetGetDataFunction([](const std::string& path) {
+      PROFILE_SCOPE(Imread);
+      return LoadUnitFloatImage<T>(path); // cache images already converted to desired format for IPC
+    });
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
 

@@ -32,7 +32,8 @@ inline consteval i32 GetMatType(i32 channels = 1)
 template <typename T>
 inline cv::Mat LoadUnitFloatImage(const std::string& path)
 {
-  cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+  PROFILE_FUNCTION;
+  cv::Mat mat = cv::imread(path, cv::IMREAD_UNCHANGED);
   mat.convertTo(mat, GetMatType<T>());
   normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;
@@ -138,6 +139,8 @@ inline void Rotate(cv::Mat& image, f32 rot, f32 scale = 1)
 template <typename T>
 inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
 {
+  PROFILE_FUNCTION;
+
   if (mat1.size() != mat2.size())
     return false;
   if (mat1.channels() != mat2.channels())
