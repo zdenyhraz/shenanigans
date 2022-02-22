@@ -33,7 +33,7 @@ template <typename T>
 inline cv::Mat LoadUnitFloatImage(const std::string& path)
 {
   PROFILE_FUNCTION;
-  cv::Mat mat = cv::imread(path, cv::IMREAD_UNCHANGED);
+  cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
   mat.convertTo(mat, GetMatType<T>());
   normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;

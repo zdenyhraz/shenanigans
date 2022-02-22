@@ -55,7 +55,7 @@ public:
   }
 
 private:
-  const GetDataFunction mGetDataFunction;
+  GetDataFunction mGetDataFunction;
   std::unordered_map<Key, Value> mData;
   usize mCapacity = 100;
   std::mutex mMutex;
