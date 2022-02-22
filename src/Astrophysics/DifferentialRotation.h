@@ -59,7 +59,7 @@ public:
     std::vector<f64> theta, fshiftx, fshifty, theta0, R;
   };
 
-  template <bool Managed = false, typename T = f32> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
+  template <bool Managed = false, typename T = f64> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
   DifferentialRotationData Calculate(const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 idstart) const
   {
     PROFILE_FUNCTION;
