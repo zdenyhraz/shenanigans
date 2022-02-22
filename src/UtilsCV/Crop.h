@@ -24,7 +24,7 @@ template <typename T>
 inline cv::Mat kirkl(i32 rows, i32 cols, u32 radius)
 {
   PROFILE_FUNCTION;
-  cv::Mat kirkl = cv::Mat::zeros(rows, cols, std::is_same_v<T, f32> ? CV_32F : CV_64F);
+  cv::Mat kirkl = cv::Mat::zeros(rows, cols, GetMatType<T>());
   for (i32 r = 0; r < rows; r++)
     for (i32 c = 0; c < cols; c++)
       kirkl.at<T>(r, c) = 1.0f * ((sqr(r - rows / 2) + sqr(c - cols / 2)) < sqr(radius));

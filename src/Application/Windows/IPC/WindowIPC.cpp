@@ -91,8 +91,8 @@ void WindowIPC::align()
   cv::Point cropfocus(2048, 2048);
   i32 cropsize = 1.0 * 4096;
 
-  cv::Mat img1 = roicrop(LoadUnitFloatImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
-  cv::Mat img2 = roicrop(LoadUnitFloatImage("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img1 = roicrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img2 = roicrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
   i32 size = cropsize;
   cv::resize(img1, img1, cv::Size(size, size));
@@ -116,8 +116,8 @@ void WindowIPC::CalculateFlow()
   RefreshIPCparameters();
   const auto path1 = ui.lineEdit_15->text().toStdString();
   const auto path2 = ui.lineEdit_16->text().toStdString();
-  cv::Mat img1 = LoadUnitFloatImage(path1);
-  cv::Mat img2 = LoadUnitFloatImage(path2);
+  cv::Mat img1 = LoadUnitFloatImage<f32>(path1);
+  cv::Mat img2 = LoadUnitFloatImage<f32>(path2);
 
   if (0)
   {
@@ -147,8 +147,8 @@ void WindowIPC::features()
 {
   std::string path1 = ui.lineEdit_15->text().toStdString();
   std::string path2 = ui.lineEdit_16->text().toStdString();
-  cv::Mat img1 = LoadUnitFloatImage(path1);
-  cv::Mat img2 = LoadUnitFloatImage(path2);
+  cv::Mat img1 = LoadUnitFloatImage<f32>(path1);
+  cv::Mat img2 = LoadUnitFloatImage<f32>(path2);
 }
 
 void WindowIPC::linearFlow()

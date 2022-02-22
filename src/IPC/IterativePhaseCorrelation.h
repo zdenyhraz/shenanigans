@@ -743,7 +743,7 @@ public:
     if constexpr (debugGradualShift)
     {
       SetDebugDirectory("../data/peakshift/new");
-      const cv::Mat image1 = LoadUnitFloatImage("../data/AIA/171A.png");
+      const cv::Mat image1 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
       const cv::Mat crop1 = roicropmid(image1, mCols, mRows);
       cv::Mat image2 = image1.clone();
       cv::Mat crop2;
@@ -777,7 +777,7 @@ public:
 
     if constexpr (debugWindow)
     {
-      cv::Mat img = roicrop(LoadUnitFloatImage("../data/test.png"), 2048, 2048, mCols, mRows);
+      cv::Mat img = roicrop(LoadUnitFloatImage<Float>("../data/test.png"), 2048, 2048, mCols, mRows);
       cv::Mat w, imgw;
       createHanningWindow(w, img.size(), GetMatType<Float>());
       multiply(img, w, imgw);
@@ -840,7 +840,7 @@ public:
 
     if constexpr (debugBandpassRinging)
     {
-      cv::Mat img = roicrop(LoadUnitFloatImage("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+      cv::Mat img = roicrop(LoadUnitFloatImage<Float>("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
       cv::Mat fftR = Fourier::fft(img);
       cv::Mat fftG = Fourier::fft(img);
       cv::Mat filterR = cv::Mat::zeros(img.size(), GetMatType<Float>());
@@ -897,7 +897,7 @@ private:
   f64 mBandpassH = 1;
   i32 mL2size = 7;
   f64 mL1ratio = 0.5;
-  f64 mL1ratioStep = 0.1;
+  f64 mL1ratioStep = 0.05;
   i32 mUpsampleCoeff = 15;
   i32 mMaxIterations = 10;
   BandpassType mBandpassType = BandpassType::Gaussian;

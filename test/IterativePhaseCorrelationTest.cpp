@@ -3,7 +3,7 @@
 class IterativePhaseCorrelationTest : public ::testing::Test
 {
 protected:
-  IterativePhaseCorrelationTest() : mImg1(LoadUnitFloatImage("../test/data/shape.png")) {}
+  IterativePhaseCorrelationTest() : mImg1(LoadUnitFloatImage<f64>("../test/data/shape.png")) {}
 
   void SetUp() override
   {

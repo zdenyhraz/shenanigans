@@ -3,7 +3,7 @@
 
 TEST(FourierTest, ForwardInverseConsistency)
 {
-  auto img = LoadUnitFloatImage("../test/data/shape.png");
+  auto img = LoadUnitFloatImage<f32>("../test/data/shape.png");
   ASSERT_EQ(img.depth(), CV_32F);
   ASSERT_EQ(img.channels(), 1);
 
