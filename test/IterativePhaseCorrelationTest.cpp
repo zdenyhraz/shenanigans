@@ -83,8 +83,8 @@ TEST_F(IterativePhaseCorrelationTest, FloatTypes)
 {
   const auto ipc32 = GetIPC<f32>();
   const auto ipc64 = GetIPC<f64>();
-  const auto shift32 = ipc32.Calculate(mImg1, mImg1);
-  const auto shift64 = ipc64.Calculate(mImg1, mImg1);
+  const auto shift32 = ipc32.Calculate(mImg1, mImg2);
+  const auto shift64 = ipc64.Calculate(mImg1, mImg2);
   EXPECT_NEAR(shift32.x, shift64.x, kTolerance);
   EXPECT_NEAR(shift32.y, shift64.y, kTolerance);
 }
