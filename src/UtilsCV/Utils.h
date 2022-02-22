@@ -1,9 +1,13 @@
 #pragma once
 
+template <typename Float = f32>
 inline cv::Mat LoadUnitFloatImage(const std::string& path)
 {
   cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  mat.convertTo(mat, CV_32F);
+  if constexpr (std::is_same_v<Float, f32>)
+    mat.convertTo(mat, CV_32F);
+  if constexpr (std::is_same_v<Float, f64>)
+    mat.convertTo(mat, CV_64F);
   normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;
 }
@@ -123,4 +127,42 @@ inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
         return false;
 
   return true;
+}
+
+template <typename T>
+inline constexpr i32 GetMatType()
+{
+  if constexpr (std::is_same_v<T, f32>)
+    return CV_32F;
+  if constexpr (std::is_same_v<T, f64>)
+    return CV_64F;
+}
+
+template <typename T>
+inline constexpr i32 GetMatType(i32 channels)
+{
+  if constexpr (std::is_same_v<T, f32>)
+    switch (channels)
+    {
+    case 1:
+      return CV_32FC1;
+    case 2:
+      return CV_32FC2;
+    case 3:
+      return CV_32FC3;
+    case 4:
+      return CV_32FC4;
+    }
+  if constexpr (std::is_same_v<T, f64>)
+    switch (channels)
+    {
+    case 1:
+      return CV_64FC1;
+    case 2:
+      return CV_64FC2;
+    case 3:
+      return CV_64FC3;
+    case 4:
+      return CV_64FC4;
+    }
 }

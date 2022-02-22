@@ -2,17 +2,10 @@
 
 namespace Fourier
 {
-inline cv::Mat fft(cv::Mat&& img, bool packed = false)
+inline cv::Mat fft(cv::Mat&& img)
 {
   PROFILE_FUNCTION;
-  if (img.type() != CV_32F)
-    [[unlikely]] img.convertTo(img, CV_32F);
-
-  if (packed)
-    [[unlikely]] cv::dft(img, img);
-  else
-    cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);
-
+  cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);
   return img;
 }
 
@@ -26,9 +19,6 @@ inline cv::Mat ifft(cv::Mat&& fft)
 inline cv::Mat gpufft(cv::Mat&& img)
 {
   PROFILE_FUNCTION;
-  if (img.type() != CV_32F)
-    img.convertTo(img, CV_32F);
-
   /*
   cv::cuda::GpuMat imgGpu;
   imgGpu.upload(img);
@@ -50,9 +40,9 @@ inline cv::Mat gpuifft(cv::Mat&& fft)
   return fft;
 }
 
-inline cv::Mat fft(cv::Mat& img, bool packed = false)
+inline cv::Mat fft(cv::Mat& img)
 {
-  return fft(img.clone(), packed);
+  return fft(img.clone());
 }
 
 inline cv::Mat ifft(cv::Mat& fft)

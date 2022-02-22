@@ -59,8 +59,8 @@ public:
     std::vector<f64> theta, fshiftx, fshifty, theta0, R;
   };
 
-  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
+  template <bool Managed = false, typename T = f32> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 idstart) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
@@ -166,7 +166,8 @@ public:
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
-  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  template <typename T>
+  void Optimize(IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Optimize");
@@ -182,7 +183,7 @@ public:
 
     const auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
-    const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
+    const auto obj = [&](const IterativePhaseCorrelation<T>& ipcopt) {
       const auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
@@ -450,7 +451,8 @@ private:
     PyPlot::Plot("omega y", {.z = data.omegay, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega y [px]", .aspectratio = aspectratio});
   }
 
-  void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation& ipc, const std::string& dataPath) const
+  template <typename T>
+  void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Save");
@@ -489,7 +491,8 @@ private:
     file << "R" << data.R;
   }
 
-  void SaveOptimizedParameters(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  template <typename T>
+  void SaveOptimizedParameters(const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
