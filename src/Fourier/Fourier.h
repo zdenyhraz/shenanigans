@@ -145,7 +145,15 @@ inline cv::Mat logmagn(const cv::Mat& img, i32 logs = 1)
 
 inline cv::Mat magn(const cv::Mat& img)
 {
-  return logmagn(img, 0);
+  PROFILE_FUNCTION;
+  if (img.channels() != 2)
+    throw std::runtime_error("Need two channels for magnitude info");
+
+  cv::Mat mgn;
+  cv::Mat planes[2];
+  split(img, planes);
+  magnitude(planes[0], planes[1], mgn);
+  return mgn;
 }
 
 inline cv::Mat phase(const cv::Mat& img)
@@ -158,7 +166,6 @@ inline cv::Mat phase(const cv::Mat& img)
   cv::Mat planes[2];
   split(img, planes);
   phase(planes[0], planes[1], phs);
-
   return phs;
 }
 

@@ -136,19 +136,24 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  if (0) // function profiling / complexity estimation
+  if (0) // bandpass with width
   {
-    const std::function<cv::Point2d(const cv::Mat&)> f1 = [](const auto& mat) { return findCentroid(mat); };
-    const std::function<cv::Point2d(const cv::Mat&)> f2 = [](const auto& mat) {
-      const auto m = cv::moments(mat);
-      return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
-    };
-    const std::function<cv::Mat(usize)> gi = [](usize size) {
-      cv::Mat mat = cv::Mat::ones(size, size, CV_32F);
-      return mat;
-    };
+    cv::Mat mat = cv::Mat::zeros(1000, 1000, CV_32F);
+    const f64 center = 0.0;
+    const f64 width = 0.5;
+    const f64 width2 = 0.01;
 
-    Profiler::Profile({f1, f2}, gi, {.nmin = 16, .nmax = 256, .nstep = 8, .iters = 1000, .labels = {"find centroid mine", "find centroid opencv"}});
+    for (i32 r = 0; r < mat.rows; ++r)
+    {
+      for (i32 c = 0; c < mat.cols; ++c)
+      {
+        const f64 radius = std::sqrt(std::pow((r - 0.5 * mat.rows) / (0.5 * mat.rows), 2) + std::pow((c - 0.5 * mat.cols) / (0.5 * mat.cols), 2)) / std::sqrt(2);
+        mat.at<f32>(r, c) = std::exp(-std::pow(radius - center, 2) / std::pow(width, 2)) * (1. - std::exp(-std::pow(radius - center, 2) / std::pow(width2, 2)));
+      }
+    }
+    PyPlot::Plot("Bandpass", {.z = mat});
+    PyPlot::Plot("Bandpass 1D", {.y = GetMidRow<f32>(mat)});
+    return;
   }
   if (0) // optimization / metaoptimization
   {

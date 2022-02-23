@@ -75,8 +75,8 @@ public:
   void SetSize(const cv::Size& size) { SetSize(size.height, size.width); }
   void SetBandpassParameters(f64 bandpassL, f64 bandpassH)
   {
-    mBandpassL = clamp(bandpassL, -std::numeric_limits<f64>::max(), 1); // L from [-inf, 1]
-    mBandpassH = clamp(bandpassH, 0, std::numeric_limits<f64>::max());  // H from [0, inf]
+    mBandpassL = std::clamp(bandpassL, 0., std::numeric_limits<f64>::max());
+    mBandpassH = std::clamp(bandpassH, 0., std::numeric_limits<f64>::max());
     UpdateBandpass();
   }
   void SetBandpassType(BandpassType type)
@@ -936,28 +936,29 @@ private:
     mBandpass = cv::Mat::ones(mRows, mCols, GetMatType<Float>());
     if (mBandpassType == BandpassType::None)
       return;
+    if (mBandpassL == 0 and mBandpassH == 0)
+      return;
 
     switch (mBandpassType)
     {
     case BandpassType::Gaussian:
-      if (mBandpassL <= 0 and mBandpassH < 1)
+      if (mBandpassL == 0 and mBandpassH != 0)
       {
         for (i32 r = 0; r < mRows; ++r)
           for (i32 c = 0; c < mCols; ++c)
             mBandpass.at<Float>(r, c) = LowpassEquation(r, c);
       }
-      else if (mBandpassL > 0 and mBandpassH >= 1)
+      else if (mBandpassL != 0 and mBandpassH == 0)
       {
         for (i32 r = 0; r < mRows; ++r)
           for (i32 c = 0; c < mCols; ++c)
             mBandpass.at<Float>(r, c) = HighpassEquation(r, c);
       }
-      else if (mBandpassL > 0 and mBandpassH < 1)
+      else if (mBandpassL != 0 and mBandpassH != 0)
       {
         for (i32 r = 0; r < mRows; ++r)
           for (i32 c = 0; c < mCols; ++c)
             mBandpass.at<Float>(r, c) = BandpassGEquation(r, c);
-
         normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
       }
       break;
@@ -1179,7 +1180,8 @@ private:
 
   void DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
   {
-    PyPlot::Plot(fmt::format("{} CP log magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::logmagn(crosspower))});
+    PyPlot::Plot(fmt::format("{} CP magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
+    PyPlot::Plot(fmt::format("{} CP magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
     PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
     PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
         {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
@@ -1433,7 +1435,7 @@ private:
     evo.mMutStrat = Evolution::RAND1;
     evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "UC", "L1R"});
     evo.mLB = {0, -0.5, 0.0, 0, 0, 3, 0.1};
-    evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 1.0, 1.5, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
+    evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2.0, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
         static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 51, 0.8};
     evo.SetPlotOutput(true);
     evo.SetConsoleOutput(true);
@@ -1464,11 +1466,14 @@ private:
     SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
     SetL1ratio(optimalParameters[L1ratioParameter]);
 
-    LOG_SUCCESS("Final IPC BandpassType: {} -> {}", thisBefore.BandpassType2String(GetBandpassType()), BandpassType2String(GetBandpassType()));
-    LOG_SUCCESS("Final IPC BandpassL: {:.2f} -> {:.2f}", thisBefore.GetBandpassL(), GetBandpassL());
-    LOG_SUCCESS("Final IPC BandpassH: {:.2f} -> {:.2f}", thisBefore.GetBandpassH(), GetBandpassH());
-    LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", thisBefore.InterpolationType2String(GetInterpolationType()), InterpolationType2String(GetInterpolationType()));
-    LOG_SUCCESS("Final IPC WindowType: {} -> {}", thisBefore.WindowType2String(GetWindowType()), WindowType2String(GetWindowType()));
+    LOG_SUCCESS("Final IPC BandpassType: {} -> {}", BandpassType2String(thisBefore.GetBandpassType()), BandpassType2String(GetBandpassType()));
+    if (GetBandpassType() != BandpassType::None)
+    {
+      LOG_SUCCESS("Final IPC BandpassL: {:.2f} -> {:.2f}", thisBefore.GetBandpassL(), GetBandpassL());
+      LOG_SUCCESS("Final IPC BandpassH: {:.2f} -> {:.2f}", thisBefore.GetBandpassH(), GetBandpassH());
+    }
+    LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", InterpolationType2String(thisBefore.GetInterpolationType()), InterpolationType2String(GetInterpolationType()));
+    LOG_SUCCESS("Final IPC WindowType: {} -> {}", WindowType2String(thisBefore.GetWindowType()), WindowType2String(GetWindowType()));
     LOG_SUCCESS("Final IPC UpsampleCoeff: {} -> {}", thisBefore.GetUpsampleCoeff(), GetUpsampleCoeff());
     LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", thisBefore.GetL1ratio(), GetL1ratio());
   }
@@ -1512,30 +1517,12 @@ private:
       }
     }
 
-    Plot1D::Set("IPCshift");
-    Plot1D::SetSavePath("../data/debug/ipc_opt.png");
-    Plot1D::SetXlabel("reference shift [px]");
-    Plot1D::SetYlabel("calculated shift [px]");
-    Plot1D::SetYnames({"pixel", "subpixel", "ipc", "ipc opt", "reference"});
-    Plot1D::SetPens({QPen(Plot::black, Plot::pt), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt), QPen(Plot::blue, Plot::pt)});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(shiftsXReference, {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference});
-
     PyPlot::Plot("IPCshift", {.x = shiftsXReference,
                                  .ys = {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference},
                                  .xlabel = "reference shift [px]",
                                  .ylabel = "calculated shift [px]",
                                  .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
                                  .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
-
-    Plot1D::Set("IPCshift error");
-    Plot1D::SetSavePath("../data/debug/ipc_opt_error.png");
-    Plot1D::SetXlabel("reference shift [px]");
-    Plot1D::SetYlabel("error [px]");
-    Plot1D::SetYnames({"pixel", "subpixel", "ipc", "ipc opt", "reference"});
-    Plot1D::SetPens({QPen(Plot::black, Plot::pt), QPen(Plot::orange, Plot::pt), QPen(Plot::magenta, Plot::pt), QPen(Plot::green, Plot::pt), QPen(Plot::blue, Plot::pt)});
-    Plot1D::SetLegendPosition(Plot1D::LegendPosition::BotRight);
-    Plot1D::Plot(shiftsXReference, {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError});
 
     PyPlot::Plot("IPCshift error", {.x = shiftsXReference,
                                        .ys = {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError},

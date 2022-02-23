@@ -94,30 +94,6 @@ inline cv::Point2f mean(const std::vector<cv::Point2f>& vec)
   return mean * (1. / vec.size());
 }
 
-inline std::vector<f64> GetMidRow(const cv::Mat& img)
-{
-  std::vector<f64> out(img.cols);
-  for (i32 c = 0; c < img.cols; ++c)
-    out[c] = img.at<f32>(img.rows / 2, c);
-  return out;
-}
-
-inline std::vector<f64> GetMidCol(const cv::Mat& img)
-{
-  std::vector<f64> out(img.rows);
-  for (i32 r = 0; r < img.rows; ++r)
-    out[r] = img.at<f32>(r, img.cols / 2);
-  return out;
-}
-
-inline std::vector<f64> GetDiagonal(const cv::Mat& img)
-{
-  std::vector<f64> out(img.cols);
-  for (i32 c = 0; c < img.cols; ++c)
-    out[c] = img.at<f32>(c, c);
-  return out;
-}
-
 inline void Shift(cv::Mat& image, const cv::Point2f& shift)
 {
   cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
