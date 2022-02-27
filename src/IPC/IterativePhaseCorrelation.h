@@ -594,7 +594,6 @@ private:
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2);
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;
-  static void AddNoise(cv::Mat& image, f64 noiseStdev);
   IterativePhaseCorrelation<Float> CreateIPCFromParams(const std::vector<f64>& params) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const;

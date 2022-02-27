@@ -1,4 +1,5 @@
 #include "IterativePhaseCorrelation.h"
+#include "Filtering/Noise.h"
 
 template class IterativePhaseCorrelation<f32>;
 template class IterativePhaseCorrelation<f64>;
@@ -507,12 +508,8 @@ try
     if constexpr (addNoise)
     {
       const f64 noiseStdev = 0.01;
-      cv::Mat noise1 = cv::Mat(image1.rows, image1.cols, GetMatType<Float>());
-      cv::Mat noise2 = cv::Mat(image2.rows, image2.cols, GetMatType<Float>());
-      randn(noise1, 0, noiseStdev);
-      randn(noise2, 0, noiseStdev);
-      image1 += noise1;
-      image2 += noise2;
+      AddNoise<Float>(image1, noiseStdev);
+      AddNoise<Float>(image2, noiseStdev);
     }
 
     auto ipcshift = Calculate<DebugMode>(image1, image2);
@@ -529,16 +526,11 @@ try
     const i32 iters = 51;
     const f64 totalshift = 2.;
     const f64 noiseStdev = 0.01;
-    cv::Mat noise1, noise2;
+    cv::Mat noise = GetNoise(crop2.size(), noiseStdev);
 
     if constexpr (addNoise)
-    {
-      noise1 = cv::Mat(crop1.rows, crop1.cols, GetMatType<Float>());
-      noise2 = cv::Mat(crop1.rows, crop1.cols, GetMatType<Float>());
-      randn(noise1, 0, noiseStdev);
-      randn(noise2, 0, noiseStdev);
-      crop1 += noise1;
-    }
+      AddNoise<Float>(crop1, noiseStdev);
+
     for (i32 i = 0; i < iters; i++)
     {
       SetDebugIndex(i);
@@ -547,7 +539,7 @@ try
       warpAffine(image1, image2, Tmat, image2.size());
       crop2 = roicropmid(image2, mCols, mRows);
       if (addNoise)
-        crop2 += noise2;
+        crop2 += noise;
       SetDebugTrueShift(shift);
       const auto ipcshift = Calculate<DebugMode>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
@@ -866,8 +858,8 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
       ConvertToUnitFloat<false>(image1);
       ConvertToUnitFloat<false>(image2);
 
-      AddNoise(image1, noiseStdev);
-      AddNoise(image2, noiseStdev);
+      AddNoise<Float>(image1, noiseStdev);
+      AddNoise<Float>(image2, noiseStdev);
 
       imagePairs.push_back({image1, image2, shift});
 
@@ -886,18 +878,6 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
     return shifta.x < shiftb.x;
   });
   return imagePairs;
-}
-
-template <typename Float>
-void IterativePhaseCorrelation<Float>::AddNoise(cv::Mat& image, f64 noiseStdev)
-{
-  PROFILE_FUNCTION;
-  if (noiseStdev <= 0)
-    return;
-
-  cv::Mat noise = cv::Mat(image.rows, image.cols, GetMatType<Float>());
-  randn(noise, 0, noiseStdev);
-  image += noise;
 }
 
 template <typename Float>

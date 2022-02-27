@@ -1,5 +1,17 @@
 #pragma once
 
+inline cv::Mat HistogramEqualize(const cv::Mat& img)
+{
+  cv::Mat sourceimg = img.clone();
+  normalize(sourceimg, sourceimg, 0, 255, cv::NORM_MINMAX);
+  sourceimg.convertTo(sourceimg, CV_8U);
+  equalizeHist(sourceimg, sourceimg);
+  sourceimg.convertTo(sourceimg, CV_16U);
+  normalize(sourceimg, sourceimg, 0, 65535, cv::NORM_MINMAX);
+  std::cout << "histogram equalized" << std::endl;
+  return sourceimg;
+}
+
 inline std::vector<f32> CalculateHistogram(const cv::Mat& img)
 {
   std::vector<f32> hist(256, 0);

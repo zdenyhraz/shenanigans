@@ -3,6 +3,7 @@
 #include "Fit/Polyfit.h"
 #include "Fit/Trigfit.h"
 #include "Utils/DataCache.h"
+#include "Filtering/Median.h"
 
 class DifferentialRotation
 {
@@ -45,14 +46,12 @@ public:
     void PostProcess()
     {
       PROFILE_FUNCTION;
-
-      for (const auto medsize : {3})
-      {
-        cv::medianBlur(shiftx, shiftx, medsize);
-        cv::medianBlur(shifty, shifty, medsize);
-        cv::medianBlur(omegax, omegax, medsize);
-        cv::medianBlur(omegay, omegay, medsize);
-      }
+      const i32 medsizeX = 5; // time
+      const i32 medsizeY = 3; // meridian
+      shiftx = MedianBlur<f32>(shiftx, medsizeX, medsizeY);
+      shifty = MedianBlur<f32>(shifty, medsizeX, medsizeY);
+      omegax = MedianBlur<f32>(omegax, medsizeX, medsizeY);
+      omegay = MedianBlur<f32>(omegay, medsizeX, medsizeY);
     }
 
     cv::Mat shiftx, shifty, omegax, omegay;

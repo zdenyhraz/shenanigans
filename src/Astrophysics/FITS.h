@@ -1,7 +1,5 @@
 #pragma once
-#include "Filtering/Filtering.h"
 
-//.fits parameters
 enum class fitsType : char
 {
   HMI,

@@ -141,7 +141,8 @@ inline f64 Median(std::vector<T>&& vec)
 {
   if (vec.size() % 2 == 0)
   {
-    std::partial_sort(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
+    // std::partial_sort(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
+    std::sort(vec.begin(), vec.end());
     return 0.5 * vec[vec.size() / 2] + 0.5 * vec[vec.size() / 2 - 1];
   }
 
