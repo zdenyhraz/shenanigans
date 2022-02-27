@@ -451,7 +451,6 @@ private:
 
         if constexpr (CrossCorrelation)
         {
-
           dft1p[col][0] = re * band;
           dft1p[col][1] = im * band;
         }
