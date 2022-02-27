@@ -22,8 +22,8 @@ try
   cv::Mat img2FT = Fourier::fft(img2W);
   Fourier::fftshift(img1FT);
   Fourier::fftshift(img2FT);
-  cv::Mat img1FTm = cv::Mat::zeros(img1FT.size(), GetMatType<Float>());
-  cv::Mat img2FTm = cv::Mat::zeros(img2FT.size(), GetMatType<Float>());
+  cv::Mat img1FTm = cv::Mat(img1FT.size(), GetMatType<Float>());
+  cv::Mat img2FTm = cv::Mat(img2FT.size(), GetMatType<Float>());
   for (i32 row = 0; row < img1FT.rows; ++row)
   {
     auto img1FTp = img1FT.ptr<cv::Vec<Float, 2>>(row);
@@ -87,8 +87,8 @@ try
   if (mRows > image1.rows or mCols > image1.cols)
     throw std::runtime_error(fmt::format("Images are too small ({} < {})", image1.size(), cv::Size(mCols, mRows)));
 
-  cv::Mat flowX = cv::Mat::zeros(cv::Size(resolution * image1.cols, resolution * image1.rows), GetMatType<Float>());
-  cv::Mat flowY = cv::Mat::zeros(cv::Size(resolution * image2.cols, resolution * image2.rows), GetMatType<Float>());
+  cv::Mat flowX = cv::Mat(cv::Size(resolution * image1.cols, resolution * image1.rows), GetMatType<Float>());
+  cv::Mat flowY = cv::Mat(cv::Size(resolution * image2.cols, resolution * image2.rows), GetMatType<Float>());
   std::atomic<i32> progress = 0;
 
 #pragma omp parallel for
@@ -507,8 +507,8 @@ try
     if constexpr (addNoise)
     {
       const f64 noiseStdev = 0.01;
-      cv::Mat noise1 = cv::Mat::zeros(image1.rows, image1.cols, GetMatType<Float>());
-      cv::Mat noise2 = cv::Mat::zeros(image2.rows, image2.cols, GetMatType<Float>());
+      cv::Mat noise1 = cv::Mat(image1.rows, image1.cols, GetMatType<Float>());
+      cv::Mat noise2 = cv::Mat(image2.rows, image2.cols, GetMatType<Float>());
       randn(noise1, 0, noiseStdev);
       randn(noise2, 0, noiseStdev);
       image1 += noise1;
@@ -533,8 +533,8 @@ try
 
     if constexpr (addNoise)
     {
-      noise1 = cv::Mat::zeros(crop1.rows, crop1.cols, GetMatType<Float>());
-      noise2 = cv::Mat::zeros(crop1.rows, crop1.cols, GetMatType<Float>());
+      noise1 = cv::Mat(crop1.rows, crop1.cols, GetMatType<Float>());
+      noise2 = cv::Mat(crop1.rows, crop1.cols, GetMatType<Float>());
       randn(noise1, 0, noiseStdev);
       randn(noise2, 0, noiseStdev);
       crop1 += noise1;
@@ -585,8 +585,8 @@ try
 
   if constexpr (debugBandpass)
   {
-    cv::Mat bpR = cv::Mat::zeros(mRows, mCols, GetMatType<Float>());
-    cv::Mat bpG = cv::Mat::zeros(mRows, mCols, GetMatType<Float>());
+    cv::Mat bpR = cv::Mat(mRows, mCols, GetMatType<Float>());
+    cv::Mat bpG = cv::Mat(mRows, mCols, GetMatType<Float>());
     for (i32 r = 0; r < mRows; ++r)
     {
       for (i32 c = 0; c < mCols; ++c)
@@ -622,8 +622,8 @@ try
     cv::Mat img = roicrop(LoadUnitFloatImage<Float>("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     cv::Mat fftR = Fourier::fft(img);
     cv::Mat fftG = Fourier::fft(img);
-    cv::Mat filterR = cv::Mat::zeros(img.size(), GetMatType<Float>());
-    cv::Mat filterG = cv::Mat::zeros(img.size(), GetMatType<Float>());
+    cv::Mat filterR = cv::Mat(img.size(), GetMatType<Float>());
+    cv::Mat filterG = cv::Mat(img.size(), GetMatType<Float>());
 
     for (i32 r = 0; r < mRows; ++r)
     {
@@ -767,8 +767,8 @@ cv::Mat IterativePhaseCorrelation<Float>::ColorComposition(const cv::Mat& img1, 
   const f64 gamma1 = 1.0;
   const f64 gamma2 = 1.0;
 
-  cv::Mat img1c = cv::Mat::zeros(img1.size(), GetMatType<Float>(3));
-  cv::Mat img2c = cv::Mat::zeros(img2.size(), GetMatType<Float>(3));
+  cv::Mat img1c = cv::Mat(img1.size(), GetMatType<Float>(3));
+  cv::Mat img2c = cv::Mat(img2.size(), GetMatType<Float>(3));
 
   for (i32 row = 0; row < img1.rows; ++row)
   {
@@ -895,7 +895,7 @@ void IterativePhaseCorrelation<Float>::AddNoise(cv::Mat& image, f64 noiseStdev)
   if (noiseStdev <= 0)
     return;
 
-  cv::Mat noise = cv::Mat::zeros(image.rows, image.cols, GetMatType<Float>());
+  cv::Mat noise = cv::Mat(image.rows, image.cols, GetMatType<Float>());
   randn(noise, 0, noiseStdev);
   image += noise;
 }

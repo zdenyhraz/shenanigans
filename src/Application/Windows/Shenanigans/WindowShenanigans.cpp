@@ -136,6 +136,35 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
+  if (1)
+  {
+    const i32 n = 51;
+    const i32 medsize = 3;
+    cv::Mat matorig(n, n, CV_32F);
+    for (i32 r = 0; r < matorig.rows; ++r)
+    {
+      auto matorigp = matorig.ptr<f32>(r);
+      for (i32 c = 0; c < matorig.cols; ++c)
+        matorigp[c] = std::sin(0.1 * (r + c));
+    }
+    cv::Mat mat = matorig.clone();
+    for (i32 i = 0; i < 3 * n; ++i)
+      mat.at<f32>(rand() % n, rand() % n) = 1.3;
+
+    cv::Mat medcv;
+    cv::medianBlur(mat, medcv, medsize);
+    const auto med = MedianBlur<f32>(mat, medsize, medsize);
+
+    PyPlot::Plot("Mat original", {.z = matorig});
+    PyPlot::Plot("Mat original fuxed", {.z = mat});
+    PyPlot::Plot("Mat median blur", {.z = med});
+    PyPlot::Plot("Mat median blur cv", {.z = medcv});
+    PyPlot::Plot("Mat median blur diff", {.z = cv::abs(med - matorig)});
+    PyPlot::Plot("Mat median blur diff cv", {.z = cv::abs(medcv - matorig)});
+    PyPlot::Plot("Mat median blur diff cv self", {.z = cv::abs(medcv - med)});
+
+    return;
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;

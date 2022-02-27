@@ -30,8 +30,8 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
 
   i32 rows = iters;
   i32 cols = iters;
-  cv::Mat landscape = cv::Mat::zeros(rows, cols, CV_32F);
-  cv::Mat landscapeLog = cv::Mat::zeros(rows, cols, CV_32F);
+  cv::Mat landscape = cv::Mat(rows, cols, CV_32F);
+  cv::Mat landscapeLog = cv::Mat(rows, cols, CV_32F);
   std::atomic<i32> progress = 0;
   static constexpr f64 logConstant = std::numeric_limits<f32>::epsilon();
 

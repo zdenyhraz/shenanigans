@@ -137,22 +137,23 @@ inline std::vector<T> abs(const std::vector<T>& vec)
 }
 
 template <typename T>
-inline f64 median(const std::vector<T>& vec)
+inline f64 Median(std::vector<T>&& vec)
 {
-  auto result = vec;
-  std::sort(result.begin(), result.end());
-  return result[result.size() / 2];
+  if (vec.size() % 2 == 0)
+  {
+    std::partial_sort(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
+    return 0.5 * vec[vec.size() / 2] + 0.5 * vec[vec.size() / 2 - 1];
+  }
+
+  std::nth_element(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
+  return vec[vec.size() / 2];
 }
 
-inline bool vectorLess(const std::vector<f64>& left, const std::vector<f64>& right)
+template <typename T>
+inline f64 Median(const std::vector<T>& _vec)
 {
-  f64 L = 0, R = 0;
-  for (usize i = 0; i < left.size(); i++)
-  {
-    L += abs(left[i]);
-    R += abs(right[i]);
-  }
-  return L < R;
+  auto vec = _vec;
+  return Median(std::move(vec));
 }
 
 template <typename T>
@@ -309,7 +310,7 @@ inline void filterMedian(std::vector<f64>& vec, i32 size)
       med.emplace_back(vec[idx]);
     }
 
-    vecMedian[i] = median(med);
+    vecMedian[i] = Median(med);
   }
   vec = vecMedian;
 }
