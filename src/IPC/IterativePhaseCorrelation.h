@@ -934,6 +934,7 @@ private:
   {
     PROFILE_FUNCTION;
     mBandpass = cv::Mat::ones(mRows, mCols, GetMatType<Float>());
+
     if (mBandpassType == BandpassType::None)
       return;
     if (mBandpassL == 0 and mBandpassH == 0)
@@ -945,20 +946,29 @@ private:
       if (mBandpassL == 0 and mBandpassH != 0)
       {
         for (i32 r = 0; r < mRows; ++r)
+        {
+          auto bpp = mBandpass.ptr<Float>(r);
           for (i32 c = 0; c < mCols; ++c)
-            mBandpass.at<Float>(r, c) = LowpassEquation(r, c);
+            bpp[c] = LowpassEquation(r, c);
+        }
       }
       else if (mBandpassL != 0 and mBandpassH == 0)
       {
         for (i32 r = 0; r < mRows; ++r)
+        {
+          auto bpp = mBandpass.ptr<Float>(r);
           for (i32 c = 0; c < mCols; ++c)
-            mBandpass.at<Float>(r, c) = HighpassEquation(r, c);
+            bpp[c] = HighpassEquation(r, c);
+        }
       }
       else if (mBandpassL != 0 and mBandpassH != 0)
       {
         for (i32 r = 0; r < mRows; ++r)
+        {
+          auto bpp = mBandpass.ptr<Float>(r);
           for (i32 c = 0; c < mCols; ++c)
-            mBandpass.at<Float>(r, c) = BandpassGEquation(r, c);
+            bpp[c] = BandpassGEquation(r, c);
+        }
         normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
       }
       break;
@@ -966,8 +976,11 @@ private:
       if (mBandpassL < mBandpassH)
       {
         for (i32 r = 0; r < mRows; ++r)
+        {
+          auto bpp = mBandpass.ptr<Float>(r);
           for (i32 c = 0; c < mCols; ++c)
-            mBandpass.at<Float>(r, c) = BandpassREquation(r, c);
+            bpp[c] = BandpassREquation(r, c);
+        }
       }
       break;
     default:
