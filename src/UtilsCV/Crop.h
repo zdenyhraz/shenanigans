@@ -21,21 +21,26 @@ inline cv::Mat roicropmid(const cv::Mat& mat, i32 w, i32 h)
 }
 
 template <typename T>
-inline cv::Mat kirkl(i32 rows, i32 cols, u32 radius)
+inline cv::Mat kirkl(i32 rows, i32 cols, f64 radius)
 {
   PROFILE_FUNCTION;
-  cv::Mat kirkl = cv::Mat::zeros(rows, cols, GetMatType<T>());
-  for (i32 r = 0; r < rows; r++)
-    for (i32 c = 0; c < cols; c++)
-      kirkl.at<T>(r, c) = 1.0f * ((sqr(r - rows / 2) + sqr(c - cols / 2)) < sqr(radius));
-
-  return kirkl;
+  cv::Mat mat = cv::Mat::zeros(rows, cols, GetMatType<T>());
+  const i32 radsq = sqr(radius);
+  const i32 rowsh = rows / 2;
+  const i32 colsh = cols / 2;
+  for (i32 r = 0; r < rows; ++r)
+  {
+    auto matp = mat.ptr<T>(r);
+    for (i32 c = 0; c < cols; ++c)
+      matp[c] = (sqr(r - rowsh) + sqr(c - colsh)) <= radsq;
+  }
+  return mat;
 }
 
 template <typename T>
-inline cv::Mat kirkl(u32 size)
+inline cv::Mat kirkl(i32 size)
 {
-  return kirkl<T>(size, size, size / 2);
+  return kirkl<T>(size, size, 0.5 * size);
 }
 
 template <typename T>

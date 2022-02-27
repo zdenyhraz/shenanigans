@@ -2,8 +2,10 @@
 
 void PyPlot::Initialize()
 {
-  PROFILE_FUNCTION;
-  py::eval_file("../script/plot/plot_init.py");
+  std::call_once(mInitialized, []() {
+    PROFILE_FUNCTION;
+    py::eval_file("../script/plot/plot_init.py");
+  });
 }
 
 void PyPlot::Plot(std::string&& name, Data1D&& data)

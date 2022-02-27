@@ -40,6 +40,7 @@ public:
 private:
   inline static std::unordered_map<std::string, u32> mPlotIds;
   inline static u32 mId = 0;
+  inline static std::once_flag mInitialized;
 
   static void CheckIfPlotExists(const std::string& name);
   static py::dict GetScopeData(const std::string& name, const Data1D& data);

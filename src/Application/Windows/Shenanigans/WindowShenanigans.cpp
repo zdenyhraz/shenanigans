@@ -136,23 +136,9 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  if (0) // bandpass with width
+  if (1) // kirkl
   {
-    cv::Mat mat = cv::Mat::zeros(1000, 1000, CV_32F);
-    const f64 center = 0.0;
-    const f64 width = 0.5;
-    const f64 width2 = 0.01;
-
-    for (i32 r = 0; r < mat.rows; ++r)
-    {
-      for (i32 c = 0; c < mat.cols; ++c)
-      {
-        const f64 radius = std::sqrt(std::pow((r - 0.5 * mat.rows) / (0.5 * mat.rows), 2) + std::pow((c - 0.5 * mat.cols) / (0.5 * mat.cols), 2)) / std::sqrt(2);
-        mat.at<f32>(r, c) = std::exp(-std::pow(radius - center, 2) / std::pow(width, 2)) * (1. - std::exp(-std::pow(radius - center, 2) / std::pow(width2, 2)));
-      }
-    }
-    PyPlot::Plot("Bandpass", {.z = mat});
-    PyPlot::Plot("Bandpass 1D", {.y = GetMidRow<f32>(mat)});
+    PyPlot::Plot("kirkl", {.z = kirkl<f32>(mWindowData->IPC->GetRows())});
     return;
   }
   if (0) // optimization / metaoptimization
