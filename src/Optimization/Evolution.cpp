@@ -295,7 +295,7 @@ try
       Plot1D::SetYnames({"obj", "valid"});
     else
       Plot1D::SetYnames({"obj"});
-    Plot1D::SetY2names({"%diff"});
+    Plot1D::SetY2names({"%sim"});
     Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
     Plot1D::SetYLogarithmic(true);
   }
