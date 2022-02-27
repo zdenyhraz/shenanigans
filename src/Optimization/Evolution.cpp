@@ -707,7 +707,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
   }
 
 #pragma omp parallel for
-  for (usize eid = 0; eid < NP; eid++)
+  for (usize eid = 0; eid < NP; ++eid)
   {
     entities[eid].fitness = obj(entities[eid].params);
 
@@ -724,7 +724,7 @@ void Evolution::Population::InitializeOffspring(usize nParents)
   if (mConsoleOutput)
     LOG_FUNCTION("Offspring initialization");
   offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
-  for (usize eid = 0; eid < entities.size(); eid++)
+  for (usize eid = 0; eid < entities.size(); ++eid)
   {
     offspring[eid].params = entities[eid].params;
     offspring[eid].fitness = entities[eid].fitness;
@@ -759,9 +759,10 @@ void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
   PROFILE_FUNCTION;
   for (auto& idx : parentIndices)
   {
-    usize idxTst = rand() % NP;
-    while (!isDistinct(idxTst, parentIndices, eid))
+    usize idxTst = 0;
+    do
       idxTst = rand() % NP;
+    while (std::any_of(parentIndices.begin(), parentIndices.end(), [&](const auto pidx) { return idxTst == pidx; }) or idxTst == eid);
     idx = idxTst;
   }
 }
@@ -776,7 +777,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   case CrossoverStrategy::BIN:
   {
     usize definite = rand() % params.size(); // at least one param undergoes crossover
-    for (usize pid = 0; pid < params.size(); pid++)
+    for (usize pid = 0; pid < params.size(); ++pid)
     {
       f64 random = rand01();
       if (random < CR or pid == definite)
@@ -806,23 +807,10 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
 
 f64 Evolution::averageVectorDistance(const std::vector<f64>& vec1, const std::vector<f64>& vec2, const std::vector<f64>& boundsRange)
 {
-  PROFILE_FUNCTION;
   f64 result = 0;
   for (usize i = 0; i < vec1.size(); i++)
     result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // normalize -> 0 to 1
 
   result /= vec1.size(); // coordinate average
   return result;
-}
-
-bool Evolution::isDistinct(usize inpindex, const std::vector<usize>& indices, usize currindex)
-{
-  PROFILE_FUNCTION;
-  bool isdist = true;
-  for (auto& idx : indices)
-  {
-    if (inpindex == idx or inpindex == currindex)
-      isdist = false;
-  }
-  return isdist;
 }

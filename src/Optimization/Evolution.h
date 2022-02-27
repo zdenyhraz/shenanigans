@@ -105,7 +105,6 @@ private:
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
   static f64 averageVectorDistance(const std::vector<f64>& vec1, const std::vector<f64>& vec2, const std::vector<f64>& boundsRange);
-  static bool isDistinct(usize inpindex, const std::vector<usize>& indices, usize currindex);
 
   f64 mAbsoluteDifferenceThreshold = 1e-10;
   f64 mRelativeDifferenceThreshold = 0.9;
