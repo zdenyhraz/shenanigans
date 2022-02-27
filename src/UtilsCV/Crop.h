@@ -43,6 +43,17 @@ inline cv::Mat roicropclip(const cv::Mat& mat, i32 x, i32 y, i32 w, i32 h)
 }
 
 template <typename T>
+inline cv::Mat roicroprep(const cv::Mat& mat, i32 x, i32 y, i32 w, i32 h)
+{
+  PROFILE_FUNCTION;
+  cv::Mat roi(h, w, GetMatType<T>());
+  for (i32 r = 0; r < roi.rows; ++r)
+    for (i32 c = 0; c < roi.cols; ++c)
+      roi.at<T>(r, c) = mat.at<T>(std::clamp(y - h / 2 + r, 0, mat.rows - 1), std::clamp(x - w / 2 + c, 0, mat.cols - 1));
+  return roi;
+}
+
+template <typename T>
 inline cv::Mat kirkl(i32 rows, i32 cols, f64 radius)
 {
   PROFILE_FUNCTION;

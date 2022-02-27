@@ -154,7 +154,7 @@ inline cv::Mat MedianBlur(const cv::Mat& mat, i32 kwidth, i32 kheight)
   {
     auto medp = med.ptr<T>(r);
     for (i32 c = 0; c < mat.cols; ++c)
-      medp[c] = GetMedian<T>(roicropclipref(mat, c, r, kwidth, kheight));
+      medp[c] = GetMedian<T>(roicroprep<T>(mat, c, r, kwidth, kheight));
   }
 
   return med;
