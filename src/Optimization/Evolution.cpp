@@ -759,10 +759,9 @@ void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
   PROFILE_FUNCTION;
   for (auto& idx : parentIndices)
   {
-    usize idxTst = 0;
-    do
+    usize idxTst = rand() % NP;
+    while (std::any_of(parentIndices.begin(), parentIndices.end(), [&](const auto pidx) { return idxTst == pidx; }) or idxTst == eid)
       idxTst = rand() % NP;
-    while (std::any_of(parentIndices.begin(), parentIndices.end(), [&](const auto pidx) { return idxTst == pidx; }) or idxTst == eid);
     idx = idxTst;
   }
 }
