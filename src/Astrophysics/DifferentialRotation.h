@@ -46,8 +46,8 @@ public:
     void PostProcess()
     {
       PROFILE_FUNCTION;
-      const i32 medsizeX = 5; // time
-      const i32 medsizeY = 3; // meridian
+      const i32 medsizeX = std::min(3, shiftx.cols); // time
+      const i32 medsizeY = std::min(3, shiftx.rows); // meridian
       shiftx = MedianBlur<f32>(shiftx, medsizeX, medsizeY);
       shifty = MedianBlur<f32>(shifty, medsizeX, medsizeY);
       omegax = MedianBlur<f32>(omegax, medsizeX, medsizeY);
@@ -118,8 +118,8 @@ public:
           PROFILE_SCOPE(CalculateMeridianShift);
           const auto theta = data.theta[y];
           const auto yshift = -R * std::sin(theta - theta0);
-          auto crop1 = roicrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
-          auto crop2 = roicrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
+          auto crop1 = RoiCrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
+          auto crop2 = RoiCrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);

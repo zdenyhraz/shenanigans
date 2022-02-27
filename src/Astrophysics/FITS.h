@@ -218,11 +218,11 @@ private:
 
     if constexpr (0) // show
     {
-      showimg(roicrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
-      showimg(roicrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
-      showimg(roicrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
-      showimg(roicrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
-      showimg(roicrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
+      showimg(RoiCrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
+      showimg(RoiCrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
+      showimg(RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
+      showimg(RoiCrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
+      showimg(RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
     }
   }
 

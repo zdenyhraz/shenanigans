@@ -81,7 +81,7 @@ inline cv::Mat EqualizeHistogramAdaptive(const cv::Mat& img, i32 wsize)
     {
       if (r > wsize / 2 and c > wsize / 2 and r < img.rows - wsize / 2 and c < img.cols - wsize / 2)
       {
-        auto chist = CalculateCummulativeHistogram(roicrop(img, r, c, wsize, wsize));
+        auto chist = CalculateCummulativeHistogram(RoiCrop(img, r, c, wsize, wsize));
         out.at<uchar>(r, c) = static_cast<uchar>(chist[img.at<uchar>(r, c)] / chist.back() * 255);
       }
     }

@@ -232,7 +232,7 @@ public:
       cv::Point2d L1mid(L1size / 2, L1size / 2);
       cv::Point2d L1peak;
       if (L1circle.cols != L1size)
-        [[unlikely]] L1circle = kirkl<Float>(L1size);
+        [[unlikely]] L1circle = Kirkl<Float>(L1size);
       if constexpr (DebugMode)
         DebugL1B(L2U, L1size, L3peak - L3mid);
 
@@ -319,7 +319,7 @@ private:
   void UpdateL1circle()
   {
     PROFILE_FUNCTION;
-    mL1circle = kirkl<Float>(GetL1size(mL2size * mUpsampleCoeff, mL1ratio));
+    mL1circle = Kirkl<Float>(GetL1size(mL2size * mUpsampleCoeff, mL1ratio));
   }
 
   void UpdateBandpass()
@@ -505,7 +505,7 @@ private:
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
-    return roicrop(L3, L3peak.x, L3peak.y, L2size, L2size);
+    return RoiCrop(L3, L3peak.x, L3peak.y, L2size, L2size);
   }
 
   template <bool DebugMode>
@@ -539,7 +539,7 @@ private:
     return L1size % 2 ? L1size : L1size + 1;
   }
 
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
 
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
 

@@ -105,7 +105,7 @@ try
       if (IsOutOfBounds(center, image1, {mCols, mRows}))
         continue;
 
-      const auto shift = Calculate(roicrop(image1, center.x, center.y, mCols, mRows), roicrop(image2, center.x, center.y, mCols, mRows));
+      const auto shift = Calculate(RoiCrop(image1, center.x, center.y, mCols, mRows), RoiCrop(image2, center.x, center.y, mCols, mRows));
       flowX.at<Float>(r, c) = shift.x;
       flowY.at<Float>(r, c) = shift.y;
     }
@@ -501,8 +501,8 @@ try
     cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
     cv::Mat imageShifted;
     warpAffine(image, imageShifted, Tmat, image.size());
-    cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
-    cv::Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
+    cv::Mat image1 = RoiCrop(image, point.x, point.y, mCols, mRows);
+    cv::Mat image2 = RoiCrop(imageShifted, point.x, point.y, mCols, mRows);
     SetDebugTrueShift(shift);
 
     if constexpr (addNoise)
@@ -520,7 +520,7 @@ try
   {
     SetDebugDirectory("../data/peakshift/new");
     const cv::Mat image1 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
-    const cv::Mat crop1 = roicropmid(image1, mCols, mRows);
+    const cv::Mat crop1 = RoiCropMid(image1, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
@@ -537,7 +537,7 @@ try
       const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image1, image2, Tmat, image2.size());
-      crop2 = roicropmid(image2, mCols, mRows);
+      crop2 = RoiCropMid(image2, mCols, mRows);
       if (addNoise)
         crop2 += noise;
       SetDebugTrueShift(shift);
@@ -548,7 +548,7 @@ try
 
   if constexpr (debugWindow)
   {
-    cv::Mat img = roicrop(LoadUnitFloatImage<Float>("../data/test.png"), 2048, 2048, mCols, mRows);
+    cv::Mat img = RoiCrop(LoadUnitFloatImage<Float>("../data/test.png"), 2048, 2048, mCols, mRows);
     cv::Mat w, imgw;
     createHanningWindow(w, img.size(), GetMatType<Float>());
     multiply(img, w, imgw);
@@ -611,7 +611,7 @@ try
 
   if constexpr (debugBandpassRinging)
   {
-    cv::Mat img = roicrop(LoadUnitFloatImage<Float>("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
+    cv::Mat img = RoiCrop(LoadUnitFloatImage<Float>("../data/test.png"), 4098 / 2, 4098 / 2, mCols, mRows);
     cv::Mat fftR = Fourier::fft(img);
     cv::Mat fftG = Fourier::fft(img);
     cv::Mat filterR = cv::Mat(img.size(), GetMatType<Float>());
@@ -730,7 +730,7 @@ void IterativePhaseCorrelation<Float>::DebugL1B(const cv::Mat& L2U, i32 L1size, 
 {
   cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(kirkl<Float>(mat.rows));
+  mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
   cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
@@ -742,7 +742,7 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(kirkl<Float>(mat.rows));
+  mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
@@ -815,7 +815,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation<Float>::LoadImages(const std::str
     // crop the input image - good for solar images, omits the black borders
     static constexpr f64 cropFocusRatio = 0.5;
     auto image = LoadUnitFloatImage<Float>(path);
-    image = roicropmid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
+    image = RoiCropMid(image, cropFocusRatio * image.cols, cropFocusRatio * image.rows);
     images.push_back(image);
     LOG_DEBUG("Loaded image {}", path);
   }
@@ -852,8 +852,8 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
       cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
       warpAffine(image, imageShifted, Tmat, image.size());
-      cv::Mat image1 = roicrop(image, point.x, point.y, mCols, mRows);
-      cv::Mat image2 = roicrop(imageShifted, point.x, point.y, mCols, mRows);
+      cv::Mat image1 = RoiCrop(image, point.x, point.y, mCols, mRows);
+      cv::Mat image2 = RoiCrop(imageShifted, point.x, point.y, mCols, mRows);
 
       ConvertToUnitFloat<false>(image1);
       ConvertToUnitFloat<false>(image2);

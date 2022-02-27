@@ -91,8 +91,8 @@ void WindowIPC::align()
   cv::Point cropfocus(2048, 2048);
   i32 cropsize = 1.0 * 4096;
 
-  cv::Mat img1 = roicrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
-  cv::Mat img2 = roicrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img1 = RoiCrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
+  cv::Mat img2 = RoiCrop(LoadUnitFloatImage<f32>("../data/171A.png"), cropfocus.x, cropfocus.y, cropsize, cropsize);
 
   i32 size = cropsize;
   cv::resize(img1, img1, cv::Size(size, size));
@@ -122,8 +122,8 @@ void WindowIPC::CalculateFlow()
   if (0)
   {
     auto debugipc = *mWindowData->IPC;
-    debugipc.Calculate(roicrop(img1, img1.cols / 2, img1.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()),
-        roicrop(img2, img2.cols / 2, img2.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()));
+    debugipc.Calculate(RoiCrop(img1, img1.cols / 2, img1.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()),
+        RoiCrop(img2, img2.cols / 2, img2.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()));
 
     return;
   }

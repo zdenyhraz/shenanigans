@@ -21,3 +21,19 @@ TEST(MedianBlur, OpenCVConsistency)
 
   EXPECT_TRUE(Equal<f32>(med, medcv));
 }
+
+TEST(MedianBlur, OnePixelKernel)
+{
+  const i32 n = 51;
+  const i32 medsize = 1;
+  cv::Mat mat(n, n, CV_32F);
+  for (i32 r = 0; r < mat.rows; ++r)
+  {
+    auto matp = mat.ptr<f32>(r);
+    for (i32 c = 0; c < mat.cols; ++c)
+      matp[c] = std::sin(0.1 * (r + c));
+  }
+
+  const auto med = MedianBlur<f32>(mat, medsize, medsize);
+  EXPECT_TRUE(Equal<f32>(med, mat));
+}
