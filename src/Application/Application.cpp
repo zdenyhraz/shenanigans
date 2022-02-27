@@ -26,9 +26,9 @@ int main(int argc, char** argv)
 try
 {
   RandInitialize();
+  QtInitialize();
   PythonInitialize();
   PyPlotInitialize();
-  QtInitialize();
 
   QApplication application(argc, argv);
   WindowShenanigans window;
