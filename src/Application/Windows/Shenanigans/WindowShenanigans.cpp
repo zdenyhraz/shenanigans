@@ -136,11 +136,6 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  if (1) // kirkl
-  {
-    PyPlot::Plot("kirkl", {.z = kirkl<f32>(mWindowData->IPC->GetRows())});
-    return;
-  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
