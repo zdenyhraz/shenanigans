@@ -46,7 +46,7 @@ public:
     {
       PROFILE_FUNCTION;
 
-      for (auto medsize : {3, 5})
+      for (const auto medsize : {3})
       {
         cv::medianBlur(shiftx, shiftx, medsize);
         cv::medianBlur(shifty, shifty, medsize);

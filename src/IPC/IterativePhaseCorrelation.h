@@ -439,9 +439,9 @@ private:
 
     for (i32 row = 0; row < dft1.rows; ++row)
     {
-      auto dft1p = dft1.ptr<cv::Vec<Float, 2>>(row);
-      auto dft2p = dft2.ptr<cv::Vec<Float, 2>>(row);
-      auto bandp = mBandpass.ptr<Float>(row);
+      auto dft1p = dft1.ptr<cv::Vec<Float, 2>>(row); // reuse dft1 memory
+      const auto dft2p = dft2.ptr<cv::Vec<Float, 2>>(row);
+      const auto bandp = mBandpass.ptr<Float>(row);
       for (i32 col = 0; col < dft1.cols; ++col)
       {
         const Float re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
@@ -451,13 +451,12 @@ private:
 
         if constexpr (CrossCorrelation)
         {
-          // reuse dft1 memory
+
           dft1p[col][0] = re * band;
           dft1p[col][1] = im * band;
         }
         else
         {
-          // reuse dft1 memory
           dft1p[col][0] = re / mag * band;
           dft1p[col][1] = im / mag * band;
         }
@@ -538,8 +537,7 @@ private:
   static i32 GetL1size(i32 L2Usize, f64 L1ratio)
   {
     i32 L1size = std::floor(L1ratio * L2Usize);
-    L1size = L1size % 2 ? L1size : L1size + 1;
-    return L1size;
+    return L1size % 2 ? L1size : L1size + 1;
   }
 
   static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return roicropref(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
