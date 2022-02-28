@@ -51,6 +51,7 @@ inline f64 Angle(const cv::Point2f& pt)
 
 inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
 {
+  PROFILE_FUNCTION;
   f64 minR, maxR;
   minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
   return std::make_pair(minR, maxR);
@@ -58,6 +59,7 @@ inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
 
 inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
 {
+  PROFILE_FUNCTION;
   if (Y.rows != X.rows)
     throw std::runtime_error("Data count mismatch");
 
@@ -66,17 +68,20 @@ inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
 
 inline void Shift(cv::Mat& mat, const cv::Point2f& shift)
 {
+  PROFILE_FUNCTION;
   cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
   warpAffine(mat, mat, T, mat.size());
 }
 
 inline void Shift(cv::Mat& mat, f32 shiftx, f32 shifty)
 {
+  PROFILE_FUNCTION;
   Shift(mat, {shiftx, shifty});
 }
 
 inline void Rotate(cv::Mat& mat, f32 rot, f32 scale = 1)
 {
+  PROFILE_FUNCTION;
   cv::Point2f center((f32)mat.cols / 2, (f32)mat.rows / 2);
   cv::Mat R = getRotationMatrix2D(center, rot, scale);
   warpAffine(mat, mat, R, mat.size());
@@ -86,7 +91,6 @@ template <typename T>
 inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
 {
   PROFILE_FUNCTION;
-
   if (mat1.size() != mat2.size())
     return false;
   if (mat1.channels() != mat2.channels())

@@ -236,12 +236,12 @@ void IterativePhaseCorrelation<Float>::PlotObjectiveFunctionLandscape(const std:
       std::vector<f64> parameters(OptimizedParameterCount);
 
       // default
-      parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
-      parameters[BandpassLParameter] = mBandpassL;
-      parameters[BandpassHParameter] = mBandpassH;
-      parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
-      parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
-      parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+      parameters[BandpassTypeParameter] = static_cast<i32>(mBPT);
+      parameters[BandpassLParameter] = mBPL;
+      parameters[BandpassHParameter] = mBPH;
+      parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
+      parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
+      parameters[UpsampleCoeffParameter] = mUC;
       parameters[L1ratioParameter] = mL1ratio;
 
       // modified
@@ -284,12 +284,12 @@ void IterativePhaseCorrelation<Float>::PlotImageSizeAccuracyDependence(const std
     std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
-    parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
-    parameters[BandpassLParameter] = mBandpassL;
-    parameters[BandpassHParameter] = mBandpassH;
-    parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
-    parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
-    parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+    parameters[BandpassTypeParameter] = static_cast<i32>(mBPT);
+    parameters[BandpassLParameter] = mBPL;
+    parameters[BandpassHParameter] = mBPH;
+    parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
+    parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
+    parameters[UpsampleCoeffParameter] = mUC;
     parameters[L1ratioParameter] = mL1ratio;
 
     imageSizes[i] = imageSize;
@@ -325,12 +325,12 @@ void IterativePhaseCorrelation<Float>::PlotUpsampleCoefficientAccuracyDependence
     std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
-    parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
-    parameters[BandpassLParameter] = mBandpassL;
-    parameters[BandpassHParameter] = mBandpassH;
-    parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
-    parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
-    parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+    parameters[BandpassTypeParameter] = static_cast<i32>(mBPT);
+    parameters[BandpassLParameter] = mBPL;
+    parameters[BandpassHParameter] = mBPH;
+    parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
+    parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
+    parameters[UpsampleCoeffParameter] = mUC;
     parameters[L1ratioParameter] = mL1ratio;
 
     // modified
@@ -376,12 +376,12 @@ void IterativePhaseCorrelation<Float>::PlotNoiseAccuracyDependence(const std::st
     std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
-    parameters[BandpassTypeParameter] = static_cast<i32>(mBandpassType);
-    parameters[BandpassLParameter] = mBandpassL;
-    parameters[BandpassHParameter] = mBandpassH;
-    parameters[InterpolationTypeParameter] = static_cast<i32>(mInterpolationType);
-    parameters[WindowTypeParameter] = static_cast<i32>(mWindowType);
-    parameters[UpsampleCoeffParameter] = mUpsampleCoeff;
+    parameters[BandpassTypeParameter] = static_cast<i32>(mBPT);
+    parameters[BandpassLParameter] = mBPL;
+    parameters[BandpassHParameter] = mBPH;
+    parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
+    parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
+    parameters[UpsampleCoeffParameter] = mUC;
     parameters[L1ratioParameter] = mL1ratio;
 
     noiseStdevs[i] = noise;
@@ -555,8 +555,8 @@ try
     cv::multiply(img, w, imgw);
     cv::Mat w0 = w.clone();
     cv::Mat r0 = cv::Mat::ones(w.size(), GetMatType<Float>());
-    cv::copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    cv::copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(w0, w0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(r0, r0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
@@ -586,21 +586,21 @@ try
       {
         bpR.at<Float>(r, c) = BandpassREquation(r, c);
 
-        if (mBandpassL <= 0 and mBandpassH < 1)
+        if (mBPL <= 0 and mBPH < 1)
           bpG.at<Float>(r, c) = LowpassEquation(r, c);
-        else if (mBandpassL > 0 and mBandpassH >= 1)
+        else if (mBPL > 0 and mBPH >= 1)
           bpG.at<Float>(r, c) = HighpassEquation(r, c);
-        else if (mBandpassL > 0 and mBandpassH < 1)
+        else if (mBPL > 0 and mBPH < 1)
           bpG.at<Float>(r, c) = BandpassGEquation(r, c);
       }
     }
 
-    if (mBandpassL > 0 and mBandpassH < 1)
+    if (mBPL > 0 and mBPH < 1)
       cv::normalize(bpG, bpG, 0.0, 1.0, cv::NORM_MINMAX);
 
     cv::Mat bpR0, bpG0;
-    cv::copyMakeBorder(bpR, bpR0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    cv::copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpR, bpR0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpG, bpG0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
@@ -624,11 +624,11 @@ try
       {
         filterR.at<Float>(r, c) = BandpassREquation(r, c);
 
-        if (mBandpassL <= 0 and mBandpassH < 1)
+        if (mBPL <= 0 and mBPH < 1)
           filterG.at<Float>(r, c) = LowpassEquation(r, c);
-        else if (mBandpassL > 0 and mBandpassH >= 1)
+        else if (mBPL > 0 and mBPH >= 1)
           filterG.at<Float>(r, c) = HighpassEquation(r, c);
-        else if (mBandpassL > 0 and mBandpassH < 1)
+        else if (mBPL > 0 and mBPH < 1)
           filterG.at<Float>(r, c) = BandpassGEquation(r, c);
       }
     }
@@ -686,9 +686,9 @@ void IterativePhaseCorrelation<Float>::DebugFourierTransforms(const cv::Mat& dft
 template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
-  PyPlot::Plot(fmt::format("{} CP cv::magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
-  PyPlot::Plot(fmt::format("{} CP cv::magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
-  PyPlot::Plot(fmt::format("{} CP cv::phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
+  PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
   PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
       {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
           .label_ys = {"x", "y"}});
@@ -704,7 +704,7 @@ template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL2(const cv::Mat& L2) const
 {
   auto plot = L2.clone();
-  cv::resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
+  cv::resize(plot, plot, plot.size() * mUC, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L2", mDebugName), {.z = plot});
 }
 
@@ -716,9 +716,9 @@ void IterativePhaseCorrelation<Float>::DebugL2U(const cv::Mat& L2, const cv::Mat
   if (0)
   {
     cv::Mat nearest, linear, cubic;
-    cv::resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
-    cv::resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
-    cv::resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
+    cv::resize(L2, nearest, L2.size() * mUC, 0, 0, cv::INTER_NEAREST);
+    cv::resize(L2, linear, L2.size() * mUC, 0, 0, cv::INTER_LINEAR);
+    cv::resize(L2, cubic, L2.size() * mUC, 0, 0, cv::INTER_CUBIC);
 
     PyPlot::Plot("IPCL2UN", {.z = nearest});
     PyPlot::Plot("IPCL2UL", {.z = linear});
@@ -733,8 +733,8 @@ void IterativePhaseCorrelation<Float>::DebugL1B(const cv::Mat& L2U, i32 L1size, 
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift));
-  cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift));
+  cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
@@ -745,8 +745,8 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUpsampleCoeff * (mDebugTrueShift - L3shift) - L2Ushift);
-  cv::resize(mat, mat, cv::Size(mUpsampleCoeff * mL2size, mUpsampleCoeff * mL2size), 0, 0, cv::INTER_NEAREST);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift) - L2Ushift);
+  cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 

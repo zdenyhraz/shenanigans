@@ -147,7 +147,7 @@ inline cv::Mat magn(const cv::Mat& img)
 {
   PROFILE_FUNCTION;
   if (img.channels() != 2)
-    throw std::runtime_error("Need two channels for cv::magnitude info");
+    throw std::runtime_error("Need two channels for magnitude info");
 
   cv::Mat mgn;
   cv::Mat planes[2];
@@ -160,7 +160,7 @@ inline cv::Mat phase(const cv::Mat& img)
 {
   PROFILE_FUNCTION;
   if (img.channels() != 2)
-    throw std::runtime_error("Need two channels for cv::phase info");
+    throw std::runtime_error("Need two channels for phase info");
 
   cv::Mat phs;
   cv::Mat planes[2];
