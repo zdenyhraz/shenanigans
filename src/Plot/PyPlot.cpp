@@ -10,8 +10,9 @@ void PyPlot::PlotInternal(const std::string& name, const Data1D& data)
 try
 {
   PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
+  const auto plotname = fmt::format("{} 1d", name);
+  CheckIfPlotExists(plotname);
+  py::eval_file("../script/plot/plot_1d.py", GetScopeData(plotname, data));
 }
 catch (const std::exception& e)
 {
@@ -22,8 +23,9 @@ void PyPlot::PlotInternal(const std::string& name, const Data2D& data)
 try
 {
   PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
+  const auto plotname = fmt::format("{} 2d", name);
+  CheckIfPlotExists(plotname);
+  py::eval_file("../script/plot/plot_2d.py", GetScopeData(plotname, data));
 }
 catch (const std::exception& e)
 {
@@ -34,8 +36,9 @@ void PyPlot::PlotSurfInternal(const std::string& name, const Data2D& data)
 try
 {
   PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_surf.py", GetScopeData(name, data));
+  const auto plotname = fmt::format("{} surf", name);
+  CheckIfPlotExists(plotname);
+  py::eval_file("../script/plot/plot_surf.py", GetScopeData(plotname, data));
 }
 catch (const std::exception& e)
 {

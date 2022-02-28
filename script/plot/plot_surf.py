@@ -13,13 +13,13 @@ xsize = Z.shape[0]
 ysize = Z.shape[1]
 n = 101
 X = np.linspace(xmin, xmax, xsize)
-Y = np.linspace(ymin, ymax, ysize)
+Y = np.linspace(ymax, ymin, ysize)
 X, Y = np.meshgrid(X, Y)
 
 plt.clf()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(X, Y, Z, cmap=cmap, edgecolor='none', linewidth=0,
-                       antialiased=False, rstride=int(ysize/n), cstride=int(xsize/n))
+                       antialiased=False, rstride=max(int(ysize/n), 1), cstride=max(int(xsize/n), 1))
 
 ax.view_init(elev=25, azim=-130)
 ax.set_xlim(xmin, xmax)

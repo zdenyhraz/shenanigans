@@ -692,12 +692,15 @@ void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& cr
   PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
       {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
           .label_ys = {"x", "y"}});
+  PyPlot::PlotSurf(fmt::format("{} CP phase", mDebugName),
+      {.z = Fourier::fftshift(Fourier::phase(crosspower)), .save = not mDebugDirectory.empty() ? fmt::format("{}/CPSs_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL3(const cv::Mat& L3) const
 {
   PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
+  PyPlot::PlotSurf(fmt::format("{} L3", mDebugName), {.z = L3});
 }
 
 template <typename Float>
@@ -748,6 +751,8 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
+  if (last)
+    PyPlot::PlotSurf(fmt::format("{} L1A", mDebugName), {.z = L1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1As_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>

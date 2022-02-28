@@ -32,6 +32,7 @@ void WindowIPC::RefreshIPCparameters()
   mWindowData->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
   mWindowData->IPC->SetUpsampleCoeff(ui.lineEdit_4->text().toInt());
   mWindowData->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
+  LOG_DEBUG("IPC parameters updated");
 }
 
 void WindowIPC::RefreshIPCparametersAndExit()
