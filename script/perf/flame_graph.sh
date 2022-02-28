@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd build
 perf record -a --call-graph fp ./shenanigans
 perf script > out.perf
