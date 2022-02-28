@@ -186,6 +186,7 @@ const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationR
     return "No absolute improvement reached";
   case UnexpectedErrorOccured:
     return "Unexpected error occured";
+  default:
+    return "Unknown reason";
   }
-  return "Unknown reason";
 }
