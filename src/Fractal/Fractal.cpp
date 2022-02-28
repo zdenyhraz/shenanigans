@@ -64,8 +64,8 @@ cv::Mat computeFractal(Fractalset& fractalset)
   cv::setTrackbarMax("maxiter", "Fractal", 1e4);
   cv::setTrackbarMax("magnTresh", "Fractal", 100);
 
-  showimg(Fractal, "Fractal");
-  showimg(Fractal, "Fractal_JET", true);
+  Showimg(Fractal, "Fractal");
+  Showimg(Fractal, "Fractal_JET", true);
 
   std::cout << "Fractal created." << std::endl;
   return Fractal;

@@ -4,16 +4,16 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
 {
   LOG_INFO(" Optimization started (pattern search)");
   std::vector<f64> boundsRange = mUB - mLB;
-  f64 initialStep = vectorMax(boundsRange) / 4;
+  f64 initialStep = *std::max_element(boundsRange.begin(), boundsRange.end()) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
-  std::vector<f64> topPoint = zerovect(N, 0.);
+  std::vector<f64> topPoint = Zerovect(N, 0.);
   f64 topPointFitness = std::numeric_limits<f64>::max();
   // generate all starting points
-  std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, zerovect(N, 0.));
+  std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, Zerovect(N, 0.));
   for (i32 run = 0; run < multistartMaxCnt; run++)
     for (usize indexParam = 0; indexParam < N; indexParam++)
-      mainPointsInitial[run][indexParam] = randr(mLB[indexParam], mUB[indexParam]); // idk dude
+      mainPointsInitial[run][indexParam] = RandRange(mLB[indexParam], mUB[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
@@ -30,7 +30,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
     std::vector<f64> mainPoint = mainPointsInitial[run];
     f64 mainPointFitness = obj(mainPoint);
     std::vector<std::vector<std::vector<f64>>> pattern;                                            // N-2-N (N pairs of N-dimensional points)
-    std::vector<std::vector<f64>> patternFitness(N, zerovect(2, std::numeric_limits<f64>::max())); // N-2 (N pairs of fitness)
+    std::vector<std::vector<f64>> patternFitness(N, Zerovect(2, std::numeric_limits<f64>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
 
     for (usize dim = 0; dim < N; dim++)
@@ -51,7 +51,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
         {
           pattern[dim][pm] = mainPoint;
           pattern[dim][pm][dim] += pm == 0 ? step : -step;
-          pattern[dim][pm][dim] = clampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLB[dim], mUB[dim]);
+          pattern[dim][pm][dim] = ClampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLB[dim], mUB[dim]);
 
           // evaluate vertices
           patternFitness[dim][pm] = obj(pattern[dim][pm]);
@@ -71,7 +71,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
               {
                 std::vector<f64> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
-                testPoint[dim] = clampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
+                testPoint[dim] = ClampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
                 testPointFitness = obj(testPoint);
                 funEvalsThisRun++;
 

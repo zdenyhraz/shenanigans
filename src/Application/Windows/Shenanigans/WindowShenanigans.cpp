@@ -99,7 +99,7 @@ void WindowShenanigans::GenerateLand()
 {
   LOG_FUNCTION("Generate land");
   cv::Mat mat = Procedural::procedural(1000, 1000);
-  showimg(Procedural::colorlandscape(mat), "procedural nature");
+  Showimg(Procedural::colorlandscape(mat), "procedural nature");
 }
 
 void WindowShenanigans::UnitTests()
@@ -131,8 +131,8 @@ try
     Evolution Evo(N);
     Evo.mNP = 5 * N;
     Evo.mMutStrat = Evolution::RAND1;
-    Evo.mLB = zerovect(N, -5.0);
-    Evo.mUB = zerovect(N, +5.0);
+    Evo.mLB = Zerovect(N, -5.0);
+    Evo.mUB = Zerovect(N, +5.0);
     Evo.mMaxFunEvals = maxFunEvals;
     Evo.mOptimalFitness = optimalFitness;
     Evo.SetName("debug");

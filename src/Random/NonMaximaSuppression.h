@@ -11,7 +11,7 @@ inline std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
     {
       f32 gradX = (img.at<f32>(r, c + 1) - img.at<f32>(r, c - 1)) / 2;
       f32 gradY = (img.at<f32>(r + 1, c) - img.at<f32>(r - 1, c)) / 2;
-      gradM.at<f32>(r, c) = sqrt(sqr(gradX) + sqr(gradY));
+      gradM.at<f32>(r, c) = sqrt(Sqr(gradX) + Sqr(gradY));
       f32 angle = atan2(gradY, gradX);
       gradA.at<f32>(r, c) = angle >= 0 ? angle : angle + Constants::TwoPi;
     }
@@ -70,7 +70,7 @@ inline cv::Mat NonMaximaSuppresion(const cv::Mat& img)
       if (rr or cc)
         relativePoints.push_back(cv::Point2f(cc, rr));
 
-  if (relativePoints.size() != static_cast<usize>(sqr(size)) - 1)
+  if (relativePoints.size() != static_cast<usize>(Sqr(size)) - 1)
     throw;
 
   for (i32 r = 1; r < out.rows - 1; ++r)

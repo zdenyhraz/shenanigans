@@ -26,5 +26,5 @@ void WindowFiltering::HistogramEqualize()
   ShowHistogram(heq, "heq histogram");
   ShowHistogram(aheq, "aheq histogram");
 
-  showimg(std::vector<cv::Mat>{img, heq, aheq}, "hist eq", false, 0, 1, 1200);
+  Showimg(std::vector<cv::Mat>{img, heq, aheq}, "hist eq", false, 0, 1, 1200);
 }

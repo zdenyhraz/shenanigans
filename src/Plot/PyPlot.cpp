@@ -48,7 +48,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
     std::iota(x.begin(), x.end(), 0);
   }
   scope["id"] = mPlotIds[name];
-  scope["x"] = not data.x.empty() ? data.x : Iota(0, not data.y.empty() ? data.y.size() : data.ys[0].size());
+  scope["x"] = not data.x.empty() ? data.x : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
   scope["y"] = data.y;
   scope["y2"] = data.y2;
   scope["ys"] = data.ys;
@@ -80,7 +80,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   PROFILE_FUNCTION;
   cv::Mat mz = data.z.clone();
   mz.convertTo(mz, CV_32F);
-  auto z = zerovect2(mz.rows, mz.cols, 0.0f);
+  auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
   for (i32 r = 0; r < mz.rows; ++r)
     for (i32 c = 0; c < mz.cols; ++c)
       z[r][c] = mz.at<f32>(r, c);

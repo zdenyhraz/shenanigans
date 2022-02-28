@@ -104,7 +104,7 @@ void WindowIPC::align()
   IterativePhaseCorrelation ipc = *mWindowData->IPC;
   ipc.SetSize(img1.size());
   cv::Mat aligned = ipc.Align(img1, img2);
-  showimg(std::vector<cv::Mat>{img1, img2, aligned}, "align triplet");
+  Showimg(std::vector<cv::Mat>{img1, img2, aligned}, "align triplet");
 }
 
 void WindowIPC::alignXY()

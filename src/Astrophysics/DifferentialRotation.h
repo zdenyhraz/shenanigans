@@ -264,8 +264,8 @@ public:
       cv::line(imageclrz, pt1z, pt2z, colorpred, thickness, cv::LINE_AA);
     }
 
-    showimg(imageclr, "meridian curve", false, 0, 1, 1200);
-    // saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
+    Showimg(imageclr, "meridian curve", false, 0, 1, 1200);
+    // Saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
   }
 
 private:

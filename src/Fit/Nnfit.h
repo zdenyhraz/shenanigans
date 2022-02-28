@@ -7,7 +7,7 @@ inline i32 findNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Poi
   f64 dist;
   for (usize i = 0; i < pts.size(); i++)
   {
-    dist = magnitude(pts[i] - pt);
+    dist = Magnitude(pts[i] - pt);
     if (dist < mindist)
     {
       mindist = dist;
@@ -71,7 +71,7 @@ inline cv::Mat wnnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64
       std::vector<std::pair<i32, f64>> proxidxs(proxpts);
       for (usize i = 0; i < pts.size(); i++)
       {
-        distance = magnitude(pts[i] - pt);
+        distance = Magnitude(pts[i] - pt);
         if (distance > maxdistance)
           maxdistance = distance;
 
@@ -86,7 +86,7 @@ inline cv::Mat wnnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64
       f64 weightsum = 0;
       for (auto i : proxidxs)
       {
-        weight = std::max(1. - magnitude(pts[i.first] - pt) / (maxdistance / proxcoeff), 0.);
+        weight = std::max(1. - Magnitude(pts[i.first] - pt) / (maxdistance / proxcoeff), 0.);
         weightsum += weight;
         out.at<f32>(r, c) += weight * zdata[i.first];
       }

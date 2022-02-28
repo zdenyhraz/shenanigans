@@ -590,7 +590,7 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
       }
     }
     // check for boundaries, effectively clamp
-    newoffspring.params[pid] = clampSmooth(newoffspring.params[pid], entities[eid].params[pid], LB[pid], UB[pid]);
+    newoffspring.params[pid] = ClampSmooth(newoffspring.params[pid], entities[eid].params[pid], LB[pid], UB[pid]);
   }
 
   try
@@ -669,7 +669,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
   PROFILE_FUNCTION;
   if (mConsoleOutput)
     LOG_FUNCTION("Population initialization");
-  entities = zerovect(NP, Entity(N));
+  entities = Zerovect(NP, Entity(N));
   std::vector<f64> RB = UB - LB;
   const f64 initialMinAvgDist = 0.5;
   const usize distincEntityMaxTrials = 10;
@@ -684,7 +684,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
       distinctEntity = true; // assume entity is distinct
 
       for (usize pid = 0; pid < N; pid++) // generate initial entity
-        entities[eid].params[pid] = randr(LB[pid], UB[pid]);
+        entities[eid].params[pid] = RandRange(LB[pid], UB[pid]);
 
       for (usize eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
@@ -723,7 +723,7 @@ void Evolution::Population::InitializeOffspring(usize nParents)
   PROFILE_FUNCTION;
   if (mConsoleOutput)
     LOG_FUNCTION("Offspring initialization");
-  offspring = zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
+  offspring = Zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
   for (usize eid = 0; eid < entities.size(); ++eid)
   {
     offspring[eid].params = entities[eid].params;
@@ -769,7 +769,7 @@ void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
 void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, f64 CR)
 {
   PROFILE_FUNCTION;
-  crossoverParameters = zerovect(params.size(), false);
+  crossoverParameters = Zerovect(params.size(), false);
 
   switch (crossoverStrategy)
   {
@@ -778,7 +778,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
     usize definite = rand() % params.size(); // at least one param undergoes crossover
     for (usize pid = 0; pid < params.size(); ++pid)
     {
-      f64 random = rand01();
+      f64 random = RandU();
       if (random < CR or pid == definite)
         crossoverParameters[pid] = true;
     }
@@ -787,7 +787,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   case CrossoverStrategy::EXP:
   {
     usize L = 1; // at least one param undergoes crossover
-    while ((rand01() < CR) and (L < params.size()))
+    while ((RandU() < CR) and (L < params.size()))
       L++;
 
     usize pid = rand() % params.size();

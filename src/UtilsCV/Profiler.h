@@ -14,8 +14,8 @@ public:
   {
     using namespace std::chrono;
     const usize nsize = (data.nmax - data.nmin) / data.nstep + 1;
-    std::vector<std::vector<f64>> durations = zerovect2(funcs.size(), nsize, 0.);
-    std::vector<std::vector<f64>> durationfits = zerovect2(funcs.size(), nsize, 0.);
+    std::vector<std::vector<f64>> durations = Zerovect2(funcs.size(), nsize, 0.);
+    std::vector<std::vector<f64>> durationfits = Zerovect2(funcs.size(), nsize, 0.);
     std::vector<f64> ns(nsize);
     std::vector<cv::Mat> Y(funcs.size());
     for (auto& y : Y)

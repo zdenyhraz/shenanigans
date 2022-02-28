@@ -26,6 +26,9 @@ template <typename T>
 inline void AddNoiseCustom(cv::Mat& img, f64 stddev)
 {
   PROFILE_FUNCTION;
+  if (stddev <= 0)
+    return;
+
   std::random_device device;
   std::mt19937 generator(device());
   std::normal_distribution<f32> distribution(0, stddev);

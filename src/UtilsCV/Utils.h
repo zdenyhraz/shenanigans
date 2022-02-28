@@ -39,77 +39,47 @@ inline cv::Mat LoadUnitFloatImage(const std::string& path)
   return mat;
 }
 
-inline f64 magnitude(const cv::Point2f& pt)
+inline f64 Magnitude(const cv::Point2f& pt)
 {
-  return sqrt(sqr(pt.x) + sqr(pt.y));
+  return sqrt(Sqr(pt.x) + Sqr(pt.y));
 }
 
-inline f64 angle(const cv::Point2f& pt)
+inline f64 Angle(const cv::Point2f& pt)
 {
-  return toDegrees(atan2(pt.y, pt.x));
+  return ToDegrees(atan2(pt.y, pt.x));
 }
 
-inline std::pair<f64, f64> minMaxMat(const cv::Mat& sourceimg)
+inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
 {
   f64 minR, maxR;
-  minMaxLoc(sourceimg, &minR, &maxR, nullptr, nullptr);
+  minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
   return std::make_pair(minR, maxR);
 }
 
-inline std::string to_string(const cv::Point2d& point)
+inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
 {
-  return std::string("[" + std::to_string(point.x) + "," + std::to_string(point.y) + "]");
+  if (Y.rows != X.rows)
+    throw std::runtime_error("Data count mismatch");
+
+  return (X.t() * X).inv() * X.t() * Y;
 }
 
-inline cv::Point2d findCentroid(const cv::Mat& mat)
-{
-  f32 m00 = 0, m10 = 0, m01 = 0;
-  for (i32 r = 0; r < mat.rows; ++r)
-  {
-    const auto matp = mat.ptr<f32>(r);
-    for (i32 c = 0; c < mat.cols; ++c)
-    {
-      const auto val = matp[c];
-      m00 += val;
-      m10 += val * c;
-      m01 += val * r;
-    }
-  }
-
-  return cv::Point2d(static_cast<f64>(m10) / m00, static_cast<f64>(m01) / m00);
-}
-
-inline cv::Point2d median(std::vector<cv::Point2d>& vec)
-{
-  // function changes the vec order, watch out
-  std::sort(vec.begin(), vec.end(), [](cv::Point2d a, cv::Point2d b) { return a.x < b.x; });
-  return vec[vec.size() / 2];
-}
-
-inline cv::Point2f mean(const std::vector<cv::Point2f>& vec)
-{
-  cv::Point2f mean(0, 0);
-  for (auto& x : vec)
-    mean += x;
-  return mean * (1. / vec.size());
-}
-
-inline void Shift(cv::Mat& image, const cv::Point2f& shift)
+inline void Shift(cv::Mat& mat, const cv::Point2f& shift)
 {
   cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-  warpAffine(image, image, T, image.size());
+  warpAffine(mat, mat, T, mat.size());
 }
 
-inline void Shift(cv::Mat& image, f32 shiftx, f32 shifty)
+inline void Shift(cv::Mat& mat, f32 shiftx, f32 shifty)
 {
-  Shift(image, {shiftx, shifty});
+  Shift(mat, {shiftx, shifty});
 }
 
-inline void Rotate(cv::Mat& image, f32 rot, f32 scale = 1)
+inline void Rotate(cv::Mat& mat, f32 rot, f32 scale = 1)
 {
-  cv::Point2f center((f32)image.cols / 2, (f32)image.rows / 2);
+  cv::Point2f center((f32)mat.cols / 2, (f32)mat.rows / 2);
   cv::Mat R = getRotationMatrix2D(center, rot, scale);
-  warpAffine(image, image, R, image.size());
+  warpAffine(mat, mat, R, mat.size());
 }
 
 template <typename T>

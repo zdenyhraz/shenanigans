@@ -58,14 +58,14 @@ inline cv::Mat Kirkl(i32 rows, i32 cols, f64 radius)
 {
   PROFILE_FUNCTION;
   cv::Mat mat = cv::Mat(rows, cols, GetMatType<T>());
-  const i32 radsq = sqr(radius);
+  const i32 radsq = Sqr(radius);
   const i32 rowsh = rows / 2;
   const i32 colsh = cols / 2;
   for (i32 r = 0; r < rows; ++r)
   {
     auto matp = mat.ptr<T>(r);
     for (i32 c = 0; c < cols; ++c)
-      matp[c] = (sqr(r - rowsh) + sqr(c - colsh)) <= radsq;
+      matp[c] = (Sqr(r - rowsh) + Sqr(c - colsh)) <= radsq;
   }
   return mat;
 }

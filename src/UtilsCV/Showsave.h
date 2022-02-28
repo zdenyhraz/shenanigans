@@ -1,7 +1,7 @@
 #pragma once
 #include "Colormap.h"
 
-inline void showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
@@ -19,16 +19,16 @@ inline void showimg(const cv::Mat& sourceimgIn, const std::string& windowname, b
   if (sourceimg.channels() == 1)
   {
     if (color)
-      sourceimg = applyQuantileColorMap(sourceimg, quantileB, quantileT);
+      sourceimg = ApplyQuantileColormap(sourceimg, quantileB, quantileT);
     else if (quantileB != 0 or quantileT != 1)
-      sourceimg = applyQuantile(sourceimg, quantileB, quantileT);
+      sourceimg = ApplyQuantile(sourceimg, quantileB, quantileT);
   }
 
   imshow(windowname, sourceimg);
   cv::waitKey(1);
 }
 
-inline void showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   // 1st image determines the main hconcat height
   i32 mainHeight = sourceimgIns[0].rows;
@@ -48,32 +48,32 @@ inline void showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string&
 
   cv::Mat concatenated;
   hconcat(sourceimgs, concatenated);
-  showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
+  Showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
+inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
 {
-  cv::Mat saveimg = sourceimgIn.clone();
+  cv::Mat img = sourceimgIn.clone();
 
   if (size != cv::Size2i(0, 0))
   {
     if (bilinear)
-      resize(sourceimgIn, saveimg, size, 0, 0, cv::INTER_LINEAR);
+      resize(sourceimgIn, img, size, 0, 0, cv::INTER_LINEAR);
     else
-      resize(sourceimgIn, saveimg, size, 0, 0, cv::INTER_NEAREST);
+      resize(sourceimgIn, img, size, 0, 0, cv::INTER_NEAREST);
   }
 
-  normalize(saveimg, saveimg, 0, 255, cv::NORM_MINMAX);
-  saveimg.convertTo(saveimg, CV_8U);
+  normalize(img, img, 0, 255, cv::NORM_MINMAX);
+  img.convertTo(img, CV_8U);
 
-  if (saveimg.channels() == 1)
+  if (img.channels() == 1)
   {
     if (color)
-      saveimg = applyQuantileColorMap(saveimg, quantileB, quantileT);
+      img = ApplyQuantileColormap(img, quantileB, quantileT);
     else if (quantileB != 0 or quantileT != 1)
-      saveimg = applyQuantile(saveimg, quantileB, quantileT);
+      img = ApplyQuantile(img, quantileB, quantileT);
   }
 
-  imwrite(path, saveimg);
+  imwrite(path, img);
   LOG_DEBUG("Saved image to {}", std::filesystem::weakly_canonical(path));
 }

@@ -61,7 +61,7 @@ try
     LOG_INFO("Evaluated rotation: {} deg", rotation);
     LOG_INFO("Evaluated scale: {}", 1.f / scale);
     LOG_INFO("Evaluated shift: {} px", shiftT);
-    showimg(ColorComposition(image1, image2), "color composition result", 0, 0, 1, 1000);
+    Showimg(ColorComposition(image1, image2), "color composition result", 0, 0, 1, 1000);
   }
   return image2;
 }
@@ -496,8 +496,9 @@ try
     cv::Mat image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
     cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
     const f64 shiftmax = 10.;
-    cv::Point2d shift(rand11() * shiftmax, rand11() * shiftmax);
-    cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
+    cv::Point2d shift(RandRange(-1, 1) * shiftmax, RandRange(-1, 1) * shiftmax);
+    cv::Point2i point(std::clamp(RandU() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
+        std::clamp(RandU() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
     cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
     cv::Mat imageShifted;
     warpAffine(image, imageShifted, Tmat, image.size());
@@ -847,8 +848,9 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
     for (i32 i = 0; i < itersPerImage; ++i)
     {
       // random shift from a random point
-      cv::Point2d shift(rand11() * maxShift, rand11() * maxShift);
-      cv::Point2i point(clamp(rand01() * image.cols, mCols, image.cols - mCols), clamp(rand01() * image.rows, mRows, image.rows - mRows));
+      cv::Point2d shift(RandRange(-1, 1) * maxShift, RandRange(-1, 1) * maxShift);
+      cv::Point2i point(std::clamp(RandU() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
+          std::clamp(RandU() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
       cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
       warpAffine(image, imageShifted, Tmat, image.size());
@@ -867,7 +869,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
       {
         cv::Mat hcct;
         hconcat(image1, image2, hcct);
-        showimg(hcct, fmt::format("IPC optimization pair {}", i));
+        Showimg(hcct, fmt::format("IPC optimization pair {}", i));
       }
     }
   }
@@ -1118,7 +1120,7 @@ void IterativePhaseCorrelation<Float>::ShowRandomImagePair(const std::vector<std
   PROFILE_FUNCTION;
   LOG_FUNCTION("ShowRandomImagePair");
 
-  const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(rand01() * imagePairs.size())];
+  const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(RandU() * imagePairs.size())];
   cv::Mat concat;
   hconcat(img1, img2, concat);
   Plot2D::Set("Random image pair");

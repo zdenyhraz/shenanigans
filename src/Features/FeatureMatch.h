@@ -115,8 +115,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     }
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const f64 spd = magnitude(shift) * kmpp / dt;
-    const f64 dir = toDegrees(atan2(-shift.y, shift.x));
+    const f64 spd = Magnitude(shift) * kmpp / dt;
+    const f64 dir = ToDegrees(atan2(-shift.y, shift.x));
 
     if (std::any_of(removeSpeeds.begin(), removeSpeeds.end(), [&](const auto& remspd) { return std::abs(spd - remspd) < 1; }))
       continue;
@@ -157,13 +157,13 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
       continue;
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const f64 spd = magnitude(shift) * kmpp / dt;
+    const f64 spd = Magnitude(shift) * kmpp / dt;
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
     cv::Point2f arrStart = data.upscale * pts.first;
     cv::Point2f arrEnd = data.upscale * pts.first + arrow_scale * out.cols / maxspd * (pts.second - pts.first);
     cv::Point2f textpos = (arrStart + arrEnd) / 2;
-    cv::Scalar color = colorMapJet(spd, 100, 1050); // not too strong colors
+    cv::Scalar color = ColormapJet(spd, 100, 1050); // not too strong colors
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
     arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, cv::LINE_AA, 0, 0.1);
@@ -204,7 +204,7 @@ inline cv::Mat DrawFeatureMatchArrows(
       if (!otherdraw)
         continue;
 
-      if (magnitude(kp1[match.queryIdx].pt - kp2[othermatch.queryIdx].pt) < data.overlapdistance)
+      if (Magnitude(kp1[match.queryIdx].pt - kp2[othermatch.queryIdx].pt) < data.overlapdistance)
         otherdraw = false;
     }
   }
@@ -215,10 +215,10 @@ inline cv::Mat DrawFeatureMatchArrows(
       continue;
 
     const auto pts = GetFeatureMatchPoints(match, kp1, kp2);
-    const f64 spd = magnitude(GetFeatureMatchShift(match, kp1, kp2));
-    const f64 diagonal = sqrt(sqr(img.rows) + sqr(img.cols));
+    const f64 spd = Magnitude(GetFeatureMatchShift(match, kp1, kp2));
+    const f64 diagonal = sqrt(Sqr(img.rows) + Sqr(img.cols));
 
-    cv::Scalar color = colorMapJet(spd, 0, 0.3 * diagonal);
+    cv::Scalar color = ColormapJet(spd, 0, 0.3 * diagonal);
     arrowedLine(out, pts.first, pts.second, color, 0.002 * out.cols, cv::LINE_AA, 0, 0.1);
   }
 
@@ -282,7 +282,7 @@ try
       LOG_FUNCTION("Draw matches");
       cv::Mat img_matches;
       drawMatches(img1, keypoints1, img2, keypoints2, matches, img_matches, cv::Scalar(0, 255, 255), cv::Scalar(0, 255, 0), std::vector<char>(), cv::DrawMatchesFlags::DEFAULT);
-      showimg(img_matches, "Good matches");
+      Showimg(img_matches, "Good matches");
     }
   }
 
@@ -300,8 +300,8 @@ try
       const auto& [idx2, pic2, match2, ignore2] = b;
       const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
       const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-      const auto spd1 = magnitude(shift1);
-      const auto spd2 = magnitude(shift2);
+      const auto spd1 = Magnitude(shift1);
+      const auto spd2 = Magnitude(shift2);
       return spd1 > spd2;
     });
 
@@ -331,7 +331,7 @@ try
           continue;
 
         const auto shift = keypoints1_all[pic][match.queryIdx].pt - keypoints1_all[otherpic][othermatch.queryIdx].pt;
-        const f64 distance = magnitude(shift);
+        const f64 distance = Magnitude(shift);
         otheroverlap = distance < data.overlapdistance;
       }
     }
@@ -340,11 +340,11 @@ try
   const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, false);
   const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, true);
 
-  showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
-  showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
+  Showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
+  Showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
 
-  saveimg("Debug/arrowsIdx.png", arrowsIdx);
-  saveimg("Debug/arrowsSpd.png", arrowsSpd);
+  Saveimg("Debug/arrowsIdx.png", arrowsIdx);
+  Saveimg("Debug/arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
@@ -391,8 +391,8 @@ try
   Plot2D::Plot(img2);
 
   const auto arrows = DrawFeatureMatchArrows(img1, matches, keypoints1, keypoints2, data);
-  showimg(arrows, "matches", false, 0, 1, 1024);
-  saveimg("Debug/featurematch_ARR.png", arrows);
+  Showimg(arrows, "matches", false, 0, 1, 1024);
+  Saveimg("Debug/featurematch_ARR.png", arrows);
 }
 catch (const std::exception& e)
 {

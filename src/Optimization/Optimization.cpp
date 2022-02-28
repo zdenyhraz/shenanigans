@@ -4,8 +4,8 @@
 OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
 {
   PROFILE_FUNCTION;
-  mLB = zerovect(N, -1.);
-  mUB = zerovect(N, 1.);
+  mLB = Zerovect(N, -1.);
+  mUB = Zerovect(N, 1.);
   mParameterNames = std::vector<std::string>(N, "");
   mParameterValueToNameFunctions = std::vector<std::function<std::string(f64)>>(N, nullptr);
 

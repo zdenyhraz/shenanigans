@@ -8,13 +8,13 @@ inline std::vector<f64> inverseMappingZH(const std::vector<std::vector<f64>>& tr
 
   // degenerate safety checks
   if (trials < (degree * N + 1)) // underdetermined system
-    return zerovect(N, 0.);
+    return Zerovect(N, 0.);
 
   if (trialInputs.size() != trialOutputs.size()) // system makes no sense
-    return zerovect(N, 0.);
+    return Zerovect(N, 0.);
 
   if (trialInputs[0].size() != trialOutputs[0].size()) // zero or infinite solutions
-    return zerovect(N, 0.);
+    return Zerovect(N, 0.);
 
   // fill input trial matrix
   cv::Mat trialInputsM = cv::Mat::zeros(trials, degree * N + 1, CV_32F);

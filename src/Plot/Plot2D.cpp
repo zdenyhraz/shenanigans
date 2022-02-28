@@ -19,7 +19,7 @@ Plot2D& Plot2D::GetPlot(const std::string& name)
 void Plot2D::PlotCore(const cv::Mat& z)
 {
   PROFILE_FUNCTION;
-  std::vector<std::vector<double>> zv = zerovect2(z.rows, z.cols);
+  std::vector<std::vector<double>> zv = Zerovect2(z.rows, z.cols);
 
   if (z.depth() != CV_32F)
   {

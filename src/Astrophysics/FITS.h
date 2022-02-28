@@ -145,12 +145,12 @@ private:
 
   static void DebugValues(const cv::Mat& mat, const FitsParams& params)
   {
-    auto [mmin, mmax] = minMaxMat(mat);
+    auto [mmin, mmax] = MinMax(mat);
     LOG_INFO("min/max mat {}/{}", mmin, mmax);
     cv::Mat xd = mat.clone();
     cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
     circle(xd, cv::Point(mat.cols / 2, mat.rows / 2), params.R, cv::Scalar(0, 0, 65535), 5);
-    showimg(xd, "xd");
+    Showimg(xd, "xd");
   }
 
   static void DebugCircles(const cv::Mat& mat, const FitsParams& params)
@@ -218,11 +218,11 @@ private:
 
     if constexpr (0) // show
     {
-      showimg(RoiCrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
-      showimg(RoiCrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
-      showimg(RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
-      showimg(RoiCrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
-      showimg(RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
+      Showimg(RoiCrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC" + std::to_string(rand()));
+      Showimg(RoiCrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL" + std::to_string(rand()));
+      Showimg(RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR" + std::to_string(rand()));
+      Showimg(RoiCrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT" + std::to_string(rand()));
+      Showimg(RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB" + std::to_string(rand()));
     }
   }
 
