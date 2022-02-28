@@ -12,6 +12,7 @@ im = plt.imshow(z,
                 extent=[xmin, xmax, ymin, ymax],
                 interpolation='bilinear' if interp else 'none',
                 aspect='auto')
+
 cbar = plt.colorbar(im)
 
 if xlabel:

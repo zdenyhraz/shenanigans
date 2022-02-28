@@ -18,8 +18,15 @@ X, Y = np.meshgrid(X, Y)
 
 plt.clf()
 ax = fig.gca(projection='3d')
-surf = ax.plot_surface(X, Y, Z, cmap=cmap, edgecolor='none', linewidth=0,
-                       antialiased=False, rstride=max(int(ysize/n), 1), cstride=max(int(xsize/n), 1))
+surf = ax.plot_surface(
+    X, Y, Z,
+    cmap=cmap,
+    edgecolor='none',
+    linewidth=0,
+    antialiased=False,
+    rstride=rstride if rstride else max(int(ysize / n), 1),
+    cstride=cstride if cstride else max(int(xsize / n), 1))
+
 ax.view_init(elev=25, azim=-130)
 ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)

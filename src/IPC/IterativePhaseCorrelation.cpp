@@ -701,7 +701,7 @@ template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL3(const cv::Mat& L3) const
 {
   PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
-  PyPlot::PlotSurf(fmt::format("{} L3", mDebugName), {.z = L3, .save = not mDebugDirectory.empty() ? fmt::format("{}/L3_{}.png", mDebugDirectory, mDebugIndex) : ""});
+  PyPlot::PlotSurf(fmt::format("{} L3 surf", mDebugName), {.z = L3, .rstride = 1, .cstride = 1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L3_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>
@@ -753,7 +753,7 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
   cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
   if (last)
-    PyPlot::PlotSurf(fmt::format("{} L1A", mDebugName), {.z = L1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1As_{}.png", mDebugDirectory, mDebugIndex) : ""});
+    PyPlot::PlotSurf(fmt::format("{} L1A surf", mDebugName), {.z = L1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1As_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>

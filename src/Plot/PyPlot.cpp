@@ -10,9 +10,8 @@ void PyPlot::PlotInternal(const std::string& name, const Data1D& data)
 try
 {
   PROFILE_FUNCTION;
-  const auto plotname = fmt::format("{} 1d", name);
-  CheckIfPlotExists(plotname);
-  py::eval_file("../script/plot/plot_1d.py", GetScopeData(plotname, data));
+  CheckIfPlotExists(name);
+  py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
@@ -23,22 +22,20 @@ void PyPlot::PlotInternal(const std::string& name, const Data2D& data)
 try
 {
   PROFILE_FUNCTION;
-  const auto plotname = fmt::format("{} 2d", name);
-  CheckIfPlotExists(plotname);
-  py::eval_file("../script/plot/plot_2d.py", GetScopeData(plotname, data));
+  CheckIfPlotExists(name);
+  py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
   LOG_ERROR("PyPlot::Plot error: {}", e.what());
 }
 
-void PyPlot::PlotSurfInternal(const std::string& name, const Data2D& data)
+void PyPlot::PlotInternal(const std::string& name, const Data3D& data)
 try
 {
   PROFILE_FUNCTION;
-  const auto plotname = fmt::format("{} surf", name);
-  CheckIfPlotExists(plotname);
-  py::eval_file("../script/plot/plot_surf.py", GetScopeData(plotname, data));
+  CheckIfPlotExists(name);
+  py::eval_file("../script/plot/plot_3d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
@@ -55,11 +52,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
 {
   PROFILE_FUNCTION;
   py::dict scope;
-  if (data.x.empty())
-  {
-    std::vector<f64> x(not data.y.empty() ? data.y.size() : data.ys.size());
-    std::iota(x.begin(), x.end(), 0);
-  }
   scope["id"] = mPlotIds[name];
   scope["x"] = not data.x.empty() ? data.x : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
   scope["y"] = data.y;
@@ -84,7 +76,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["aspectratio"] = data.aspectratio;
   scope["save"] = data.save;
   scope["title"] = not data.title.empty() ? data.title : name;
-
   return scope;
 }
 
@@ -113,6 +104,34 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   scope["cmap"] = data.cmap;
   scope["save"] = data.save;
   scope["title"] = not data.title.empty() ? data.title : name;
+  return scope;
+}
 
+py::dict PyPlot::GetScopeData(const std::string& name, const Data3D& data)
+{
+  PROFILE_FUNCTION;
+  cv::Mat mz = data.z.clone();
+  mz.convertTo(mz, CV_32F);
+  auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
+  for (i32 r = 0; r < mz.rows; ++r)
+    for (i32 c = 0; c < mz.cols; ++c)
+      z[r][c] = mz.at<f32>(r, c);
+
+  py::dict scope;
+  scope["id"] = mPlotIds[name];
+  scope["z"] = z;
+  scope["xlabel"] = data.xlabel;
+  scope["ylabel"] = data.ylabel;
+  scope["zlabel"] = data.zlabel;
+  scope["xmin"] = data.xmin;
+  scope["xmax"] = data.xmax;
+  scope["ymin"] = data.ymin;
+  scope["ymax"] = data.ymax;
+  scope["aspectratio"] = data.aspectratio;
+  scope["cmap"] = data.cmap;
+  scope["rstride"] = data.rstride;
+  scope["cstride"] = data.cstride;
+  scope["save"] = data.save;
+  scope["title"] = not data.title.empty() ? data.title : name;
   return scope;
 }

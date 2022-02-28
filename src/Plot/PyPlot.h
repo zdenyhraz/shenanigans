@@ -33,9 +33,21 @@ public:
     std::string title;
   };
 
+  struct Data3D
+  {
+    cv::Mat z;
+    f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
+    std::string xlabel = "x", ylabel = "y", zlabel = "z";
+    f64 aspectratio = 1;
+    std::string cmap = "jet";
+    u32 rstride = 0, cstride = 0;
+    std::string save;
+    std::string title;
+  };
+
   static void Plot(const std::string& name, const Data1D& data) { Get().PlotInternal(name, data); }
   static void Plot(const std::string& name, const Data2D& data) { Get().PlotInternal(name, data); }
-  static void PlotSurf(const std::string& name, const Data2D& data) { Get().PlotSurfInternal(name, data); }
+  static void PlotSurf(const std::string& name, const Data3D& data) { Get().PlotInternal(name, data); }
 
 private:
   std::map<std::string, u32> mPlotIds;
@@ -52,7 +64,8 @@ private:
   void CheckIfPlotExists(const std::string& name);
   py::dict GetScopeData(const std::string& name, const Data1D& data);
   py::dict GetScopeData(const std::string& name, const Data2D& data);
+  py::dict GetScopeData(const std::string& name, const Data3D& data);
   void PlotInternal(const std::string& name, const Data1D& data);
   void PlotInternal(const std::string& name, const Data2D& data);
-  void PlotSurfInternal(const std::string& name, const Data2D& data);
+  void PlotInternal(const std::string& name, const Data3D& data);
 };
