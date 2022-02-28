@@ -124,7 +124,7 @@ try
 
   if (1)
   {
-    const usize n = 101;
+    const usize n = 1001;
     cv::Mat mat(n, n, CV_32F);
     for (u32 r = 0; r < n; ++r)
     {

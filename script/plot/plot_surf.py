@@ -8,15 +8,22 @@ if fig.get_figheight() < 5:
   fig.set_figheight(fig.get_figheight()*2)
   fig.set_figwidth(fig.get_figwidth()*2*aspectratio)
 
-plt.clf()
-
 Z = np.array([np.array(row) for row in z])
-X = np.linspace(xmin, xmax, len(z[0]))
-Y = np.linspace(ymin, ymax, len(z))
+xsize = Z.shape[0]
+ysize = Z.shape[1]
+n = 101
+X = np.linspace(xmin, xmax, xsize)
+Y = np.linspace(ymin, ymax, ysize)
 X, Y = np.meshgrid(X, Y)
 
+plt.clf()
 ax = fig.gca(projection='3d')
-surf = ax.plot_surface(X, Y, Z, cmap=cmap, edgecolor='none', antialiased=True)
+surf = ax.plot_surface(X, Y, Z, cmap=cmap, edgecolor='none', linewidth=0,
+                       antialiased=False, rstride=int(ysize/n), cstride=int(xsize/n))
+
+ax.view_init(elev=25, azim=-130)
+ax.set_xlim(xmin, xmax)
+ax.set_ylim(ymin, ymax)
 cbar = fig.colorbar(surf, shrink=0.7, aspect=15)
 
 if xlabel:
