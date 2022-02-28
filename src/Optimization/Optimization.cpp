@@ -72,6 +72,9 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     minLoc = minLocf;
   }
 
+  PyPlot::PlotSurf(fmt::format("Objective function landscape: {} raw surf", funName), {.z = landscape});
+  PyPlot::PlotSurf(fmt::format("Objective function landscape: {} log surf", funName), {.z = landscapeLog});
+
   static constexpr f64 pointSizeMultiplierMin = 0.01;
   static constexpr f64 pointSizeMultiplierBest = 0.008;
   static constexpr f64 pointSizeMultiplierEvaluated = 0.004;
@@ -159,33 +162,10 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   DrawCircledPoint(landscape, minLoc, pointColorMin, pointSizeMin, pointThickness);
   DrawCircledPoint(landscapeLog, minLoc, pointColorMinLog, pointSizeMin, pointThickness);
 
-  if (true)
-  {
-    Plot2D::Set(fmt::format("Objective function landscape: {} raw", funName));
-    Plot2D::SetXmin(xmin);
-    Plot2D::SetXmax(xmax);
-    Plot2D::SetYmin(ymin);
-    Plot2D::SetYmax(ymax);
-    Plot2D::SetXlabel(xName);
-    Plot2D::SetYlabel(yName);
-    Plot2D::SetZlabel("obj");
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::Plot(landscape);
-  }
-
-  if (true)
-  {
-    Plot2D::Set(fmt::format("Objective function landscape: {} log", funName));
-    Plot2D::SetXmin(xmin);
-    Plot2D::SetXmax(xmax);
-    Plot2D::SetYmin(ymin);
-    Plot2D::SetYmax(ymax);
-    Plot2D::SetXlabel(xName);
-    Plot2D::SetYlabel(yName);
-    Plot2D::SetZlabel(fmt::format("log({:.1e}+obj)", logConstant));
-    Plot2D::ShowAxisLabels(true);
-    Plot2D::Plot(landscapeLog);
-  }
+  PyPlot::Plot(
+      fmt::format("Objective function landscape: {} raw", funName), {.z = landscape, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xName, .ylabel = yName, .zlabel = "obj"});
+  PyPlot::Plot(fmt::format("Objective function landscape: {} log", funName),
+      {.z = landscapeLog, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xName, .ylabel = yName, .zlabel = fmt::format("log({:.1e}+obj)", logConstant)});
 }
 
 const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
