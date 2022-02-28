@@ -33,16 +33,26 @@ public:
     std::string title;
   };
 
-  static void Initialize();
-  static void Plot(std::string&& name, Data1D&& data);
-  static void Plot(std::string&& name, Data2D&& data);
+  static void Plot(const std::string& name, const Data1D& data) { Get().PlotInternal(name, data); }
+  static void Plot(const std::string& name, const Data2D& data) { Get().PlotInternal(name, data); }
+  static void PlotSurf(const std::string& name, const Data2D& data) { Get().PlotSurfInternal(name, data); }
 
 private:
-  inline static std::unordered_map<std::string, u32> mPlotIds;
-  inline static u32 mId = 0;
-  inline static std::once_flag mInitialized;
+  std::map<std::string, u32> mPlotIds;
+  u32 mId = 0;
 
-  static void CheckIfPlotExists(const std::string& name);
-  static py::dict GetScopeData(const std::string& name, const Data1D& data);
-  static py::dict GetScopeData(const std::string& name, const Data2D& data);
+  PyPlot();
+
+  static PyPlot& Get()
+  {
+    static PyPlot plt;
+    return plt;
+  }
+
+  void CheckIfPlotExists(const std::string& name);
+  py::dict GetScopeData(const std::string& name, const Data1D& data);
+  py::dict GetScopeData(const std::string& name, const Data2D& data);
+  void PlotInternal(const std::string& name, const Data1D& data);
+  void PlotInternal(const std::string& name, const Data2D& data);
+  void PlotSurfInternal(const std::string& name, const Data2D& data);
 };

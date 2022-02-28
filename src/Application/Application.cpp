@@ -10,11 +10,6 @@ void PythonInitialize()
   static py::scoped_interpreter guard{};
 }
 
-void PyPlotInitialize()
-{
-  PyPlot::Initialize();
-}
-
 void QtInitialize()
 {
   qputenv("QT_SCALE_FACTOR", "2.0");
@@ -28,7 +23,6 @@ try
   RandInitialize();
   QtInitialize();
   PythonInitialize();
-  PyPlotInitialize();
 
   QApplication application(argc, argv);
   WindowShenanigans window;

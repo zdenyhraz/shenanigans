@@ -1,14 +1,12 @@
 #include "PyPlot.h"
 
-void PyPlot::Initialize()
+PyPlot::PyPlot()
 {
-  std::call_once(mInitialized, []() {
-    PROFILE_FUNCTION;
-    py::eval_file("../script/plot/plot_init.py");
-  });
+  PROFILE_FUNCTION;
+  py::eval_file("../script/plot/plot_init.py");
 }
 
-void PyPlot::Plot(std::string&& name, Data1D&& data)
+void PyPlot::PlotInternal(const std::string& name, const Data1D& data)
 try
 {
   PROFILE_FUNCTION;
@@ -20,12 +18,24 @@ catch (const std::exception& e)
   LOG_ERROR("PyPlot::Plot error: {}", e.what());
 }
 
-void PyPlot::Plot(std::string&& name, Data2D&& data)
+void PyPlot::PlotInternal(const std::string& name, const Data2D& data)
 try
 {
   PROFILE_FUNCTION;
   CheckIfPlotExists(name);
   py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("PyPlot::Plot error: {}", e.what());
+}
+
+void PyPlot::PlotSurfInternal(const std::string& name, const Data2D& data)
+try
+{
+  PROFILE_FUNCTION;
+  CheckIfPlotExists(name);
+  py::eval_file("../script/plot/plot_surf.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {

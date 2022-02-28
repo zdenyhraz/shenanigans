@@ -122,6 +122,24 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
+  if (1)
+  {
+    const usize n = 101;
+    cv::Mat mat(n, n, CV_32F);
+    for (u32 r = 0; r < n; ++r)
+    {
+      auto matp = mat.ptr<f32>(r);
+      for (u32 c = 0; c < n; ++c)
+      {
+        const f32 radius = std::sqrt(Sqr(r - n / 2) + Sqr(c - n / 2));
+        matp[c] = 100. * std::exp(-Sqr(radius) / Sqr(0.2 * n));
+      }
+    }
+
+    PyPlot::Plot("normal", {.z = mat});
+    PyPlot::PlotSurf("surf", {.z = mat});
+    return;
+  }
   if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
