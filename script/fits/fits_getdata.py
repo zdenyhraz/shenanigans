@@ -71,14 +71,6 @@ def ParseArguments():
       if opt == "--idcount":
         parameters["idcount"] = arg
 
-    # required parameters
-    parameters["name"]
-    parameters["outputdir"]
-    parameters["idstart"]
-    parameters["idstep"]
-    parameters["idstride"]
-    parameters["idcount"]
-
     return parameters
 
   except Exception as error:
