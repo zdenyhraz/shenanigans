@@ -22,10 +22,10 @@ if zlabel:
   cbar.set_label(zlabel)
 if title:
   plt.title(title)
-if save:
-  plt.savefig(save, bbox_inches='tight')
 
 plt.set_cmap(cmap)
 plt.tight_layout()
 plt.draw()
 plt.pause(1e-9)
+if save:
+  plt.savefig(save, bbox_inches='tight')

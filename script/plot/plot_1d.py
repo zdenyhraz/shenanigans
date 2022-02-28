@@ -39,14 +39,14 @@ if ylabel:
   ax1.set_ylabel(ylabel)
 if ax2 and y2label:
   ax2.set_ylabel(y2label)
-if title:
-  plt.title(title)
 if label_y or label_ys or label_y2 or label_y2s:
   labels = [line.get_label() for line in lines]
   plt.legend(lines, labels)
-if save:
-  plt.savefig(save, bbox_inches='tight')
+if title:
+  plt.title(title)
 
 plt.tight_layout()
 plt.draw()
 plt.pause(1e-9)
+if save:
+  plt.savefig(save, bbox_inches='tight')

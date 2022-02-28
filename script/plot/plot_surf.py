@@ -20,7 +20,6 @@ plt.clf()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(X, Y, Z, cmap=cmap, edgecolor='none', linewidth=0,
                        antialiased=False, rstride=max(int(ysize/n), 1), cstride=max(int(xsize/n), 1))
-
 ax.view_init(elev=25, azim=-130)
 ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)
@@ -34,10 +33,10 @@ if zlabel:
   cbar.set_label(zlabel)
 if title:
   plt.title(title)
-if save:
-  plt.savefig(save, bbox_inches='tight')
 
 plt.set_cmap(cmap)
 plt.tight_layout()
 plt.draw()
 plt.pause(1e-9)
+if save:
+  plt.savefig(save, bbox_inches='tight')

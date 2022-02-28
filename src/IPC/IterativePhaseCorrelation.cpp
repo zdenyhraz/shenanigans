@@ -484,12 +484,12 @@ try
   LOG_FUNCTION("ShowDebugStuff()");
 
   constexpr bool DebugMode = true;
-  constexpr bool addNoise = false;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
+  constexpr bool addNoise = false;
 
   if constexpr (debugShift)
   {
@@ -519,18 +519,21 @@ try
 
   if constexpr (debugGradualShift)
   {
-    SetDebugDirectory("../data/peakshift/new");
+    SetDebugDirectory("../data/peakshift");
     const cv::Mat image1 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
     const cv::Mat crop1 = RoiCropMid(image1, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
     const f64 totalshift = 2.;
-    const f64 noiseStdev = 0.01;
-    cv::Mat noise = GetNoise(crop2.size(), noiseStdev);
+    cv::Mat noise2;
 
     if constexpr (addNoise)
-      AddNoise<Float>(crop1, noiseStdev);
+    {
+      const f64 noiseStdev = 0.01;
+      crop1 += GetNoise<Float>(crop1.size(), noiseStdev);
+      noise2 = GetNoise<Float>(crop1.size(), noiseStdev);
+    }
 
     for (i32 i = 0; i < iters; i++)
     {
@@ -539,8 +542,8 @@ try
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       warpAffine(image1, image2, Tmat, image2.size());
       crop2 = RoiCropMid(image2, mCols, mRows);
-      if (addNoise)
-        crop2 += noise;
+      if constexpr (addNoise)
+        crop2 += noise2;
       SetDebugTrueShift(shift);
       const auto ipcshift = Calculate<DebugMode>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
@@ -692,15 +695,13 @@ void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& cr
   PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
       {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
           .label_ys = {"x", "y"}});
-  PyPlot::PlotSurf(fmt::format("{} CP phase", mDebugName),
-      {.z = Fourier::fftshift(Fourier::phase(crosspower)), .save = not mDebugDirectory.empty() ? fmt::format("{}/CPSs_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL3(const cv::Mat& L3) const
 {
   PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
-  PyPlot::PlotSurf(fmt::format("{} L3", mDebugName), {.z = L3});
+  PyPlot::PlotSurf(fmt::format("{} L3", mDebugName), {.z = L3, .save = not mDebugDirectory.empty() ? fmt::format("{}/L3_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>
