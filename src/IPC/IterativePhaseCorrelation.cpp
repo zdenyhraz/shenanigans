@@ -484,6 +484,7 @@ try
   LOG_FUNCTION("ShowDebugStuff()");
 
   constexpr bool DebugMode = true;
+  constexpr bool CrossCorrelation = false;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
@@ -494,8 +495,7 @@ try
   if constexpr (debugShift)
   {
     cv::Mat image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
-    cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
-    const f64 shiftmax = 10.;
+    const f64 shiftmax = 0.5 * mRows;
     cv::Point2d shift(RandRange(-1, 1) * shiftmax, RandRange(-1, 1) * shiftmax);
     cv::Point2i point(std::clamp(RandU() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
         std::clamp(RandU() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
@@ -513,7 +513,7 @@ try
       AddNoise<Float>(image2, noiseStdev);
     }
 
-    auto ipcshift = Calculate<DebugMode>(image1, image2);
+    auto ipcshift = Calculate<DebugMode, CrossCorrelation>(image1, image2);
     LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
   }
 
