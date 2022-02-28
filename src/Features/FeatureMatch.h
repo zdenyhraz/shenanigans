@@ -80,7 +80,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
   cvtColor(img, out, cv::COLOR_GRAY2BGR);
 
   if (data.upscale != 1)
-    resize(out, out, cv::Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, cv::INTER_LINEAR);
+    cv::resize(out, out, cv::Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, cv::INTER_LINEAR);
 
   f64 minspd = std::numeric_limits<f64>::max();
   f64 maxspd = std::numeric_limits<f64>::min();

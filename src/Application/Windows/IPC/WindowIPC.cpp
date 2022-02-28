@@ -130,8 +130,8 @@ void WindowIPC::CalculateFlow()
 
   const auto [flowX, flowY] = mWindowData->IPC->CalculateFlow(img1, img2, 0.125);
   cv::Mat flowM, flowP;
-  magnitude(flowX, flowY, flowM);
-  phase(flowX, flowY, flowP);
+  cv::magnitude(flowX, flowY, flowM);
+  cv::phase(flowX, flowY, flowP);
   flowM *= 696010. / 378.3 / 11.8;
   flowP *= Constants::Rad;
 

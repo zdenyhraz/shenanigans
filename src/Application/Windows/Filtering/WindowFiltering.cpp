@@ -12,7 +12,7 @@ void WindowFiltering::HistogramEqualize()
 {
   cv::Mat img = cv::imread(ui.lineEdit->text().toStdString(), cv::IMREAD_GRAYSCALE);
 
-  normalize(img, img, 0, 255, cv::NORM_MINMAX);
+  cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
   img.convertTo(img, CV_8UC1);
 
   if (ui.checkBox->isChecked())

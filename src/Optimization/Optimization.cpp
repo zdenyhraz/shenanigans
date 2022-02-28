@@ -62,8 +62,8 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   {
     static constexpr i32 landscapeSize = 1000;
     f64 lanscapeSizeMultiplier = (f64)landscapeSize / cols;
-    resize(landscape, landscape, cv::Size(landscapeSize, lanscapeSizeMultiplier * rows), 0, 0, cv::INTER_LINEAR);
-    resize(landscapeLog, landscapeLog, cv::Size(landscapeSize, landscapeSize * rows / cols), 0, 0, cv::INTER_LINEAR);
+    cv::resize(landscape, landscape, cv::Size(landscapeSize, lanscapeSizeMultiplier * rows), 0, 0, cv::INTER_LINEAR);
+    cv::resize(landscapeLog, landscapeLog, cv::Size(landscapeSize, landscapeSize * rows / cols), 0, 0, cv::INTER_LINEAR);
     rows = landscape.rows;
     cols = landscape.cols;
     cv::Point2f minLocf = minLoc;

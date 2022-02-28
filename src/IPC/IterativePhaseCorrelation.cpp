@@ -551,12 +551,12 @@ try
   {
     cv::Mat img = RoiCrop(LoadUnitFloatImage<Float>("../data/test.png"), 2048, 2048, mCols, mRows);
     cv::Mat w, imgw;
-    createHanningWindow(w, img.size(), GetMatType<Float>());
-    multiply(img, w, imgw);
+    cv::createHanningWindow(w, img.size(), GetMatType<Float>());
+    cv::multiply(img, w, imgw);
     cv::Mat w0 = w.clone();
     cv::Mat r0 = cv::Mat::ones(w.size(), GetMatType<Float>());
-    copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(w0, w0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(r0, r0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
@@ -596,11 +596,11 @@ try
     }
 
     if (mBandpassL > 0 and mBandpassH < 1)
-      normalize(bpG, bpG, 0.0, 1.0, cv::NORM_MINMAX);
+      cv::normalize(bpG, bpG, 0.0, 1.0, cv::NORM_MINMAX);
 
     cv::Mat bpR0, bpG0;
-    copyMakeBorder(bpR, bpR0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpR, bpR0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpG, bpG0, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, mUpsampleCoeff, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
@@ -639,14 +639,14 @@ try
     cv::Mat filterRc = Fourier::dupchansc(filterR);
     cv::Mat filterGc = Fourier::dupchansc(filterG);
 
-    multiply(fftR, filterRc, fftR);
-    multiply(fftG, filterGc, fftG);
+    cv::multiply(fftR, filterRc, fftR);
+    cv::multiply(fftG, filterGc, fftG);
 
     cv::Mat imgfR = Fourier::ifft(fftR);
     cv::Mat imgfG = Fourier::ifft(fftG);
 
-    normalize(imgfR, imgfR, 0.0, 1.0, cv::NORM_MINMAX);
-    normalize(imgfG, imgfG, 0.0, 1.0, cv::NORM_MINMAX);
+    cv::normalize(imgfR, imgfR, 0.0, 1.0, cv::NORM_MINMAX);
+    cv::normalize(imgfG, imgfG, 0.0, 1.0, cv::NORM_MINMAX);
 
     // // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DBandpassImageR.png");
     Plot2D::Plot("IPCdebug2D", imgfR);
@@ -686,9 +686,9 @@ void IterativePhaseCorrelation<Float>::DebugFourierTransforms(const cv::Mat& dft
 template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
-  PyPlot::Plot(fmt::format("{} CP magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
-  PyPlot::Plot(fmt::format("{} CP magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
-  PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP cv::magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
+  PyPlot::Plot(fmt::format("{} CP cv::magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
+  PyPlot::Plot(fmt::format("{} CP cv::phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
   PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
       {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
           .label_ys = {"x", "y"}});
@@ -704,7 +704,7 @@ template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL2(const cv::Mat& L2) const
 {
   auto plot = L2.clone();
-  resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
+  cv::resize(plot, plot, plot.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L2", mDebugName), {.z = plot});
 }
 
@@ -716,9 +716,9 @@ void IterativePhaseCorrelation<Float>::DebugL2U(const cv::Mat& L2, const cv::Mat
   if (0)
   {
     cv::Mat nearest, linear, cubic;
-    resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
-    resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
-    resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
+    cv::resize(L2, nearest, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_NEAREST);
+    cv::resize(L2, linear, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_LINEAR);
+    cv::resize(L2, cubic, L2.size() * mUpsampleCoeff, 0, 0, cv::INTER_CUBIC);
 
     PyPlot::Plot("IPCL2UN", {.z = nearest});
     PyPlot::Plot("IPCL2UL", {.z = linear});
@@ -784,8 +784,8 @@ cv::Mat IterativePhaseCorrelation<Float>::ColorComposition(const cv::Mat& img1, 
 
   if (gamma1 != 1 or gamma2 != 1)
   {
-    normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
-    normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
   }
 
   return (img1c + img2c) / 2;
@@ -1122,7 +1122,7 @@ void IterativePhaseCorrelation<Float>::ShowRandomImagePair(const std::vector<std
 
   const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(RandU() * imagePairs.size())];
   cv::Mat concat;
-  hconcat(img1, img2, concat);
+  cv::hconcat(img1, img2, concat);
   Plot2D::Set("Random image pair");
   Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
   Plot2D::Plot("Random image pair", concat);

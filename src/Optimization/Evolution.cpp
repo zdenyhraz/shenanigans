@@ -808,7 +808,7 @@ f64 Evolution::averageVectorDistance(const std::vector<f64>& vec1, const std::ve
 {
   f64 result = 0;
   for (usize i = 0; i < vec1.size(); i++)
-    result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // normalize -> 0 to 1
+    result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // cv::normalize -> 0 to 1
 
   result /= vec1.size(); // coordinate average
   return result;

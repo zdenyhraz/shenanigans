@@ -40,7 +40,7 @@ inline cv::Mat procedural(i32 rows, i32 cols)
 
     mat += (RandU() * gaussian(rows, cols, cx, cy, RandU(), RandU()));
   }
-  normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
+  cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;
 }
 

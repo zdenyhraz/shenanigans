@@ -309,7 +309,7 @@ private:
     switch (mWindowType)
     {
     case WindowType::Hann:
-      createHanningWindow(mWindow, cv::Size(mCols, mRows), GetMatType<Float>());
+      cv::createHanningWindow(mWindow, cv::Size(mCols, mRows), GetMatType<Float>());
       return;
     default:
       return;
@@ -361,7 +361,7 @@ private:
           for (i32 c = 0; c < mCols; ++c)
             bpp[c] = BandpassGEquation(r, c);
         }
-        normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
+        cv::normalize(mBandpass, mBandpass, 0.0, 1.0, cv::NORM_MINMAX);
       }
       break;
     case BandpassType::Rectangular:
@@ -410,7 +410,7 @@ private:
       image.convertTo(image, GetMatType<Float>());
 
     if constexpr (Normalize)
-      normalize(image, image, 0, 1, cv::NORM_MINMAX);
+      cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
 
   template <bool DebugMode>
@@ -420,7 +420,7 @@ private:
     LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
 
     if (mWindowType != WindowType::None)
-      multiply(image, mWindow, image);
+      cv::multiply(image, mWindow, image);
   }
 
   template <bool DebugMode>

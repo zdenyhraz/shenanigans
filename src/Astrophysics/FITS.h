@@ -120,7 +120,7 @@ private:
       params.succload = true;
       params.fitsMidX = size - 1 - params.fitsMidX;
 
-      // normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
+      // cv::normalize(mat, mat, 0, 65535, cv::NORM_MINMAX);
 
       if constexpr (0)
         DebugValues(mat, params);
@@ -157,7 +157,7 @@ private:
   {
     cv::Mat img = mat.clone();
     cv::Mat imgc;
-    normalize(img, img, 0, 255, cv::NORM_MINMAX);
+    cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
     img.convertTo(img, CV_8U);
     cvtColor(img, imgc, cv::COLOR_GRAY2BGR);
 
@@ -230,7 +230,7 @@ private:
   {
     // 8-bit input
     cv::Mat img = mat.clone();
-    normalize(img, img, 0, 255, cv::NORM_MINMAX);
+    cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
     img.convertTo(img, CV_8U);
 
     // canny

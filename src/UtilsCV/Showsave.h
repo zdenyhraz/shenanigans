@@ -11,7 +11,7 @@ inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, b
   cv::resizeWindow(windowname, wCols, wRows);
 
   sourceimg.convertTo(sourceimg, CV_32F);
-  normalize(sourceimg, sourceimg, 0, 1, cv::NORM_MINMAX);
+  cv::normalize(sourceimg, sourceimg, 0, 1, cv::NORM_MINMAX);
 
   if (sourceimg.channels() > 1 and (quantileB != 0 or quantileT != 1))
     LOG_WARNING("Quantile clipping not implemented for color images");
@@ -39,8 +39,8 @@ inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string&
     if (!srcimg.empty())
     {
       auto img = srcimg.clone();
-      resize(img, img, cv::Size((f64)mainHeight / img.rows * img.cols, mainHeight));
-      normalize(img, img, 0, 255, cv::NORM_MINMAX);
+      cv::resize(img, img, cv::Size((f64)mainHeight / img.rows * img.cols, mainHeight));
+      cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
       img.convertTo(img, CV_8U);
       sourceimgs.emplace_back(img);
     }
@@ -58,12 +58,12 @@ inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bi
   if (size != cv::Size2i(0, 0))
   {
     if (bilinear)
-      resize(sourceimgIn, img, size, 0, 0, cv::INTER_LINEAR);
+      cv::resize(sourceimgIn, img, size, 0, 0, cv::INTER_LINEAR);
     else
-      resize(sourceimgIn, img, size, 0, 0, cv::INTER_NEAREST);
+      cv::resize(sourceimgIn, img, size, 0, 0, cv::INTER_NEAREST);
   }
 
-  normalize(img, img, 0, 255, cv::NORM_MINMAX);
+  cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
   img.convertTo(img, CV_8U);
 
   if (img.channels() == 1)
