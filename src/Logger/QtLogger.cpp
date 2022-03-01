@@ -2,11 +2,11 @@
 
 QtLogger::QtLogger()
 {
-  mLogLevelSettings[LogLevel::Trace] = {QColor(150, 150, 150), false};
-  mLogLevelSettings[LogLevel::Function] = {QColor(178, 102, 255), false};
-  mLogLevelSettings[LogLevel::Debug] = {QColor(51, 153, 255), false};
-  mLogLevelSettings[LogLevel::Info] = {QColor(2, 190, 230), true};
-  mLogLevelSettings[LogLevel::Success] = {QColor(0, 204, 0), true};
-  mLogLevelSettings[LogLevel::Warning] = {QColor(255, 154, 20), false};
-  mLogLevelSettings[LogLevel::Error] = {QColor(225, 0, 0), false};
+  mLogLevelSettings[LogLevel::Trace] = {.color = QColor(150, 150, 150)};
+  mLogLevelSettings[LogLevel::Function] = {.color = QColor(150, 150, 150)}; //{QColor(178, 102, 255)};
+  mLogLevelSettings[LogLevel::Debug] = {.color = QColor(51, 153, 255)};
+  mLogLevelSettings[LogLevel::Info] = {.color = QColor(2, 190, 230), .italic = true};
+  mLogLevelSettings[LogLevel::Success] = {.color = QColor(0, 204, 0), .italic = true};
+  mLogLevelSettings[LogLevel::Warning] = {.color = QColor(255, 154, 20)};
+  mLogLevelSettings[LogLevel::Error] = {.color = QColor(225, 0, 0)};
 }

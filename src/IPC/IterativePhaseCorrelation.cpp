@@ -495,7 +495,7 @@ try
   if constexpr (debugShift)
   {
     cv::Mat image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
-    const f64 shiftmax = 0.5 * mRows;
+    const f64 shiftmax = 0.4 * mRows;
     cv::Point2d shift(RandRange(-1, 1) * shiftmax, RandRange(-1, 1) * shiftmax);
     cv::Point2i point(std::clamp(RandU() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
         std::clamp(RandU() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
@@ -525,7 +525,7 @@ try
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
-    const f64 totalshift = 2.;
+    const f64 totalshift = 1.;
     cv::Mat noise2;
 
     if constexpr (addNoise)
@@ -535,7 +535,7 @@ try
       noise2 = GetNoise<Float>(crop1.size(), noiseStdev);
     }
 
-    for (i32 i = 0; i < iters; i++)
+    for (i32 i = 0; i < iters; ++i)
     {
       SetDebugIndex(i);
       const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
@@ -701,7 +701,6 @@ template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL3(const cv::Mat& L3) const
 {
   PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
-  PyPlot::PlotSurf(fmt::format("{} L3 surf", mDebugName), {.z = L3, .rstride = 1, .cstride = 1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L3_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>
@@ -715,7 +714,7 @@ void IterativePhaseCorrelation<Float>::DebugL2(const cv::Mat& L2) const
 template <typename Float>
 void IterativePhaseCorrelation<Float>::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const
 {
-  PyPlot::Plot(fmt::format("{} L2U", mDebugName), {.z = L2U});
+  PyPlot::PlotSurf(fmt::format("{} L2U surf", mDebugName), {.z = L2U, .save = not mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", mDebugDirectory, mDebugIndex) : ""});
 
   if (0)
   {
@@ -752,8 +751,6 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
-  if (last)
-    PyPlot::PlotSurf(fmt::format("{} L1A surf", mDebugName), {.z = L1, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1As_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
 template <typename Float>

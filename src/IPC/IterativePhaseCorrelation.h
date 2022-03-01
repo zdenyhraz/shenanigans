@@ -58,7 +58,7 @@ public:
     PROFILE_FUNCTION;
     SetSize(rows, cols);
     SetBandpassParameters(bpL, bpH);
-    UpdateL1circles();
+    UpdateL1circle();
   }
 
   void SetSize(i32 rows, i32 cols = -1)
@@ -92,19 +92,19 @@ public:
   void SetL2size(i32 L2size)
   {
     mL2size = L2size % 2 ? L2size : L2size + 1;
-    UpdateL1circles();
+    UpdateL1circle();
   }
 
   void SetL1ratio(f64 L1ratio)
   {
     mL1ratio = L1ratio;
-    UpdateL1circles();
+    UpdateL1circle();
   }
 
   void SetUpsampleCoeff(i32 upsampleCoeff)
   {
     mUC = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1;
-    UpdateL1circles();
+    UpdateL1circle();
   }
 
   void SetMaxIterations(i32 maxIterations) { mMaxIter = maxIterations; }
@@ -207,7 +207,7 @@ public:
     // L2
     cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (DebugMode and not CrossCorrelation)
       DebugL2(L2);
 
     // L2U
@@ -216,19 +216,21 @@ public:
     if constexpr (DebugMode)
       DebugL2U(L2, L2U);
 
-    for (auto [L1ratioIter, L1ratio] = std::tuple<u32, f64>{0, mL1ratio}; L1ratioIter < mL1circles.size(); ++L1ratioIter, L1ratio -= mL1ratioStep)
+    // L1
+    i32 L1size;
+    cv::Mat L1, L1circle;
+    cv::Point2d L2Upeak, L1mid, L1peak;
+
+    for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
-      LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::IterativeRefinement");
+      if constexpr (DebugMode)
+        LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
-      // reset L2U peak position
-      cv::Point2d L2Upeak = L2Umid;
-
-      // L1
-      cv::Mat L1;
-      i32 L1size = GetL1size(L2U.cols, L1ratio);
-      cv::Point2d L1mid(L1size / 2, L1size / 2);
-      cv::Point2d L1peak;
+      L2Upeak = L2Umid; // reset L2U peak position
+      L1size = GetL1size(L2U.cols, L1ratio);
+      L1mid = cv::Point2d(L1size / 2, L1size / 2);
+      L1circle = mL1circle.cols == L1size ? mL1circle : Kirkl<Float>(L1size);
 
       if constexpr (DebugMode)
         DebugL1B(L2U, L1size, L3peak - L3mid);
@@ -236,13 +238,15 @@ public:
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
+        if constexpr (DebugMode)
+          LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (DebugMode)
           DebugL1A(L1, L3peak - L3mid, L2Upeak - L2Umid);
-        L1peak = GetPeakSubpixel<true>(L1, mL1circles[L1ratioIter]);
+        L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid))
@@ -286,17 +290,17 @@ private:
   f64 mBPL = 0;
   f64 mBPH = 1;
   i32 mL2size = 7;
-  f64 mL1ratio = 0.5;
-  f64 mL1ratioStep = 0.05;
+  f64 mL1ratio = 0.45;
+  f64 mL1ratioStep = 0.025;
   i32 mL1ratioStepCount = 4;
-  i32 mUC = 15;
+  i32 mUC = 51;
   i32 mMaxIter = 10;
   BandpassType mBPT = BandpassType::Gaussian;
   InterpolationType mIntT = InterpolationType::Linear;
   WindowType mWinT = WindowType::Hann;
   cv::Mat mBP;
   cv::Mat mWin;
-  std::vector<cv::Mat> mL1circles;
+  cv::Mat mL1circle;
   mutable std::string mDebugName = "IPC";
   mutable std::string mDebugDirectory;
   mutable i32 mDebugIndex = 0;
@@ -315,13 +319,7 @@ private:
     }
   }
 
-  void UpdateL1circles()
-  {
-    PROFILE_FUNCTION;
-    mL1circles.resize(std::min(mL1ratioStepCount, static_cast<i32>(mL1ratio / mL1ratioStep - 1)));
-    for (u32 iter = 0; iter < mL1circles.size(); ++iter)
-      mL1circles[iter] = Kirkl<Float>(GetL1size(mL2size * mUC, mL1ratio - mL1ratioStep * iter));
-  }
+  void UpdateL1circle() { mL1circle = Kirkl<Float>(GetL1size(mL2size * mUC, mL1ratio)); }
 
   void UpdateBandpass()
   {
