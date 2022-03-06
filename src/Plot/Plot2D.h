@@ -23,12 +23,13 @@ public:
   static void SetColorMapType(QCPColorGradient colorMapType) { GetPlot().mColormapType = colorMapType; }
   static void ShowAxisLabels(bool showAxisLabels) { GetPlot().mShowAxisLabels = showAxisLabels; }
 
+  explicit Plot2D(const std::string& name);
+
 private:
   static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
   static std::map<std::string, Plot2D> mPlots;
   static std::string mCurrentPlot;
 
-  explicit Plot2D(const std::string& name);
   void PlotCore(const cv::Mat& z);
   void PlotCore(const std::vector<std::vector<double>>& z);
   void Initialize(int xcnt, int ycnt);

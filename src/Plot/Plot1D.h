@@ -53,12 +53,13 @@ public:
   static void SetY2min(double y2min) { GetPlot().mY2min = y2min; }
   static void SetY2max(double y2max) { GetPlot().mY2max = y2max; }
 
+  explicit Plot1D(const std::string& name);
+
 private:
   static Plot1D& GetPlot(const std::string& name = mCurrentPlot);
   static std::unordered_map<std::string, Plot1D> mPlots;
   static std::string mCurrentPlot;
 
-  explicit Plot1D(const std::string& name);
   void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s = {});
   void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s = {});
   void Initialize(int ycnt, int y1cnt, int y2cnt, bool clear);

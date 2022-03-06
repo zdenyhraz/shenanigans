@@ -9,9 +9,7 @@ Plot2D::Plot2D(const std::string& name) : mName(name)
 
 Plot2D& Plot2D::GetPlot(const std::string& name)
 {
-  if (mPlots.count(name) == 0)
-    mPlots.emplace(name, Plot2D(name));
-
+  mPlots.try_emplace(name, name);
   mCurrentPlot = name;
   return mPlots.at(name);
 }
