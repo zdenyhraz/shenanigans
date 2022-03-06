@@ -25,7 +25,7 @@ jobs:
       run: sudo apt-get install cppcheck
 
     - name: Run cppcheck
-      run: cppcheck --std=c++20 --enable=all -I external/ --error-exitcode=0 src/
+      run: cppcheck --enable=all -I external/ --error-exitcode=0 --verbose src/
 
   cpplint:
     runs-on: ubuntu-latest
@@ -39,4 +39,4 @@ jobs:
         packages: cpplint
 
     - name: Run cpplint
-      run: find src/ -name '*.h' -o -name '*.cpp' | xargs cpplint --quiet
+      run: find src/ -name '*.h' -o -name '*.cpp' | xargs cpplint
