@@ -2,35 +2,22 @@
 
 struct Fractalset
 {
-  f64 zoom;
-  i32 sliderZoom;
-  i32 sliderLog;
-  i32 sliderMaxiter;
-  i32 sliderMagntresh;
-  i32 fractalWidth;
+  f64 zoom = 1.;
+  i32 sliderZoom = 50;
+  i32 sliderLog = 1;
+  i32 sliderMaxiter = 1000;
+  i32 sliderMagntresh = 50;
+  i32 fractalWidth = 1000;
   i32 fractalHeight;
-  cv::Point2d fractalCenter;
-  f64 xmin;
-  f64 xmax;
-  f64 ymin;
-  f64 ymax;
-  f64 magnTresh;
-  i32 maxiter;
+  cv::Point2d fractalCenter{0., 0.};
+  f64 xmin = -1;
+  f64 xmax = 1;
+  f64 ymin = -1;
+  f64 ymax = 1;
+  f64 magnTresh = 2.;
+  i32 maxiter = 1;
 
-  Fractalset() // constructor
-  {
-    // std::cout << "Fractal object created" << std::endl;
-    zoom = 1.;
-    sliderZoom = 50;
-    sliderLog = 1;
-    sliderMaxiter = 1000;
-    sliderMagntresh = 50;
-    fractalWidth = 1000;
-    fractalCenter.x = 0.;
-    fractalCenter.y = 0.;
-    magnTresh = 2.;
-    computeDependent();
-  }
+  Fractalset() { computeDependent(); }
 
   void computeDependent()
   {
@@ -42,8 +29,6 @@ struct Fractalset
     zoom *= pow(2., ((f64)sliderZoom - 50) / 50 * 3.);
     magnTresh = ((f64)sliderMagntresh - 50) / 50 + 2.;
     maxiter = sliderMaxiter;
-    // std::cout << "Fractal center: " << fractalCenter.x << " + " << fractalCenter.y << "i, delta_x: " << xmax - xmin << ", eps: " << (xmax - xmin) / fractalWidth << ", zoom: " << zoom << "(" << 1. /
-    // zoom << " x)" << std::endl;
   }
 };
 

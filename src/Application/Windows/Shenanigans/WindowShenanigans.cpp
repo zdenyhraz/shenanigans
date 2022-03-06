@@ -7,11 +7,8 @@
 #include "Random/Procedural.h"
 #include "Optimization/OptimizationTestFunctions.h"
 
-WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent)
+WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
 {
-  // data shared within windows
-  mWindowData = std::make_unique<WindowData>();
-
   // create windows
   mWindows["ipc"] = std::make_unique<WindowIPC>(this, mWindowData.get());
   mWindows["diffrot"] = std::make_unique<WindowDiffrot>(this, mWindowData.get());

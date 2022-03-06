@@ -86,8 +86,8 @@ void WindowIPC::PlotImageSizeAccuracyDependence()
 void WindowIPC::align()
 {
   RefreshIPCparameters();
-  std::string path1 = ui.lineEdit_15->text().toStdString();
-  std::string path2 = ui.lineEdit_16->text().toStdString();
+  // std::string path1 = ui.lineEdit_15->text().toStdString();
+  // std::string path2 = ui.lineEdit_16->text().toStdString();
 
   cv::Point cropfocus(2048, 2048);
   i32 cropsize = 1.0 * 4096;
@@ -146,10 +146,10 @@ void WindowIPC::CalculateFlow()
 
 void WindowIPC::features()
 {
-  std::string path1 = ui.lineEdit_15->text().toStdString();
-  std::string path2 = ui.lineEdit_16->text().toStdString();
-  cv::Mat img1 = LoadUnitFloatImage<f32>(path1);
-  cv::Mat img2 = LoadUnitFloatImage<f32>(path2);
+  // std::string path1 = ui.lineEdit_15->text().toStdString();
+  // std::string path2 = ui.lineEdit_16->text().toStdString();
+  // cv::Mat img1 = LoadUnitFloatImage<f32>(path1);
+  // cv::Mat img2 = LoadUnitFloatImage<f32>(path2);
 }
 
 void WindowIPC::linearFlow()

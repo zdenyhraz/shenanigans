@@ -12,7 +12,10 @@ else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-missing-field-initializers") # excluded warnings
+  set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+  set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 endif()
+
 
 # ignore warnings from external sources
 file(GLOB_RECURSE SRC_EXTERNAL "external/*.h" "external/*.hpp" "external/*.c" "external/*.cpp")
@@ -136,5 +139,7 @@ target_sources(shenanigans_test PRIVATE ${SRC_TEST})
 gtest_discover_tests(shenanigans_test)
 
 # precompiled headers
-target_precompile_headers(shenanigans PRIVATE src/Precompiled.h)
-target_precompile_headers(shenanigans_test PRIVATE src/Precompiled.h)
+file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.h)
+message(STATUS "PCH: " ${SRC_PRECOMPILED})
+target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
+target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})

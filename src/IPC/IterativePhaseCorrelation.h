@@ -91,7 +91,7 @@ public:
 
   void SetL2size(i32 L2size)
   {
-    mL2size = L2size % 2 ? L2size : L2size + 1;
+    mL2size = (L2size % 2) ? L2size : L2size + 1;
     UpdateL1circle();
   }
 
@@ -103,7 +103,7 @@ public:
 
   void SetUpsampleCoeff(i32 upsampleCoeff)
   {
-    mUC = upsampleCoeff % 2 ? upsampleCoeff : upsampleCoeff + 1;
+    mUC = (upsampleCoeff % 2) ? upsampleCoeff : upsampleCoeff + 1;
     UpdateL1circle();
   }
 
@@ -535,7 +535,7 @@ private:
   static i32 GetL1size(i32 L2Usize, f64 L1ratio)
   {
     i32 L1size = std::floor(L1ratio * L2Usize);
-    return L1size % 2 ? L1size : L1size + 1;
+    return (L1size % 2) ? L1size : L1size + 1;
   }
 
   static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }

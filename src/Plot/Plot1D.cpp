@@ -7,13 +7,13 @@ Plot1D::Plot1D(const std::string& name) : mName(name)
 {
 }
 
-Plot1D& Plot1D::GetPlot(const std::string& mName)
+Plot1D& Plot1D::GetPlot(const std::string& name)
 {
-  if (mPlots.count(mName) == 0)
-    mPlots.emplace(mName, Plot1D(mName));
+  if (mPlots.count(name) == 0)
+    mPlots.emplace(name, Plot1D(name));
 
-  mCurrentPlot = mName;
-  return mPlots.at(mName);
+  mCurrentPlot = name;
+  return mPlots.at(name);
 }
 
 void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s)
@@ -163,12 +163,11 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
 
   for (int i = 0; i < ycnt; i++)
   {
-    auto graph = plot->graph(i);
+    QCPGraph* graph = nullptr;
 
     if (i < y1cnt)
     {
-      plot->addGraph(plot->xAxis, plot->yAxis);
-      graph = plot->graph(i);
+      graph = plot->addGraph(plot->xAxis, plot->yAxis);
 
       if (mYnames.size() > static_cast<size_t>(i))
         graph->setName(QString::fromStdString(mYnames[i]));
@@ -177,8 +176,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
     }
     else
     {
-      plot->addGraph(plot->xAxis, plot->yAxis2);
-      graph = plot->graph(i);
+      graph = plot->addGraph(plot->xAxis, plot->yAxis2);
 
       if (mY2names.size() > static_cast<size_t>(i - y1cnt))
         graph->setName(QString::fromStdString(mY2names[i - y1cnt]));

@@ -54,7 +54,11 @@ public:
   }
 
 private:
-  QtLogger();
+  static QtLogger& Get()
+  {
+    static QtLogger logger;
+    return logger;
+  }
 
   struct LogLevelSettings
   {
@@ -62,13 +66,9 @@ private:
     bool italic = false;
   };
 
-  static QtLogger& Get()
-  {
-    static QtLogger logger;
-    return logger;
-  }
+  QtLogger();
 
-  bool ShouldLog(LogLevel logLevel) { return mTextBrowser and logLevel >= mLogLevel; }
+  bool ShouldLog(LogLevel logLevel) const { return mTextBrowser and logLevel >= mLogLevel; }
 
   void SetTextBrowserInternal(QTextBrowser* textBrowser)
   {
@@ -84,7 +84,7 @@ private:
 
   static std::string GetCurrentTime()
   {
-    time_t now = time(0);
+    auto now = time(nullptr);
     char buf[sizeof "12:34:56"];
     strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&now));
     return buf;

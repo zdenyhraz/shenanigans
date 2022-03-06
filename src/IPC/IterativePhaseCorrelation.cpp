@@ -277,7 +277,7 @@ void IterativePhaseCorrelation<Float>::PlotImageSizeAccuracyDependence(const std
   {
     LOG_INFO("Calculating image size accuracy dependence ({:.1f}%)", static_cast<f64>(progress) / (iters - 1) * 100);
     i32 imageSize = xmin + (f64)i / (iters - 1) * (xmax - xmin);
-    imageSize = imageSize % 2 ? imageSize + 1 : imageSize;
+    imageSize = (imageSize % 2) ? imageSize + 1 : imageSize;
     SetSize(imageSize, imageSize);
     const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
     const auto obj = CreateObjectiveFunction(trainingImagePairs);
@@ -785,12 +785,8 @@ cv::Mat IterativePhaseCorrelation<Float>::ColorComposition(const cv::Mat& img1, 
     }
   }
 
-  if (gamma1 != 1 or gamma2 != 1)
-  {
-    cv::normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
-    cv::normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
-  }
-
+  cv::normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
+  cv::normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
   return (img1c + img2c) / 2;
 }
 
