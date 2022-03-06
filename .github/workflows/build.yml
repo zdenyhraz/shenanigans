@@ -64,6 +64,6 @@ jobs:
 
     - name: Test
       run: |
-        (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}} --extra-verbose)
+        (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}})
         (cd ${{github.workspace}}/build; ./shenanigans_test)
 
