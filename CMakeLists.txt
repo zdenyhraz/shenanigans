@@ -33,15 +33,15 @@ else()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
 
+# ignore warnings from external sources
+file(GLOB_RECURSE SRC_EXTERNAL "external/*")
+set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
+
 # ccache
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
   set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
 endif()
-
-# ignore warnings from external sources
-file(GLOB_RECURSE SRC_EXTERNAL "external/*")
-set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
 
 # sanitizer
 if(ENABLE_SANITIZER)
