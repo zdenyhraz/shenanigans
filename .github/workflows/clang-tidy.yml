@@ -1,4 +1,5 @@
 name: clang-tidy
+
 on: [push,pull_request]
 
 jobs:
@@ -49,7 +50,7 @@ jobs:
         setup-python: false
         cached: ${{steps.qt-cache.outputs.cache-hit}}
 
-    - name: Configure
+    - name: cmake configure
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
         CC: clang

@@ -1,4 +1,5 @@
 name: build/test
+
 on: [push,pull_request]
 
 env:
@@ -54,16 +55,17 @@ jobs:
         setup-python: false
         cached: ${{steps.qt-cache.outputs.cache-hit}}
 
-    - name: Configure
+    - name: cmake configure
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
-    - name: Build
+    - name: cmake build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Test
-      run: |
-        (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}})
-        (cd ${{github.workspace}}/build; ./shenanigans_test)
+    - name: cmake test
+      run: (cd ${{github.workspace}}/build; ctest -C ${{env.BUILD_TYPE}})
+
+    - name: run test
+      run: (cd ${{github.workspace}}/build; ./shenanigans_test)
 
