@@ -1,5 +1,4 @@
 name: build/test
-
 on: [push,pull_request]
 
 env:
@@ -13,39 +12,40 @@ jobs:
       with:
         submodules: true
 
-    - name: Install GCC 11
+    - name: gcc install
       run: |
         sudo apt install gcc-11 g++-11
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
         sudo update-alternatives --set gcc /usr/bin/gcc-11
 
-    - name: Install Ninja
+    - name: ninja install
       run: sudo apt-get install -y ninja-build
 
-    - uses: actions/setup-python@v2
+    - name: python install
+      uses: actions/setup-python@v2
 
-    - name: Cache OpenCV
+    - name: opencv cache
       id: opencv-cache
       uses: actions/cache@v2
       with:
         path: ./opencv-install
         key: ${{runner.os}}-opencv-cache
 
-    - name: Install OpenCV
+    - name: opencv install
       uses: rayandrews/with-opencv-action@v1
       with:
         opencv-version: '4.5.1'
         dir: ./opencv-install
         cached: ${{steps.opencv-cache.outputs.cache-hit}}
 
-    - name: Cache Qt
+    - name: qt cache
       id: qt-cache
       uses: actions/cache@v2
       with:
         path: ./qt
         key: ${{runner.os}}-qt-cache
 
-    - name: Install Qt
+    - name: qt install
       uses: jurplel/install-qt-action@v2
       with:
         version: "5.12.2"

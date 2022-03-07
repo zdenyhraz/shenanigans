@@ -1,5 +1,4 @@
-name: lint
-
+name: clang-tidy
 on: [push,pull_request]
 
 jobs:
@@ -11,36 +10,37 @@ jobs:
       with:
         submodules: true
 
-    - name: Install Clang
-      run: sudo apt install clang-12 --install-suggests
+    - name: clang install
+      run: sudo apt install -y clang-12 --install-suggests
 
-    - name: Install Ninja
+    - name: ninja install
       run: sudo apt-get install -y ninja-build
 
-    - uses: actions/setup-python@v2
+    - name: python install
+      uses: actions/setup-python@v2
 
-    - name: Cache OpenCV
+    - name: opencv cache
       id: opencv-cache
       uses: actions/cache@v2
       with:
         path: ./opencv-install
         key: ${{runner.os}}-opencv-cache
 
-    - name: Install OpenCV
+    - name: opencv install
       uses: rayandrews/with-opencv-action@v1
       with:
         opencv-version: '4.5.1'
         dir: ./opencv-install
         cached: ${{steps.opencv-cache.outputs.cache-hit}}
 
-    - name: Cache Qt
+    - name: qt cache
       id: qt-cache
       uses: actions/cache@v2
       with:
         path: ./qt
         key: ${{runner.os}}-qt-cache
 
-    - name: Install Qt
+    - name: qt install
       uses: jurplel/install-qt-action@v2
       with:
         version: "5.12.2"
@@ -56,34 +56,8 @@ jobs:
         CXX: clang++
       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
-    - name: Install clang-tidy
+    - name: clang-tidy install
       run: sudo apt-get install -y clang-tidy
 
-    - name: Run clang-tidy
+    - name: clang-tidy run
       run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
-
-  cppcheck:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install cppcheck
-      run: sudo apt-get install cppcheck
-
-    - name: Run cppcheck
-      run: cppcheck --enable=all -I external/ --error-exitcode=0 --verbose src/
-
-  cpplint:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-python@v2
-    - uses: BSFishy/pip-action@v1
-      with:
-        packages: cpplint
-
-    - name: Run cpplint
-      run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs cpplint
