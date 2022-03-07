@@ -3,17 +3,64 @@ name: lint
 on: [push,pull_request]
 
 jobs:
-  # clang-tidy:
-  #   runs-on: ubuntu-latest
-  #   continue-on-error: true
-  #   steps:
-  #   - uses: actions/checkout@v2
+  clang-tidy:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
 
-  #   - name: Install clang-tidy
-  #     run: sudo apt-get install -y clang-tidy
+    - name: Install Clang
+      run: sudo apt install clang-12 --install-suggests
 
-  #   - name: Run clang-tidy
-  #     run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file
+    - name: Install Ninja
+      run: sudo apt-get install -y ninja-build
+
+    - uses: actions/setup-python@v2
+
+    - name: Cache OpenCV
+      id: opencv-cache
+      uses: actions/cache@v2
+      with:
+        path: ./opencv-install
+        key: ${{runner.os}}-opencv-cache
+
+    - name: Install OpenCV
+      uses: rayandrews/with-opencv-action@v1
+      with:
+        opencv-version: '4.5.1'
+        dir: ./opencv-install
+        cached: ${{steps.opencv-cache.outputs.cache-hit}}
+
+    - name: Cache Qt
+      id: qt-cache
+      uses: actions/cache@v2
+      with:
+        path: ./qt
+        key: ${{runner.os}}-qt-cache
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: "5.12.2"
+        dir: "./qt"
+        install-deps: true
+        setup-python: false
+        cached: ${{steps.qt-cache.outputs.cache-hit}}
+
+    - name: Configure
+      env:
+        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+        CC: clang
+        CXX: clang++
+      run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
+
+    - name: Install clang-tidy
+      run: sudo apt-get install -y clang-tidy
+
+    - name: Run clang-tidy
+      run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
 
   cppcheck:
     runs-on: ubuntu-latest
