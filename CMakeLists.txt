@@ -128,20 +128,20 @@ include_directories("src")
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
 src/*.ui src/*.rc src/*.qrc
-src/Application/Windows/*.h src/Application/Windows/*.cpp
-src/Astrophysics/*.h src/Astrophysics/*.cpp
-src/Features/*.h src/Features/*.cpp
-src/Filtering/*.h src/Filtering/*.cpp
-src/Fit/*.h src/Fit/*.cpp
-src/Fourier/*.h src/Fourier/*.cpp
-src/Fractal/*.h src/Fractal/*.cpp
-src/IPC/*.h src/IPC/*.cpp
-src/Logger/*.h src/Logger/*.cpp
-src/Optimization/*.h src/Optimization/*.cpp
-src/Plot/*.h src/Plot/*.cpp
-src/Random/*.h src/Random/*.cpp
-src/Utils/*.h src/Utils/*.cpp
-src/UtilsCV/*.h src/UtilsCV/*.cpp
+src/Application/Windows/*.hpp src/Application/Windows/*.cpp
+src/Astrophysics/*.hpp src/Astrophysics/*.cpp
+src/Features/*.hpp src/Features/*.cpp
+src/Filtering/*.hpp src/Filtering/*.cpp
+src/Fit/*.hpp src/Fit/*.cpp
+src/Fourier/*.hpp src/Fourier/*.cpp
+src/Fractal/*.hpp src/Fractal/*.cpp
+src/IPC/*.hpp src/IPC/*.cpp
+src/Logger/*.hpp src/Logger/*.cpp
+src/Optimization/*.hpp src/Optimization/*.cpp
+src/Plot/*.hpp src/Plot/*.cpp
+src/Random/*.hpp src/Random/*.cpp
+src/Utils/*.hpp src/Utils/*.cpp
+src/UtilsCV/*.hpp src/UtilsCV/*.cpp
 )
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
@@ -151,13 +151,13 @@ file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/Application.cpp)
 target_sources(shenanigans PRIVATE ${SRC_APP})
 
 # test sources
-file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.h test/*.cpp)
+file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_TEST})
 gtest_discover_tests(shenanigans_test)
 
 # precompiled headers
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.h)
+file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.hpp)
 message(STATUS "PCH: " ${SRC_PRECOMPILED})
 target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
 target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})

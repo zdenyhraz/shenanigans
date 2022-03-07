@@ -1,5 +1,5 @@
-#include "IterativePhaseCorrelation.h"
-#include "Filtering/Noise.h"
+#include "IterativePhaseCorrelation.hpp"
+#include "Filtering/Noise.hpp"
 
 template class IterativePhaseCorrelation<f32>;
 template class IterativePhaseCorrelation<f64>;

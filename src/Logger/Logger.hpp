@@ -1,5 +1,5 @@
 #pragma once
-#include "QtLogger.h"
+#include "QtLogger.hpp"
 
 using Logger = QtLogger;
 

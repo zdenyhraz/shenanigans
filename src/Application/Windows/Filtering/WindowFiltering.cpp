@@ -1,6 +1,6 @@
 
-#include "WindowFiltering.h"
-#include "Filtering/HistogramEqualization.h"
+#include "WindowFiltering.hpp"
+#include "Filtering/HistogramEqualization.hpp"
 
 WindowFiltering::WindowFiltering(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {

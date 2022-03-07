@@ -1,4 +1,4 @@
-#include "Fractal.h"
+#include "Fractal.hpp"
 
 void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr)
 {

@@ -1,4 +1,4 @@
-#include "PatternSearch.h"
+#include "PatternSearch.hpp"
 
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {

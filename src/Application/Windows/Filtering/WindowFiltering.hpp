@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowFiltering.h"
-#include "Application/Windows/WindowData.h"
+#include "Application/Windows/WindowData.hpp"
 
 class WindowFiltering : public QMainWindow
 {

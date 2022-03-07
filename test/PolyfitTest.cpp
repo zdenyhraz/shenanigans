@@ -1,4 +1,4 @@
-#include "Fit/Polyfit.h"
+#include "Fit/Polyfit.hpp"
 
 TEST(PolyfitTest, Fit)
 {

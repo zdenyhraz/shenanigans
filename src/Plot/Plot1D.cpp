@@ -1,4 +1,4 @@
-#include "Plot1D.h"
+#include "Plot1D.hpp"
 
 std::unordered_map<std::string, Plot1D> Plot1D::mPlots;
 std::string Plot1D::mCurrentPlot = "Plot1D";

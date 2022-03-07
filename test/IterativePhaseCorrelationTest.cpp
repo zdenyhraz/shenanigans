@@ -1,4 +1,4 @@
-#include "IPC/IterativePhaseCorrelation.h"
+#include "IPC/IterativePhaseCorrelation.hpp"
 
 class IterativePhaseCorrelationTest : public ::testing::Test
 {

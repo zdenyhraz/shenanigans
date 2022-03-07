@@ -1,9 +1,9 @@
 #pragma once
 
-#include "PrecompiledSTL.h"
-#include "PrecompiledExternal.h"
-#include "PrecompiledQt.h"
-#include "PrecompiledCV.h"
+#include "PrecompiledSTL.hpp"
+#include "PrecompiledExternal.hpp"
+#include "PrecompiledQt.hpp"
+#include "PrecompiledCV.hpp"
 
 namespace py = pybind11;
 namespace json = nlohmann;
@@ -37,20 +37,20 @@ using usize = size_t;
   #define PROFILE_SCOPE(name)
 #endif
 
-#include "Logger/Logger.h"
-#include "Logger/LogFunction.h"
+#include "Logger/Logger.hpp"
+#include "Logger/LogFunction.hpp"
 
-#include "Utils/Constants.h"
-#include "Utils/Utils.h"
-#include "Utils/Timer.h"
-#include "Utils/Formatters.h"
+#include "Utils/Constants.hpp"
+#include "Utils/Utils.hpp"
+#include "Utils/Timer.hpp"
+#include "Utils/Formatters.hpp"
 
-#include "UtilsCV/Utils.h"
-#include "UtilsCV/Crop.h"
-#include "UtilsCV/Draw.h"
-#include "UtilsCV/Showsave.h"
-#include "UtilsCV/Formatters.h"
+#include "UtilsCV/Utils.hpp"
+#include "UtilsCV/Crop.hpp"
+#include "UtilsCV/Draw.hpp"
+#include "UtilsCV/Showsave.hpp"
+#include "UtilsCV/Formatters.hpp"
 
-#include "Plot/Plot1D.h"
-#include "Plot/Plot2D.h"
-#include "Plot/PyPlot.h"
+#include "Plot/Plot1D.hpp"
+#include "Plot/Plot2D.hpp"
+#include "Plot/PyPlot.hpp"

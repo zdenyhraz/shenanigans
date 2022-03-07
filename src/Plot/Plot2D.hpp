@@ -1,5 +1,5 @@
 #pragma once
-#include "Plot.h"
+#include "Plot.hpp"
 
 class Plot2D
 {

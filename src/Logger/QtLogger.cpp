@@ -1,4 +1,4 @@
-#include "QtLogger.h"
+#include "QtLogger.hpp"
 
 QtLogger::QtLogger()
 {

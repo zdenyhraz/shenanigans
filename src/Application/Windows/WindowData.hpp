@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IPC/IterativePhaseCorrelation.h"
+#include "IPC/IterativePhaseCorrelation.hpp"
 
 class WindowData
 {

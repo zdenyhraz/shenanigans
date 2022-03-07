@@ -1,5 +1,5 @@
 
-#include "WindowIPC.h"
+#include "WindowIPC.hpp"
 
 WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {

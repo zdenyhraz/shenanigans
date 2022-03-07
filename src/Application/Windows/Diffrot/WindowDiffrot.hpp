@@ -1,7 +1,7 @@
 #pragma once
 #include "ui_WindowDiffrot.h"
-#include "Application/Windows/WindowData.h"
-#include "Astrophysics/DifferentialRotation.h"
+#include "Application/Windows/WindowData.hpp"
+#include "Astrophysics/DifferentialRotation.hpp"
 
 class WindowDiffrot : public QMainWindow
 {

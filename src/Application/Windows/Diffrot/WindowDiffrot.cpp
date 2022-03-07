@@ -1,5 +1,5 @@
 
-#include "WindowDiffrot.h"
+#include "WindowDiffrot.hpp"
 
 WindowDiffrot::WindowDiffrot(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Optimization.h"
+#include "Optimization.hpp"
 
 struct PatternSearch : public OptimizationAlgorithm
 {

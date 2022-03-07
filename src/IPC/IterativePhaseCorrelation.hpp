@@ -1,7 +1,7 @@
 #pragma once
-#include "Fourier/Fourier.h"
-#include "Optimization/Evolution.h"
-#include "UtilsCV/Vectmat.h"
+#include "Fourier/Fourier.hpp"
+#include "Optimization/Evolution.hpp"
+#include "UtilsCV/Vectmat.hpp"
 
 template <typename Float = f64>
 class IterativePhaseCorrelation

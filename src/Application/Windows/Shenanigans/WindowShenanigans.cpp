@@ -1,11 +1,11 @@
-#include "WindowShenanigans.h"
-#include "../IPC/WindowIPC.h"
-#include "../Diffrot/WindowDiffrot.h"
-#include "../Features/WindowFeatures.h"
-#include "../FITS/WindowFITS.h"
-#include "../Filtering/WindowFiltering.h"
-#include "Random/Procedural.h"
-#include "Optimization/OptimizationTestFunctions.h"
+#include "WindowShenanigans.hpp"
+#include "../IPC/WindowIPC.hpp"
+#include "../Diffrot/WindowDiffrot.hpp"
+#include "../Features/WindowFeatures.hpp"
+#include "../FITS/WindowFITS.hpp"
+#include "../Filtering/WindowFiltering.hpp"
+#include "Random/Procedural.hpp"
+#include "Optimization/OptimizationTestFunctions.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
 {

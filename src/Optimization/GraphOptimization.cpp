@@ -3,7 +3,7 @@
 // PhD work of Zdenek Hrazdira
 // made during 2019
 
-#include "GraphOptimization.h"
+#include "GraphOptimization.hpp"
 
 std::ostream& operator<<(std::ostream& out, std::tuple<u32, f64, u32> tuple)
 {

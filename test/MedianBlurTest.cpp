@@ -1,4 +1,4 @@
-#include "Filtering/Median.h"
+#include "Filtering/Median.hpp"
 
 TEST(MedianBlur, OpenCVEquality)
 {

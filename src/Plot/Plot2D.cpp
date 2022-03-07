@@ -1,4 +1,4 @@
-#include "Plot2D.h"
+#include "Plot2D.hpp"
 
 std::map<std::string, Plot2D> Plot2D::mPlots;
 std::string Plot2D::mCurrentPlot = "Plot2D";

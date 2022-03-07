@@ -1,4 +1,4 @@
-#include "PyPlot.h"
+#include "PyPlot.hpp"
 
 PyPlot::PyPlot()
 {

@@ -1,4 +1,4 @@
-#include "Windows/Shenanigans/WindowShenanigans.h"
+#include "Windows/Shenanigans/WindowShenanigans.hpp"
 
 void RandInitialize()
 {

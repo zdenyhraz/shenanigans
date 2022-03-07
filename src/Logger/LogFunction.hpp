@@ -1,5 +1,5 @@
 #pragma once
-#include "Logger.h"
+#include "Logger.hpp"
 
 #define LOG_FUNCTION(funName) LogFunction logFunction(funName)
 #define LOG_FUNCTION_IF(show, funName) LogFunction<show> logFunction(funName)

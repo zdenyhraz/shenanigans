@@ -1,5 +1,5 @@
 
-#include "Optimization.h"
+#include "Optimization.hpp"
 
 OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
 {

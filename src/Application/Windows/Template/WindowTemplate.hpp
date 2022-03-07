@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowTemplate.h"
-#include "Application/Windows/WindowData.h"
+#include "Application/Windows/WindowData.hpp"
 
 class WindowTemplate : public QMainWindow
 {

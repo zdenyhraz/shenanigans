@@ -1,6 +1,6 @@
 #pragma once
 #include "ui_WindowFITS.h"
-#include "Application/Windows/WindowData.h"
+#include "Application/Windows/WindowData.hpp"
 
 class WindowFITS : public QMainWindow
 {

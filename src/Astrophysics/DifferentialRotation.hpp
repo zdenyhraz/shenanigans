@@ -1,9 +1,9 @@
 #pragma once
-#include "IPC/IterativePhaseCorrelation.h"
-#include "Fit/Polyfit.h"
-#include "Fit/Trigfit.h"
-#include "Utils/DataCache.h"
-#include "Filtering/Median.h"
+#include "IPC/IterativePhaseCorrelation.hpp"
+#include "Fit/Polyfit.hpp"
+#include "Fit/Trigfit.hpp"
+#include "Utils/DataCache.hpp"
+#include "Filtering/Median.hpp"
 
 class DifferentialRotation
 {

@@ -1,5 +1,5 @@
 
-#include "WindowFeatures.h"
+#include "WindowFeatures.hpp"
 
 WindowFeatures::WindowFeatures(QWidget* parent, WindowData* windowData) : QMainWindow(parent), mWindowData(windowData)
 {

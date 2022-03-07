@@ -1,4 +1,4 @@
-#include "Plot.h"
+#include "Plot.hpp"
 
 std::map<std::string, std::unique_ptr<WindowPlot>> Plot::plots;
 std::function<void(std::string)> Plot::OnClose = [](std::string name) {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Colormap.h"
+#include "Colormap.hpp"
 
 inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
