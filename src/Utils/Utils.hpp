@@ -157,3 +157,8 @@ inline f64 GetQuantile(const std::vector<T>& vec, f64 quan)
   std::sort(out.begin(), out.end());
   return out[(usize)(quan * (out.size() - 1))];
 }
+
+inline bool IsImagePath(const std::string& path)
+{
+  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or path.ends_with(".JPEG");
+}

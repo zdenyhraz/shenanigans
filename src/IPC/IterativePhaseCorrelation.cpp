@@ -805,8 +805,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation<Float>::LoadImages(const std::str
   {
     const std::string path = entry.path().string();
 
-    if (not(path.find(".png") != std::string::npos or path.find(".PNG") != std::string::npos or path.find(".jpg") != std::string::npos or path.find(".JPG") != std::string::npos ||
-            path.find(".jpeg") != std::string::npos or path.find(".JPEG") != std::string::npos or path.find(".fits") != std::string::npos or path.find(".FITS") != std::string::npos))
+    if (not IsImagePath(path))
     {
       LOG_DEBUG("Directory contains a non-image file {}", path);
       continue;
