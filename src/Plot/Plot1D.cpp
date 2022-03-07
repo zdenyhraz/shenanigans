@@ -35,13 +35,13 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
 
   plot->rescaleAxes();
 
-  if (mYmin != -std::numeric_limits<double>::infinity())
+  if (mYmin != std::numeric_limits<double>::lowest())
     plot->yAxis->setRangeLower(mYmin);
-  if (mYmax != std::numeric_limits<double>::infinity())
+  if (mYmax != std::numeric_limits<double>::max())
     plot->yAxis->setRangeUpper(mYmax);
-  if (mY2min != -std::numeric_limits<double>::infinity())
+  if (mY2min != std::numeric_limits<double>::lowest())
     plot->yAxis2->setRangeLower(mY2min);
-  if (mY2max != std::numeric_limits<double>::infinity())
+  if (mY2max != std::numeric_limits<double>::max())
     plot->yAxis2->setRangeUpper(mY2max);
 
   plot->replot();
@@ -78,13 +78,13 @@ void Plot1D::PlotCore(double x, const std::vector<double>& y1s, const std::vecto
 
   plot->rescaleAxes();
 
-  if (mYmin != -std::numeric_limits<double>::infinity())
+  if (mYmin != std::numeric_limits<double>::lowest())
     plot->yAxis->setRangeLower(mYmin);
-  if (mYmax != std::numeric_limits<double>::infinity())
+  if (mYmax != std::numeric_limits<double>::max())
     plot->yAxis->setRangeUpper(mYmax);
-  if (mY2min != -std::numeric_limits<double>::infinity())
+  if (mY2min != std::numeric_limits<double>::lowest())
     plot->yAxis2->setRangeLower(mY2min);
-  if (mY2max != std::numeric_limits<double>::infinity())
+  if (mY2max != std::numeric_limits<double>::max())
     plot->yAxis2->setRangeUpper(mY2max);
 
   plot->replot();

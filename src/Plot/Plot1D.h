@@ -78,8 +78,8 @@ private:
   bool mYLogarithmic = false;
   bool mY2Logarithmic = false;
   bool mScatterStyle = false;
-  double mYmin = -std::numeric_limits<double>::infinity();
-  double mYmax = std::numeric_limits<double>::infinity();
-  double mY2min = -std::numeric_limits<double>::infinity();
-  double mY2max = std::numeric_limits<double>::infinity();
+  double mYmin = std::numeric_limits<double>::lowest();
+  double mYmax = std::numeric_limits<double>::max();
+  double mY2min = std::numeric_limits<double>::lowest();
+  double mY2max = std::numeric_limits<double>::max();
 };

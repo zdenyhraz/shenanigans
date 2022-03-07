@@ -1,31 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(shenanigans)
 
-# cpp
-set(CMAKE_CXX_STANDARD 20)
-
-# compiler
-if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp") # optimizations
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX") # warnings
-else ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fopenmp") # optimizations
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow") # warnings
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-missing-field-initializers") # excluded warnings
-  set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-endif()
-
-# ccache
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-  set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
-endif()
-
-# ignore warnings from external sources
-file(GLOB_RECURSE SRC_EXTERNAL "external/*.h" "external/*.hpp" "external/*.c" "external/*.cpp")
-set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
-
 # variables
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -35,20 +12,55 @@ set(ENABLE_SANITIZER OFF)
 
 if(CI)
   set(ENABLE_PROFILING OFF)
+  set(ENABLE_SANITIZER ON)
 endif()
 
+# compiler
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX")
+else()
+  set(CXX_FLAGS "-march=native -fopenmp -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow -Wno-unused-parameter -Wno-missing-field-initializers")
+  set(CXX_FLAGS_DEBUG "-g -Og")
+  set(CXX_FLAGS_RELEASE "-Ofast")
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_DEBUG}")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_RELEASE}")
+
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+endif()
+
+# ccache
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+  set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+endif()
+
+# ignore warnings from external sources
+file(GLOB_RECURSE SRC_EXTERNAL "external/*")
+set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
+
+# sanitizer
 if(ENABLE_SANITIZER)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
 
-# status messages
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
-
 # targets
 add_executable(shenanigans)
 add_executable(shenanigans_test)
+
+# status messages
+message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
+message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
+message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
+message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 
 # pybind11
 find_package(PythonLibs REQUIRED)
@@ -78,6 +90,7 @@ include_directories("external/json/include")
 target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
+# profiling
 if(ENABLE_PROFILING)
   # tracy
   include_directories("external/tracy")
@@ -143,6 +156,7 @@ target_sources(shenanigans_test PRIVATE ${SRC_TEST})
 gtest_discover_tests(shenanigans_test)
 
 # precompiled headers
+set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.h)
 message(STATUS "PCH: " ${SRC_PRECOMPILED})
 target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
