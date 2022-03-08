@@ -58,10 +58,12 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
     - name: infer install
-      run: VERSION=1.1.0; \
-           curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
-           | sudo tar -C /opt -xJ && \
-           sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
+      run: |
+        sudo apt install -y curl
+        VERSION=1.1.0; \
+        curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+        | sudo tar -C /opt -xJ && \
+        sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
 
     - name: infer run
       continue-on-error: true
