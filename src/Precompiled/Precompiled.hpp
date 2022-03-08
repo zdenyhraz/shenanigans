@@ -37,8 +37,8 @@ using usize = size_t;
   #define PROFILE_SCOPE(name)
 #endif
 
-#include "Logger/Logger.hpp"
-#include "Logger/LogFunction.hpp"
+#include "Log/Logger.hpp"
+#include "Log/LogFunction.hpp"
 
 #include "Utils/Constants.hpp"
 #include "Utils/Utils.hpp"

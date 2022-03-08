@@ -69,7 +69,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
   {
     csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << std::endl;
   }
-  LOG_INFO("Feature data exported to {}", std::filesystem::weakly_canonical(pth));
+  LOG_INFO("Feature data exported to {}", std::filesystem::weakly_canonical(pth).string());
 }
 
 inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,

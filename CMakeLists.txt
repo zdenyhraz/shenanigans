@@ -139,7 +139,7 @@ src/Fit/*.hpp src/Fit/*.cpp
 src/Fourier/*.hpp src/Fourier/*.cpp
 src/Fractal/*.hpp src/Fractal/*.cpp
 src/IPC/*.hpp src/IPC/*.cpp
-src/Logger/*.hpp src/Logger/*.cpp
+src/Log/*.hpp src/Log/*.cpp
 src/Optimization/*.hpp src/Optimization/*.cpp
 src/Plot/*.hpp src/Plot/*.cpp
 src/Random/*.hpp src/Random/*.cpp

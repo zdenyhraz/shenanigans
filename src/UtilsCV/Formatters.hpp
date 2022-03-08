@@ -1,7 +1,7 @@
 #pragma once
 
-template <>
-struct fmt::formatter<cv::Point2f>
+template <typename T>
+struct fmt::formatter<cv::Point_<T>>
 {
   template <typename ParseContext>
   constexpr auto parse(ParseContext& ctx)
@@ -10,7 +10,7 @@ struct fmt::formatter<cv::Point2f>
   }
 
   template <typename FormatContext>
-  constexpr auto format(const cv::Point2f& point, FormatContext& ctx)
+  constexpr auto format(const cv::Point_<T>& point, FormatContext& ctx)
   {
     return fmt::format_to(ctx.out(), "[{:.2f}, {:.2f}]", point.x, point.y);
   }
