@@ -80,6 +80,7 @@ public:
 
 protected:
   static const char* GetTerminationReasonString(const TerminationReason& reason);
+  static f64 ClampSmooth(f64 x_new, f64 x_prev, f64 clampMin, f64 clampMax) { return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new; }
 
   bool mConsoleOutput = true;
   bool mPlotOutput = true;

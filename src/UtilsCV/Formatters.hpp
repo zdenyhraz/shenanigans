@@ -12,7 +12,7 @@ struct fmt::formatter<cv::Point_<T>>
   template <typename FormatContext>
   constexpr auto format(const cv::Point_<T>& point, FormatContext& ctx)
   {
-    return fmt::format_to(ctx.out(), "[{:.2f}, {:.2f}]", point.x, point.y);
+    return fmt::format_to(ctx.out(), "[{}, {}]", point.x, point.y);
   }
 };
 

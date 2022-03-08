@@ -1,10 +1,5 @@
 #include "Windows/Shenanigans/WindowShenanigans.hpp"
 
-void RandInitialize()
-{
-  std::srand(std::time(nullptr));
-}
-
 void PythonInitialize()
 {
   static py::scoped_interpreter guard{};
@@ -20,7 +15,6 @@ void QtInitialize()
 int main(int argc, char** argv)
 try
 {
-  RandInitialize();
   QtInitialize();
   PythonInitialize();
 

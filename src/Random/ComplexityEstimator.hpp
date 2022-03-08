@@ -29,7 +29,7 @@ inline void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f,
 
     std::vector<I> input(n);
     for (auto& in : input)
-      in = RandU();
+      in = Random::Randu();
 
     const auto start = clock::now();
     for (usize ti = 0; ti < timeIters; ++ti)

@@ -58,10 +58,12 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
     - name: cmake build
+      continue-on-error: true
       run: cmake --build ${{github.workspace}}/build --config Release
 
     - name: clang-tidy install
       run: sudo apt-get install -y clang-tidy
 
     - name: clang-tidy run
+      continue-on-error: true
       run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build

@@ -13,7 +13,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
   std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, Zerovect(N, 0.));
   for (i32 run = 0; run < multistartMaxCnt; run++)
     for (usize indexParam = 0; indexParam < N; indexParam++)
-      mainPointsInitial[run][indexParam] = RandRange(mLB[indexParam], mUB[indexParam]); // idk dude
+      mainPointsInitial[run][indexParam] = Random::Randu(mLB[indexParam], mUB[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;

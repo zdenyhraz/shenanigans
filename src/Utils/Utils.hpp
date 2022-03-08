@@ -1,20 +1,5 @@
 #pragma once
 
-inline f64 RandU()
-{
-  return static_cast<f64>(rand()) / RAND_MAX;
-}
-
-inline f64 RandRange(f64 min_, f64 max_)
-{
-  return min_ + RandU() * (max_ - min_);
-}
-
-inline f64 ClampSmooth(f64 x_new, f64 x_prev, f64 clampMin, f64 clampMax)
-{
-  return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
-}
-
 template <typename T = f64>
 inline auto Zerovect(i32 N, T value = 0.)
 {

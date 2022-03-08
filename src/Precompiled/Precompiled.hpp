@@ -43,6 +43,7 @@ using usize = size_t;
 #include "Utils/Constants.hpp"
 #include "Utils/Utils.hpp"
 #include "Utils/Timer.hpp"
+#include "Utils/Random.hpp"
 #include "Utils/Formatters.hpp"
 
 #include "UtilsCV/Utils.hpp"

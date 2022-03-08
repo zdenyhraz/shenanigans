@@ -2,6 +2,7 @@
 build/**
 data/**
 
+*.dump
 cppcheck_report.*
 
 !data/app/

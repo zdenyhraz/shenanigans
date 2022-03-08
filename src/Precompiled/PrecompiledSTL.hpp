@@ -27,3 +27,5 @@
 #include <cstdint>
 #include <initializer_list>
 #include <span>
+#include <type_traits>
+#include <concepts>
