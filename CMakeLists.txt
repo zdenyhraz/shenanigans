@@ -18,7 +18,7 @@ if(CI)
   set(ENABLE_PROFILING OFF)
   set(ENABLE_SANITIZER OFF)
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-  set(ENABLE_PCH OFF)
+  #set(ENABLE_PCH OFF)
 endif()
 
 # compiler
