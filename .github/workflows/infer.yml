@@ -11,6 +11,14 @@ jobs:
       with:
         submodules: true
 
+    - name: infer install
+      run: |
+        sudo apt install -y curl
+        VERSION=1.1.0; \
+        curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+        | sudo tar -C /opt -xJ && \
+        sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
+
     - name: clang install
       run: sudo apt install -y clang-12 --install-suggests
 
@@ -56,14 +64,6 @@ jobs:
         CC: clang
         CXX: clang++
       run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
-
-    - name: infer install
-      run: |
-        sudo apt install -y curl
-        VERSION=1.1.0; \
-        curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
-        | sudo tar -C /opt -xJ && \
-        sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
 
     - name: infer run
       continue-on-error: true
