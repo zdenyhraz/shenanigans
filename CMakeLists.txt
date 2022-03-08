@@ -16,6 +16,7 @@ if(CI)
   set(ENABLE_PROFILING OFF)
   set(ENABLE_SANITIZER OFF)
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  add_compile_options(-w)
 endif()
 
 # compiler
