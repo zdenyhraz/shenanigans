@@ -11,12 +11,14 @@ set(CMAKE_AUTOUIC ON)
 set(ENABLE_PROFILING OFF)
 set(ENABLE_SANITIZER OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(ENABLE_PCH ON)
 
+# ci variables
 if(CI)
   set(ENABLE_PROFILING OFF)
   set(ENABLE_SANITIZER OFF)
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-  add_compile_options(-w)
+  set(ENABLE_PCH OFF)
 endif()
 
 # compiler
@@ -159,9 +161,11 @@ file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_TEST})
 gtest_discover_tests(shenanigans_test)
 
-# precompiled headers
-set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.hpp)
-message(STATUS "PCH: " ${SRC_PRECOMPILED})
-target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
-target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
+if (ENABLE_PCH)
+  # precompiled headers
+  set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+  file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.hpp)
+  message(STATUS "PCH: " ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
+endif()

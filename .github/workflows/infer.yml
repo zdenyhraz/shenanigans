@@ -1,20 +1,18 @@
-name: build/test
+name: infer
 
 on: [push,pull_request]
 
 jobs:
-  build-test:
+  infer:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
 
-    - name: gcc install
-      run: |
-        sudo apt install gcc-11 g++-11
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-        sudo update-alternatives --set gcc /usr/bin/gcc-11
+    - name: clang install
+      run: sudo apt install -y clang-12 --install-suggests
 
     - name: ninja install
       run: sudo apt-get install -y ninja-build
@@ -55,14 +53,16 @@ jobs:
     - name: cmake configure
       env:
         CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+        CC: clang
+        CXX: clang++
       run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
-    - name: cmake build
-      run: cmake --build ${{github.workspace}}/build --config Release
+    - name: infer install
+      run: VERSION=1.1.0; \
+           curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+           | sudo tar -C /opt -xJ && \
+           sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
 
-    - name: cmake test
-      run: (cd ${{github.workspace}}/build; ctest)
-
-    - name: run test
-      run: (cd ${{github.workspace}}/build; ./shenanigans_test)
-
+    - name: infer run
+      continue-on-error: true
+      run: infer run --compilation-database build/compile_commands.json
