@@ -91,13 +91,13 @@ jobs:
       - name: chmod build
         run: chmod -R 755 ${{github.workspace}}/build
 
-      - name: cmake test
-        working-directory: ${{github.workspace}}/build
-        run: ctest
-
       - name: run test
         working-directory: ${{github.workspace}}/build
         run: ./shenanigans_test
+
+      - name: cmake test
+        working-directory: ${{github.workspace}}/build
+        run: ctest --rerun-failed --output-on-failure
 
   cppcheck:
     needs: test
