@@ -121,7 +121,7 @@ jobs:
           packages: cpplint
 
       - name: cpplint run
-        run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs cpplint
+        run: find src/ -type f \( -iname \*.hpp -o -iname \*.h -o -iname \*.cpp \) | xargs cpplint
 
   clang-tidy:
     needs: build
@@ -144,7 +144,7 @@ jobs:
 
       - name: clang-tidy run
         continue-on-error: true
-        run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
+        run: find src/ -type f \( -iname \*.hpp -o -iname \*.h -o -iname \*.cpp \) | xargs clang-tidy --format-style=file -p build
 
   infer:
     needs: build
