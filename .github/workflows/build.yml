@@ -43,9 +43,7 @@ jobs:
         id: opencv-cache
         uses: actions/cache@v2
         with:
-          path: |
-            ./opencv-install
-            /usr/local/
+          path: ./opencv-install
           key: ${{runner.os}}-opencv-cache
 
       - name: opencv install
