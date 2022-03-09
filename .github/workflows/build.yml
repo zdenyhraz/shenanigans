@@ -82,7 +82,6 @@ jobs:
         run: ctest --rerun-failed --output-on-failure
 
   cppcheck:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
@@ -95,7 +94,6 @@ jobs:
         run: cppcheck --enable=all -I external/ --error-exitcode=0 src/
 
   cpplint:
-    needs: test
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -114,7 +112,7 @@ jobs:
         run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs cpplint
 
   clang-tidy:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -137,7 +135,7 @@ jobs:
         run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
 
   infer:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
