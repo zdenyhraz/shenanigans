@@ -83,11 +83,13 @@ jobs:
         with:
           name: build
           path: ${{github.workspace}}/build
-        run: chmod -R 755 ${{github.workspace}}/build
 
       - name: display build files
         working-directory: ${{github.workspace}}/build
         run: ls -R
+
+      - name: chmod build
+        run: chmod -R 755 ${{github.workspace}}/build
 
       - name: cmake test
         working-directory: ${{github.workspace}}/build
@@ -144,7 +146,6 @@ jobs:
         with:
           name: build
           path: ${{github.workspace}}/build
-        run: chmod -R 755 ${{github.workspace}}/build
 
       - name: clang-tidy install
         run: sudo apt-get install -y clang-tidy
@@ -168,7 +169,6 @@ jobs:
         with:
           name: build
           path: ${{github.workspace}}/build
-        run: chmod -R 755 ${{github.workspace}}/build
 
       - name: infer install
         run: |
