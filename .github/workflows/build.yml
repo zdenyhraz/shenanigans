@@ -122,46 +122,46 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-    - name: checkout repo
-      uses: actions/checkout@v2
-      with:
-        submodules: true
+      - name: checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    - name: download build
+      - name: download build
         uses: actions/download-artifact@v3
         with:
           name: build
 
-    - name: clang-tidy install
-      run: sudo apt-get install -y clang-tidy
+      - name: clang-tidy install
+        run: sudo apt-get install -y clang-tidy
 
-    - name: clang-tidy run
-      continue-on-error: true
-      run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
+      - name: clang-tidy run
+        continue-on-error: true
+        run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy --format-style=file -p build
 
   infer:
     needs: test
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-    - name: checkout repo
-      uses: actions/checkout@v2
-      with:
-        submodules: true
+      - name: checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    - name: download build
+      - name: download build
         uses: actions/download-artifact@v3
         with:
           name: build
 
-    - name: infer install
-      run: |
-        sudo apt install -y curl
-        VERSION=1.1.0; \
-        curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
-        | sudo tar -C /opt -xJ && \
-        sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
+      - name: infer install
+        run: |
+          sudo apt install -y curl
+          VERSION=1.1.0; \
+          curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+          | sudo tar -C /opt -xJ && \
+          sudo ln -s "/opt/infer-linux64-v$VERSION/bin/infer" /usr/local/bin/infer
 
-    - name: infer run
-      continue-on-error: true
-      run: infer run --compilation-database build/compile_commands.json
+      - name: infer run
+        continue-on-error: true
+        run: infer run --compilation-database build/compile_commands.json
