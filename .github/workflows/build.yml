@@ -98,10 +98,11 @@ jobs:
         run: sudo apt-get install -y cppcheck
 
       - name: cppcheck run
-        run: cppcheck --project=build/compile_commands.json --enable=all --suppressions-list=.cppcheck-suppressions --error-exitcode=0 2> .cppcheck-result
+        run: cppcheck --enable=all --error-exitcode=0 src/ 2> cppcheck-result.txt
+        #run: cppcheck --project=build/compile_commands.json --enable=all --suppressions-list=.cppcheck-suppressions --error-exitcode=0 2> cppcheck-result.txt
 
       - name: cppcheck show
-        run: cat .cppcheck-result
+        run: cat cppcheck-result.txt
 
   cpplint:
     needs: build
@@ -171,4 +172,4 @@ jobs:
 
       - name: infer run
         continue-on-error: true
-        run: infer run --compilation-database build/compile_commands.json
+        run: infer run --compilation-database build/compile_commands.json --keep-going
