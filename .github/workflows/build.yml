@@ -82,18 +82,31 @@ jobs:
         run: ctest --rerun-failed --output-on-failure
 
   cppcheck:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ${{github.workspace}}/build
 
       - name: cppcheck install
         run: sudo apt-get install -y cppcheck
 
       - name: cppcheck run
-        run: cppcheck --enable=all -I external/ --error-exitcode=0 src/
+        run: cppcheck --project=build/compile_commands.json --enable=all --suppressions-list=.cppcheck-suppressions --error-exitcode=0 2> .cppcheck-result
+
+      - name: cppcheck show
+        run: cat .cppcheck-result
 
   cpplint:
+    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
