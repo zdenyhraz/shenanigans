@@ -86,7 +86,7 @@ jobs:
         run: (cd build; ./shenanigans_test)
 
   cppcheck:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
@@ -99,7 +99,7 @@ jobs:
         run: cppcheck --enable=all -I external/ --error-exitcode=0 src/
 
   cpplint:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
