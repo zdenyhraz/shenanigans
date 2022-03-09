@@ -2,9 +2,6 @@
 
 <p align="center">
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
-<br>
 <a href="https://www.codacy.com/gh/zdenyhraz/shenanigans/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdenyhraz/shenanigans&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master" alt="CodeFactor" /></a>
 <!---<a href="https://bettercodehub.com/results/zdenyhraz/shenanigans"><img src="https://bettercodehub.com/edge/badge/zdenyhraz/shenanigans?branch=master"/></a>-->
