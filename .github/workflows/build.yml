@@ -43,7 +43,9 @@ jobs:
         id: opencv-cache
         uses: actions/cache@v2
         with:
-          path: ./opencv-install
+          path: |
+            ./opencv-install
+            /usr/local/
           key: ${{runner.os}}-opencv-cache
 
       - name: opencv install
@@ -70,26 +72,6 @@ jobs:
         with:
           name: build
           path: ${{github.workspace}}/build
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v2
-
-      - name: download build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: ${{github.workspace}}/build
-
-      - name: display build files
-        working-directory: ${{github.workspace}}/build
-        run: ls -R
-
-      - name: chmod build
-        run: chmod -R 755 ${{github.workspace}}/build
 
       - name: run test
         working-directory: ${{github.workspace}}/build
