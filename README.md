@@ -2,7 +2,6 @@
 
 <p align="center">
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
 <br>

@@ -1,68 +1,116 @@
-name: build/test
+name: build/test/lint
 
 on: [push,pull_request]
 
 jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
+      - name: checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    - name: gcc install
-      run: |
-        sudo apt install gcc-11 g++-11
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-        sudo update-alternatives --set gcc /usr/bin/gcc-11
+      - name: gcc install
+        run: |
+          sudo apt install gcc-11 g++-11
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+          sudo update-alternatives --set gcc /usr/bin/gcc-11
 
-    - name: ninja install
-      run: sudo apt-get install -y ninja-build
+      - name: ninja install
+        run: sudo apt-get install -y ninja-build
 
-    - name: python install
-      uses: actions/setup-python@v2
+      - name: python install
+        uses: actions/setup-python@v2
 
-    - name: opencv cache
-      id: opencv-cache
-      uses: actions/cache@v2
-      with:
-        path: ./opencv-install
-        key: ${{runner.os}}-opencv-cache
+      - name: opencv cache
+        id: opencv-cache
+        uses: actions/cache@v2
+        with:
+          path: ./opencv-install
+          key: ${{runner.os}}-opencv-cache
 
-    - name: opencv install
-      uses: rayandrews/with-opencv-action@v1
-      with:
-        opencv-version: '4.5.1'
-        dir: ./opencv-install
-        cached: ${{steps.opencv-cache.outputs.cache-hit}}
+      - name: opencv install
+        uses: rayandrews/with-opencv-action@v1
+        with:
+          opencv-version: '4.5.1'
+          dir: ./opencv-install
+          cached: ${{steps.opencv-cache.outputs.cache-hit}}
 
-    - name: qt cache
-      id: qt-cache
-      uses: actions/cache@v2
-      with:
-        path: ./qt
-        key: ${{runner.os}}-qt-cache
+      - name: qt cache
+        id: qt-cache
+        uses: actions/cache@v2
+        with:
+          path: ./qt
+          key: ${{runner.os}}-qt-cache
 
-    - name: qt install
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: "5.12.2"
-        dir: "./qt"
-        install-deps: true
-        setup-python: false
-        cached: ${{steps.qt-cache.outputs.cache-hit}}
+      - name: qt install
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: "5.12.2"
+          dir: "./qt"
+          install-deps: true
+          setup-python: false
+          cached: ${{steps.qt-cache.outputs.cache-hit}}
 
-    - name: cmake configure
-      env:
-        CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
-      run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
+      - name: cmake configure
+        env:
+          CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B '${{github.workspace}}'/build -G "Ninja" -DCI=ON
 
-    - name: cmake build
-      run: cmake --build ${{github.workspace}}/build --config Release
+      - name: cmake build
+        run: cmake --build ${{github.workspace}}/build --config Release
 
-    - name: cmake test
-      run: (cd ${{github.workspace}}/build; ctest)
+      - name: upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/
 
-    - name: run test
-      run: (cd ${{github.workspace}}/build; ./shenanigans_test)
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
 
+      - name: download build
+          uses: actions/download-artifact@v3
+          with:
+            name: build
+
+      - name: cmake test
+        run: (cd build; ctest)
+
+      - name: run test
+        run: (cd build; ./shenanigans_test)
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: cppcheck install
+        run: sudo apt-get install -y cppcheck
+
+      - name: cppcheck run
+        run: cppcheck --enable=all -I external/ --error-exitcode=0 src/
+
+  cpplint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: python install
+        uses: actions/setup-python@v2
+
+      - name: cpplint install
+        uses: BSFishy/pip-action@v1
+        with:
+          packages: cpplint
+
+      - name: cpplint run
+        run: find src/ -name '*.h' -name '*.hpp' -o -name '*.cpp' | xargs cpplint
