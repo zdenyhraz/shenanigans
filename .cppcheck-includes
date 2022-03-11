@@ -1,0 +1,7 @@
+external/fmt/include
+external/gtest/googletest/include
+external/gtest/googlemock/include
+external/json/include
+external/pybind11/include
+external/qcustomplot
+external/tracy
