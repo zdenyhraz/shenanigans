@@ -3,7 +3,7 @@ name: build/test
 on: [push,pull_request]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
@@ -61,16 +61,6 @@ jobs:
       - name: cmake build
         run: cmake --build ${{github.workspace}}/build --config Release
 
-      - name: display build files
-        working-directory: ${{github.workspace}}/build
-        run: ls -R
-
-      - name: upload build
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: ${{github.workspace}}/build
-
       - name: run test
         working-directory: ${{github.workspace}}/build
         run: ./shenanigans_test
@@ -78,6 +68,16 @@ jobs:
       - name: cmake test
         working-directory: ${{github.workspace}}/build
         run: ctest --rerun-failed --output-on-failure
+
+      # - name: display build files
+      #   working-directory: ${{github.workspace}}/build
+      #   run: ls -R
+
+      # - name: upload build
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: build
+      #     path: ${{github.workspace}}/build
 
   # clang-tidy:
   #   needs: build
