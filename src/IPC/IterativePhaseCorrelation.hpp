@@ -37,7 +37,19 @@ public:
     SubpixelIterative
   };
 
-  enum OptimizedParameters
+  enum class CorrelationType : u8
+  {
+    CrossCorrelation,
+    PhaseCorrelation
+  };
+
+  enum class ModeType : u8
+  {
+    Debug,
+    Release
+  };
+
+  enum OptimizedParameters : u8
   {
     BandpassTypeParameter,
     BandpassLParameter,
@@ -143,18 +155,18 @@ public:
   WindowType GetWindowType() const { return mWinT; }
   InterpolationType GetInterpolationType() const { return mIntT; }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
+  template <ModeType ModeT = ModeType::Release, CorrelationType CorrelationT = CorrelationType::PhaseCorrelation, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
     PROFILE_FUNCTION;
-    return Calculate<DebugMode, CrossCorrelation, AccuracyT>(image1.clone(), image2.clone());
+    return Calculate<ModeT, CorrelationT, AccuracyT>(image1.clone(), image2.clone());
   }
 
-  template <bool DebugMode = false, bool CrossCorrelation = false, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
+  template <ModeType ModeT = ModeType::Release, CorrelationType CorrelationT = CorrelationType::PhaseCorrelation, AccuracyType AccuracyT = AccuracyType::SubpixelIterative>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::Calculate");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows))
       [[unlikely]] throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
@@ -165,55 +177,55 @@ public:
     if (image1.channels() != 1 or image2.channels() != 1)
       [[unlikely]] throw std::invalid_argument("Multichannel images are not supported");
 
-    ConvertToUnitFloat<DebugMode, CrossCorrelation>(image1);
-    ConvertToUnitFloat<DebugMode, CrossCorrelation>(image2);
-    if constexpr (DebugMode)
+    ConvertToUnitFloat<ModeT, CorrelationT == CorrelationType::CrossCorrelation>(image1);
+    ConvertToUnitFloat<ModeT, CorrelationT == CorrelationType::CrossCorrelation>(image2);
+    if constexpr (ModeT == ModeType::Debug)
       DebugInputImages(image1, image2);
 
     // windowing
-    ApplyWindow<DebugMode>(image1);
-    ApplyWindow<DebugMode>(image2);
+    ApplyWindow<ModeT>(image1);
+    ApplyWindow<ModeT>(image2);
 
     // ffts
-    auto dft1 = CalculateFourierTransform<DebugMode>(std::move(image1));
-    auto dft2 = CalculateFourierTransform<DebugMode>(std::move(image2));
-    if constexpr (DebugMode and 0)
+    auto dft1 = CalculateFourierTransform<ModeT>(std::move(image1));
+    auto dft2 = CalculateFourierTransform<ModeT>(std::move(image2));
+    if constexpr (ModeT == ModeType::Debug and 0)
       DebugFourierTransforms(dft1, dft2);
 
     // cross-power
-    auto crosspower = CalculateCrossPowerSpectrum<DebugMode, CrossCorrelation>(std::move(dft1), std::move(dft2));
-    if constexpr (DebugMode)
+    auto crosspower = CalculateCrossPowerSpectrum<ModeT, CorrelationT>(std::move(dft1), std::move(dft2));
+    if constexpr (ModeT == ModeType::Debug)
       DebugCrossPowerSpectrum(crosspower);
 
     // L3
-    cv::Mat L3 = CalculateL3<DebugMode>(std::move(crosspower));
-    cv::Point2d L3peak = GetPeak<DebugMode>(L3);
+    cv::Mat L3 = CalculateL3<ModeT>(std::move(crosspower));
+    cv::Point2d L3peak = GetPeak<ModeT>(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == ModeType::Debug)
       DebugL3(L3);
 
     if constexpr (AccuracyT == AccuracyType::Pixel)
       return GetPixelShift(L3peak, L3mid);
 
     if constexpr (AccuracyT == AccuracyType::Subpixel)
-      return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, 5);
+      return GetSubpixelShift<ModeT>(L3, L3peak, L3mid, 5);
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size))
+      if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
 
     // L2
-    cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
+    cv::Mat L2 = CalculateL2<ModeT>(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
-    if constexpr (DebugMode and not CrossCorrelation)
+    if constexpr (ModeT == ModeType::Debug and CorrelationT != CorrelationType::CrossCorrelation)
       DebugL2(L2);
 
     // L2U
-    cv::Mat L2U = CalculateL2U<DebugMode>(L2);
+    cv::Mat L2U = CalculateL2U<ModeT>(L2);
     cv::Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == ModeType::Debug)
       DebugL2U(L2, L2U);
 
     // L1
@@ -224,7 +236,7 @@ public:
     for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
-      if constexpr (DebugMode)
+      if constexpr (ModeT == ModeType::Debug)
         LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
       L2Upeak = L2Umid; // reset L2U peak position
@@ -232,19 +244,19 @@ public:
       L1mid = cv::Point2d(L1size / 2, L1size / 2);
       L1circle = mL1circle.cols == L1size ? mL1circle : Kirkl<Float>(L1size);
 
-      if constexpr (DebugMode)
+      if constexpr (ModeT == ModeType::Debug)
         DebugL1B(L2U, L1size, L3peak - L3mid);
 
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
-        if constexpr (DebugMode)
+        if constexpr (ModeT == ModeType::Debug)
           LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        if constexpr (DebugMode)
+        if constexpr (ModeT == ModeType::Debug)
           DebugL1A(L1, L3peak - L3mid, L2Upeak - L2Umid);
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
@@ -252,19 +264,19 @@ public:
         if (AccuracyReached(L1peak, L1mid))
           [[unlikely]]
           {
-            if constexpr (DebugMode)
+            if constexpr (ModeT == ModeType::Debug)
               DebugL1A(L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, true);
             return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUC;
           }
       }
 
-      if constexpr (DebugMode)
+      if constexpr (ModeT == ModeType::Debug)
         LOG_WARNING("L1 did not converge - reducing L1ratio: {:.2f} -> {:.2f}", L1ratio, L1ratio - mL1ratioStep);
     }
 
-    if constexpr (DebugMode)
+    if constexpr (ModeT == ModeType::Debug)
       LOG_WARNING("L1 failed to converge with all L1ratios, return non-iterative subpixel shift");
-    return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, L2size);
+    return GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size);
   }
 
   cv::Mat Align(const cv::Mat& image1, const cv::Mat& image2) const;
@@ -315,6 +327,7 @@ private:
       cv::createHanningWindow(mWin, cv::Size(mCols, mRows), GetMatType<Float>());
       return;
     default:
+      mWin = cv::Mat();
       return;
     }
   }
@@ -328,7 +341,11 @@ private:
 
     if (mBPT == BandpassType::None)
       return;
+
     if (mBPL == 0 and mBPH == 0)
+      return;
+
+    if (mBPT == BandpassType::Rectangular and mBPL >= mBPH)
       return;
 
     switch (mBPT)
@@ -352,7 +369,7 @@ private:
             bpp[c] = HighpassEquation(r, c);
         }
       }
-      else if (mBPL != 0 and mBPH != 0)
+      else
       {
         for (i32 r = 0; r < mRows; ++r)
         {
@@ -364,14 +381,11 @@ private:
       }
       break;
     case BandpassType::Rectangular:
-      if (mBPL < mBPH)
+      for (i32 r = 0; r < mRows; ++r)
       {
-        for (i32 r = 0; r < mRows; ++r)
-        {
-          auto bpp = mBP.ptr<Float>(r);
-          for (i32 c = 0; c < mCols; ++c)
-            bpp[c] = BandpassREquation(r, c);
-        }
+        auto bpp = mBP.ptr<Float>(r);
+        for (i32 c = 0; c < mCols; ++c)
+          bpp[c] = BandpassREquation(r, c);
       }
       break;
     default:
@@ -399,11 +413,11 @@ private:
     return (mBPL <= r and r <= mBPH) ? 1 : 0;
   }
 
-  template <bool DebugMode, bool Normalize = false>
+  template <ModeType ModeT = ModeType::Release, bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ConvertToUnitFloat");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::ConvertToUnitFloat");
 
     if (image.type() != GetMatType<Float>())
       image.convertTo(image, GetMatType<Float>());
@@ -412,29 +426,29 @@ private:
       cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   void ApplyWindow(cv::Mat& image) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::ApplyWindow");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::ApplyWindow");
 
     if (mWinT != WindowType::None)
       cv::multiply(image, mWin, image);
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   static cv::Mat CalculateFourierTransform(cv::Mat&& image)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateFourierTransform");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::CalculateFourierTransform");
     return Fourier::fft(std::move(image));
   }
 
-  template <bool DebugMode, bool CrossCorrelation>
+  template <ModeType ModeT = ModeType::Release, CorrelationType CorrelationT = CorrelationType::PhaseCorrelation>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::CalculateCrossPowerSpectrum");
 
     for (i32 row = 0; row < dft1.rows; ++row)
     {
@@ -448,7 +462,7 @@ private:
         const Float mag = std::sqrt(re * re + im * im);
         const Float band = bandp[col];
 
-        if constexpr (CrossCorrelation)
+        if constexpr (CorrelationT == CorrelationType::CrossCorrelation)
         {
           dft1p[col][0] = re * band;
           dft1p[col][1] = im * band;
@@ -463,21 +477,21 @@ private:
     return dft1;
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL3");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::CalculateL3");
     cv::Mat L3 = Fourier::ifft(std::move(crosspower));
     Fourier::fftshift(L3);
     return L3;
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   static cv::Point2d GetPeak(const cv::Mat& mat)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::GetPeak");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::GetPeak");
     cv::Point2i peak(0, 0);
     minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
     return peak;
@@ -499,19 +513,19 @@ private:
     }
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, i32 L2size)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::CalculateL2");
     return RoiCrop(L3, L3peak.x, L3peak.y, L2size, L2size);
   }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   cv::Mat CalculateL2U(const cv::Mat& L2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IterativePhaseCorrelation::CalculateL2U");
+    LOG_FUNCTION_IF(ModeT == ModeType::Debug, "IterativePhaseCorrelation::CalculateL2U");
 
     cv::Mat L2U;
     switch (mIntT)
@@ -549,26 +563,26 @@ private:
 
   static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   static bool ReduceL2size(i32& L2size)
   {
     L2size -= 2;
-    if constexpr (DebugMode)
+    if constexpr (ModeT == ModeType::Debug)
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
 
   static cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) { return L3peak - L3mid; }
 
-  template <bool DebugMode>
+  template <ModeType ModeT = ModeType::Release>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
     PROFILE_FUNCTION;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size))
+      if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
 
-    cv::Mat L2 = CalculateL2<DebugMode>(L3, L3peak, L2size);
+    cv::Mat L2 = CalculateL2<ModeT>(L3, L3peak, L2size);
     cv::Point2d L2peak = GetPeakSubpixel<false>(L2, cv::Mat());
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
     return L3peak - L3mid + L2peak - L2mid;

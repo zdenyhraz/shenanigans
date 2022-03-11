@@ -17,8 +17,8 @@ try
   PROFILE_FUNCTION;
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
-  ApplyWindow<false>(img1W);
-  ApplyWindow<false>(img2W);
+  ApplyWindow<ModeType::Release>(img1W);
+  ApplyWindow<ModeType::Release>(img2W);
   cv::Mat img1FT = Fourier::fft(img1W);
   cv::Mat img2FT = Fourier::fft(img2W);
   Fourier::fftshift(img1FT);
@@ -483,8 +483,8 @@ try
 {
   LOG_FUNCTION("ShowDebugStuff()");
 
-  constexpr bool DebugMode = true;
-  constexpr bool CrossCorrelation = false;
+  constexpr ModeType ModeT = ModeType::Debug;
+  constexpr CorrelationType CorrelationT = CorrelationType::PhaseCorrelation;
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
@@ -513,7 +513,7 @@ try
       AddNoise<Float>(image2, noiseStdev);
     }
 
-    auto ipcshift = Calculate<DebugMode, CrossCorrelation>(image1, image2);
+    auto ipcshift = Calculate<ModeT, CorrelationT>(image1, image2);
     LOG_INFO("Artificial shift = {}", shift);
     LOG_INFO("Estimated shift = {}", ipcshift);
     LOG_INFO("Error = {}", ipcshift - shift);
@@ -547,7 +547,7 @@ try
       if constexpr (addNoise)
         crop2 += noise2;
       SetDebugTrueShift(shift);
-      const auto ipcshift = Calculate<DebugMode>(crop1, crop2);
+      const auto ipcshift = Calculate<ModeT>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
     }
   }
@@ -857,8 +857,8 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
       cv::Mat image1 = RoiCrop(image, point.x, point.y, mCols, mRows);
       cv::Mat image2 = RoiCrop(imageShifted, point.x, point.y, mCols, mRows);
 
-      ConvertToUnitFloat<false>(image1);
-      ConvertToUnitFloat<false>(image2);
+      ConvertToUnitFloat(image1);
+      ConvertToUnitFloat(image2);
 
       AddNoise<Float>(image1, noiseStdev);
       AddNoise<Float>(image2, noiseStdev);
@@ -1067,7 +1067,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetNonIterativeShifts
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate<false, false, AccuracyType::Subpixel>(image1, image2));
+    out.push_back(Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Subpixel>(image1, image2));
 
   return out;
 }
@@ -1080,7 +1080,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetPixelShifts(const 
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate<false, false, AccuracyType::Pixel>(image1, image2));
+    out.push_back(Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Pixel>(image1, image2));
 
   return out;
 }
