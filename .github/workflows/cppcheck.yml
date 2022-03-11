@@ -11,12 +11,6 @@ jobs:
         with:
           submodules: true
 
-      - name: download build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: ${{github.workspace}}/build
-
       - name: cppcheck install
         run: sudo apt-get install -y cppcheck
 
