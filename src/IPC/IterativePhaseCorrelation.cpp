@@ -1,24 +1,21 @@
 #include "IterativePhaseCorrelation.hpp"
+#include "Optimization/Evolution.hpp"
+#include "UtilsCV/Vectmat.hpp"
 #include "Filtering/Noise.hpp"
 
-template class IterativePhaseCorrelation<f32>;
-template class IterativePhaseCorrelation<f64>;
-
-template <typename Float>
-cv::Mat IterativePhaseCorrelation<Float>::Align(const cv::Mat& image1, const cv::Mat& image2) const
+cv::Mat IterativePhaseCorrelation::Align(const cv::Mat& image1, const cv::Mat& image2) const
 {
   return Align(image1.clone(), image2.clone());
 }
 
-template <typename Float>
-cv::Mat IterativePhaseCorrelation<Float>::Align(cv::Mat&& image1, cv::Mat&& image2) const
+cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
 try
 {
   PROFILE_FUNCTION;
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
-  ApplyWindow<ModeType::Release>(img1W);
-  ApplyWindow<ModeType::Release>(img2W);
+  ApplyWindow(img1W);
+  ApplyWindow(img2W);
   cv::Mat img1FT = Fourier::fft(img1W);
   cv::Mat img2FT = Fourier::fft(img2W);
   Fourier::fftshift(img1FT);
@@ -71,14 +68,12 @@ catch (const std::exception& e)
   return cv::Mat();
 }
 
-template <typename Float>
-std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation<Float>::CalculateFlow(const cv::Mat& image1, const cv::Mat& image2, f64 resolution) const
+std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation::CalculateFlow(const cv::Mat& image1, const cv::Mat& image2, f64 resolution) const
 {
   return CalculateFlow(image1.clone(), image2.clone(), resolution);
 }
 
-template <typename Float>
-std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation<Float>::CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, f64 resolution) const
+std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation::CalculateFlow(cv::Mat&& image1, cv::Mat&& image2, f64 resolution) const
 try
 {
   PROFILE_FUNCTION;
@@ -119,8 +114,7 @@ catch (const std::exception& e)
   return {};
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::Optimize(
+void IterativePhaseCorrelation::Optimize(
     const std::string& trainingImagesDirectory, const std::string& validationImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, f64 validationRatio, i32 populationSize)
 try
 {
@@ -177,8 +171,7 @@ catch (const std::exception& e)
   LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
+void IterativePhaseCorrelation::Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize)
 try
 {
   PROFILE_FUNCTION;
@@ -210,8 +203,7 @@ catch (const std::exception& e)
   LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
+void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
@@ -261,8 +253,7 @@ void IterativePhaseCorrelation<Float>::PlotObjectiveFunctionLandscape(const std:
   Plot2D::Plot("IPCdebug2D", landscape);
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters)
+void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters)
 {
   LOG_FUNCTION("PlotImageSizeAccuracyDependence");
 
@@ -304,8 +295,7 @@ void IterativePhaseCorrelation<Float>::PlotImageSizeAccuracyDependence(const std
   Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy);
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
+void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
 {
   LOG_FUNCTION("PlotUpsampleCoefficientAccuracyDependence");
 
@@ -348,8 +338,7 @@ void IterativePhaseCorrelation<Float>::PlotUpsampleCoefficientAccuracyDependence
   Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy);
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
+void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
 {
   LOG_FUNCTION("PlotNoiseAccuracyDependence");
 
@@ -395,8 +384,7 @@ void IterativePhaseCorrelation<Float>::PlotNoiseAccuracyDependence(const std::st
   Plot1D::Plot("NoiseAccuracyDependence", noiseStdevs, accuracy);
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
+void IterativePhaseCorrelation::PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
 {
   LOG_FUNCTION("PlotNoiseOptimalBPHDependence");
 
@@ -431,8 +419,7 @@ void IterativePhaseCorrelation<Float>::PlotNoiseOptimalBPHDependence(const std::
   Plot1D::Plot("NoiseOptimalBPHDependence", noiseStdevs, optimalBPHs);
 }
 
-template <typename Float>
-std::string IterativePhaseCorrelation<Float>::BandpassType2String(BandpassType type)
+std::string IterativePhaseCorrelation::BandpassType2String(BandpassType type)
 {
   switch (type)
   {
@@ -447,8 +434,7 @@ std::string IterativePhaseCorrelation<Float>::BandpassType2String(BandpassType t
   }
 }
 
-template <typename Float>
-std::string IterativePhaseCorrelation<Float>::WindowType2String(WindowType type)
+std::string IterativePhaseCorrelation::WindowType2String(WindowType type)
 {
   switch (type)
   {
@@ -461,8 +447,7 @@ std::string IterativePhaseCorrelation<Float>::WindowType2String(WindowType type)
   }
 }
 
-template <typename Float>
-std::string IterativePhaseCorrelation<Float>::InterpolationType2String(InterpolationType type)
+std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationType type)
 {
   switch (type)
   {
@@ -477,14 +462,12 @@ std::string IterativePhaseCorrelation<Float>::InterpolationType2String(Interpola
   }
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::ShowDebugStuff() const
+void IterativePhaseCorrelation::ShowDebugStuff() const
 try
 {
   LOG_FUNCTION("ShowDebugStuff()");
 
-  constexpr ModeType ModeT = ModeType::Debug;
-  constexpr CorrelationType CorrelationT = CorrelationType::PhaseCorrelation;
+  constexpr Options OptionsT{.ModeT = ModeType::Debug, .CorrelationT = CorrelationType::PhaseCorrelation};
   constexpr bool debugShift = true;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
@@ -513,7 +496,7 @@ try
       AddNoise<Float>(image2, noiseStdev);
     }
 
-    auto ipcshift = Calculate<ModeT, CorrelationT>(image1, image2);
+    auto ipcshift = Calculate<OptionsT>(image1, image2);
     LOG_INFO("Artificial shift = {}", shift);
     LOG_INFO("Estimated shift = {}", ipcshift);
     LOG_INFO("Error = {}", ipcshift - shift);
@@ -547,7 +530,7 @@ try
       if constexpr (addNoise)
         crop2 += noise2;
       SetDebugTrueShift(shift);
-      const auto ipcshift = Calculate<ModeT>(crop1, crop2);
+      const auto ipcshift = Calculate<OptionsT>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
     }
   }
@@ -667,15 +650,13 @@ catch (const std::exception& e)
   LOG_ERROR("ShowDebugStuff() error: {}", e.what());
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
+void IterativePhaseCorrelation::DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const
 {
   PyPlot::Plot(fmt::format("{} I1", mDebugName), {.z = image1, .cmap = "gray"});
   PyPlot::Plot(fmt::format("{} I2", mDebugName), {.z = image2, .cmap = "gray"});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugFourierTransforms(const cv::Mat& dft1, const cv::Mat& dft2) const
+void IterativePhaseCorrelation::DebugFourierTransforms(const cv::Mat& dft1, const cv::Mat& dft2) const
 {
   auto plot1 = dft1.clone();
   Fourier::fftshift(plot1);
@@ -688,8 +669,7 @@ void IterativePhaseCorrelation<Float>::DebugFourierTransforms(const cv::Mat& dft
   PyPlot::Plot(fmt::format("{} DFT2p", mDebugName), {.z = Fourier::phase(plot2)});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
+void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
   PyPlot::Plot(fmt::format("{} CP magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
   PyPlot::Plot(fmt::format("{} CP magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
@@ -699,22 +679,19 @@ void IterativePhaseCorrelation<Float>::DebugCrossPowerSpectrum(const cv::Mat& cr
           .label_ys = {"x", "y"}});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugL3(const cv::Mat& L3) const
+void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
 {
   PyPlot::Plot(fmt::format("{} L3", mDebugName), {.z = L3});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugL2(const cv::Mat& L2) const
+void IterativePhaseCorrelation::DebugL2(const cv::Mat& L2) const
 {
   auto plot = L2.clone();
   cv::resize(plot, plot, plot.size() * mUC, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L2", mDebugName), {.z = plot});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const
+void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const
 {
   PyPlot::PlotSurf(fmt::format("{} L2U surf", mDebugName), {.z = L2U, .save = not mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", mDebugDirectory, mDebugIndex) : ""});
 
@@ -731,8 +708,7 @@ void IterativePhaseCorrelation<Float>::DebugL2U(const cv::Mat& L2, const cv::Mat
   }
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const
 {
   cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
@@ -743,8 +719,7 @@ void IterativePhaseCorrelation<Float>::DebugL1B(const cv::Mat& L2U, i32 L1size, 
   PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last) const
+void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last) const
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
@@ -755,8 +730,7 @@ void IterativePhaseCorrelation<Float>::DebugL1A(const cv::Mat& L1, const cv::Poi
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
-template <typename Float>
-cv::Mat IterativePhaseCorrelation<Float>::ColorComposition(const cv::Mat& img1, const cv::Mat& img2)
+cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const cv::Mat& img2)
 {
   PROFILE_FUNCTION;
   const cv::Vec<Float, 3> img1clr = {1, 0.5, 0};
@@ -792,8 +766,7 @@ cv::Mat IterativePhaseCorrelation<Float>::ColorComposition(const cv::Mat& img1, 
   return (img1c + img2c) / 2;
 }
 
-template <typename Float>
-std::vector<cv::Mat> IterativePhaseCorrelation<Float>::LoadImages(const std::string& imagesDirectory)
+std::vector<cv::Mat> IterativePhaseCorrelation::LoadImages(const std::string& imagesDirectory)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("LoadImages");
@@ -823,8 +796,7 @@ std::vector<cv::Mat> IterativePhaseCorrelation<Float>::LoadImages(const std::str
   return images;
 }
 
-template <typename Float>
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation<Float>::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
+std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation::CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateImagePairs");
@@ -882,8 +854,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
   return imagePairs;
 }
 
-template <typename Float>
-IterativePhaseCorrelation<Float> IterativePhaseCorrelation<Float>::CreateIPCFromParams(const std::vector<f64>& params) const
+IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const std::vector<f64>& params) const
 {
   PROFILE_FUNCTION;
   IterativePhaseCorrelation ipc(mRows, mCols);
@@ -896,8 +867,7 @@ IterativePhaseCorrelation<Float> IterativePhaseCorrelation<Float>::CreateIPCFrom
   return ipc;
 }
 
-template <typename Float>
-std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation<Float>::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
+std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
@@ -917,8 +887,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation<Float>::Cr
   };
 }
 
-template <typename Float>
-std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation<Float>::CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const
+std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
@@ -932,8 +901,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation<Float>::Cr
   };
 }
 
-template <typename Float>
-std::vector<f64> IterativePhaseCorrelation<Float>::CalculateOptimalParameters(
+std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
     const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
 {
   PROFILE_FUNCTION;
@@ -961,8 +929,7 @@ std::vector<f64> IterativePhaseCorrelation<Float>::CalculateOptimalParameters(
   return evo.Optimize(obj, valid).optimum;
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
+void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& optimalParameters)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("ApplyOptimalParameters");
@@ -991,8 +958,7 @@ void IterativePhaseCorrelation<Float>::ApplyOptimalParameters(const std::vector<
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", thisBefore.GetL1ratio(), GetL1ratio());
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
+void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
     const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
 {
   PROFILE_FUNCTION;
@@ -1046,8 +1012,7 @@ void IterativePhaseCorrelation<Float>::ShowOptimizationPlots(const std::vector<c
                                      .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 }
 
-template <typename Float>
-std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
@@ -1059,34 +1024,31 @@ std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetShifts(const std::
   return out;
 }
 
-template <typename Float>
-std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetNonIterativeShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Subpixel>(image1, image2));
+    out.push_back(Calculate<{.AccuracyT = AccuracyType::Subpixel}>(image1, image2));
 
   return out;
 }
 
-template <typename Float>
-std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetPixelShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Pixel>(image1, image2));
+    out.push_back(Calculate<{.AccuracyT = AccuracyType::Pixel}>(image1, image2));
 
   return out;
 }
 
-template <typename Float>
-std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IterativePhaseCorrelation::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
@@ -1098,8 +1060,7 @@ std::vector<cv::Point2d> IterativePhaseCorrelation<Float>::GetReferenceShifts(co
   return out;
 }
 
-template <typename Float>
-f64 IterativePhaseCorrelation<Float>::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts)
+f64 IterativePhaseCorrelation::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts)
 {
   PROFILE_FUNCTION;
   if (shiftsReference.size() != shifts.size())
@@ -1114,8 +1075,7 @@ f64 IterativePhaseCorrelation<Float>::GetAverageAccuracy(const std::vector<cv::P
   return avgerror / shifts.size();
 }
 
-template <typename Float>
-void IterativePhaseCorrelation<Float>::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("ShowRandomImagePair");

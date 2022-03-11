@@ -58,8 +58,8 @@ public:
     std::vector<f64> theta, fshiftx, fshifty, theta0, R;
   };
 
-  template <bool Managed = false, typename T = f64> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 idstart) const
+  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
+  DifferentialRotationData Calculate(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
@@ -120,7 +120,7 @@ public:
           const auto yshift = -R * std::sin(theta - theta0);
           auto crop1 = RoiCrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
           auto crop2 = RoiCrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
-          const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
+          const auto shift = ipc.Calculate<{.AccuracyT = IterativePhaseCorrelation::AccuracyType::SubpixelIterative}>(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
           const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
@@ -165,8 +165,7 @@ public:
     LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
   }
 
-  template <typename T>
-  void Optimize(IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  void Optimize(IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Optimize");
@@ -179,14 +178,14 @@ public:
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
     diffrot.imageCache.SetGetDataFunction([](const std::string& path) {
       PROFILE_SCOPE(Imread);
-      return LoadUnitFloatImage<T>(path); // cache images already converted to desired format for IPC
+      return LoadUnitFloatImage<IterativePhaseCorrelation::Float>(path); // cache images already converted to desired format for IPC
     });
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
 
     const auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
-    const auto obj = [&](const IterativePhaseCorrelation<T>& ipcopt) {
+    const auto obj = [&](const IterativePhaseCorrelation& ipcopt) {
       const auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
@@ -454,8 +453,7 @@ private:
     PyPlot::Plot("omega y", {.z = data.omegay, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega y [px]", .aspectratio = aspectratio});
   }
 
-  template <typename T>
-  void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath) const
+  void Save(const DifferentialRotationData& data, const IterativePhaseCorrelation& ipc, const std::string& dataPath) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Save");
@@ -494,8 +492,7 @@ private:
     file << "R" << data.R;
   }
 
-  template <typename T>
-  void SaveOptimizedParameters(const IterativePhaseCorrelation<T>& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  void SaveOptimizedParameters(const IterativePhaseCorrelation& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");

@@ -24,9 +24,9 @@ WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(pare
 
 void WindowIPC::RefreshIPCparameters()
 {
-  mWindowData->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation<>::BandpassType>(ui.comboBox->currentIndex()));
-  mWindowData->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation<>::InterpolationType>(ui.comboBox_2->currentIndex()));
-  mWindowData->IPC->SetWindowType(static_cast<IterativePhaseCorrelation<>::WindowType>(ui.comboBox_3->currentIndex()));
+  mWindowData->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation::BandpassType>(ui.comboBox->currentIndex()));
+  mWindowData->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation::InterpolationType>(ui.comboBox_2->currentIndex()));
+  mWindowData->IPC->SetWindowType(static_cast<IterativePhaseCorrelation::WindowType>(ui.comboBox_3->currentIndex()));
   mWindowData->IPC->SetSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
   mWindowData->IPC->SetL2size(ui.lineEdit_2->text().toInt());
   mWindowData->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());

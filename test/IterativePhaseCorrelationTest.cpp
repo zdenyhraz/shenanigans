@@ -5,12 +5,12 @@ class IterativePhaseCorrelationTest : public ::testing::Test
 protected:
   IterativePhaseCorrelationTest() : mImg1(LoadUnitFloatImage<f64>("../test/data/baboon.png")) {}
 
-  using ModeType = IterativePhaseCorrelation<>::ModeType;
-  using CorrelationType = IterativePhaseCorrelation<>::CorrelationType;
-  using InterpolationType = IterativePhaseCorrelation<>::InterpolationType;
-  using BandpassType = IterativePhaseCorrelation<>::BandpassType;
-  using WindowType = IterativePhaseCorrelation<>::WindowType;
-  using AccuracyType = IterativePhaseCorrelation<>::AccuracyType;
+  using ModeType = IterativePhaseCorrelation::ModeType;
+  using CorrelationType = IterativePhaseCorrelation::CorrelationType;
+  using InterpolationType = IterativePhaseCorrelation::InterpolationType;
+  using BandpassType = IterativePhaseCorrelation::BandpassType;
+  using WindowType = IterativePhaseCorrelation::WindowType;
+  using AccuracyType = IterativePhaseCorrelation::AccuracyType;
 
   void SetUp() override
   {
@@ -20,11 +20,7 @@ protected:
     ASSERT_TRUE(not mImg2.empty());
   }
 
-  template <typename T = f64>
-  IterativePhaseCorrelation<T> GetIPC() const
-  {
-    return IterativePhaseCorrelation<T>(mImg1.size());
-  }
+  IterativePhaseCorrelation GetIPC() const { return IterativePhaseCorrelation(mImg1.size()); }
 
   const cv::Point2d mShift = cv::Point2d(38.638, -67.425);
   static constexpr f64 kTolerance = 1e-7;
@@ -59,8 +55,8 @@ TEST_F(IterativePhaseCorrelationTest, Shift)
 {
   const auto ipc = GetIPC();
   const auto shift = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shift.x, mShift.x, 0.3);
-  EXPECT_NEAR(shift.y, mShift.y, 0.3);
+  EXPECT_NEAR(shift.x, mShift.x, 0.5);
+  EXPECT_NEAR(shift.y, mShift.y, 0.5);
 }
 
 TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputs)
@@ -74,11 +70,10 @@ TEST_F(IterativePhaseCorrelationTest, UnnormalizedInputs)
 
 TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)
 {
-
   const auto ipc = GetIPC();
-  const auto subpixeliterativeError = ipc.Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::SubpixelIterative>(mImg1, mImg2) - mShift;
-  const auto subpixelError = ipc.Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Subpixel>(mImg1, mImg2) - mShift;
-  const auto pixelError = ipc.Calculate<ModeType::Release, CorrelationType::PhaseCorrelation, AccuracyType::Pixel>(mImg1, mImg2) - mShift;
+  const auto subpixeliterativeError = ipc.Calculate<{.AccuracyT = AccuracyType::SubpixelIterative}>(mImg1, mImg2) - mShift;
+  const auto subpixelError = ipc.Calculate<{.AccuracyT = AccuracyType::Subpixel}>(mImg1, mImg2) - mShift;
+  const auto pixelError = ipc.Calculate<{.AccuracyT = AccuracyType::Pixel}>(mImg1, mImg2) - mShift;
   EXPECT_LT(std::abs(subpixeliterativeError.x), std::abs(subpixelError.x));
   EXPECT_LT(std::abs(subpixeliterativeError.y), std::abs(subpixelError.y));
   EXPECT_LT(std::abs(subpixelError.x), std::abs(pixelError.x));
@@ -87,21 +82,11 @@ TEST_F(IterativePhaseCorrelationTest, AccuracyTypes)
   EXPECT_LT(std::abs(pixelError.y), 0.5);
 }
 
-TEST_F(IterativePhaseCorrelationTest, FloatTypes)
-{
-  const auto ipc32 = GetIPC<f32>();
-  const auto ipc64 = GetIPC<f64>();
-  const auto shift32 = ipc32.Calculate(mImg1, mImg2);
-  const auto shift64 = ipc64.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shift32.x, shift64.x, kTolerance);
-  EXPECT_NEAR(shift32.y, shift64.y, kTolerance);
-}
-
 TEST_F(IterativePhaseCorrelationTest, CorrelationTypes)
 {
   const auto ipc = GetIPC();
-  EXPECT_NO_THROW((std::ignore = ipc.Calculate<ModeType::Release, CorrelationType::PhaseCorrelation>(mImg1, mImg2)));
-  EXPECT_NO_THROW((std::ignore = ipc.Calculate<ModeType::Release, CorrelationType::CrossCorrelation>(mImg1, mImg2)));
+  EXPECT_NO_THROW((ipc.Calculate<{.CorrelationT = CorrelationType::PhaseCorrelation}>(mImg1, mImg2)));
+  EXPECT_NO_THROW((ipc.Calculate<{.CorrelationT = CorrelationType::CrossCorrelation}>(mImg1, mImg2)));
 }
 
 TEST_F(IterativePhaseCorrelationTest, InterpolationTypes)
@@ -110,18 +95,18 @@ TEST_F(IterativePhaseCorrelationTest, InterpolationTypes)
 
   ipc.SetInterpolationType(InterpolationType::NearestNeighbor);
   const auto shiftNearest = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftNearest.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftNearest.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftNearest.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftNearest.y, mShift.y, 0.5);
 
   ipc.SetInterpolationType(InterpolationType::Linear);
   const auto shiftLinear = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftLinear.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftLinear.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftLinear.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftLinear.y, mShift.y, 0.5);
 
   ipc.SetInterpolationType(InterpolationType::Cubic);
   const auto shiftCubic = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftCubic.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftCubic.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftCubic.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftCubic.y, mShift.y, 0.5);
 }
 
 TEST_F(IterativePhaseCorrelationTest, BandpassTypes)
@@ -131,18 +116,18 @@ TEST_F(IterativePhaseCorrelationTest, BandpassTypes)
 
   ipc.SetBandpassType(BandpassType::Rectangular);
   const auto shiftRectangular = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftRectangular.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftRectangular.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftRectangular.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftRectangular.y, mShift.y, 0.5);
 
   ipc.SetBandpassType(BandpassType::Gaussian);
   const auto shiftGaussian = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftGaussian.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftGaussian.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftGaussian.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftGaussian.y, mShift.y, 0.5);
 
   ipc.SetBandpassType(BandpassType::None);
   const auto shiftNone = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftNone.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftNone.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftNone.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftNone.y, mShift.y, 0.5);
 }
 
 TEST_F(IterativePhaseCorrelationTest, WindowTypes)
@@ -151,11 +136,11 @@ TEST_F(IterativePhaseCorrelationTest, WindowTypes)
 
   ipc.SetWindowType(WindowType::None);
   const auto shiftNone = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftNone.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftNone.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftNone.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftNone.y, mShift.y, 0.5);
 
   ipc.SetWindowType(WindowType::Hann);
   const auto shiftHann = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shiftHann.x, mShift.x, 0.3);
-  EXPECT_NEAR(shiftHann.y, mShift.y, 0.3);
+  EXPECT_NEAR(shiftHann.x, mShift.x, 0.5);
+  EXPECT_NEAR(shiftHann.y, mShift.y, 0.5);
 }

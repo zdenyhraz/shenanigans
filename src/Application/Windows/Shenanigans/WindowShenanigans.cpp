@@ -5,6 +5,7 @@
 #include "../FITS/WindowFITS.hpp"
 #include "../Filtering/WindowFiltering.hpp"
 #include "Random/Procedural.hpp"
+#include "Optimization/Evolution.hpp"
 #include "Optimization/OptimizationTestFunctions.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
