@@ -3,71 +3,6 @@
 #include "UtilsCV/Vectmat.hpp"
 #include "Filtering/Noise.hpp"
 
-cv::Mat IterativePhaseCorrelation::Align(const cv::Mat& image1, const cv::Mat& image2) const
-{
-  return Align(image1.clone(), image2.clone());
-}
-
-cv::Mat IterativePhaseCorrelation::Align(cv::Mat&& image1, cv::Mat&& image2) const
-try
-{
-  PROFILE_FUNCTION;
-  cv::Mat img1W = image1.clone();
-  cv::Mat img2W = image2.clone();
-  ApplyWindow(img1W);
-  ApplyWindow(img2W);
-  cv::Mat img1FT = Fourier::fft(img1W);
-  cv::Mat img2FT = Fourier::fft(img2W);
-  Fourier::fftshift(img1FT);
-  Fourier::fftshift(img2FT);
-  cv::Mat img1FTm = cv::Mat(img1FT.size(), GetMatType<Float>());
-  cv::Mat img2FTm = cv::Mat(img2FT.size(), GetMatType<Float>());
-  for (i32 row = 0; row < img1FT.rows; ++row)
-  {
-    auto img1FTp = img1FT.ptr<cv::Vec<Float, 2>>(row);
-    auto img2FTp = img2FT.ptr<cv::Vec<Float, 2>>(row);
-    auto img1FTmp = img1FTm.ptr<Float>(row);
-    auto img2FTmp = img2FTm.ptr<Float>(row);
-    for (i32 col = 0; col < img1FT.cols; ++col)
-    {
-      const auto& re1 = img1FTp[col][0];
-      const auto& im1 = img1FTp[col][1];
-      const auto& re2 = img2FTp[col][0];
-      const auto& im2 = img2FTp[col][1];
-      img1FTmp[col] = std::log(std::sqrt(re1 * re1 + im1 * im1));
-      img2FTmp[col] = std::log(std::sqrt(re2 * re2 + im2 * im2));
-    }
-  }
-  cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
-  f64 maxRadius = std::min(center.y, center.x);
-  warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
-  warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
-
-  // rotation
-  auto shiftR = Calculate(img1FTm, img2FTm);
-  f64 rotation = -shiftR.y / image1.rows * 360;
-  f64 scale = exp(shiftR.x * log(maxRadius) / image1.cols);
-  Rotate(image2, -rotation, scale);
-
-  // translation
-  auto shiftT = Calculate(image1, image2);
-  Shift(image2, -shiftT);
-
-  if constexpr (0)
-  {
-    LOG_INFO("Evaluated rotation: {} deg", rotation);
-    LOG_INFO("Evaluated scale: {}", 1.f / scale);
-    LOG_INFO("Evaluated shift: {} px", shiftT);
-    Showimg(ColorComposition(image1, image2), "color composition result", 0, 0, 1, 1000);
-  }
-  return image2;
-}
-catch (const std::exception& e)
-{
-  LOG_ERROR("IPC Align error: {}", e.what());
-  return cv::Mat();
-}
-
 std::tuple<cv::Mat, cv::Mat> IterativePhaseCorrelation::CalculateFlow(const cv::Mat& image1, const cv::Mat& image2, f64 resolution) const
 {
   return CalculateFlow(image1.clone(), image2.clone(), resolution);
@@ -468,16 +403,17 @@ try
   LOG_FUNCTION("ShowDebugStuff()");
 
   constexpr Options OptionsT{.ModeT = ModeType::Debug, .CorrelationT = CorrelationType::PhaseCorrelation};
+  constexpr bool addNoise = true;
   constexpr bool debugShift = true;
+  constexpr bool debugAlign = false;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
-  constexpr bool addNoise = false;
 
   if constexpr (debugShift)
   {
-    cv::Mat image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
+    const auto image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
     const f64 shiftmax = 0.4 * mRows;
     cv::Point2d shift(Random::Randu(-1., 1.) * shiftmax, Random::Randu(-1., 1.) * shiftmax);
     cv::Point2i point(std::clamp(Random::Randu() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
@@ -496,10 +432,34 @@ try
       AddNoise<Float>(image2, noiseStdev);
     }
 
-    auto ipcshift = Calculate<OptionsT>(image1, image2);
+    const auto ipcshift = Calculate<OptionsT>(image1, image2);
+
     LOG_INFO("Artificial shift = {}", shift);
     LOG_INFO("Estimated shift = {}", ipcshift);
     LOG_INFO("Error = {}", ipcshift - shift);
+  }
+
+  if constexpr (debugAlign)
+  {
+    auto image1 = LoadUnitFloatImage<Float>("../data/AIA/304A.png");
+    auto image2 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
+    if (mRows != image1.rows or mCols != image1.cols)
+    {
+      image1 = RoiCrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
+      image2 = RoiCrop(image2, image1.cols / 2, image1.rows / 2, mCols, mRows);
+    }
+
+    Shift(image2, -950, 1050);
+    Rotate(image2, 70, 1.2);
+
+    if constexpr (addNoise and 0)
+    {
+      const f64 noiseStdev = 0.01;
+      AddNoise<Float>(image1, noiseStdev);
+      AddNoise<Float>(image2, noiseStdev);
+    }
+
+    const auto aligned = Align<OptionsT>(image1, image2);
   }
 
   if constexpr (debugGradualShift)
@@ -672,11 +632,7 @@ void IterativePhaseCorrelation::DebugFourierTransforms(const cv::Mat& dft1, cons
 void IterativePhaseCorrelation::DebugCrossPowerSpectrum(const cv::Mat& crosspower) const
 {
   PyPlot::Plot(fmt::format("{} CP magnitude", mDebugName), {.z = Fourier::fftshift(Fourier::magn(crosspower))});
-  PyPlot::Plot(fmt::format("{} CP magnitude 1D", mDebugName), {.y = GetMidRow<Float>(Fourier::fftshift(Fourier::magn(crosspower)))});
   PyPlot::Plot(fmt::format("{} CP phase", mDebugName), {.z = Fourier::fftshift(Fourier::phase(crosspower))});
-  PyPlot::Plot(fmt::format("{} CP sawtooth", mDebugName),
-      {.ys = {GetRow<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.rows), GetCol<Float>(Fourier::fftshift(Fourier::phase(crosspower)), 0.6 * crosspower.cols)},
-          .label_ys = {"x", "y"}});
 }
 
 void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
@@ -730,14 +686,11 @@ void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
-cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const cv::Mat& img2)
+cv::Mat IterativePhaseCorrelation::ColorComposition(const cv::Mat& img1, const cv::Mat& img2, f64 gamma1, f64 gamma2)
 {
   PROFILE_FUNCTION;
   const cv::Vec<Float, 3> img1clr = {1, 0.5, 0};
   const cv::Vec<Float, 3> img2clr = {0, 0.5, 1};
-
-  const f64 gamma1 = 1.0;
-  const f64 gamma2 = 1.0;
 
   cv::Mat img1c = cv::Mat(img1.size(), GetMatType<Float>(3));
   cv::Mat img2c = cv::Mat(img2.size(), GetMatType<Float>(3));

@@ -66,23 +66,23 @@ inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
   return (X.t() * X).inv() * X.t() * Y;
 }
 
-inline void Shift(cv::Mat& mat, const cv::Point2f& shift)
+inline void Shift(cv::Mat& mat, const cv::Point2d& shift)
 {
   PROFILE_FUNCTION;
-  cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+  cv::Mat T = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
   warpAffine(mat, mat, T, mat.size());
 }
 
-inline void Shift(cv::Mat& mat, f32 shiftx, f32 shifty)
+inline void Shift(cv::Mat& mat, f64 shiftx, f64 shifty)
 {
   PROFILE_FUNCTION;
   Shift(mat, {shiftx, shifty});
 }
 
-inline void Rotate(cv::Mat& mat, f32 rot, f32 scale = 1)
+inline void Rotate(cv::Mat& mat, f64 rot, f64 scale = 1)
 {
   PROFILE_FUNCTION;
-  cv::Point2f center((f32)mat.cols / 2, (f32)mat.rows / 2);
+  cv::Point2d center(mat.cols / 2, mat.rows / 2);
   cv::Mat R = getRotationMatrix2D(center, rot, scale);
   warpAffine(mat, mat, R, mat.size());
 }
