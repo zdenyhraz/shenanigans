@@ -128,12 +128,20 @@ file(GLOB_RECURSE SRC_QCUSTOMPLOT CONFIGURE_DEPENDS external/qcustomplot/qcustom
 target_sources(shenanigans PRIVATE ${SRC_QCUSTOMPLOT})
 target_sources(shenanigans_test PRIVATE ${SRC_QCUSTOMPLOT})
 
+# torch
+find_package(Torch REQUIRED HINTS "external/libtorch")
+include_directories("external/libtorch/include")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+target_link_libraries(shenanigans PRIVATE "${TORCH_LIBRARIES}")
+target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
+
 # custom
 include_directories("src")
 
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
 src/*.ui src/*.rc src/*.qrc
+src/ANN/*.hpp src/ANN/*.cpp
 src/Application/Windows/*.hpp src/Application/Windows/*.cpp
 src/Astrophysics/*.hpp src/Astrophysics/*.cpp
 src/Features/*.hpp src/Features/*.cpp

@@ -2,6 +2,7 @@
 build/*
 data/diffrot_*
 debug/*
+external/libtorch
 
 *.dump
 cppcheck_report.*

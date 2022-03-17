@@ -8,9 +8,6 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-// QCustomPlot
-#include <qcustomplot.h>
-
 // fmt
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -21,3 +18,6 @@
 
 // json
 #include <nlohmann/json.hpp>
+
+// torch
+#include <torch/torch.h>

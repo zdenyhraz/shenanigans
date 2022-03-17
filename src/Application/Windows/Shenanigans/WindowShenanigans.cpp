@@ -7,6 +7,7 @@
 #include "Random/Procedural.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/OptimizationTestFunctions.hpp"
+#include "ANN/RegressionModel.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
 {
@@ -119,6 +120,21 @@ void WindowShenanigans::RandomShit()
 try
 {
   LOG_FUNCTION("RandomShit");
+
+  RegressionModel model;
+  model.Train({});
+  torch::Tensor x = torch::linspace(0, 1, 11);
+  torch::Tensor ytrue = TestFunction(x);
+  torch::Tensor ypred = model.Forward(x);
+
+  for (int64_t i = 0; i < x.size(0); ++i)
+  {
+    auto xval = x[i].item<float>();
+    auto trueval = ytrue[i].item<float>();
+    auto predval = ypred[i].item<float>();
+    LOG_DEBUG("x: {:.2f} | True: {:.2f} | Pred: {:.2f} | Error: {:.2f}", xval, trueval, predval, predval - trueval);
+  }
+  return;
 
   if (0) // optimization / metaoptimization
   {

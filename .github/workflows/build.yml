@@ -23,6 +23,13 @@ jobs:
       - name: python install
         uses: actions/setup-python@v2
 
+      - name: torch install
+        run: |
+          working-directory: ${{github.workspace}}/external
+          wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
+          mkdir libtorch
+          unzip libtorch-shared-with-deps-latest.zip -d libtorch
+
       - name: qt cache
         id: qt-cache
         uses: actions/cache@v2
