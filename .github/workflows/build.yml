@@ -24,8 +24,9 @@ jobs:
         uses: actions/setup-python@v2
 
       - name: torch install
+        working-directory: ${{github.workspace}}/external
         run: |
-          working-directory: ${{github.workspace}}/external
+          apt install wget
           wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
           mkdir libtorch
           unzip libtorch-shared-with-deps-latest.zip -d libtorch
