@@ -122,18 +122,12 @@ try
   LOG_FUNCTION("RandomShit");
 
   RegressionModel model;
-  model.Train({});
-  torch::Tensor x = torch::linspace(0, 1, 11);
-  torch::Tensor ytrue = TestFunction(x);
-  torch::Tensor ypred = model.Forward(x);
+  model.Train({.epochCount = 50});
+  torch::Tensor xTensor = torch::linspace(0, 1, 1001);
+  torch::Tensor yTensor = TestFunction(xTensor);
+  torch::Tensor ypredTensor = model.Forward(xTensor);
 
-  for (int64_t i = 0; i < x.size(0); ++i)
-  {
-    auto xval = x[i].item<float>();
-    auto trueval = ytrue[i].item<float>();
-    auto predval = ypred[i].item<float>();
-    LOG_DEBUG("x: {:.2f} | True: {:.2f} | Pred: {:.2f} | Error: {:.2f}", xval, trueval, predval, predval - trueval);
-  }
+  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"y", "ypred"}});
   return;
 
   if (0) // optimization / metaoptimization

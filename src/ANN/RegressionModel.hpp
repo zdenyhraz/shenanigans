@@ -34,8 +34,12 @@ public:
 
     torch::optim::Adam optimizer(parameters(), options.learningRate); // SGD, Adam, ...
 
+    std::vector<f64> epochs;
+    std::vector<f64> losses;
+
     for (i64 epochIndex = 0; epochIndex < options.epochCount; ++epochIndex)
     {
+      i64 batchIndex = 0;
       for (auto& batch : *dataloaderTrain)
       {
         optimizer.zero_grad();
@@ -43,7 +47,16 @@ public:
         torch::Tensor loss = torch::mse_loss(prediction, batch.target);
         loss.backward();
         optimizer.step();
+
+        if (batchIndex == 0)
+        {
+          epochs.push_back(epochIndex);
+          losses.push_back(loss.item<float>());
+        }
+        ++batchIndex;
       }
+
+      PyPlot::Plot("RegressionModel::Train", {.x = epochs, .y = losses});
 
       if (options.logProgress and epochIndex % (options.epochCount / options.logProgressCount) == 0)
       {

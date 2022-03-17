@@ -1,12 +1,12 @@
 #pragma once
 #include "Dataset.hpp"
-
+#include "Utils.hpp"
 class Model : public torch::nn::Module
 {
 public:
   struct TrainOptions
   {
-    i64 epochCount = 500;
+    i64 epochCount = 100;
     i64 batchSize = 16;
     f32 learningRate = 0.001;
     bool saveNetwork = false;
