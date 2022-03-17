@@ -26,10 +26,8 @@ jobs:
       - name: torch install
         working-directory: ${{github.workspace}}/external
         run: |
-          sudo apt install wget
           wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
-          mkdir libtorch
-          unzip libtorch-shared-with-deps-latest.zip -d libtorch
+          unzip libtorch-shared-with-deps-latest.zip
 
       - name: qt cache
         id: qt-cache
