@@ -413,7 +413,7 @@ try
 
   if constexpr (debugShift)
   {
-    const auto image = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
+    const auto image = LoadUnitFloatImage<Float>("../debug/AIA/171A.png");
     const f64 shiftmax = 0.4 * mRows;
     cv::Point2d shift(Random::Randu(-1., 1.) * shiftmax, Random::Randu(-1., 1.) * shiftmax);
     cv::Point2i point(std::clamp(Random::Randu() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
@@ -441,8 +441,8 @@ try
 
   if constexpr (debugAlign)
   {
-    auto image1 = LoadUnitFloatImage<Float>("../data/AIA/304A.png");
-    auto image2 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
+    auto image1 = LoadUnitFloatImage<Float>("../debug/AIA/304A.png");
+    auto image2 = LoadUnitFloatImage<Float>("../debug/AIA/171A.png");
     if (mRows != image1.rows or mCols != image1.cols)
     {
       image1 = RoiCrop(image1, image1.cols / 2, image1.rows / 2, mCols, mRows);
@@ -464,8 +464,8 @@ try
 
   if constexpr (debugGradualShift)
   {
-    SetDebugDirectory("../data/peakshift");
-    const cv::Mat image1 = LoadUnitFloatImage<Float>("../data/AIA/171A.png");
+    SetDebugDirectory("../debug/peakshift");
+    const cv::Mat image1 = LoadUnitFloatImage<Float>("../debug/AIA/171A.png");
     const cv::Mat crop1 = RoiCropMid(image1, mCols, mRows);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;

@@ -264,7 +264,7 @@ public:
     }
 
     Showimg(imageclr, "meridian curve", false, 0, 1, 1200);
-    // Saveimg(fmt::format("{}/meridian_curve.png", "../data/debug"), imageclr, false, imageclr.size() / 6);
+    // Saveimg(fmt::format("{}/meridian_curve.png", "../debug/debug"), imageclr, false, imageclr.size() / 6);
   }
 
 private:

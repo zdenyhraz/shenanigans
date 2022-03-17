@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from PIL import Image
 
 # open a FITS file, URL can also be used
-hdul = fits.open('data/HMI/HMI.fits')
+hdul = fits.open('debug/HMI/HMI.fits')
 hdul.verify('fix')
 print(hdul)
 
@@ -17,10 +17,10 @@ for line in hdr:
 
 print("---------- Data ----------")
 fitsdata = np.transpose(np.rot90(hdul[0].data))  # assume the first extension is an image
-Image.fromarray(fitsdata.astype(np.int32)).save('data/HMI/HMI.png')  # save as png
+Image.fromarray(fitsdata.astype(np.int32)).save('debug/HMI/HMI.png')  # save as png
 
 # check if saved png is the same as fits
-imdata = np.asarray(Image.open('data/HMI/HMI.png'))
+imdata = np.asarray(Image.open('debug/HMI/HMI.png'))
 print("Arrays equal: {}".format(np.array_equal(fitsdata, imdata)))
 print("Array types: {} / {}".format(fitsdata.dtype, imdata.dtype))
 print("Value at [1000,1000]: {} / {}".format(fitsdata[1000, 1000], imdata[1000, 1000]))

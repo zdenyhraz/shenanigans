@@ -1,15 +1,8 @@
-.vscode/**
-build/**
-data/**
+.vscode/*
+build/*
+data/diffrot_*
+debug/*
 
 *.dump
 cppcheck_report.*
 
-!data/app/
-!data/app/**
-!data/articles/
-!data/articles/**
-!data/dissertation/
-!data/dissertation/**
-!data/readme/
-!data/readme/**
