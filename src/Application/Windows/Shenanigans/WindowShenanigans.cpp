@@ -121,13 +121,14 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  RegressionModel model;
-  model.Train({.epochCount = 100});
   torch::Tensor xTensor = torch::linspace(0, 1, 1001);
   torch::Tensor yTensor = TestFunction(xTensor);
-  torch::Tensor ypredTensor = model.Forward(xTensor);
+  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
 
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"y", "ypred"}});
+  RegressionModel model;
+  model.Train({.epochCount = 50}, "128", "16");
+  torch::Tensor ypredTensor = model.Forward(xTensor);
+  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
   return;
 
   if (0) // optimization / metaoptimization

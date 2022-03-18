@@ -2,15 +2,15 @@
 
 torch::Tensor TestFunction(torch::Tensor x)
 {
-  return torch::exp(-20. * torch::pow(x - 0.25, 2)) + 3. * torch::exp(-100. * torch::pow(x - 0.75, 2));
+  return torch::exp(-20. * torch::pow(x - 0.3, 2)) + 3. * torch::exp(-100. * torch::pow(x - 0.75, 2)) + 0.2 * torch::exp(-50. * torch::pow(x - 0.3, 2)) * torch::sin(x * 6.28 * 50);
 }
 
 class Dataset : public torch::data::Dataset<Dataset>
 {
 public:
-  Dataset(size_t n)
+  Dataset(const std::string& n)
   {
-    mInputs = torch::rand(n);
+    mInputs = torch::rand(std::stoi(n));
     mTargets = TestFunction(mInputs);
   }
 

@@ -24,13 +24,13 @@ public:
     return x;
   }
 
-  void Train(const TrainOptions& options) override
+  void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = Dataset(128).map(torch::data::transforms::Stack<>());
-    auto datasetTest = Dataset(32).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = Dataset(pathTrain).map(torch::data::transforms::Stack<>());
+    auto datasetTest = Dataset(pathTest).map(torch::data::transforms::Stack<>());
 
-    auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(datasetTrain, options.batchSize);
-    auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(datasetTest, options.batchSize);
+    auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
+    auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
     torch::optim::Adam optimizer(parameters(), options.learningRate);
 
     std::vector<f64> epochs, lossesTrainAvg, lossesTestAvg;
@@ -55,10 +55,10 @@ public:
       }
 
       {
+        torch::NoGradGuard noGrad;
         i64 batchTestIndex = 0;
         for (auto& batchTest : *dataloaderTest)
         {
-          torch::NoGradGuard noGrad;
           torch::Tensor predictionTest = Forward(batchTest.data).reshape({options.batchSize});
           torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
           lossTestAvg += lossTest.item<float>();
@@ -67,18 +67,19 @@ public:
         lossTestAvg /= batchTestIndex;
       }
 
-      epochs.push_back(epochIndex);
-      lossesTrainAvg.push_back(lossTrainAvg);
-      lossesTestAvg.push_back(lossTestAvg);
-
-      if (options.plotProgress)
-        PyPlot::Plot("RegressionModel::Train", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"lossTrainAvg", "lossTestAvg"}});
-
       if (options.logProgress and epochIndex % (options.epochCount / options.logProgressCount) == 0)
-        LOG_DEBUG("Epoch {} | LossTrain {} | LossTest {}", epochIndex, lossTrainAvg, lossTestAvg);
+        LOG_DEBUG("Epoch {} | TrainLoss {:.2e} | TestLoss {:.2e}", epochIndex, lossTrainAvg, lossTestAvg);
 
       if (options.saveNetwork and epochIndex % (options.epochCount / options.saveNetworkCount) == 0)
         torch::save(shared_from_this(), fmt::format("../debug/ANN/net_epoch{}.pt", epochIndex));
+
+      if (options.plotProgress)
+      {
+        epochs.push_back(epochIndex);
+        lossesTrainAvg.push_back(lossTrainAvg);
+        lossesTestAvg.push_back(lossTestAvg);
+        PyPlot::Plot("RegressionModel::Train", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"train loss", "test loss"}});
+      }
     }
   }
 
