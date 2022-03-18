@@ -7,18 +7,20 @@ class ImageSegmentationModel : public Model
 public:
   ImageSegmentationModel()
   {
-    fc1 = register_module("fc1", torch::nn::Linear(kImageWidth * kImageHeight, 1024));
-    fc2 = register_module("fc2", torch::nn::Linear(1024, 512));
-    fc3 = register_module("fc3", torch::nn::Linear(512, 1024));
-    fc4 = register_module("fc4", torch::nn::Linear(1024, kImageWidth * kImageHeight));
+    conv1 = register_module("conv1", torch::nn::Conv2d(1, 8, kKernelSize));
+    conv2 = register_module("conv2", torch::nn::Conv2d(8, 16, kKernelSize));
+    conv3 = register_module("conv3", torch::nn::Conv2d(16, 8, kKernelSize));
+    conv4 = register_module("conv4", torch::nn::Conv2d(8, 1, kKernelSize));
+    us = register_module("us", torch::nn::Upsample(torch::nn::UpsampleOptions().size({{kImageHeight, kImageWidth}}).mode(torch::kBilinear).align_corners(false)));
   }
 
   torch::Tensor Forward(torch::Tensor x) override
   {
-    x = torch::relu(fc1->forward(x));
-    x = torch::relu(fc2->forward(x));
-    x = torch::relu(fc3->forward(x));
-    x = fc4->forward(x);
+    x = torch::relu(conv1->forward(x));
+    x = torch::relu(conv2->forward(x));
+    x = torch::relu(conv3->forward(x));
+    x = conv4->forward(x);
+    x = us->forward(x);
     return x;
   }
 
@@ -83,15 +85,18 @@ public:
 
   static constexpr i64 kImageWidth = 128;
   static constexpr i64 kImageHeight = 128;
+  static constexpr i32 kKernelSize = 5;
 
 private:
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
+  torch::nn::Conv2d conv1{nullptr}, conv2{nullptr}, conv3{nullptr}, conv4{nullptr};
+  torch::nn::Upsample us;
 };
 
 void ImageSegmentationModelTest()
 {
   ImageSegmentationModel model;
-  model.Train({.epochCount = 10, .batchSize = 2}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
+  model.Train({.epochCount = 50, .batchSize = 8}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
 
   cv::Mat image = LoadUnitFloatImage<f32>("../debug/AIA/171A.png");
   const i32 x = image.cols / 2 + Random::Rand(-1., 1.) * (image.cols / 2 - ImageSegmentationModel::kImageWidth);
@@ -99,7 +104,7 @@ void ImageSegmentationModelTest()
 
   cv::Mat input = RoiCrop(image, x, y, ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight);
   cv::Mat target = ImageSegmentationModelTestFunction(input);
-  torch::Tensor inputTensor = ToTensor(input);
+  torch::Tensor inputTensor = ToTensor(input).reshape({1, 1, ImageSegmentationModel::kImageHeight, ImageSegmentationModel::kImageWidth});
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
   PyPlot::Plot("ImageSegmentationModel input", {.z = input});
