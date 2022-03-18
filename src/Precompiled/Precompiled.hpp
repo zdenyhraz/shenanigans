@@ -1,8 +1,8 @@
 #pragma once
 
 #include "PrecompiledSTL.hpp"
-#include "PrecompiledExternal.hpp"
 #include "PrecompiledCV.hpp"
+#include "PrecompiledExternal.hpp"
 #include "PrecompiledQt.hpp"
 
 #ifdef ENABLE_PROFILING
