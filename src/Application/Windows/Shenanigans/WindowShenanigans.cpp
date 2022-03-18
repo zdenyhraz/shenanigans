@@ -7,7 +7,7 @@
 #include "Random/Procedural.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/OptimizationTestFunctions.hpp"
-#include "MachineLearning/RegressionModel.hpp"
+#include "MachineLearning/ImageSegmentationModel.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
 {
@@ -121,14 +121,7 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  torch::Tensor xTensor = torch::linspace(0, 1, 1001);
-  torch::Tensor yTensor = TestFunction(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
-
-  RegressionModel model;
-  model.Train({.epochCount = 50}, "128", "16");
-  torch::Tensor ypredTensor = model.Forward(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
+  ImageSegmentationModelTest();
   return;
 
   if (0) // optimization / metaoptimization

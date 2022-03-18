@@ -1,11 +1,11 @@
 #pragma once
 #include "Model.hpp"
-#include "RegressionDataset.hpp"
+#include "ImageSegmentationDataset.hpp"
 
-class RegressionModel : public Model
+class ImageSegmentationModel : public Model
 {
 public:
-  RegressionModel()
+  ImageSegmentationModel()
   {
     fc1 = register_module("fc1", torch::nn::Linear(kInputSize, 128));
     fc2 = register_module("fc2", torch::nn::Linear(128, 64));
@@ -27,8 +27,8 @@ public:
 
   void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = RegressionDataset(pathTrain).map(torch::data::transforms::Stack<>());
-    auto datasetTest = RegressionDataset(pathTest).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = ImageSegmentationDataset(pathTrain).map(torch::data::transforms::Stack<>());
+    auto datasetTest = ImageSegmentationDataset(pathTest).map(torch::data::transforms::Stack<>());
 
     auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
     auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
@@ -79,7 +79,7 @@ public:
         epochs.push_back(epochIndex);
         lossesTrainAvg.push_back(lossTrainAvg);
         lossesTestAvg.push_back(lossTestAvg);
-        PyPlot::Plot("RegressionModel training", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"train loss", "test loss"}});
+        PyPlot::Plot("ImageSegmentationModel training", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"train loss", "test loss"}});
       }
     }
   }
@@ -90,15 +90,15 @@ private:
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 };
 
-void RegressionModelTest()
+void ImageSegmentationModelTest()
 {
   torch::Tensor xTensor = torch::linspace(0, 1, 1001);
-  torch::Tensor yTensor = TestFunction(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
+  torch::Tensor yTensor = torch::exp(xTensor);
+  PyPlot::Plot("ImageSegmentationModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
 
-  RegressionModel model;
+  ImageSegmentationModel model;
   model.Train({.epochCount = 50}, "128", "16");
   torch::Tensor ypredTensor = model.Forward(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
+  PyPlot::Plot("ImageSegmentationModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
   return;
 }

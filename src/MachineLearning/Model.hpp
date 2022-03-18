@@ -18,6 +18,7 @@ public:
   };
 
   virtual torch::Tensor Forward(torch::Tensor x) = 0;
+
   virtual void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) = 0;
 
 private:
