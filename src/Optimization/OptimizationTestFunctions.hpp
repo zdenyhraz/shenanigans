@@ -142,7 +142,7 @@ inline f64 Noisy(const std::vector<f64>& arg)
 {
   f64 retval = 0;
   for (usize i = 0; i < arg.size(); i++)
-    retval += arg[i] * (std::sin(3 * arg[i]) + Random::Randu(-0.3, 0.3));
+    retval += arg[i] * (std::sin(3 * arg[i]) + Random::Rand(-0.3, 0.3));
   return retval / arg.size();
 }
 }

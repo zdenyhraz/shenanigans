@@ -415,9 +415,9 @@ try
   {
     const auto image = LoadUnitFloatImage<Float>("../debug/AIA/171A.png");
     const f64 shiftmax = 0.4 * mRows;
-    cv::Point2d shift(Random::Randu(-1., 1.) * shiftmax, Random::Randu(-1., 1.) * shiftmax);
-    cv::Point2i point(std::clamp(Random::Randu() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
-        std::clamp(Random::Randu() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
+    cv::Point2d shift(Random::Rand(-1., 1.) * shiftmax, Random::Rand(-1., 1.) * shiftmax);
+    cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
+        std::clamp(Random::Rand() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
     cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
     cv::Mat imageShifted;
     warpAffine(image, imageShifted, Tmat, image.size());
@@ -773,9 +773,9 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IterativePhaseCorrelation
     for (i32 i = 0; i < itersPerImage; ++i)
     {
       // random shift from a random point
-      cv::Point2d shift(Random::Randu(-1., 1.) * maxShift, Random::Randu(-1., 1.) * maxShift);
-      cv::Point2i point(std::clamp(Random::Randu() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
-          std::clamp(Random::Randu() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
+      cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
+      cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(mCols), static_cast<f64>(image.cols - mCols)),
+          std::clamp(Random::Rand() * image.rows, static_cast<f64>(mRows), static_cast<f64>(image.rows - mRows)));
       cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
       warpAffine(image, imageShifted, Tmat, image.size());
@@ -1033,7 +1033,7 @@ void IterativePhaseCorrelation::ShowRandomImagePair(const std::vector<std::tuple
   PROFILE_FUNCTION;
   LOG_FUNCTION("ShowRandomImagePair");
 
-  const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(Random::Randu() * imagePairs.size())];
+  const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
   cv::Mat concat;
   cv::hconcat(img1, img2, concat);
   Plot2D::Set("Random image pair");

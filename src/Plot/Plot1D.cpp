@@ -185,7 +185,7 @@ void Plot1D::Initialize(int ycnt, int y1cnt, int y2cnt, bool clear)
     if (static_cast<size_t>(i) < mPens.size())
       graph->setPen(mPens[i]);
     else
-      graph->setPen(QPen(QColor(Random::Rand() % 255, Random::Rand() % 255, Random::Rand() % 255), Plot::pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+      graph->setPen(QPen(QColor(Random::Rand<i32>(0, 1e6) % 255, Random::Rand<i32>(0, 1e6) % 255, Random::Rand<i32>(0, 1e6) % 255), Plot::pt, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     if (mScatterStyle)
     {

@@ -7,18 +7,15 @@ class ImageSegmentationModel : public Model
 public:
   ImageSegmentationModel()
   {
-    fc1 = register_module("fc1", torch::nn::Linear(kInputSize, 128));
-    fc2 = register_module("fc2", torch::nn::Linear(128, 64));
-    fc3 = register_module("fc3", torch::nn::Linear(64, 32));
-    fc4 = register_module("fc4", torch::nn::Linear(32, kOutputSize));
+    fc1 = register_module("fc1", torch::nn::Linear(kImageWidth * kImageHeight, 1024));
+    fc2 = register_module("fc2", torch::nn::Linear(1024, 512));
+    fc3 = register_module("fc3", torch::nn::Linear(512, 1024));
+    fc4 = register_module("fc4", torch::nn::Linear(1024, kImageWidth * kImageHeight));
   }
 
   torch::Tensor Forward(torch::Tensor x) override
   {
-    // x = torch::dropout(x, /*p=*/0.5, /*train=*/is_training());
-    // x = torch::log_softmax(fc3->forward(x), /*dim=*/1);
-
-    x = torch::relu(fc1->forward(x.reshape({x.size(0), kInputSize})));
+    x = torch::relu(fc1->forward(x));
     x = torch::relu(fc2->forward(x));
     x = torch::relu(fc3->forward(x));
     x = fc4->forward(x);
@@ -27,8 +24,8 @@ public:
 
   void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = ImageSegmentationDataset(pathTrain).map(torch::data::transforms::Stack<>());
-    auto datasetTest = ImageSegmentationDataset(pathTest).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = ImageSegmentationDataset(pathTrain, {kImageWidth, kImageHeight}).map(torch::data::transforms::Stack<>());
+    auto datasetTest = ImageSegmentationDataset(pathTest, {kImageWidth, kImageHeight}).map(torch::data::transforms::Stack<>());
 
     auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
     auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
@@ -45,7 +42,7 @@ public:
         for (auto& batchTrain : *dataloaderTrain)
         {
           optimizer.zero_grad();
-          torch::Tensor predictionTrain = Forward(batchTrain.data).reshape({options.batchSize});
+          torch::Tensor predictionTrain = Forward(batchTrain.data);
           torch::Tensor lossTrain = torch::mse_loss(predictionTrain, batchTrain.target);
           lossTrainAvg += lossTrain.item<f32>();
           lossTrain.backward();
@@ -60,7 +57,7 @@ public:
         i64 batchTestIndex = 0;
         for (auto& batchTest : *dataloaderTest)
         {
-          torch::Tensor predictionTest = Forward(batchTest.data).reshape({options.batchSize});
+          torch::Tensor predictionTest = Forward(batchTest.data);
           torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
           lossTestAvg += lossTest.item<f32>();
           ++batchTestIndex;
@@ -84,21 +81,28 @@ public:
     }
   }
 
+  static constexpr i64 kImageWidth = 128;
+  static constexpr i64 kImageHeight = 128;
+
 private:
-  static constexpr i64 kInputSize = 1;
-  static constexpr i64 kOutputSize = 1;
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 };
 
 void ImageSegmentationModelTest()
 {
-  torch::Tensor xTensor = torch::linspace(0, 1, 1001);
-  torch::Tensor yTensor = torch::exp(xTensor);
-  PyPlot::Plot("ImageSegmentationModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
-
   ImageSegmentationModel model;
-  model.Train({.epochCount = 50}, "128", "16");
-  torch::Tensor ypredTensor = model.Forward(xTensor);
-  PyPlot::Plot("ImageSegmentationModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
-  return;
+  model.Train({.epochCount = 10, .batchSize = 2}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
+
+  cv::Mat image = LoadUnitFloatImage<f32>("../debug/AIA/171A.png");
+  const i32 x = image.cols / 2 + Random::Rand(-1., 1.) * (image.cols / 2 - ImageSegmentationModel::kImageWidth);
+  const i32 y = image.rows / 2 + Random::Rand(-1., 1.) * (image.rows / 2 - ImageSegmentationModel::kImageHeight);
+
+  cv::Mat input = RoiCrop(image, x, y, ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight);
+  cv::Mat target = ImageSegmentationModelTestFunction(input);
+  torch::Tensor inputTensor = ToTensor(input);
+  torch::Tensor outputTensor = model.Forward(inputTensor);
+
+  PyPlot::Plot("ImageSegmentationModel input", {.z = input});
+  PyPlot::Plot("ImageSegmentationModel target", {.z = target});
+  PyPlot::Plot("ImageSegmentationModel output", {.z = ToCVMat(outputTensor, input.size())});
 }

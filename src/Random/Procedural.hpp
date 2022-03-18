@@ -31,14 +31,14 @@ inline cv::Mat procedural(i32 rows, i32 cols)
 
   for (usize i = 0; i < N; i++)
   {
-    f32 cx = 0.02 * Random::Randu();
-    f32 cy = 0.02 * Random::Randu();
+    f32 cx = 0.02 * Random::Rand();
+    f32 cy = 0.02 * Random::Rand();
     f32 ratio = cx / cy;
 
     if (ratio > 5 or ratio < (1. / 5))
       continue;
 
-    mat += (Random::Randu() * gaussian(rows, cols, cx, cy, Random::Randu(), Random::Randu()));
+    mat += (Random::Rand() * gaussian(rows, cols, cx, cy, Random::Rand(), Random::Rand()));
   }
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;

@@ -684,7 +684,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
       distinctEntity = true; // assume entity is distinct
 
       for (usize pid = 0; pid < N; pid++) // generate initial entity
-        entities[eid].params[pid] = Random::Randu(LB[pid], UB[pid]);
+        entities[eid].params[pid] = Random::Rand(LB[pid], UB[pid]);
 
       for (usize eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
@@ -759,9 +759,9 @@ void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
   PROFILE_FUNCTION;
   for (auto& idx : parentIndices)
   {
-    usize idxTst = Random::Rand() % NP;
+    usize idxTst = Random::Rand<i32>(0, 1e6) % NP;
     while (std::any_of(parentIndices.begin(), parentIndices.end(), [&](const auto pidx) { return idxTst == pidx; }) or idxTst == eid)
-      idxTst = Random::Rand() % NP;
+      idxTst = Random::Rand<i32>(0, 1e6) % NP;
     idx = idxTst;
   }
 }
@@ -775,10 +775,10 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   {
   case CrossoverStrategy::BIN:
   {
-    usize definite = Random::Rand() % params.size(); // at least one param undergoes crossover
+    usize definite = Random::Rand<i32>(0, 1e6) % params.size(); // at least one param undergoes crossover
     for (usize pid = 0; pid < params.size(); ++pid)
     {
-      f64 random = Random::Randu();
+      f64 random = Random::Rand();
       if (random < CR or pid == definite)
         crossoverParameters[pid] = true;
     }
@@ -787,10 +787,10 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   case CrossoverStrategy::EXP:
   {
     usize L = 1; // at least one param undergoes crossover
-    while ((Random::Randu() < CR) and (L < params.size()))
+    while ((Random::Rand() < CR) and (L < params.size()))
       L++;
 
-    usize pid = Random::Rand() % params.size();
+    usize pid = Random::Rand<i32>(0, 1e6) % params.size();
     for (usize i = 0; i < L; i++)
     {
       crossoverParameters[pid] = true;

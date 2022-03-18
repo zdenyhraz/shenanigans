@@ -29,6 +29,7 @@ jobs:
           wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
           sudo chmod 755 libtorch-shared-with-deps-latest.zip
           unzip libtorch-shared-with-deps-latest.zip
+          ls
 
       - name: qt cache
         id: qt-cache

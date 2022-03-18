@@ -7,6 +7,7 @@
 #include "Random/Procedural.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/OptimizationTestFunctions.hpp"
+#include "MachineLearning/RegressionModel.hpp"
 #include "MachineLearning/ImageSegmentationModel.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
@@ -121,6 +122,7 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
+  // RegressionModelTest();
   ImageSegmentationModelTest();
   return;
 

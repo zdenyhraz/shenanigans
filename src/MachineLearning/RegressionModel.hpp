@@ -18,7 +18,7 @@ public:
     // x = torch::dropout(x, /*p=*/0.5, /*train=*/is_training());
     // x = torch::log_softmax(fc3->forward(x), /*dim=*/1);
 
-    x = torch::relu(fc1->forward(x.reshape({x.size(0), kInputSize})));
+    x = torch::relu(fc1->forward(x));
     x = torch::relu(fc2->forward(x));
     x = torch::relu(fc3->forward(x));
     x = fc4->forward(x);
@@ -27,8 +27,8 @@ public:
 
   void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = RegressionDataset(pathTrain).map(torch::data::transforms::Stack<>());
-    auto datasetTest = RegressionDataset(pathTest).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = RegressionDataset(pathTrain, kInputSize, kOutputSize).map(torch::data::transforms::Stack<>());
+    auto datasetTest = RegressionDataset(pathTest, kInputSize, kOutputSize).map(torch::data::transforms::Stack<>());
 
     auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
     auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
@@ -45,7 +45,7 @@ public:
         for (auto& batchTrain : *dataloaderTrain)
         {
           optimizer.zero_grad();
-          torch::Tensor predictionTrain = Forward(batchTrain.data).reshape({options.batchSize});
+          torch::Tensor predictionTrain = Forward(batchTrain.data);
           torch::Tensor lossTrain = torch::mse_loss(predictionTrain, batchTrain.target);
           lossTrainAvg += lossTrain.item<f32>();
           lossTrain.backward();
@@ -60,7 +60,7 @@ public:
         i64 batchTestIndex = 0;
         for (auto& batchTest : *dataloaderTest)
         {
-          torch::Tensor predictionTest = Forward(batchTest.data).reshape({options.batchSize});
+          torch::Tensor predictionTest = Forward(batchTest.data);
           torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
           lossTestAvg += lossTest.item<f32>();
           ++batchTestIndex;
@@ -92,13 +92,13 @@ private:
 
 void RegressionModelTest()
 {
-  torch::Tensor xTensor = torch::linspace(0, 1, 1001);
-  torch::Tensor yTensor = TestFunction(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor)}, .label_ys = {"fun"}});
-
   RegressionModel model;
   model.Train({.epochCount = 50}, "128", "16");
-  torch::Tensor ypredTensor = model.Forward(xTensor);
-  PyPlot::Plot("RegressionModel predictions", {.x = ToVector<f64>(xTensor), .ys = {ToVector<f64>(yTensor), ToVector<f64>(ypredTensor)}, .label_ys = {"fun", "pred"}});
+  i64 n = 1001;
+  torch::Tensor inputTensor = torch::linspace(0, 1, n).reshape({n, 1});
+  torch::Tensor targetTensor = RegressionModelTestFunction(inputTensor);
+  torch::Tensor outputTensor = model.Forward(inputTensor);
+
+  PyPlot::Plot("RegressionModel predictions", {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
   return;
 }
