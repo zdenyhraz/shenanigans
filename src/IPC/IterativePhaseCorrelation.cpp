@@ -230,9 +230,9 @@ void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::strin
   Plot1D::Plot("ImageSizeAccuracyDependence", imageSizes, accuracy);
 }
 
-void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
+void IterativePhaseCorrelation::PlotL2UsizeAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
 {
-  LOG_FUNCTION("PlotUpsampleCoefficientAccuracyDependence");
+  LOG_FUNCTION("PlotL2UsizeAccuracyDependence");
 
   const auto trainingImages = LoadImages(trainingImagesDirectory);
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
@@ -246,7 +246,7 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
 
   for (i32 i = 0; i < iters; ++i)
   {
-    LOG_INFO("Calculating upsample coeffecient accuracy dependence ({:.1f}%)", static_cast<f64>(progress) / (iters - 1) * 100);
+    LOG_INFO("Calculating L2U size accuracy dependence ({:.1f}%)", static_cast<f64>(progress) / (iters - 1) * 100);
     std::vector<f64> parameters(OptimizedParameterCount);
 
     // default
@@ -267,7 +267,7 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
   }
 
   Plot1D::Set("L2UsizeAccuracyDependence");
-  Plot1D::SetXlabel("Upsample coefficient");
+  Plot1D::SetXlabel("L2U size");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::SetYLogarithmic(true);
   Plot1D::Plot("L2UsizeAccuracyDependence", L2Usize, accuracy);
@@ -866,10 +866,10 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   Evolution evo(OptimizedParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "UC", "L1R"});
-  evo.mLB = {0, -0.5, 0.0, 0, 0, 3, 0.1};
+  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R"});
+  evo.mLB = {0, -0.5, 0.0, 0, 0, 51, 0.1};
   evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2.0, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 51, 0.8};
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 1001, 0.8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val)); });
@@ -877,7 +877,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   evo.SetParameterValueToNameFunction("BPH", [](f64 val) { return fmt::format("{:.2f}", val); });
   evo.SetParameterValueToNameFunction("INT", [](f64 val) { return InterpolationType2String(static_cast<InterpolationType>((i32)val)); });
   evo.SetParameterValueToNameFunction("WIN", [](f64 val) { return WindowType2String(static_cast<WindowType>((i32)val)); });
-  evo.SetParameterValueToNameFunction("UC", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
+  evo.SetParameterValueToNameFunction("L2U", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
   evo.SetParameterValueToNameFunction("L1R", [](f64 val) { return fmt::format("{:.2f}", val); });
   return evo.Optimize(obj, valid).optimum;
 }

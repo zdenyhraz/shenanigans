@@ -555,7 +555,7 @@
        <item row="1" column="0">
         <widget class="QPushButton" name="pushButton_12">
          <property name="text">
-          <string>UpsampleCoeff/accuracy plot</string>
+          <string>L2Usize/accuracy plot</string>
          </property>
         </widget>
        </item>

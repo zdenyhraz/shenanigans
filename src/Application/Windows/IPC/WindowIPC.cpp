@@ -9,7 +9,7 @@ WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(pare
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(RefreshIPCparameters()));
   connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(Optimize()));
   connect(ui.pushButton_13, SIGNAL(clicked()), this, SLOT(PlotObjectiveFunctionLandscape()));
-  connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(PlotUpsampleCoefficientAccuracyDependence()));
+  connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(PlotL2UsizeAccuracyDependence()));
   connect(ui.pushButton_14, SIGNAL(clicked()), this, SLOT(PlotNoiseAccuracyDependence()));
   connect(ui.pushButton_15, SIGNAL(clicked()), this, SLOT(PlotNoiseOptimalBPHDependence()));
   connect(ui.pushButton_11, SIGNAL(clicked()), this, SLOT(PlotImageSizeAccuracyDependence()));
@@ -55,10 +55,10 @@ void WindowIPC::PlotObjectiveFunctionLandscape()
       ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
-void WindowIPC::PlotUpsampleCoefficientAccuracyDependence()
+void WindowIPC::PlotL2UsizeAccuracyDependence()
 {
   RefreshIPCparameters();
-  mWindowData->IPC->PlotUpsampleCoefficientAccuracyDependence(
+  mWindowData->IPC->PlotL2UsizeAccuracyDependence(
       ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 

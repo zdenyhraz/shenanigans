@@ -160,8 +160,6 @@ public:
   BandpassType GetBandpassType() const { return mBPT; }
   WindowType GetWindowType() const { return mWinT; }
   InterpolationType GetInterpolationType() const { return mIntT; }
-  f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
-  f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
   template <Options OptionsT = Options()>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
@@ -364,7 +362,7 @@ public:
   void Optimize(const std::function<f64(const IterativePhaseCorrelation&)>& obj, i32 populationSize = OptimizedParameterCount * 7);
   void PlotObjectiveFunctionLandscape(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotImageSizeAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters);
-  void PlotUpsampleCoefficientAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const;
+  void PlotL2UsizeAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const;
   void PlotNoiseOptimalBPHDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const;
   static std::string BandpassType2String(BandpassType type);
@@ -650,6 +648,8 @@ private:
     return L3peak - L3mid + L2peak - L2mid;
   }
 
+  f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
+  f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
   void DebugInputImages(const cv::Mat& image1, const cv::Mat& image2) const;
   void DebugFourierTransforms(const cv::Mat& dft1, const cv::Mat& dft2) const;
   void DebugCrossPowerSpectrum(const cv::Mat& crosspower) const;

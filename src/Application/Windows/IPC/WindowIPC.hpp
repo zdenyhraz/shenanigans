@@ -18,7 +18,7 @@ public slots:
   void RefreshIPCparametersAndExit();
   void Optimize();
   void PlotObjectiveFunctionLandscape();
-  void PlotUpsampleCoefficientAccuracyDependence();
+  void PlotL2UsizeAccuracyDependence();
   void PlotNoiseAccuracyDependence();
   void PlotNoiseOptimalBPHDependence();
   void PlotImageSizeAccuracyDependence();
