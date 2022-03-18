@@ -84,9 +84,10 @@ public:
     }
   }
 
-private:
   static constexpr i64 kInputSize = 1;
   static constexpr i64 kOutputSize = 1;
+
+private:
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 };
 

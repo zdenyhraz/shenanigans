@@ -3,9 +3,9 @@
 
 cv::Mat ImageSegmentationModelTestFunction(const cv::Mat& mat)
 {
-  // cv::Mat out;
-  // cv::pow(mat, 0.5, out);
-  return 1. - mat;
+  cv::Mat out;
+  cv::pow(mat, 0.5, out);
+  return 1. - out;
 }
 
 class ImageSegmentationDataset : public Dataset

@@ -7,10 +7,10 @@ class ImageSegmentationModel : public Model
 public:
   ImageSegmentationModel()
   {
-    conv1 = register_module("conv1", torch::nn::Conv2d(1, 8, kKernelSize));
-    conv2 = register_module("conv2", torch::nn::Conv2d(8, 16, kKernelSize));
-    conv3 = register_module("conv3", torch::nn::Conv2d(16, 8, kKernelSize));
-    conv4 = register_module("conv4", torch::nn::Conv2d(8, 1, kKernelSize));
+    conv1 = register_module("conv1", torch::nn::Conv2d(kImageChannels, 16, kKernelSize));
+    conv2 = register_module("conv2", torch::nn::Conv2d(16, 32, kKernelSize));
+    conv3 = register_module("conv3", torch::nn::Conv2d(32, 16, kKernelSize));
+    conv4 = register_module("conv4", torch::nn::Conv2d(16, kImageChannels, kKernelSize));
     us = register_module("us", torch::nn::Upsample(torch::nn::UpsampleOptions().size({{kImageHeight, kImageWidth}}).mode(torch::kBilinear).align_corners(false)));
   }
 
@@ -85,10 +85,10 @@ public:
 
   static constexpr i64 kImageWidth = 128;
   static constexpr i64 kImageHeight = 128;
+  static constexpr i64 kImageChannels = 1;
   static constexpr i32 kKernelSize = 5;
 
 private:
-  torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
   torch::nn::Conv2d conv1{nullptr}, conv2{nullptr}, conv3{nullptr}, conv4{nullptr};
   torch::nn::Upsample us;
 };
@@ -96,18 +96,19 @@ private:
 void ImageSegmentationModelTest()
 {
   ImageSegmentationModel model;
-  model.Train({.epochCount = 50, .batchSize = 8}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
+  model.Train({.epochCount = 20, .batchSize = 8}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
 
   cv::Mat image = LoadUnitFloatImage<f32>("../debug/AIA/171A.png");
-  const i32 x = image.cols / 2 + Random::Rand(-1., 1.) * (image.cols / 2 - ImageSegmentationModel::kImageWidth);
-  const i32 y = image.rows / 2 + Random::Rand(-1., 1.) * (image.rows / 2 - ImageSegmentationModel::kImageHeight);
-
-  cv::Mat input = RoiCrop(image, x, y, ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight);
+  const cv::Size size(1024, 1024);
+  const i32 x = image.cols / 2 + Random::Rand(-1., 1.) * (image.cols / 2 - size.width);
+  const i32 y = image.rows / 2 + Random::Rand(-1., 1.) * (image.rows / 2 - size.height);
+  cv::Mat input = RoiCrop(image, x, y, size.width, size.height);
+  cv::resize(input, input, {ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight});
   cv::Mat target = ImageSegmentationModelTestFunction(input);
-  torch::Tensor inputTensor = ToTensor(input).reshape({1, 1, ImageSegmentationModel::kImageHeight, ImageSegmentationModel::kImageWidth});
+  torch::Tensor inputTensor = ToTensor(input).reshape({1, ImageSegmentationModel::kImageChannels, ImageSegmentationModel::kImageHeight, ImageSegmentationModel::kImageWidth});
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::Plot("ImageSegmentationModel input", {.z = input});
-  PyPlot::Plot("ImageSegmentationModel target", {.z = target});
-  PyPlot::Plot("ImageSegmentationModel output", {.z = ToCVMat(outputTensor, input.size())});
+  PyPlot::Plot("ImageSegmentationModel input", {.z = input, .cmap = "gray"});
+  PyPlot::Plot("ImageSegmentationModel target", {.z = target, .cmap = "gray"});
+  PyPlot::Plot("ImageSegmentationModel output", {.z = ToCVMat(outputTensor, input.size()), .cmap = "gray"});
 }
