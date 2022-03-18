@@ -55,7 +55,7 @@ public:
     BandpassHParameter,
     InterpolationTypeParameter,
     WindowTypeParameter,
-    UpsampleCoeffParameter,
+    L2UsizeParameter,
     L1ratioParameter,
     OptimizedParameterCount, // last
   };
@@ -119,9 +119,9 @@ public:
     UpdateL1circle();
   }
 
-  void SetUpsampleCoeff(i32 upsampleCoeff)
+  void SetL2Usize(i32 L2Usize)
   {
-    mUC = (upsampleCoeff % 2) ? upsampleCoeff : upsampleCoeff + 1;
+    mL2Usize = L2Usize;
     UpdateL1circle();
   }
 
@@ -154,12 +154,14 @@ public:
   f64 GetBandpassH() const { return mBPH; }
   i32 GetL2size() const { return mL2size; }
   f64 GetL1ratio() const { return mL1ratio; }
-  i32 GetUpsampleCoeff() const { return mUC; }
+  i32 GetL2Usize() const { return mL2Usize; }
   cv::Mat GetWindow() const { return mWin; }
   cv::Mat GetBandpass() const { return mBP; }
   BandpassType GetBandpassType() const { return mBPT; }
   WindowType GetWindowType() const { return mWinT; }
   InterpolationType GetInterpolationType() const { return mIntT; }
+  f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
+  f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
   template <Options OptionsT = Options()>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
@@ -251,7 +253,7 @@ public:
       L1circle = mL1circle.cols == L1size ? mL1circle : Kirkl<Float>(L1size);
 
       if constexpr (OptionsT.ModeT == ModeType::Debug and 0)
-        DebugL1B(L2U, L1size, L3peak - L3mid);
+        DebugL1B(L2U, L1size, L3peak - L3mid, GetUpsampleCoeff(L2size));
 
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
@@ -263,7 +265,7 @@ public:
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (OptionsT.ModeT == ModeType::Debug)
-          DebugL1A(L1, L3peak - L3mid, L2Upeak - L2Umid);
+          DebugL1A(L1, L3peak - L3mid, L2Upeak - L2Umid, GetUpsampleCoeff(L2size));
         L1peak = GetPeakSubpixel<true>(L1, L1circle);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
@@ -271,8 +273,8 @@ public:
           [[unlikely]]
           {
             if constexpr (OptionsT.ModeT == ModeType::Debug)
-              DebugL1A(L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, true);
-            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / mUC;
+              DebugL1A(L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
+            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
           }
       }
 
@@ -379,7 +381,7 @@ private:
   f64 mL1ratio = 0.45;
   f64 mL1ratioStep = 0.025;
   i32 mL1ratioStepCount = 4;
-  i32 mUC = 51;
+  i32 mL2Usize = 357;
   i32 mMaxIter = 10;
   BandpassType mBPT = BandpassType::Gaussian;
   InterpolationType mIntT = InterpolationType::Linear;
@@ -406,7 +408,7 @@ private:
     }
   }
 
-  void UpdateL1circle() { mL1circle = Kirkl<Float>(GetL1size(mL2size * mUC, mL1ratio)); }
+  void UpdateL1circle() { mL1circle = Kirkl<Float>(GetL1size(mL2Usize, mL1ratio)); }
 
   void UpdateBandpass()
   {
@@ -591,13 +593,13 @@ private:
     switch (mIntT)
     {
     case InterpolationType::NearestNeighbor:
-      cv::resize(L2, L2U, L2.size() * mUC, 0, 0, cv::INTER_NEAREST);
+      cv::resize(L2, L2U, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_NEAREST);
       break;
     case InterpolationType::Linear:
-      cv::resize(L2, L2U, L2.size() * mUC, 0, 0, cv::INTER_LINEAR);
+      cv::resize(L2, L2U, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_LINEAR);
       break;
     case InterpolationType::Cubic:
-      cv::resize(L2, L2U, L2.size() * mUC, 0, 0, cv::INTER_CUBIC);
+      cv::resize(L2, L2U, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_CUBIC);
       break;
     default:
       break;
@@ -654,8 +656,8 @@ private:
   void DebugL3(const cv::Mat& L3) const;
   void DebugL2(const cv::Mat& L2) const;
   void DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) const;
-  void DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const;
-  void DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last = false) const;
+  void DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift, f64 UC) const;
+  void DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, f64 UC, bool last = false) const;
   static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2, f64 gamma1 = 1., f64 gamma2 = 1.);
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory);
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStdev) const;

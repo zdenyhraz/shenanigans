@@ -168,7 +168,7 @@ void IterativePhaseCorrelation::PlotObjectiveFunctionLandscape(const std::string
       parameters[BandpassHParameter] = mBPH;
       parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
       parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
-      parameters[UpsampleCoeffParameter] = mUC;
+      parameters[L2UsizeParameter] = mL2Usize;
       parameters[L1ratioParameter] = mL1ratio;
 
       // modified
@@ -215,7 +215,7 @@ void IterativePhaseCorrelation::PlotImageSizeAccuracyDependence(const std::strin
     parameters[BandpassHParameter] = mBPH;
     parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
     parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
-    parameters[UpsampleCoeffParameter] = mUC;
+    parameters[L2UsizeParameter] = mL2Usize;
     parameters[L1ratioParameter] = mL1ratio;
 
     imageSizes[i] = imageSize;
@@ -238,10 +238,10 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
   const auto trainingImagePairs = CreateImagePairs(trainingImages, maxShift, itersPerImage, noiseStdev);
   const auto obj = CreateObjectiveFunction(trainingImagePairs);
 
-  std::vector<f64> upsampleCoeff(iters);
+  std::vector<f64> L2Usize(iters);
   std::vector<f64> accuracy(iters);
-  const f64 xmin = 1;
-  const f64 xmax = 35;
+  const f64 xmin = 35;
+  const f64 xmax = 501;
   std::atomic<i32> progress = 0;
 
   for (i32 i = 0; i < iters; ++i)
@@ -255,22 +255,22 @@ void IterativePhaseCorrelation::PlotUpsampleCoefficientAccuracyDependence(const 
     parameters[BandpassHParameter] = mBPH;
     parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
     parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
-    parameters[UpsampleCoeffParameter] = mUC;
+    parameters[L2UsizeParameter] = mL2Usize;
     parameters[L1ratioParameter] = mL1ratio;
 
     // modified
-    parameters[UpsampleCoeffParameter] = xmin + (f64)i / (iters - 1) * (xmax - xmin);
+    parameters[L2UsizeParameter] = xmin + (f64)i / (iters - 1) * (xmax - xmin);
 
-    upsampleCoeff[i] = parameters[UpsampleCoeffParameter];
+    L2Usize[i] = parameters[L2UsizeParameter];
     accuracy[i] = obj(parameters);
     progress++;
   }
 
-  Plot1D::Set("UpsampleCoefficientAccuracyDependence");
+  Plot1D::Set("L2UsizeAccuracyDependence");
   Plot1D::SetXlabel("Upsample coefficient");
   Plot1D::SetYlabel("Average pixel error");
   Plot1D::SetYLogarithmic(true);
-  Plot1D::Plot("UpsampleCoefficientAccuracyDependence", upsampleCoeff, accuracy);
+  Plot1D::Plot("L2UsizeAccuracyDependence", L2Usize, accuracy);
 }
 
 void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& trainingImagesDirectory, f64 maxShift, f64 noiseStdev, i32 itersPerImage, i32 iters) const
@@ -305,7 +305,7 @@ void IterativePhaseCorrelation::PlotNoiseAccuracyDependence(const std::string& t
     parameters[BandpassHParameter] = mBPH;
     parameters[InterpolationTypeParameter] = static_cast<i32>(mIntT);
     parameters[WindowTypeParameter] = static_cast<i32>(mWinT);
-    parameters[UpsampleCoeffParameter] = mUC;
+    parameters[L2UsizeParameter] = mL2Usize;
     parameters[L1ratioParameter] = mL1ratio;
 
     noiseStdevs[i] = noise;
@@ -503,8 +503,8 @@ try
     cv::multiply(img, w, imgw);
     cv::Mat w0 = w.clone();
     cv::Mat r0 = cv::Mat::ones(w.size(), GetMatType<Float>());
-    cv::copyMakeBorder(w0, w0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    cv::copyMakeBorder(r0, r0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(w0, w0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(r0, r0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
     // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
@@ -547,8 +547,8 @@ try
       cv::normalize(bpG, bpG, 0.0, 1.0, cv::NORM_MINMAX);
 
     cv::Mat bpR0, bpG0;
-    cv::copyMakeBorder(bpR, bpR0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-    cv::copyMakeBorder(bpG, bpG0, mUC, mUC, mUC, mUC, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpR, bpR0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
+    cv::copyMakeBorder(bpG, bpG0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
     // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
@@ -643,7 +643,7 @@ void IterativePhaseCorrelation::DebugL3(const cv::Mat& L3) const
 void IterativePhaseCorrelation::DebugL2(const cv::Mat& L2) const
 {
   auto plot = L2.clone();
-  cv::resize(plot, plot, plot.size() * mUC, 0, 0, cv::INTER_NEAREST);
+  cv::resize(plot, plot, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L2", mDebugName), {.z = plot});
 }
 
@@ -654,9 +654,9 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   if (0)
   {
     cv::Mat nearest, linear, cubic;
-    cv::resize(L2, nearest, L2.size() * mUC, 0, 0, cv::INTER_NEAREST);
-    cv::resize(L2, linear, L2.size() * mUC, 0, 0, cv::INTER_LINEAR);
-    cv::resize(L2, cubic, L2.size() * mUC, 0, 0, cv::INTER_CUBIC);
+    cv::resize(L2, nearest, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_NEAREST);
+    cv::resize(L2, linear, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_LINEAR);
+    cv::resize(L2, cubic, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_CUBIC);
 
     PyPlot::Plot("IPCL2UN", {.z = nearest});
     PyPlot::Plot("IPCL2UL", {.z = linear});
@@ -664,25 +664,25 @@ void IterativePhaseCorrelation::DebugL2U(const cv::Mat& L2, const cv::Mat& L2U) 
   }
 }
 
-void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift) const
+void IterativePhaseCorrelation::DebugL1B(const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift, f64 UC) const
 {
   cv::Mat mat = CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift));
-  cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (mDebugTrueShift - L3shift));
+  cv::resize(mat, mat, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1B", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
-void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, bool last) const
+void IterativePhaseCorrelation::DebugL1A(const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, f64 UC, bool last) const
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(Kirkl<Float>(mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + mUC * (mDebugTrueShift - L3shift) - L2Ushift);
-  cv::resize(mat, mat, cv::Size(mUC * mL2size, mUC * mL2size), 0, 0, cv::INTER_NEAREST);
+  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (mDebugTrueShift - L3shift) - L2Ushift);
+  cv::resize(mat, mat, {mL2Usize, mL2Usize}, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", mDebugName), {.z = mat, .save = not mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", mDebugDirectory, mDebugIndex) : ""});
 }
 
@@ -815,7 +815,7 @@ IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const s
   ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
   ipc.SetInterpolationType(static_cast<InterpolationType>((i32)params[InterpolationTypeParameter]));
   ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
-  ipc.SetUpsampleCoeff(params[UpsampleCoeffParameter]);
+  ipc.SetL2Usize(params[L2UsizeParameter]);
   ipc.SetL1ratio(params[L1ratioParameter]);
   return ipc;
 }
@@ -827,7 +827,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObj
   return [&](const std::vector<f64>& params) {
     const auto ipc = CreateIPCFromParams(params);
 
-    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
+    if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
 
     f64 avgerror = 0;
@@ -847,7 +847,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObj
   return [&](const std::vector<f64>& params) {
     const auto ipc = CreateIPCFromParams(params);
 
-    if (std::floor(ipc.GetL2size() * ipc.GetUpsampleCoeff() * ipc.GetL1ratio()) < 3)
+    if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
 
     return obj(ipc);
@@ -896,7 +896,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
   SetInterpolationType(static_cast<InterpolationType>((i32)optimalParameters[InterpolationTypeParameter]));
   SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
-  SetUpsampleCoeff(optimalParameters[UpsampleCoeffParameter]);
+  SetL2Usize(optimalParameters[L2UsizeParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
 
   LOG_SUCCESS("Final IPC BandpassType: {} -> {}", BandpassType2String(thisBefore.GetBandpassType()), BandpassType2String(GetBandpassType()));
@@ -907,7 +907,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   }
   LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", InterpolationType2String(thisBefore.GetInterpolationType()), InterpolationType2String(GetInterpolationType()));
   LOG_SUCCESS("Final IPC WindowType: {} -> {}", WindowType2String(thisBefore.GetWindowType()), WindowType2String(GetWindowType()));
-  LOG_SUCCESS("Final IPC UpsampleCoeff: {} -> {}", thisBefore.GetUpsampleCoeff(), GetUpsampleCoeff());
+  LOG_SUCCESS("Final IPC L2Usize: {} -> {}", thisBefore.GetL2Usize(), GetL2Usize());
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", thisBefore.GetL1ratio(), GetL1ratio());
 }
 

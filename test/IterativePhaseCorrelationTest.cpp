@@ -14,15 +14,15 @@ protected:
 
   void SetUp() override
   {
-    cv::Mat T = (cv::Mat_<f32>(2, 3) << 1., 0., mShift.x, 0., 1., mShift.y);
-    warpAffine(mImg1, mImg2, T, mImg2.size());
+    mImg2 = mImg1.clone();
+    Shift(mImg2, mShift);
     ASSERT_TRUE(not mImg1.empty());
     ASSERT_TRUE(not mImg2.empty());
   }
 
   IterativePhaseCorrelation GetIPC() const { return IterativePhaseCorrelation(mImg1.size()); }
 
-  const cv::Point2d mShift = cv::Point2d(38.638, -67.425);
+  cv::Point2d mShift = cv::Point2d(38.638, -67.425);
   static constexpr f64 kTolerance = 1e-7;
   cv::Mat mImg1;
   cv::Mat mImg2;
@@ -54,6 +54,17 @@ TEST_F(IterativePhaseCorrelationTest, ZeroShift)
 TEST_F(IterativePhaseCorrelationTest, Shift)
 {
   const auto ipc = GetIPC();
+  const auto shift = ipc.Calculate(mImg1, mImg2);
+  EXPECT_NEAR(shift.x, mShift.x, 0.5);
+  EXPECT_NEAR(shift.y, mShift.y, 0.5);
+}
+
+TEST_F(IterativePhaseCorrelationTest, LargeShift)
+{
+  const auto ipc = GetIPC();
+  mImg2 = mImg1.clone();
+  mShift = cv::Point2d(mImg2.cols / 2 * 0.995, 0.);
+  Shift(mImg2, mShift);
   const auto shift = ipc.Calculate(mImg1, mImg2);
   EXPECT_NEAR(shift.x, mShift.x, 0.5);
   EXPECT_NEAR(shift.y, mShift.y, 0.5);

@@ -76,7 +76,7 @@
        <item row="0" column="2">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>UC</string>
+          <string>L2Usize</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -86,7 +86,7 @@
        <item row="0" column="3">
         <widget class="QLineEdit" name="lineEdit_4">
          <property name="text">
-          <string>51</string>
+          <string>357</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
