@@ -27,6 +27,7 @@ jobs:
         working-directory: ${{github.workspace}}/external
         run: |
           wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
+          sudo chmod 755 libtorch-shared-with-deps-latest.zip
           unzip libtorch-shared-with-deps-latest.zip
 
       - name: qt cache
