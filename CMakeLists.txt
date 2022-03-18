@@ -141,7 +141,6 @@ include_directories("src")
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
 src/*.ui src/*.rc src/*.qrc
-src/ANN/*.hpp src/ANN/*.cpp
 src/Application/Windows/*.hpp src/Application/Windows/*.cpp
 src/Astrophysics/*.hpp src/Astrophysics/*.cpp
 src/Features/*.hpp src/Features/*.cpp
@@ -151,6 +150,7 @@ src/Fourier/*.hpp src/Fourier/*.cpp
 src/Fractal/*.hpp src/Fractal/*.cpp
 src/IPC/*.hpp src/IPC/*.cpp
 src/Log/*.hpp src/Log/*.cpp
+src/MachineLearning/*.hpp src/MachineLearning/*.cpp
 src/Optimization/*.hpp src/Optimization/*.cpp
 src/Plot/*.hpp src/Plot/*.cpp
 src/Random/*.hpp src/Random/*.cpp

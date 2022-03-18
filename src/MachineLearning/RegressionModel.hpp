@@ -1,5 +1,6 @@
 #pragma once
 #include "Model.hpp"
+#include "RegressionDataset.hpp"
 
 class RegressionModel : public Model
 {
@@ -26,13 +27,13 @@ public:
 
   void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = Dataset(pathTrain).map(torch::data::transforms::Stack<>());
-    auto datasetTest = Dataset(pathTest).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = RegressionDataset(pathTrain).map(torch::data::transforms::Stack<>());
+    auto datasetTest = RegressionDataset(pathTest).map(torch::data::transforms::Stack<>());
 
     auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
     auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
-    torch::optim::Adam optimizer(parameters(), options.learningRate);
 
+    torch::optim::Adam optimizer(parameters(), options.learningRate);
     std::vector<f64> epochs, lossesTrainAvg, lossesTestAvg;
 
     for (i64 epochIndex = 0; epochIndex < options.epochCount; ++epochIndex)
@@ -46,7 +47,7 @@ public:
           optimizer.zero_grad();
           torch::Tensor predictionTrain = Forward(batchTrain.data).reshape({options.batchSize});
           torch::Tensor lossTrain = torch::mse_loss(predictionTrain, batchTrain.target);
-          lossTrainAvg += lossTrain.item<float>();
+          lossTrainAvg += lossTrain.item<f32>();
           lossTrain.backward();
           optimizer.step();
           ++batchTrainIndex;
@@ -61,7 +62,7 @@ public:
         {
           torch::Tensor predictionTest = Forward(batchTest.data).reshape({options.batchSize});
           torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
-          lossTestAvg += lossTest.item<float>();
+          lossTestAvg += lossTest.item<f32>();
           ++batchTestIndex;
         }
         lossTestAvg /= batchTestIndex;
@@ -84,7 +85,7 @@ public:
   }
 
 private:
-  static constexpr size_t kInputSize = 1;
-  static constexpr size_t kOutputSize = 1;
+  static constexpr i64 kInputSize = 1;
+  static constexpr i64 kOutputSize = 1;
   torch::nn::Linear fc1{nullptr}, fc2{nullptr}, fc3{nullptr}, fc4{nullptr};
 };
