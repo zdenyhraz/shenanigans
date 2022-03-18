@@ -122,7 +122,7 @@ try
   LOG_FUNCTION("RandomShit");
 
   RegressionModel model;
-  model.Train({.epochCount = 50});
+  model.Train({.epochCount = 100});
   torch::Tensor xTensor = torch::linspace(0, 1, 1001);
   torch::Tensor yTensor = TestFunction(xTensor);
   torch::Tensor ypredTensor = model.Forward(xTensor);

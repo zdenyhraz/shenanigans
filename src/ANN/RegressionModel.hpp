@@ -26,51 +26,56 @@ public:
 
   void Train(const TrainOptions& options) override
   {
-    auto datasetTrain = Dataset(256).map(torch::data::transforms::Stack<>());
-    auto datasetTest = Dataset(64).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = Dataset(128).map(torch::data::transforms::Stack<>());
+    auto datasetTest = Dataset(32).map(torch::data::transforms::Stack<>());
 
-    auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
-    auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), *datasetTest.size());
+    auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(datasetTrain, options.batchSize);
+    auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(datasetTest, options.batchSize);
+    torch::optim::Adam optimizer(parameters(), options.learningRate);
 
-    torch::optim::Adam optimizer(parameters(), options.learningRate); // SGD, Adam, ...
-
-    std::vector<f64> epochs;
-    std::vector<f64> losses;
+    std::vector<f64> epochs, lossesTrainAvg, lossesTestAvg;
 
     for (i64 epochIndex = 0; epochIndex < options.epochCount; ++epochIndex)
     {
-      i64 batchIndex = 0;
-      for (auto& batch : *dataloaderTrain)
-      {
-        optimizer.zero_grad();
-        torch::Tensor prediction = Forward(batch.data).reshape({options.batchSize});
-        torch::Tensor loss = torch::mse_loss(prediction, batch.target);
-        loss.backward();
-        optimizer.step();
+      f32 lossTrainAvg = 0, lossTestAvg = 0;
 
-        if (batchIndex == 0)
+      {
+        i64 batchTrainIndex = 0;
+        for (auto& batchTrain : *dataloaderTrain)
         {
-          epochs.push_back(epochIndex);
-          losses.push_back(loss.item<float>());
+          optimizer.zero_grad();
+          torch::Tensor predictionTrain = Forward(batchTrain.data).reshape({options.batchSize});
+          torch::Tensor lossTrain = torch::mse_loss(predictionTrain, batchTrain.target);
+          lossTrainAvg += lossTrain.item<float>();
+          lossTrain.backward();
+          optimizer.step();
+          ++batchTrainIndex;
         }
-        ++batchIndex;
+        lossTrainAvg /= batchTrainIndex;
       }
 
-      PyPlot::Plot("RegressionModel::Train", {.x = epochs, .y = losses});
+      {
+        i64 batchTestIndex = 0;
+        for (auto& batchTest : *dataloaderTest)
+        {
+          torch::NoGradGuard noGrad;
+          torch::Tensor predictionTest = Forward(batchTest.data).reshape({options.batchSize});
+          torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
+          lossTestAvg += lossTest.item<float>();
+          ++batchTestIndex;
+        }
+        lossTestAvg /= batchTestIndex;
+      }
+
+      epochs.push_back(epochIndex);
+      lossesTrainAvg.push_back(lossTrainAvg);
+      lossesTestAvg.push_back(lossTestAvg);
+
+      if (options.plotProgress)
+        PyPlot::Plot("RegressionModel::Train", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"lossTrainAvg", "lossTestAvg"}});
 
       if (options.logProgress and epochIndex % (options.epochCount / options.logProgressCount) == 0)
-      {
-        // evaluate training and test loss on the entire dataset
-        torch::NoGradGuard noGrad;
-
-        torch::Tensor prediction = Forward(dataloaderTrain->begin()->data);
-        torch::Tensor predictionTest = Forward(dataloaderTest->begin()->data);
-
-        torch::Tensor loss = torch::mse_loss(prediction, dataloaderTrain->begin()->target);
-        torch::Tensor lossTest = torch::mse_loss(predictionTest, dataloaderTest->begin()->target);
-
-        LOG_DEBUG("Epoch {} | LossTrain {} | LossTest {}", epochIndex, loss.item<float>(), lossTest.item<float>());
-      }
+        LOG_DEBUG("Epoch {} | LossTrain {} | LossTest {}", epochIndex, lossTrainAvg, lossTestAvg);
 
       if (options.saveNetwork and epochIndex % (options.epochCount / options.saveNetworkCount) == 0)
         torch::save(shared_from_this(), fmt::format("../debug/ANN/net_epoch{}.pt", epochIndex));

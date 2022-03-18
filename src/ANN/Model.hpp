@@ -8,11 +8,12 @@ public:
   {
     i64 epochCount = 100;
     i64 batchSize = 16;
-    f32 learningRate = 0.001;
+    f32 learningRate = 1e-3;
     bool saveNetwork = false;
     i64 saveNetworkCount = 5;
     bool logProgress = true;
     i64 logProgressCount = 10;
+    bool plotProgress = true;
   };
 
   virtual torch::Tensor Forward(torch::Tensor x) = 0;

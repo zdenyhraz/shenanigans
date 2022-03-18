@@ -1,8 +1,8 @@
 #pragma once
 
-torch::Tensor TestFunction(const torch::Tensor& x)
+torch::Tensor TestFunction(torch::Tensor x)
 {
-  return torch::exp(-50. * torch::pow(x - 0.25, 2)) + torch::exp(-50. * torch::pow(x - 0.75, 2));
+  return torch::exp(-20. * torch::pow(x - 0.25, 2)) + 3. * torch::exp(-100. * torch::pow(x - 0.75, 2));
 }
 
 class Dataset : public torch::data::Dataset<Dataset>
