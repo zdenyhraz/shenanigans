@@ -26,8 +26,8 @@ public:
 
   void Train(const TrainOptions& options, const std::string& pathTrain, const std::string& pathTest) override
   {
-    auto datasetTrain = ImageSegmentationDataset(pathTrain, {kImageWidth, kImageHeight}).map(torch::data::transforms::Stack<>());
-    auto datasetTest = ImageSegmentationDataset(pathTest, {kImageWidth, kImageHeight}).map(torch::data::transforms::Stack<>());
+    auto datasetTrain = ImageSegmentationDataset(pathTrain, {kImageWidth, kImageHeight}, 64).map(torch::data::transforms::Stack<>());
+    auto datasetTest = ImageSegmentationDataset(pathTest, {kImageWidth, kImageHeight}, 16).map(torch::data::transforms::Stack<>());
 
     auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
     auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);

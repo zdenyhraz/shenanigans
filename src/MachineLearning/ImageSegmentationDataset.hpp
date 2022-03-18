@@ -11,23 +11,22 @@ cv::Mat ImageSegmentationModelTestFunction(const cv::Mat& mat)
 class ImageSegmentationDataset : public Dataset
 {
 public:
-  ImageSegmentationDataset(const std::string& path, cv::Size size)
+  ImageSegmentationDataset(const std::string& path, cv::Size imageSize, i64 imageCount)
   {
-    i64 nImages = 32;
     i64 nChannels = 1;
-    mInputs = torch::empty({nImages, nChannels, size.height, size.width});
-    mTargets = torch::empty({nImages, nChannels, size.height, size.width});
+    mInputs = torch::empty({imageCount, nChannels, imageSize.height, imageSize.width});
+    mTargets = torch::empty({imageCount, nChannels, imageSize.height, imageSize.width});
     cv::Mat image = LoadUnitFloatImage<f32>(path);
 
-    for (i64 i = 0; i < nImages; ++i)
+    for (i64 i = 0; i < imageCount; ++i)
     {
-      const auto x = image.cols / 2 + Random::Rand(-1, 1) * (image.cols / 2 - size.width);
-      const auto y = image.rows / 2 + Random::Rand(-1, 1) * (image.rows / 2 - size.height);
-      cv::Mat input = RoiCrop(image, x, y, size.width, size.height);
+      const auto x = image.cols / 2 + Random::Rand(-1, 1) * (image.cols / 2 - imageSize.width);
+      const auto y = image.rows / 2 + Random::Rand(-1, 1) * (image.rows / 2 - imageSize.height);
+      cv::Mat input = RoiCrop(image, x, y, imageSize.width, imageSize.height);
       cv::Mat target = ImageSegmentationModelTestFunction(input);
 
-      mInputs[i] = torch::from_blob(input.data, {nChannels, size.height, size.width});
-      mTargets[i] = torch::from_blob(target.data, {nChannels, size.height, size.width});
+      mInputs[i] = torch::from_blob(input.data, {nChannels, imageSize.height, imageSize.width});
+      mTargets[i] = torch::from_blob(target.data, {nChannels, imageSize.height, imageSize.width});
     }
   }
 };
