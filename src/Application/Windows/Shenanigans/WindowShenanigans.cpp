@@ -122,11 +122,13 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
-  // RegressionModelTest();
-  ImageSegmentationModelTest();
-  return;
-
-  if (0) // optimization / metaoptimization
+  if (0) // ML
+  {
+    // RegressionModelTest();
+    ImageSegmentationModelTest();
+    return;
+  }
+  else if (0) // optimization / metaoptimization
   {
     const i32 N = 2;
     const i32 runs = 20;
@@ -153,7 +155,7 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  if (1) // ipc debug stuff
+  else // ipc debug stuff
   {
     dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
   }

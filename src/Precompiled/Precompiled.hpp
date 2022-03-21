@@ -1,5 +1,4 @@
 #pragma once
-
 #include "PrecompiledSTL.hpp"
 #include "PrecompiledCV.hpp"
 #include "PrecompiledExternal.hpp"

@@ -57,6 +57,7 @@ public:
     WindowTypeParameter,
     L2UsizeParameter,
     L1ratioParameter,
+    CPepsParameter,
     OptimizedParameterCount, // last
   };
 
@@ -121,9 +122,11 @@ public:
 
   void SetL2Usize(i32 L2Usize)
   {
-    mL2Usize = L2Usize;
+    mL2Usize = std::max(L2Usize, mL2size);
     UpdateL1circle();
   }
+
+  void SetCrossPowerEpsilon(f64 CPeps) { mCPeps = std::max(CPeps, 0.); }
 
   void SetMaxIterations(i32 maxIterations) { mMaxIter = maxIterations; }
 
@@ -155,6 +158,7 @@ public:
   i32 GetL2size() const { return mL2size; }
   f64 GetL1ratio() const { return mL1ratio; }
   i32 GetL2Usize() const { return mL2Usize; }
+  f64 GetCrossPowerEpsilon() const { return mCPeps; }
   cv::Mat GetWindow() const { return mWin; }
   cv::Mat GetBandpass() const { return mBP; }
   BandpassType GetBandpassType() const { return mBPT; }
@@ -381,6 +385,7 @@ private:
   i32 mL1ratioStepCount = 4;
   i32 mL2Usize = 357;
   i32 mMaxIter = 10;
+  f64 mCPeps = 0;
   BandpassType mBPT = BandpassType::Gaussian;
   InterpolationType mIntT = InterpolationType::Linear;
   WindowType mWinT = WindowType::Hann;
@@ -518,6 +523,7 @@ private:
   {
     PROFILE_FUNCTION;
 
+    const Float eps = mCPeps * dft1.rows * dft1.cols;
     for (i32 row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec<Float, 2>>(row); // reuse dft1 memory
@@ -530,6 +536,10 @@ private:
         const Float mag = std::sqrt(re * re + im * im);
         const Float band = bandp[col];
 
+        // if (row == dft1.rows / 2 or row == dft1.rows / 2 + 1 or row == dft1.rows / 2 - 1)
+        //   if (col == dft1.cols / 2 or col == dft1.cols / 2 + 1 or col == dft1.cols / 2 - 1)
+        //     LOG_DEBUG("CPmag: {}", mag);
+
         if constexpr (OptionsT.CorrelationT == CorrelationType::CrossCorrelation)
         {
           dft1p[col][0] = re * band;
@@ -537,8 +547,8 @@ private:
         }
         else
         {
-          dft1p[col][0] = re / mag * band;
-          dft1p[col][1] = im / mag * band;
+          dft1p[col][0] = re / (mag + eps) * band;
+          dft1p[col][1] = im / (mag + eps) * band;
         }
       }
     }
@@ -664,7 +674,7 @@ private:
   IterativePhaseCorrelation CreateIPCFromParams(const std::vector<f64>& params) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs) const;
   std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::function<f64(const IterativePhaseCorrelation&)>& obj) const;
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
+  std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize) const;
   void ApplyOptimalParameters(const std::vector<f64>& optimalParameters);
   static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
       const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter);

@@ -196,7 +196,7 @@
        <item row="3" column="2">
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>xdd</string>
+          <string>CPeps</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -206,7 +206,7 @@
        <item row="3" column="3">
         <widget class="QLineEdit" name="lineEdit_7">
          <property name="text">
-          <string>xdd</string>
+          <string>0.0</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

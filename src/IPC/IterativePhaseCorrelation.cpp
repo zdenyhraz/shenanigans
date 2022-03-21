@@ -403,7 +403,7 @@ try
   LOG_FUNCTION("ShowDebugStuff()");
 
   constexpr Options OptionsT{.ModeT = ModeType::Debug, .CorrelationT = CorrelationType::PhaseCorrelation};
-  constexpr bool addNoise = true;
+  constexpr bool addNoise = false;
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;
   constexpr bool debugGradualShift = false;
@@ -817,6 +817,7 @@ IterativePhaseCorrelation IterativePhaseCorrelation::CreateIPCFromParams(const s
   ipc.SetWindowType(static_cast<WindowType>((i32)params[WindowTypeParameter]));
   ipc.SetL2Usize(params[L2UsizeParameter]);
   ipc.SetL1ratio(params[L1ratioParameter]);
+  ipc.SetCrossPowerEpsilon(params[CPepsParameter]);
   return ipc;
 }
 
@@ -855,7 +856,7 @@ std::function<f64(const std::vector<f64>&)> IterativePhaseCorrelation::CreateObj
 }
 
 std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
-    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
+    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize) const
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CalculateOptimalParameters");
@@ -866,10 +867,10 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   Evolution evo(OptimizedParameterCount);
   evo.mNP = populationSize;
   evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R"});
-  evo.mLB = {0, -0.5, 0.0, 0, 0, 21, 0.1};
-  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2.0, static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 501, 0.8};
+  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps"});
+  evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4};
+  evo.mUB = {static_cast<f64>(BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(InterpolationType::InterpolationTypeCount) - 1e-8,
+      static_cast<f64>(WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return BandpassType2String(static_cast<BandpassType>((i32)val)); });
@@ -879,6 +880,7 @@ std::vector<f64> IterativePhaseCorrelation::CalculateOptimalParameters(
   evo.SetParameterValueToNameFunction("WIN", [](f64 val) { return WindowType2String(static_cast<WindowType>((i32)val)); });
   evo.SetParameterValueToNameFunction("L2U", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
   evo.SetParameterValueToNameFunction("L1R", [](f64 val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("CPeps", [](f64 val) { return fmt::format("{:.2e}", val); });
   return evo.Optimize(obj, valid).optimum;
 }
 
@@ -898,6 +900,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   SetWindowType(static_cast<WindowType>((i32)optimalParameters[WindowTypeParameter]));
   SetL2Usize(optimalParameters[L2UsizeParameter]);
   SetL1ratio(optimalParameters[L1ratioParameter]);
+  SetCrossPowerEpsilon(optimalParameters[CPepsParameter]);
 
   LOG_SUCCESS("Final IPC BandpassType: {} -> {}", BandpassType2String(thisBefore.GetBandpassType()), BandpassType2String(GetBandpassType()));
   if (GetBandpassType() != BandpassType::None)
@@ -909,6 +912,7 @@ void IterativePhaseCorrelation::ApplyOptimalParameters(const std::vector<f64>& o
   LOG_SUCCESS("Final IPC WindowType: {} -> {}", WindowType2String(thisBefore.GetWindowType()), WindowType2String(GetWindowType()));
   LOG_SUCCESS("Final IPC L2Usize: {} -> {}", thisBefore.GetL2Usize(), GetL2Usize());
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", thisBefore.GetL1ratio(), GetL1ratio());
+  LOG_SUCCESS("Final IPC CPeps: {:.2e} -> {:.2e}", thisBefore.GetCrossPowerEpsilon(), GetCrossPowerEpsilon());
 }
 
 void IterativePhaseCorrelation::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
