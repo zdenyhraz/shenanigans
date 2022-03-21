@@ -397,6 +397,12 @@ std::string IterativePhaseCorrelation::InterpolationType2String(InterpolationTyp
   }
 }
 
+std::string IterativePhaseCorrelation::Serialize() const
+{
+  return fmt::format("Rows: {}, Cols: {}, BPL: {}, BPH: {}, L2size: {}, L1ratio: {}, L2Usize: {}, CPeps: {}, BPT: {}, WinT: {}, IntT: {}", GetRows(), GetCols(), GetBandpassL(), GetBandpassH(),
+      GetL2size(), GetL1ratio(), GetL2Usize(), GetCrossPowerEpsilon(), BandpassType2String(GetBandpassType()), WindowType2String(GetWindowType()), InterpolationType2String(GetInterpolationType()));
+}
+
 void IterativePhaseCorrelation::ShowDebugStuff() const
 try
 {

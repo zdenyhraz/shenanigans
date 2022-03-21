@@ -372,6 +372,7 @@ public:
   static std::string BandpassType2String(BandpassType type);
   static std::string WindowType2String(WindowType type);
   static std::string InterpolationType2String(InterpolationType type);
+  std::string Serialize() const;
   void ShowDebugStuff() const;
 
 private:

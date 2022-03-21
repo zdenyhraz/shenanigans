@@ -469,17 +469,7 @@ private:
     file << "idstride" << idstride;
     file << "thetamax" << thetamax;
     file << "cadence" << cadence;
-    // ipc params
-    file << "wxsize" << ipc.GetCols();
-    file << "wysize" << ipc.GetRows();
-    file << "bandpassL" << ipc.GetBandpassL();
-    file << "bandpassH" << ipc.GetBandpassH();
-    file << "L2size" << ipc.GetL2size();
-    file << "L1ratio" << ipc.GetL1ratio();
-    file << "L2Usize" << ipc.GetL2Usize();
-    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType());
-    file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
-    file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
+    file << "IPC" << ipc.Serialize();
     // diffrot data
     file << "theta" << data.theta;
     file << "shiftx" << data.shiftx;
@@ -500,21 +490,10 @@ private:
     LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::weakly_canonical(path).string());
 
     cv::FileStorage file(path, cv::FileStorage::WRITE);
-    // diffrot opt params
     file << "xsizeopt" << xsizeopt;
     file << "ysizeopt" << ysizeopt;
     file << "popsize" << popsize;
-    // ipc params
-    file << "wxsize" << ipc.GetCols();
-    file << "wysize" << ipc.GetRows();
-    file << "bandpassL" << ipc.GetBandpassL();
-    file << "bandpassH" << ipc.GetBandpassH();
-    file << "L2size" << ipc.GetL2size();
-    file << "L1ratio" << ipc.GetL1ratio();
-    file << "L2Usize" << ipc.GetL2Usize();
-    file << "BandpassType" << ipc.BandpassType2String(ipc.GetBandpassType());
-    file << "WindowType" << ipc.WindowType2String(ipc.GetWindowType());
-    file << "InterpolationType" << ipc.InterpolationType2String(ipc.GetInterpolationType());
+    file << "IPC" << ipc.Serialize();
   }
 
   DifferentialRotationData Load(const std::string& path)
