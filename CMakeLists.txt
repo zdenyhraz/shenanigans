@@ -147,7 +147,7 @@ src/Filtering/*.hpp src/Filtering/*.cpp
 src/Fit/*.hpp src/Fit/*.cpp
 src/Fourier/*.hpp src/Fourier/*.cpp
 src/Fractal/*.hpp src/Fractal/*.cpp
-src/IPC/*.hpp src/IPC/*.cpp
+src/ImageRegistration/*.hpp src/ImageRegistration/*.cpp
 src/Log/*.hpp src/Log/*.cpp
 src/ML/*.hpp src/ML/*.cpp
 src/Optimization/*.hpp src/Optimization/*.cpp

@@ -53,7 +53,7 @@ inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
 {
   PROFILE_FUNCTION;
   f64 minR, maxR;
-  minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
+  cv::minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
   return std::make_pair(minR, maxR);
 }
 

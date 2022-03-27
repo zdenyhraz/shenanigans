@@ -1,5 +1,5 @@
 #pragma once
-#include "IPC/IPC.hpp"
+#include "ImageRegistration/IPC.hpp"
 #include "Fit/Polyfit.hpp"
 #include "Fit/Trigfit.hpp"
 #include "Utils/DataCache.hpp"

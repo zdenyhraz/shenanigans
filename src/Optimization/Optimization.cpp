@@ -55,8 +55,8 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
 
   f64 minVal, maxVal, minValLog, maxValLog;
   cv::Point minLoc;
-  minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
-  minMaxLoc(landscapeLog, &minValLog, &maxValLog);
+  cv::minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
+  cv::minMaxLoc(landscapeLog, &minValLog, &maxValLog);
 
   if (true)
   {

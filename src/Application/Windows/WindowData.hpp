@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IPC/IPC.hpp"
+#include "ImageRegistration/IPC.hpp"
 
 struct WindowData
 {

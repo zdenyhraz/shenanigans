@@ -1,4 +1,4 @@
-#include "IPC/IPC.hpp"
+#include "ImageRegistration/IPC.hpp"
 
 class IPCTest : public ::testing::Test
 {
@@ -6,7 +6,6 @@ protected:
   IPCTest() : mImg1(LoadUnitFloatImage<f64>("../test/data/baboon.png")) {}
 
   using ModeType = IPC::ModeType;
-  using CorrelationType = IPC::CorrelationType;
   using InterpolationType = IPC::InterpolationType;
   using BandpassType = IPC::BandpassType;
   using WindowType = IPC::WindowType;
@@ -91,13 +90,6 @@ TEST_F(IPCTest, AccuracyTypes)
   EXPECT_LT(std::abs(subpixelError.y), std::abs(pixelError.y));
   EXPECT_LT(std::abs(pixelError.x), 0.5);
   EXPECT_LT(std::abs(pixelError.y), 0.5);
-}
-
-TEST_F(IPCTest, CorrelationTypes)
-{
-  const auto ipc = GetIPC();
-  EXPECT_NO_THROW((ipc.Calculate<{.CorrelationT = CorrelationType::PhaseCorrelation}>(mImg1, mImg2)));
-  EXPECT_NO_THROW((ipc.Calculate<{.CorrelationT = CorrelationType::CrossCorrelation}>(mImg1, mImg2)));
 }
 
 TEST_F(IPCTest, InterpolationTypes)

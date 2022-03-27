@@ -46,12 +46,6 @@ public:
     SubpixelIterative
   };
 
-  enum class CorrelationType : u8
-  {
-    CrossCorrelation,
-    PhaseCorrelation
-  };
-
   enum class ModeType : u8
   {
     Debug,
@@ -61,7 +55,6 @@ public:
   struct Options
   {
     ModeType ModeT = ModeType::Release;
-    CorrelationType CorrelationT = CorrelationType::PhaseCorrelation;
     AccuracyType AccuracyT = AccuracyType::SubpixelIterative;
   };
 
@@ -186,8 +179,8 @@ public:
     if (image1.channels() != 1 or image2.channels() != 1)
       [[unlikely]] throw std::invalid_argument("Multichannel images are not supported");
 
-    ConvertToUnitFloat<OptionsT.CorrelationT == CorrelationType::CrossCorrelation>(image1);
-    ConvertToUnitFloat<OptionsT.CorrelationT == CorrelationType::CrossCorrelation>(image2);
+    ConvertToUnitFloat(image1);
+    ConvertToUnitFloat(image2);
     if constexpr (OptionsT.ModeT == ModeType::Debug)
       IPCDebug::DebugInputImages(*this, image1, image2);
 
@@ -228,7 +221,7 @@ public:
     // L2
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
-    if constexpr (OptionsT.ModeT == ModeType::Debug and OptionsT.CorrelationT != CorrelationType::CrossCorrelation)
+    if constexpr (OptionsT.ModeT == ModeType::Debug)
       IPCDebug::DebugL2(*this, L2);
 
     // L2U
@@ -441,7 +434,6 @@ private:
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
     PROFILE_FUNCTION;
-
     const Float eps = mCPeps * dft1.rows * dft1.cols;
     for (i32 row = 0; row < dft1.rows; ++row)
     {
@@ -455,20 +447,8 @@ private:
         const Float mag = std::sqrt(re * re + im * im);
         const Float band = bandp[col];
 
-        // if (row == dft1.rows / 2 or row == dft1.rows / 2 + 1 or row == dft1.rows / 2 - 1)
-        //   if (col == dft1.cols / 2 or col == dft1.cols / 2 + 1 or col == dft1.cols / 2 - 1)
-        //     LOG_DEBUG("CPmag: {}", mag);
-
-        if constexpr (OptionsT.CorrelationT == CorrelationType::CrossCorrelation)
-        {
-          dft1p[col][0] = re * band;
-          dft1p[col][1] = im * band;
-        }
-        else
-        {
-          dft1p[col][0] = re / (mag + eps) * band;
-          dft1p[col][1] = im / (mag + eps) * band;
-        }
+        dft1p[col][0] = re / (mag + eps) * band;
+        dft1p[col][1] = im / (mag + eps) * band;
       }
     }
     return dft1;
@@ -486,7 +466,7 @@ private:
   {
     PROFILE_FUNCTION;
     cv::Point2i peak(0, 0);
-    minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
+    cv::minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
     return peak;
   }
 

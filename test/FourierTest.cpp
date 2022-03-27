@@ -1,5 +1,5 @@
 #include "Fourier/Fourier.hpp"
-#include "IPC/IPC.hpp"
+#include "ImageRegistration/IPC.hpp"
 
 TEST(FourierTest, ForwardInverseConsistency)
 {

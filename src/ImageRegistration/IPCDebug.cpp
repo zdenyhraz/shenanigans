@@ -84,7 +84,7 @@ try
 {
   LOG_FUNCTION("ShowDebugStuff()");
 
-  constexpr IPC::Options OptionsT{.ModeT = IPC::ModeType::Debug, .CorrelationT = IPC::CorrelationType::PhaseCorrelation};
+  constexpr IPC::Options OptionsT{.ModeT = IPC::ModeType::Debug};
   constexpr bool addNoise = false;
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;
