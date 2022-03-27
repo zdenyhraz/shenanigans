@@ -85,10 +85,9 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 # gtest
 add_subdirectory(external/gtest)
 include_directories("external/gtest/googletest/include")
-include_directories("external/gtest/googlemock/include")
 enable_testing()
 include(GoogleTest)
-target_link_libraries(shenanigans_test PRIVATE GTest::gtest_main GTest::gmock)
+target_link_libraries(shenanigans_test PRIVATE GTest::gtest_main)
 
 # json
 add_subdirectory(external/json)
