@@ -149,7 +149,7 @@ src/Fourier/*.hpp src/Fourier/*.cpp
 src/Fractal/*.hpp src/Fractal/*.cpp
 src/IPC/*.hpp src/IPC/*.cpp
 src/Log/*.hpp src/Log/*.cpp
-src/MachineLearning/*.hpp src/MachineLearning/*.cpp
+src/ML/*.hpp src/ML/*.cpp
 src/Optimization/*.hpp src/Optimization/*.cpp
 src/Plot/*.hpp src/Plot/*.cpp
 src/Random/*.hpp src/Random/*.cpp

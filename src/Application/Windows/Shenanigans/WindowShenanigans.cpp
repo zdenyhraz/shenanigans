@@ -7,8 +7,8 @@
 #include "Random/Procedural.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/OptimizationTestFunctions.hpp"
-#include "MachineLearning/RegressionModel.hpp"
-#include "MachineLearning/ImageSegmentationModel.hpp"
+#include "ML/RegressionModel.hpp"
+#include "ML/ImageSegmentationModel.hpp"
 
 WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWindowData(std::make_unique<WindowData>())
 {

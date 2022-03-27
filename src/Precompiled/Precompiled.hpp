@@ -29,15 +29,6 @@
 #include <type_traits>
 #include <concepts>
 
-#include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/features2d.hpp>
-#include <opencv2/xfeatures2d.hpp>
-//#include <opencv2/core/cuda.hpp>
-//#include <opencv2/cudaarithm.hpp>
-
 #include <omp.h>
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
@@ -53,6 +44,15 @@
 #include <QtGui>
 #include <QtPrintSupport>
 #include <qcustomplot.h>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/xfeatures2d.hpp>
+//#include <opencv2/core/cuda.hpp>
+//#include <opencv2/cudaarithm.hpp>
 
 #ifdef ENABLE_PROFILING
   #include <Tracy.hpp>
