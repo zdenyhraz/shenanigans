@@ -169,7 +169,7 @@ public:
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Optimize");
-    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over hte entire time span
+    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over the entire time span
     LOG_INFO("Optimization xsize: {}", xsizeopt);
     LOG_INFO("Optimization ysize: {}", ysizeopt);
     LOG_INFO("Optimization popsize: {}", popsize);

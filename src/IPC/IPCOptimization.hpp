@@ -26,9 +26,9 @@ public:
 private:
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio = 0.5);
   static std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStddev);
-  static IPC CreateIPCFromParams(const std::vector<f64>& params);
-  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
-  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const std::function<f64(const IPC&)>& obj);
+  static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
+  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
+  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
   static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
   static void ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters);
   static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,

@@ -18,8 +18,8 @@ try
 
   const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, itersPerImage, noiseStddev);
   const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, testRatio * itersPerImage, noiseStddev);
-  const auto obj = CreateObjectiveFunction(trainImagePairs);
-  const auto valid = CreateObjectiveFunction(testImagePairs);
+  const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
+  const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 
   // before
   LOG_INFO("Running IPC parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated", trainImages.size(),
@@ -66,7 +66,7 @@ try
   LOG_FUNCTION("Optimize");
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
-  const auto objf = CreateObjectiveFunction(obj);
+  const auto objf = CreateObjectiveFunction(ipc, obj);
   const auto optimalParameters = CalculateOptimalParameters(objf, nullptr, populationSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
@@ -97,7 +97,7 @@ void IPCOptimization::PlotObjectiveFunctionLandscape(const IPC& ipc, const std::
   LOG_FUNCTION("PlotObjectiveFunctionLandscape");
   const auto trainImages = LoadImages(trainDirectory);
   const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, itersPerImage, noiseStddev);
-  const auto obj = CreateObjectiveFunction(trainImagePairs);
+  const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
   const i32 rows = iters;
   const i32 cols = iters;
   cv::Mat landscape(rows, cols, GetMatType<IPC::Float>());
@@ -229,10 +229,10 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
   return imagePairs;
 }
 
-IPC IPCOptimization::CreateIPCFromParams(const std::vector<f64>& params)
+IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>& params)
 {
   PROFILE_FUNCTION;
-  IPC ipc(ipc.mRows, ipc.mCols);
+  IPC ipc(ipc_.mRows, ipc_.mCols);
   ipc.SetBandpassType(static_cast<IPC::BandpassType>((i32)params[BandpassTypeParameter]));
   ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
   ipc.SetInterpolationType(static_cast<IPC::InterpolationType>((i32)params[InterpolationTypeParameter]));
@@ -243,13 +243,12 @@ IPC IPCOptimization::CreateIPCFromParams(const std::vector<f64>& params)
   return ipc;
 }
 
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
   return [&](const std::vector<f64>& params) {
-    const auto ipc = CreateIPCFromParams(params);
-
+    const auto ipc = CreateIPCFromParams(ipc_, params);
     if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
 
@@ -263,13 +262,12 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
   };
 }
 
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const std::function<f64(const IPC&)>& obj)
+std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::function<f64(const IPC&)>& obj)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
   return [&](const std::vector<f64>& params) {
-    const auto ipc = CreateIPCFromParams(params);
-
+    const auto ipc = CreateIPCFromParams(ipc_, params);
     if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
 
