@@ -80,7 +80,7 @@ public:
       try
       {
         PROFILE_SCOPE(CalculateMeridianShifts);
-        const auto logprogress = static_cast<f64>(progress.fetch_add(1, std::memory_order_relaxed)) + 1.;
+        const f64 logprogress = progress++ + 1;
         const auto [id1, id2] = ids[x];
         const auto path1 = fmt::format("{}/{}.png", dataPath, id1);
         const auto path2 = fmt::format("{}/{}.png", dataPath, id2);

@@ -404,16 +404,10 @@ private:
     return (mBPL <= r and r <= mBPH) ? 1 : 0;
   }
 
-  template <bool Normalize = false>
   static void ConvertToUnitFloat(cv::Mat& image)
   {
     PROFILE_FUNCTION;
-
-    if (image.type() != GetMatType<Float>())
-      image.convertTo(image, GetMatType<Float>());
-
-    if constexpr (Normalize)
-      cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
+    image.convertTo(image, GetMatType<Float>());
   }
 
   void ApplyWindow(cv::Mat& image) const

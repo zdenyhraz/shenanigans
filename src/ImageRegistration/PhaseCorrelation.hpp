@@ -36,9 +36,7 @@ private:
   static void ConvertToUnitFloat(cv::Mat& image)
   {
     PROFILE_FUNCTION;
-
-    if (image.type() != GetMatType<Float>())
-      image.convertTo(image, GetMatType<Float>());
+    image.convertTo(image, GetMatType<Float>());
   }
 
   static void ApplyWindow(cv::Mat& image)

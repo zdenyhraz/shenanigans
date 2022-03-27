@@ -155,9 +155,11 @@ try
     else
       Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
-  else // ipc debug stuff
+  else // ipc
   {
-    dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
+    const auto image = RoiCropMid(LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png"), 1024, 1024);
+    IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, image, 51);
+    // dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
   }
 }
 catch (const std::exception& e)
