@@ -1,5 +1,5 @@
 #include "Fourier/Fourier.hpp"
-#include "IPC/IterativePhaseCorrelation.hpp"
+#include "IPC/IPC.hpp"
 
 TEST(FourierTest, ForwardInverseConsistency)
 {

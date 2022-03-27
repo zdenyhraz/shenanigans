@@ -33,7 +33,7 @@ i32 WindowDiffrot::GetIdstart()
 
 void WindowDiffrot::Calculate()
 {
-  GetDifferentialRotation().Calculate(*mWindowData->IPC, GetDataPath(), GetIdstart());
+  GetDifferentialRotation().Calculate(mWindowData->mIPC, GetDataPath(), GetIdstart());
 }
 
 void WindowDiffrot::Load()
@@ -47,12 +47,12 @@ void WindowDiffrot::Optimize()
   const i32 ysizeopt = ui.lineEdit_14->text().toInt();
   const i32 popsize = ui.lineEdit_4->text().toInt();
   // const i32 maxgen = ui.lineEdit_5->text().toInt();
-  GetDifferentialRotation().Optimize(*mWindowData->IPC, ui.lineEdit_8->text().toStdString(), GetIdstart(), xsizeopt, ysizeopt, popsize);
+  GetDifferentialRotation().Optimize(mWindowData->mIPC, ui.lineEdit_8->text().toStdString(), GetIdstart(), xsizeopt, ysizeopt, popsize);
 }
 
 void WindowDiffrot::PlotMeridianCurve()
 {
-  auto rawdata = GetDifferentialRotation(1).Calculate<true>(*mWindowData->IPC, GetDataPath(), GetIdstart());
+  auto rawdata = GetDifferentialRotation(1).Calculate<true>(mWindowData->mIPC, GetDataPath(), GetIdstart());
   rawdata.PostProcess();
   const auto timestep = ui.lineEdit_15->text().toDouble(); // [days]
   DifferentialRotation::PlotMeridianCurve(rawdata, GetDataPath(), GetIdstart(), timestep);

@@ -77,7 +77,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   cv::Mat out;
-  cvtColor(img, out, cv::COLOR_GRAY2BGR);
+  cv::cvtColor(img, out, cv::COLOR_GRAY2BGR);
 
   if (data.upscale != 1)
     cv::resize(out, out, cv::Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, cv::INTER_LINEAR);
@@ -170,7 +170,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     putText(out, drawSpeed ? fmt::format("{} ({:.0f})", drawcounter, spd) : fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, cv::LINE_AA);
 
     if (data.drawOverlapCircles)
-      circle(out, arrStart, data.upscale * data.overlapdistance, cv::Scalar(0, 255, 255), text_thickness * out.cols, cv::LINE_AA);
+      cv::circle(out, arrStart, data.upscale * data.overlapdistance, cv::Scalar(0, 255, 255), text_thickness * out.cols, cv::LINE_AA);
 
     drawcounter++;
   }
@@ -184,7 +184,7 @@ inline cv::Mat DrawFeatureMatchArrows(
 {
   LOG_FUNCTION("DrawFeatureMatchArrows");
   cv::Mat out;
-  cvtColor(img, out, cv::COLOR_GRAY2BGR);
+  cv::cvtColor(img, out, cv::COLOR_GRAY2BGR);
 
   std::vector<std::pair<cv::DMatch, bool>> matches_filtered;
   for (const auto& match : matches)

@@ -108,14 +108,14 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     const cv::Point pointOffset1(size, size);
     const cv::Point pointOffset2(size, -size);
 
-    line(mat, point - pointOffset1, point + pointOffset1, color, thickness, cv::LINE_AA);
-    line(mat, point - pointOffset2, point + pointOffset2, color, thickness, cv::LINE_AA);
+    cv::line(mat, point - pointOffset1, point + pointOffset1, color, thickness, cv::LINE_AA);
+    cv::line(mat, point - pointOffset2, point + pointOffset2, color, thickness, cv::LINE_AA);
   };
 
-  const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) { circle(mat, point, size, color, thickness, cv::LINE_AA); };
+  const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) { cv::circle(mat, point, size, color, thickness, cv::LINE_AA); };
 
   const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness) {
-    line(mat, point1, point2, color, thickness, cv::LINE_AA);
+    cv::line(mat, point1, point2, color, thickness, cv::LINE_AA);
     // arrowedLine(mat, point1, point2, color, thickness, cv::LINE_AA);
   };
 

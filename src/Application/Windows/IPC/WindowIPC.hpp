@@ -18,10 +18,6 @@ public slots:
   void RefreshIPCparametersAndExit();
   void Optimize();
   void PlotObjectiveFunctionLandscape();
-  void PlotL2UsizeAccuracyDependence();
-  void PlotNoiseAccuracyDependence();
-  void PlotNoiseOptimalBPHDependence();
-  void PlotImageSizeAccuracyDependence();
   void align();
   void alignXY();
   void CalculateFlow();

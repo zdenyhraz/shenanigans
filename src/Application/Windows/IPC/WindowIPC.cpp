@@ -9,10 +9,6 @@ WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(pare
   connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(RefreshIPCparameters()));
   connect(ui.pushButton_3, SIGNAL(clicked()), this, SLOT(Optimize()));
   connect(ui.pushButton_13, SIGNAL(clicked()), this, SLOT(PlotObjectiveFunctionLandscape()));
-  connect(ui.pushButton_12, SIGNAL(clicked()), this, SLOT(PlotL2UsizeAccuracyDependence()));
-  connect(ui.pushButton_14, SIGNAL(clicked()), this, SLOT(PlotNoiseAccuracyDependence()));
-  connect(ui.pushButton_15, SIGNAL(clicked()), this, SLOT(PlotNoiseOptimalBPHDependence()));
-  connect(ui.pushButton_11, SIGNAL(clicked()), this, SLOT(PlotImageSizeAccuracyDependence()));
   connect(ui.pushButton_9, SIGNAL(clicked()), this, SLOT(align()));
   connect(ui.pushButton_6, SIGNAL(clicked()), this, SLOT(alignXY()));
   connect(ui.pushButton_4, SIGNAL(clicked()), this, SLOT(CalculateFlow()));
@@ -24,15 +20,15 @@ WindowIPC::WindowIPC(QWidget* parent, WindowData* windowData) : QMainWindow(pare
 
 void WindowIPC::RefreshIPCparameters()
 {
-  mWindowData->IPC->SetBandpassType(static_cast<IterativePhaseCorrelation::BandpassType>(ui.comboBox->currentIndex()));
-  mWindowData->IPC->SetInterpolationType(static_cast<IterativePhaseCorrelation::InterpolationType>(ui.comboBox_2->currentIndex()));
-  mWindowData->IPC->SetWindowType(static_cast<IterativePhaseCorrelation::WindowType>(ui.comboBox_3->currentIndex()));
-  mWindowData->IPC->SetSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
-  mWindowData->IPC->SetL2size(ui.lineEdit_2->text().toInt());
-  mWindowData->IPC->SetL1ratio(ui.lineEdit_3->text().toDouble());
-  mWindowData->IPC->SetL2Usize(ui.lineEdit_4->text().toInt());
-  mWindowData->IPC->SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
-  mWindowData->IPC->SetCrossPowerEpsilon(ui.lineEdit_7->text().toDouble());
+  mWindowData->mIPC.SetBandpassType(static_cast<IPC::BandpassType>(ui.comboBox->currentIndex()));
+  mWindowData->mIPC.SetInterpolationType(static_cast<IPC::InterpolationType>(ui.comboBox_2->currentIndex()));
+  mWindowData->mIPC.SetWindowType(static_cast<IPC::WindowType>(ui.comboBox_3->currentIndex()));
+  mWindowData->mIPC.SetSize(ui.lineEdit->text().toInt(), ui.lineEdit_9->text().toInt());
+  mWindowData->mIPC.SetL2size(ui.lineEdit_2->text().toInt());
+  mWindowData->mIPC.SetL1ratio(ui.lineEdit_3->text().toDouble());
+  mWindowData->mIPC.SetL2Usize(ui.lineEdit_4->text().toInt());
+  mWindowData->mIPC.SetBandpassParameters(ui.lineEdit_5->text().toDouble(), ui.lineEdit_6->text().toDouble());
+  mWindowData->mIPC.SetCrossPowerEpsilon(ui.lineEdit_7->text().toDouble());
   LOG_DEBUG("IPC parameters updated");
 }
 
@@ -45,43 +41,15 @@ void WindowIPC::RefreshIPCparametersAndExit()
 void WindowIPC::Optimize()
 {
   RefreshIPCparameters();
-  mWindowData->IPC->Optimize(ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
+  IPCOptimization::Optimize(mWindowData->mIPC, ui.lineEdit_10->text().toStdString(), ui.lineEdit_11->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(),
       ui.lineEdit_14->text().toInt(), ui.lineEdit_20->text().toDouble(), ui.lineEdit_21->text().toInt());
 }
 
 void WindowIPC::PlotObjectiveFunctionLandscape()
 {
   RefreshIPCparameters();
-  mWindowData->IPC->PlotObjectiveFunctionLandscape(
-      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
-}
-
-void WindowIPC::PlotL2UsizeAccuracyDependence()
-{
-  RefreshIPCparameters();
-  mWindowData->IPC->PlotL2UsizeAccuracyDependence(
-      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
-}
-
-void WindowIPC::PlotNoiseAccuracyDependence()
-{
-  RefreshIPCparameters();
-  mWindowData->IPC->PlotNoiseAccuracyDependence(
-      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
-}
-
-void WindowIPC::PlotNoiseOptimalBPHDependence()
-{
-  RefreshIPCparameters();
-  mWindowData->IPC->PlotNoiseOptimalBPHDependence(
-      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
-}
-
-void WindowIPC::PlotImageSizeAccuracyDependence()
-{
-  RefreshIPCparameters();
-  mWindowData->IPC->PlotImageSizeAccuracyDependence(
-      ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
+  IPCOptimization::PlotObjectiveFunctionLandscape(
+      mWindowData->mIPC, ui.lineEdit_10->text().toStdString(), ui.lineEdit_12->text().toDouble(), ui.lineEdit_13->text().toDouble(), ui.lineEdit_14->text().toInt(), ui.lineEdit_22->text().toInt());
 }
 
 void WindowIPC::align()
@@ -103,9 +71,9 @@ void WindowIPC::align()
   Shift(img2, -950, 1050);
   Rotate(img2, 70, 1.2);
 
-  IterativePhaseCorrelation ipc = *mWindowData->IPC;
+  IPC ipc = mWindowData->mIPC;
   ipc.SetSize(img1.size());
-  cv::Mat aligned = ipc.Align(img1, img2);
+  cv::Mat aligned = IPCAlign::Align(ipc, img1, img2);
   Showimg(std::vector<cv::Mat>{img1, img2, aligned}, "align triplet");
 }
 
@@ -123,14 +91,14 @@ void WindowIPC::CalculateFlow()
 
   if (0)
   {
-    auto debugipc = *mWindowData->IPC;
-    debugipc.Calculate(RoiCrop(img1, img1.cols / 2, img1.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()),
-        RoiCrop(img2, img2.cols / 2, img2.rows / 2, mWindowData->IPC->GetCols(), mWindowData->IPC->GetRows()));
+    auto debugipc = mWindowData->mIPC;
+    debugipc.Calculate(RoiCrop(img1, img1.cols / 2, img1.rows / 2, mWindowData->mIPC.GetCols(), mWindowData->mIPC.GetRows()),
+        RoiCrop(img2, img2.cols / 2, img2.rows / 2, mWindowData->mIPC.GetCols(), mWindowData->mIPC.GetRows()));
 
     return;
   }
 
-  const auto [flowX, flowY] = mWindowData->IPC->CalculateFlow(img1, img2, 0.125);
+  const auto [flowX, flowY] = IPCFlow::CalculateFlow(mWindowData->mIPC, img1, img2, 0.125);
   cv::Mat flowM, flowP;
   cv::magnitude(flowX, flowY, flowM);
   cv::phase(flowX, flowY, flowP);
@@ -164,5 +132,5 @@ void WindowIPC::constantFlow()
 void WindowIPC::ShowDebugStuff()
 {
   RefreshIPCparameters();
-  mWindowData->IPC->ShowDebugStuff();
+  IPCDebug::ShowDebugStuff(mWindowData->mIPC);
 }

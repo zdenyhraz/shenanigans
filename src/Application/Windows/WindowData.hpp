@@ -1,11 +1,8 @@
 #pragma once
 
-#include "IPC/IterativePhaseCorrelation.hpp"
+#include "IPC/IPC.hpp"
 
-class WindowData
+struct WindowData
 {
-public:
-  WindowData() { IPC = std::make_unique<IterativePhaseCorrelation>(64, 64, 0.1, 0.6); }
-
-  std::unique_ptr<IterativePhaseCorrelation> IPC;
+  IPC mIPC{64, 64};
 };

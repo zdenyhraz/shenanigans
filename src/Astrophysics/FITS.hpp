@@ -139,8 +139,8 @@ private:
 
   static void AlignImage(cv::Mat& mat)
   {
-    warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(mat.cols / 2, mat.rows / 2), 90, 1.0), cv::Size(mat.cols, mat.rows));
-    transpose(mat, mat);
+    cv::warpAffine(mat, mat, getRotationMatrix2D(cv::Point2f(mat.cols / 2, mat.rows / 2), 90, 1.0), cv::Size(mat.cols, mat.rows));
+    cv::transpose(mat, mat);
   }
 
   static void DebugValues(const cv::Mat& mat, const FitsParams& params)
@@ -148,8 +148,8 @@ private:
     auto [mmin, mmax] = MinMax(mat);
     LOG_INFO("min/max mat {}/{}", mmin, mmax);
     cv::Mat xd = mat.clone();
-    cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
-    circle(xd, cv::Point(mat.cols / 2, mat.rows / 2), params.R, cv::Scalar(0, 0, 65535), 5);
+    cv::cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
+    cv::circle(xd, cv::Point(mat.cols / 2, mat.rows / 2), params.R, cv::Scalar(0, 0, 65535), 5);
     Showimg(xd, "xd");
   }
 
@@ -159,7 +159,7 @@ private:
     cv::Mat imgc;
     cv::normalize(img, img, 0, 255, cv::NORM_MINMAX);
     img.convertTo(img, CV_8U);
-    cvtColor(img, imgc, cv::COLOR_GRAY2BGR);
+    cv::cvtColor(img, imgc, cv::COLOR_GRAY2BGR);
 
     // fits
     {
@@ -167,13 +167,13 @@ private:
       f64 radius = params.R;
       cv::Scalar color(0, 0, 65535);
 
-      // draw the circle center
-      circle(imgc, center, 1, color, -1);
-      // draw the circle outline
-      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+      // draw the cv::circle center
+      cv::circle(imgc, center, 1, color, -1);
+      // draw the cv::circle outline
+      cv::circle(imgc, center, radius, color, 1, cv::LINE_AA);
 
       // draw the image center
-      circle(imgc, cv::Point2f(mat.cols / 2, mat.rows / 2), 1, cv::Scalar(65535, 0, 0), -1);
+      cv::circle(imgc, cv::Point2f(mat.cols / 2, mat.rows / 2), 1, cv::Scalar(65535, 0, 0), -1);
 
       LOG_INFO("Fits center / radius: {} / {}", center, radius);
     }
@@ -187,15 +187,15 @@ private:
       f64 radius = circlesHough[0][2];
       cv::Scalar color(0, 65535, 0);
 
-      // draw the circle center
-      circle(imgc, center, 1, color, -1);
-      // draw the circle outline
-      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+      // draw the cv::circle center
+      cv::circle(imgc, center, 1, color, -1);
+      // draw the cv::circle outline
+      cv::circle(imgc, center, radius, color, 1, cv::LINE_AA);
 
       LOG_INFO("Hough center / radius: {} / {}", center, radius);
     }
 
-    // min enclosing circle
+    // min enclosing cv::circle
     {
       cv::Mat canny_output;
       Canny(img, canny_output, 50, 200);
@@ -208,10 +208,10 @@ private:
       cv::Scalar color(65535, 0, 65535);
       minEnclosingCircle(contours[0], center, radius);
 
-      // draw the circle center
-      circle(imgc, center, 1, color, -1);
-      // draw the circle outline
-      circle(imgc, center, radius, color, 1, cv::LINE_AA);
+      // draw the cv::circle center
+      cv::circle(imgc, center, 1, color, -1);
+      // draw the cv::circle outline
+      cv::circle(imgc, center, radius, color, 1, cv::LINE_AA);
 
       LOG_INFO("Canny enclosing center / radius: {} / {}", center, radius);
     }
@@ -241,7 +241,7 @@ private:
     std::vector<std::vector<cv::Point>> contours;
     findContours(canny_output, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-    // circle
+    // cv::circle
     cv::Point2f center;
     f32 radius;
     minEnclosingCircle(contours[0], center, radius);
