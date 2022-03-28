@@ -85,13 +85,13 @@ try
   LOG_FUNCTION("ShowDebugStuff()");
 
   constexpr IPC::Options OptionsT{.ModeT = IPC::ModeType::Debug};
-  constexpr bool addNoise = false;
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
+  constexpr f64 noiseStdev = 0.0; // 0.01;
 
   if constexpr (debugShift)
   {
@@ -106,13 +106,8 @@ try
     cv::Mat image1 = RoiCrop(image, point.x, point.y, ipc.mCols, ipc.mRows);
     cv::Mat image2 = RoiCrop(imageShifted, point.x, point.y, ipc.mCols, ipc.mRows);
     ipc.SetDebugTrueShift(shift);
-
-    if constexpr (addNoise)
-    {
-      const f64 noiseStdev = 0.01;
-      AddNoise<IPC::Float>(image1, noiseStdev);
-      AddNoise<IPC::Float>(image2, noiseStdev);
-    }
+    AddNoise<IPC::Float>(image1, noiseStdev);
+    AddNoise<IPC::Float>(image2, noiseStdev);
 
     const auto ipcshift = ipc.Calculate<OptionsT>(image1, image2);
 
@@ -134,12 +129,8 @@ try
     Shift(image2, -950, 1050);
     Rotate(image2, 70, 1.2);
 
-    if constexpr (addNoise and 0)
-    {
-      const f64 noiseStdev = 0.01;
-      AddNoise<IPC::Float>(image1, noiseStdev);
-      AddNoise<IPC::Float>(image2, noiseStdev);
-    }
+    AddNoise<IPC::Float>(image1, noiseStdev);
+    AddNoise<IPC::Float>(image2, noiseStdev);
 
     const auto aligned = IPCAlign::Align(ipc, image1, image2);
   }
@@ -148,19 +139,12 @@ try
   {
     ipc.SetDebugDirectory("../debug/peakshift");
     const cv::Mat image1 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
-    const cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
+    const cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows) + GetNoise<IPC::Float>(crop1.size(), noiseStdev);
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
     const f64 totalshift = 1.;
-    cv::Mat noise2;
-
-    if constexpr (addNoise)
-    {
-      const f64 noiseStdev = 0.01;
-      crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
-      noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
-    }
+    cv::Mat noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
 
     for (i32 i = 0; i < iters; ++i)
     {
@@ -168,9 +152,7 @@ try
       const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::warpAffine(image1, image2, Tmat, image2.size());
-      crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows);
-      if constexpr (addNoise)
-        crop2 += noise2;
+      crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
       ipc.SetDebugTrueShift(shift);
       const auto ipcshift = ipc.Calculate<OptionsT>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);

@@ -120,7 +120,7 @@ public:
           const auto yshift = -R * std::sin(theta - theta0);
           auto crop1 = RoiCrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
           auto crop2 = RoiCrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
-          const auto shift = ipc.Calculate<{.AccuracyT = IPC::AccuracyType::SubpixelIterative}>(std::move(crop1), std::move(crop2));
+          const auto shift = ipc.Calculate<{}>(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
           const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);

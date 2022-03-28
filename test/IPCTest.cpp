@@ -27,21 +27,6 @@ protected:
   cv::Mat mImg2;
 };
 
-TEST_F(IPCTest, BadInputs)
-{
-  const auto ipc = GetIPC();
-  EXPECT_THROW(ipc.Calculate(mImg1, cv::Mat::ones(mImg1.rows + 1, mImg1.cols + 1, CV_32F)), std::invalid_argument);
-  EXPECT_THROW(ipc.Calculate(mImg1, cv::Mat::ones(mImg1.rows, mImg1.cols, CV_32FC3)), std::invalid_argument);
-}
-
-TEST_F(IPCTest, Consistency)
-{
-  const auto ipc = GetIPC();
-  const auto shift1 = ipc.Calculate(mImg1, mImg1);
-  const auto shift2 = ipc.Calculate(mImg1, mImg1);
-  EXPECT_EQ(shift1, shift2);
-}
-
 TEST_F(IPCTest, ZeroShift)
 {
   const auto ipc = GetIPC();
@@ -56,6 +41,21 @@ TEST_F(IPCTest, Shift)
   const auto shift = ipc.Calculate(mImg1, mImg2);
   EXPECT_NEAR(shift.x, mShift.x, 0.5);
   EXPECT_NEAR(shift.y, mShift.y, 0.5);
+}
+
+TEST_F(IPCTest, BadInputs)
+{
+  const auto ipc = GetIPC();
+  EXPECT_THROW(ipc.Calculate(mImg1, cv::Mat::ones(mImg1.rows + 1, mImg1.cols + 1, CV_32F)), std::invalid_argument);
+  EXPECT_THROW(ipc.Calculate(mImg1, cv::Mat::ones(mImg1.rows, mImg1.cols, CV_32FC3)), std::invalid_argument);
+}
+
+TEST_F(IPCTest, Consistency)
+{
+  const auto ipc = GetIPC();
+  const auto shift1 = ipc.Calculate(mImg1, mImg1);
+  const auto shift2 = ipc.Calculate(mImg1, mImg1);
+  EXPECT_EQ(shift1, shift2);
 }
 
 TEST_F(IPCTest, LargeShift)
@@ -76,20 +76,6 @@ TEST_F(IPCTest, UnnormalizedInputs)
   const auto unnormShift = ipc.Calculate(mImg1 * 25.73, mImg2 * 38.14);
   EXPECT_NEAR(normShift.x, unnormShift.x, kTolerance);
   EXPECT_NEAR(normShift.y, unnormShift.y, kTolerance);
-}
-
-TEST_F(IPCTest, AccuracyTypes)
-{
-  const auto ipc = GetIPC();
-  const auto subpixeliterativeError = ipc.Calculate<{.AccuracyT = AccuracyType::SubpixelIterative}>(mImg1, mImg2) - mShift;
-  const auto subpixelError = ipc.Calculate<{.AccuracyT = AccuracyType::Subpixel}>(mImg1, mImg2) - mShift;
-  const auto pixelError = ipc.Calculate<{.AccuracyT = AccuracyType::Pixel}>(mImg1, mImg2) - mShift;
-  EXPECT_LT(std::abs(subpixeliterativeError.x), std::abs(subpixelError.x));
-  EXPECT_LT(std::abs(subpixeliterativeError.y), std::abs(subpixelError.y));
-  EXPECT_LT(std::abs(subpixelError.x), std::abs(pixelError.x));
-  EXPECT_LT(std::abs(subpixelError.y), std::abs(pixelError.y));
-  EXPECT_LT(std::abs(pixelError.x), 0.5);
-  EXPECT_LT(std::abs(pixelError.y), 0.5);
 }
 
 TEST_F(IPCTest, InterpolationTypes)

@@ -2,6 +2,7 @@
 #include "IPC.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Filtering/Noise.hpp"
+#include "PhaseCorrelation.hpp"
 
 void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, f64 testRatio, i32 populationSize)
 try
@@ -407,7 +408,7 @@ std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(const IPC& ipc, 
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(ipc.Calculate<{.AccuracyT = IPC::AccuracyType::Subpixel}>(image1, image2));
+    out.push_back(cv::phaseCorrelate(image1, image2));
 
   return out;
 }
@@ -419,7 +420,7 @@ std::vector<cv::Point2d> IPCOptimization::GetPixelShifts(const IPC& ipc, const s
   out.reserve(imagePairs.size());
 
   for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(ipc.Calculate<{.AccuracyT = IPC::AccuracyType::Pixel}>(image1, image2));
+    out.push_back(PhaseCorrelation::Calculate(image1, image2));
 
   return out;
 }

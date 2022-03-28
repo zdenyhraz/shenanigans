@@ -39,13 +39,6 @@ public:
     InterpolationTypeCount // last
   };
 
-  enum class AccuracyType : u8
-  {
-    Pixel,
-    Subpixel,
-    SubpixelIterative
-  };
-
   enum class ModeType : u8
   {
     Debug,
@@ -55,7 +48,6 @@ public:
   struct Options
   {
     ModeType ModeT = ModeType::Release;
-    AccuracyType AccuracyT = AccuracyType::SubpixelIterative;
   };
 
   explicit IPC(i32 rows, i32 cols = -1, f64 bpL = 0, f64 bpH = 1) { Initialize(rows, cols, bpL, bpH); }
@@ -157,14 +149,14 @@ public:
   f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
   f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
-  template <Options OptionsT = Options()>
+  template <Options OptionsT = {}>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
     PROFILE_FUNCTION;
     return Calculate<OptionsT>(image1.clone(), image2.clone());
   }
 
-  template <Options OptionsT = Options()>
+  template <Options OptionsT = {}>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
@@ -205,12 +197,6 @@ public:
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
     if constexpr (OptionsT.ModeT == ModeType::Debug)
       IPCDebug::DebugL3(*this, L3);
-
-    if constexpr (OptionsT.AccuracyT == AccuracyType::Pixel)
-      return L3peak - L3mid;
-
-    if constexpr (OptionsT.AccuracyT == AccuracyType::Subpixel)
-      return GetSubpixelShift<OptionsT>(L3, L3peak, L3mid, 5);
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;

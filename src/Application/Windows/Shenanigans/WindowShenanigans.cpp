@@ -157,8 +157,11 @@ try
   }
   else // ipc
   {
-    const auto image = RoiCropMid(LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png"), 1024, 1024);
-    IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, image, 51);
+    // const auto image = RoiCropMid(LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png"), 1024, 1024);
+    const auto image = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shapef.png");
+
+    IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, image, 101);
+
     // dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
   }
 }
