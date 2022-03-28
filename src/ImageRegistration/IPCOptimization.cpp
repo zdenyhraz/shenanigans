@@ -4,7 +4,7 @@
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, f64 testRatio, i32 populationSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, f64 testRatio, i32 popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -24,7 +24,7 @@ try
 
   // before
   LOG_INFO("Running IPC parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated", trainImages.size(),
-      testImages.size(), trainImagePairs.size(), testImagePairs.size(), populationSize * trainImagePairs.size() + testImagePairs.size(), ipc.mCols, ipc.mRows);
+      testImages.size(), trainImagePairs.size(), testImagePairs.size(), popSize * trainImagePairs.size() + testImagePairs.size(), ipc.mCols, ipc.mRows);
   ShowRandomImagePair(trainImagePairs);
   const auto referenceShifts = GetReferenceShifts(trainImagePairs);
   const auto shiftsPixel = GetPixelShifts(ipc, trainImagePairs);
@@ -34,7 +34,7 @@ try
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
 
   // opt
-  const auto optimalParameters = CalculateOptimalParameters(obj, valid, populationSize);
+  const auto optimalParameters = CalculateOptimalParameters(obj, valid, popSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
 
@@ -60,7 +60,7 @@ catch (const std::exception& e)
   LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
-void IPCOptimization::Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 populationSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -68,7 +68,7 @@ try
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
   const auto objf = CreateObjectiveFunction(ipc, obj);
-  const auto optimalParameters = CalculateOptimalParameters(objf, nullptr, populationSize);
+  const auto optimalParameters = CalculateOptimalParameters(objf, nullptr, popSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
 
@@ -122,6 +122,7 @@ void IPCOptimization::PlotObjectiveFunctionLandscape(const IPC& ipc, const std::
       parameters[BandpassHParameter] = ipc.mBPH;
       parameters[InterpolationTypeParameter] = static_cast<i32>(ipc.mIntT);
       parameters[WindowTypeParameter] = static_cast<i32>(ipc.mWinT);
+      parameters[L1WindowTypeParameter] = static_cast<i32>(ipc.mL1WinT);
       parameters[L2UsizeParameter] = ipc.mL2Usize;
       parameters[L1ratioParameter] = ipc.mL1ratio;
 
@@ -180,8 +181,6 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
     throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
   if (itersPerImage < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
-  if (noiseStddev < 0)
-    throw std::runtime_error(fmt::format("Invalid noise stdev ({})", noiseStddev));
 
   if (const auto badimage = std::find_if(images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.mRows + maxShift or image.cols < ipc.mCols + maxShift; });
       badimage != images.end())
@@ -189,35 +188,28 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
         badimage->cols, ipc.mRows + maxShift, ipc.mCols + maxShift));
 
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
-  imagePairs.reserve(images.size() * itersPerImage);
+  imagePairs.reserve(images.size() * Sqr(itersPerImage));
 
   for (const auto& image : images)
   {
-    for (i32 i = 0; i < itersPerImage; ++i)
+    cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
+    IPC::ConvertToUnitFloat(image1);
+    AddNoise<IPC::Float>(image1, noiseStddev);
+
+    for (i32 row = 0; row < itersPerImage; ++row)
     {
-      // random shift from a random point
-      cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
-      cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
-          std::clamp(Random::Rand() * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
-      cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-      cv::Mat imageShifted;
-      cv::warpAffine(image, imageShifted, Tmat, image.size());
-      cv::Mat image1 = RoiCrop(image, point.x, point.y, ipc.mCols, ipc.mRows);
-      cv::Mat image2 = RoiCrop(imageShifted, point.x, point.y, ipc.mCols, ipc.mRows);
-
-      IPC::ConvertToUnitFloat(image1);
-      IPC::ConvertToUnitFloat(image2);
-
-      AddNoise<IPC::Float>(image1, noiseStddev);
-      AddNoise<IPC::Float>(image2, noiseStddev);
-
-      imagePairs.push_back({image1, image2, shift});
-
-      if constexpr (0)
+      for (i32 col = 0; col < itersPerImage; ++col)
       {
-        cv::Mat hcct;
-        hconcat(image1, image2, hcct);
-        Showimg(hcct, fmt::format("IPC optimization pair {}", i));
+        const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (itersPerImage - 1)), maxShift * (-1.0 + 2.0 * row / (itersPerImage - 1)));
+        const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+        cv::Mat imageShifted;
+        cv::warpAffine(image, imageShifted, Tmat, image.size());
+
+        cv::Mat image2 = RoiCropMid(imageShifted, ipc.mCols, ipc.mRows);
+        IPC::ConvertToUnitFloat(image2);
+        AddNoise<IPC::Float>(image2, noiseStddev);
+
+        imagePairs.push_back({image1, image2, shift});
       }
     }
   }
@@ -238,6 +230,7 @@ IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>
   ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
   ipc.SetInterpolationType(static_cast<IPC::InterpolationType>((i32)params[InterpolationTypeParameter]));
   ipc.SetWindowType(static_cast<IPC::WindowType>((i32)params[WindowTypeParameter]));
+  ipc.SetL1WindowType(static_cast<IPC::L1WindowType>((i32)params[L1WindowTypeParameter]));
   ipc.SetL2Usize(params[L2UsizeParameter]);
   ipc.SetL1ratio(params[L1ratioParameter]);
   ipc.SetCrossPowerEpsilon(params[CPepsParameter]);
@@ -276,21 +269,21 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
   };
 }
 
-std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize)
+std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CalculateOptimalParameters");
 
-  if (populationSize < 4)
-    throw std::runtime_error(fmt::format("Invalid population size ({})", populationSize));
+  if (popSize < 4)
+    throw std::runtime_error(fmt::format("Invalid population size ({})", popSize));
 
   Evolution evo(OptimizedParameterCount);
-  evo.mNP = populationSize;
-  evo.mMutStrat = Evolution::RAND1;
-  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps"});
-  evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4};
+  evo.mNP = popSize;
+  evo.mMutStrat = Evolution::BEST1;
+  evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps", "L1WIN"});
+  evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0};
   evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4};
+      static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return IPC::BandpassType2String(static_cast<IPC::BandpassType>((i32)val)); });
@@ -301,6 +294,7 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function
   evo.SetParameterValueToNameFunction("L2U", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
   evo.SetParameterValueToNameFunction("L1R", [](f64 val) { return fmt::format("{:.2f}", val); });
   evo.SetParameterValueToNameFunction("CPeps", [](f64 val) { return fmt::format("{:.2e}", val); });
+  evo.SetParameterValueToNameFunction("L1WIN", [](f64 val) { return IPC::L1WindowType2String(static_cast<IPC::L1WindowType>((i32)val)); });
   return evo.Optimize(obj, valid).optimum;
 }
 
@@ -313,14 +307,7 @@ void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& o
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
 
   const auto ipcBefore = ipc;
-
-  ipc.SetBandpassType(static_cast<IPC::BandpassType>((i32)optimalParameters[BandpassTypeParameter]));
-  ipc.SetBandpassParameters(optimalParameters[BandpassLParameter], optimalParameters[BandpassHParameter]);
-  ipc.SetInterpolationType(static_cast<IPC::InterpolationType>((i32)optimalParameters[InterpolationTypeParameter]));
-  ipc.SetWindowType(static_cast<IPC::WindowType>((i32)optimalParameters[WindowTypeParameter]));
-  ipc.SetL2Usize(optimalParameters[L2UsizeParameter]);
-  ipc.SetL1ratio(optimalParameters[L1ratioParameter]);
-  ipc.SetCrossPowerEpsilon(optimalParameters[CPepsParameter]);
+  ipc = CreateIPCFromParams(ipc, optimalParameters);
 
   LOG_SUCCESS("Final IPC BandpassType: {} -> {}", IPC::BandpassType2String(ipcBefore.GetBandpassType()), IPC::BandpassType2String(ipc.GetBandpassType()));
   if (ipc.GetBandpassType() != IPC::BandpassType::None)
@@ -330,6 +317,7 @@ void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& o
   }
   LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", IPC::InterpolationType2String(ipcBefore.GetInterpolationType()), IPC::InterpolationType2String(ipc.GetInterpolationType()));
   LOG_SUCCESS("Final IPC WindowType: {} -> {}", IPC::WindowType2String(ipcBefore.GetWindowType()), IPC::WindowType2String(ipc.GetWindowType()));
+  LOG_SUCCESS("Final IPC L1WindowType: {} -> {}", IPC::L1WindowType2String(ipcBefore.GetL1WindowType()), IPC::L1WindowType2String(ipc.GetL1WindowType()));
   LOG_SUCCESS("Final IPC L2Usize: {} -> {}", ipcBefore.GetL2Usize(), ipc.GetL2Usize());
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", ipcBefore.GetL1ratio(), ipc.GetL1ratio());
   LOG_SUCCESS("Final IPC CPeps: {:.2e} -> {:.2e}", ipcBefore.GetCrossPowerEpsilon(), ipc.GetCrossPowerEpsilon());
@@ -368,7 +356,6 @@ void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shif
     if (i < shiftsAfter.size())
     {
       const auto& shiftAfter = shiftsAfter[i];
-
       shiftsXAfter.push_back(shiftAfter.x);
       shiftsXAfterError.push_back(shiftAfter.x - referenceShift.x);
     }
@@ -378,14 +365,14 @@ void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shif
                                .ys = {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference},
                                .xlabel = "reference shift [px]",
                                .ylabel = "calculated shift [px]",
-                               .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
+                               .label_ys = {"pc", "pcs", "ipc", "ipc opt", "ref"},
                                .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 
   PyPlot::Plot("IPCshift error", {.x = shiftsXReference,
                                      .ys = {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError},
                                      .xlabel = "reference shift [px]",
                                      .ylabel = "error [px]",
-                                     .label_ys = {"pixel", "subpixel", "ipc", "ipc opt", "reference"},
+                                     .label_ys = {"pc", "pcs", "ipc", "ipc opt", "ref"},
                                      .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 }
 

@@ -126,42 +126,11 @@ try
   {
     // RegressionModelTest();
     ImageSegmentationModelTest();
-    return;
-  }
-  else if (0) // optimization / metaoptimization
-  {
-    const i32 N = 2;
-    const i32 runs = 20;
-    const i32 maxFunEvals = 1000;
-    const f32 optimalFitness = -std::numeric_limits<f64>::max();
-    const bool meta = false;
-    Evolution Evo(N);
-    Evo.mNP = 5 * N;
-    Evo.mMutStrat = Evolution::RAND1;
-    Evo.mLB = Zerovect(N, -5.0);
-    Evo.mUB = Zerovect(N, +5.0);
-    Evo.mMaxFunEvals = maxFunEvals;
-    Evo.mOptimalFitness = optimalFitness;
-    Evo.SetName("debug");
-    Evo.SetParameterNames({"x", "y"});
-    Evo.SetConsoleOutput(true);
-    Evo.SetPlotOutput(true);
-    Evo.SetPlotObjectiveFunctionLandscape(true);
-    Evo.SetPlotObjectiveFunctionLandscapeIterations(meta ? 51 : 301);
-    Evo.SetSaveProgress(true);
-
-    if (meta)
-      Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
-    else
-      Evo.Optimize(OptimizationTestFunctions::Rosenbrock);
   }
   else // ipc
   {
-    // const auto image = RoiCropMid(LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png"), 1024, 1024);
-    const auto image = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shapef.png");
-
-    IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, image, 101);
-
+    // IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, LoadUnitFloatImage<IPC::Float>("../debug/shapes/shapef.png"), 101);
+    IPCOptimization::Optimize(mWindowData->mIPC, "../debug/ipcopt", "../debug/ipcopt", 1.0, 0.01, 51, 0.2, 6);
     // dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
   }
 }

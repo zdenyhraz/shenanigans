@@ -134,3 +134,27 @@ inline cv::Mat ApplyQuantile(const cv::Mat& mat, f64 quantileB, f64 quantileT)
 
   return matq;
 }
+
+template <typename T>
+inline cv::Mat Gaussian(i32 size, f64 stddev)
+{
+  cv::Mat mat(size, size, GetMatType<T>());
+  for (i32 row = 0; row < size; ++row)
+  {
+    auto matp = mat.ptr<T>(row);
+    for (i32 col = 0; col < size; ++col)
+    {
+      f64 r = std::sqrt(Sqr(row - size / 2) + Sqr(col - size / 2));
+      matp[col] = Gaussian(r, 1, 0, stddev);
+    }
+  }
+  return mat;
+}
+
+template <typename T>
+inline cv::Mat Hanning(cv::Size size)
+{
+  cv::Mat mat;
+  cv::createHanningWindow(mat, size, GetMatType<T>());
+  return mat;
+}

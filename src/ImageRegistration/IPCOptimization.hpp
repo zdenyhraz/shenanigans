@@ -15,12 +15,13 @@ public:
     L2UsizeParameter,
     L1ratioParameter,
     CPepsParameter,
+    L1WindowTypeParameter,
     OptimizedParameterCount, // last
   };
 
   static void Optimize(
-      IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift = 2.0, f64 noiseStddev = 0.01, i32 itersPerImage = 100, f64 testRatio = 0.2, i32 populationSize = 42);
-  static void Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 populationSize = 42);
+      IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift = 2.0, f64 noiseStddev = 0.01, i32 itersPerImage = 101, f64 testRatio = 0.2, i32 popSize = 42);
+  static void Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize = 42);
   static void PlotObjectiveFunctionLandscape(const IPC& ipc, const std::string& trainDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, i32 iters);
 
 private:
@@ -29,7 +30,7 @@ private:
   static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 populationSize);
+  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize);
   static void ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters);
   static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
       const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter);

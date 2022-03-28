@@ -28,6 +28,21 @@ std::string IPC::WindowType2String(WindowType type)
   }
 }
 
+std::string IPC::L1WindowType2String(L1WindowType type)
+{
+  switch (type)
+  {
+  case L1WindowType::None:
+    return "None";
+  case L1WindowType::Circular:
+    return "Circular";
+  case L1WindowType::Gaussian:
+    return "Gaussian";
+  default:
+    return "Unknown";
+  }
+}
+
 std::string IPC::InterpolationType2String(InterpolationType type)
 {
   switch (type)

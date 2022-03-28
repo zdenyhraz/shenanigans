@@ -5,11 +5,9 @@ class IPCTest : public ::testing::Test
 protected:
   IPCTest() : mImg1(LoadUnitFloatImage<f64>("../test/data/baboon.png")) {}
 
-  using ModeType = IPC::ModeType;
   using InterpolationType = IPC::InterpolationType;
   using BandpassType = IPC::BandpassType;
   using WindowType = IPC::WindowType;
-  using AccuracyType = IPC::AccuracyType;
 
   void SetUp() override
   {

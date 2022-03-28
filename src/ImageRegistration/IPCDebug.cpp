@@ -61,7 +61,7 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
 {
   cv::Mat mat = IPC::CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(Kirkl<IPC::Float>(mat.rows));
+  mat = mat.mul(IPC::GetL1Window(ipc.mL1WinT, mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
@@ -72,7 +72,7 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
-  mat = mat.mul(Kirkl<IPC::Float>(mat.rows));
+  mat = mat.mul(IPC::GetL1Window(ipc.mL1WinT, mat.rows));
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
@@ -84,14 +84,13 @@ try
 {
   LOG_FUNCTION("ShowDebugStuff()");
 
-  constexpr IPC::Options OptionsT{.ModeT = IPC::ModeType::Debug};
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
-  constexpr f64 noiseStdev = 0.0; // 0.01;
+  constexpr f64 noiseStdev = 0.01; // 0.01;
 
   if constexpr (debugShift)
   {
@@ -109,7 +108,7 @@ try
     AddNoise<IPC::Float>(image1, noiseStdev);
     AddNoise<IPC::Float>(image2, noiseStdev);
 
-    const auto ipcshift = ipc.Calculate<OptionsT>(image1, image2);
+    const auto ipcshift = ipc.Calculate<true>(image1, image2);
 
     LOG_INFO("Artificial shift = {}", shift);
     LOG_INFO("Estimated shift = {}", ipcshift);
@@ -154,7 +153,7 @@ try
       cv::warpAffine(image1, image2, Tmat, image2.size());
       crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
       ipc.SetDebugTrueShift(shift);
-      const auto ipcshift = ipc.Calculate<OptionsT>(crop1, crop2);
+      const auto ipcshift = ipc.Calculate<true>(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
     }
   }

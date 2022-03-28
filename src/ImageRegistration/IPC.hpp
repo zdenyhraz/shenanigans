@@ -31,23 +31,20 @@ public:
     WindowTypeCount // last
   };
 
+  enum class L1WindowType : u8
+  {
+    None,
+    Circular,
+    Gaussian,
+    L1WindowTypeCount // last
+  };
+
   enum class InterpolationType : u8
   {
     NearestNeighbor,
     Linear,
     Cubic,
     InterpolationTypeCount // last
-  };
-
-  enum class ModeType : u8
-  {
-    Debug,
-    Release
-  };
-
-  struct Options
-  {
-    ModeType ModeT = ModeType::Release;
   };
 
   explicit IPC(i32 rows, i32 cols = -1, f64 bpL = 0, f64 bpH = 1) { Initialize(rows, cols, bpL, bpH); }
@@ -59,7 +56,7 @@ public:
     PROFILE_FUNCTION;
     SetSize(rows, cols);
     SetBandpassParameters(bpL, bpH);
-    UpdateL1circle();
+    UpdateL1Window();
   }
 
   void SetSize(i32 rows, i32 cols = -1)
@@ -93,26 +90,20 @@ public:
   void SetL2size(i32 L2size)
   {
     mL2size = (L2size % 2) ? L2size : L2size + 1;
-    UpdateL1circle();
+    UpdateL1Window();
   }
 
   void SetL1ratio(f64 L1ratio)
   {
     mL1ratio = L1ratio;
-    UpdateL1circle();
+    UpdateL1Window();
   }
 
   void SetL2Usize(i32 L2Usize)
   {
     mL2Usize = std::max(L2Usize, mL2size);
-    UpdateL1circle();
+    UpdateL1Window();
   }
-
-  void SetCrossPowerEpsilon(f64 CPeps) { mCPeps = std::max(CPeps, 0.); }
-
-  void SetMaxIterations(i32 maxIterations) { mMaxIter = maxIterations; }
-
-  void SetInterpolationType(InterpolationType interpolationType) { mIntT = interpolationType; }
 
   void SetWindowType(WindowType type)
   {
@@ -120,17 +111,24 @@ public:
     UpdateWindow();
   }
 
+  void SetL1WindowType(L1WindowType type)
+  {
+    mL1WinT = type;
+    UpdateL1Window();
+  }
+
+  void SetCrossPowerEpsilon(f64 CPeps) { mCPeps = std::max(CPeps, 0.); }
+  void SetMaxIterations(i32 maxIterations) { mMaxIter = maxIterations; }
+  void SetInterpolationType(InterpolationType interpolationType) { mIntT = interpolationType; }
+  void SetDebugName(const std::string& name) const { mDebugName = name; }
+  void SetDebugIndex(i32 index) const { mDebugIndex = index; }
+  void SetDebugTrueShift(const cv::Point2d& shift) const { mDebugTrueShift = shift; }
   void SetDebugDirectory(const std::string& dir) const
   {
     mDebugDirectory = dir;
     if (not std::filesystem::exists(dir))
       std::filesystem::create_directory(dir);
   }
-  void SetDebugName(const std::string& name) const { mDebugName = name; }
-
-  void SetDebugIndex(i32 index) const { mDebugIndex = index; }
-
-  void SetDebugTrueShift(const cv::Point2d& shift) const { mDebugTrueShift = shift; }
 
   i32 GetRows() const { return mRows; }
   i32 GetCols() const { return mCols; }
@@ -145,22 +143,23 @@ public:
   cv::Mat GetBandpass() const { return mBP; }
   BandpassType GetBandpassType() const { return mBPT; }
   WindowType GetWindowType() const { return mWinT; }
+  L1WindowType GetL1WindowType() const { return mL1WinT; }
   InterpolationType GetInterpolationType() const { return mIntT; }
   f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
   f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
-  template <Options OptionsT = {}>
+  template <bool DebugMode = false>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
     PROFILE_FUNCTION;
-    return Calculate<OptionsT>(image1.clone(), image2.clone());
+    return Calculate<DebugMode>(image1.clone(), image2.clone());
   }
 
-  template <Options OptionsT = {}>
+  template <bool DebugMode = false>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(OptionsT.ModeT == ModeType::Debug, "IPC::Calculate");
+    LOG_FUNCTION_IF(DebugMode, "IPC::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows))
       [[unlikely]] throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
@@ -173,7 +172,7 @@ public:
 
     ConvertToUnitFloat(image1);
     ConvertToUnitFloat(image2);
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       IPCDebug::DebugInputImages(*this, image1, image2);
 
     // windowing
@@ -183,92 +182,93 @@ public:
     // ffts
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
-    if constexpr (OptionsT.ModeT == ModeType::Debug and 0)
+    if constexpr (DebugMode and 0)
       IPCDebug::DebugFourierTransforms(*this, dft1, dft2);
 
     // cross-power
-    auto crosspower = CalculateCrossPowerSpectrum<OptionsT>(std::move(dft1), std::move(dft2));
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
+    if constexpr (DebugMode)
       IPCDebug::DebugCrossPowerSpectrum(*this, crosspower);
 
     // L3
     cv::Mat L3 = CalculateL3(std::move(crosspower));
     cv::Point2d L3peak = GetPeak(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       IPCDebug::DebugL3(*this, L3);
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<OptionsT>(L2size))
+      if (!ReduceL2size<DebugMode>(L2size))
         return L3peak - L3mid;
 
     // L2
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       IPCDebug::DebugL2(*this, L2);
 
     // L2U
     cv::Mat L2U = CalculateL2U(L2);
     cv::Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       IPCDebug::DebugL2U(*this, L2, L2U);
 
     // L1
     i32 L1size;
-    cv::Mat L1, L1circle;
+    cv::Mat L1, L1Win;
     cv::Point2d L2Upeak, L1mid, L1peak;
 
     for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
-      if constexpr (OptionsT.ModeT == ModeType::Debug)
+      if constexpr (DebugMode)
         LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
       L2Upeak = L2Umid; // reset L2U peak position
       L1size = GetL1size(L2U.cols, L1ratio);
       L1mid = cv::Point2d(L1size / 2, L1size / 2);
-      L1circle = mL1circle.cols == L1size ? mL1circle : Kirkl<Float>(L1size);
+      L1Win = mL1Win.cols == L1size ? mL1Win : GetL1Window(mL1WinT, L1size);
 
-      if constexpr (OptionsT.ModeT == ModeType::Debug and 0)
+      if constexpr (DebugMode and 0)
         IPCDebug::DebugL1B(*this, L2U, L1size, L3peak - L3mid, GetUpsampleCoeff(L2size));
 
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
-        if constexpr (OptionsT.ModeT == ModeType::Debug)
+        if constexpr (DebugMode)
           LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
         if (IsOutOfBounds(L2Upeak, L2U, L1size))
           [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        if constexpr (OptionsT.ModeT == ModeType::Debug)
+        if constexpr (DebugMode)
           IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - L2Umid, GetUpsampleCoeff(L2size));
-        L1peak = GetPeakSubpixel<true>(L1, L1circle);
+        L1peak = GetPeakSubpixel<true>(L1, L1Win);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
         if (AccuracyReached(L1peak, L1mid))
           [[unlikely]]
           {
-            if constexpr (OptionsT.ModeT == ModeType::Debug)
+            if constexpr (DebugMode)
               IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
             return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
           }
       }
 
-      if constexpr (OptionsT.ModeT == ModeType::Debug)
+      if constexpr (DebugMode)
         LOG_WARNING("L1 did not converge - reducing L1ratio: {:.2f} -> {:.2f}", L1ratio, L1ratio - mL1ratioStep);
     }
 
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       LOG_WARNING("L1 failed to converge with all L1ratios, return non-iterative subpixel shift");
-    return GetSubpixelShift<OptionsT>(L3, L3peak, L3mid, L2size);
+    return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, L2size);
   }
 
   static std::string BandpassType2String(BandpassType type);
   static std::string WindowType2String(WindowType type);
+  static std::string L1WindowType2String(L1WindowType type);
   static std::string InterpolationType2String(InterpolationType type);
   std::string Serialize() const;
 
@@ -287,29 +287,44 @@ private:
   BandpassType mBPT = BandpassType::Gaussian;
   InterpolationType mIntT = InterpolationType::Linear;
   WindowType mWinT = WindowType::Hann;
+  L1WindowType mL1WinT = L1WindowType::Gaussian;
   cv::Mat mBP;
   cv::Mat mWin;
-  cv::Mat mL1circle;
+  cv::Mat mL1Win;
   mutable std::string mDebugName = "IPC";
   mutable std::string mDebugDirectory;
   mutable i32 mDebugIndex = 0;
   mutable cv::Point2d mDebugTrueShift;
 
-  void UpdateWindow()
+  static cv::Mat GetWindow(WindowType type, cv::Size size)
   {
     PROFILE_FUNCTION;
-    switch (mWinT)
+    switch (type)
     {
     case WindowType::Hann:
-      cv::createHanningWindow(mWin, cv::Size(mCols, mRows), GetMatType<Float>());
-      return;
+      return Hanning<Float>(size);
     default:
-      mWin = cv::Mat();
-      return;
+      return cv::Mat();
     }
   }
 
-  void UpdateL1circle() { mL1circle = Kirkl<Float>(GetL1size(mL2Usize, mL1ratio)); }
+  static cv::Mat GetL1Window(L1WindowType type, i32 size)
+  {
+    PROFILE_FUNCTION;
+    switch (type)
+    {
+    case L1WindowType::Circular:
+      return Kirkl<Float>(size);
+    case L1WindowType::Gaussian:
+      return Gaussian<Float>(size, 0.5 * size);
+    default:
+      return cv::Mat::ones(size, size, GetMatType<Float>());
+    }
+  }
+
+  void UpdateWindow() { mWin = GetWindow(mWinT, cv::Size(mCols, mRows)); }
+
+  void UpdateL1Window() { mL1Win = GetL1Window(mL1WinT, GetL1size(mL2Usize, mL1ratio)); }
 
   void UpdateBandpass()
   {
@@ -318,10 +333,8 @@ private:
 
     if (mBPT == BandpassType::None)
       return;
-
     if (mBPL == 0 and mBPH == 0)
       return;
-
     if (mBPT == BandpassType::Rectangular and mBPL >= mBPH)
       return;
 
@@ -410,7 +423,6 @@ private:
     return Fourier::fft(std::move(image));
   }
 
-  template <Options OptionsT>
   cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2) const
   {
     PROFILE_FUNCTION;
@@ -450,13 +462,13 @@ private:
     return peak;
   }
 
-  template <bool Circular>
-  static cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1circle)
+  template <bool Window>
+  static cv::Point2d GetPeakSubpixel(const cv::Mat& mat, const cv::Mat& L1Win)
   {
     PROFILE_FUNCTION;
-    if constexpr (Circular)
+    if constexpr (Window)
     {
-      const auto m = cv::moments(mat.mul(L1circle));
+      const auto m = cv::moments(mat.mul(L1Win));
       return cv::Point2d(m.m10 / m.m00, m.m01 / m.m00);
     }
     else
@@ -512,21 +524,21 @@ private:
 
   static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
 
-  template <Options OptionsT>
+  template <bool DebugMode>
   static bool ReduceL2size(i32& L2size)
   {
     L2size -= 2;
-    if constexpr (OptionsT.ModeT == ModeType::Debug)
+    if constexpr (DebugMode)
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
 
-  template <Options OptionsT>
+  template <bool DebugMode>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
     PROFILE_FUNCTION;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<OptionsT>(L2size))
+      if (!ReduceL2size<DebugMode>(L2size))
         return L3peak - L3mid;
 
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
