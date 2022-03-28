@@ -39,14 +39,16 @@ inline cv::Mat LoadUnitFloatImage(const std::string& path)
   return mat;
 }
 
-inline f64 Magnitude(const cv::Point2f& pt)
+template <typename T>
+inline f64 Magnitude(const cv::Point_<T>& pt)
 {
-  return sqrt(Sqr(pt.x) + Sqr(pt.y));
+  return std::sqrt(std::pow(pt.x, 2) + std::pow(pt.y, 2));
 }
 
-inline f64 Angle(const cv::Point2f& pt)
+template <typename T>
+inline f64 Angle(const cv::Point_<T>& pt)
 {
-  return ToDegrees(atan2(pt.y, pt.x));
+  return ToDegrees(std::atan2(pt.y, pt.x));
 }
 
 inline std::pair<f64, f64> MinMax(const cv::Mat& mat)

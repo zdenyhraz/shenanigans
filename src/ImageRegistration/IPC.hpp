@@ -207,7 +207,7 @@ public:
       IPCDebug::DebugL3(*this, L3);
 
     if constexpr (OptionsT.AccuracyT == AccuracyType::Pixel)
-      return GetPixelShift(L3peak, L3mid);
+      return L3peak - L3mid;
 
     if constexpr (OptionsT.AccuracyT == AccuracyType::Subpixel)
       return GetSubpixelShift<OptionsT>(L3, L3peak, L3mid, 5);
@@ -534,8 +534,6 @@ private:
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
-
-  static cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) { return L3peak - L3mid; }
 
   template <Options OptionsT>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const

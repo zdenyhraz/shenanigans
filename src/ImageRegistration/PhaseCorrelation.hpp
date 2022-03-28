@@ -6,13 +6,13 @@ class PhaseCorrelation
 public:
   using Float = f64;
 
-  static cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
+  static cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2)
   {
     PROFILE_FUNCTION;
     return Calculate(image1.clone(), image2.clone());
   }
 
-  static cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
+  static cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2)
   {
     PROFILE_FUNCTION;
 
@@ -29,7 +29,7 @@ public:
 
     cv::Point2d L3peak = GetPeak(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
-    return GetPixelShift(L3peak, L3mid);
+    return L3peak - L3mid;
   }
 
 private:
@@ -66,8 +66,8 @@ private:
         const Float im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
         const Float mag = std::sqrt(re * re + im * im);
 
-        dft1p[col][0] = re / mag * band;
-        dft1p[col][1] = im / mag * band;
+        dft1p[col][0] = re / mag;
+        dft1p[col][1] = im / mag;
       }
     }
     return dft1;
@@ -88,6 +88,4 @@ private:
     cv::minMaxLoc(mat, nullptr, nullptr, nullptr, &peak);
     return peak;
   }
-
-  static cv::Point2d GetPixelShift(const cv::Point2d& L3peak, const cv::Point2d& L3mid) { return L3peak - L3mid; }
 };
