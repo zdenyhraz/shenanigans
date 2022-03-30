@@ -42,7 +42,14 @@ jobs:
           path: ./opencv-4.5.5/build
           key: ${{runner.os}}-opencv-cache
 
+      - name: opencv install from cache
+        if: steps.opencv-cache.outputs.cache-hit == 'true'
+        run: |
+          cd opencv-4.5.5/build
+          sudo ninja install
+
       - name: opencv install
+        if: steps.opencv-cache.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/opencv/opencv/archive/refs/tags/4.5.5.tar.gz
           sudo chmod 755 4.5.5.tar.gz
@@ -52,7 +59,7 @@ jobs:
           mkdir build && cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
           cmake --build . --config Release -j 6
-          ninja install
+          sudo ninja install
 
       - name: cmake configure
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
