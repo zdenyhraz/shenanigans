@@ -1,5 +1,41 @@
 #pragma once
-#include "Plot.hpp"
+#include "Application/Windows/Plot/WindowPlot.hpp"
+
+class Plot
+{
+public:
+  static QPoint GetNewPlotPosition(WindowPlot* windowPlot, const std::string& name);
+  static void CloseAll();
+
+  inline static std::map<std::string, std::unique_ptr<WindowPlot>> plots;
+  inline static std::function<void(std::string)> OnClose = [](std::string name)
+  {
+    const auto idx = plots.find(name);
+    if (idx != plots.end())
+      plots.erase(idx);
+  };
+  inline static QFont fontTicks{"Newyork", 11};
+  inline static QFont fontLabels{"Newyork", 13};
+  inline static QFont fontLegend{"Newyork", 9};
+  inline static double pt = 3.0;
+  inline static QColor black{50, 50, 50};
+  inline static QColor blue{0, 113.9850, 188.9550};
+  inline static QColor orange{216.750, 82.875, 24.990};
+  inline static QColor yellow{236.895, 176.970, 31.875};
+  inline static QColor magenta{125.970, 46.920, 141.780};
+  inline static QColor green{118.830, 171.870, 47.940};
+  inline static QColor cyan{76.755, 189.975, 237.915};
+  inline static QColor red{161.925, 19.890, 46.920};
+  inline static std::vector<QPen> pens{
+      QPen(blue, pt),
+      QPen(orange, pt),
+      QPen(green, pt),
+      QPen(magenta, pt),
+      QPen(red, pt),
+      QPen(black, pt),
+      QPen(cyan, pt),
+  };
+};
 
 class Plot1D
 {
@@ -58,7 +94,7 @@ public:
 private:
   static Plot1D& GetPlot(const std::string& name = mCurrentPlot);
   static std::unordered_map<std::string, Plot1D> mPlots;
-  static std::string mCurrentPlot;
+  inline static std::string mCurrentPlot = "Plot1D";
 
   void PlotCore(const std::vector<double>& x, const std::vector<std::vector<double>>& y1s, const std::vector<std::vector<double>>& y2s = {});
   void PlotCore(double x, const std::vector<double>& y1s, const std::vector<double>& y2s = {});
@@ -82,4 +118,52 @@ private:
   double mYmax = std::numeric_limits<double>::max();
   double mY2min = std::numeric_limits<double>::lowest();
   double mY2max = std::numeric_limits<double>::max();
+};
+
+class Plot2D
+{
+public:
+  static void Set(const std::string& name) { mCurrentPlot = name; }
+  static void Plot(const std::string& name, const cv::Mat& z) { GetPlot(name).PlotCore(z); }
+  static void Plot(const std::string& name, const std::vector<std::vector<double>>& z) { GetPlot(name).PlotCore(z); }
+
+  // unnamed setters
+  static void Plot(const cv::Mat& z) { GetPlot().PlotCore(z); }
+  static void Plot(const std::vector<std::vector<double>>& z) { GetPlot().PlotCore(z); }
+  static void SetXlabel(const std::string& xlabel) { GetPlot().mXlabel = xlabel; }
+  static void SetYlabel(const std::string& ylabel) { GetPlot().mYlabel = ylabel; }
+  static void SetZlabel(const std::string& zlabel) { GetPlot().mZlabel = zlabel; }
+  static void SetXmin(double xmin) { GetPlot().mXmin = xmin; }
+  static void SetXmax(double xmax) { GetPlot().mXmax = xmax; }
+  static void SetYmin(double ymin) { GetPlot().mYmin = ymin; }
+  static void SetYmax(double ymax) { GetPlot().mYmax = ymax; }
+  static void SetColRowRatio(double colRowRatio) { GetPlot().mColRowRatio = colRowRatio; }
+  static void SetSavePath(const std::string& savePath) { GetPlot().mSavepath = savePath; }
+  static void SetColorMapType(QCPColorGradient colorMapType) { GetPlot().mColormapType = colorMapType; }
+  static void ShowAxisLabels(bool showAxisLabels) { GetPlot().mShowAxisLabels = showAxisLabels; }
+
+  explicit Plot2D(const std::string& name);
+
+private:
+  static Plot2D& GetPlot(const std::string& name = mCurrentPlot);
+  static std::unordered_map<std::string, Plot2D> mPlots;
+  inline static std::string mCurrentPlot = "Plot2D";
+
+  void PlotCore(const cv::Mat& z);
+  void PlotCore(const std::vector<std::vector<double>>& z);
+  void Initialize(int xcnt, int ycnt);
+  void ClearCore();
+
+  std::string mName = "plot";
+  std::string mXlabel = "x";
+  std::string mYlabel = "y";
+  std::string mZlabel = "z";
+  double mXmin = 0;
+  double mXmax = 1;
+  double mYmin = 0;
+  double mYmax = 1;
+  double mColRowRatio = 0;
+  std::string mSavepath;
+  bool mShowAxisLabels = false;
+  QCPColorGradient mColormapType = QCPColorGradient::gpJet;
 };

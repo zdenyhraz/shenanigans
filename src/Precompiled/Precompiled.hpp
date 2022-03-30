@@ -29,6 +29,11 @@
 #include <type_traits>
 #include <concepts>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <GLFW/glfw3.h>
+
 #include <omp.h>
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
@@ -38,11 +43,6 @@
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <torch/torch.h>
-
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#include <GLFW/glfw3.h>
 
 #include <QtWidgets>
 #include <QtCore>
@@ -106,6 +106,5 @@ namespace json = nlohmann;
 #include "UtilsCV/Showsave.hpp"
 #include "UtilsCV/Formatters.hpp"
 
-#include "Plot/Plot1D.hpp"
-#include "Plot/Plot2D.hpp"
+#include "Plot/QtPlot.hpp"
 #include "Plot/PyPlot.hpp"
