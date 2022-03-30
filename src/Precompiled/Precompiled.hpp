@@ -91,7 +91,7 @@ using usize = size_t;
 namespace py = pybind11;
 namespace json = nlohmann;
 
-#include "Log/Logger.hpp"
+#include "Log/Log.hpp"
 #include "Log/LogFunction.hpp"
 
 #include "Utils/Constants.hpp"

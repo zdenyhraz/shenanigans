@@ -1,5 +1,5 @@
 #pragma once
-#include "Logger.hpp"
+#include "Log.hpp"
 
 #define LOG_FUNCTION(funName) LogFunction logFunction(funName)
 #define LOG_FUNCTION_IF(show, funName) LogFunction<show> logFunction(funName)
@@ -17,14 +17,14 @@ public:
     {
       mStartTime = clock::now();
       mFunName = std::move(funName);
-      Logger::Function("{} started", mFunName);
+      Log::Function("{} started", mFunName);
     }
   }
 
   ~LogFunction()
   {
     if constexpr (Show)
-      Logger::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
+      Log::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
   }
 
 private:

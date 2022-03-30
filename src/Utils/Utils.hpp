@@ -104,11 +104,9 @@ inline std::string GetCurrentDateTime()
 
 inline std::string GetCurrentTime()
 {
-  time_t now = time(0);
-  struct tm tstruct;
-  char buf[80];
-  tstruct = *localtime(&now);
-  strftime(buf, sizeof(buf), "%H:%M:%S", &tstruct);
+  auto now = time(nullptr);
+  char buf[sizeof("12:34:56")];
+  strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&now));
   return buf;
 }
 
