@@ -18,7 +18,7 @@ jobs:
           sudo update-alternatives --set gcc /usr/bin/gcc-11
 
       - name: ninja install
-        run: sudo apt-get install -y ninja-build
+        run: sudo apt-get install ninja-build
 
       - name: python install
         uses: actions/setup-python@v2
@@ -29,10 +29,8 @@ jobs:
           wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
           sudo chmod 755 libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
           unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
-          rm libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
-          ls
 
-      - name: qt install # sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
+      - name: qt install
         run: |
           sudo apt-get update
           sudo apt-get install qt5-default
@@ -45,16 +43,24 @@ jobs:
           key: ${{runner.os}}-opencv-cache
 
       - name: opencv install
-        uses: rayandrews/with-opencv-action@v1
-        with:
-          opencv-version: '4.5.1'
-          dir: ./opencv-install
-          cached: ${{steps.opencv-cache.outputs.cache-hit}}
+        run: |
+          wget https://github.com/opencv/opencv/archive/refs/tags/4.5.5.tar.gz
+          sudo chmod 755 4.5.5.tar.gz
+          tar -xf 4.5.5.tar.gz
+          git clone https://github.com/opencv/opencv_contrib.git
+          cd opencv-4.5.5
+          mkdir build && cd build
+          cmake .. -G Ninja -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
+          cmake --build . --config Release -j 6
+          cd build
+          ninja install
+
+
 
       - name: cmake configure
         env:
           CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G "Ninja"
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
 
       - name: cmake build
         run: cmake --build ${{github.workspace}}/build --config Release -j 6
@@ -94,7 +100,7 @@ jobs:
   #         path: ${{github.workspace}}/build
 
   #     - name: clang-tidy install
-  #       run: sudo apt-get install -y clang-tidy
+  #       run: sudo apt-get install clang-tidy
 
   #     - name: clang-tidy run
   #       continue-on-error: true
@@ -118,7 +124,7 @@ jobs:
 
   #     - name: infer install
   #       run: |
-  #         sudo apt install -y curl
+  #         sudo apt install curl
   #         VERSION=1.1.0; \
   #         curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
   #         | sudo tar -C /opt -xJ && \
