@@ -32,8 +32,10 @@ jobs:
           rm libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
           ls
 
-      - name: qt install
-        run: sudo apt-get install qt5-default # sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
+      - name: qt install # sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install qt5-default
 
       - name: opencv cache
         id: opencv-cache

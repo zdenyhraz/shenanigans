@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 
 FONT_SCALE = 2.2
