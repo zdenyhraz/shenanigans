@@ -34,13 +34,13 @@ else()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_DEBUG}")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_RELEASE}")
 
-  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -w")
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
 endif()
 
 # ignore warnings from external sources
-file(GLOB_RECURSE SRC_EXTERNAL external/*.h external/*.hpp external/*.c external/*.cpp)
+file(GLOB_RECURSE SRC_EXTERNAL CONFIGURE_DEPENDS external/*.h external/*.hpp external/*.c external/*.cpp)
 set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
 
 # ccache
@@ -95,19 +95,17 @@ include_directories("external/json/include")
 target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
-# profiling
+# tracy
 if(ENABLE_PROFILING)
-  # tracy
   include_directories("external/tracy")
-  add_compile_definitions(TRACY_ENABLE)
-  add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
+  add_compile_definitions(TRACY_ENABLE) # for tracy macros
+  add_compile_definitions(ENABLE_PROFILING) # for custom macros
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
   set(SRC_TRACY external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
   target_sources(shenanigans PRIVATE ${SRC_TRACY})
   target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
   target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
-  add_compile_definitions(ENABLE_PROFILING)
 endif()
 
 # opencv
@@ -133,6 +131,22 @@ include_directories("external/libtorch/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 target_link_libraries(shenanigans PRIVATE "${TORCH_LIBRARIES}")
 target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
+
+# imgui
+include_directories("external/imgui")
+include_directories("external/imgui/backends")
+file(GLOB SRC_IMGUI external/imgui/*.cpp)
+set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+
+# glfw
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(external/glfw)
+target_link_libraries(shenanigans PRIVATE glfw)
+target_link_libraries(shenanigans_test PRIVATE glfw)
 
 # custom
 include_directories("src")
