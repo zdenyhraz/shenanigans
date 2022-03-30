@@ -28,9 +28,9 @@ void Plot1D::PlotCore(const std::vector<double>& x, const std::vector<std::vecto
   for (int i = 0; i < ycnt; i++)
   {
     if (i < y1cnt)
-      plot->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y1s[i]));
+      plot->graph(i)->setData(QVector<double>(x.begin(), x.end()), QVector<double>(y1s[i].begin(), y1s[i].end()));
     else
-      plot->graph(i)->setData(QVector<double>::fromStdVector(x), QVector<double>::fromStdVector(y2s[i - y1cnt]));
+      plot->graph(i)->setData(QVector<double>(x.begin(), x.end()), QVector<double>(y2s[i - y1cnt].begin(), y2s[i - y1cnt].end()));
   }
 
   plot->rescaleAxes();
