@@ -2,10 +2,8 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure(num=id)
 fig.canvas.set_window_title(title)
-
-if fig.get_figheight() < 5:
-  fig.set_figheight(fig.get_figheight()*2)
-  fig.set_figwidth(fig.get_figwidth()*2*aspectratio)
+fig.set_figheight(fig.get_figheight())
+fig.set_figwidth(fig.get_figwidth()*aspectratio)
 
 plt.clf()
 im = plt.imshow(z,

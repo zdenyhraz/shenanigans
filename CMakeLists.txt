@@ -28,7 +28,7 @@ if(MSVC)
 else()
   set(CXX_FLAGS "-march=native -fopenmp -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow -Wno-unused-parameter -Wno-missing-field-initializers")
   set(CXX_FLAGS_DEBUG "-g -Og")
-  set(CXX_FLAGS_RELEASE "-Ofast")
+  set(CXX_FLAGS_RELEASE "-O3")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_DEBUG}")
