@@ -33,7 +33,7 @@ jobs:
           ls
 
       - name: qt install
-        run: sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
+        run: sudo apt-get install qt5-default # sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
 
       - name: opencv cache
         id: opencv-cache
@@ -55,7 +55,7 @@ jobs:
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G "Ninja"
 
       - name: cmake build
-        run: cmake --build ${{github.workspace}}/build --config Release
+        run: cmake --build ${{github.workspace}}/build --config Release -j 6
 
       - name: run test
         working-directory: ${{github.workspace}}/build
