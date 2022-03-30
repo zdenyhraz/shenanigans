@@ -40,7 +40,7 @@ else()
 endif()
 
 # ignore warnings from external sources
-file(GLOB_RECURSE SRC_EXTERNAL "external/*")
+file(GLOB_RECURSE SRC_EXTERNAL external/*.h external/*.hpp external/*.c external/*.cpp)
 set_source_files_properties(${SRC_EXTERNAL} PROPERTIES COMPILE_FLAGS "-w")
 
 # ccache
@@ -102,7 +102,7 @@ if(ENABLE_PROFILING)
   add_compile_definitions(TRACY_ENABLE)
   add_compile_definitions(TRACY_TIMER_FALLBACK) # needed for WSL
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
-  file(GLOB_RECURSE SRC_TRACY CONFIGURE_DEPENDS external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
+  set(SRC_TRACY external/tracy/Tracy.hpp external/tracy/TracyClient.cpp)
   target_sources(shenanigans PRIVATE ${SRC_TRACY})
   target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
@@ -123,7 +123,7 @@ target_link_libraries(shenanigans_test PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Q
 
 # qcustomplot
 include_directories("external/qcustomplot")
-file(GLOB_RECURSE SRC_QCUSTOMPLOT CONFIGURE_DEPENDS external/qcustomplot/qcustomplot.h external/qcustomplot/qcustomplot.cpp)
+set(SRC_QCUSTOMPLOT external/qcustomplot/qcustomplot.h external/qcustomplot/qcustomplot.cpp)
 target_sources(shenanigans PRIVATE ${SRC_QCUSTOMPLOT})
 target_sources(shenanigans_test PRIVATE ${SRC_QCUSTOMPLOT})
 
@@ -138,9 +138,7 @@ target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
 include_directories("src")
 
 # sources
-file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
-src/*.ui src/*.rc src/*.qrc
-src/Application/Windows/*.hpp src/Application/Windows/*.cpp
+file(GLOB SRC CONFIGURE_DEPENDS
 src/Astrophysics/*.hpp src/Astrophysics/*.cpp
 src/Features/*.hpp src/Features/*.cpp
 src/Filtering/*.hpp src/Filtering/*.cpp
@@ -159,19 +157,26 @@ src/UtilsCV/*.hpp src/UtilsCV/*.cpp
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 
+# qt resources
+file(GLOB_RECURSE SRC_QT CONFIGURE_DEPENDS
+src/Application/Windows/*.hpp src/Application/Windows/*.cpp
+src/Application/*.ui src/Application/*.rc src/Application/*.qrc)
+target_sources(shenanigans PRIVATE ${SRC_QT})
+target_sources(shenanigans_test PRIVATE ${SRC_QT})
+
 # app sources
-file(GLOB_RECURSE SRC_APP CONFIGURE_DEPENDS src/Application/Application.cpp)
+set(SRC_APP src/Application/Application.cpp)
 target_sources(shenanigans PRIVATE ${SRC_APP})
 
 # test sources
-file(GLOB_RECURSE SRC_TEST CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
+file(GLOB SRC_TEST CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_TEST})
 gtest_discover_tests(shenanigans_test)
 
+# precompiled headers
 if (ENABLE_PCH)
-  # precompiled headers
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-  file(GLOB_RECURSE SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.hpp)
+  file(GLOB SRC_PRECOMPILED CONFIGURE_DEPENDS src/Precompiled/Precompiled.hpp)
   message(STATUS "PCH: " ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
