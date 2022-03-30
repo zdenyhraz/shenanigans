@@ -3,7 +3,6 @@ import numpy as np
 
 fig = plt.figure(num=id)
 fig.canvas.set_window_title(title)
-fig.set_figheight(fig.get_figheight())
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
 
 Z = np.array([np.array(row) for row in z])
