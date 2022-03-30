@@ -50,13 +50,11 @@ jobs:
           cd opencv-4.5.5
           git clone https://github.com/opencv/opencv_contrib.git
           mkdir build && cd build
-          cmake .. -G Ninja -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
           cmake --build . --config Release -j 6
           ninja install
 
       - name: cmake configure
-        env:
-          CMAKE_PREFIX_PATH: ${{env.Qt5_Dir}}
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
 
       - name: cmake build
