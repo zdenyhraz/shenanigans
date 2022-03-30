@@ -45,7 +45,7 @@ jobs:
         run: cd opencv/build && sudo ninja install
 
       - name: opencv install
-        if: steps.opencv-cache.outputs.cache-hit == 'false'
+        if: steps.opencv-cache.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/opencv/opencv/archive/refs/tags/4.5.5.tar.gz
           sudo chmod 755 4.5.5.tar.gz
