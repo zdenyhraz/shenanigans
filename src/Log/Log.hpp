@@ -1,7 +1,9 @@
 #pragma once
+#include "TermLogger.hpp"
 #include "QtLogger.hpp"
 
 using Log = QtLogger;
+// using Log = TermLogger;
 
 #define LOG_TRACE(...) Log::Trace(__VA_ARGS__)
 #define LOG_DEBUG(...) Log::Debug(__VA_ARGS__)

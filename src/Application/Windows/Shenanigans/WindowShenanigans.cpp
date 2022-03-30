@@ -27,9 +27,9 @@ WindowShenanigans::WindowShenanigans(QWidget* parent) : QMainWindow(parent), mWi
   ui.label_2->setPixmap(pm);
   ui.label_2->setScaledContents(true);
 
-  // set the logging text browser
+  // set logging params
+  Logger::SetLogLevel(Logger::LogLevel::Function);
   QtLogger::SetTextBrowser(ui.textBrowser);
-  QtLogger::SetLogLevel(QtLogger::LogLevel::Function);
 
   LOG_SUCCESS("Welcome back, my friend.");
 

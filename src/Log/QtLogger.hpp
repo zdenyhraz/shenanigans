@@ -55,14 +55,6 @@ private:
     return logger;
   }
 
-  static std::string GetCurrentTime()
-  {
-    auto now = time(nullptr);
-    char buf[sizeof("12:34:56")];
-    strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&now));
-    return buf;
-  }
-
   QtLogger()
   {
     mLogLevelSettings[LogLevel::Trace] = {.color = QColor(150, 150, 150)};
@@ -104,5 +96,4 @@ private:
 
   QTextBrowser* mTextBrowser = nullptr;
   std::map<LogLevel, LogLevelSettings> mLogLevelSettings;
-  std::mutex mMutex;
 };

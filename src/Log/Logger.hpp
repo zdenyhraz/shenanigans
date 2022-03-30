@@ -14,8 +14,21 @@ public:
     Error
   };
 
-  void SetLogLevel(LogLevel logLevel) { mLogLevel = logLevel; }
+  static void SetLogLevel(LogLevel logLevel)
+  {
+    std::scoped_lock lock(mMutex);
+    mLogLevel = logLevel;
+  }
 
 protected:
-  LogLevel mLogLevel = LogLevel::Function;
+  inline static LogLevel mLogLevel = LogLevel::Function;
+  inline static std::mutex mMutex;
+
+  static std::string GetCurrentTime()
+  {
+    auto now = std::time(nullptr);
+    char buf[sizeof("12:34:56")];
+    std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime(&now));
+    return buf;
+  }
 };
