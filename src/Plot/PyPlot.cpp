@@ -3,6 +3,7 @@
 PyPlot::PyPlot()
 {
   PROFILE_FUNCTION;
+  LOG_FUNCTION("Initialize matplotlib");
   py::eval_file("../script/plot/plot_init.py");
 }
 

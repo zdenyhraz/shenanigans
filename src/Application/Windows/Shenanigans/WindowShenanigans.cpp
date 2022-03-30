@@ -122,6 +122,8 @@ try
 {
   LOG_FUNCTION("RandomShit");
 
+  // Showimg(LoadUnitFloatImage<f64>("../debug/AIA/171A.png"), "xd");
+
   if (0) // ML
   {
     // RegressionModelTest();
@@ -130,8 +132,8 @@ try
   else // ipc
   {
     // IPCMeasure::MeasureAccuracyMap(mWindowData->mIPC, LoadUnitFloatImage<IPC::Float>("../debug/shapes/shapef.png"), 101);
-    IPCOptimization::Optimize(mWindowData->mIPC, "../debug/ipcopt", "../debug/ipcopt", 1.0, 0.01, 51, 0.2, 6);
-    // dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
+    // IPCOptimization::Optimize(mWindowData->mIPC, "../debug/ipcopt", "../debug/ipcopt", 1.0, 0.01, 51, 0.2, 6);
+    dynamic_cast<WindowIPC&>(*mWindows["ipc"]).ShowDebugStuff();
   }
 }
 catch (const std::exception& e)

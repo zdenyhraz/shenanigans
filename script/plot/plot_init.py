@@ -1,5 +1,9 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+
+matplotlib.use('Qt5Agg')
+print("Matplotlib is using the", matplotlib.get_backend(), "backend")
 
 FONT_SCALE = 2.2
 SMALL_SIZE = 8*FONT_SCALE
