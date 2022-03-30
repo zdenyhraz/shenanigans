@@ -26,27 +26,14 @@ jobs:
       - name: torch install
         working-directory: ${{github.workspace}}/external
         run: |
-          wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
-          sudo chmod 755 libtorch-shared-with-deps-latest.zip
-          unzip libtorch-shared-with-deps-latest.zip
-          rm libtorch-shared-with-deps-latest.zip
+          wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
+          sudo chmod 755 libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+          unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+          rm libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
           ls
 
-      - name: qt cache
-        id: qt-cache
-        uses: actions/cache@v2
-        with:
-          path: ./qt
-          key: ${{runner.os}}-qt-cache
-
       - name: qt install
-        uses: jurplel/install-qt-action@v2
-        with:
-          version: "5.12.2"
-          dir: "./qt"
-          install-deps: true
-          setup-python: false
-          cached: ${{steps.qt-cache.outputs.cache-hit}}
+        run: sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
 
       - name: opencv cache
         id: opencv-cache
