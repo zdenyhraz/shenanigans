@@ -1,6 +1,7 @@
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+// #include <imgui.h>
+// #include <imgui_impl_glfw.h>
+// #include <imgui_impl_opengl3.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Windows/Shenanigans/WindowShenanigans.hpp"
@@ -21,11 +22,11 @@ static void GLFWErrorCallback(int error, const char* description)
   LOG_ERROR("GLFW Error: {}", description);
 }
 
-// static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-// {
-//   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-//     glfwSetWindowShouldClose(window, GLFW_TRUE);
-// }
+static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
 
 int main(int argc, char** argv)
 try
@@ -47,64 +48,64 @@ try
     glfwSwapInterval(1);
     glfwSetKeyCallback(window, GLFWKeyCallback);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-    // io.ConfigViewportsNoAutoMerge = true;
-    // io.ConfigViewportsNoTaskBarIcon = true;
-    ImGui::StyleColorsDark(); // ImGui::StyleColorsClassic();
+    // IMGUI_CHECKVERSION();
+    // ImGui::CreateContext();
+    // ImGuiIO& io = ImGui::GetIO();
+    // (void)io;
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    // // io.ConfigViewportsNoAutoMerge = true;
+    // // io.ConfigViewportsNoTaskBarIcon = true;
+    // ImGui::StyleColorsDark(); // ImGui::StyleColorsClassic();
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-      style.WindowRounding = 0.0f;
-      style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
+    // ImGuiStyle& style = ImGui::GetStyle();
+    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    // {
+    //   style.WindowRounding = 0.0f;
+    //   style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    // }
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    // ImGui_ImplGlfw_InitForOpenGL(window, true);
+    // ImGui_ImplOpenGL3_Init("#version 130");
 
     while (!glfwWindowShouldClose(window))
     {
       glfwPollEvents();
-      ImGui_ImplOpenGL3_NewFrame();
-      ImGui_ImplGlfw_NewFrame();
-      ImGui::NewFrame();
+      // ImGui_ImplOpenGL3_NewFrame();
+      // ImGui_ImplGlfw_NewFrame();
+      // ImGui::NewFrame();
 
-      {
-        ImGui::Begin("ddx");
-        ImGui::Button("Hi mom");
-        static float value = 0;
-        ImGui::DragFloat("value", &value);
-        ImGui::End();
-      }
+      // {
+      //   ImGui::Begin("ddx");
+      //   ImGui::Button("Hi mom");
+      //   static float value = 0;
+      //   ImGui::DragFloat("value", &value);
+      //   ImGui::End();
+      // }
 
-      ImGui::Render();
+      // ImGui::Render();
       int width, height;
       glfwGetFramebufferSize(window, &width, &height);
       glViewport(0, 0, width, height);
       glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
       glClear(GL_COLOR_BUFFER_BIT);
-      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+      // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-      if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-      {
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
-      }
+      // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+      // {
+      //   GLFWwindow* backup_current_context = glfwGetCurrentContext();
+      //   ImGui::UpdatePlatformWindows();
+      //   ImGui::RenderPlatformWindowsDefault();
+      //   glfwMakeContextCurrent(backup_current_context);
+      // }
 
       glfwSwapBuffers(window);
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    // ImGui_ImplOpenGL3_Shutdown();
+    // ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
