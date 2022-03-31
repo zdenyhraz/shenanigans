@@ -94,7 +94,6 @@ namespace json = nlohmann;
 #include "Utils/Timer.hpp"
 #include "Utils/Random.hpp"
 #include "Utils/Formatters.hpp"
-
 #include "UtilsCV/Utils.hpp"
 #include "UtilsCV/Crop.hpp"
 #include "UtilsCV/Draw.hpp"
