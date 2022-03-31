@@ -132,27 +132,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 target_link_libraries(shenanigans PRIVATE "${TORCH_LIBRARIES}")
 target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
 
-# imgui
-include_directories("external/imgui")
-include_directories("external/imgui/backends")
-file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp)
-set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
-target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-
-# glfw
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(external/glfw)
-target_link_libraries(shenanigans PRIVATE glfw)
-target_link_libraries(shenanigans_test PRIVATE glfw)
-
-# glad
-add_subdirectory(external/glad)
-target_link_libraries(shenanigans PRIVATE glad)
-target_link_libraries(shenanigans_test PRIVATE glad)
-
 # custom
 include_directories("src")
 
