@@ -133,12 +133,12 @@ target_link_libraries(shenanigans PRIVATE "${TORCH_LIBRARIES}")
 target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
 
 # imgui
-# include_directories("external/imgui")
-# include_directories("external/imgui/backends")
-# file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp)
-# set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
-# target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-# target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+include_directories("external/imgui")
+include_directories("external/imgui/backends")
+file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp)
+set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -153,10 +153,10 @@ add_subdirectory(external/glad)
 target_link_libraries(shenanigans PRIVATE glad)
 target_link_libraries(shenanigans_test PRIVATE glad)
 
-# gl
-find_package(OpenGL REQUIRED)
-target_link_libraries(shenanigans PRIVATE OpenGL::GL)
-target_link_libraries(shenanigans_test PRIVATE OpenGL::GL)
+# # gl
+# find_package(OpenGL REQUIRED)
+# target_link_libraries(shenanigans PRIVATE OpenGL::GL)
+# target_link_libraries(shenanigans_test PRIVATE OpenGL::GL)
 
 # custom
 include_directories("src")
