@@ -47,6 +47,7 @@ public:
     InterpolationTypeCount // last
   };
 
+  IPC() { Initialize(0, 0, 0, 1); }
   explicit IPC(i32 rows, i32 cols = -1, f64 bpL = 0, f64 bpH = 1) { Initialize(rows, cols, bpL, bpH); }
   explicit IPC(const cv::Size& size, f64 bpL = 0, f64 bpH = 1) { Initialize(size.height, size.width, bpL, bpH); }
   explicit IPC(const cv::Mat& img, f64 bpL = 0, f64 bpH = 1) { Initialize(img.rows, img.cols, bpL, bpH); }
@@ -161,14 +162,14 @@ public:
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(DebugMode, "IPC::Calculate");
 
-    if (image1.size() != cv::Size(mCols, mRows))
-      [[unlikely]] throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
+    if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
+      throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
-    if (image1.size() != image2.size())
-      [[unlikely]] throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+    if (image1.size() != image2.size()) [[unlikely]]
+      throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
-    if (image1.channels() != 1 or image2.channels() != 1)
-      [[unlikely]] throw std::invalid_argument("Multichannel images are not supported");
+    if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
+      throw std::invalid_argument("Multichannel images are not supported");
 
     ConvertToUnitFloat(image1);
     ConvertToUnitFloat(image2);
@@ -239,8 +240,8 @@ public:
         PROFILE_SCOPE(IterativeRefinementIteration);
         if constexpr (DebugMode)
           LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
-        if (IsOutOfBounds(L2Upeak, L2U, L1size))
-          [[unlikely]] break;
+        if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
+          break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (DebugMode)
@@ -248,13 +249,12 @@ public:
         L1peak = GetPeakSubpixel<true>(L1, L1Win);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
-        if (AccuracyReached(L1peak, L1mid))
-          [[unlikely]]
-          {
-            if constexpr (DebugMode)
-              IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
-            return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
-          }
+        if (AccuracyReached(L1peak, L1mid)) [[unlikely]]
+        {
+          if constexpr (DebugMode)
+            IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
+          return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
+        }
       }
 
       if constexpr (DebugMode)
@@ -280,7 +280,6 @@ private:
   i32 mL2size = 7;
   f64 mL1ratio = 0.45;
   f64 mL1ratioStep = 0.025;
-  i32 mL1ratioStepCount = 4;
   i32 mL2Usize = 357;
   i32 mMaxIter = 10;
   f64 mCPeps = 0;

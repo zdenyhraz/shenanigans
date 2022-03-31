@@ -90,7 +90,7 @@ try
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
-  constexpr f64 noiseStdev = 0.01; // 0.01;
+  constexpr f64 noiseStdev = 0.01;
 
   if constexpr (debugShift)
   {
