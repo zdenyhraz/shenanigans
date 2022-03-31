@@ -175,10 +175,10 @@ try
     // "/1DWindowsDFT.png");
 
     // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImage.png");
-    Plot2D::Plot("IPCdebug2D", img);
+    // Plot2D::Plot("IPCdebug2D", img);
 
     // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
-    Plot2D::Plot("IPCdebug2D", imgw);
+    // Plot2D::Plot("IPCdebug2D", imgw);
 
     // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
     // Plot2D::Plot(Fourier::fftlogmagn(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
@@ -260,10 +260,10 @@ try
     cv::normalize(imgfG, imgfG, 0.0, 1.0, cv::NORM_MINMAX);
 
     // Plot2D::SetSavePath("IPCdebug2D", ipc.mDebugDirectory + "/2DBandpassImageR.png");
-    Plot2D::Plot("IPCdebug2D", imgfR);
+    // Plot2D::Plot("IPCdebug2D", imgfR);
 
     // Plot2D::SetSavePath("IPCdebug2D", ipc.mDebugDirectory + "/2DBandpassImageG.png");
-    Plot2D::Plot("IPCdebug2D", imgfG);
+    // Plot2D::Plot("IPCdebug2D", imgfG);
   }
 
   LOG_INFO("IPC debug stuff shown");

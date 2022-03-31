@@ -61,6 +61,6 @@ private:
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
-    fmt::print("[{}] {}", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
+    fmt::print("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
   }
 };

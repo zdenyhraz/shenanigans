@@ -135,12 +135,12 @@ void IPCOptimization::PlotObjectiveFunctionLandscape(const IPC& ipc, const std::
     }
   }
 
-  Plot2D::Set("IPCdebug2D");
-  Plot2D::SetXmin(xmin);
-  Plot2D::SetXmax(xmax);
-  Plot2D::SetYmin(ymin);
-  Plot2D::SetYmax(ymax);
-  Plot2D::Plot("IPCdebug2D", landscape);
+  // Plot2D::Set("IPCdebug2D");
+  // Plot2D::SetXmin(xmin);
+  // Plot2D::SetXmax(xmax);
+  // Plot2D::SetYmin(ymin);
+  // Plot2D::SetYmax(ymax);
+  // Plot2D::Plot("IPCdebug2D", landscape);
 }
 
 std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio)
@@ -214,11 +214,13 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
     }
   }
 
-  std::sort(imagePairs.begin(), imagePairs.end(), [](const auto& a, const auto& b) {
-    const auto& [img1a, img2a, shifta] = a;
-    const auto& [img1b, img2b, shiftb] = b;
-    return shifta.x < shiftb.x;
-  });
+  std::sort(imagePairs.begin(), imagePairs.end(),
+      [](const auto& a, const auto& b)
+      {
+        const auto& [img1a, img2a, shifta] = a;
+        const auto& [img1b, img2b, shiftb] = b;
+        return shifta.x < shiftb.x;
+      });
   return imagePairs;
 }
 
@@ -241,7 +243,8 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
-  return [&](const std::vector<f64>& params) {
+  return [&](const std::vector<f64>& params)
+  {
     const auto ipc = CreateIPCFromParams(ipc_, params);
     if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
@@ -260,7 +263,8 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateObjectiveFunction");
-  return [&](const std::vector<f64>& params) {
+  return [&](const std::vector<f64>& params)
+  {
     const auto ipc = CreateIPCFromParams(ipc_, params);
     if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
       return std::numeric_limits<f64>::max();
@@ -447,7 +451,7 @@ void IPCOptimization::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, 
   const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
   cv::Mat concat;
   cv::hconcat(img1, img2, concat);
-  Plot2D::Set("Random image pair");
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot("Random image pair", concat);
+  // Plot2D::Set("Random image pair");
+  // Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  // Plot2D::Plot("Random image pair", concat);
 }

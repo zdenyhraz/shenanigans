@@ -115,7 +115,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     MetaParameterCount
   };
 
-  const auto GetMetaParameterString = [](MetaParameter metaParameter) {
+  const auto GetMetaParameterString = [](MetaParameter metaParameter)
+  {
     switch (metaParameter)
     {
     case MetaNP:
@@ -133,7 +134,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     }
   };
 
-  const auto metaObj = [&](const std::vector<f64>& metaparams) {
+  const auto metaObj = [&](const std::vector<f64>& metaparams)
+  {
     f64 retval = 0;
 
     for (usize run = 0; run < runsPerObj; run++)
@@ -228,13 +230,13 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   // plot unoptimized vs optimized
   std::vector<f64> xs(resultsB4[0].bestFitnessProgress.size());
   std::iota(xs.begin(), xs.end(), 0);
-  Plot1D::Set(fmt::format("{} metaopt comparison", mName));
-  Plot1D::SetXlabel("generation");
-  Plot1D::SetYlabel("objective function value");
-  Plot1D::SetYnames({"obj B4", "obj A4"});
-  Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
-  Plot1D::SetYLogarithmic(true);
-  Plot1D::Plot(xs, {resultsB4.front().bestFitnessProgress, resultsA4.front().bestFitnessProgress});
+  // Plot1D::Set(fmt::format("{} metaopt comparison", mName));
+  // Plot1D::SetXlabel("generation");
+  // Plot1D::SetYlabel("objective function value");
+  // Plot1D::SetYnames({"obj B4", "obj A4"});
+  // Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
+  // Plot1D::SetYLogarithmic(true);
+  // Plot1D::Plot(xs, {resultsB4.front().bestFitnessProgress, resultsA4.front().bestFitnessProgress});
 
   // restore original settings
   SetConsoleOutput(consoleOutput);
@@ -286,18 +288,18 @@ try
 
   if (mPlotOutput)
   {
-    Plot1D::Set(fmt::format("Evolution ({})", mName));
-    Plot1D::Clear();
-    Plot1D::SetXlabel("generation");
-    Plot1D::SetYlabel("objective function value");
-    Plot1D::SetY2label("best-average relative similarity [%]");
-    if (valid)
-      Plot1D::SetYnames({"obj", "valid"});
-    else
-      Plot1D::SetYnames({"obj"});
-    Plot1D::SetY2names({"%sim"});
-    Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
-    Plot1D::SetYLogarithmic(true);
+    // Plot1D::Set(fmt::format("Evolution ({})", mName));
+    // Plot1D::Clear();
+    // Plot1D::SetXlabel("generation");
+    // Plot1D::SetYlabel("objective function value");
+    // Plot1D::SetY2label("best-average relative similarity [%]");
+    // if (valid)
+    //   Plot1D::SetYnames({"obj", "valid"});
+    // else
+    //   Plot1D::SetYnames({"obj"});
+    // Plot1D::SetY2names({"%sim"});
+    // Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
+    // Plot1D::SetYLogarithmic(true);
   }
 }
 catch (const std::exception& e)
@@ -414,10 +416,10 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
 
   if (mPlotOutput)
   {
-    if (valid)
-      Plot1D::Plot(generation, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
-    else
-      Plot1D::Plot(generation, population.bestEntity.fitness, population.relativeDifference * 100);
+    // if (valid)
+    //   Plot1D::Plot(generation, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
+    // else
+    //   Plot1D::Plot(generation, population.bestEntity.fitness, population.relativeDifference * 100);
   }
 }
 

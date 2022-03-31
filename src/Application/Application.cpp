@@ -1,10 +1,3 @@
-#include "Windows/Shenanigans/WindowShenanigans.hpp"
-
-void QtInitialize()
-{
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-}
 
 void PythonInitialize()
 {
@@ -14,12 +7,8 @@ void PythonInitialize()
 int main(int argc, char** argv)
 try
 {
-  QtInitialize();
+  LOG_DEBUG("hi mom");
   PythonInitialize();
-  QApplication application(argc, argv);
-  WindowShenanigans windowshen;
-  windowshen.show();
-  application.exec();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)

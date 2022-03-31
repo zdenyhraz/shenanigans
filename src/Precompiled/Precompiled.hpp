@@ -39,12 +39,6 @@
 #include <nlohmann/json.hpp>
 #include <torch/torch.h>
 
-#include <QtWidgets>
-#include <QtCore>
-#include <QtGui>
-#include <QtPrintSupport>
-#include <qcustomplot.h>
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -101,5 +95,4 @@ namespace json = nlohmann;
 #include "UtilsCV/Showsave.hpp"
 #include "UtilsCV/Formatters.hpp"
 
-#include "Plot/QtPlot.hpp"
 #include "Plot/PyPlot.hpp"

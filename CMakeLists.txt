@@ -5,9 +5,6 @@ project(shenanigans)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 set(ENABLE_PROFILING OFF)
 set(ENABLE_SANITIZER OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -114,17 +111,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 
-# qt
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
-target_link_libraries(shenanigans PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
-target_link_libraries(shenanigans_test PRIVATE Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport)
-
-# qcustomplot
-include_directories("external/qcustomplot")
-set(SRC_QCUSTOMPLOT external/qcustomplot/qcustomplot.h external/qcustomplot/qcustomplot.cpp)
-target_sources(shenanigans PRIVATE ${SRC_QCUSTOMPLOT})
-target_sources(shenanigans_test PRIVATE ${SRC_QCUSTOMPLOT})
-
 # torch
 find_package(Torch REQUIRED HINTS "external/libtorch")
 include_directories("external/libtorch/include")
@@ -154,13 +140,6 @@ src/UtilsCV/*.hpp src/UtilsCV/*.cpp
 )
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
-
-# qt resources
-file(GLOB_RECURSE SRC_QT CONFIGURE_DEPENDS
-src/Application/Windows/*.hpp src/Application/Windows/*.cpp
-src/Application/*.ui src/Application/*.rc src/Application/*.qrc)
-target_sources(shenanigans PRIVATE ${SRC_QT})
-target_sources(shenanigans_test PRIVATE ${SRC_QT})
 
 # app sources
 set(SRC_APP src/Application/Application.cpp)
