@@ -69,32 +69,32 @@ message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 find_package(PythonLibs REQUIRED)
 add_subdirectory(external/pybind11)
 include_directories(${PYTHON_INCLUDE_DIRS})
-include_directories("external/pybind11/include")
+include_directories(external/pybind11/include)
 target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
 
 # fmt
 add_subdirectory(external/fmt)
-include_directories("external/fmt/include")
+include_directories(external/fmt/include)
 target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 
 # gtest
 add_subdirectory(external/gtest)
-include_directories("external/gtest/googletest/include")
+include_directories(external/gtest/googletest/include)
 enable_testing()
 include(GoogleTest)
 target_link_libraries(shenanigans_test PRIVATE GTest::gtest_main)
 
 # json
 add_subdirectory(external/json)
-include_directories("external/json/include")
+include_directories(external/json/include)
 target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 
 # tracy
 if(ENABLE_PROFILING)
-  include_directories("external/tracy")
+  include_directories(external/tracy)
   add_compile_definitions(TRACY_ENABLE) # for tracy macros
   add_compile_definitions(ENABLE_PROFILING) # for custom macros
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
@@ -112,48 +112,54 @@ target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 
 # torch
-find_package(Torch REQUIRED HINTS "external/libtorch")
-include_directories("external/libtorch/include")
+find_package(Torch REQUIRED HINTS external/libtorch)
+include_directories(external/libtorch/include)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-target_link_libraries(shenanigans PRIVATE "${TORCH_LIBRARIES}")
-target_link_libraries(shenanigans_test PRIVATE "${TORCH_LIBRARIES}")
+target_link_libraries(shenanigans PRIVATE ${TORCH_LIBRARIES})
+target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
+
+# imgui
+include_directories(external/imgui)
+include_directories(external/imgui/backends)
+file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp)
+set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+
+# glfw
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(external/glfw)
+target_link_libraries(shenanigans PRIVATE glfw)
+target_link_libraries(shenanigans_test PRIVATE glfw)
+
+# glad
+add_subdirectory(external/glad)
+target_link_libraries(shenanigans PRIVATE glad)
+target_link_libraries(shenanigans_test PRIVATE glad)
 
 # custom
-include_directories("src")
+include_directories(src)
 
 # sources
-file(GLOB SRC CONFIGURE_DEPENDS
-src/Astrophysics/*.hpp src/Astrophysics/*.cpp
-src/Features/*.hpp src/Features/*.cpp
-src/Filtering/*.hpp src/Filtering/*.cpp
-src/Fit/*.hpp src/Fit/*.cpp
-src/Fourier/*.hpp src/Fourier/*.cpp
-src/Fractal/*.hpp src/Fractal/*.cpp
-src/ImageRegistration/*.hpp src/ImageRegistration/*.cpp
-src/Log/*.hpp src/Log/*.cpp
-src/ML/*.hpp src/ML/*.cpp
-src/Optimization/*.hpp src/Optimization/*.cpp
-src/Plot/*.hpp src/Plot/*.cpp
-src/Random/*.hpp src/Random/*.cpp
-src/Utils/*.hpp src/Utils/*.cpp
-src/UtilsCV/*.hpp src/UtilsCV/*.cpp
-)
+file(GLOB SRC CONFIGURE_DEPENDS src/*.hpp src/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 
-# app sources
-set(SRC_APP src/Application/Application.cpp)
-target_sources(shenanigans PRIVATE ${SRC_APP})
+# shenanigans app sources
+set(SRC_SHENANIGANS_APP apps/Shenanigans.cpp)
+target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
-# test sources
-file(GLOB SRC_TEST CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
-target_sources(shenanigans_test PRIVATE ${SRC_TEST})
+# shenanigans_test app sources
+file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
+target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST_APP})
 gtest_discover_tests(shenanigans_test)
 
 # precompiled headers
 if (ENABLE_PCH)
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-  set(SRC_PRECOMPILED src/Precompiled/Precompiled.hpp)
+  set(SRC_PRECOMPILED src/Precompiled.hpp)
   target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
 endif()

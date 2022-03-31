@@ -29,6 +29,12 @@
 #include <type_traits>
 #include <concepts>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <omp.h>
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
