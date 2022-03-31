@@ -153,11 +153,6 @@ add_subdirectory(external/glad)
 target_link_libraries(shenanigans PRIVATE glad)
 target_link_libraries(shenanigans_test PRIVATE glad)
 
-# # gl
-# find_package(OpenGL REQUIRED)
-# target_link_libraries(shenanigans PRIVATE OpenGL::GL)
-# target_link_libraries(shenanigans_test PRIVATE OpenGL::GL)
-
 # custom
 include_directories("src")
 
