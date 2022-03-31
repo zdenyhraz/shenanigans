@@ -143,12 +143,12 @@ target_link_libraries(shenanigans_test PRIVATE glad)
 include_directories(src)
 
 # sources
-file(GLOB SRC CONFIGURE_DEPENDS src/*.hpp src/*.cpp)
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.hpp src/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 
 # shenanigans app sources
-set(SRC_SHENANIGANS_APP apps/Shenanigans.cpp)
+file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.hpp apps/shenanigans/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
