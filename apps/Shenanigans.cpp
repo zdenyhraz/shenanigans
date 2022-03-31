@@ -36,7 +36,7 @@ try
   glfwSwapInterval(1);
   glfwSetKeyCallback(window, GLFWKeyCallback);
 
-  std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+  LOG_DEBUG("OpenGL version: {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
