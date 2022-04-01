@@ -13,7 +13,7 @@ void Shenanigans::Run()
   auto window = GLFWCreateWindow(1, 1);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  ImGuiIO& io = ImGuiInitialize(window, 2.5);
+  ImGuiIO& io = ImGuiInitialize(window, 2.0);
   InitializeWindows();
 
   while (!glfwWindowShouldClose(window))

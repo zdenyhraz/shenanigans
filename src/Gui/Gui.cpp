@@ -42,8 +42,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-  io.FontGlobalScale = scale;
-  io.Fonts->AddFontFromFileTTF("../data/app/CascadiaCode.ttf", 17);
+  io.Fonts->AddFontFromFileTTF("../data/app/CascadiaCode.ttf", scale * 19);
   ImGui::StyleColorsClassic();
 
   ImGuiStyle& style = ImGui::GetStyle();
