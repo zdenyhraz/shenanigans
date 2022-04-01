@@ -1,11 +1,11 @@
 #pragma once
 #include "IPCWindow.hpp"
 
-struct GuiModules
+struct Windows
 {
-  bool mIPCWindow = true;
-  bool mIPCOptimizeWindow = true;
-  bool mDiffrotWindow = true;
+  bool IPCWindow = true;
+  bool IPCOptimizeWindow = true;
+  bool DiffrotWindow = true;
 };
 
 class Shenanigans
@@ -14,7 +14,7 @@ public:
   static void Run();
 
 private:
-  inline static GuiModules mGuiModules;
+  inline static Windows mWindows;
 
   static void Render();
   static void InitializeWindows();
