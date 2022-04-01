@@ -4,7 +4,7 @@
 #include "PhaseCorrelation.hpp"
 #include "Filtering/Noise.hpp"
 
-void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat image, i32 n)
+void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 n)
 {
   using T = IPC::Float;
   cv::Mat accuracyMapCC(n, n, GetMatType<T>());

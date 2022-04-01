@@ -5,6 +5,7 @@ struct Windows
 {
   bool IPCWindow = true;
   bool IPCOptimizeWindow = true;
+  bool IPCMeasureWindow = true;
   bool DiffrotWindow = true;
 };
 

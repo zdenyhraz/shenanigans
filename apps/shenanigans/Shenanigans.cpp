@@ -3,6 +3,7 @@
 #include "Python/Python.hpp"
 #include "IPCWindow.hpp"
 #include "IPCOptimizeWindow.hpp"
+#include "IPCMeasureWindow.hpp"
 #include "DiffrotWindow.hpp"
 
 void Shenanigans::Run()
@@ -31,6 +32,7 @@ void Shenanigans::Render()
   ImGui::Begin("Modules");
   ImGui::Checkbox("IPC parameters", &mWindows.IPCWindow);
   ImGui::Checkbox("IPC optimize", &mWindows.IPCOptimizeWindow);
+  ImGui::Checkbox("IPC measure", &mWindows.IPCMeasureWindow);
   ImGui::Checkbox("Diffrot", &mWindows.DiffrotWindow);
   ImGui::End();
 
@@ -38,6 +40,8 @@ void Shenanigans::Render()
     IPCWindow::Render();
   if (mWindows.IPCOptimizeWindow)
     IPCOptimizeWindow::Render();
+  if (mWindows.IPCMeasureWindow)
+    IPCMeasureWindow::Render();
   if (mWindows.DiffrotWindow)
     DiffrotWindow::Render();
 }
@@ -46,6 +50,7 @@ void Shenanigans::InitializeWindows()
 {
   IPCWindow::Initialize();
   IPCOptimizeWindow::Initialize();
+  IPCMeasureWindow::Initialize();
   DiffrotWindow::Initialize();
 }
 
