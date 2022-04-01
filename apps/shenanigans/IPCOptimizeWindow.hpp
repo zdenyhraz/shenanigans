@@ -2,8 +2,8 @@
 
 struct IPCOptimizeParameters
 {
-  std::string trainDirectory;
-  std::string testDirectory;
+  std::string trainDirectory = "../debug/ipcopt";
+  std::string testDirectory = "../debug/ipcopt";
   f32 maxShift = 2.0;
   f32 noiseStddev = 0.01;
   i32 iters = 11;
