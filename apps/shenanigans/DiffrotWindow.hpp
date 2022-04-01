@@ -9,13 +9,11 @@ struct DiffrotParameters
   i32 idstride = 25;
   f32 thetamax = 50;
   i32 cadence = 45;
-  std::string dataPath = "../data/diffrot_month_5000";
   i32 idstart = 123132;
-
   i32 xsizeopt = 1;
   i32 ysizeopt = 101;
   i32 popsize = 6;
-
+  std::string dataPath = "../data/diffrot_month_5000";
   std::string loadPath = "../data/diffrot_month_5000/xd.json";
 };
 
@@ -28,6 +26,5 @@ public:
 private:
   inline static DiffrotParameters mParameters;
   inline static DifferentialRotation::DifferentialRotationData mDiffrotData;
-
-  static DifferentialRotation GetDiffrot();
+  inline static f32 mProgress = 0;
 };

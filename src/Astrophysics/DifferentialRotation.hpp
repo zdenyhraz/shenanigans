@@ -8,39 +8,49 @@
 class DifferentialRotation
 {
 public:
-  DifferentialRotation() {}
-
-  DifferentialRotation(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_) :
-    xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), thetamax(thetamax_), cadence(cadence_)
+  struct ImageHeader
   {
-    PROFILE_FUNCTION;
-    if (idstride > 0) // images are not reused with non-zero stride
-    {
-      imageCache.SetCapacity(0);
-      headerCache.SetCapacity(0);
-    }
-  }
+    f64 xcenter; // [px]
+    f64 ycenter; // [px]
+    f64 theta0;  // [rad]
+    f64 R;       // [px]
+  };
 
   struct DifferentialRotationData
   {
     DifferentialRotationData() {}
 
-    DifferentialRotationData(i32 xsize, i32 ysize, f64 thetamax) :
-      shiftx(cv::Mat::zeros(ysize, xsize, CV_32F)),
-      shifty(cv::Mat::zeros(ysize, xsize, CV_32F)),
-      omegax(cv::Mat::zeros(ysize, xsize, CV_32F)),
-      omegay(cv::Mat::zeros(ysize, xsize, CV_32F)),
-      theta(GenerateTheta(ysize, thetamax)),
-      fshiftx(std::vector<f64>(xsize, 0.)),
-      fshifty(std::vector<f64>(xsize, 0.)),
-      theta0(std::vector<f64>(xsize, 0.)),
-      R(std::vector<f64>(xsize, 0.))
+    DifferentialRotationData(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_, i32 idstart_) :
+      xsize(xsize_),
+      ysize(ysize_),
+      idstep(idstep_),
+      idstride(idstride_),
+      thetamax(thetamax_),
+      cadence(cadence_),
+      idstart(idstart_),
+      shiftx(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
+      shifty(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
+      omegax(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
+      omegay(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
+      theta(GenerateTheta(ysize_, thetamax_)),
+      fshiftx(std::vector<f64>(xsize_, 0.)),
+      fshifty(std::vector<f64>(xsize_, 0.)),
+      theta0(std::vector<f64>(xsize_, 0.)),
+      R(std::vector<f64>(xsize_, 0.))
     {
     }
 
     void Load(const std::string& path)
     {
+      PROFILE_FUNCTION;
+      LOG_FUNCTION("DifferentialRotationData::Load");
       cv::FileStorage file(path, cv::FileStorage::READ);
+      file["xsize"] >> xsize;
+      file["ysize"] >> ysize;
+      file["idstep"] >> idstep;
+      file["idstride"] >> idstride;
+      file["thetamax"] >> thetamax;
+      file["cadence"] >> cadence;
       file["theta"] >> theta;
       file["shiftx"] >> shiftx;
       file["shifty"] >> shifty;
@@ -52,6 +62,31 @@ public:
       file["R"] >> R;
     }
 
+    void Save(const std::string& dataPath, const IPC& ipc) const
+    {
+      PROFILE_FUNCTION;
+      LOG_FUNCTION("DifferentialRotationData::Save");
+      std::string path = fmt::format("{}/diffrot.json", dataPath);
+      LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path).string());
+      cv::FileStorage file(path, cv::FileStorage::WRITE);
+      file << "xsize" << xsize;
+      file << "ysize" << ysize;
+      file << "idstep" << idstep;
+      file << "idstride" << idstride;
+      file << "thetamax" << thetamax;
+      file << "cadence" << cadence;
+      file << "IPC" << ipc.Serialize();
+      file << "theta" << theta;
+      file << "shiftx" << shiftx;
+      file << "shifty" << shifty;
+      file << "omegax" << omegax;
+      file << "omegay" << omegay;
+      file << "fshiftx" << fshiftx;
+      file << "fshifty" << fshifty;
+      file << "theta0" << theta0;
+      file << "R" << R;
+    }
+
     static std::vector<f64> GenerateTheta(i32 ysize, f64 thetamax)
     {
       std::vector<f64> theta(ysize);
@@ -59,6 +94,18 @@ public:
       for (usize i = 0; i < theta.size(); ++i)
         theta[i] = thetamax - i * thetastep;
       return theta;
+    }
+
+    std::vector<std::pair<i32, i32>> GenerateIds() const
+    {
+      std::vector<std::pair<i32, i32>> ids(xsize);
+      i32 id = idstart;
+      for (i32 x = 0; x < xsize; ++x)
+      {
+        ids[x] = {id, id + idstep};
+        id += idstride != 0 ? idstride : idstep;
+      }
+      return ids;
     }
 
     void PostProcess()
@@ -72,17 +119,77 @@ public:
       omegay = MedianBlur<f32>(omegay, medsizeX, medsizeY);
     }
 
+    template <bool Managed>
+    void FixMissingData()
+    {
+      PROFILE_FUNCTION;
+      // fix missing data by interpolation
+      for (i32 x = 0; x < omegax.cols; ++x)
+      {
+        if (omegax.at<f32>(0, x) != 0.0f) // no need to fix, data not missing
+          continue;
+
+        // find first non-missing previous data
+        auto xindex1 = std::max(x - 1, 0);
+
+        // find first non-missing next data
+        auto xindex2 = std::min(x + 1, omegax.cols - 1);
+        while (omegax.at<f32>(0, xindex2) == 0.0f and xindex2 < omegax.cols - 1)
+          ++xindex2;
+
+        const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
+
+        if constexpr (not Managed)
+          LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
+
+        for (i32 y = 0; y < omegax.rows; ++y)
+        {
+          fshiftx[x] = std::lerp(fshiftx[xindex1], fshiftx[xindex2], t);
+          fshifty[x] = std::lerp(fshifty[xindex1], fshifty[xindex2], t);
+          theta0[x] = std::lerp(theta0[xindex1], theta0[xindex2], t);
+          R[x] = std::lerp(R[xindex1], R[xindex2], t);
+          shiftx.at<f32>(y, x) = std::lerp(shiftx.at<f32>(y, xindex1), shiftx.at<f32>(y, xindex2), static_cast<f32>(t));
+          shifty.at<f32>(y, x) = std::lerp(shifty.at<f32>(y, xindex1), shifty.at<f32>(y, xindex2), static_cast<f32>(t));
+          omegax.at<f32>(y, x) = std::lerp(omegax.at<f32>(y, xindex1), omegax.at<f32>(y, xindex2), static_cast<f32>(t));
+          omegay.at<f32>(y, x) = std::lerp(omegay.at<f32>(y, xindex1), omegay.at<f32>(y, xindex2), static_cast<f32>(t));
+        }
+      }
+    }
+
+    i32 xsize = 2500;
+    i32 ysize = 101;
+    i32 idstep = 1;
+    i32 idstride = 25;
+    f64 thetamax = 50. / Constants::Rad;
+    i32 cadence = 45;
+    i32 idstart = 123456;
+
     cv::Mat shiftx, shifty, omegax, omegay;
     std::vector<f64> theta, fshiftx, fshifty, theta0, R;
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 idstart) const
+  static DifferentialRotationData Calculate(
+      const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress = nullptr)
+  {
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
+        {
+          PROFILE_SCOPE(Imread);
+          return cv::imread(path, cv::IMREAD_UNCHANGED);
+        }};
+    DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
+
+    return Calculate<Managed>(ipc, dataPath, xsize, ysize, idstep, idstride, thetamax, cadence, idstart, progress, imageCache, headerCache);
+  }
+
+  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
+  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress,
+      DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
-    DifferentialRotationData data(xsize, ysize, thetamax);
-    std::atomic<i32> progress = 0;
+    DifferentialRotationData data(xsize, ysize, idstep, idstride, thetamax, cadence, idstart);
+    std::atomic<i32> progressi = 0;
     const auto tstep = idstep * cadence;
     const auto wxsize = ipc.GetCols();
     const auto wysize = ipc.GetRows();
@@ -90,7 +197,7 @@ public:
     const auto shiftxmax = 0.4 * idstep;
     const auto shiftymax = 0.08;
     const auto fshiftmax = 0.1;
-    const auto ids = GenerateIds(idstart);
+    const auto ids = data.GenerateIds();
     const auto omegaxpred = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615);
 
 #pragma omp parallel for if (not Managed)
@@ -98,7 +205,9 @@ public:
       try
       {
         PROFILE_SCOPE(CalculateMeridianShifts);
-        const f64 logprogress = progress++ + 1;
+        const f64 logprogress = ++progressi;
+        if (progress)
+          *progress = logprogress / xsize;
         const auto [id1, id2] = ids[x];
         const auto path1 = fmt::format("{}/{}.png", dataPath, id1);
         const auto path2 = fmt::format("{}/{}.png", dataPath, id2);
@@ -155,20 +264,20 @@ public:
         continue;
       }
 
-    FixMissingData<Managed>(data);
+    data.FixMissingData<Managed>();
     data.PostProcess();
 
     if constexpr (not Managed)
+    {
       if (xsize > 100)
-        Save(data, ipc, fmt::format("{}/proc", dataPath));
-
-    if constexpr (not Managed)
-      Plot(data, dataPath, idstart);
+        data.Save(fmt::format("{}/proc", dataPath), ipc);
+      Plot(data, dataPath);
+    }
 
     return data;
   }
 
-  void Optimize(IPC& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Optimize");
@@ -177,22 +286,21 @@ public:
     LOG_INFO("Optimization ysize: {}", ysizeopt);
     LOG_INFO("Optimization popsize: {}", popsize);
     LOG_INFO("Optimization idstride: {}", idstrideopt);
-    DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstrideopt, thetamax, cadence);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
-    diffrot.imageCache.SetGetDataFunction(
-        [](const std::string& path)
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
         {
           PROFILE_SCOPE(Imread);
           return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
-        });
-    diffrot.imageCache.Reserve(ids);
-    diffrot.headerCache.Reserve(ids);
+        }};
+    DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
+    imageCache.Reserve(ids);
+    headerCache.Reserve(ids);
 
-    const auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    const auto dataBefore = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
     const auto obj = [&](const IPC& ipcopt)
     {
-      const auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
+      const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
 
@@ -208,7 +316,7 @@ public:
     IPCOptimization::Optimize(ipc, obj, popsize);
     if (xsizeopt >= 100)
       SaveOptimizedParameters(ipc, fmt::format("{}/proc", dataPath), xsizeopt, ysizeopt, popsize);
-    const auto dataAfter = diffrot.Calculate<true>(ipc, dataPath, idstart);
+    const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
     PyPlot::Plot("Diffrot opt",
         {.x = Constants::Rad * dataAfter.theta,
@@ -219,11 +327,11 @@ public:
             .label_ys = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"}});
   }
 
-  static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, i32 idstart, f64 timestep)
+  static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, f64 timestep)
   {
     PROFILE_FUNCTION;
-    const auto image = cv::imread(fmt::format("{}/{}.png", dataPath, idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-    const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, idstart));
+    const auto image = cv::imread(fmt::format("{}/{}.png", dataPath, data.idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, data.idstart));
     const auto omegax = GetRowAverage(data.omegax);                            // [deg/day]
     const auto predx = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615); // [deg/day]
     std::vector<cv::Point2d> mcpts(data.theta.size());                         // [px,px]
@@ -270,31 +378,9 @@ public:
     }
 
     Showimg(imageclr, "meridian curve", false, 0, 1, 1200);
-    // Saveimg(fmt::format("{}/meridian_curve.png", "../debug/debug"), imageclr, false, imageclr.size() / 6);
   }
 
 private:
-  struct ImageHeader
-  {
-    f64 xcenter; // [px]
-    f64 ycenter; // [px]
-    f64 theta0;  // [rad]
-    f64 R;       // [px]
-  };
-
-  i32 xsize = 2500;
-  i32 ysize = 101;
-  i32 idstep = 1;
-  i32 idstride = 25;
-  f64 thetamax = 50. / Constants::Rad;
-  i32 cadence = 45;
-  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
-      {
-        PROFILE_SCOPE(Imread);
-        return cv::imread(path, cv::IMREAD_UNCHANGED);
-      }};
-  mutable DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
-
   static ImageHeader GetHeader(const std::string& path)
   {
     PROFILE_FUNCTION;
@@ -308,55 +394,6 @@ private:
     header.theta0 = j["CRLT_OBS"].get<f64>() / Constants::Rad;            // [rad] (convert from deg to rad)
     header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // [px] (arcsec / arcsec per pixel)
     return header;
-  }
-
-  std::vector<std::pair<i32, i32>> GenerateIds(i32 idstart) const
-  {
-    std::vector<std::pair<i32, i32>> ids(xsize);
-    i32 id = idstart;
-    for (i32 x = 0; x < xsize; ++x)
-    {
-      ids[x] = {id, id + idstep};
-      id += idstride != 0 ? idstride : idstep;
-    }
-    return ids;
-  }
-
-  template <bool Managed>
-  static void FixMissingData(DifferentialRotationData& data)
-  {
-    PROFILE_FUNCTION;
-    // fix missing data by interpolation
-    for (i32 x = 0; x < data.omegax.cols; ++x)
-    {
-      if (data.omegax.at<f32>(0, x) != 0.0f) // no need to fix, data not missing
-        continue;
-
-      // find first non-missing previous data
-      auto xindex1 = std::max(x - 1, 0);
-
-      // find first non-missing next data
-      auto xindex2 = std::min(x + 1, data.omegax.cols - 1);
-      while (data.omegax.at<f32>(0, xindex2) == 0.0f and xindex2 < data.omegax.cols - 1)
-        ++xindex2;
-
-      const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
-
-      if constexpr (not Managed)
-        LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
-
-      for (i32 y = 0; y < data.omegax.rows; ++y)
-      {
-        data.fshiftx[x] = std::lerp(data.fshiftx[xindex1], data.fshiftx[xindex2], t);
-        data.fshifty[x] = std::lerp(data.fshifty[xindex1], data.fshifty[xindex2], t);
-        data.theta0[x] = std::lerp(data.theta0[xindex1], data.theta0[xindex2], t);
-        data.R[x] = std::lerp(data.R[xindex1], data.R[xindex2], t);
-        data.shiftx.at<f32>(y, x) = std::lerp(data.shiftx.at<f32>(y, xindex1), data.shiftx.at<f32>(y, xindex2), static_cast<f32>(t));
-        data.shifty.at<f32>(y, x) = std::lerp(data.shifty.at<f32>(y, xindex1), data.shifty.at<f32>(y, xindex2), static_cast<f32>(t));
-        data.omegax.at<f32>(y, x) = std::lerp(data.omegax.at<f32>(y, xindex1), data.omegax.at<f32>(y, xindex2), static_cast<f32>(t));
-        data.omegay.at<f32>(y, x) = std::lerp(data.omegay.at<f32>(y, xindex1), data.omegay.at<f32>(y, xindex2), static_cast<f32>(t));
-      }
-    }
   }
 
   static std::vector<f64> GetTimesInDays(i32 tstep, i32 tstride, i32 xsize)
@@ -410,12 +447,12 @@ private:
     return omegas;
   }
 
-  void Plot(DifferentialRotationData& data, const std::string& dataPath, i32 idstart) const
+  static void Plot(const DifferentialRotationData& data, const std::string& dataPath)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::Plot");
-    const auto times = GetTimesInDays(idstep * cadence, idstride * cadence, xsize);
-    PlotMeridianCurve(data, dataPath, idstart, 27);
+    const auto times = GetTimesInDays(data.idstep * data.cadence, data.idstride * data.cadence, data.xsize);
+    PlotMeridianCurve(data, dataPath, 27);
 
     PyPlot::Plot("fits params", {.x = times,
                                     .ys = {data.fshiftx, data.fshifty},
@@ -460,35 +497,6 @@ private:
     PyPlot::Plot("omega y", {.z = data.omegay, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega y [px]", .aspectratio = aspectratio});
   }
 
-  void Save(const DifferentialRotationData& data, const IPC& ipc, const std::string& dataPath) const
-  {
-    PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::Save");
-
-    std::string path = fmt::format("{}/diffrot.json", dataPath);
-    LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path).string());
-    cv::FileStorage file(path, cv::FileStorage::WRITE);
-
-    // diffrot params
-    file << "xsize" << xsize;
-    file << "ysize" << ysize;
-    file << "idstep" << idstep;
-    file << "idstride" << idstride;
-    file << "thetamax" << thetamax;
-    file << "cadence" << cadence;
-    file << "IPC" << ipc.Serialize();
-    // diffrot data
-    file << "theta" << data.theta;
-    file << "shiftx" << data.shiftx;
-    file << "shifty" << data.shifty;
-    file << "omegax" << data.omegax;
-    file << "omegay" << data.omegay;
-    file << "fshiftx" << data.fshiftx;
-    file << "fshifty" << data.fshifty;
-    file << "theta0" << data.theta0;
-    file << "R" << data.R;
-  }
-
   static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
@@ -501,34 +509,5 @@ private:
     file << "ysizeopt" << ysizeopt;
     file << "popsize" << popsize;
     file << "IPC" << ipc.Serialize();
-  }
-
-  DifferentialRotationData Load(const std::string& path)
-  {
-    PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::Load");
-    LOG_DEBUG("Loading differential rotation data {}", path);
-
-    cv::FileStorage file(path, cv::FileStorage::READ);
-    // diffrot params
-    file["xsize"] >> xsize;
-    file["ysize"] >> ysize;
-    file["idstep"] >> idstep;
-    file["idstride"] >> idstride;
-    file["thetamax"] >> thetamax;
-    file["cadence"] >> cadence;
-    // diffrot data
-    DifferentialRotationData data(xsize, ysize, thetamax);
-    file["theta"] >> data.theta;
-    file["shiftx"] >> data.shiftx;
-    file["shifty"] >> data.shifty;
-    file["omegax"] >> data.omegax;
-    file["omegay"] >> data.omegay;
-    file["fshiftx"] >> data.fshiftx;
-    file["fshifty"] >> data.fshifty;
-    file["theta0"] >> data.theta0;
-    file["R"] >> data.R;
-
-    return data;
   }
 };
