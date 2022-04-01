@@ -27,7 +27,9 @@ jobs:
         uses: actions/setup-python@v2
 
       - name: opengl install
-        run: sudo apt-get install libglu1-mesa-dev mesa-common-dev
+        run: |
+          sudo apt-get install libglu1-mesa-dev mesa-common-dev
+          sudo apt install libxrandr-dev
 
       - name: torch install
         working-directory: ${{github.workspace}}/external
