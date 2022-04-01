@@ -11,7 +11,8 @@ public:
     Info,
     Success,
     Warning,
-    Error
+    Error,
+    LogLevelCount
   };
 
   static void SetLogLevel(LogLevel logLevel)

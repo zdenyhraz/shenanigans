@@ -4,7 +4,7 @@
 class ImGuiLogger : public Logger
 {
   ImGuiTextBuffer mTextBuffer;
-  ImVector<int> mLineOffsets;
+  std::vector<std::pair<int, LogLevel>> mLineOffsets;
 
 public:
   template <typename... Args>
@@ -65,51 +65,19 @@ private:
       return;
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
-    int old_size = mTextBuffer.size();
+    i32 oldSize = mTextBuffer.size();
     mTextBuffer.append(message.c_str(), message.c_str() + message.size());
-    for (int new_size = mTextBuffer.size(); old_size < new_size; old_size++)
-      if (mTextBuffer[old_size] == '\n')
-        mLineOffsets.push_back(old_size + 1);
+    for (i32 newSize = mTextBuffer.size(); oldSize < newSize; ++oldSize)
+      if (mTextBuffer[oldSize] == '\n')
+        mLineOffsets.emplace_back(oldSize + 1, logLevel);
   }
 
   void Clear()
   {
     mTextBuffer.clear();
     mLineOffsets.clear();
-    mLineOffsets.push_back(0);
+    mLineOffsets.emplace_back(0, LogLevel::Trace);
   }
 
-  void Draw()
-  {
-    ImGui::Begin("ImGuiLogger");
-
-    if (ImGui::Button("Clear"))
-      Clear();
-
-    ImGui::Separator();
-    ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    const char* bufStart = mTextBuffer.begin();
-    const char* bufEnd = mTextBuffer.end();
-
-    ImGuiListClipper clipper;
-    clipper.Begin(mLineOffsets.Size);
-    while (clipper.Step())
-    {
-      for (int lineNumber = clipper.DisplayStart; lineNumber < clipper.DisplayEnd; lineNumber++)
-      {
-        const char* lineStart = bufStart + mLineOffsets[lineNumber];
-        const char* lineEnd = (lineNumber + 1 < mLineOffsets.Size) ? (bufStart + mLineOffsets[lineNumber + 1] - 1) : bufEnd;
-        ImGui::TextUnformatted(lineStart, lineEnd);
-      }
-    }
-    clipper.End();
-    ImGui::PopStyleVar();
-
-    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-      ImGui::SetScrollHereY(1.0f);
-
-    ImGui::EndChild();
-    ImGui::End();
-  }
+  void Draw();
 };
