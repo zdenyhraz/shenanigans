@@ -10,8 +10,12 @@ void IPCOptimizeWindow::Render()
   ImGui::Begin("IPC optimization");
 
   if (ImGui::Button("Optimize"))
-    IPCOptimization::Optimize(
-        IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.iters, mParameters.testRatio, mParameters.popSize);
+    LaunchAsync(
+        []()
+        {
+          IPCOptimization::Optimize(
+              IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.iters, mParameters.testRatio, mParameters.popSize);
+        });
 
   ImGui::InputText("Train directory", &mParameters.trainDirectory);
   ImGui::InputText("Test directory", &mParameters.testDirectory);

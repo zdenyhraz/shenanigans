@@ -22,7 +22,7 @@ public:
   }
 
 protected:
-  inline static LogLevel mLogLevel = LogLevel::Function;
+  inline static LogLevel mLogLevel = LogLevel::Trace;
   inline static std::mutex mMutex;
 
   static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }

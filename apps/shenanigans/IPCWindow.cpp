@@ -10,12 +10,12 @@ void IPCWindow::Render()
   ImGui::Begin("IPC parameters");
 
   if (ImGui::Button("Update"))
-    UpdateIPCParameters();
+    LaunchAsync([]() { UpdateIPCParameters(); });
 
   ImGui::SameLine();
 
   if (ImGui::Button("Debug"))
-    IPCDebug::ShowDebugStuff(mIPC);
+    LaunchAsync([]() { IPCDebug::ShowDebugStuff(mIPC); });
 
   ImGui::SliderInt("Width", &mParameters.Cols, 3, 512);
   ImGui::SliderInt("Height", &mParameters.Rows, 3, 512);
