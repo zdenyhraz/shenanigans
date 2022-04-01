@@ -3,6 +3,7 @@
 #include "Python/Python.hpp"
 #include "IPCWindow.hpp"
 #include "IPCOptimizeWindow.hpp"
+#include "DiffrotWindow.hpp"
 
 void Shenanigans::Run()
 {
@@ -28,21 +29,24 @@ void Shenanigans::Run()
 void Shenanigans::Render()
 {
   ImGui::Begin("Modules");
-  ImGui::Checkbox("IPC parameters", &mGuiModules.mIPCParameters);
-  ImGui::Checkbox("IPC optimize", &mGuiModules.mIPCOptimize);
+  ImGui::Checkbox("IPC parameters", &mGuiModules.mIPCWindow);
+  ImGui::Checkbox("IPC optimize", &mGuiModules.mIPCOptimizeWindow);
+  ImGui::Checkbox("Diffrot", &mGuiModules.mDiffrotWindow);
   ImGui::End();
 
-  if (mGuiModules.mIPCParameters)
+  if (mGuiModules.mIPCWindow)
     IPCWindow::Render();
-
-  if (mGuiModules.mIPCOptimize)
+  if (mGuiModules.mIPCOptimizeWindow)
     IPCOptimizeWindow::Render();
+  if (mGuiModules.mDiffrotWindow)
+    DiffrotWindow::Render();
 }
 
 void Shenanigans::InitializeWindows()
 {
   IPCWindow::Initialize();
   IPCOptimizeWindow::Initialize();
+  DiffrotWindow::Initialize();
 }
 
 void Shenanigans::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -3,8 +3,9 @@
 
 struct GuiModules
 {
-  bool mIPCParameters = true;
-  bool mIPCOptimize = true;
+  bool mIPCWindow = true;
+  bool mIPCOptimizeWindow = true;
+  bool mDiffrotWindow = true;
 };
 
 class Shenanigans
