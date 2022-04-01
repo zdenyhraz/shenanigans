@@ -17,7 +17,7 @@ void IPCOptimizeWindow::Render()
   ImGui::InputText("Test directory", &mParameters.testDirectory);
   ImGui::SliderFloat("Max shift", &mParameters.maxShift, 0.5, 3.0);
   ImGui::SliderFloat("Noise stddev", &mParameters.noiseStddev, 0.0, 0.1);
-  ImGui::SliderInt("Iters", &mParameters.iters, 1, 21);
+  ImGui::SliderInt("Iters", &mParameters.iters, 1, 51);
   ImGui::SliderFloat("Test ratio", &mParameters.testRatio, 0.0, 1.0);
   ImGui::SliderInt("Population size", &mParameters.popSize, 6, 60);
   ImGui::End();

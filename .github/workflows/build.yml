@@ -23,11 +23,11 @@ jobs:
       - name: ninja install
         run: sudo apt-get install ninja-build
 
-      - name: python install
-        uses: actions/setup-python@v2
-
       - name: opengl install
         run: sudo apt-get install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+
+      - name: python install
+        uses: actions/setup-python@v2
 
       - name: torch install
         working-directory: ${{github.workspace}}/external
