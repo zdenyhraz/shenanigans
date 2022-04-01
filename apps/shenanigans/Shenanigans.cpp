@@ -13,7 +13,7 @@ void Shenanigans::Run()
   auto window = GLFWCreateWindow(1, 1);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  ImGuiIO& io = ImGuiInitialize(window, 2.0);
+  ImGuiIO& io = ImGuiInitialize(window, 2.5);
   InitializeWindows();
 
   while (!glfwWindowShouldClose(window))
@@ -35,6 +35,8 @@ void Shenanigans::Render()
   ImGui::Checkbox("IPC measure", &mWindows.IPCMeasureWindow);
   ImGui::Checkbox("Diffrot", &mWindows.DiffrotWindow);
   ImGui::End();
+
+  ImGui::ShowDemoWindow();
 
   if (mWindows.IPCWindow)
     IPCWindow::Render();

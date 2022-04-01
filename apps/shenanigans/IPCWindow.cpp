@@ -26,10 +26,10 @@ void IPCWindow::Render()
   ImGui::SliderInt("L2Usize", &mParameters.L2Usize, 31, 501);
   ImGui::SliderInt("MaxIter", &mParameters.MaxIter, 1, 21);
   ImGui::SliderFloat("CPeps", &mParameters.CPeps, 0, 0.1);
-  ImGui::Combo("WindowType", &mParameters.WinT, IPCParameters::WindowTypes, IM_ARRAYSIZE(IPCParameters::WindowTypes));
-  ImGui::Combo("BandpassType", &mParameters.BPT, IPCParameters::BandpassTypes, IM_ARRAYSIZE(IPCParameters::BandpassTypes));
-  ImGui::Combo("InterpolationType", &mParameters.IntT, IPCParameters::InterpolationTypes, IM_ARRAYSIZE(IPCParameters::InterpolationTypes));
-  ImGui::Combo("L1WindowType", &mParameters.L1WinT, IPCParameters::L1windowTypes, IM_ARRAYSIZE(IPCParameters::L1windowTypes));
+  ImGui::SliderInt("WindowType", &mParameters.WinT, 0, static_cast<i32>(IPC::WindowType::WindowTypeCount) - 1, IPCParameters::WindowTypes[mParameters.WinT]);
+  ImGui::SliderInt("BandpassType", &mParameters.BPT, 0, static_cast<i32>(IPC::BandpassType::BandpassTypeCount) - 1, IPCParameters::BandpassTypes[mParameters.BPT]);
+  ImGui::SliderInt("InterpolationType", &mParameters.IntT, 0, static_cast<i32>(IPC::InterpolationType::InterpolationTypeCount) - 1, IPCParameters::InterpolationTypes[mParameters.IntT]);
+  ImGui::SliderInt("L1WindowType", &mParameters.L1WinT, 0, static_cast<i32>(IPC::L1WindowType::L1WindowTypeCount) - 1, IPCParameters::L1WindowTypes[mParameters.L1WinT]);
   ImGui::End();
 }
 

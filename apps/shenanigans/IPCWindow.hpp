@@ -19,7 +19,7 @@ struct IPCParameters
   static constexpr const char* WindowTypes[] = {"None", "Hann"};
   static constexpr const char* BandpassTypes[] = {"None", "Rectangular", "Gaussian"};
   static constexpr const char* InterpolationTypes[] = {"NearestNeighbor", "Linear", "Cubic"};
-  static constexpr const char* L1windowTypes[] = {"None", "Circular", "Gaussian"};
+  static constexpr const char* L1WindowTypes[] = {"None", "Circular", "Gaussian"};
 };
 
 class IPCWindow
