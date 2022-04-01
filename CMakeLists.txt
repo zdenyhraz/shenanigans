@@ -52,10 +52,6 @@ if(ENABLE_SANITIZER)
   add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
 
-# targets
-add_executable(shenanigans)
-add_executable(shenanigans_test)
-
 # status messages
 message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
 message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
@@ -64,6 +60,10 @@ message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
 message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
 message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
+
+# targets
+add_executable(shenanigans)
+add_executable(shenanigans_test)
 
 # pybind11
 find_package(PythonLibs REQUIRED)
