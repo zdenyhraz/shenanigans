@@ -3,7 +3,6 @@
 #include "Python/Python.hpp"
 #include "IPCWindow.hpp"
 #include "IPCOptimizeWindow.hpp"
-#include "IPCMeasureWindow.hpp"
 #include "DiffrotWindow.hpp"
 
 void Shenanigans::Run()
@@ -36,7 +35,6 @@ void Shenanigans::Render()
 
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
-  IPCMeasureWindow::Render();
   DiffrotWindow::Render();
 }
 
@@ -44,7 +42,6 @@ void Shenanigans::InitializeWindows()
 {
   IPCWindow::Initialize();
   IPCOptimizeWindow::Initialize();
-  IPCMeasureWindow::Initialize();
   DiffrotWindow::Initialize();
 }
 

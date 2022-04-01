@@ -4,36 +4,39 @@
 #include "PhaseCorrelation.hpp"
 #include "Filtering/Noise.hpp"
 
-void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 n)
+void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 iters, f64 maxShift, f64 noiseStddev, f32* progress)
 {
-  using T = IPC::Float;
-  cv::Mat accuracyMapCC(n, n, GetMatType<T>());
-  cv::Mat accuracyMapPC(n, n, GetMatType<T>());
-  cv::Mat accuracyMapPCS(n, n, GetMatType<T>());
-  cv::Mat accuracyMapIPC(n, n, GetMatType<T>());
-  cv::Mat accuracyMapIPCx(n, n, GetMatType<T>());
-  cv::Mat accuracyMapIPCy(n, n, GetMatType<T>());
+  PROFILE_FUNCTION;
+  LOG_FUNCTION("IPCMeasure::MeasureAccuracyMap");
 
-  static constexpr f64 maxShift = 2.0;
-  static constexpr f64 noiseStddev = 0.1;
+  using T = IPC::Float;
+  cv::Mat accuracyMapCC(iters, iters, GetMatType<T>());
+  cv::Mat accuracyMapPC(iters, iters, GetMatType<T>());
+  cv::Mat accuracyMapPCS(iters, iters, GetMatType<T>());
+  cv::Mat accuracyMapIPC(iters, iters, GetMatType<T>());
+  cv::Mat accuracyMapIPCx(iters, iters, GetMatType<T>());
+  cv::Mat accuracyMapIPCy(iters, iters, GetMatType<T>());
+
   static constexpr f64 quanB = 0.0;
   static constexpr f64 quanT = 0.95;
-  const std::string xlabel = "x shift";
-  const std::string ylabel = "y shift";
-  const std::string zlabel = "error";
+  static const std::string xlabel = "x shift";
+  static const std::string ylabel = "y shift";
+  static const std::string zlabel = "error";
   cv::Mat imageres;
   cv::resize(image, imageres, cv::Size(ipc.mCols + 3 * maxShift, ipc.mRows + 3 * maxShift));
 
   cv::Mat image1 = RoiCropMid(imageres, ipc.mCols, ipc.mRows);
-  std::atomic<i32> progress = 0;
+  std::atomic<i32> progressi = 0;
   AddNoise<T>(image1, noiseStddev);
   PyPlot::Plot("Image", {.z = image1, .cmap = "gray"});
 
 #pragma omp parallel for
-  for (i32 row = 0; row < n; ++row)
+  for (i32 row = 0; row < iters; ++row)
   {
-    const f64 logprogress = progress++ + 1;
-    LOG_INFO("[{:>3.0f}% :: {} / {}] Calculating IPC accuracy map ...", logprogress / n * 100, logprogress, n);
+    const f64 logprogress = ++progressi;
+    if (progress)
+      *progress = logprogress / iters;
+    LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating IPC accuracy map ...", logprogress / iters * 100, logprogress, iters);
 
     auto accCC = accuracyMapCC.ptr<T>(row);
     auto accPC = accuracyMapPC.ptr<T>(row);
@@ -42,9 +45,9 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 n)
     auto accIPCx = accuracyMapIPCx.ptr<T>(row);
     auto accIPCy = accuracyMapIPCy.ptr<T>(row);
 
-    for (i32 col = 0; col < n; ++col)
+    for (i32 col = 0; col < iters; ++col)
     {
-      const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (n - 1)), maxShift * (-1.0 + 2.0 * (n - 1 - row) / (n - 1)));
+      const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1)));
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
       cv::warpAffine(imageres, imageShifted, Tmat, imageres.size());

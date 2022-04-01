@@ -3,6 +3,7 @@
 
 void IPCOptimizeWindow::Initialize()
 {
+  mImage = LoadUnitFloatImage<IPC::Float>(mParameters.imagePath);
 }
 
 void IPCOptimizeWindow::Render()
@@ -17,12 +18,27 @@ void IPCOptimizeWindow::Render()
               IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.iters, mParameters.testRatio, mParameters.popSize);
         });
 
-  ImGui::InputText("Train directory", &mParameters.trainDirectory);
-  ImGui::InputText("Test directory", &mParameters.testDirectory);
-  ImGui::SliderFloat("Max shift", &mParameters.maxShift, 0.5, 3.0);
-  ImGui::SliderFloat("Noise stddev", &mParameters.noiseStddev, 0.0, 0.1);
-  ImGui::SliderInt("Iters", &mParameters.iters, 1, 51);
-  ImGui::SliderFloat("Test ratio", &mParameters.testRatio, 0.0, 1.0);
-  ImGui::SliderInt("Population size", &mParameters.popSize, 6, 60);
+  ImGui::SameLine();
+
+  if (ImGui::Button("Accuracy map"))
+    LaunchAsync([]() { IPCMeasure::MeasureAccuracyMap(IPCWindow::GetIPC(), mImage, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
+
+  ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
+  ImGui::InputText("##load path", &mParameters.imagePath);
+  ImGui::SameLine();
+  if (ImGui::Button("Load"))
+    LaunchAsync(
+        []()
+        {
+          mImage = LoadUnitFloatImage<IPC::Float>(mParameters.imagePath);
+          LOG_DEBUG("Loaded image {}", mParameters.imagePath);
+        });
+  ImGui::InputText("train directory", &mParameters.trainDirectory);
+  ImGui::InputText("test directory", &mParameters.testDirectory);
+  ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);
+  ImGui::SliderFloat("noise stddev", &mParameters.noiseStddev, 0.0, 0.5);
+  ImGui::SliderInt("iters", &mParameters.iters, 1, 201);
+  ImGui::SliderFloat("test ratio", &mParameters.testRatio, 0.0, 1.0);
+  ImGui::SliderInt("popsize", &mParameters.popSize, 6, 60);
   ImGui::End();
 }
