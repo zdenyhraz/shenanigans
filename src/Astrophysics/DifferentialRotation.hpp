@@ -8,6 +8,8 @@
 class DifferentialRotation
 {
 public:
+  DifferentialRotation() {}
+
   DifferentialRotation(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_) :
     xsize(xsize_), ysize(ysize_), idstep(idstep_), idstride(idstride_), thetamax(thetamax_), cadence(cadence_)
   {
@@ -21,6 +23,8 @@ public:
 
   struct DifferentialRotationData
   {
+    DifferentialRotationData() {}
+
     DifferentialRotationData(i32 xsize, i32 ysize, f64 thetamax) :
       shiftx(cv::Mat::zeros(ysize, xsize, CV_32F)),
       shifty(cv::Mat::zeros(ysize, xsize, CV_32F)),
@@ -32,6 +36,20 @@ public:
       theta0(std::vector<f64>(xsize, 0.)),
       R(std::vector<f64>(xsize, 0.))
     {
+    }
+
+    void Load(const std::string& path)
+    {
+      cv::FileStorage file(path, cv::FileStorage::READ);
+      file["theta"] >> theta;
+      file["shiftx"] >> shiftx;
+      file["shifty"] >> shifty;
+      file["omegax"] >> omegax;
+      file["omegay"] >> omegay;
+      file["fshiftx"] >> fshiftx;
+      file["fshifty"] >> fshifty;
+      file["theta0"] >> theta0;
+      file["R"] >> R;
     }
 
     static std::vector<f64> GenerateTheta(i32 ysize, f64 thetamax)
@@ -84,19 +102,17 @@ public:
         const auto [id1, id2] = ids[x];
         const auto path1 = fmt::format("{}/{}.png", dataPath, id1);
         const auto path2 = fmt::format("{}/{}.png", dataPath, id2);
-        if (std::filesystem::exists(path1) and std::filesystem::exists(path2))
-          [[likely]]
-          {
-            if constexpr (not Managed)
-              LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-          }
-        else
-          [[unlikely]]
-          {
-            if constexpr (not Managed)
-              LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, skipping ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-            continue;
-          }
+        if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
+        {
+          if constexpr (not Managed)
+            LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
+        }
+        else [[unlikely]]
+        {
+          if constexpr (not Managed)
+            LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, skipping ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
+          continue;
+        }
 
         const auto image1 = imageCache.Get(path1);
         const auto image2 = imageCache.Get(path2);
@@ -110,8 +126,8 @@ public:
         data.theta0[xindex] = theta0;
         data.R[xindex] = R;
 
-        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax)
-          [[unlikely]] continue;
+        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax) [[unlikely]]
+          continue;
 
         for (i32 y = 0; y < ysize; ++y)
         {
@@ -152,19 +168,6 @@ public:
     return data;
   }
 
-  void LoadAndShow(const std::string& path, const std::string& dataPath, i32 idstart)
-  try
-  {
-    PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::LoadAndShow");
-    auto data = Load(path);
-    Plot(data, dataPath, idstart);
-  }
-  catch (const std::exception& e)
-  {
-    LOG_ERROR("DifferentialRotation::LoadAndShow error: {}", e.what());
-  }
-
   void Optimize(IPC& ipc, const std::string& dataPath, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
   {
     PROFILE_FUNCTION;
@@ -176,16 +179,19 @@ public:
     LOG_INFO("Optimization idstride: {}", idstrideopt);
     DifferentialRotation diffrot(xsizeopt, ysizeopt, idstep, idstrideopt, thetamax, cadence);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
-    diffrot.imageCache.SetGetDataFunction([](const std::string& path) {
-      PROFILE_SCOPE(Imread);
-      return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
-    });
+    diffrot.imageCache.SetGetDataFunction(
+        [](const std::string& path)
+        {
+          PROFILE_SCOPE(Imread);
+          return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
+        });
     diffrot.imageCache.Reserve(ids);
     diffrot.headerCache.Reserve(ids);
 
     const auto dataBefore = diffrot.Calculate<true>(ipc, dataPath, idstart);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
-    const auto obj = [&](const IPC& ipcopt) {
+    const auto obj = [&](const IPC& ipcopt)
+    {
       const auto dataopt = diffrot.Calculate<true>(ipcopt, dataPath, idstart);
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
@@ -282,10 +288,11 @@ private:
   i32 idstride = 25;
   f64 thetamax = 50. / Constants::Rad;
   i32 cadence = 45;
-  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
-    PROFILE_SCOPE(Imread);
-    return cv::imread(path, cv::IMREAD_UNCHANGED);
-  }};
+  mutable DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
+      {
+        PROFILE_SCOPE(Imread);
+        return cv::imread(path, cv::IMREAD_UNCHANGED);
+      }};
   mutable DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
 
   static ImageHeader GetHeader(const std::string& path)
@@ -482,7 +489,7 @@ private:
     file << "R" << data.R;
   }
 
-  void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize) const
+  static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");

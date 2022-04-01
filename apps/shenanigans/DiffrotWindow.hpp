@@ -1,4 +1,5 @@
 #pragma once
+#include "Astrophysics/DifferentialRotation.hpp"
 
 struct DiffrotParameters
 {
@@ -14,6 +15,8 @@ struct DiffrotParameters
   i32 xsizeopt = 1;
   i32 ysizeopt = 101;
   i32 popsize = 6;
+
+  std::string loadPath = "../data/diffrot_month_5000/xd.json";
 };
 
 class DiffrotWindow
@@ -24,4 +27,7 @@ public:
 
 private:
   inline static DiffrotParameters mParameters;
+  inline static DifferentialRotation::DifferentialRotationData mDiffrotData;
+
+  static DifferentialRotation GetDiffrot();
 };
