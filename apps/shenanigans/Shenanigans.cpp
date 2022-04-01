@@ -29,7 +29,7 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  ImGui::ShowDemoWindow();
+  // ImGui::ShowDemoWindow();
 
   ImGuiLogger::Render();
   IPCWindow::Render();

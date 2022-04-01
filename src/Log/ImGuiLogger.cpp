@@ -1,15 +1,20 @@
 #include "ImGuiLogger.hpp"
 
+static consteval ImVec4 GetColorFromU8(f32 R, f32 G, f32 B)
+{
+  return ImVec4(R / 255, G / 255, B / 255, 1.0f);
+}
+
 static consteval std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
 {
   std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> colors;
-  colors[static_cast<usize>(Logger::LogLevel::Trace)] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Function)] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Debug)] = ImVec4(0.f / 255, 174.f / 255, 255.0f / 255, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Info)] = ImVec4(255.f / 255, 255.f / 255, 0.f / 255, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Success)] = ImVec4(102.f / 255, 255.f / 255, 0.f / 255, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Warning)] = ImVec4(255.f / 255, 128.f / 255, 0.f / 255, 1.0f);
-  colors[static_cast<usize>(Logger::LogLevel::Error)] = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+  colors[static_cast<usize>(Logger::LogLevel::Trace)] = GetColorFromU8(125, 125, 125);
+  colors[static_cast<usize>(Logger::LogLevel::Function)] = GetColorFromU8(125, 125, 125);
+  colors[static_cast<usize>(Logger::LogLevel::Debug)] = GetColorFromU8(0, 185, 255);
+  colors[static_cast<usize>(Logger::LogLevel::Info)] = GetColorFromU8(255, 255, 255);
+  colors[static_cast<usize>(Logger::LogLevel::Success)] = GetColorFromU8(0, 227, 15);
+  colors[static_cast<usize>(Logger::LogLevel::Warning)] = GetColorFromU8(255, 200, 0);
+  colors[static_cast<usize>(Logger::LogLevel::Error)] = GetColorFromU8(255, 0, 0);
   return colors;
 }
 
