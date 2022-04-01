@@ -6,10 +6,10 @@ void Shenanigans::Run()
 {
   PythonInitialize();
   GLFWInitialize();
-  auto window = GLFWCreateWindow();
+  auto window = GLFWCreateWindow(1.5 * 1920, 1.5 * 1080);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  ImGuiIO& io = ImGuiInitialize(window);
+  ImGuiIO& io = ImGuiInitialize(window, 2.0);
 
   UpdateIPCParameters();
 

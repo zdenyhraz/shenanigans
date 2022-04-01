@@ -8,12 +8,12 @@ void GLFWInitialize()
     throw std::runtime_error("GLFW initialization failed");
 }
 
-GLFWwindow* GLFWCreateWindow()
+GLFWwindow* GLFWCreateWindow(i32 width, i32 height)
 {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  GLFWwindow* window = glfwCreateWindow(1920, 1080, "hi mom", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, "hi mom", NULL, NULL);
   if (not window)
     throw std::runtime_error("GLFW create window failed");
 
@@ -34,9 +34,8 @@ void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback)
   glfwSetKeyCallback(window, callback);
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
 {
-  static constexpr float scale = 2;
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
