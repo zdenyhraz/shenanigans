@@ -53,8 +53,6 @@ private:
     return logger;
   }
 
-  bool ShouldLog(LogLevel logLevel) const { return logLevel >= mLogLevel; }
-
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {

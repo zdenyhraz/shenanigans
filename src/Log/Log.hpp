@@ -1,7 +1,8 @@
 #pragma once
 #include "TermLogger.hpp"
+#include "ImGuiLogger.hpp"
 
-using Log = TermLogger;
+using Log = ImGuiLogger;
 
 #define LOG_TRACE(...) Log::Trace(__VA_ARGS__)
 #define LOG_DEBUG(...) Log::Debug(__VA_ARGS__)

@@ -24,6 +24,8 @@ protected:
   inline static LogLevel mLogLevel = LogLevel::Function;
   inline static std::mutex mMutex;
 
+  static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
+
   static std::string GetCurrentTime()
   {
     auto now = std::time(nullptr);

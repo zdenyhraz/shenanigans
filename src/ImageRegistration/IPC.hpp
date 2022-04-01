@@ -10,11 +10,6 @@ class IPC
 {
 public:
   using Float = f64;
-  friend class IPCAlign;
-  friend class IPCDebug;
-  friend class IPCFlow;
-  friend class IPCMeasure;
-  friend class IPCOptimization;
 
   enum class WindowType : u8
   {
@@ -47,6 +42,36 @@ public:
     L1WindowTypeCount // last
   };
 
+private:
+  i32 mRows = 0;
+  i32 mCols = 0;
+  f64 mBPL = 0;
+  f64 mBPH = 1;
+  i32 mL2size = 7;
+  f64 mL1ratio = 0.45;
+  f64 mL1ratioStep = 0.025;
+  i32 mL2Usize = 357;
+  i32 mMaxIter = 10;
+  f64 mCPeps = 0;
+  BandpassType mBPT = BandpassType::Gaussian;
+  InterpolationType mIntT = InterpolationType::Linear;
+  WindowType mWinT = WindowType::Hann;
+  L1WindowType mL1WinT = L1WindowType::Circular;
+  cv::Mat mBP;
+  cv::Mat mWin;
+  cv::Mat mL1Win;
+  mutable std::string mDebugName = "IPC";
+  mutable std::string mDebugDirectory;
+  mutable i32 mDebugIndex = 0;
+  mutable cv::Point2d mDebugTrueShift;
+
+  friend class IPCAlign;
+  friend class IPCDebug;
+  friend class IPCFlow;
+  friend class IPCMeasure;
+  friend class IPCOptimization;
+
+public:
   IPC() { Initialize(0, 0, 0, 1); }
   explicit IPC(i32 rows, i32 cols = -1, f64 bpL = 0, f64 bpH = 1) { Initialize(rows, cols, bpL, bpH); }
   explicit IPC(const cv::Size& size, f64 bpL = 0, f64 bpH = 1) { Initialize(size.height, size.width, bpL, bpH); }
@@ -273,28 +298,6 @@ public:
   std::string Serialize() const;
 
 private:
-  i32 mRows = 0;
-  i32 mCols = 0;
-  f64 mBPL = 0;
-  f64 mBPH = 1;
-  i32 mL2size = 7;
-  f64 mL1ratio = 0.45;
-  f64 mL1ratioStep = 0.025;
-  i32 mL2Usize = 357;
-  i32 mMaxIter = 10;
-  f64 mCPeps = 0;
-  BandpassType mBPT = BandpassType::Gaussian;
-  InterpolationType mIntT = InterpolationType::Linear;
-  WindowType mWinT = WindowType::Hann;
-  L1WindowType mL1WinT = L1WindowType::Circular;
-  cv::Mat mBP;
-  cv::Mat mWin;
-  cv::Mat mL1Win;
-  mutable std::string mDebugName = "IPC";
-  mutable std::string mDebugDirectory;
-  mutable i32 mDebugIndex = 0;
-  mutable cv::Point2d mDebugTrueShift;
-
   static cv::Mat GetWindow(WindowType type, cv::Size size)
   {
     PROFILE_FUNCTION;

@@ -29,23 +29,13 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  ImGui::Begin("Modules");
-  ImGui::Checkbox("IPC parameters", &mWindows.IPCWindow);
-  ImGui::Checkbox("IPC optimize", &mWindows.IPCOptimizeWindow);
-  ImGui::Checkbox("IPC measure", &mWindows.IPCMeasureWindow);
-  ImGui::Checkbox("Diffrot", &mWindows.DiffrotWindow);
-  ImGui::End();
+  // ImGui::ShowDemoWindow();
 
-  ImGui::ShowDemoWindow();
-
-  if (mWindows.IPCWindow)
-    IPCWindow::Render();
-  if (mWindows.IPCOptimizeWindow)
-    IPCOptimizeWindow::Render();
-  if (mWindows.IPCMeasureWindow)
-    IPCMeasureWindow::Render();
-  if (mWindows.DiffrotWindow)
-    DiffrotWindow::Render();
+  ImGuiLogger::Render();
+  IPCWindow::Render();
+  IPCOptimizeWindow::Render();
+  IPCMeasureWindow::Render();
+  DiffrotWindow::Render();
 }
 
 void Shenanigans::InitializeWindows()
