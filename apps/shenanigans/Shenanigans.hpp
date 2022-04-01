@@ -25,6 +25,12 @@ struct IPCParameters
   static constexpr const char* mL1windowTypes[] = {"None", "Circular", "Gaussian"};
 };
 
+struct GuiModules
+{
+  bool mIPCParameters = true;
+  bool mIPCOptimize = false;
+};
+
 class Shenanigans
 {
 public:
@@ -33,6 +39,7 @@ public:
 private:
   inline static IPCParameters mIPCPars;
   inline static IPC mIPC;
+  inline static GuiModules mGuiModules;
 
   static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
   static void UpdateIPCParameters();

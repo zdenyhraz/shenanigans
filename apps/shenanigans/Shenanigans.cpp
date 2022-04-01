@@ -17,6 +17,12 @@ void Shenanigans::Run()
   {
     ImGuiNewFrame();
 
+    ImGui::Begin("Modules");
+    ImGui::Checkbox("IPC parameters", &mGuiModules.mIPCParameters);
+    ImGui::Checkbox("IPC optimize", &mGuiModules.mIPCOptimize);
+    ImGui::End();
+
+    if (mGuiModules.mIPCParameters)
     {
       ImGui::Begin("IPC parameters");
 
@@ -40,6 +46,12 @@ void Shenanigans::Run()
       ImGui::Combo("BandpassType", &mIPCPars.mBPT, IPCParameters::mBandpassTypes, IM_ARRAYSIZE(IPCParameters::mBandpassTypes));
       ImGui::Combo("InterpolationType", &mIPCPars.mIntT, IPCParameters::mInterpolationTypes, IM_ARRAYSIZE(IPCParameters::mInterpolationTypes));
       ImGui::Combo("L1WindowType", &mIPCPars.mL1WinT, IPCParameters::mL1windowTypes, IM_ARRAYSIZE(IPCParameters::mL1windowTypes));
+      ImGui::End();
+    }
+
+    if (mGuiModules.mIPCOptimize)
+    {
+      ImGui::Begin("IPC optimize");
       ImGui::End();
     }
 
