@@ -8,11 +8,11 @@ try
 }
 catch (const std::exception& e)
 {
-  fmt::print("Error: {}\n", e.what());
+  TermLogger::Error("Error: {}", e.what());
   return EXIT_FAILURE;
 }
 catch (...)
 {
-  fmt::print("Error: Unknown error\n");
+  TermLogger::Error("Error: Unknown error");
   return EXIT_FAILURE;
 }

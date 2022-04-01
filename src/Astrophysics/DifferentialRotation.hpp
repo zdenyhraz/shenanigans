@@ -301,6 +301,8 @@ public:
     const auto obj = [&](const IPC& ipcopt)
     {
       const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+      if (dataopt.omegax.empty())
+        return std::numeric_limits<f64>::infinity();
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
 

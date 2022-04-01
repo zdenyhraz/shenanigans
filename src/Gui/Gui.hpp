@@ -9,3 +9,4 @@ void ImGuiNewFrame();
 void ImGuiRender(GLFWwindow* window, ImGuiIO& io);
 void ImGuiShutdown();
 void GLFWShutdown(GLFWwindow* window);
+void GLFWCloseWindow(GLFWwindow* window);

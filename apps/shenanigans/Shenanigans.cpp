@@ -9,7 +9,7 @@ void Shenanigans::Run()
 {
   PythonInitialize();
   GLFWInitialize();
-  auto window = GLFWCreateWindow(1.5 * 1920, 1.5 * 1080);
+  auto window = GLFWCreateWindow(1, 1);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
   ImGuiIO& io = ImGuiInitialize(window, 2.0);

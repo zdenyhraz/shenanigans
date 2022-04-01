@@ -10,8 +10,8 @@ void DiffrotWindow::Render()
   ImGui::Begin("Differential rotation");
 
   if (ImGui::Button("Calculate"))
-    mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, mParameters.thetamax,
-        mParameters.cadence, mParameters.idstart, &mProgress);
+    mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
+        mParameters.thetamax / Constants::Rad, mParameters.cadence, mParameters.idstart, &mProgress);
   ImGui::SameLine();
   if (ImGui::Button("Plot meridian curve"))
     DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27);
@@ -33,8 +33,8 @@ void DiffrotWindow::Render()
   ImGui::Separator();
 
   if (ImGui::Button("Optimize"))
-    DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, mParameters.thetamax, mParameters.cadence,
-        mParameters.idstart, mParameters.xsizeopt, mParameters.ysizeopt, mParameters.popsize);
+    DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, mParameters.thetamax / Constants::Rad,
+        mParameters.cadence, mParameters.idstart, mParameters.xsizeopt, mParameters.ysizeopt, mParameters.popsize);
   ImGui::SliderInt("xsizeopt", &mParameters.xsizeopt, 1, 500);
   ImGui::SliderInt("ysizeopt", &mParameters.ysizeopt, 3, 201);
   ImGui::SliderInt("popsize", &mParameters.popsize, 6, 36);

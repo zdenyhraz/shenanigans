@@ -83,6 +83,9 @@ void ImGuiRender(GLFWwindow* window, ImGuiIO& io)
     glfwMakeContextCurrent(backup_current_context);
   }
 
+  if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+    GLFWCloseWindow(window);
+
   glfwSwapBuffers(window);
 }
 
@@ -97,4 +100,9 @@ void GLFWShutdown(GLFWwindow* window)
 {
   glfwDestroyWindow(window);
   glfwTerminate();
+}
+
+void GLFWCloseWindow(GLFWwindow* window)
+{
+  glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
