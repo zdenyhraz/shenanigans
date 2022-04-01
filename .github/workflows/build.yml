@@ -18,10 +18,13 @@ jobs:
           sudo update-alternatives --set gcc /usr/bin/gcc-11
 
       - name: ninja install
-        run: sudo apt-get install ninja-build
+        run: sudo apt-get install libglu1-mesa-dev mesa-common-dev
 
       - name: python install
         uses: actions/setup-python@v2
+
+      - name: opengl install
+        run: sudo apt-get install xorg-dev libglu1-mesa-dev
 
       - name: torch install
         working-directory: ${{github.workspace}}/external

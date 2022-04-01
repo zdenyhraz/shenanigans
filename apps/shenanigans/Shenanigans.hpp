@@ -28,7 +28,7 @@ struct IPCParameters
 struct GuiModules
 {
   bool mIPCParameters = true;
-  bool mIPCOptimize = false;
+  bool mIPCOptimize = true;
 };
 
 class Shenanigans
