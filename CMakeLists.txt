@@ -84,7 +84,7 @@ add_subdirectory(external/gtest)
 include_directories(external/gtest/googletest/include)
 enable_testing()
 include(GoogleTest)
-target_link_libraries(shenanigans_test PRIVATE GTest::gtest_main)
+target_link_libraries(shenanigans_test PRIVATE GTest::gtest)
 
 # json
 add_subdirectory(external/json)
@@ -152,7 +152,7 @@ file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.hpp apps/shen
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS test/*.hpp test/*.cpp)
+file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS apps/shenanigans_test/*.hpp apps/shenanigans_test/*.cpp test/*.hpp test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST_APP})
 gtest_discover_tests(shenanigans_test)
 
