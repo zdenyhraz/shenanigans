@@ -35,7 +35,8 @@ void ImGuiLogger::Draw()
     Warning("Warning message");
     Error("Error message");
   }
-
+  ImGui::SameLine();
+  ImGui::Text("%.3f ms/frame (%.1f fps)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
   ImGui::Separator();
   ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));

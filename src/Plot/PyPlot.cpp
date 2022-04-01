@@ -136,3 +136,47 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data3D& data)
   scope["title"] = not data.title.empty() ? data.title : name;
   return scope;
 }
+
+void PyPlot::ScheldulePlot(const std::string& name, const Data1D& data)
+{
+  std::scoped_lock lock(mMutex);
+  mPlot1DQueue.emplace(name, data);
+}
+
+void PyPlot::ScheldulePlot(const std::string& name, const Data2D& data)
+{
+  std::scoped_lock lock(mMutex);
+  mPlot2DQueue.emplace(name, data);
+}
+
+void PyPlot::ScheldulePlot(const std::string& name, const Data3D& data)
+{
+  std::scoped_lock lock(mMutex);
+  mPlot3DQueue.emplace(name, data);
+}
+
+void PyPlot::RenderInternal()
+{
+  std::scoped_lock lock(mMutex);
+
+  while (not mPlot1DQueue.empty())
+  {
+    const auto& [name, data] = mPlot1DQueue.front();
+    PlotInternal(name, data);
+    mPlot1DQueue.pop();
+  }
+
+  while (not mPlot2DQueue.empty())
+  {
+    const auto& [name, data] = mPlot2DQueue.front();
+    PlotInternal(name, data);
+    mPlot2DQueue.pop();
+  }
+
+  while (not mPlot3DQueue.empty())
+  {
+    const auto& [name, data] = mPlot3DQueue.front();
+    PlotInternal(name, data);
+    mPlot3DQueue.pop();
+  }
+}

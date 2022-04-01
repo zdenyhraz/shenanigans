@@ -29,9 +29,11 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  // ImGui::ShowDemoWindow();
+  ImGui::ShowDemoWindow();
 
   ImGuiLogger::Render();
+  PyPlot::Render();
+
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
   IPCMeasureWindow::Render();

@@ -45,13 +45,23 @@ public:
     std::string title;
   };
 
-  static void Plot(const std::string& name, const Data1D& data) { Get().PlotInternal(name, data); }
-  static void Plot(const std::string& name, const Data2D& data) { Get().PlotInternal(name, data); }
-  static void PlotSurf(const std::string& name, const Data3D& data) { Get().PlotInternal(name, data); }
+  static void Plot(const std::string& name, const Data1D& data) { Get().ScheldulePlot(name, data); }
+  static void Plot(const std::string& name, const Data2D& data) { Get().ScheldulePlot(name, data); }
+  static void PlotSurf(const std::string& name, const Data3D& data) { Get().ScheldulePlot(name, data); }
+
+  static void Render()
+  {
+    // python interpreter calls have to be from the main thread
+    Get().RenderInternal();
+  }
 
 private:
   std::map<std::string, u32> mPlotIds;
   u32 mId = 0;
+  std::queue<std::pair<std::string, Data1D>> mPlot1DQueue;
+  std::queue<std::pair<std::string, Data2D>> mPlot2DQueue;
+  std::queue<std::pair<std::string, Data3D>> mPlot3DQueue;
+  std::mutex mMutex;
 
   PyPlot();
 
@@ -61,11 +71,17 @@ private:
     return plt;
   }
 
+  void RenderInternal();
   void CheckIfPlotExists(const std::string& name);
   py::dict GetScopeData(const std::string& name, const Data1D& data);
   py::dict GetScopeData(const std::string& name, const Data2D& data);
   py::dict GetScopeData(const std::string& name, const Data3D& data);
+
   void PlotInternal(const std::string& name, const Data1D& data);
   void PlotInternal(const std::string& name, const Data2D& data);
   void PlotInternal(const std::string& name, const Data3D& data);
+
+  void ScheldulePlot(const std::string& name, const Data1D& data);
+  void ScheldulePlot(const std::string& name, const Data2D& data);
+  void ScheldulePlot(const std::string& name, const Data3D& data);
 };

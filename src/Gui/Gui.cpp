@@ -43,11 +43,13 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
   io.FontGlobalScale = scale;
+  io.Fonts->AddFontFromFileTTF("../data/app/CascadiaCode.ttf", 17);
   ImGui::StyleColorsClassic();
 
   ImGuiStyle& style = ImGui::GetStyle();
   style.ScaleAllSizes(scale);
   style.GrabRounding = 12;
+
   if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
   {
     style.WindowRounding = 0.0f;
