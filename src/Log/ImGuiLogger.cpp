@@ -46,7 +46,8 @@ void ImGuiLogger::Draw()
     {
       const char* lineStart = bufStart + mLineOffsets[lineNumber].first;
       const char* lineEnd = (lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? (bufStart + mLineOffsets[lineNumber + 1].first - 1) : bufEnd;
-      ImGui::PushStyleColor(ImGuiCol_Text, mLogLevelColors[static_cast<i32>(mLineOffsets[lineNumber + 1].second)]);
+      ImGui::PushStyleColor(
+          ImGuiCol_Text, mLogLevelColors[(lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? static_cast<i32>(mLineOffsets[lineNumber + 1].second) : static_cast<i32>(Logger::LogLevel::Debug)]);
       ImGui::TextUnformatted(lineStart, lineEnd);
       ImGui::PopStyleColor();
     }
