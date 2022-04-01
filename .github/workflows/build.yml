@@ -11,6 +11,9 @@ jobs:
         with:
           submodules: true
 
+      - name: apt-get update
+        run: sudo apt-get update
+
       - name: gcc install
         run: |
           sudo apt install gcc-11 g++-11
