@@ -4,7 +4,7 @@
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, f64 testRatio, i32 popSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 iters, f64 testRatio, i32 popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -17,8 +17,8 @@ try
   if (trainImages.empty())
     throw std::runtime_error("Empty training images vector");
 
-  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, itersPerImage, noiseStddev);
-  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, testRatio * itersPerImage, noiseStddev);
+  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, iters, noiseStddev);
+  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, testRatio * iters, noiseStddev);
   const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
   const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 
@@ -92,57 +92,6 @@ catch (const std::exception& e)
   LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
 }
 
-void IPCOptimization::PlotObjectiveFunctionLandscape(const IPC& ipc, const std::string& trainDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, i32 iters)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION("PlotObjectiveFunctionLandscape");
-  const auto trainImages = LoadImages(trainDirectory);
-  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, itersPerImage, noiseStddev);
-  const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
-  const i32 rows = iters;
-  const i32 cols = iters;
-  cv::Mat landscape(rows, cols, GetMatType<IPC::Float>());
-  const f64 xmin = -0.25;
-  const f64 xmax = 0.75;
-  const f64 ymin = 0.25;
-  const f64 ymax = 1.25;
-  std::atomic<i32> progress = 0;
-
-#pragma omp parallel for
-  for (i32 r = 0; r < rows; ++r)
-  {
-    for (i32 c = 0; c < cols; ++c)
-    {
-      LOG_INFO("Calculating objective function landscape ({:.1f}%)", static_cast<f64>(progress) / (rows * cols - 1) * 100);
-      std::vector<f64> parameters(OptimizedParameterCount);
-
-      // default
-      parameters[BandpassTypeParameter] = static_cast<i32>(ipc.mBPT);
-      parameters[BandpassLParameter] = ipc.mBPL;
-      parameters[BandpassHParameter] = ipc.mBPH;
-      parameters[InterpolationTypeParameter] = static_cast<i32>(ipc.mIntT);
-      parameters[WindowTypeParameter] = static_cast<i32>(ipc.mWinT);
-      parameters[L1WindowTypeParameter] = static_cast<i32>(ipc.mL1WinT);
-      parameters[L2UsizeParameter] = ipc.mL2Usize;
-      parameters[L1ratioParameter] = ipc.mL1ratio;
-
-      // modified
-      parameters[BandpassLParameter] = xmin + (f64)c / (cols - 1) * (xmax - xmin);
-      parameters[BandpassHParameter] = ymin + (f64)r / (rows - 1) * (ymax - ymin);
-
-      landscape.at<IPC::Float>(r, c) = std::log(obj(parameters));
-      progress++;
-    }
-  }
-
-  // Plot2D::Set("IPCdebug2D");
-  // Plot2D::SetXmin(xmin);
-  // Plot2D::SetXmax(xmax);
-  // Plot2D::SetYmin(ymin);
-  // Plot2D::SetYmax(ymax);
-  // Plot2D::Plot("IPCdebug2D", landscape);
-}
-
 std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio)
 {
   PROFILE_FUNCTION;
@@ -172,15 +121,15 @@ std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirect
   return images;
 }
 
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStddev)
+std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION("CreateImagePairs");
 
   if (maxShift <= 0)
     throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
-  if (itersPerImage < 1)
-    throw std::runtime_error(fmt::format("Invalid iters per image ({})", itersPerImage));
+  if (iters < 1)
+    throw std::runtime_error(fmt::format("Invalid iters per image ({})", iters));
 
   if (const auto badimage = std::find_if(images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.mRows + maxShift or image.cols < ipc.mCols + maxShift; });
       badimage != images.end())
@@ -188,7 +137,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
         badimage->cols, ipc.mRows + maxShift, ipc.mCols + maxShift));
 
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
-  imagePairs.reserve(images.size() * Sqr(itersPerImage));
+  imagePairs.reserve(images.size() * Sqr(iters));
 
   for (const auto& image : images)
   {
@@ -196,11 +145,11 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
     IPC::ConvertToUnitFloat(image1);
     AddNoise<IPC::Float>(image1, noiseStddev);
 
-    for (i32 row = 0; row < itersPerImage; ++row)
+    for (i32 row = 0; row < iters; ++row)
     {
-      for (i32 col = 0; col < itersPerImage; ++col)
+      for (i32 col = 0; col < iters; ++col)
       {
-        const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (itersPerImage - 1)), maxShift * (-1.0 + 2.0 * row / (itersPerImage - 1)));
+        const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * row / (iters - 1)));
         const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
         cv::Mat imageShifted;
         cv::warpAffine(image, imageShifted, Tmat, image.size());

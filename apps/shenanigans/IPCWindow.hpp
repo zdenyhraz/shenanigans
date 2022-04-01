@@ -27,9 +27,10 @@ class IPCWindow
 public:
   static void Initialize();
   static void Render();
+  static IPC& GetIPC();
 
 private:
-  inline static IPCParameters mIPCPars;
+  inline static IPCParameters mParameters;
   inline static IPC mIPC;
 
   static void UpdateIPCParameters();

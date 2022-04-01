@@ -120,8 +120,9 @@ target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
 
 # imgui
 include_directories(external/imgui)
+include_directories(external/imgui/misc/cpp)
 include_directories(external/imgui/backends)
-file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp)
+file(GLOB SRC_IMGUI CONFIGURE_DEPENDS external/imgui/*.cpp external/imgui/misc/cpp/imgui_stdlib.cpp)
 set(SRC_IMGUI_BACKEND external/imgui/backends/imgui_impl_glfw.cpp external/imgui/backends/imgui_impl_opengl3.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})

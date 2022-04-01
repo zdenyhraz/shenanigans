@@ -20,13 +20,12 @@ public:
   };
 
   static void Optimize(
-      IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift = 2.0, f64 noiseStddev = 0.01, i32 itersPerImage = 101, f64 testRatio = 0.2, i32 popSize = 42);
+      IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift = 2.0, f64 noiseStddev = 0.01, i32 iters = 101, f64 testRatio = 0.2, i32 popSize = 42);
   static void Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize = 42);
-  static void PlotObjectiveFunctionLandscape(const IPC& ipc, const std::string& trainDirectory, f64 maxShift, f64 noiseStddev, i32 itersPerImage, i32 iters);
 
 private:
   static std::vector<cv::Mat> LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio = 0.5);
-  static std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 itersPerImage, f64 noiseStddev);
+  static std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev);
   static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
