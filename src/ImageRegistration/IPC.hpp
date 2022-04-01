@@ -16,14 +16,6 @@ public:
   friend class IPCMeasure;
   friend class IPCOptimization;
 
-  enum class BandpassType : u8
-  {
-    Rectangular,
-    Gaussian,
-    None,
-    BandpassTypeCount // last
-  };
-
   enum class WindowType : u8
   {
     None,
@@ -31,12 +23,12 @@ public:
     WindowTypeCount // last
   };
 
-  enum class L1WindowType : u8
+  enum class BandpassType : u8
   {
     None,
-    Circular,
+    Rectangular,
     Gaussian,
-    L1WindowTypeCount // last
+    BandpassTypeCount // last
   };
 
   enum class InterpolationType : u8
@@ -45,6 +37,14 @@ public:
     Linear,
     Cubic,
     InterpolationTypeCount // last
+  };
+
+  enum class L1WindowType : u8
+  {
+    None,
+    Circular,
+    Gaussian,
+    L1WindowTypeCount // last
   };
 
   IPC() { Initialize(0, 0, 0, 1); }
@@ -286,7 +286,7 @@ private:
   BandpassType mBPT = BandpassType::Gaussian;
   InterpolationType mIntT = InterpolationType::Linear;
   WindowType mWinT = WindowType::Hann;
-  L1WindowType mL1WinT = L1WindowType::Gaussian;
+  L1WindowType mL1WinT = L1WindowType::Circular;
   cv::Mat mBP;
   cv::Mat mWin;
   cv::Mat mL1Win;

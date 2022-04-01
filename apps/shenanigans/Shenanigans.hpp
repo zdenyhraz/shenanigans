@@ -12,13 +12,17 @@ struct IPCParameters
   i32 mL2Usize = 357;
   i32 mMaxIter = 10;
   f32 mCPeps = 0;
-  IPC::BandpassType mBPT = IPC::BandpassType::Gaussian;
-  IPC::InterpolationType mIntT = IPC::InterpolationType::Linear;
-  IPC::WindowType mWinT = IPC::WindowType::Hann;
-  IPC::L1WindowType mL1WinT = IPC::L1WindowType::Gaussian;
+  i32 mWinT = static_cast<i32>(IPC::WindowType::Hann);
+  i32 mBPT = static_cast<i32>(IPC::BandpassType::Gaussian);
+  i32 mIntT = static_cast<i32>(IPC::InterpolationType::Linear);
+  i32 mL1WinT = static_cast<i32>(IPC::L1WindowType::Circular);
   cv::Mat mBP;
   cv::Mat mWin;
   cv::Mat mL1Win;
+  static constexpr const char* mWindowTypes[] = {"None", "Hann"};
+  static constexpr const char* mBandpassTypes[] = {"None", "Rectangular", "Gaussian"};
+  static constexpr const char* mInterpolationTypes[] = {"NearestNeighbor", "Linear", "Cubic"};
+  static constexpr const char* mL1windowTypes[] = {"None", "Circular", "Gaussian"};
 };
 
 class Shenanigans
@@ -27,7 +31,7 @@ public:
   static void Run();
 
 private:
-  inline static IPCParameters mIPCParameters;
+  inline static IPCParameters mIPCPars;
   inline static IPC mIPC;
 
   static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

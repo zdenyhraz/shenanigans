@@ -27,15 +27,19 @@ void Shenanigans::Run()
       if (ImGui::Button("Debug"))
         IPCDebug::ShowDebugStuff(mIPC);
 
-      ImGui::SliderInt("Width", &mIPCParameters.mCols, 3, 4096);
-      ImGui::SliderInt("Height", &mIPCParameters.mRows, 3, 4096);
-      ImGui::SliderFloat("BPL", &mIPCParameters.mBPL, 0, 1);
-      ImGui::SliderFloat("BPH", &mIPCParameters.mBPH, 0, 2);
-      ImGui::SliderInt("L2size", &mIPCParameters.mL2size, 3, 11);
-      ImGui::SliderFloat("L1ratio", &mIPCParameters.mL1ratio, 0.1, 0.9);
-      ImGui::SliderInt("L2Usize", &mIPCParameters.mL2Usize, 31, 501);
-      ImGui::SliderInt("MaxIter", &mIPCParameters.mMaxIter, 1, 21);
-      ImGui::SliderFloat("CPeps", &mIPCParameters.mCPeps, 0, 0.1);
+      ImGui::SliderInt("Width", &mIPCPars.mCols, 3, 512);
+      ImGui::SliderInt("Height", &mIPCPars.mRows, 3, 512);
+      ImGui::SliderFloat("BPL", &mIPCPars.mBPL, 0, 1);
+      ImGui::SliderFloat("BPH", &mIPCPars.mBPH, 0, 2);
+      ImGui::SliderInt("L2size", &mIPCPars.mL2size, 3, 11);
+      ImGui::SliderFloat("L1ratio", &mIPCPars.mL1ratio, 0.1, 0.9);
+      ImGui::SliderInt("L2Usize", &mIPCPars.mL2Usize, 31, 501);
+      ImGui::SliderInt("MaxIter", &mIPCPars.mMaxIter, 1, 21);
+      ImGui::SliderFloat("CPeps", &mIPCPars.mCPeps, 0, 0.1);
+      ImGui::Combo("WindowType", &mIPCPars.mWinT, IPCParameters::mWindowTypes, IM_ARRAYSIZE(IPCParameters::mWindowTypes));
+      ImGui::Combo("BandpassType", &mIPCPars.mBPT, IPCParameters::mBandpassTypes, IM_ARRAYSIZE(IPCParameters::mBandpassTypes));
+      ImGui::Combo("InterpolationType", &mIPCPars.mIntT, IPCParameters::mInterpolationTypes, IM_ARRAYSIZE(IPCParameters::mInterpolationTypes));
+      ImGui::Combo("L1WindowType", &mIPCPars.mL1WinT, IPCParameters::mL1windowTypes, IM_ARRAYSIZE(IPCParameters::mL1windowTypes));
       ImGui::End();
     }
 
@@ -54,12 +58,16 @@ void Shenanigans::KeyCallback(GLFWwindow* window, int key, int scancode, int act
 
 void Shenanigans::UpdateIPCParameters()
 {
-  mIPC.SetSize(mIPCParameters.mRows, mIPCParameters.mCols);
-  mIPC.SetBandpassParameters(mIPCParameters.mBPL, mIPCParameters.mBPH);
-  mIPC.SetL2size(mIPCParameters.mL2size);
-  mIPC.SetL1ratio(mIPCParameters.mL1ratio);
-  mIPC.SetL2Usize(mIPCParameters.mL2Usize);
-  mIPC.SetMaxIterations(mIPCParameters.mMaxIter);
-  mIPC.SetCrossPowerEpsilon(mIPCParameters.mCPeps);
+  mIPC.SetSize(mIPCPars.mRows, mIPCPars.mCols);
+  mIPC.SetBandpassParameters(mIPCPars.mBPL, mIPCPars.mBPH);
+  mIPC.SetL2size(mIPCPars.mL2size);
+  mIPC.SetL1ratio(mIPCPars.mL1ratio);
+  mIPC.SetL2Usize(mIPCPars.mL2Usize);
+  mIPC.SetMaxIterations(mIPCPars.mMaxIter);
+  mIPC.SetCrossPowerEpsilon(mIPCPars.mCPeps);
+  mIPC.SetWindowType(static_cast<IPC::WindowType>(mIPCPars.mWinT));
+  mIPC.SetBandpassType(static_cast<IPC::BandpassType>(mIPCPars.mBPT));
+  mIPC.SetInterpolationType(static_cast<IPC::InterpolationType>(mIPCPars.mIntT));
+  mIPC.SetL1WindowType(static_cast<IPC::L1WindowType>(mIPCPars.mL1WinT));
   LOG_DEBUG("IPC parameters updated");
 }
