@@ -1,24 +1,24 @@
 [submodule "external/fmt"]
-	path = external/fmt
+	path = libs/fmt
 	url = https://github.com/fmtlib/fmt.git
 [submodule "external/gtest"]
-	path = external/gtest
+	path = libs/gtest
 	url = https://github.com/google/googletest.git
 [submodule "external/json"]
-	path = external/json
+	path = libs/json
 	url = https://github.com/nlohmann/json.git
 [submodule "external/flamegraph"]
-	path = external/flamegraph
+	path = libs/flamegraph
 	url = https://github.com/brendangregg/FlameGraph.git
 [submodule "external/tracy"]
-	path = external/tracy
+	path = libs/tracy
 	url = https://github.com/wolfpld/tracy.git
 [submodule "external/pybind11"]
-	path = external/pybind11
+	path = libs/pybind11
 	url = https://github.com/pybind/pybind11.git
 [submodule "external/imgui"]
-	path = external/imgui
+	path = libs/imgui
 	url = https://github.com/ocornut/imgui.git
 [submodule "external/glfw"]
-	path = external/glfw
+	path = libs/glfw
 	url = https://github.com/glfw/glfw.git
