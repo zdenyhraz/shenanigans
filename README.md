@@ -62,9 +62,9 @@ Semi-random funky stuff, mainly for my PhD. Contains calculations and algorithm 
 
 ### Profiling with [Tracy](https://github.com/wolfpld/tracy)
 - install the required libraries `sudo apt-get -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
-- build the profiler via `make release -j12` in `./external/tracy/profiler/build/unix/`
+- build the profiler via `make release -j12` in `./libs/tracy/profiler/build/unix/`
 - run the app with `ENABLE_PROFILING` defined
-- run `script/perf/tracy.sh` or `./external/tracy/profiler/build/unix/Tracy-release` and click connect
+- run `script/perf/tracy.sh` or `./libs/tracy/profiler/build/unix/Tracy-release` and click connect
 - save the trace file if needed
 <img src="data/readme/tracy.png" width="100%">
 

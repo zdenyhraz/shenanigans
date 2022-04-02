@@ -2,9 +2,6 @@
 build/*
 data/diffrot_*
 debug/*
-external/libtorch
+libs/libtorch
 
 *.dump
-
-!build/imgui.ini
-
