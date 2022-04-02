@@ -43,6 +43,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
   io.Fonts->AddFontFromFileTTF("../data/app/CascadiaCode.ttf", scale * 19);
+  io.IniFilename = "../data/app/imgui.ini";
   ImGui::StyleColorsDark();
 
   ImGuiStyle& style = ImGui::GetStyle();
