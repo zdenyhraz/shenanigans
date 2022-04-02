@@ -4,6 +4,8 @@ class PyPlot
 {
   // colors: b, g, r, c, m, y, k, w, tab:blue, tab:orange, tab:green, tab:red, tab:purple, tab:brown, tab:pink, tab:gray, tab:olive, tab:cyan
   // for all colors see https://matplotlib.org/stable/gallery/color/named_colors.html
+  // python interpreter calls have to be from the main thread, which is the reason for async plotting (render queues)
+
 public:
   struct Data1D
   {
@@ -16,6 +18,7 @@ public:
     std::vector<std::string> color_ys, color_y2s;           // line colors
     std::string linestyle_y = "-", linestyle_y2 = "-";      // line styles
     std::vector<std::string> linestyle_ys, linestyle_y2s;   // multi line styles
+    bool log = false;                                       // logarithmic scale
     f64 aspectratio = 1;                                    // aspect ratio
     std::string save;                                       // save path
     std::string title;                                      // plot title
@@ -49,11 +52,7 @@ public:
   static void Plot(const std::string& name, const Data2D& data) { Get().ScheldulePlot(name, data); }
   static void PlotSurf(const std::string& name, const Data3D& data) { Get().ScheldulePlot(name, data); }
 
-  static void Render()
-  {
-    // python interpreter calls have to be from the main thread
-    Get().RenderInternal();
-  }
+  static void Render() { Get().RenderInternal(); }
 
 private:
   std::map<std::string, u32> mPlotIds;

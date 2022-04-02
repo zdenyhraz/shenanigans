@@ -9,15 +9,14 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
   PROFILE_FUNCTION;
   LOG_FUNCTION("IPCMeasure::MeasureAccuracyMap");
 
-  using T = IPC::Float;
-  cv::Mat accuracyMapCC(iters, iters, GetMatType<T>());
-  cv::Mat accuracyMapPC(iters, iters, GetMatType<T>());
-  cv::Mat accuracyMapPCS(iters, iters, GetMatType<T>());
-  cv::Mat accuracyMapIPC(iters, iters, GetMatType<T>());
-  cv::Mat accuracyMapIPCx(iters, iters, GetMatType<T>());
-  cv::Mat accuracyMapIPCy(iters, iters, GetMatType<T>());
+  cv::Mat refShiftsX(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapCC(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapPC(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapPCS(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapIPC(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapIPCx(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyMapIPCy(iters, iters, GetMatType<f64>());
 
-  static constexpr f64 quanB = 0.0;
   static constexpr f64 quanT = 0.95;
   static const std::string xlabel = "x shift";
   static const std::string ylabel = "y shift";
@@ -27,7 +26,7 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
 
   cv::Mat image1 = RoiCropMid(imageres, ipc.mCols, ipc.mRows);
   std::atomic<i32> progressi = 0;
-  AddNoise<T>(image1, noiseStddev);
+  AddNoise<f64>(image1, noiseStddev);
   PyPlot::Plot("Image", {.z = image1, .cmap = "gray"});
 
 #pragma omp parallel for
@@ -38,21 +37,23 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
       *progress = logprogress / iters;
     LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating IPC accuracy map ...", logprogress / iters * 100, logprogress, iters);
 
-    auto accCC = accuracyMapCC.ptr<T>(row);
-    auto accPC = accuracyMapPC.ptr<T>(row);
-    auto accPCS = accuracyMapPCS.ptr<T>(row);
-    auto accIPC = accuracyMapIPC.ptr<T>(row);
-    auto accIPCx = accuracyMapIPCx.ptr<T>(row);
-    auto accIPCy = accuracyMapIPCy.ptr<T>(row);
+    auto refX = refShiftsX.ptr<f64>(row);
+    auto accCC = accuracyMapCC.ptr<f64>(row);
+    auto accPC = accuracyMapPC.ptr<f64>(row);
+    auto accPCS = accuracyMapPCS.ptr<f64>(row);
+    auto accIPC = accuracyMapIPC.ptr<f64>(row);
+    auto accIPCx = accuracyMapIPCx.ptr<f64>(row);
+    auto accIPCy = accuracyMapIPCy.ptr<f64>(row);
 
     for (i32 col = 0; col < iters; ++col)
     {
       const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1)));
+      refX[col] = shift.x;
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::Mat imageShifted;
       cv::warpAffine(imageres, imageShifted, Tmat, imageres.size());
       cv::Mat image2 = RoiCropMid(imageShifted, ipc.mCols, ipc.mRows);
-      AddNoise<T>(image2, noiseStddev);
+      AddNoise<f64>(image2, noiseStddev);
 
       accCC[col] = Magnitude(CrossCorrelation::Calculate(image1, image2) - shift);
       accPC[col] = Magnitude(PhaseCorrelation::Calculate(image1, image2) - shift);
@@ -65,16 +66,45 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
     }
   }
 
-  PyPlot::Plot("CC accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapCC, quanB, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("PC accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapPC, quanB, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("PCS accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapPCS, quanB, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("IPC accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapIPC, quanB, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("IPCx accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapIPCx, 1. - quanT, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("IPCy accuracy map",
-      {.z = ApplyQuantile<T>(accuracyMapIPCy, 1. - quanT, quanT), .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  accuracyMapCC = ApplyQuantile<f64>(accuracyMapCC, 0, quanT);
+  accuracyMapPC = ApplyQuantile<f64>(accuracyMapPC, 0, quanT);
+  accuracyMapPCS = ApplyQuantile<f64>(accuracyMapPCS, 0, quanT);
+  accuracyMapIPC = ApplyQuantile<f64>(accuracyMapIPC, 0, quanT);
+  accuracyMapIPCx = ApplyQuantile<f64>(accuracyMapIPCx, 1. - quanT, quanT);
+  accuracyMapIPCy = ApplyQuantile<f64>(accuracyMapIPCy, 1. - quanT, quanT);
+
+  PyPlot::Plot("shift error", {.x = GetColSortedValues(refShiftsX),
+                                  .ys = {GetColSortedValues(accuracyMapPCS), GetColSortedValues(accuracyMapIPC)},
+                                  .xlabel = "reference shift x [px]",
+                                  .ylabel = "error [px]",
+                                  .label_ys = {"pcs", "ipc"},
+                                  .color_ys = {"k", "tab:green"},
+                                  .log = false});
+
+  PyPlot::Plot("shift error log scale", {.x = GetColSortedValues(refShiftsX),
+                                            .ys = {GetColSortedValues(accuracyMapPCS), GetColSortedValues(accuracyMapIPC)},
+                                            .xlabel = "reference shift x [px]",
+                                            .ylabel = "error [px]",
+                                            .label_ys = {"pcs", "ipc"},
+                                            .color_ys = {"k", "tab:green"},
+                                            .log = true});
+
+  PyPlot::Plot("CC accuracy map", {.z = accuracyMapCC, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  PyPlot::Plot("PC accuracy map", {.z = accuracyMapPC, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  PyPlot::Plot("PCS accuracy map", {.z = accuracyMapPCS, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  PyPlot::Plot("IPC accuracy map", {.z = accuracyMapIPC, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  PyPlot::Plot("IPCx accuracy map", {.z = accuracyMapIPCx, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+  PyPlot::Plot("IPCy accuracy map", {.z = accuracyMapIPCy, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+}
+
+std::vector<f64> IPCMeasure::GetColSortedValues(const cv::Mat& mat)
+{
+  std::vector<f64> values;
+  values.reserve(mat.rows * mat.cols);
+
+  for (i32 c = 0; c < mat.cols; ++c)
+    for (i32 r = 0; r < mat.rows; ++r)
+      values.push_back(mat.at<f64>(r, c));
+
+  return values;
 }

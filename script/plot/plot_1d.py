@@ -41,6 +41,8 @@ if label_y or label_ys or label_y2 or label_y2s:
   plt.legend(lines, labels)
 if title:
   plt.title(title)
+if log:
+  plt.yscale("log")
 
 plt.tight_layout()
 plt.draw()

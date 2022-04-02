@@ -74,6 +74,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["linestyle_y2"] = data.linestyle_y2;
   scope["linestyle_ys"] = data.linestyle_ys;
   scope["linestyle_y2s"] = data.linestyle_y2s;
+  scope["log"] = data.log;
   scope["aspectratio"] = data.aspectratio;
   scope["save"] = data.save;
   scope["title"] = not data.title.empty() ? data.title : name;
