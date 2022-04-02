@@ -14,8 +14,8 @@ void IPCOptimizeWindow::Render()
     LaunchAsync(
         []()
         {
-          IPCOptimization::Optimize(
-              IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.iters, mParameters.testRatio, mParameters.popSize);
+          IPCOptimization::Optimize(IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.optiters,
+              mParameters.testRatio, mParameters.popSize);
         });
 
   ImGui::SameLine();
@@ -37,7 +37,8 @@ void IPCOptimizeWindow::Render()
   ImGui::InputText("test directory", &mParameters.testDirectory);
   ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);
   ImGui::SliderFloat("noise stddev", &mParameters.noiseStddev, 0.0, 0.5);
-  ImGui::SliderInt("iters", &mParameters.iters, 1, 201);
+  ImGui::SliderInt("iters", &mParameters.iters, 3, 501);
+  ImGui::SliderInt("opt iters", &mParameters.optiters, 3, 201);
   ImGui::SliderFloat("test ratio", &mParameters.testRatio, 0.0, 1.0);
   ImGui::SliderInt("popsize", &mParameters.popSize, 6, 60);
   ImGui::End();
