@@ -14,8 +14,7 @@ jobs:
       - name: cppcheck install
         run: sudo apt-get install -y cppcheck
 
-      - name: cppcheck run
+      - name: cppcheck run #--project=build/compile_commands.json
         run: |
           cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=0 src/ apps/ 2> cppcheck-result.txt
           cat cppcheck-result.txt
-        #--project=build/compile_commands.json
