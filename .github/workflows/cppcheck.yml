@@ -16,6 +16,6 @@ jobs:
 
       - name: cppcheck run
         run: |
-          cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=0 . 2> cppcheck-result.txt
+          cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=0 src/ apps/ 2> cppcheck-result.txt
           cat cppcheck-result.txt
         #--project=build/compile_commands.json
