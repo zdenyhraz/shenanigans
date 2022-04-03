@@ -29,45 +29,6 @@ inline consteval i32 GetMatType(i32 channels = 1)
     }
 }
 
-template <typename T>
-inline cv::Mat LoadUnitFloatImage(const std::string& path)
-{
-  PROFILE_FUNCTION;
-  cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  mat.convertTo(mat, GetMatType<T>());
-  cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
-  return mat;
-}
-
-template <typename T>
-inline f64 Magnitude(const cv::Point_<T>& pt)
-{
-  return std::sqrt(std::pow(pt.x, 2) + std::pow(pt.y, 2));
-}
-
-template <typename T>
-inline f64 Angle(const cv::Point_<T>& pt)
-{
-  return ToDegrees(std::atan2(pt.y, pt.x));
-}
-
-inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
-{
-  PROFILE_FUNCTION;
-  f64 minR, maxR;
-  cv::minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
-  return std::make_pair(minR, maxR);
-}
-
-inline cv::Mat LeastSquares(const cv::Mat& Y, const cv::Mat& X)
-{
-  PROFILE_FUNCTION;
-  if (Y.rows != X.rows)
-    throw std::runtime_error("Data count mismatch");
-
-  return (X.t() * X).inv() * X.t() * Y;
-}
-
 inline void Shift(cv::Mat& mat, const cv::Point2d& shift)
 {
   PROFILE_FUNCTION;
@@ -108,47 +69,6 @@ inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
         return false;
 
   return true;
-}
-
-template <typename T>
-inline cv::Mat ApplyQuantile(const cv::Mat& mat, f64 quantileB, f64 quantileT)
-{
-  if (quantileB <= 0 and quantileT >= 1)
-    return mat.clone();
-
-  cv::Mat matq = mat.clone();
-  matq.convertTo(matq, GetMatType<T>());
-  std::vector<T> values(matq.rows * matq.cols);
-
-  for (i32 r = 0; r < matq.rows; ++r)
-    for (i32 c = 0; c < matq.cols; ++c)
-      values[r * matq.cols + c] = matq.at<T>(r, c);
-
-  std::sort(values.begin(), values.end());
-  const auto valMin = values[quantileB * (values.size() - 1)];
-  const auto valMax = values[quantileT * (values.size() - 1)];
-
-  for (i32 r = 0; r < matq.rows; ++r)
-    for (i32 c = 0; c < matq.cols; ++c)
-      matq.at<T>(r, c) = std::clamp(matq.at<T>(r, c), valMin, valMax);
-
-  return matq;
-}
-
-template <typename T>
-inline cv::Mat Gaussian(i32 size, f64 stddev)
-{
-  cv::Mat mat(size, size, GetMatType<T>());
-  for (i32 row = 0; row < size; ++row)
-  {
-    auto matp = mat.ptr<T>(row);
-    for (i32 col = 0; col < size; ++col)
-    {
-      f64 r = std::sqrt(Sqr(row - size / 2) + Sqr(col - size / 2));
-      matp[col] = Gaussian(r, 1, 0, stddev);
-    }
-  }
-  return mat;
 }
 
 template <typename T>

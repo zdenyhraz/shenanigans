@@ -7,7 +7,7 @@ inline cv::Mat sinian(i32 rows, i32 cols, f64 rowsFreq, f64 colsFreq, f64 rowsSh
   cv::Mat mat = cv::Mat::zeros(rows, cols, CV_32F);
   for (i32 r = 0; r < rows; r++)
     for (i32 c = 0; c < cols; c++)
-      mat.at<f32>(r, c) = sin(colsFreq * Constants::TwoPi * ((f64)c / (cols - 1) + colsShift)) + sin(rowsFreq * Constants::TwoPi * ((f64)r / (rows - 1) + rowsShift));
+      mat.at<f32>(r, c) = sin(colsFreq * TwoPi * ((f64)c / (cols - 1) + colsShift)) + sin(rowsFreq * TwoPi * ((f64)r / (rows - 1) + rowsShift));
   return mat;
 }
 

@@ -160,7 +160,7 @@ public:
     i32 ysize = 101;
     i32 idstep = 1;
     i32 idstride = 25;
-    f64 thetamax = 50. / Constants::Rad;
+    f64 thetamax = 50. / Rad;
     i32 cadence = 45;
     i32 idstart = 123456;
 
@@ -248,8 +248,8 @@ public:
           const auto shift = ipc.Calculate<{}>(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
-          const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * Constants::RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
-          const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * Constants::RadPerSecToDegPerDay;
+          const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
+          const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * RadPerSecToDegPerDay;
 
           data.shiftx.at<f32>(y, xindex) = shiftx;
           data.shifty.at<f32>(y, xindex) = shifty;
@@ -321,7 +321,7 @@ public:
     const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
     PyPlot::Plot("Diffrot opt",
-        {.x = Constants::Rad * dataAfter.theta,
+        {.x = Rad * dataAfter.theta,
             .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
                 sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
             .xlabel = "latitude [deg]",
@@ -342,15 +342,15 @@ public:
 
     for (usize y = 0; y < data.theta.size(); ++y)
     {
-      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / Constants::Rad);
+      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / Rad);
       const f64 mcy = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcpts[y] = cv::Point2d(mcx, mcy);
 
-      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Constants::Rad);
+      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Rad);
       const f64 mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptspred[y] = cv::Point2d(mcxpred, mcypred);
 
-      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / Constants::Rad);
+      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / Rad);
       const f64 mcyz = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptsz[y] = cv::Point2d(mcxz, mcyz);
     }
@@ -393,7 +393,7 @@ private:
     ImageHeader header;
     header.xcenter = (j["NAXIS1"].get<f64>()) - (j["CRPIX1"].get<f64>()); // [py] (x is flipped, 4095 - fits index from 1)
     header.ycenter = j["CRPIX2"].get<f64>() - 1;                          // [px] (fits index from 1)
-    header.theta0 = j["CRLT_OBS"].get<f64>() / Constants::Rad;            // [rad] (convert from deg to rad)
+    header.theta0 = j["CRLT_OBS"].get<f64>() / Rad;                       // [rad] (convert from deg to rad)
     header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // [px] (arcsec / arcsec per pixel)
     return header;
   }
@@ -458,13 +458,13 @@ private:
 
     PyPlot::Plot("fits params", {.x = times,
                                     .ys = {data.fshiftx, data.fshifty},
-                                    .y2s = {Constants::Rad * data.theta0},
+                                    .y2s = {Rad * data.theta0},
                                     .xlabel = "time [days]",
                                     .ylabel = "fits shift [px]",
                                     .y2label = "theta0 [deg]",
                                     .label_ys = {"center shift x", "center shift y"},
                                     .label_y2s = {"theta0"}});
-    PyPlot::Plot("avgshift x", {.x = Constants::Rad * data.theta,
+    PyPlot::Plot("avgshift x", {.x = Rad * data.theta,
                                    .y = GetRowAverage(data.shiftx),
                                    .y2 = GetRowAverage(data.shifty),
                                    .xlabel = "latitude [deg]",
@@ -473,7 +473,7 @@ private:
                                    .label_y = "ipc x",
                                    .label_y2 = "ipc y"});
     PyPlot::Plot("avgomega x", {
-                                   .x = Constants::Rad * data.theta,
+                                   .x = Rad * data.theta,
                                    .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
                                        GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
                                    .xlabel = "latitude [deg]",
@@ -481,7 +481,7 @@ private:
                                    .label_ys = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
                                });
     PyPlot::Plot("avgomega y", {
-                                   .x = Constants::Rad * data.theta,
+                                   .x = Rad * data.theta,
                                    .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
                                    .xlabel = "latitude [deg]",
                                    .ylabel = "average omega x [deg/day]",
@@ -489,7 +489,7 @@ private:
                                });
 
     const f64 xmin = times.front(), xmax = times.back();
-    const f64 ymin = data.theta.back() * Constants::Rad, ymax = data.theta.front() * Constants::Rad;
+    const f64 ymin = data.theta.back() * Rad, ymax = data.theta.front() * Rad;
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
     const f64 aspectratio = 2;

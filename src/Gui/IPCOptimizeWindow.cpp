@@ -3,7 +3,6 @@
 
 void IPCOptimizeWindow::Initialize()
 {
-  mImage = LoadUnitFloatImage<IPC::Float>(mParameters.imagePath);
 }
 
 void IPCOptimizeWindow::Render()
@@ -21,18 +20,9 @@ void IPCOptimizeWindow::Render()
   ImGui::SameLine();
 
   if (ImGui::Button("Accuracy map"))
-    LaunchAsync([]() { IPCMeasure::MeasureAccuracyMap(IPCWindow::GetIPC(), mImage, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
+    LaunchAsync([]() { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), mParameters.testDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
 
   ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
-  ImGui::InputText("##load path", &mParameters.imagePath);
-  ImGui::SameLine();
-  if (ImGui::Button("Load"))
-    LaunchAsync(
-        []()
-        {
-          mImage = LoadUnitFloatImage<IPC::Float>(mParameters.imagePath);
-          LOG_DEBUG("Loaded image {}", mParameters.imagePath);
-        });
   ImGui::InputText("train directory", &mParameters.trainDirectory);
   ImGui::InputText("test directory", &mParameters.testDirectory);
   ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);

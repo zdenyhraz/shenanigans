@@ -42,12 +42,11 @@ private:
   static std::tuple<cv::Mat, FitsParams> loadfits(const std::string& path)
   {
     std::ifstream file(path, std::ios::binary | std::ios::in);
-    if (not file)
-      [[unlikely]]
-      {
-        LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
-        return std::make_tuple(cv::Mat(), FitsParams());
-      }
+    if (not file) [[unlikely]]
+    {
+      LOG_ERROR("<loadfits> Cannot load file '{}'- file does not exist dude!", path);
+      return std::make_tuple(cv::Mat(), FitsParams());
+    }
     else
     {
       // LOG_DEBUG("<loadfits> Loading file '{}'...", path);
@@ -100,7 +99,7 @@ private:
         {
           usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
-          params.theta0 = stod(snum) / (360. / 2. / Constants::Pi);
+          params.theta0 = stod(snum) / (360. / 2. / Pi);
         }
         else if (sline.find("END                        ") != std::string::npos)
         {

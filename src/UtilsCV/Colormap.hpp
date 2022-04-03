@@ -1,4 +1,5 @@
 #pragma once
+#include "Math.hpp"
 
 inline cv::Scalar ColormapJet(f32 x, f32 valMin = 0, f32 valMax = 1, f32 val = 255)
 {
@@ -15,12 +16,11 @@ inline cv::Scalar ColormapJet(f32 x, f32 valMin = 0, f32 valMax = 1, f32 val = 2
   return cv::Scalar(B, G, R);
 }
 
-inline cv::Mat ApplyQuantileColormap(const cv::Mat& mat, f64 quantileB = 0, f64 quantileT = 1)
+inline cv::Mat QuantileColormap(const cv::Mat& mat, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat sourceimg = mat.clone();
   sourceimg.convertTo(sourceimg, CV_32F);
-  f32 valMin, valMax;
-  std::tie(valMin, valMax) = MinMax(sourceimg);
+  auto [valMin, valMax] = MinMax(sourceimg);
 
   if (quantileB > 0 or quantileT < 1)
   {

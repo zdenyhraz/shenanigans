@@ -13,29 +13,6 @@ inline auto Zerovect2(i32 N, i32 M, T value = 0.)
 }
 
 template <typename T>
-inline constexpr T Sqr(T x)
-{
-  return x * x;
-}
-
-template <typename T>
-inline f64 Mean(const std::vector<T>& vec)
-{
-  return std::accumulate(vec.begin(), vec.end(), 0.) / vec.size();
-}
-
-template <typename T>
-inline f64 Stddev(const std::vector<T>& vec)
-{
-  const f64 m = Mean(vec);
-  f64 stdev = 0;
-  for (const auto x : vec)
-    stdev += Sqr(x - m);
-  stdev /= vec.size();
-  return std::sqrt(stdev);
-}
-
-template <typename T>
 inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
   std::vector<T> result(vec1.size());
@@ -78,20 +55,6 @@ inline std::vector<T> operator*(f64 val, const std::vector<T>& vec)
   return result;
 }
 
-template <typename T>
-inline f64 Median(std::vector<T>& vec)
-{
-  if (vec.size() % 2 == 0)
-  {
-    // std::partial_sort(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
-    std::sort(vec.begin(), vec.end());
-    return 0.5 * vec[vec.size() / 2] + 0.5 * vec[vec.size() / 2 - 1];
-  }
-
-  std::nth_element(vec.begin(), vec.begin() + vec.size() / 2, vec.end());
-  return vec[vec.size() / 2];
-}
-
 inline std::string GetCurrentDateTime()
 {
   time_t now = time(0);
@@ -110,38 +73,10 @@ inline std::string GetCurrentTime()
   return buf;
 }
 
-inline f64 Gaussian(f64 x, f64 amp, f64 mid, f64 sigma)
-{
-  return amp * std::exp(-0.5 * std::pow((x - mid) / sigma, 2));
-}
-
 template <typename T>
 inline std::vector<T> Iota(T first, usize size)
 {
   std::vector<T> vec(size);
   std::iota(vec.begin(), vec.end(), first);
   return vec;
-}
-
-inline f64 ToDegrees(f64 rad)
-{
-  return rad * Constants::Rad;
-}
-
-inline f64 ToRadians(f64 deg)
-{
-  return deg / Constants::Rad;
-}
-
-template <typename T>
-inline f64 GetQuantile(const std::vector<T>& vec, f64 quan)
-{
-  std::vector<T> out = vec;
-  std::sort(out.begin(), out.end());
-  return out[(usize)(quan * (out.size() - 1))];
-}
-
-inline bool IsImagePath(const std::string& path)
-{
-  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or path.ends_with(".JPEG");
 }

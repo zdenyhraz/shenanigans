@@ -19,9 +19,9 @@ inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, b
   if (sourceimg.channels() == 1)
   {
     if (color)
-      sourceimg = ApplyQuantileColormap(sourceimg, quantileB, quantileT);
+      sourceimg = QuantileColormap(sourceimg, quantileB, quantileT);
     else if (quantileB != 0 or quantileT != 1)
-      sourceimg = ApplyQuantile<f32>(sourceimg, quantileB, quantileT);
+      sourceimg = QuantileFilter<f32>(sourceimg, quantileB, quantileT);
   }
 
   cv::imshow(windowname, sourceimg);
@@ -69,9 +69,9 @@ inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bi
   if (img.channels() == 1)
   {
     if (color)
-      img = ApplyQuantileColormap(img, quantileB, quantileT);
+      img = QuantileColormap(img, quantileB, quantileT);
     else if (quantileB != 0 or quantileT != 1)
-      img = ApplyQuantile<f32>(img, quantileB, quantileT);
+      img = QuantileFilter<f32>(img, quantileB, quantileT);
   }
 
   cv::imwrite(path, img);

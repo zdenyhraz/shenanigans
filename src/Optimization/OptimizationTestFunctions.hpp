@@ -22,7 +22,7 @@ inline f64 Rastigrin(const std::vector<f64>& arg)
 {
   f64 retval = 0;
   for (const auto& x : arg)
-    retval += x * x - 10. * std::cos(2. * Constants::Pi * x);
+    retval += x * x - 10. * std::cos(2. * Pi * x);
   return retval;
 }
 
@@ -30,7 +30,7 @@ inline f64 Ackley(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  return -20. * exp(-0.2 * sqrt(0.5 * (x * x + y * y))) - exp(0.5 * (cos(2 * Constants::Pi * x) + cos(2 * Constants::Pi * y))) + exp(1.) + 20;
+  return -20. * exp(-0.2 * sqrt(0.5 * (x * x + y * y))) - exp(0.5 * (cos(2 * Pi * x) + cos(2 * Pi * y))) + exp(1.) + 20;
 }
 
 inline f64 Himmelblau(const std::vector<f64>& arg)
@@ -74,7 +74,7 @@ inline f64 Levi(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  f64 pi = Constants::Pi;
+  f64 pi = Pi;
   return Sqr(std::sin(3. * pi * x)) + Sqr(x - 1) * (1 + Sqr(std::sin(3 * pi * y))) + Sqr(y - 1) * (1 + Sqr(std::sin(2 * pi * y)));
 }
 
@@ -89,7 +89,7 @@ inline f64 Easom(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  f64 pi = Constants::Pi;
+  f64 pi = Pi;
   return -std::cos(x) * std::cos(y) * std::exp(-(Sqr(x - pi) + Sqr(y - pi)));
 }
 
@@ -97,7 +97,7 @@ inline f64 CrossInTray(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  f64 pi = Constants::Pi;
+  f64 pi = Pi;
   return -0.0001 * std::pow(std::abs(std::sin(x) * std::sin(y) * std::exp(std::abs(100 - std::sqrt(x * x + y * y) / pi))) + 1, 0.1);
 }
 
@@ -105,7 +105,7 @@ inline f64 HolderTable(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  return -std::abs(std::sin(x) * std::cos(y) * std::exp(std::abs(1 - std::sqrt(x * x + y * y) / Constants::Pi)));
+  return -std::abs(std::sin(x) * std::cos(y) * std::exp(std::abs(1 - std::sqrt(x * x + y * y) / Pi)));
 }
 
 inline f64 McCormick(const std::vector<f64>& arg)

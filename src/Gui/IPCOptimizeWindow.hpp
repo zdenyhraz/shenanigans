@@ -2,9 +2,8 @@
 
 struct IPCOptimizeParameters
 {
-  std::string imagePath = "../debug/ipcopt/shape.png";
-  std::string trainDirectory = "../debug/ipcopt";
-  std::string testDirectory = "../debug/ipcopt";
+  std::string trainDirectory = "../debug/ipcopt/train";
+  std::string testDirectory = "../debug/ipcopt/test";
   f32 maxShift = 2.0;
   f32 noiseStddev = 0.0;
   i32 iters = 101;
@@ -21,6 +20,5 @@ public:
 
 private:
   inline static IPCOptimizeParameters mParameters;
-  inline static cv::Mat mImage;
   inline static f32 mProgress = 0;
 };
