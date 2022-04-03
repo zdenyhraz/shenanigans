@@ -4,8 +4,7 @@
 void PyPlot::Initialize()
 {
   PROFILE_FUNCTION;
-  LOG_FUNCTION("PyPlot::Initialize()");
-  LOG_DEBUG("Initializing matplotlib ...");
+  LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
   py::eval_file("../script/plot/plot_init.py");
 }
