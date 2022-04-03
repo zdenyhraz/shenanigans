@@ -1,4 +1,4 @@
-name: build/test
+name: build_sonar
 
 on: [push,pull_request]
 
@@ -91,7 +91,7 @@ jobs:
 
       - name: build-wrapper
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }}cmake --build ${{github.workspace}}/build --config Release -j 6
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build ${{github.workspace}}/build --config Release -j 6
 
       - name: sonar-scanner
         env:
