@@ -1,9 +1,9 @@
-name: sonarcloud
+name: sonarcloud-analyze
 
 on: [push,pull_request]
 
 jobs:
-  build_analyze:
+  sonarcloud-analyze:
     runs-on: ubuntu-latest
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
