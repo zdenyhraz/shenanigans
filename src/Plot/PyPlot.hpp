@@ -6,8 +6,15 @@ class PyPlot
   // for all colors see https://matplotlib.org/stable/gallery/color/named_colors.html
   // python interpreter calls have to be from the main thread, which is the reason for async plotting (render queues)
 
+  struct PlotData
+  {
+    std::string name;
+    std::string type;
+    py::dict data;
+  };
+
 public:
-  struct Data1D
+  struct PlotData1D
   {
     std::vector<f64> x, y, y2;                              // plot data
     std::vector<std::vector<f64>> ys, y2s;                  // plot multi data
@@ -21,10 +28,9 @@ public:
     bool log = false;                                       // logarithmic scale
     f64 aspectratio = 1;                                    // aspect ratio
     std::string save;                                       // save path
-    std::string title;                                      // plot title
   };
 
-  struct Data2D
+  struct PlotData2D
   {
     cv::Mat z;
     f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
@@ -33,10 +39,9 @@ public:
     f64 aspectratio = 1;
     std::string cmap = "jet";
     std::string save;
-    std::string title;
   };
 
-  struct Data3D
+  struct PlotData3D
   {
     cv::Mat z;
     f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
@@ -45,42 +50,28 @@ public:
     std::string cmap = "jet";
     u32 rstride = 0, cstride = 0;
     std::string save;
-    std::string title;
   };
 
-  static void Plot(const std::string& name, const Data1D& data) { Get().ScheldulePlot(name, data); }
-  static void Plot(const std::string& name, const Data2D& data) { Get().ScheldulePlot(name, data); }
-  static void PlotSurf(const std::string& name, const Data3D& data) { Get().ScheldulePlot(name, data); }
-
-  static void Render() { Get().RenderInternal(); }
+  static void Initialize();
+  static void Render();
+  static void Plot(const std::string& name, const PlotData1D& data) { ScheldulePlot(name, "plot1d", GetScopeData(name, data)); }
+  static void Plot(const std::string& name, const PlotData2D& data) { ScheldulePlot(name, "plot2d", GetScopeData(name, data)); }
+  static void PlotSurf(const std::string& name, const PlotData3D& data) { ScheldulePlot(name, "plot3d", GetScopeData(name, data)); }
+  static void Plot(const std::string& name, const std::string& type, const py::dict& data) { ScheldulePlot(name, type, GetScopeData(name, data)); }
 
 private:
-  std::map<std::string, u32> mPlotIds;
-  u32 mId = 0;
-  std::queue<std::pair<std::string, Data1D>> mPlot1DQueue;
-  std::queue<std::pair<std::string, Data2D>> mPlot2DQueue;
-  std::queue<std::pair<std::string, Data3D>> mPlot3DQueue;
-  std::mutex mMutex;
+  inline static std::unordered_map<std::string, i32> mPlotIds;
+  inline static i32 mId = 0;
+  inline static std::queue<PlotData> mPlotQueue;
+  inline static std::mutex mMutex;
 
-  PyPlot();
+  static i32 GetPlotId(const std::string& name);
+  static void AddDefaultScopeData(const std::string& name, py::dict& scope);
+  static py::dict GetScopeData(const std::string& name, const py::dict& data);
+  static py::dict GetScopeData(const std::string& name, const PlotData1D& data);
+  static py::dict GetScopeData(const std::string& name, const PlotData2D& data);
+  static py::dict GetScopeData(const std::string& name, const PlotData3D& data);
 
-  static PyPlot& Get()
-  {
-    static PyPlot plt;
-    return plt;
-  }
-
-  void RenderInternal();
-  void CheckIfPlotExists(const std::string& name);
-  py::dict GetScopeData(const std::string& name, const Data1D& data);
-  py::dict GetScopeData(const std::string& name, const Data2D& data);
-  py::dict GetScopeData(const std::string& name, const Data3D& data);
-
-  void PlotInternal(const std::string& name, const Data1D& data);
-  void PlotInternal(const std::string& name, const Data2D& data);
-  void PlotInternal(const std::string& name, const Data3D& data);
-
-  void ScheldulePlot(const std::string& name, const Data1D& data);
-  void ScheldulePlot(const std::string& name, const Data2D& data);
-  void ScheldulePlot(const std::string& name, const Data3D& data);
+  static void ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data);
+  static void PlotInternal(const PlotData& plotdata);
 };

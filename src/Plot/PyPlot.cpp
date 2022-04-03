@@ -1,59 +1,56 @@
 #include "PyPlot.hpp"
+#include "Python/Python.hpp"
 
-PyPlot::PyPlot()
+void PyPlot::Initialize()
 {
   PROFILE_FUNCTION;
-  LOG_FUNCTION("Initialize matplotlib");
+  LOG_FUNCTION("PyPlot::Initialize()");
+  LOG_DEBUG("Initializing matplotlib ...");
+  Python::Initialize();
   py::eval_file("../script/plot/plot_init.py");
 }
 
-void PyPlot::PlotInternal(const std::string& name, const Data1D& data)
+void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
   PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot1d.py", GetScopeData(name, data));
+  py::eval_file(fmt::format("../script/plot/{}.py", plotdata.type), py::globals(), plotdata.data);
 }
 catch (const std::exception& e)
 {
   LOG_ERROR("PyPlot::Plot error: {}", e.what());
 }
 
-void PyPlot::PlotInternal(const std::string& name, const Data2D& data)
-try
-{
-  PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot2d.py", GetScopeData(name, data));
-}
-catch (const std::exception& e)
-{
-  LOG_ERROR("PyPlot::Plot error: {}", e.what());
-}
-
-void PyPlot::PlotInternal(const std::string& name, const Data3D& data)
-try
-{
-  PROFILE_FUNCTION;
-  CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot3d.py", GetScopeData(name, data));
-}
-catch (const std::exception& e)
-{
-  LOG_ERROR("PyPlot::Plot error: {}", e.what());
-}
-
-void PyPlot::CheckIfPlotExists(const std::string& name)
+i32 PyPlot::GetPlotId(const std::string& name)
 {
   if (not mPlotIds.contains(name))
     mPlotIds[name] = mId++;
+
+  return mPlotIds[name];
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
+void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
+{
+  scope["id"] = GetPlotId(name);
+  scope["title"] = name;
+}
+
+py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)
+{
+  std::scoped_lock lock(mMutex);
+
+  py::dict scope = data;
+  AddDefaultScopeData(name, scope);
+  return scope;
+}
+
+py::dict PyPlot::GetScopeData(const std::string& name, const PlotData1D& data)
 {
   PROFILE_FUNCTION;
+  std::scoped_lock lock(mMutex);
+
   py::dict scope;
-  scope["id"] = mPlotIds[name];
+  AddDefaultScopeData(name, scope);
   scope["x"] = not data.x.empty() ? data.x : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
   scope["y"] = data.y;
   scope["y2"] = data.y2;
@@ -77,13 +74,14 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data1D& data)
   scope["log"] = data.log;
   scope["aspectratio"] = data.aspectratio;
   scope["save"] = data.save;
-  scope["title"] = not data.title.empty() ? data.title : name;
   return scope;
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
+py::dict PyPlot::GetScopeData(const std::string& name, const PlotData2D& data)
 {
   PROFILE_FUNCTION;
+  std::scoped_lock lock(mMutex);
+
   cv::Mat mz = data.z.clone();
   mz.convertTo(mz, CV_32F);
   auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
@@ -92,7 +90,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
       z[r][c] = mz.at<f32>(r, c);
 
   py::dict scope;
-  scope["id"] = mPlotIds[name];
+  AddDefaultScopeData(name, scope);
   scope["z"] = z;
   scope["xlabel"] = data.xlabel;
   scope["ylabel"] = data.ylabel;
@@ -105,13 +103,14 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data2D& data)
   scope["aspectratio"] = data.aspectratio;
   scope["cmap"] = data.cmap;
   scope["save"] = data.save;
-  scope["title"] = not data.title.empty() ? data.title : name;
   return scope;
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const Data3D& data)
+py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
 {
   PROFILE_FUNCTION;
+  std::scoped_lock lock(mMutex);
+
   cv::Mat mz = data.z.clone();
   mz.convertTo(mz, CV_32F);
   auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
@@ -120,7 +119,7 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data3D& data)
       z[r][c] = mz.at<f32>(r, c);
 
   py::dict scope;
-  scope["id"] = mPlotIds[name];
+  AddDefaultScopeData(name, scope);
   scope["z"] = z;
   scope["xlabel"] = data.xlabel;
   scope["ylabel"] = data.ylabel;
@@ -134,50 +133,23 @@ py::dict PyPlot::GetScopeData(const std::string& name, const Data3D& data)
   scope["rstride"] = data.rstride;
   scope["cstride"] = data.cstride;
   scope["save"] = data.save;
-  scope["title"] = not data.title.empty() ? data.title : name;
   return scope;
 }
 
-void PyPlot::ScheldulePlot(const std::string& name, const Data1D& data)
+void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data)
 {
   std::scoped_lock lock(mMutex);
-  mPlot1DQueue.emplace(name, data);
+  mPlotQueue.emplace(name, type, data);
 }
 
-void PyPlot::ScheldulePlot(const std::string& name, const Data2D& data)
+void PyPlot::Render()
 {
-  std::scoped_lock lock(mMutex);
-  mPlot2DQueue.emplace(name, data);
-}
-
-void PyPlot::ScheldulePlot(const std::string& name, const Data3D& data)
-{
-  std::scoped_lock lock(mMutex);
-  mPlot3DQueue.emplace(name, data);
-}
-
-void PyPlot::RenderInternal()
-{
+  PROFILE_FUNCTION;
   std::scoped_lock lock(mMutex);
 
-  while (not mPlot1DQueue.empty())
+  while (not mPlotQueue.empty())
   {
-    const auto& [name, data] = mPlot1DQueue.front();
-    PlotInternal(name, data);
-    mPlot1DQueue.pop();
-  }
-
-  while (not mPlot2DQueue.empty())
-  {
-    const auto& [name, data] = mPlot2DQueue.front();
-    PlotInternal(name, data);
-    mPlot2DQueue.pop();
-  }
-
-  while (not mPlot3DQueue.empty())
-  {
-    const auto& [name, data] = mPlot3DQueue.front();
-    PlotInternal(name, data);
-    mPlot3DQueue.pop();
+    PlotInternal(mPlotQueue.front());
+    mPlotQueue.pop();
   }
 }

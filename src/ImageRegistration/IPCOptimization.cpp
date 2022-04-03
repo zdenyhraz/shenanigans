@@ -18,7 +18,7 @@ try
     throw std::runtime_error("Empty training images vector");
 
   const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, iters, noiseStddev);
-  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, testRatio * iters, noiseStddev);
+  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, std::max(testRatio * iters, 1.), noiseStddev);
   const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
   const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 
