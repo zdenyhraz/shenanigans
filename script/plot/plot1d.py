@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 
 fig = plt.figure(num=id)
-fig.canvas.set_window_title(title)
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
 
 fig.clf()
@@ -39,11 +38,10 @@ if ax2 and y2label:
 if label_y or label_ys or label_y2 or label_y2s:
   labels = [line.get_label() for line in lines]
   plt.legend(lines, labels)
-if title:
-  plt.title(title)
 if log:
   plt.yscale("log")
 
+plt.title(title)
 plt.tight_layout()
 plt.draw()
 plt.pause(1e-9)

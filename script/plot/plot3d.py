@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 fig = plt.figure(num=id)
-fig.canvas.set_window_title(title)
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
 
 Z = np.array([np.array(row) for row in z])
@@ -35,9 +34,8 @@ if ylabel:
   plt.ylabel(ylabel)
 if zlabel:
   cbar.set_label(zlabel)
-if title:
-  plt.title(title)
 
+plt.title(title)
 plt.set_cmap(cmap)
 plt.tight_layout()
 plt.draw()
