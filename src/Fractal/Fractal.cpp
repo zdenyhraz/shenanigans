@@ -14,8 +14,6 @@ void mouseEventFractal(i32 event, i32 x, i32 y, i32 flags, void* ptr)
 
 cv::Mat computeFractal(Fractalset& fractalset)
 {
-  using namespace std::complex_literals;
-
   cv::Mat Fractal = cv::Mat::zeros(fractalset.fractalHeight, fractalset.fractalWidth, CV_32F);
   std::complex<f64> startZ = 0. + 0.i;
   std::cout << "Computing Fractal...";

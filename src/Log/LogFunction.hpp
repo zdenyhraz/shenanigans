@@ -31,7 +31,6 @@ private:
   static std::string FormatDuration(std::chrono::nanoseconds dur)
   {
     using namespace std::chrono;
-    using namespace std::chrono_literals;
 
     if (dur < 1s)
       return fmt::format("{:.2f} ms", duration<f32, std::milli>(dur).count());

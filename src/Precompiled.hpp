@@ -86,6 +86,9 @@ using usize = size_t;
 
 namespace py = pybind11;
 namespace json = nlohmann;
+using namespace std::complex_literals;
+using namespace std::chrono_literals;
+using namespace pybind11::literals;
 
 #include "Log/Log.hpp"
 #include "Log/LogFunction.hpp"

@@ -12,7 +12,7 @@ try
 {
   PROFILE_FUNCTION;
   CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_1d.py", GetScopeData(name, data));
+  py::eval_file("../script/plot/plot1d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
@@ -24,7 +24,7 @@ try
 {
   PROFILE_FUNCTION;
   CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_2d.py", GetScopeData(name, data));
+  py::eval_file("../script/plot/plot2d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
@@ -36,7 +36,7 @@ try
 {
   PROFILE_FUNCTION;
   CheckIfPlotExists(name);
-  py::eval_file("../script/plot/plot_3d.py", GetScopeData(name, data));
+  py::eval_file("../script/plot/plot3d.py", GetScopeData(name, data));
 }
 catch (const std::exception& e)
 {
