@@ -13,11 +13,11 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
   cv::Mat refShiftsX(iters, iters, GetMatType<f64>());
   cv::Mat refShiftsY(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyCC(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyPC(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyPCS(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyIPC(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyIPCO(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyCC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyPCS = cv::Mat::zeros(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyIPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
+  cv::Mat accuracyIPCO = cv::Mat::zeros(iters, iters, GetMatType<f64>());
 
   std::atomic<i32> progressi = 0;
   i32 imageIndex = 0;

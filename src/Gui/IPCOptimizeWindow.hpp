@@ -9,7 +9,7 @@ struct IPCOptimizeParameters
   i32 iters = 101;
   i32 optiters = 11;
   f32 testRatio = 0.2;
-  i32 popSize = 42;
+  i32 popSize = 6;
 };
 
 class IPCOptimizeWindow

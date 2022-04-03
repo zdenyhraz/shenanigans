@@ -76,14 +76,14 @@ try
   auto ipcAfter = ipc;
   ApplyOptimalParameters(ipcAfter, optimalParameters);
   const auto objAfter = obj(ipcAfter);
-  LOG_INFO("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
 
-  if (objAfter > objBefore)
+  if (objAfter >= objBefore)
   {
-    LOG_WARNING("Objective function value not improved, parameters unchanged");
+    LOG_WARNING("Objective function value not improved ({}%), parameters unchanged", static_cast<i32>((objBefore - objAfter) / objBefore * 100));
     return;
   }
 
+  LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
   ApplyOptimalParameters(ipc, optimalParameters);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
