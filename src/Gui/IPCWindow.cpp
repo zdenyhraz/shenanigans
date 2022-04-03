@@ -2,7 +2,8 @@
 
 void IPCWindow::Initialize()
 {
-  UpdateIPCParameters();
+  UpdateIPCParameters(mIPC);
+  UpdateIPCParameters(mIPCOptimized);
 }
 
 void IPCWindow::Render()
@@ -10,7 +11,12 @@ void IPCWindow::Render()
   ImGui::Begin("IPC parameters");
 
   if (ImGui::Button("Update"))
-    LaunchAsync([]() { UpdateIPCParameters(); });
+    LaunchAsync(
+        []()
+        {
+          UpdateIPCParameters(mIPC);
+          UpdateIPCParameters(mIPCOptimized);
+        });
 
   ImGui::SameLine();
 
@@ -33,23 +39,18 @@ void IPCWindow::Render()
   ImGui::End();
 }
 
-IPC& IPCWindow::GetIPC()
+void IPCWindow::UpdateIPCParameters(IPC& ipc)
 {
-  return mIPC;
-}
-
-void IPCWindow::UpdateIPCParameters()
-{
-  mIPC.SetSize(mParameters.Rows, mParameters.Cols);
-  mIPC.SetBandpassParameters(mParameters.BPL, mParameters.BPH);
-  mIPC.SetL2size(mParameters.L2size);
-  mIPC.SetL1ratio(mParameters.L1ratio);
-  mIPC.SetL2Usize(mParameters.L2Usize);
-  mIPC.SetMaxIterations(mParameters.MaxIter);
-  mIPC.SetCrossPowerEpsilon(mParameters.CPeps);
-  mIPC.SetWindowType(static_cast<IPC::WindowType>(mParameters.WinT));
-  mIPC.SetBandpassType(static_cast<IPC::BandpassType>(mParameters.BPT));
-  mIPC.SetInterpolationType(static_cast<IPC::InterpolationType>(mParameters.IntT));
-  mIPC.SetL1WindowType(static_cast<IPC::L1WindowType>(mParameters.L1WinT));
+  ipc.SetSize(mParameters.Rows, mParameters.Cols);
+  ipc.SetBandpassParameters(mParameters.BPL, mParameters.BPH);
+  ipc.SetL2size(mParameters.L2size);
+  ipc.SetL1ratio(mParameters.L1ratio);
+  ipc.SetL2Usize(mParameters.L2Usize);
+  ipc.SetMaxIterations(mParameters.MaxIter);
+  ipc.SetCrossPowerEpsilon(mParameters.CPeps);
+  ipc.SetWindowType(static_cast<IPC::WindowType>(mParameters.WinT));
+  ipc.SetBandpassType(static_cast<IPC::BandpassType>(mParameters.BPT));
+  ipc.SetInterpolationType(static_cast<IPC::InterpolationType>(mParameters.IntT));
+  ipc.SetL1WindowType(static_cast<IPC::L1WindowType>(mParameters.L1WinT));
   LOG_DEBUG("IPC parameters updated");
 }

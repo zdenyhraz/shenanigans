@@ -13,14 +13,15 @@ void IPCOptimizeWindow::Render()
     LaunchAsync(
         []()
         {
-          IPCOptimization::Optimize(IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.optiters,
+          IPCOptimization::Optimize(IPCWindow::GetIPCOptimized(), mParameters.trainDirectory, mParameters.testDirectory, mParameters.maxShift, mParameters.noiseStddev, mParameters.optiters,
               mParameters.testRatio, mParameters.popSize);
         });
 
   ImGui::SameLine();
 
   if (ImGui::Button("Measure accuracy"))
-    LaunchAsync([]() { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), mParameters.testDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
+    LaunchAsync([]()
+        { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), mParameters.testDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
 
   ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
   ImGui::InputText("train directory", &mParameters.trainDirectory);

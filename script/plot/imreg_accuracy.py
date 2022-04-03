@@ -21,10 +21,16 @@ ax1.fill_between(
     np.array(pcs_error) + np.array(pcs_stddev),
     color="tab:blue", alpha=alpha, linewidth=0.5*linewidth)
 
-ax1.plot(x, ipc_error, color="tab:green", label="ipc", linewidth=linewidth)
+ax1.plot(x, ipc_error, color="tab:purple", label="ipc", linewidth=linewidth)
 ax1.fill_between(
     x, np.array(ipc_error) - np.array(ipc_stddev),
     np.array(ipc_error) + np.array(ipc_stddev),
+    color="tab:purple", alpha=alpha, linewidth=0.5*linewidth)
+
+ax1.plot(x, ipco_error, color="tab:green", label="ipco", linewidth=linewidth)
+ax1.fill_between(
+    x, np.array(ipco_error) - np.array(ipco_stddev),
+    np.array(ipco_error) + np.array(ipco_stddev),
     color="tab:green", alpha=alpha, linewidth=0.5*linewidth)
 
 
