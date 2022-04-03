@@ -1,4 +1,4 @@
-#include "Shenanigans.hpp"
+#include "Gui/Shenanigans.hpp"
 
 int main(int argc, char** argv)
 try

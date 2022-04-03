@@ -149,11 +149,11 @@ target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 
 # shenanigans app sources
-file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.hpp apps/shenanigans/*.cpp)
+file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS apps/shenanigans_test/*.hpp apps/shenanigans_test/*.cpp test/*.hpp test/*.cpp)
+file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp test/*.hpp test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST_APP})
 gtest_discover_tests(shenanigans_test)
 
