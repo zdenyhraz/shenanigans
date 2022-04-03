@@ -1,8 +1,9 @@
 #include "IPCMeasure.hpp"
 #include "IPC.hpp"
+#include "Filtering/Noise.hpp"
 #include "CrossCorrelation.hpp"
 #include "PhaseCorrelation.hpp"
-#include "Filtering/Noise.hpp"
+#include "PhaseCorrelationUpscale.hpp"
 
 void IPCMeasure::MeasureAccuracy(const IPC& ipc, const std::string& path, i32 iters, f64 maxShift, f64 noiseStddev, f32* progress)
 {
@@ -38,7 +39,7 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const std::string& path, i32 it
       const f64 logprogress = ++progressi;
       if (progress)
         *progress = logprogress / (iters * images.size());
-      LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating IPC accuracy map ...", logprogress / (iters * images.size()) * 100, logprogress, iters * images.size());
+      LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating image registration accuracy ...", logprogress / (iters * images.size()) * 100, logprogress, iters * images.size());
 
       auto refX = refShiftsX.ptr<f64>(row);
       auto refY = refShiftsY.ptr<f64>(row);
@@ -76,10 +77,10 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const std::string& path, i32 it
   accuracyIPCx = QuantileFilter<f64>(accuracyIPCx / images.size(), 1. - mQuanT, mQuanT);
   accuracyIPCy = QuantileFilter<f64>(accuracyIPCy / images.size(), 1. - mQuanT, mQuanT);
 
-  LOG_SUCCESS("CC average accuracy: {:.3f}", Mean<f64>(accuracyCC), Stddev<f64>(accuracyCC));
-  LOG_SUCCESS("PC average accuracy: {:.3f}", Mean<f64>(accuracyPC), Stddev<f64>(accuracyPC));
-  LOG_SUCCESS("PCS average accuracy: {:.3f}", Mean<f64>(accuracyPCS), Stddev<f64>(accuracyPCS));
-  LOG_SUCCESS("IPC average accuracy: {:.3f}", Mean<f64>(accuracyIPC), Stddev<f64>(accuracyIPC));
+  LOG_SUCCESS("CC average accuracy: {:.3f} (sd: {:.3f})", Mean<f64>(accuracyCC), Stddev<f64>(accuracyCC));
+  LOG_SUCCESS("PC average accuracy: {:.3f} (sd: {:.3f})", Mean<f64>(accuracyPC), Stddev<f64>(accuracyPC));
+  LOG_SUCCESS("PCS average accuracy: {:.3f} (sd: {:.3f})", Mean<f64>(accuracyPCS), Stddev<f64>(accuracyPCS));
+  LOG_SUCCESS("IPC average accuracy: {:.3f} (sd: {:.3f})", Mean<f64>(accuracyIPC), Stddev<f64>(accuracyIPC));
 
   PyPlot::Plot("shift error", "imreg_accuracy",
       py::dict{"x"_a = ColMeans<f64>(refShiftsX), "pc_error"_a = ColMeans<f64>(accuracyPC), "pc_stddev"_a = ColStddevs<f64>(accuracyPC), "pcs_error"_a = ColMeans<f64>(accuracyPCS),

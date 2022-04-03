@@ -26,12 +26,12 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  PyPlot::Render();
   ImGuiLogger::Render();
   // ImGui::ShowDemoWindow();
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
   DiffrotWindow::Render();
+  PyPlot::Render();
 }
 
 void Shenanigans::Initialize()

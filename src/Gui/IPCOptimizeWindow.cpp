@@ -19,7 +19,7 @@ void IPCOptimizeWindow::Render()
 
   ImGui::SameLine();
 
-  if (ImGui::Button("Accuracy map"))
+  if (ImGui::Button("Measure accuracy"))
     LaunchAsync([]() { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), mParameters.testDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
 
   ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
