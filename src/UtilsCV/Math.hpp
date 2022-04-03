@@ -1,4 +1,5 @@
 #pragma once
+#include "Crop.hpp"
 
 template <typename T>
 inline f64 Magnitude(const cv::Point_<T>& pt)
@@ -23,6 +24,42 @@ inline f64 Mean(const cv::Mat& mat)
       mean += matp[c];
   }
   return mean / mat.rows / mat.cols;
+}
+
+template <typename T>
+inline f64 Stddev(const cv::Mat& mat)
+{
+  f64 mean = Mean<T>(mat);
+  f64 stddev = 0;
+  for (i32 r = 0; r < mat.rows; ++r)
+  {
+    auto matp = mat.ptr<T>(r);
+    for (i32 c = 0; c < mat.cols; ++c)
+      stddev += std::pow(matp[c] - mean, 2);
+  }
+  return std::sqrt(stddev / mat.rows / mat.cols);
+}
+
+template <typename T>
+inline std::vector<f64> ColMeans(const cv::Mat& mat)
+{
+  std::vector<f64> means(mat.cols);
+
+  for (i32 c = 0; c < mat.cols; ++c)
+    means[c] = Mean<T>(RoiCropRef(mat, c, mat.rows / 2, 1, mat.rows));
+
+  return means;
+}
+
+template <typename T>
+inline std::vector<f64> ColStddevs(const cv::Mat& mat)
+{
+  std::vector<f64> stddevs(mat.cols);
+
+  for (i32 c = 0; c < mat.cols; ++c)
+    stddevs[c] = Stddev<T>(RoiCropRef(mat, c, mat.rows / 2, 1, mat.rows));
+
+  return stddevs;
 }
 
 template <typename T>
@@ -101,4 +138,12 @@ inline std::pair<f64, f64> MinMax(const cv::Mat& mat)
   f64 minR, maxR;
   cv::minMaxLoc(mat, &minR, &maxR, nullptr, nullptr);
   return {minR, maxR};
+}
+
+template <typename T>
+inline cv::Mat Hanning(cv::Size size)
+{
+  cv::Mat mat;
+  cv::createHanningWindow(mat, size, GetMatType<T>());
+  return mat;
 }

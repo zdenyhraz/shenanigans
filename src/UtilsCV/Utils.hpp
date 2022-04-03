@@ -29,27 +29,6 @@ inline consteval i32 GetMatType(i32 channels = 1)
     }
 }
 
-inline void Shift(cv::Mat& mat, const cv::Point2d& shift)
-{
-  PROFILE_FUNCTION;
-  cv::Mat T = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
-  cv::warpAffine(mat, mat, T, mat.size());
-}
-
-inline void Shift(cv::Mat& mat, f64 shiftx, f64 shifty)
-{
-  PROFILE_FUNCTION;
-  Shift(mat, {shiftx, shifty});
-}
-
-inline void Rotate(cv::Mat& mat, f64 rot, f64 scale = 1)
-{
-  PROFILE_FUNCTION;
-  cv::Point2d center(mat.cols / 2, mat.rows / 2);
-  cv::Mat R = getRotationMatrix2D(center, rot, scale);
-  cv::warpAffine(mat, mat, R, mat.size());
-}
-
 template <typename T>
 inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
 {
@@ -69,12 +48,4 @@ inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
         return false;
 
   return true;
-}
-
-template <typename T>
-inline cv::Mat Hanning(cv::Size size)
-{
-  cv::Mat mat;
-  cv::createHanningWindow(mat, size, GetMatType<T>());
-  return mat;
 }

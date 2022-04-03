@@ -106,5 +106,6 @@ using namespace pybind11::literals;
 #include "UtilsCV/Formatters.hpp"
 #include "UtilsCV/Load.hpp"
 #include "UtilsCV/Math.hpp"
+#include "UtilsCV/Transform.hpp"
 
 #include "Plot/PyPlot.hpp"

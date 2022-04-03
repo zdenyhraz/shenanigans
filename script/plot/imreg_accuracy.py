@@ -9,11 +9,17 @@ linewidth = 3
 
 ax1 = fig.subplots()
 
-ax1.plot(x, pcs_error, color="tab:orange", label="pcs", linewidth=linewidth)
+ax1.plot(x, pc_error, color="tab:orange", label="pc", linewidth=linewidth)
+ax1.fill_between(
+    x, np.array(pc_error) - np.array(pc_stddev),
+    np.array(pc_error) + np.array(pc_stddev),
+    color="tab:orange", alpha=alpha, linewidth=0.5*linewidth)
+
+ax1.plot(x, pcs_error, color="tab:blue", label="pcs", linewidth=linewidth)
 ax1.fill_between(
     x, np.array(pcs_error) - np.array(pcs_stddev),
     np.array(pcs_error) + np.array(pcs_stddev),
-    color="tab:orange", alpha=alpha, linewidth=0.5*linewidth)
+    color="tab:blue", alpha=alpha, linewidth=0.5*linewidth)
 
 ax1.plot(x, ipc_error, color="tab:green", label="ipc", linewidth=linewidth)
 ax1.fill_between(

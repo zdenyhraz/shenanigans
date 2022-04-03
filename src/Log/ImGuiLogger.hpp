@@ -64,6 +64,13 @@ private:
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
+    if (mLineOffsets.size() > mMaxMessages)
+    {
+      Debug("Clearing message log ...");
+      Clear();
+      Debug("Message log cleared after {} messages", mMaxMessages);
+    }
+
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
     i32 oldSize = mTextBuffer.size();
     mTextBuffer.append(message.c_str(), message.c_str() + message.size());

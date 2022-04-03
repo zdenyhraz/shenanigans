@@ -125,7 +125,7 @@ try
       image2 = RoiCrop(image2, image1.cols / 2, image1.rows / 2, ipc.mCols, ipc.mRows);
     }
 
-    Shift(image2, -950, 1050);
+    Shift(image2, cv::Point2d(-950, 1050));
     Rotate(image2, 70, 1.2);
 
     AddNoise<IPC::Float>(image1, noiseStdev);

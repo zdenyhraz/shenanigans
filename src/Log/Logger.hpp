@@ -24,6 +24,7 @@ public:
 protected:
   inline static LogLevel mLogLevel = LogLevel::Trace;
   inline static std::mutex mMutex;
+  static constexpr usize mMaxMessages = 5000;
 
   static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 
