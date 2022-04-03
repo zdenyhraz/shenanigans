@@ -17,7 +17,6 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
   cv::Mat accuracyMapIPCx(iters, iters, GetMatType<f64>());
   cv::Mat accuracyMapIPCy(iters, iters, GetMatType<f64>());
 
-  static constexpr f64 quanT = 0.95;
   static const std::string xlabel = "x shift";
   static const std::string ylabel = "y shift";
   static const std::string zlabel = "error";
@@ -66,28 +65,16 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
     }
   }
 
-  accuracyMapCC = ApplyQuantile<f64>(accuracyMapCC, 0, quanT);
-  accuracyMapPC = ApplyQuantile<f64>(accuracyMapPC, 0, quanT);
-  accuracyMapPCS = ApplyQuantile<f64>(accuracyMapPCS, 0, quanT);
-  accuracyMapIPC = ApplyQuantile<f64>(accuracyMapIPC, 0, quanT);
-  accuracyMapIPCx = ApplyQuantile<f64>(accuracyMapIPCx, 1. - quanT, quanT);
-  accuracyMapIPCy = ApplyQuantile<f64>(accuracyMapIPCy, 1. - quanT, quanT);
+  accuracyMapCC = ApplyQuantile<f64>(accuracyMapCC, 0, mQuanT);
+  accuracyMapPC = ApplyQuantile<f64>(accuracyMapPC, 0, mQuanT);
+  accuracyMapPCS = ApplyQuantile<f64>(accuracyMapPCS, 0, mQuanT);
+  accuracyMapIPC = ApplyQuantile<f64>(accuracyMapIPC, 0, mQuanT);
+  accuracyMapIPCx = ApplyQuantile<f64>(accuracyMapIPCx, 1. - mQuanT, mQuanT);
+  accuracyMapIPCy = ApplyQuantile<f64>(accuracyMapIPCy, 1. - mQuanT, mQuanT);
 
-  PyPlot::Plot("shift error", {.x = GetColSortedValues(refShiftsX),
-                                  .ys = {GetColSortedValues(accuracyMapPCS), GetColSortedValues(accuracyMapIPC)},
-                                  .xlabel = "reference shift x [px]",
-                                  .ylabel = "error [px]",
-                                  .label_ys = {"pcs", "ipc"},
-                                  .color_ys = {"k", "tab:green"},
-                                  .log = false});
-
-  PyPlot::Plot("shift error log scale", {.x = GetColSortedValues(refShiftsX),
-                                            .ys = {GetColSortedValues(accuracyMapPCS), GetColSortedValues(accuracyMapIPC)},
-                                            .xlabel = "reference shift x [px]",
-                                            .ylabel = "error [px]",
-                                            .label_ys = {"pcs", "ipc"},
-                                            .color_ys = {"k", "tab:green"},
-                                            .log = true});
+  PyPlot::Plot("shift error", "imreg_accuracy",
+      py::dict{"x"_a = GetColsMeans(refShiftsX), "pcs_error"_a = GetColsMeans(accuracyMapPCS), "pcs_stddev"_a = GetColsStddevs(accuracyMapPCS), "ipc_error"_a = GetColsMeans(accuracyMapIPC),
+          "ipc_stddev"_a = GetColsStddevs(accuracyMapIPC)});
 
   PyPlot::Plot("CC accuracy map", {.z = accuracyMapCC, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
   PyPlot::Plot("PC accuracy map", {.z = accuracyMapPC, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
@@ -97,14 +84,36 @@ void IPCMeasure::MeasureAccuracyMap(const IPC& ipc, const cv::Mat& image, i32 it
   PyPlot::Plot("IPCy accuracy map", {.z = accuracyMapIPCy, .xmin = -maxShift, .xmax = maxShift, .ymin = -maxShift, .ymax = maxShift, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
 }
 
-std::vector<f64> IPCMeasure::GetColSortedValues(const cv::Mat& mat)
+void IPCMeasure::MeasureAccuracy(const IPC& ipc, const std::string& dataPath, i32 iters, f64 maxShift, f64 noiseStddev, f32* progress)
 {
-  std::vector<f64> values;
-  values.reserve(mat.rows * mat.cols);
+}
+
+std::vector<f64> IPCMeasure::GetColsMeans(const cv::Mat& mat)
+{
+  std::vector<f64> averages(mat.cols, 0.);
 
   for (i32 c = 0; c < mat.cols; ++c)
+  {
     for (i32 r = 0; r < mat.rows; ++r)
-      values.push_back(mat.at<f64>(r, c));
+      averages[c] += mat.at<f64>(r, c);
 
-  return values;
+    averages[c] /= mat.rows;
+  }
+  return averages;
+}
+
+std::vector<f64> IPCMeasure::GetColsStddevs(const cv::Mat& mat)
+{
+  std::vector<f64> stddevs(mat.cols, 0.);
+  const auto means = GetColsMeans(mat);
+
+  for (i32 c = 0; c < mat.cols; ++c)
+  {
+    for (i32 r = 0; r < mat.rows; ++r)
+      stddevs[c] += std::pow(mat.at<f64>(r, c) - means[c], 2);
+
+    stddevs[c] /= mat.rows;
+    stddevs[c] = std::sqrt(stddevs[c]);
+  }
+  return stddevs;
 }

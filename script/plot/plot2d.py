@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure(num=id)
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
-
+fig.canvas.manager.set_window_title(title)
 plt.clf()
+
 im = plt.imshow(z,
                 extent=[xmin, xmax, ymin, ymax],
                 interpolation='bilinear' if interp else 'none',

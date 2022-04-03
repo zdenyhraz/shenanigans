@@ -32,6 +32,13 @@ void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
 {
   scope["id"] = GetPlotId(name);
   scope["title"] = name;
+
+  if (not scope.contains("aspectratio"))
+    scope["aspectratio"] = 1;
+  if (not scope.contains("save"))
+    scope["save"] = false;
+  if (not scope.contains("log"))
+    scope["log"] = false;
 }
 
 py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)

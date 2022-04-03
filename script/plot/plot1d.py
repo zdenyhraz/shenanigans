@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure(num=id)
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
+fig.canvas.manager.set_window_title(title)
+plt.clf()
 
-fig.clf()
 ax1 = fig.subplots()
 ax2 = ax1.twinx() if (y2 or y2s) else None
 color_cycle = ax1._get_lines.prop_cycler

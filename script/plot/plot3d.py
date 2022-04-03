@@ -3,6 +3,8 @@ import numpy as np
 
 fig = plt.figure(num=id)
 fig.set_figwidth(fig.get_figwidth()*aspectratio)
+fig.canvas.manager.set_window_title(title)
+plt.clf()
 
 Z = np.array([np.array(row) for row in z])
 xsize = Z.shape[0]
@@ -12,7 +14,6 @@ X = np.linspace(xmin, xmax, xsize)
 Y = np.linspace(ymax, ymin, ysize)
 X, Y = np.meshgrid(X, Y)
 
-plt.clf()
 ax = fig.gca(projection='3d')
 surf = ax.plot_surface(
     X, Y, Z,
