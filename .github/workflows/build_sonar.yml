@@ -1,0 +1,101 @@
+name: build/test
+
+on: [push,pull_request]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      SONAR_SCANNER_VERSION: 4.7.0.2747
+      SONAR_SERVER_URL: "https://sonarcloud.io"
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: JDK 11 install
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: sonar-scanner install
+        env:
+          SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+        run: |
+          mkdir -p $HOME/.sonar
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+          unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
+
+      - name: build-wrapper install
+        env:
+          BUILD_WRAPPER_DOWNLOAD_URL: ${{ env.SONAR_SERVER_URL }}/static/cpp/build-wrapper-linux-x86.zip
+        run: |
+          curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
+          unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
+
+      - name: apt-get update
+        run: sudo apt-get update
+
+      - name: gcc install
+        run: |
+          sudo apt install gcc-11 g++-11
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+          sudo update-alternatives --set gcc /usr/bin/gcc-11
+
+      - name: ninja install
+        run: sudo apt-get install ninja-build
+
+      - name: opengl install
+        run: sudo apt-get install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+
+      - name: python install
+        uses: actions/setup-python@v2
+
+      - name: torch install
+        working-directory: ${{github.workspace}}/libs
+        run: |
+          wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip
+          sudo chmod 755 libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+          unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+
+      - name: opencv cache
+        id: opencv-cache
+        uses: actions/cache@v3
+        with:
+          path: ./opencv
+          key: ${{runner.os}}-opencv-cache
+
+      - name: opencv install from cache
+        if: steps.opencv-cache.outputs.cache-hit == 'true'
+        run: cd opencv/build && sudo ninja install
+
+      - name: opencv install from source
+        if: steps.opencv-cache.outputs.cache-hit != 'true'
+        run: |
+          wget https://github.com/opencv/opencv/archive/refs/tags/4.5.5.tar.gz
+          sudo chmod 755 4.5.5.tar.gz
+          tar -xf 4.5.5.tar.gz && mv opencv-4.5.5 opencv && cd opencv
+          git clone https://github.com/opencv/opencv_contrib.git
+          mkdir build && cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
+          cmake --build . --config Release -j 6
+          sudo ninja install
+
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
+
+      - name: build-wrapper
+        run: |
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }}cmake --build ${{github.workspace}}/build --config Release -j 6
+
+      - name: sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
