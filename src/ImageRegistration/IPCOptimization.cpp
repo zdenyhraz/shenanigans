@@ -43,14 +43,14 @@ try
   ApplyOptimalParameters(ipcAfter, optimalParameters);
   const auto shiftsAfter = GetShifts(ipcAfter, trainImagePairs);
   const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-  LOG_INFO("Average pixel accuracy improvement: {:.3f} -> {:.3f} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
 
-  if (objAfter > objBefore)
+  if (objAfter >= objBefore)
   {
-    LOG_WARNING("Objective function value not improved, parameters unchanged");
+    LOG_WARNING("Objective function value not improved ({}%), parameters unchanged", static_cast<i32>((objBefore - objAfter) / objBefore * 100));
     return;
   }
 
+  LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
   ApplyOptimalParameters(ipc, optimalParameters);
   ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
@@ -67,8 +67,7 @@ try
   LOG_FUNCTION("Optimize");
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
-  const auto objf = CreateObjectiveFunction(ipc, obj);
-  const auto optimalParameters = CalculateOptimalParameters(objf, nullptr, popSize);
+  const auto optimalParameters = CalculateOptimalParameters(CreateObjectiveFunction(ipc, obj), nullptr, popSize);
   if (optimalParameters.empty())
     throw std::runtime_error("Optimization failed");
 

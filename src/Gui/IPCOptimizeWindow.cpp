@@ -19,7 +19,7 @@ void IPCOptimizeWindow::Render()
 
   ImGui::SameLine();
 
-  if (ImGui::Button("Measure accuracy"))
+  if (ImGui::Button("Measure"))
     LaunchAsync([]()
         { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), mParameters.testDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgress); });
 

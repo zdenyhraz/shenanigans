@@ -38,7 +38,6 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
       const f64 logprogress = ++progressi;
       if (progress)
         *progress = logprogress / (iters * images.size());
-      LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating image registration accuracy ...", logprogress / (iters * images.size()) * 100, logprogress, iters * images.size());
 
       auto refX = refShiftsX.ptr<f64>(row);
       auto refY = refShiftsY.ptr<f64>(row);
