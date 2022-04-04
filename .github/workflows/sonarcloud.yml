@@ -46,7 +46,7 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
 
       - name: Setup linux
-        run: sudo ./script/linux/setup_linux.sh
+        run: sudo chmod 755 script/linux/setup_linux.sh && ./script/linux/setup_linux.sh
     
       - name: OpenCV cache
         id: opencv-cache
