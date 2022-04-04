@@ -27,7 +27,7 @@ jobs:
 
       - name: OpenCV install from source
         if: steps.opencv-cache.outputs.cache-hit != 'true'
-        run: ./script/linux/setup_opencv.sh
+        run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
 
       - name: CMake configure
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
