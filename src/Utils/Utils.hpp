@@ -55,22 +55,14 @@ inline std::vector<T> operator*(f64 val, const std::vector<T>& vec)
   return result;
 }
 
-inline std::string GetCurrentDateTime()
+inline std::string GetCurrentDate()
 {
-  auto now = std::time(nullptr);
-  char buf[sizeof("2022-Aug-04-12.34.56")];
-  tm time;
-  std::strftime(buf, sizeof(buf), "%Y-%b-%d-%H.%M.%S", std::localtime_r(&now, &time));
-  return buf;
+  return fmt::format("{:%Y-%b-%d}", fmt::localtime(std::time(nullptr)));
 }
 
 inline std::string GetCurrentTime()
 {
-  auto now = std::time(nullptr);
-  char buf[sizeof("12:34:56")];
-  tm time;
-  std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime_r(&now, &time));
-  return buf;
+  return fmt::format("{:%H:%M:%S}", fmt::localtime(std::time(nullptr)));
 }
 
 template <typename T>

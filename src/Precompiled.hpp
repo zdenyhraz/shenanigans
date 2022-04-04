@@ -42,6 +42,7 @@
 #include <pybind11/numpy.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fmt/chrono.h>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <torch/torch.h>

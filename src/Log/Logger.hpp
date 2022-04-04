@@ -27,13 +27,4 @@ protected:
   static constexpr usize mMaxMessages = 5000;
 
   static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
-
-  static std::string GetCurrentTime()
-  {
-    auto now = std::time(nullptr);
-    char buf[sizeof("12:34:56")];
-    tm time;
-    std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime_r(&now, &time));
-    return buf;
-  }
 };

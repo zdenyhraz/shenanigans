@@ -1,5 +1,6 @@
 #pragma once
 #include "Logger.hpp"
+#include "Utils/Utils.hpp"
 
 class TerminalLogger : public Logger
 {
