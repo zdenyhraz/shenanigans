@@ -4,38 +4,16 @@ on: [push,pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
           submodules: true
 
-      - name: Update packages
-        run: sudo apt-get update
-
-      - name: GCC install
-        run: |
-          sudo apt install gcc-11 g++-11
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-          sudo update-alternatives --set gcc /usr/bin/gcc-11
-
-      - name: Ninja install
-        run: sudo apt-get install ninja-build
-
-      - name: OpenGL install
-        run: sudo apt-get install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
-
-      - name: Python install
-        uses: actions/setup-python@v2
-
-      - name: Torch install
-        working-directory: ${{github.workspace}}/libs
-        run: |
-          wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip --no-check-certificate
-          sudo chmod 755 libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
-          unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
-
+      - name: Setup linux
+        run: ./script/linux/setup_linux.sh
+    
       - name: OpenCV cache
         id: opencv-cache
         uses: actions/cache@v3
@@ -49,15 +27,7 @@ jobs:
 
       - name: OpenCV install from source
         if: steps.opencv-cache.outputs.cache-hit != 'true'
-        run: |
-          wget https://github.com/opencv/opencv/archive/refs/tags/4.5.5.tar.gz
-          sudo chmod 755 4.5.5.tar.gz
-          tar -xf 4.5.5.tar.gz && mv opencv-4.5.5 opencv && cd opencv
-          git clone https://github.com/opencv/opencv_contrib.git
-          mkdir build && cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules
-          cmake --build . --config Release -j 6
-          sudo ninja install
+        run: ./script/linux/setup_opencv.sh
 
       - name: CMake configure
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
