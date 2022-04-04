@@ -1,9 +1,9 @@
-name: build-
+name: test
 
 on: [push,pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -64,3 +64,11 @@ jobs:
 
       - name: CMake build
         run: cmake --build ${{github.workspace}}/build --config Release -j 6
+
+      - name: Execute test
+        working-directory: ${{github.workspace}}/build
+        run: ./shenanigans_test
+
+      - name: CMake test
+        working-directory: ${{github.workspace}}/build
+        run: ctest --rerun-failed --output-on-failure
