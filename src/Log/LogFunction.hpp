@@ -23,7 +23,6 @@ public:
   }
   catch (...)
   {
-    TermLogger::Function("{} started", mFunName);
   }
 
   ~LogFunction()
@@ -34,7 +33,6 @@ public:
   }
   catch (...)
   {
-    TermLogger::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
   }
 
 private:
