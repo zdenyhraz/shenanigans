@@ -12,6 +12,7 @@ class LogFunction
 
 public:
   explicit LogFunction(std::string&& funName)
+  try
   {
     if constexpr (Show)
     {
@@ -20,11 +21,20 @@ public:
       Log::Function("{} started", mFunName);
     }
   }
+  catch (...)
+  {
+    TermLogger::Log("{} started", mFunName);
+  }
 
   ~LogFunction()
+  try
   {
     if constexpr (Show)
       Log::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
+  }
+  catch (...)
+  {
+    TermLogger::Log("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
   }
 
 private:
