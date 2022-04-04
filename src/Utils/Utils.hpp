@@ -57,19 +57,19 @@ inline std::vector<T> operator*(f64 val, const std::vector<T>& vec)
 
 inline std::string GetCurrentDateTime()
 {
-  time_t now = time(0);
-  struct tm tstruct;
-  char buf[80];
-  tstruct = *localtime(&now);
-  strftime(buf, sizeof(buf), "%Y-%b%d-%H.%M.%S", &tstruct);
+  auto now = std::time(nullptr);
+  char buf[sizeof("2022-Aug-04-12.34.56")];
+  tm time;
+  std::strftime(buf, sizeof(buf), "%Y-%b-%d-%H.%M.%S", std::localtime_r(&now, &time));
   return buf;
 }
 
 inline std::string GetCurrentTime()
 {
-  auto now = time(nullptr);
+  auto now = std::time(nullptr);
   char buf[sizeof("12:34:56")];
-  strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&now));
+  tm time;
+  std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime_r(&now, &time));
   return buf;
 }
 

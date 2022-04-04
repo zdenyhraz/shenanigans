@@ -32,7 +32,8 @@ protected:
   {
     auto now = std::time(nullptr);
     char buf[sizeof("12:34:56")];
-    std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime(&now));
+    tm time;
+    std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime_r(&now, &time));
     return buf;
   }
 };
