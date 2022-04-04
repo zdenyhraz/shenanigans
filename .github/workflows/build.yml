@@ -12,7 +12,7 @@ jobs:
           submodules: true
 
       - name: Setup linux
-        run: ./script/linux/setup_linux.sh
+        run: sudo ./script/linux/setup_linux.sh
     
       - name: OpenCV cache
         id: opencv-cache
