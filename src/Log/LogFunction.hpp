@@ -12,7 +12,6 @@ class LogFunction
 
 public:
   explicit LogFunction(std::string&& funName)
-  try
   {
     if constexpr (Show)
     {
@@ -21,18 +20,11 @@ public:
       Log::Function("{} started", mFunName);
     }
   }
-  catch (...)
-  {
-  }
 
   ~LogFunction()
-  try
   {
     if constexpr (Show)
       Log::Function("{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
-  }
-  catch (...)
-  {
   }
 
 private:
