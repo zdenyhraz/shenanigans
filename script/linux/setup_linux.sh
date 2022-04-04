@@ -18,6 +18,6 @@ sudo apt-get install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-
 sudo apt-get install libpython-dev
 
 # torch
-wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip --no-check-certificate
-sudo chmod 755 libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
-unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+(cd libs && wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcpu.zip --no-check-certificate)
+sudo chmod 755 libs/libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip
+(cd libs && unzip libtorch-cxx11-abi-shared-with-deps-1.11.0+cpu.zip)
