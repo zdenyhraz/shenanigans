@@ -60,9 +60,10 @@ private:
 
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  try
   {
-    if (not ShouldLog(logLevel)) [[unlikely]]
-      return;
+    if (not ShouldLog(logLevel))
+      [[unlikely]] return;
 
     if (mLineOffsets.size() > mMaxMessages)
     {
@@ -77,6 +78,10 @@ private:
     for (i32 newSize = mTextBuffer.size(); oldSize < newSize; ++oldSize)
       if (mTextBuffer[oldSize] == '\n')
         mLineOffsets.emplace_back(oldSize + 1, logLevel);
+  }
+  catch (const std::exception& e)
+  {
+    TermLogger::Error("LogMessage error: {}", e.what());
   }
 
   void Clear()
