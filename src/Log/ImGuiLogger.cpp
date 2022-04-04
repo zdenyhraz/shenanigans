@@ -18,7 +18,7 @@ static consteval std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelC
   return colors;
 }
 
-void ImGuiLogger::Draw()
+void ImGuiLogger::RenderInternal()
 {
   ImGui::Begin("Log");
 

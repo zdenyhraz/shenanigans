@@ -8,11 +8,11 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_TERMINAL_ERROR("Error: {}", e.what());
+  LOG_ERROR("Error: {}", e.what());
   return EXIT_FAILURE;
 }
 catch (...)
 {
-  LOG_TERMINAL_ERROR("Error: Unknown error");
+  LOG_ERROR("Error: Unknown error");
   return EXIT_FAILURE;
 }
