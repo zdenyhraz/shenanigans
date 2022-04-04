@@ -1,7 +1,9 @@
+#include "ML/RegressionModel.hpp"
+
 int main(int argc, char** argv)
 try
 {
-  LOG_DEBUG("hi mom");
+  RegressionModelTest();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)

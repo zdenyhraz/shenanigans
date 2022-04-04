@@ -44,8 +44,10 @@ if log:
 
 plt.title(title)
 plt.tight_layout()
-plt.draw()
-plt.pause(1e-9)
 
 if save:
   plt.savefig(save, bbox_inches='tight')
+else
+  plt.draw()
+  plt.pause(1e-9)
+

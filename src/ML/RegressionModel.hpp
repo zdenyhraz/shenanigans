@@ -94,12 +94,13 @@ private:
 void RegressionModelTest()
 {
   RegressionModel model;
-  model.Train({.epochCount = 50}, "128", "16");
+  model.Train({.epochCount = 50, .plotProgress = false}, "128", "16");
   i64 n = 1001;
   torch::Tensor inputTensor = torch::linspace(0, 1, n).reshape({n, 1});
   torch::Tensor targetTensor = RegressionModelTestFunction(inputTensor);
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::Plot("RegressionModel predictions", {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
+  PyPlot::SavePlot("../debug/regression_predictions.png", "RegressionModel predictions",
+      {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
   return;
 }

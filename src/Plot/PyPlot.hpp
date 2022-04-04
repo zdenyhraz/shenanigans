@@ -54,10 +54,16 @@ public:
 
   static void Initialize();
   static void Render();
-  static void Plot(const std::string& name, const PlotData1D& data) { ScheldulePlot(name, "plot1d", GetScopeData(name, data)); }
-  static void Plot(const std::string& name, const PlotData2D& data) { ScheldulePlot(name, "plot2d", GetScopeData(name, data)); }
-  static void PlotSurf(const std::string& name, const PlotData3D& data) { ScheldulePlot(name, "plot3d", GetScopeData(name, data)); }
-  static void Plot(const std::string& name, const std::string& type, const py::dict& data) { ScheldulePlot(name, type, GetScopeData(name, data)); }
+
+  static void Plot(const std::string& name, const PlotData1D& data);
+  static void Plot(const std::string& name, const PlotData2D& data);
+  static void PlotSurf(const std::string& name, const PlotData3D& data);
+  static void Plot(const std::string& name, const std::string& type, const py::dict& data);
+
+  static void SavePlot(const std::string& path, const std::string& name, const PlotData1D& data);
+  static void SavePlot(const std::string& path, const std::string& name, const PlotData2D& data);
+  static void SavePlotSurf(const std::string& path, const std::string& name, const PlotData3D& data);
+  static void SavePlot(const std::string& path, const std::string& name, const std::string& type, const py::dict& data);
 
 private:
   inline static std::unordered_map<std::string, i32> mPlotIds;
@@ -65,13 +71,13 @@ private:
   inline static std::queue<PlotData> mPlotQueue;
   inline static std::mutex mMutex;
 
+  static void ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data);
+  static void PlotInternal(const PlotData& plotdata);
+
   static i32 GetPlotId(const std::string& name);
   static void AddDefaultScopeData(const std::string& name, py::dict& scope);
   static py::dict GetScopeData(const std::string& name, const py::dict& data);
   static py::dict GetScopeData(const std::string& name, const PlotData1D& data);
   static py::dict GetScopeData(const std::string& name, const PlotData2D& data);
   static py::dict GetScopeData(const std::string& name, const PlotData3D& data);
-
-  static void ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data);
-  static void PlotInternal(const PlotData& plotdata);
 };

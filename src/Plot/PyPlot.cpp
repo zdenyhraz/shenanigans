@@ -9,6 +9,24 @@ void PyPlot::Initialize()
   py::eval_file("../script/plot/plot_init.py");
 }
 
+void PyPlot::Render()
+{
+  PROFILE_FUNCTION;
+  std::scoped_lock lock(mMutex);
+
+  while (not mPlotQueue.empty())
+  {
+    PlotInternal(mPlotQueue.front());
+    mPlotQueue.pop();
+  }
+}
+
+void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data)
+{
+  std::scoped_lock lock(mMutex);
+  mPlotQueue.emplace(name, type, data);
+}
+
 void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
@@ -35,10 +53,10 @@ void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
 
   if (not scope.contains("aspectratio"))
     scope["aspectratio"] = 1;
-  if (not scope.contains("save"))
-    scope["save"] = false;
   if (not scope.contains("log"))
     scope["log"] = false;
+  if (not scope.contains("save"))
+    scope["save"] = "";
 }
 
 py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)
@@ -142,20 +160,50 @@ py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
   return scope;
 }
 
-void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data)
+void PyPlot::Plot(const std::string& name, const PlotData1D& data)
 {
-  std::scoped_lock lock(mMutex);
-  mPlotQueue.emplace(name, type, data);
+  ScheldulePlot(name, "plot1d", GetScopeData(name, data));
 }
 
-void PyPlot::Render()
+void PyPlot::Plot(const std::string& name, const PlotData2D& data)
 {
-  PROFILE_FUNCTION;
-  std::scoped_lock lock(mMutex);
+  ScheldulePlot(name, "plot2d", GetScopeData(name, data));
+}
 
-  while (not mPlotQueue.empty())
-  {
-    PlotInternal(mPlotQueue.front());
-    mPlotQueue.pop();
-  }
+void PyPlot::PlotSurf(const std::string& name, const PlotData3D& data)
+{
+  ScheldulePlot(name, "plot3d", GetScopeData(name, data));
+}
+
+void PyPlot::Plot(const std::string& name, const std::string& type, const py::dict& data)
+{
+  ScheldulePlot(name, type, GetScopeData(name, data));
+}
+
+void PyPlot::SavePlot(const std::string& path, const std::string& name, const PlotData1D& data)
+{
+  auto scope = GetScopeData(name, data);
+  scope["save"] = path;
+  ScheldulePlot(name, "plot1d", scope);
+}
+
+void PyPlot::SavePlot(const std::string& path, const std::string& name, const PlotData2D& data)
+{
+  auto scope = GetScopeData(name, data);
+  scope["save"] = path;
+  ScheldulePlot(name, "plot2d", scope);
+}
+
+void PyPlot::SavePlotSurf(const std::string& path, const std::string& name, const PlotData3D& data)
+{
+  auto scope = GetScopeData(name, data);
+  scope["save"] = path;
+  ScheldulePlot(name, "plot3d", scope);
+}
+
+void PyPlot::SavePlot(const std::string& path, const std::string& name, const std::string& type, const py::dict& data)
+{
+  auto scope = GetScopeData(name, data);
+  scope["save"] = path;
+  ScheldulePlot(name, type, scope);
 }
