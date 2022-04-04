@@ -1,5 +1,6 @@
 #pragma once
 #include "Logger.hpp"
+#include "TerminalLogger.hpp"
 
 class ImGuiLogger : public Logger
 {
@@ -81,7 +82,7 @@ private:
   }
   catch (const std::exception& e)
   {
-    TermLogger::Error("LogMessage error: {}", e.what());
+    TerminalLogger::Error("LogMessage error: {}", e.what());
   }
 
   void Clear()

@@ -1,7 +1,7 @@
 #pragma once
 #include "Logger.hpp"
 
-class TermLogger : public Logger
+class TerminalLogger : public Logger
 {
 public:
   template <typename... Args>
@@ -47,17 +47,17 @@ public:
   }
 
 private:
-  static TermLogger& Get()
+  static TerminalLogger& Get()
   {
-    static TermLogger logger;
+    static TerminalLogger logger;
     return logger;
   }
 
   template <typename... Args>
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
-    if (not ShouldLog(logLevel)) [[unlikely]]
-      return;
+    if (not ShouldLog(logLevel))
+      [[unlikely]] return;
 
     fmt::print("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
   }

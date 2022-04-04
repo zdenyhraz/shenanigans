@@ -62,8 +62,11 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
     style.WindowRounding = 0.0f;
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL3_Init("#version 130");
+  if (not ImGui_ImplGlfw_InitForOpenGL(window, true))
+    throw std::runtime_error("Failed to initialize ImGui GLFW");
+  if (not ImGui_ImplOpenGL3_Init("#version 130"))
+    throw std::runtime_error("Failed to initialize ImGui OpenGL");
+
   return io;
 }
 
