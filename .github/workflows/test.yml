@@ -44,8 +44,7 @@ jobs:
         run: ctest --rerun-failed --output-on-failure
 
       - name: Codecov upload
-        working-directory: ./build
-        run: |
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov --dir .
+        uses: codecov/codecov-action@v2
+        with:
+          directory: ./build
+          verbose: true
