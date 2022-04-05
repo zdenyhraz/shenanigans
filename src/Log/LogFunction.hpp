@@ -17,15 +17,17 @@ class LogFunction
   time_point mStartTime;
 
 public:
-  explicit LogFunction(std::string&& funName)
+  explicit LogFunction(const char* funName)
   {
     if constexpr (Show)
     {
       mStartTime = clock::now();
-      mFunName = std::move(funName);
+      mFunName = funName;
       Log::Function("{} started", mFunName);
     }
   }
+
+  explicit LogFunction(std::string&& funName) : LogFunction(funName.c_str()) {}
 
   ~LogFunction()
   {

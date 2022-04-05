@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup linux
         run: sudo chmod 755 script/linux/setup_linux.sh && ./script/linux/setup_linux.sh
-    
+
       - name: OpenCV cache
         id: opencv-cache
         uses: actions/cache@v3
@@ -64,11 +64,11 @@ jobs:
         run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
 
       - name: CMake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
 
       - name: Run build-wrapper
         run: |
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build ${{github.workspace}}/build --config Release -j 6
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build ./build --config Release -j 6
 
       - name: Run sonar-scanner
         env:

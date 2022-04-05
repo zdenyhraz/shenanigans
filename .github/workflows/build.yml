@@ -13,7 +13,7 @@ jobs:
 
       - name: Setup linux
         run: sudo chmod 755 script/linux/setup_linux.sh && ./script/linux/setup_linux.sh
-    
+
       - name: OpenCV cache
         id: opencv-cache
         uses: actions/cache@v3
@@ -30,7 +30,7 @@ jobs:
         run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
 
       - name: CMake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -G Ninja
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
 
       - name: CMake build
-        run: cmake --build ${{github.workspace}}/build --config Release -j 6
+        run: cmake --build ./build --config Release -j 6
