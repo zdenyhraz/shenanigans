@@ -42,6 +42,6 @@ plt.tight_layout()
 
 if save:
   plt.savefig(save, bbox_inches='tight')
-else
+else:
   plt.draw()
   plt.pause(1e-9)
