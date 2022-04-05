@@ -35,13 +35,17 @@ jobs:
       - name: CMake build
         run: cmake --build ./build --config Release -j 6
 
+      - name: CMake test
+        working-directory: ./build
+        run: ctest --rerun-failed --output-on-failure
+
       - name: Execute test
         working-directory: ./build
         run: ./shenanigans_test --gtest_output=xml:shenanigans_coverage.xml
 
-      - name: CMake test
+      - name: Show test report
         working-directory: ./build
-        run: ctest --rerun-failed --output-on-failure
+        run: cat shenanigans_coverage.xml
 
       - name: Codecov upload
         uses: codecov/codecov-action@v2
