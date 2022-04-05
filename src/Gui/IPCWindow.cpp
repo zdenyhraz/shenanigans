@@ -18,11 +18,6 @@ void IPCWindow::Render()
           UpdateIPCParameters(mIPCOptimized);
         });
 
-  ImGui::SameLine();
-
-  if (ImGui::Button("Debug"))
-    LaunchAsync([]() { IPCDebug::ShowDebugStuff(mIPC); });
-
   ImGui::SliderInt("Width", &mParameters.Cols, 3, 512);
   ImGui::SliderInt("Height", &mParameters.Rows, 3, 512);
   ImGui::SliderFloat("BPL", &mParameters.BPL, 0, 1);

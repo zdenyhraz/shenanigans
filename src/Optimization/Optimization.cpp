@@ -20,7 +20,7 @@ OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname)
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
     const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
-  LOG_SCOPE("PlotObjectiveFunctionLandscape");
+  LOG_FUNCTION;
 
   if (xParamIndex < 0 or yParamIndex < 0 or xParamIndex == yParamIndex)
     throw std::runtime_error("Bad x/y parameter indices");

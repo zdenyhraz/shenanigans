@@ -19,7 +19,7 @@ template <typename T>
 inline std::vector<cv::Mat> LoadImages(const std::string& path)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("LoadImages");
+  LOG_FUNCTION;
   LOG_INFO("Loading images from '{}'...", path);
 
   if (!std::filesystem::is_directory(path))

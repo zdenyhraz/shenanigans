@@ -79,10 +79,11 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
   PyPlot::Plot(fmt::format("{} L1A", ipc.mDebugName), {.z = mat, .save = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
 
-void IPCDebug::ShowDebugStuff(const IPC& ipc)
+void IPCDebug::ShowDebugStuff(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 try
 {
-  LOG_SCOPE("ShowDebugStuff()");
+  PROFILE_FUNCTION;
+  LOG_FUNCTION;
 
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;
@@ -90,13 +91,11 @@ try
   constexpr bool debugWindow = false;
   constexpr bool debugBandpass = false;
   constexpr bool debugBandpassRinging = false;
-  constexpr f64 noiseStdev = 0.01;
 
   if constexpr (debugShift)
   {
     const auto image = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
-    const f64 shiftmax = 0.4 * ipc.mRows;
-    cv::Point2d shift(Random::Rand(-1., 1.) * shiftmax, Random::Rand(-1., 1.) * shiftmax);
+    cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
     cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
         std::clamp(Random::Rand() * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
     cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
@@ -109,10 +108,11 @@ try
     AddNoise<IPC::Float>(image2, noiseStdev);
 
     const auto ipcshift = ipc.Calculate<true>(image1, image2);
+    const auto error = ipcshift - shift;
 
-    LOG_INFO("Artificial shift = {}", shift);
-    LOG_INFO("Estimated shift = {}", ipcshift);
-    LOG_INFO("Error = {}", ipcshift - shift);
+    LOG_INFO("Artificial shift = [{:.4f}, {:.4f}]", shift.x, shift.y);
+    LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
+    LOG_INFO("Error = [{:.4f}, {:.4f}]", error.x, error.y);
   }
 
   if constexpr (debugAlign)
@@ -125,11 +125,11 @@ try
       image2 = RoiCrop(image2, image1.cols / 2, image1.rows / 2, ipc.mCols, ipc.mRows);
     }
 
-    Shift(image2, cv::Point2d(-950, 1050));
-    Rotate(image2, 70, 1.2);
-
     AddNoise<IPC::Float>(image1, noiseStdev);
     AddNoise<IPC::Float>(image2, noiseStdev);
+
+    Shift(image2, cv::Point2d(-950, 1050));
+    Rotate(image2, 70, 1.2);
 
     const auto aligned = IPCAlign::Align(ipc, image1, image2);
   }
@@ -142,13 +142,12 @@ try
     cv::Mat image2 = image1.clone();
     cv::Mat crop2;
     const i32 iters = 51;
-    const f64 totalshift = 1.;
     cv::Mat noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
 
     for (i32 i = 0; i < iters; ++i)
     {
       ipc.SetDebugIndex(i);
-      const cv::Point2d shift(totalshift * i / (iters - 1), totalshift * i / (iters - 1));
+      const cv::Point2d shift(maxShift * i / (iters - 1), maxShift * i / (iters - 1));
       const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
       cv::warpAffine(image1, image2, Tmat, image2.size());
       crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
@@ -266,7 +265,7 @@ try
     // Plot2D::Plot("IPCdebug2D", imgfG);
   }
 
-  LOG_INFO("IPC debug stuff shown");
+  LOG_DEBUG("IPC debug stuff shown");
 }
 catch (const std::exception& e)
 {

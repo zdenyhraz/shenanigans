@@ -46,7 +46,7 @@ public:
     void Load(const std::string& path)
     {
       PROFILE_FUNCTION;
-      LOG_SCOPE("DifferentialRotationData::Load");
+      LOG_FUNCTION;
       cv::FileStorage file(path, cv::FileStorage::READ);
       file["xsize"] >> xsize;
       file["ysize"] >> ysize;
@@ -68,7 +68,7 @@ public:
     void Save(const std::string& dataPath, const IPC& ipc) const
     {
       PROFILE_FUNCTION;
-      LOG_SCOPE("DifferentialRotationData::Save");
+      LOG_FUNCTION;
       std::string path = fmt::format("{}/diffrot.json", dataPath);
       LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path).string());
       cv::FileStorage file(path, cv::FileStorage::WRITE);
@@ -190,7 +190,7 @@ public:
       DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
-    LOG_SCOPE_IF(not Managed, "DifferentialRotation::Calculate");
+    LOG_FUNCTION;
     DifferentialRotationData data(xsize, ysize, idstep, idstride, thetamax, cadence, idstart);
     std::atomic<i32> progressi = 0;
     const auto tstep = idstep * cadence;
@@ -283,7 +283,7 @@ public:
   static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
-    LOG_SCOPE("DifferentialRotation::Optimize");
+    LOG_FUNCTION;
     i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over the entire time span
     LOG_INFO("Optimization xsize: {}", xsizeopt);
     LOG_INFO("Optimization ysize: {}", ysizeopt);
@@ -455,7 +455,7 @@ private:
   static void Plot(const DifferentialRotationData& data, const std::string& dataPath)
   {
     PROFILE_FUNCTION;
-    LOG_SCOPE("DifferentialRotation::Plot");
+    LOG_FUNCTION;
     const auto times = GetTimesInDays(data.idstep * data.cadence, data.idstride * data.cadence, data.xsize);
     PlotMeridianCurve(data, dataPath, 27);
 
@@ -505,7 +505,7 @@ private:
   static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
-    LOG_SCOPE("DifferentialRotation::SaveOptimizedParameters");
+    LOG_FUNCTION;
     std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
     LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::weakly_canonical(path).string());
 

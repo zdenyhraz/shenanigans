@@ -9,6 +9,11 @@ void IPCOptimizeWindow::Render()
 {
   ImGui::Begin("IPC optimization");
 
+  if (ImGui::Button("Show"))
+    LaunchAsync([]() { IPCDebug::ShowDebugStuff(IPCWindow::GetIPCOptimized(), mParameters.maxShift, mParameters.noiseStddev); });
+
+  ImGui::SameLine();
+
   if (ImGui::Button("Optimize"))
     LaunchAsync(
         []()

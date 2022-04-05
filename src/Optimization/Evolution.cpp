@@ -12,7 +12,7 @@ try
   PROFILE_FUNCTION;
   if (mConsoleOutput)
   {
-    LOG_SCOPE("Evolution optimization");
+    LOG_FUNCTION;
     LOG_INFO("Running evolution...");
   }
 
@@ -103,7 +103,7 @@ catch (...)
 void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, usize runsPerObj, usize maxFunEvals, f64 optimalFitness)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("Evolution metaoptimization");
+  LOG_FUNCTION;
 
   enum MetaParameter : u8
   {
@@ -278,7 +278,7 @@ try
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Output initialization");
+    LOG_FUNCTION;
 
   if (mFileOutput)
   {
@@ -312,7 +312,7 @@ try
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Objective function normality check");
+    LOG_FUNCTION;
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = obj(arg);
@@ -352,7 +352,7 @@ try
     return;
 
   if (mConsoleOutput)
-    LOG_SCOPE("Validation function normality check");
+    LOG_FUNCTION;
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = valid(arg);
@@ -382,7 +382,7 @@ void Evolution::CheckBounds()
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Objective function parameter bounds check");
+    LOG_FUNCTION;
 
   if (mLB.size() != mUB.size())
     throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
@@ -670,7 +670,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Population initialization");
+    LOG_FUNCTION;
   entities = Zerovect(NP, Entity(N));
   std::vector<f64> RB = UB - LB;
   const f64 initialMinAvgDist = 0.5;
@@ -724,7 +724,7 @@ void Evolution::Population::InitializeOffspring(usize nParents)
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Offspring initialization");
+    LOG_FUNCTION;
   offspring = Zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
   for (usize eid = 0; eid < entities.size(); ++eid)
   {
@@ -737,7 +737,7 @@ void Evolution::Population::InitializeBestEntity()
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-    LOG_SCOPE("Best entity search");
+    LOG_FUNCTION;
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
 }

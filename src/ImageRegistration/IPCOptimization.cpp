@@ -8,7 +8,7 @@ void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, cons
 try
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("Optimize");
+  LOG_FUNCTION;
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
   const auto trainImages = LoadImages(trainDirectory);
@@ -64,7 +64,7 @@ void IPCOptimization::Optimize(IPC& ipc, const std::function<f64(const IPC&)>& o
 try
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("Optimize");
+  LOG_FUNCTION;
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
   const auto optimalParameters = CalculateOptimalParameters(CreateObjectiveFunction(ipc, obj), nullptr, popSize);
@@ -94,7 +94,7 @@ catch (const std::exception& e)
 std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("LoadImages");
+  LOG_FUNCTION;
   LOG_INFO("Loading images from '{}'...", imagesDirectory);
 
   if (!std::filesystem::is_directory(imagesDirectory))
@@ -123,7 +123,7 @@ std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirect
 std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("CreateImagePairs");
+  LOG_FUNCTION;
 
   if (maxShift <= 0)
     throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
@@ -183,7 +183,7 @@ IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>
 std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("CreateObjectiveFunction");
+  LOG_FUNCTION;
   return [&](const std::vector<f64>& params)
   {
     const auto ipc = CreateIPCFromParams(ipc_, params);
@@ -203,7 +203,7 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
 std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::function<f64(const IPC&)>& obj)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("CreateObjectiveFunction");
+  LOG_FUNCTION;
   return [&](const std::vector<f64>& params)
   {
     const auto ipc = CreateIPCFromParams(ipc_, params);
@@ -217,7 +217,7 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
 std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("CalculateOptimalParameters");
+  LOG_FUNCTION;
 
   if (popSize < 4)
     throw std::runtime_error(fmt::format("Invalid population size ({})", popSize));
@@ -246,7 +246,7 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function
 void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("ApplyOptimalParameters");
+  LOG_FUNCTION;
 
   if (optimalParameters.size() < OptimizedParameterCount)
     throw std::runtime_error("Cannot apply optimal parameters - wrong parameter count");
@@ -272,7 +272,7 @@ void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shif
     const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("ShowOptimizationPlots");
+  LOG_FUNCTION;
 
   std::vector<f64> shiftsXReference, shiftsXReferenceError;
   std::vector<f64> shiftsXPixel, shiftsXPixelError;
@@ -387,7 +387,7 @@ f64 IPCOptimization::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsRe
 void IPCOptimization::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
-  LOG_SCOPE("ShowRandomImagePair");
+  LOG_FUNCTION;
 
   const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
   cv::Mat concat;
