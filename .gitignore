@@ -1,7 +1,8 @@
-.vscode/*
-build/*
-data/diffrot_*
-debug/*
+.vscode
+build
+debug
 libs/libtorch
+__pycache__
 
 *.dump
+data/diffrot_*

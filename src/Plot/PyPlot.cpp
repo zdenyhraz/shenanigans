@@ -2,11 +2,16 @@
 #include "Python/Python.hpp"
 
 void PyPlot::Initialize()
+try
 {
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
-  py::eval_file("../script/plot/plot_init.py");
+  py::module::import("plot.plot_init").attr("Init")();
+}
+catch (const std::exception& e)
+{
+  LOG_ERROR("PyPlot::Initialize error: {}", e.what());
 }
 
 void PyPlot::Render()
@@ -31,7 +36,7 @@ void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
   PROFILE_FUNCTION;
-  py::eval_file(fmt::format("../script/plot/{}.py", plotdata.type), py::globals(), plotdata.data);
+  py::module::import(fmt::format("plot.{}", plotdata.type).c_str()).attr("Plot")(**plotdata.data);
 }
 catch (const std::exception& e)
 {
@@ -53,8 +58,6 @@ void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
 
   if (not scope.contains("aspectratio"))
     scope["aspectratio"] = 1;
-  if (not scope.contains("log"))
-    scope["log"] = false;
   if (not scope.contains("save"))
     scope["save"] = "";
 }
@@ -154,8 +157,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
   scope["ymax"] = data.ymax;
   scope["aspectratio"] = data.aspectratio;
   scope["cmap"] = data.cmap;
-  scope["rstride"] = data.rstride;
-  scope["cstride"] = data.cstride;
   scope["save"] = data.save;
   return scope;
 }

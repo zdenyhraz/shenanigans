@@ -48,7 +48,6 @@ public:
     std::string xlabel = "x", ylabel = "y", zlabel = "z";
     f64 aspectratio = 1;
     std::string cmap = "jet";
-    u32 rstride = 0, cstride = 0;
     std::string save;
   };
 
