@@ -5,7 +5,7 @@
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml/badge.svg"/></a>
-<a href="https://codecov.io/gh/zdenyhraz/shenanigans"><img src="https://codecov.io/gh/zdenyhraz/shenanigans/branch/master/graph/badge.svg?token=2CD71S18CG"/></a>
+<!-- <a href="https://codecov.io/gh/zdenyhraz/shenanigans"><img src="https://codecov.io/gh/zdenyhraz/shenanigans/branch/master/graph/badge.svg?token=2CD71S18CG"/></a> -->
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
@@ -24,6 +24,7 @@
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=bugs"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues-raw/zdenyhraz/shenanigans"></a>
 </p>
+
 
 Semi-random funky stuff, mainly for my PhD experiments and [articles](#article-links). Contains calculations and algorithm implementations for various applied mathematics and astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, sub-pixel [image registration](https://en.wikipedia.org/wiki/Image_registration), non-convex [optimization](https://en.wikipedia.org/wiki/Mathematical_optimization).
 
