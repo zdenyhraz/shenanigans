@@ -3,6 +3,7 @@
 int main(int argc, char** argv)
 try
 {
+  LOG_FUNCTION;
   Shenanigans::Run();
   return EXIT_SUCCESS;
 }

@@ -13,7 +13,7 @@ inline std::tuple<cv::Mat, cv::Mat> CalculateGradient(const cv::Mat& img)
       f32 gradY = (img.at<f32>(r + 1, c) - img.at<f32>(r - 1, c)) / 2;
       gradM.at<f32>(r, c) = sqrt(Sqr(gradX) + Sqr(gradY));
       f32 angle = atan2(gradY, gradX);
-      gradA.at<f32>(r, c) = angle >= 0 ? angle : angle + TwoPi;
+      gradA.at<f32>(r, c) = angle >= 0 ? angle : angle + 2 * std::numbers::pi;
     }
   }
   return {gradM, gradA};
@@ -37,7 +37,7 @@ inline std::tuple<i32, i32, i32, i32> GetTwoPairs(f32 angle, i32 r, i32 c, const
     f32 dangle;
     dangle = atan2(relativePoint.y, relativePoint.x);                         // from the origin
     dangle = atan2(closest.y - relativePoint.y, closest.x - relativePoint.x); // from the closest point on the line
-    dangle = dangle >= 0 ? dangle : dangle + TwoPi;
+    dangle = dangle >= 0 ? dangle : dangle + 2 * std::numbers::pi;
 
     if (d <= mind)
     {

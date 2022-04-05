@@ -75,7 +75,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
 inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,
     const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
 {
-  LOG_FUNCTION("DrawFeatureMatchArrows");
+  LOG_SCOPE("DrawFeatureMatchArrows");
   cv::Mat out;
   cv::cvtColor(img, out, cv::COLOR_GRAY2BGR);
 
@@ -182,7 +182,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 inline cv::Mat DrawFeatureMatchArrows(
     const cv::Mat& img, const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& kp1, const std::vector<cv::KeyPoint>& kp2, const FeatureMatchData& data)
 {
-  LOG_FUNCTION("DrawFeatureMatchArrows");
+  LOG_SCOPE("DrawFeatureMatchArrows");
   cv::Mat out;
   cv::cvtColor(img, out, cv::COLOR_GRAY2BGR);
 
@@ -229,7 +229,7 @@ inline cv::Mat DrawFeatureMatchArrows(
 inline void featureMatch(const FeatureMatchData& data)
 try
 {
-  LOG_FUNCTION("FeatureMatch");
+  LOG_SCOPE("FeatureMatch");
 
   cv::Mat img_base = cv::imread(data.path + "5.PNG", cv::IMREAD_GRAYSCALE);
   std::vector<std::vector<cv::DMatch>> matches_all(piccnt - 1);
@@ -263,7 +263,7 @@ try
     // filter matches using the Lowe's ratio test
     std::vector<cv::DMatch> matches;
     {
-      LOG_FUNCTION("Filter matches based on ratio test");
+      LOG_SCOPE("Filter matches based on ratio test");
       for (usize i = 0; i < knn_matches.size(); i++)
         if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
           matches.push_back(knn_matches[i][0]);
@@ -271,7 +271,7 @@ try
 
     // get first best fits
     {
-      LOG_FUNCTION("Calculate N best matches");
+      LOG_SCOPE("Calculate N best matches");
       std::sort(matches.begin(), matches.end(), [&](const cv::DMatch& a, const cv::DMatch& b) { return a.distance < b.distance; });
       matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (i32)matches.size()));
       matches_all[pic] = matches;
@@ -279,7 +279,7 @@ try
 
     if (0)
     {
-      LOG_FUNCTION("Draw matches");
+      LOG_SCOPE("Draw matches");
       cv::Mat img_matches;
       drawMatches(img1, keypoints1, img2, keypoints2, matches, img_matches, cv::Scalar(0, 255, 255), cv::Scalar(0, 255, 0), std::vector<char>(), cv::DrawMatchesFlags::DEFAULT);
       Showimg(img_matches, "Good matches");
@@ -288,22 +288,24 @@ try
 
   std::vector<std::tuple<usize, usize, cv::DMatch, bool>> matches_all_serialized;
   {
-    LOG_FUNCTION("Sort matches from fastest to slowest speeds");
+    LOG_SCOPE("Sort matches from fastest to slowest speeds");
 
     usize i = 0;
     for (usize pic = 0; pic < piccnt - 1; pic++)
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({i++, pic, match, false});
 
-    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(), [&](const auto& a, const auto& b) {
-      const auto& [idx1, pic1, match1, ignore1] = a;
-      const auto& [idx2, pic2, match2, ignore2] = b;
-      const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
-      const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-      const auto spd1 = Magnitude(shift1);
-      const auto spd2 = Magnitude(shift2);
-      return spd1 > spd2;
-    });
+    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(),
+        [&](const auto& a, const auto& b)
+        {
+          const auto& [idx1, pic1, match1, ignore1] = a;
+          const auto& [idx2, pic2, match2, ignore2] = b;
+          const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
+          const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
+          const auto spd1 = Magnitude(shift1);
+          const auto spd2 = Magnitude(shift2);
+          return spd1 > spd2;
+        });
 
     usize newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)
@@ -312,7 +314,7 @@ try
 
   if (data.overlapdistance > 0)
   {
-    LOG_FUNCTION("Filter overlapping matches");
+    LOG_SCOPE("Filter overlapping matches");
 
     for (const auto& [idx, pic, match, overlap] : matches_all_serialized)
     {
@@ -374,7 +376,7 @@ try
   // filter matches using the Lowe's ratio test
   std::vector<cv::DMatch> matches;
   {
-    LOG_FUNCTION("Filter matches based on ratio test");
+    LOG_SCOPE("Filter matches based on ratio test");
     for (usize i = 0; i < knn_matches.size(); i++)
       if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
         matches.push_back(knn_matches[i][0]);

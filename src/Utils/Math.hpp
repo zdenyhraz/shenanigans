@@ -1,14 +1,14 @@
 #pragma once
 
-static constexpr f64 Pi = 3.1415926535897932384626433;
-static constexpr f64 TwoPi = Pi * 2;
-static constexpr f64 HalfPi = Pi / 2;
-static constexpr f64 QuartPi = Pi / 4;
-static constexpr f64 E = 2.7182818284590452353602874;
-static constexpr f64 Rad = 360. / TwoPi;
-static constexpr f64 SecondsInDay = 24. * 60. * 60.;
-static constexpr f64 RadPerSecToDegPerDay = Rad * SecondsInDay;
-static constexpr f64 Infi32 = std::numeric_limits<i32>::max();
+inline constexpr f64 ToRadians(f64 degrees)
+{
+  return degrees / 360. * 2 * std::numbers::pi;
+}
+
+inline constexpr f64 ToDegrees(f64 radians)
+{
+  return radians * 360. / (2 * std::numbers::pi);
+}
 
 template <typename T>
 inline constexpr T Sqr(T x)
@@ -50,16 +50,6 @@ inline f64 Median(std::vector<T>& vec)
 inline f64 Gaussian(f64 x, f64 amp, f64 mid, f64 sigma)
 {
   return amp * std::exp(-0.5 * std::pow((x - mid) / sigma, 2));
-}
-
-inline f64 ToDegrees(f64 rad)
-{
-  return rad * Rad;
-}
-
-inline f64 ToRadians(f64 deg)
-{
-  return deg / Rad;
 }
 
 template <typename T>

@@ -185,7 +185,7 @@ public:
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode, "IPC::Calculate");
+    LOG_SCOPE_IF(DebugMode, "IPC::Calculate");
 
     if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
       throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));

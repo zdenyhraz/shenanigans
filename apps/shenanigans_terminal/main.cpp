@@ -3,6 +3,7 @@
 int main(int argc, char** argv)
 try
 {
+  LOG_FUNCTION;
   RegressionModelTest();
   return EXIT_SUCCESS;
 }

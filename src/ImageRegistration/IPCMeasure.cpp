@@ -8,7 +8,7 @@
 void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::string& path, i32 iters, f64 maxShift, f64 noiseStddev, f32* progress)
 {
   PROFILE_FUNCTION;
-  LOG_FUNCTION("IPCMeasure::MeasureAccuracy");
+  LOG_SCOPE("IPCMeasure::MeasureAccuracy");
   LOG_DEBUG("Measuring image {}% registration accuracy on images from {}", mQuanT * 100, path);
 
   cv::Mat refShiftsX(iters, iters, GetMatType<f64>());
@@ -27,7 +27,7 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
   for (const auto& image : images)
   {
-    LOG_FUNCTION(fmt::format("Image {} registration accuracy measurement", imageIndex++));
+    LOG_SCOPE(fmt::format("Image {} registration accuracy measurement", imageIndex++));
     cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
     AddNoise<f64>(image1, noiseStddev);
     PyPlot::Plot("Image", {.z = image1, .cmap = "gray"});

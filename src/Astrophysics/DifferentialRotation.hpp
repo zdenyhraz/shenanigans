@@ -7,6 +7,9 @@
 
 class DifferentialRotation
 {
+  static constexpr f64 SecondsInDay = 24. * 60. * 60.;
+  static constexpr f64 RadPerSecToDegPerDay = ToDegrees(1) * SecondsInDay;
+
 public:
   struct ImageHeader
   {
@@ -43,7 +46,7 @@ public:
     void Load(const std::string& path)
     {
       PROFILE_FUNCTION;
-      LOG_FUNCTION("DifferentialRotationData::Load");
+      LOG_SCOPE("DifferentialRotationData::Load");
       cv::FileStorage file(path, cv::FileStorage::READ);
       file["xsize"] >> xsize;
       file["ysize"] >> ysize;
@@ -65,7 +68,7 @@ public:
     void Save(const std::string& dataPath, const IPC& ipc) const
     {
       PROFILE_FUNCTION;
-      LOG_FUNCTION("DifferentialRotationData::Save");
+      LOG_SCOPE("DifferentialRotationData::Save");
       std::string path = fmt::format("{}/diffrot.json", dataPath);
       LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path).string());
       cv::FileStorage file(path, cv::FileStorage::WRITE);
@@ -160,7 +163,7 @@ public:
     i32 ysize = 101;
     i32 idstep = 1;
     i32 idstride = 25;
-    f64 thetamax = 50. / Rad;
+    f64 thetamax = ToRadians(50);
     i32 cadence = 45;
     i32 idstart = 123456;
 
@@ -187,7 +190,7 @@ public:
       DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(not Managed, "DifferentialRotation::Calculate");
+    LOG_SCOPE_IF(not Managed, "DifferentialRotation::Calculate");
     DifferentialRotationData data(xsize, ysize, idstep, idstride, thetamax, cadence, idstart);
     std::atomic<i32> progressi = 0;
     const auto tstep = idstep * cadence;
@@ -280,7 +283,7 @@ public:
   static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::Optimize");
+    LOG_SCOPE("DifferentialRotation::Optimize");
     i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over the entire time span
     LOG_INFO("Optimization xsize: {}", xsizeopt);
     LOG_INFO("Optimization ysize: {}", ysizeopt);
@@ -321,7 +324,7 @@ public:
     const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
     PyPlot::Plot("Diffrot opt",
-        {.x = Rad * dataAfter.theta,
+        {.x = ToDegrees(1) * dataAfter.theta,
             .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
                 sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
             .xlabel = "latitude [deg]",
@@ -342,15 +345,15 @@ public:
 
     for (usize y = 0; y < data.theta.size(); ++y)
     {
-      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / Rad);
+      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / ToDegrees(1));
       const f64 mcy = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcpts[y] = cv::Point2d(mcx, mcy);
 
-      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / Rad);
+      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / ToDegrees(1));
       const f64 mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptspred[y] = cv::Point2d(mcxpred, mcypred);
 
-      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / Rad);
+      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / ToDegrees(1));
       const f64 mcyz = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptsz[y] = cv::Point2d(mcxz, mcyz);
     }
@@ -393,7 +396,7 @@ private:
     ImageHeader header;
     header.xcenter = (j["NAXIS1"].get<f64>()) - (j["CRPIX1"].get<f64>()); // [py] (x is flipped, 4095 - fits index from 1)
     header.ycenter = j["CRPIX2"].get<f64>() - 1;                          // [px] (fits index from 1)
-    header.theta0 = j["CRLT_OBS"].get<f64>() / Rad;                       // [rad] (convert from deg to rad)
+    header.theta0 = ToRadians(j["CRLT_OBS"].get<f64>());                  // [rad] (convert from deg to rad)
     header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // [px] (arcsec / arcsec per pixel)
     return header;
   }
@@ -452,19 +455,19 @@ private:
   static void Plot(const DifferentialRotationData& data, const std::string& dataPath)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::Plot");
+    LOG_SCOPE("DifferentialRotation::Plot");
     const auto times = GetTimesInDays(data.idstep * data.cadence, data.idstride * data.cadence, data.xsize);
     PlotMeridianCurve(data, dataPath, 27);
 
     PyPlot::Plot("fits params", {.x = times,
                                     .ys = {data.fshiftx, data.fshifty},
-                                    .y2s = {Rad * data.theta0},
+                                    .y2s = {ToDegrees(1) * data.theta0},
                                     .xlabel = "time [days]",
                                     .ylabel = "fits shift [px]",
                                     .y2label = "theta0 [deg]",
                                     .label_ys = {"center shift x", "center shift y"},
                                     .label_y2s = {"theta0"}});
-    PyPlot::Plot("avgshift x", {.x = Rad * data.theta,
+    PyPlot::Plot("avgshift x", {.x = ToDegrees(1) * data.theta,
                                    .y = GetRowAverage(data.shiftx),
                                    .y2 = GetRowAverage(data.shifty),
                                    .xlabel = "latitude [deg]",
@@ -473,7 +476,7 @@ private:
                                    .label_y = "ipc x",
                                    .label_y2 = "ipc y"});
     PyPlot::Plot("avgomega x", {
-                                   .x = Rad * data.theta,
+                                   .x = ToDegrees(1) * data.theta,
                                    .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
                                        GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
                                    .xlabel = "latitude [deg]",
@@ -481,7 +484,7 @@ private:
                                    .label_ys = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
                                });
     PyPlot::Plot("avgomega y", {
-                                   .x = Rad * data.theta,
+                                   .x = ToDegrees(1) * data.theta,
                                    .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
                                    .xlabel = "latitude [deg]",
                                    .ylabel = "average omega x [deg/day]",
@@ -489,7 +492,7 @@ private:
                                });
 
     const f64 xmin = times.front(), xmax = times.back();
-    const f64 ymin = data.theta.back() * Rad, ymax = data.theta.front() * Rad;
+    const f64 ymin = ToDegrees(data.theta.back()), ymax = ToDegrees(data.theta.front());
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
     const f64 aspectratio = 2;
@@ -502,7 +505,7 @@ private:
   static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION("DifferentialRotation::SaveOptimizedParameters");
+    LOG_SCOPE("DifferentialRotation::SaveOptimizedParameters");
     std::string path = fmt::format("{}/diffrot_ipcopt.json", dataPath);
     LOG_DEBUG("Saving differential rotation IPC optimization results to {} ...", std::filesystem::weakly_canonical(path).string());
 

@@ -82,7 +82,7 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
 void IPCDebug::ShowDebugStuff(const IPC& ipc)
 try
 {
-  LOG_FUNCTION("ShowDebugStuff()");
+  LOG_SCOPE("ShowDebugStuff()");
 
   constexpr bool debugShift = true;
   constexpr bool debugAlign = false;

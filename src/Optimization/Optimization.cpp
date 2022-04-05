@@ -20,7 +20,7 @@ OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname)
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
     const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
-  LOG_FUNCTION("PlotObjectiveFunctionLandscape");
+  LOG_SCOPE("PlotObjectiveFunctionLandscape");
 
   if (xParamIndex < 0 or yParamIndex < 0 or xParamIndex == yParamIndex)
     throw std::runtime_error("Bad x/y parameter indices");
@@ -97,14 +97,16 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   const cv::Scalar pointColorMin(minVal + pointColorRangeMultiplierMin * (maxVal - minVal));
   const cv::Scalar pointColorMinLog(minValLog + pointColorRangeMultiplierMin * (maxValLog - minValLog));
 
-  const auto GetPoint = [&](const std::vector<f64>& parameters) {
+  const auto GetPoint = [&](const std::vector<f64>& parameters)
+  {
     cv::Point point;
     point.x = (parameters[xParamIndex] - xmin) / (xmax - xmin) * cols;
     point.y = rows - 1 - (parameters[yParamIndex] - ymin) / (ymax - ymin) * rows;
     return point;
   };
 
-  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) {
+  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
+  {
     const cv::Point pointOffset1(size, size);
     const cv::Point pointOffset2(size, -size);
 
@@ -114,12 +116,14 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
 
   const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) { cv::circle(mat, point, size, color, thickness, cv::LINE_AA); };
 
-  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness) {
+  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness)
+  {
     cv::line(mat, point1, point2, color, thickness, cv::LINE_AA);
     // arrowedLine(mat, point1, point2, color, thickness, cv::LINE_AA);
   };
 
-  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness) {
+  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
+  {
     DrawPoint(mat, point, color, size, thickness);
     DrawCircle(mat, point, color, 1.9 * size, thickness);
   };

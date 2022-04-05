@@ -10,7 +10,7 @@ inline f64 Magnitude(const cv::Point_<T>& pt)
 template <typename T>
 inline f64 Angle(const cv::Point_<T>& pt)
 {
-  return ToDegrees(std::atan2(pt.y, pt.x));
+  return std::atan2(pt.y, pt.x);
 }
 
 template <typename T>

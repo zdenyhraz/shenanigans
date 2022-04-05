@@ -99,7 +99,7 @@ private:
         {
           usize pos = sline.find("= ");
           std::string snum = sline.substr(pos + 2);
-          params.theta0 = stod(snum) / (360. / 2. / Pi);
+          params.theta0 = stod(snum) / (360. / 2. / std::numbers::pi);
         }
         else if (sline.find("END                        ") != std::string::npos)
         {

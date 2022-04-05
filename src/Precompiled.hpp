@@ -28,6 +28,8 @@
 #include <span>
 #include <type_traits>
 #include <concepts>
+#include <source_location>
+#include <numbers>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>

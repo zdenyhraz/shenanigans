@@ -1,14 +1,20 @@
 #pragma once
 #include "Log.hpp"
 
-#define LOG_FUNCTION(funName) LogFunction logFunction(funName)
-#define LOG_FUNCTION_IF(show, funName) LogFunction<show> logFunction(funName)
+#define LOG_FUNCTION LogFunction logFunction(std::source_location::current().function_name())
+#define LOG_FUNCTION_IF(show) LogFunction<show> logFunction(std::source_location::current().function_name())
+
+#define LOG_SCOPE(funName) LogFunction logFunction(funName)
+#define LOG_SCOPE_IF(show, funName) LogFunction<show> logFunction(funName)
 
 template <bool Show = true>
 class LogFunction
 {
   using clock = std::chrono::high_resolution_clock;
   using time_point = std::chrono::time_point<clock>;
+
+  std::string mFunName;
+  time_point mStartTime;
 
 public:
   explicit LogFunction(std::string&& funName)
@@ -41,7 +47,4 @@ private:
     else
       return fmt::format("{:.2f} h", duration<f32, std::ratio<3600>>(dur).count());
   }
-
-  std::string mFunName;
-  time_point mStartTime;
 };
