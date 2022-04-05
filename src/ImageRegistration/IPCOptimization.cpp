@@ -57,7 +57,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
+  LOG_EXCEPTION(e);
 }
 
 void IPCOptimization::Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize)
@@ -88,7 +88,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Iterative Phase Correlation parameter optimization error: {}", e.what());
+  LOG_EXCEPTION(e);
 }
 
 std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio)

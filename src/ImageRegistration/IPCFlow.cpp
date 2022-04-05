@@ -43,6 +43,6 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("IPC CalculateFlow error: {}", e.what());
+  LOG_EXCEPTION(e);
   return {};
 }

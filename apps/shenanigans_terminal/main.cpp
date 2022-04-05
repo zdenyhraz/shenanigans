@@ -9,7 +9,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Error: {}", e.what());
+  LOG_EXCEPTION(e);
   return EXIT_FAILURE;
 }
 catch (...)

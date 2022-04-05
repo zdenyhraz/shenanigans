@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def Plot(
+def plot(
         id, title, aspectratio, save, x, pc_error, pc_stddev, pcs_error, pcs_stddev, ipc_error, ipc_stddev, ipco_error,
         ipco_stddev, log=False):
   fig = plt.figure(num=id)

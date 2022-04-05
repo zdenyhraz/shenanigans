@@ -8,3 +8,4 @@ using Log = ImGuiLogger;
 #define LOG_SUCCESS(...) Log::Success(__VA_ARGS__)
 #define LOG_WARNING(...) Log::Warning(__VA_ARGS__)
 #define LOG_ERROR(...) Log::Error(__VA_ARGS__)
+#define LOG_EXCEPTION(e) Log::Error("{} error: {}", std::source_location::current().function_name(), e.what())

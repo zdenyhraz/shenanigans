@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def Plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel, ylabel, zlabel, cmap):
+def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel, ylabel, zlabel, cmap):
   fig = plt.figure(num=id)
   fig.set_figwidth(fig.get_figwidth()*aspectratio)
   fig.canvas.manager.set_window_title(title)

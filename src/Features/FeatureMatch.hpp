@@ -350,7 +350,7 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Feature match error: {}", e.what());
+  LOG_EXCEPTION(e);
 }
 
 inline void featureMatch2pic(const FeatureMatchData& data)
@@ -398,5 +398,5 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("Feature match error: {}", e.what());
+  LOG_EXCEPTION(e);
 }

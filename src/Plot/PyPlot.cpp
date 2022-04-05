@@ -7,11 +7,11 @@ try
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
-  py::module::import("plot.init").attr("Init")();
+  py::module::import("plot.init").attr("init")();
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("PyPlot::Initialize error: {}", e.what());
+  LOG_EXCEPTION(e);
 }
 
 void PyPlot::Render()
@@ -36,11 +36,11 @@ void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
   PROFILE_FUNCTION;
-  py::module::import(fmt::format("plot.{}", plotdata.type).c_str()).attr("Plot")(**plotdata.data);
+  py::module::import(fmt::format("plot.{}", plotdata.type).c_str()).attr("plot")(**plotdata.data);
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("PyPlot::Plot error: {}", e.what());
+  LOG_EXCEPTION(e);
 }
 
 i32 PyPlot::GetPlotId(const std::string& name)

@@ -270,5 +270,5 @@ try
 }
 catch (const std::exception& e)
 {
-  LOG_ERROR("ShowDebugStuff() error: {}", e.what());
+  LOG_EXCEPTION(e);
 }

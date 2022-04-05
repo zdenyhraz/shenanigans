@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def Plot(id, title, aspectratio, save, x, y, y2, ys, y2s, xlabel, ylabel, y2label, log, color_y, color_y2, color_ys,
+def plot(id, title, aspectratio, save, x, y, y2, ys, y2s, xlabel, ylabel, y2label, log, color_y, color_y2, color_ys,
          color_y2s, linestyle_y, linestyle_y2, linestyle_ys, linestyle_y2s, label_y, label_y2, label_ys, label_y2s):
   fig = plt.figure(num=id)
   fig.set_figwidth(fig.get_figwidth()*aspectratio)

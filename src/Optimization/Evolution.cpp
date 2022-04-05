@@ -90,7 +90,7 @@ try
 catch (const std::exception& e)
 {
   if (mConsoleOutput)
-    LOG_ERROR("Evolution optimization error: {}", e.what());
+    LOG_EXCEPTION(e);
   return OptimizationResult();
 }
 catch (...)
@@ -443,7 +443,7 @@ try
 catch (const std::exception& e)
 {
   if (mConsoleOutput)
-    LOG_ERROR("Could not uninitialize outputs: {}", e.what());
+    LOG_EXCEPTION(e);
 }
 
 Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, usize generation)
