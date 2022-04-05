@@ -7,7 +7,7 @@ try
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
-  py::module::import("plot.plot_init").attr("Init")();
+  py::module::import("plot.init").attr("Init")();
 }
 catch (const std::exception& e)
 {
@@ -163,17 +163,17 @@ py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
 
 void PyPlot::Plot(const std::string& name, const PlotData1D& data)
 {
-  ScheldulePlot(name, "plot1d", GetScopeData(name, data));
+  ScheldulePlot(name, "1d", GetScopeData(name, data));
 }
 
 void PyPlot::Plot(const std::string& name, const PlotData2D& data)
 {
-  ScheldulePlot(name, "plot2d", GetScopeData(name, data));
+  ScheldulePlot(name, "2d", GetScopeData(name, data));
 }
 
 void PyPlot::PlotSurf(const std::string& name, const PlotData3D& data)
 {
-  ScheldulePlot(name, "plot3d", GetScopeData(name, data));
+  ScheldulePlot(name, "3d", GetScopeData(name, data));
 }
 
 void PyPlot::Plot(const std::string& name, const std::string& type, const py::dict& data)
@@ -185,21 +185,21 @@ void PyPlot::SavePlot(const std::string& path, const std::string& name, const Pl
 {
   auto scope = GetScopeData(name, data);
   scope["save"] = path;
-  ScheldulePlot(name, "plot1d", scope);
+  ScheldulePlot(name, "1d", scope);
 }
 
 void PyPlot::SavePlot(const std::string& path, const std::string& name, const PlotData2D& data)
 {
   auto scope = GetScopeData(name, data);
   scope["save"] = path;
-  ScheldulePlot(name, "plot2d", scope);
+  ScheldulePlot(name, "2d", scope);
 }
 
 void PyPlot::SavePlotSurf(const std::string& path, const std::string& name, const PlotData3D& data)
 {
   auto scope = GetScopeData(name, data);
   scope["save"] = path;
-  ScheldulePlot(name, "plot3d", scope);
+  ScheldulePlot(name, "3d", scope);
 }
 
 void PyPlot::SavePlot(const std::string& path, const std::string& name, const std::string& type, const py::dict& data)
