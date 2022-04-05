@@ -18,6 +18,7 @@ void Shenanigans::Run()
     ImGuiNewFrame();
     Render();
     ImGuiRender(window, io);
+    // PROFILE_FRAME;
   }
 
   ImGuiShutdown();
@@ -36,6 +37,7 @@ void Shenanigans::Render()
 
 void Shenanigans::Initialize()
 {
+  PROFILE_FUNCTION;
   PyPlot::Initialize();
   IPCWindow::Initialize();
   IPCOptimizeWindow::Initialize();

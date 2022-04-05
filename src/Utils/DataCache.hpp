@@ -15,12 +15,7 @@ public:
     std::scoped_lock lock(mMutex);
 
     if (mData.contains(key))
-    {
-      LOG_TRACE("ImageCache::Get cache hit for {}", key);
       return mData[key];
-    }
-
-    LOG_TRACE("ImageCache::Get cache miss for {}", key);
 
     if (mData.size() < mCapacity)
     {

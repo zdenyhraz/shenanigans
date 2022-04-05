@@ -16,7 +16,6 @@ catch (const std::exception& e)
 
 void PyPlot::Render()
 {
-  PROFILE_FUNCTION;
   std::scoped_lock lock(mMutex);
 
   while (not mPlotQueue.empty())
@@ -64,8 +63,7 @@ void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
 
 py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)
 {
-  std::scoped_lock lock(mMutex);
-
+  PROFILE_FUNCTION;
   py::dict scope = data;
   AddDefaultScopeData(name, scope);
   return scope;
@@ -74,8 +72,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)
 py::dict PyPlot::GetScopeData(const std::string& name, const PlotData1D& data)
 {
   PROFILE_FUNCTION;
-  std::scoped_lock lock(mMutex);
-
   py::dict scope;
   AddDefaultScopeData(name, scope);
   scope["x"] = not data.x.empty() ? data.x : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
@@ -107,8 +103,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const PlotData1D& data)
 py::dict PyPlot::GetScopeData(const std::string& name, const PlotData2D& data)
 {
   PROFILE_FUNCTION;
-  std::scoped_lock lock(mMutex);
-
   cv::Mat mz = data.z.clone();
   mz.convertTo(mz, CV_32F);
   auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
@@ -136,8 +130,6 @@ py::dict PyPlot::GetScopeData(const std::string& name, const PlotData2D& data)
 py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
 {
   PROFILE_FUNCTION;
-  std::scoped_lock lock(mMutex);
-
   cv::Mat mz = data.z.clone();
   mz.convertTo(mz, CV_32F);
   auto z = Zerovect2(mz.rows, mz.cols, 0.0f);

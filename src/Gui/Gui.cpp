@@ -104,6 +104,7 @@ void ImGuiRender(GLFWwindow* window, ImGuiIO& io)
 
 void ImGuiShutdown()
 {
+  PROFILE_FUNCTION;
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
@@ -111,6 +112,7 @@ void ImGuiShutdown()
 
 void GLFWShutdown(GLFWwindow* window)
 {
+  PROFILE_FUNCTION;
   glfwDestroyWindow(window);
   glfwTerminate();
 }

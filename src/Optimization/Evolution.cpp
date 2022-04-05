@@ -12,7 +12,6 @@ try
   PROFILE_FUNCTION;
   if (mConsoleOutput)
   {
-    LOG_FUNCTION;
     LOG_INFO("Running evolution...");
   }
 
@@ -277,8 +276,6 @@ void Evolution::InitializeOutputs(ValidationFunction valid)
 try
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
 
   if (mFileOutput)
   {
@@ -311,8 +308,6 @@ void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 try
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = obj(arg);
@@ -324,12 +319,12 @@ try
       LOG_WARNING("Objective function is not consistent ({:.2e} != {:.2e})", result1, result2);
   }
   else if (mConsoleOutput)
-    LOG_TRACE("Objective function is consistent");
+    LOG_DEBUG("Objective function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Objective function is not finite"));
   else if (mConsoleOutput)
-    LOG_TRACE("Objective function is finite");
+    LOG_DEBUG("Objective function is finite");
 
   if (result1 < 0)
   {
@@ -337,7 +332,7 @@ try
       LOG_WARNING("Objective function is not positive ({:.2e})", result1);
   }
   else if (mConsoleOutput)
-    LOG_TRACE("Objective function is positive");
+    LOG_DEBUG("Objective function is positive");
 }
 catch (const std::exception& e)
 {
@@ -348,11 +343,9 @@ void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
 try
 {
   PROFILE_FUNCTION;
+
   if (!valid)
     return;
-
-  if (mConsoleOutput)
-    LOG_FUNCTION;
 
   const auto arg = 0.5 * (mLB + mUB);
   const auto result1 = valid(arg);
@@ -361,17 +354,17 @@ try
   if (result1 != result2)
     throw std::runtime_error(fmt::format("Validation function is not consistent ({} != {})", result1, result2));
   else if (mConsoleOutput)
-    LOG_TRACE("Validation function is consistent");
+    LOG_DEBUG("Validation function is consistent");
 
   if (!isfinite(result1))
     throw std::runtime_error(fmt::format("Validation function is not finite"));
   else if (mConsoleOutput)
-    LOG_TRACE("Validation function is finite");
+    LOG_DEBUG("Validation function is finite");
 
   if (result1 < 0)
     throw std::runtime_error(fmt::format("Validation function is not positive"));
   else if (mConsoleOutput)
-    LOG_TRACE("Validation function is positive");
+    LOG_DEBUG("Validation function is positive");
 }
 catch (const std::exception& e)
 {
@@ -381,8 +374,6 @@ catch (const std::exception& e)
 void Evolution::CheckBounds()
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
 
   if (mLB.size() != mUB.size())
     throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
@@ -606,13 +597,13 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
   catch (const std::exception& e)
   {
     if (mConsoleOutput)
-      LOG_TRACE("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
+      LOG_WARNING("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
     newoffspring.fitness = std::numeric_limits<f64>::max();
   }
   catch (...)
   {
     if (mConsoleOutput)
-      LOG_TRACE("Could not evaluate new offspring with params {}", newoffspring.params);
+      LOG_WARNING("Could not evaluate new offspring with params {}", newoffspring.params);
     newoffspring.fitness = std::numeric_limits<f64>::max();
   }
 }
@@ -669,8 +660,6 @@ void Evolution::Population::UpdateProgress()
 void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB)
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
   entities = Zerovect(NP, Entity(N));
   std::vector<f64> RB = UB - LB;
   const f64 initialMinAvgDist = 0.5;
@@ -723,8 +712,6 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
 void Evolution::Population::InitializeOffspring(usize nParents)
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
   offspring = Zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
   for (usize eid = 0; eid < entities.size(); ++eid)
   {
@@ -736,8 +723,6 @@ void Evolution::Population::InitializeOffspring(usize nParents)
 void Evolution::Population::InitializeBestEntity()
 {
   PROFILE_FUNCTION;
-  if (mConsoleOutput)
-    LOG_FUNCTION;
   bestEntity = Entity(entities[0].params.size());
   UpdateBestEntity();
 }
