@@ -6,6 +6,7 @@ class ImGuiLogger : public Logger
 {
   ImGuiTextBuffer mTextBuffer;
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
+  bool mActive = false;
 
 public:
   template <typename... Args>
@@ -72,7 +73,7 @@ private:
     if (not ShouldLog(logLevel))
       [[unlikely]] return;
 
-    if (not glfwInit()) // forward logging to terminal logger if OpenGL is not available
+    if (not mActive) // forward logging to the terminal logger if this logger is is not being rendered
       TerminalLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     if (mLineOffsets.size() > mMaxMessages)

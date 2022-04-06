@@ -66,4 +66,5 @@ void ImGuiLogger::RenderInternal()
 
   ImGui::EndChild();
   ImGui::End();
+  mActive = true;
 }

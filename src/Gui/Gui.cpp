@@ -10,13 +10,14 @@ void GLFWInitialize()
     throw std::runtime_error("GLFW initialization failed");
 }
 
-GLFWwindow* GLFWCreateWindow(i32 width, i32 height)
+GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
 {
   PROFILE_FUNCTION;
   LOG_DEBUG("Creating window ...");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_VISIBLE, hidden ? GLFW_FALSE : GLFW_TRUE);
   GLFWwindow* window = glfwCreateWindow(width, height, "hi mom", nullptr, nullptr);
   if (not window)
     throw std::runtime_error("GLFW create window failed");
