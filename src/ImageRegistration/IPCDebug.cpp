@@ -107,7 +107,7 @@ try
     AddNoise<IPC::Float>(image1, noiseStdev);
     AddNoise<IPC::Float>(image2, noiseStdev);
 
-    const auto ipcshift = ipc.Calculate<true>(image1, image2);
+    const auto ipcshift = ipc.Calculate<IPC::Mode::Debug>(image1, image2);
     const auto error = ipcshift - shift;
 
     LOG_INFO("Artificial shift = [{:.4f}, {:.4f}]", shift.x, shift.y);
@@ -152,7 +152,7 @@ try
       cv::warpAffine(image1, image2, Tmat, image2.size());
       crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
       ipc.SetDebugTrueShift(shift);
-      const auto ipcshift = ipc.Calculate<true>(crop1, crop2);
+      const auto ipcshift = ipc.Calculate(crop1, crop2);
       LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
     }
   }

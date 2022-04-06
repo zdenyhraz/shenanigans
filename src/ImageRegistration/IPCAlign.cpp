@@ -49,7 +49,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
     Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition before", 0, 0, 1, 1000);
 
   // rotation and scale
-  auto shiftR = ipc.Calculate<{}>(img1FTm, img2FTm);
+  auto shiftR = ipc.Calculate(img1FTm, img2FTm);
   f64 rotation = -shiftR.y / image1.rows * 360;
   f64 scale = exp(shiftR.x * log(maxRadius) / image1.cols);
   Rotate(image2, -rotation, scale);
@@ -57,7 +57,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
     Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition after rotation+scale", 0, 0, 1, 1000);
 
   // translation
-  auto shiftT = ipc.Calculate<{}>(image1, image2);
+  auto shiftT = ipc.Calculate(image1, image2);
   Shift(image2, -shiftT);
   if constexpr (false)
   {

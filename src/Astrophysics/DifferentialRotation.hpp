@@ -175,11 +175,10 @@ public:
   static DifferentialRotationData Calculate(
       const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress = nullptr)
   {
-    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
-        {
-          PROFILE_SCOPE(Imread);
-          return cv::imread(path, cv::IMREAD_UNCHANGED);
-        }};
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
+      PROFILE_SCOPE(Imread);
+      return cv::imread(path, cv::IMREAD_UNCHANGED);
+    }};
     DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
 
     return Calculate<Managed>(ipc, dataPath, xsize, ysize, idstep, idstride, thetamax, cadence, idstart, progress, imageCache, headerCache);
@@ -214,17 +213,19 @@ public:
         const auto [id1, id2] = ids[x];
         const auto path1 = fmt::format("{}/{}.png", dataPath, id1);
         const auto path2 = fmt::format("{}/{}.png", dataPath, id2);
-        if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
-        {
-          if constexpr (not Managed)
-            LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-        }
-        else [[unlikely]]
-        {
-          if constexpr (not Managed)
-            LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, skipping ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-          continue;
-        }
+        if (std::filesystem::exists(path1) and std::filesystem::exists(path2))
+          [[likely]]
+          {
+            if constexpr (not Managed)
+              LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
+          }
+        else
+          [[unlikely]]
+          {
+            if constexpr (not Managed)
+              LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, skipping ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
+            continue;
+          }
 
         const auto image1 = imageCache.Get(path1);
         const auto image2 = imageCache.Get(path2);
@@ -238,8 +239,8 @@ public:
         data.theta0[xindex] = theta0;
         data.R[xindex] = R;
 
-        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax) [[unlikely]]
-          continue;
+        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax)
+          [[unlikely]] continue;
 
         for (i32 y = 0; y < ysize; ++y)
         {
@@ -248,7 +249,7 @@ public:
           const auto yshift = -R * std::sin(theta - theta0);
           auto crop1 = RoiCrop(image1, std::round(header1.xcenter), std::round(header1.ycenter + yshift), wxsize, wysize);
           auto crop2 = RoiCrop(image2, std::round(header2.xcenter), std::round(header2.ycenter + yshift), wxsize, wysize);
-          const auto shift = ipc.Calculate<{}>(std::move(crop1), std::move(crop2));
+          const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
           const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
@@ -290,19 +291,17 @@ public:
     LOG_INFO("Optimization popsize: {}", popsize);
     LOG_INFO("Optimization idstride: {}", idstrideopt);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
-    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
-        {
-          PROFILE_SCOPE(Imread);
-          return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
-        }};
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
+      PROFILE_SCOPE(Imread);
+      return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
+    }};
     DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
     imageCache.Reserve(ids);
     headerCache.Reserve(ids);
 
     const auto dataBefore = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
     const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
-    const auto obj = [&](const IPC& ipcopt)
-    {
+    const auto obj = [&](const IPC& ipcopt) {
       const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
       if (dataopt.omegax.empty())
         return std::numeric_limits<f64>::infinity();

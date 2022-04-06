@@ -42,6 +42,12 @@ public:
     L1WindowTypeCount // last
   };
 
+  enum class Mode : u8
+  {
+    Normal,
+    Debug
+  };
+
 private:
   i32 mRows = 0;
   i32 mCols = 0;
@@ -174,31 +180,31 @@ public:
   f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
   f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
-  template <bool DebugMode = false>
+  template <Mode ModeT = Mode::Normal>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
     PROFILE_FUNCTION;
-    return Calculate<DebugMode>(image1.clone(), image2.clone());
+    return Calculate<ModeT>(image1.clone(), image2.clone());
   }
 
-  template <bool DebugMode = false>
+  template <Mode ModeT = Mode::Normal>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION_IF(DebugMode);
+    LOG_FUNCTION_IF(ModeT == Mode::Debug);
 
-    if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
-      throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
+    if (image1.size() != cv::Size(mCols, mRows))
+      [[unlikely]] throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
-    if (image1.size() != image2.size()) [[unlikely]]
-      throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
+    if (image1.size() != image2.size())
+      [[unlikely]] throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
-    if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
-      throw std::invalid_argument("Multichannel images are not supported");
+    if (image1.channels() != 1 or image2.channels() != 1)
+      [[unlikely]] throw std::invalid_argument("Multichannel images are not supported");
 
     ConvertToUnitFloat(image1);
     ConvertToUnitFloat(image2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugInputImages(*this, image1, image2);
 
     // windowing
@@ -208,37 +214,37 @@ public:
     // ffts
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
-    if constexpr (DebugMode and 0)
+    if constexpr (ModeT == Mode::Debug and 0)
       IPCDebug::DebugFourierTransforms(*this, dft1, dft2);
 
     // cross-power
     auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugCrossPowerSpectrum(*this, crosspower);
 
     // L3
     cv::Mat L3 = CalculateL3(std::move(crosspower));
     cv::Point2d L3peak = GetPeak(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL3(*this, L3);
 
     // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size))
+      if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
 
     // L2
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL2(*this, L2);
 
     // L2U
     cv::Mat L2U = CalculateL2U(L2);
     cv::Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL2U(*this, L2, L2U);
 
     // L1
@@ -249,7 +255,7 @@ public:
     for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
-      if constexpr (DebugMode)
+      if constexpr (ModeT == Mode::Debug)
         LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
       L2Upeak = L2Umid; // reset L2U peak position
@@ -257,38 +263,38 @@ public:
       L1mid = cv::Point2d(L1size / 2, L1size / 2);
       L1Win = mL1Win.cols == L1size ? mL1Win : GetL1Window(mL1WinT, L1size);
 
-      if constexpr (DebugMode and 0)
+      if constexpr (ModeT == Mode::Debug and 0)
         IPCDebug::DebugL1B(*this, L2U, L1size, L3peak - L3mid, GetUpsampleCoeff(L2size));
 
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
-        if constexpr (DebugMode)
+        if constexpr (ModeT == Mode::Debug)
           LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
-        if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
-          break;
+        if (IsOutOfBounds(L2Upeak, L2U, L1size))
+          [[unlikely]] break;
 
         L1 = CalculateL1(L2U, L2Upeak, L1size);
-        if constexpr (DebugMode)
+        if constexpr (ModeT == Mode::Debug)
           IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - L2Umid, GetUpsampleCoeff(L2size));
         L1peak = GetPeakSubpixel<true>(L1, L1Win);
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
-        if (AccuracyReached(L1peak, L1mid)) [[unlikely]]
+        if (AccuracyReached(L1peak, L1mid))
         {
-          if constexpr (DebugMode)
+          if constexpr (ModeT == Mode::Debug)
             IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
           return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
         }
       }
 
-      if constexpr (DebugMode)
+      if constexpr (ModeT == Mode::Debug)
         LOG_WARNING("L1 did not converge - reducing L1ratio: {:.2f} -> {:.2f}", L1ratio, L1ratio - mL1ratioStep);
     }
 
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       LOG_WARNING("L1 failed to converge with all L1ratios, return non-iterative subpixel shift");
-    return GetSubpixelShift<DebugMode>(L3, L3peak, L3mid, L2size);
+    return GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size);
   }
 
   static std::string BandpassType2String(BandpassType type);
@@ -526,21 +532,21 @@ private:
 
   static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
 
-  template <bool DebugMode>
+  template <Mode ModeT = Mode::Normal>
   static bool ReduceL2size(i32& L2size)
   {
     L2size -= 2;
-    if constexpr (DebugMode)
+    if constexpr (ModeT == Mode::Debug)
       LOG_WARNING("L2 out of bounds - reducing L2size to {}", L2size);
     return L2size >= 3;
   }
 
-  template <bool DebugMode>
+  template <Mode ModeT = Mode::Normal>
   cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
   {
     PROFILE_FUNCTION;
     while (IsOutOfBounds(L3peak, L3, L2size))
-      if (!ReduceL2size<DebugMode>(L2size))
+      if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
 
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
