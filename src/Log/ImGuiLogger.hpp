@@ -9,6 +9,7 @@ class ImGuiLogger : public Logger
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
   bool mActive = false;
   bool mFallback = true;
+  static constexpr usize mMaxMessages = 5000;
 
 public:
   template <typename... Args>
@@ -77,15 +78,15 @@ private:
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
-    if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
-      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
-
     if (mLineOffsets.size() > mMaxMessages)
     {
       Debug("Clearing message log ...");
       Clear();
       Debug("Message log cleared after {} messages", mMaxMessages);
     }
+
+    if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
+      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
     i32 oldSize = mTextBuffer.size();
