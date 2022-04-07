@@ -8,17 +8,14 @@ def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, xlabel, ylabel
   fig.canvas.manager.set_window_title(title)
   plt.clf()
 
-  Z = np.array([np.array(row) for row in z])
-  xsize = Z.shape[0]
-  ysize = Z.shape[1]
+  xsize = z.shape[0]
+  ysize = z.shape[1]
   n = 101
-  X = np.linspace(xmin, xmax, xsize)
-  Y = np.linspace(ymax, ymin, ysize)
-  X, Y = np.meshgrid(X, Y)
+  x, y = np.meshgrid(np.linspace(xmin, xmax, xsize), np.linspace(ymax, ymin, ysize))
 
   ax = fig.gca(projection='3d')
   surf = ax.plot_surface(
-      X, Y, Z,
+      x, y, z,
       cmap=cmap,
       edgecolor='none',
       linewidth=0,

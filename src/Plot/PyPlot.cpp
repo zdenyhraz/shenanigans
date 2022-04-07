@@ -7,6 +7,7 @@ try
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
+  PYTHON_INTERPRETER_GUARD;
   py::module::import("plot.init").attr("init")();
 }
 catch (const std::exception& e)
@@ -16,8 +17,7 @@ catch (const std::exception& e)
 
 void PyPlot::Render()
 {
-  std::scoped_lock lock(mMutex);
-
+  std::scoped_lock lock(mPlotQueueMutex);
   while (not mPlotQueue.empty())
   {
     PlotInternal(mPlotQueue.front());
@@ -27,7 +27,7 @@ void PyPlot::Render()
 
 void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data)
 {
-  std::scoped_lock lock(mMutex);
+  std::scoped_lock lock(mPlotQueueMutex);
   mPlotQueue.emplace(name, type, data);
 }
 
@@ -35,6 +35,7 @@ void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
   PROFILE_FUNCTION;
+  PYTHON_INTERPRETER_GUARD;
   py::module::import(fmt::format("plot.{}", plotdata.type).c_str()).attr("plot")(**plotdata.data);
 }
 catch (const std::exception& e)
@@ -44,159 +45,124 @@ catch (const std::exception& e)
 
 i32 PyPlot::GetPlotId(const std::string& name)
 {
+  std::scoped_lock lock(mPlotIdMutex);
   if (not mPlotIds.contains(name))
-    mPlotIds[name] = mId++;
+    mPlotIds[name] = mPlotId++;
 
   return mPlotIds[name];
 }
 
-void PyPlot::AddDefaultScopeData(const std::string& name, py::dict& scope)
+void PyPlot::AddDefaultPlotData(const std::string& name, py::dict& plotData)
 {
-  scope["id"] = GetPlotId(name);
-  scope["title"] = name;
+  plotData["id"] = GetPlotId(name);
+  plotData["title"] = name;
 
-  if (not scope.contains("aspectratio"))
-    scope["aspectratio"] = 1;
-  if (not scope.contains("save"))
-    scope["save"] = "";
+  if (not plotData.contains("aspectratio"))
+    plotData["aspectratio"] = 1;
+  if (not plotData.contains("save"))
+    plotData["save"] = "";
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const py::dict& data)
+py::dict PyPlot::GetDefaultPlotData(const std::string& name)
 {
-  PROFILE_FUNCTION;
-  py::dict scope = data;
-  AddDefaultScopeData(name, scope);
-  return scope;
+  py::dict plotData;
+  AddDefaultPlotData(name, plotData);
+  return plotData;
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const PlotData1D& data)
+py::dict PyPlot::GetPlotData(const std::string& name, py::dict&& data)
 {
-  PROFILE_FUNCTION;
-  py::dict scope;
-  AddDefaultScopeData(name, scope);
-  scope["x"] = not data.x.empty() ? data.x : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
-  scope["y"] = data.y;
-  scope["y2"] = data.y2;
-  scope["ys"] = data.ys;
-  scope["y2s"] = data.y2s;
-  scope["xlabel"] = data.xlabel;
-  scope["ylabel"] = data.ylabel;
-  scope["y2label"] = data.y2label;
-  scope["label_y"] = data.label_y;
-  scope["label_y2"] = data.label_y2;
-  scope["label_ys"] = data.label_ys;
-  scope["label_y2s"] = data.label_y2s;
-  scope["color_y"] = data.color_y;
-  scope["color_y2"] = data.color_y2;
-  scope["color_ys"] = data.color_ys;
-  scope["color_y2s"] = data.color_y2s;
-  scope["linestyle_y"] = data.linestyle_y;
-  scope["linestyle_y2"] = data.linestyle_y2;
-  scope["linestyle_ys"] = data.linestyle_ys;
-  scope["linestyle_y2s"] = data.linestyle_y2s;
-  scope["log"] = data.log;
-  scope["aspectratio"] = data.aspectratio;
-  scope["save"] = data.save;
-  return scope;
+  std::scoped_lock lock(mPlotQueueMutex);
+  py::dict plotData = std::move(data);
+  AddDefaultPlotData(name, plotData);
+  return plotData;
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const PlotData2D& data)
+py::dict PyPlot::GetPlotData(const std::string& name, PlotData1D&& data)
 {
-  PROFILE_FUNCTION;
-  cv::Mat mz = data.z.clone();
-  mz.convertTo(mz, CV_32F);
-  auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
-  for (i32 r = 0; r < mz.rows; ++r)
-    for (i32 c = 0; c < mz.cols; ++c)
-      z[r][c] = mz.at<f32>(r, c);
-
-  py::dict scope;
-  AddDefaultScopeData(name, scope);
-  scope["z"] = z;
-  scope["xlabel"] = data.xlabel;
-  scope["ylabel"] = data.ylabel;
-  scope["zlabel"] = data.zlabel;
-  scope["xmin"] = data.xmin;
-  scope["xmax"] = data.xmax;
-  scope["ymin"] = data.ymin;
-  scope["ymax"] = data.ymax;
-  scope["interp"] = data.interp;
-  scope["aspectratio"] = data.aspectratio;
-  scope["cmap"] = data.cmap;
-  scope["save"] = data.save;
-  return scope;
+  std::scoped_lock lock(mPlotQueueMutex);
+  py::dict plotData = GetDefaultPlotData(name);
+  plotData["x"] = not data.x.empty() ? std::move(data.x) : Iota(0., not data.y.empty() ? data.y.size() : data.ys[0].size());
+  plotData["y"] = std::move(data.y);
+  plotData["y2"] = std::move(data.y2);
+  plotData["ys"] = std::move(data.ys);
+  plotData["y2s"] = std::move(data.y2s);
+  plotData["xlabel"] = std::move(data.xlabel);
+  plotData["ylabel"] = std::move(data.ylabel);
+  plotData["y2label"] = std::move(data.y2label);
+  plotData["label_y"] = std::move(data.label_y);
+  plotData["label_y2"] = std::move(data.label_y2);
+  plotData["label_ys"] = std::move(data.label_ys);
+  plotData["label_y2s"] = std::move(data.label_y2s);
+  plotData["color_y"] = std::move(data.color_y);
+  plotData["color_y2"] = std::move(data.color_y2);
+  plotData["color_ys"] = std::move(data.color_ys);
+  plotData["color_y2s"] = std::move(data.color_y2s);
+  plotData["linestyle_y"] = std::move(data.linestyle_y);
+  plotData["linestyle_y2"] = std::move(data.linestyle_y2);
+  plotData["linestyle_ys"] = std::move(data.linestyle_ys);
+  plotData["linestyle_y2s"] = std::move(data.linestyle_y2s);
+  plotData["log"] = std::move(data.log);
+  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["save"] = std::move(data.save);
+  return plotData;
 }
 
-py::dict PyPlot::GetScopeData(const std::string& name, const PlotData3D& data)
+py::dict PyPlot::GetPlotData(const std::string& name, PlotData2D&& data)
 {
-  PROFILE_FUNCTION;
-  cv::Mat mz = data.z.clone();
-  mz.convertTo(mz, CV_32F);
-  auto z = Zerovect2(mz.rows, mz.cols, 0.0f);
-  for (i32 r = 0; r < mz.rows; ++r)
-    for (i32 c = 0; c < mz.cols; ++c)
-      z[r][c] = mz.at<f32>(r, c);
-
-  py::dict scope;
-  AddDefaultScopeData(name, scope);
-  scope["z"] = z;
-  scope["xlabel"] = data.xlabel;
-  scope["ylabel"] = data.ylabel;
-  scope["zlabel"] = data.zlabel;
-  scope["xmin"] = data.xmin;
-  scope["xmax"] = data.xmax;
-  scope["ymin"] = data.ymin;
-  scope["ymax"] = data.ymax;
-  scope["aspectratio"] = data.aspectratio;
-  scope["cmap"] = data.cmap;
-  scope["save"] = data.save;
-  return scope;
+  std::scoped_lock lock(mPlotQueueMutex);
+  py::dict plotData = GetDefaultPlotData(name);
+  data.z.convertTo(data.z, CV_32F);
+  plotData["z"] = Python::ToNumpy<f32>(data.z);
+  plotData["xlabel"] = std::move(data.xlabel);
+  plotData["ylabel"] = std::move(data.ylabel);
+  plotData["zlabel"] = std::move(data.zlabel);
+  plotData["xmin"] = std::move(data.xmin);
+  plotData["xmax"] = std::move(data.xmax);
+  plotData["ymin"] = std::move(data.ymin);
+  plotData["ymax"] = std::move(data.ymax);
+  plotData["interp"] = std::move(data.interp);
+  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["cmap"] = std::move(data.cmap);
+  plotData["save"] = std::move(data.save);
+  return plotData;
 }
 
-void PyPlot::Plot(const std::string& name, const PlotData1D& data)
+py::dict PyPlot::GetPlotData(const std::string& name, PlotData3D&& data)
 {
-  ScheldulePlot(name, "1d", GetScopeData(name, data));
+  std::scoped_lock lock(mPlotQueueMutex);
+  py::dict plotData = GetDefaultPlotData(name);
+  data.z.convertTo(data.z, CV_32F);
+  plotData["z"] = Python::ToNumpy<f32>(data.z);
+  plotData["xlabel"] = std::move(data.xlabel);
+  plotData["ylabel"] = std::move(data.ylabel);
+  plotData["zlabel"] = std::move(data.zlabel);
+  plotData["xmin"] = std::move(data.xmin);
+  plotData["xmax"] = std::move(data.xmax);
+  plotData["ymin"] = std::move(data.ymin);
+  plotData["ymax"] = std::move(data.ymax);
+  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["cmap"] = std::move(data.cmap);
+  plotData["save"] = std::move(data.save);
+  return plotData;
 }
 
-void PyPlot::Plot(const std::string& name, const PlotData2D& data)
+void PyPlot::Plot(const std::string& name, PlotData1D&& data)
 {
-  ScheldulePlot(name, "2d", GetScopeData(name, data));
+  ScheldulePlot(name, "1d", GetPlotData(name, std::move(data)));
 }
 
-void PyPlot::PlotSurf(const std::string& name, const PlotData3D& data)
+void PyPlot::Plot(const std::string& name, PlotData2D&& data)
 {
-  ScheldulePlot(name, "3d", GetScopeData(name, data));
+  ScheldulePlot(name, "2d", GetPlotData(name, std::move(data)));
 }
 
-void PyPlot::Plot(const std::string& name, const std::string& type, const py::dict& data)
+void PyPlot::PlotSurf(const std::string& name, PlotData3D&& data)
 {
-  ScheldulePlot(name, type, GetScopeData(name, data));
+  ScheldulePlot(name, "3d", GetPlotData(name, std::move(data)));
 }
 
-void PyPlot::SavePlot(const std::string& path, const std::string& name, const PlotData1D& data)
+void PyPlot::Plot(const std::string& name, const std::string& type, py::dict&& data)
 {
-  auto scope = GetScopeData(name, data);
-  scope["save"] = path;
-  ScheldulePlot(name, "1d", scope);
-}
-
-void PyPlot::SavePlot(const std::string& path, const std::string& name, const PlotData2D& data)
-{
-  auto scope = GetScopeData(name, data);
-  scope["save"] = path;
-  ScheldulePlot(name, "2d", scope);
-}
-
-void PyPlot::SavePlotSurf(const std::string& path, const std::string& name, const PlotData3D& data)
-{
-  auto scope = GetScopeData(name, data);
-  scope["save"] = path;
-  ScheldulePlot(name, "3d", scope);
-}
-
-void PyPlot::SavePlot(const std::string& path, const std::string& name, const std::string& type, const py::dict& data)
-{
-  auto scope = GetScopeData(name, data);
-  scope["save"] = path;
-  ScheldulePlot(name, type, scope);
+  ScheldulePlot(name, type, GetPlotData(name, std::move(data)));
 }

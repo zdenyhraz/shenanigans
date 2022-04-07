@@ -54,29 +54,26 @@ public:
   static void Initialize();
   static void Render();
 
-  static void Plot(const std::string& name, const PlotData1D& data);
-  static void Plot(const std::string& name, const PlotData2D& data);
-  static void PlotSurf(const std::string& name, const PlotData3D& data);
-  static void Plot(const std::string& name, const std::string& type, const py::dict& data);
-
-  static void SavePlot(const std::string& path, const std::string& name, const PlotData1D& data);
-  static void SavePlot(const std::string& path, const std::string& name, const PlotData2D& data);
-  static void SavePlotSurf(const std::string& path, const std::string& name, const PlotData3D& data);
-  static void SavePlot(const std::string& path, const std::string& name, const std::string& type, const py::dict& data);
+  static void Plot(const std::string& name, PlotData1D&& data);
+  static void Plot(const std::string& name, PlotData2D&& data);
+  static void PlotSurf(const std::string& name, PlotData3D&& data);
+  static void Plot(const std::string& name, const std::string& type, py::dict&& data);
 
 private:
   inline static std::unordered_map<std::string, i32> mPlotIds;
-  inline static i32 mId = 0;
+  inline static i32 mPlotId = 0;
   inline static std::queue<PlotData> mPlotQueue;
-  inline static std::mutex mMutex;
+  inline static std::mutex mPlotQueueMutex;
+  inline static std::mutex mPlotIdMutex;
 
   static void ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data);
   static void PlotInternal(const PlotData& plotdata);
 
   static i32 GetPlotId(const std::string& name);
-  static void AddDefaultScopeData(const std::string& name, py::dict& scope);
-  static py::dict GetScopeData(const std::string& name, const py::dict& data);
-  static py::dict GetScopeData(const std::string& name, const PlotData1D& data);
-  static py::dict GetScopeData(const std::string& name, const PlotData2D& data);
-  static py::dict GetScopeData(const std::string& name, const PlotData3D& data);
+  static void AddDefaultPlotData(const std::string& name, py::dict& scope);
+  static py::dict GetDefaultPlotData(const std::string& name);
+  static py::dict GetPlotData(const std::string& name, py::dict&& data);
+  static py::dict GetPlotData(const std::string& name, PlotData1D&& data);
+  static py::dict GetPlotData(const std::string& name, PlotData2D&& data);
+  static py::dict GetPlotData(const std::string& name, PlotData3D&& data);
 };
