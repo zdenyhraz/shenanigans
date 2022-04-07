@@ -24,6 +24,8 @@ static void OpenCVFFTComplexBenchmark(benchmark::State& state, const Input& imag
 
 static void OpenCVFFTCSSBenchmark(benchmark::State& state, const Input& images)
 {
+  // state.PauseTiming();
+  // state.ResumeTiming();
   for (auto _ : state)
     OpenCVFFTCSS(images);
 }
