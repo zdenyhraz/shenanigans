@@ -65,6 +65,7 @@ message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 add_executable(shenanigans)
 add_executable(shenanigans_test)
 add_executable(shenanigans_terminal)
+add_executable(shenanigans_benchmark)
 
 # pybind11
 find_package(PythonLibs REQUIRED)
@@ -74,6 +75,7 @@ include_directories(libs/pybind11/include)
 target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_terminal PRIVATE pybind11::embed)
+target_link_libraries(shenanigans_benchmark PRIVATE pybind11::embed)
 
 # fmt
 add_subdirectory(libs/fmt)
@@ -81,6 +83,7 @@ include_directories(libs/fmt/include)
 target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt-header-only)
+target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt-header-only)
 
 # gtest
 add_subdirectory(libs/gtest)
@@ -89,12 +92,21 @@ enable_testing()
 include(GoogleTest)
 target_link_libraries(shenanigans_test PRIVATE GTest::gtest)
 
+# benchmark
+set(BENCHMARK_ENABLE_TESTING OFF)
+add_subdirectory(libs/benchmark)
+target_link_libraries(shenanigans PRIVATE benchmark::benchmark)
+target_link_libraries(shenanigans_test PRIVATE benchmark::benchmark)
+target_link_libraries(shenanigans_terminal PRIVATE benchmark::benchmark)
+target_link_libraries(shenanigans_benchmark PRIVATE benchmark::benchmark)
+
 # json
 add_subdirectory(libs/json)
 include_directories(libs/json/include)
 target_link_libraries(shenanigans PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_test PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(shenanigans_terminal PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(shenanigans_benchmark PRIVATE nlohmann_json::nlohmann_json)
 
 # tracy
 if(ENABLE_PROFILING)
@@ -109,6 +121,7 @@ if(ENABLE_PROFILING)
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
   target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
   target_link_libraries(shenanigans_terminal PRIVATE ${CMAKE_DL_LIBS})
+  target_link_libraries(shenanigans_benchmark PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # opencv
@@ -117,6 +130,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
+target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
 
 # torch
 find_package(Torch REQUIRED HINTS libs/libtorch)
@@ -125,6 +139,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 target_link_libraries(shenanigans PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_terminal PRIVATE ${TORCH_LIBRARIES})
+target_link_libraries(shenanigans_benchmark PRIVATE ${TORCH_LIBRARIES})
 
 # imgui
 include_directories(libs/imgui)
@@ -135,6 +150,7 @@ set(SRC_IMGUI_BACKEND libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backend
 target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -144,12 +160,14 @@ add_subdirectory(libs/glfw)
 target_link_libraries(shenanigans PRIVATE glfw)
 target_link_libraries(shenanigans_test PRIVATE glfw)
 target_link_libraries(shenanigans_terminal PRIVATE glfw)
+target_link_libraries(shenanigans_benchmark PRIVATE glfw)
 
 # glad
 add_subdirectory(libs/glad)
 target_link_libraries(shenanigans PRIVATE glad)
 target_link_libraries(shenanigans_test PRIVATE glad)
 target_link_libraries(shenanigans_terminal PRIVATE glad)
+target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # custom
 include_directories(src)
@@ -173,6 +191,10 @@ gtest_discover_tests(shenanigans_test)
 file(GLOB SRC_SHENANIGANS_TERMINAL_APP CONFIGURE_DEPENDS apps/shenanigans_terminal/*.cpp)
 target_sources(shenanigans_terminal PRIVATE ${SRC_SHENANIGANS_TERMINAL_APP})
 
+# shenanigans_benchmark app sources
+file(GLOB SRC_SHENANIGANS_BENCHMARK_APP CONFIGURE_DEPENDS apps/shenanigans_benchmark/*.cpp)
+target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
+
 # precompiled headers
 if (ENABLE_PCH)
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
@@ -180,4 +202,5 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
 endif()

@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <torch/torch.h>
+#include <benchmark/benchmark.h>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
