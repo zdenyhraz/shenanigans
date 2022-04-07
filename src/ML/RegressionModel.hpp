@@ -100,7 +100,6 @@ void RegressionModelTest()
   torch::Tensor targetTensor = RegressionModelTestFunction(inputTensor);
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::SavePlot("../debug/regression_predictions.png", "RegressionModel predictions",
-      {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
+  PyPlot::Plot("RegressionModel predictions", {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
   return;
 }
