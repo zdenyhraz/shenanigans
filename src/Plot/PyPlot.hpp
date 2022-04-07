@@ -53,7 +53,6 @@ public:
 
   static void Initialize();
   static void Render();
-
   static void Plot(const std::string& name, PlotData1D&& data);
   static void Plot(const std::string& name, PlotData2D&& data);
   static void PlotSurf(const std::string& name, PlotData3D&& data);
@@ -66,9 +65,8 @@ private:
   inline static std::mutex mPlotQueueMutex;
   inline static std::mutex mPlotIdMutex;
 
-  static void ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data);
   static void PlotInternal(const PlotData& plotdata);
-
+  static void ScheldulePlot(const std::string& name, const std::string& type, py::dict&& data);
   static i32 GetPlotId(const std::string& name);
   static void AddDefaultPlotData(const std::string& name, py::dict& scope);
   static py::dict GetDefaultPlotData(const std::string& name);

@@ -25,12 +25,6 @@ void PyPlot::Render()
   }
 }
 
-void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, const py::dict& data)
-{
-  std::scoped_lock lock(mPlotQueueMutex);
-  mPlotQueue.emplace(name, type, data);
-}
-
 void PyPlot::PlotInternal(const PlotData& plotdata)
 try
 {
@@ -41,6 +35,12 @@ try
 catch (const std::exception& e)
 {
   LOG_EXCEPTION(e);
+}
+
+void PyPlot::ScheldulePlot(const std::string& name, const std::string& type, py::dict&& data)
+{
+  std::scoped_lock lock(mPlotQueueMutex);
+  mPlotQueue.emplace(name, type, std::move(data));
 }
 
 i32 PyPlot::GetPlotId(const std::string& name)
