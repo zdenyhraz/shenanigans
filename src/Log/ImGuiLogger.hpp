@@ -77,7 +77,7 @@ private:
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
-    if (not mActive and mFallback) // forward logging to the tfallback logger if this logger is is not being rendered
+    if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
       FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     if (mLineOffsets.size() > mMaxMessages)
