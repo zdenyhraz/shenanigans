@@ -30,6 +30,6 @@ public:
   template <typename T>
   static py::array_t<T> ToNumpy(const cv::Mat& mat)
   {
-    return py::array_t<T>({mat.rows, mat.cols}, reinterpret_cast<T*>(mat.data));
+    return py::array_t<T>({mat.rows, mat.cols}, std::bit_cast<T*>(mat.data));
   }
 };

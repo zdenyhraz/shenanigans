@@ -30,6 +30,7 @@
 #include <concepts>
 #include <source_location>
 #include <numbers>
+#include <bit>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
