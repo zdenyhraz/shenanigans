@@ -102,8 +102,8 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData1D&& data)
   plotData["linestyle_y2"] = std::move(data.linestyle_y2);
   plotData["linestyle_ys"] = std::move(data.linestyle_ys);
   plotData["linestyle_y2s"] = std::move(data.linestyle_y2s);
-  plotData["log"] = std::move(data.log);
-  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["log"] = data.log;
+  plotData["aspectratio"] = data.aspectratio;
   plotData["save"] = std::move(data.save);
   return plotData;
 }
@@ -117,12 +117,12 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData2D&& data)
   plotData["xlabel"] = std::move(data.xlabel);
   plotData["ylabel"] = std::move(data.ylabel);
   plotData["zlabel"] = std::move(data.zlabel);
-  plotData["xmin"] = std::move(data.xmin);
-  plotData["xmax"] = std::move(data.xmax);
-  plotData["ymin"] = std::move(data.ymin);
-  plotData["ymax"] = std::move(data.ymax);
-  plotData["interp"] = std::move(data.interp);
-  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["xmin"] = data.xmin;
+  plotData["xmax"] = data.xmax;
+  plotData["ymin"] = data.ymin;
+  plotData["ymax"] = data.ymax;
+  plotData["interp"] = data.interp;
+  plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
   plotData["save"] = std::move(data.save);
   return plotData;
@@ -137,11 +137,11 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData3D&& data)
   plotData["xlabel"] = std::move(data.xlabel);
   plotData["ylabel"] = std::move(data.ylabel);
   plotData["zlabel"] = std::move(data.zlabel);
-  plotData["xmin"] = std::move(data.xmin);
-  plotData["xmax"] = std::move(data.xmax);
-  plotData["ymin"] = std::move(data.ymin);
-  plotData["ymax"] = std::move(data.ymax);
-  plotData["aspectratio"] = std::move(data.aspectratio);
+  plotData["xmin"] = data.xmin;
+  plotData["xmax"] = data.xmax;
+  plotData["ymin"] = data.ymin;
+  plotData["ymax"] = data.ymax;
+  plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
   plotData["save"] = std::move(data.save);
   return plotData;

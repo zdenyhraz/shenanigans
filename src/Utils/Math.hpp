@@ -1,11 +1,11 @@
 #pragma once
 
-inline constexpr f64 ToRadians(f64 degrees)
+constexpr f64 ToRadians(f64 degrees)
 {
   return degrees / 360. * 2 * std::numbers::pi;
 }
 
-inline constexpr f64 ToDegrees(f64 radians)
+constexpr f64 ToDegrees(f64 radians)
 {
   return radians * 360. / (2 * std::numbers::pi);
 }
