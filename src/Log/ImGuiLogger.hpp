@@ -4,9 +4,11 @@
 
 class ImGuiLogger : public Logger
 {
+  using FallbackLogger = TerminalLogger;
   ImGuiTextBuffer mTextBuffer;
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
   bool mActive = false;
+  bool mFallback = true;
 
 public:
   template <typename... Args>
@@ -59,6 +61,8 @@ public:
 
   static void Render() { Get().RenderInternal(); }
 
+  static void SetFallback(bool forward) { Get().mFallback = forward; }
+
 private:
   static ImGuiLogger& Get()
   {
@@ -70,11 +74,11 @@ private:
   void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
   try
   {
-    if (not ShouldLog(logLevel))
-      [[unlikely]] return;
+    if (not ShouldLog(logLevel)) [[unlikely]]
+      return;
 
-    if (not mActive) // forward logging to the terminal logger if this logger is is not being rendered
-      TerminalLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
+    if (not mActive and mFallback) // forward logging to the tfallback logger if this logger is is not being rendered
+      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     if (mLineOffsets.size() > mMaxMessages)
     {
@@ -92,7 +96,7 @@ private:
   }
   catch (const std::exception& e)
   {
-    TerminalLogger::Error("LogMessage error: {}", e.what());
+    FallbackLogger::Error("LogMessage error: {}", e.what());
   }
 
   void Clear()

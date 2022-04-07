@@ -6,12 +6,14 @@
 
 void Shenanigans::Run()
 {
+  ImGuiLogger::SetFallback(false);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
   ImGuiIO& io = ImGuiInitialize(window, 2.0);
   Initialize();
+  LOG_DEBUG("Render loop started");
 
   while (!glfwWindowShouldClose(window))
   {
@@ -27,8 +29,8 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  ImGuiLogger::Render();
   // ImGui::ShowDemoWindow();
+  ImGuiLogger::Render();
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
   DiffrotWindow::Render();

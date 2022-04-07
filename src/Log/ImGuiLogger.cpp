@@ -11,7 +11,7 @@ static consteval std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelC
   colors[static_cast<usize>(Logger::LogLevel::Trace)] = GetColorFromU8(125, 125, 125);
   colors[static_cast<usize>(Logger::LogLevel::Function)] = GetColorFromU8(125, 125, 125);
   colors[static_cast<usize>(Logger::LogLevel::Debug)] = GetColorFromU8(0, 185, 255);
-  colors[static_cast<usize>(Logger::LogLevel::Info)] = GetColorFromU8(255, 255, 255);
+  colors[static_cast<usize>(Logger::LogLevel::Info)] = GetColorFromU8(235, 235, 235);
   colors[static_cast<usize>(Logger::LogLevel::Success)] = GetColorFromU8(0, 227, 15);
   colors[static_cast<usize>(Logger::LogLevel::Warning)] = GetColorFromU8(255, 200, 0);
   colors[static_cast<usize>(Logger::LogLevel::Error)] = GetColorFromU8(255, 0, 0);
