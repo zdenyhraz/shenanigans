@@ -47,14 +47,16 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImPlot::CreateContext();
+
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
   io.Fonts->AddFontFromFileTTF("../data/apps/CascadiaCode.ttf", scale * 19);
   io.IniFilename = "../data/apps/imgui.ini";
-  ImGui::StyleColorsDark();
 
+  ImGui::StyleColorsDark();
+  ImPlot::StyleColorsDark();
   ImGuiStyle& style = ImGui::GetStyle();
   style.ScaleAllSizes(scale);
   style.GrabRounding = 12;
@@ -64,6 +66,12 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
     style.WindowRounding = 0.0f;
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
+
+  ImPlotStyle& plotStyle = ImPlot::GetStyle();
+  plotStyle.LineWeight = 5;
+  plotStyle.Colormap = ImPlotColormap_Dark;
+  // plotStyle.PlotDefaultSize = ImVec2(800, 800);
+
   if (not ImGui_ImplGlfw_InitForOpenGL(window, true))
     throw std::runtime_error("Failed to initialize ImGui GLFW");
   if (not ImGui_ImplOpenGL3_Init("#version 130"))
