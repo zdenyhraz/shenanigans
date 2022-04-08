@@ -33,14 +33,7 @@ void ImGuiPlot::RenderPlot1D(const std::string&, const PlotData1D& data)
 void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data)
 {
   const auto& z = data.z;
-  const auto height = z.rows;
-  const auto width = z.cols;
-  const auto xmin = data.xmin;
-  const auto ymin = data.ymin;
-  const auto xmax = data.xmax;
-  const auto ymax = data.ymax;
-
-  ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), height, width, 0., 1, NULL, ImVec2(xmin, ymin), ImVec2(xmax, ymax));
+  ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, NULL, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
 }
 
 void ImGuiPlot::Render()
@@ -104,14 +97,7 @@ void ImGuiPlot::Debug2D()
 {
   static usize debugindex = 0;
   static constexpr usize n = 1000;
-  cv::Mat z(n, n, CV_64F);
-  for (i32 r = 0; r < z.rows; ++r)
-  {
-    auto zp = z.ptr<f64>(r);
-    for (i32 c = 0; c < z.cols; ++c)
-      zp[c] = static_cast<f64>(r + c) / (z.rows + z.cols);
-  }
 
-  Plot(fmt::format("debug2d#{}", debugindex++), PlotData2D{.z = z});
+  Plot(fmt::format("debug2d#{}", debugindex++), PlotData2D{.z = Gaussian<f64>(n, n)});
   LOG_DEBUG("Added one debug2d plot");
 }
