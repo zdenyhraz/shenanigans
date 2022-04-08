@@ -18,7 +18,7 @@ GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_VISIBLE, hidden ? GLFW_FALSE : GLFW_TRUE);
-  GLFWwindow* window = glfwCreateWindow(width, height, "hi mom", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(hidden ? 1 : width, hidden ? 1 : height, "hi mom", nullptr, nullptr);
   if (not window)
     throw std::runtime_error("GLFW create window failed");
 
