@@ -30,6 +30,7 @@ void Shenanigans::Run()
 void Shenanigans::Render()
 {
   // ImGui::ShowDemoWindow();
+  // ImPlot::ShowDemoWindow();
   ImGuiLogger::Render();
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
