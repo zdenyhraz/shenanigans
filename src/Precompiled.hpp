@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <cstdint>
+#include <variant>
 #include <initializer_list>
 #include <span>
 #include <type_traits>
@@ -31,6 +32,7 @@
 #include <source_location>
 #include <numbers>
 #include <bit>
+#include <ranges>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
