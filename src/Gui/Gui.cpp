@@ -46,6 +46,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   LOG_DEBUG("Initializing ImGui ...");
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImPlot::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
@@ -108,6 +109,7 @@ void ImGuiShutdown()
   PROFILE_FUNCTION;
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 }
 

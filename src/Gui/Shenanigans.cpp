@@ -34,6 +34,7 @@ void Shenanigans::Render()
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
   DiffrotWindow::Render();
+  ImGuiPlot::Render();
   PyPlot::Render();
 }
 

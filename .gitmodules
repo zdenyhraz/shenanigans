@@ -25,3 +25,6 @@
 [submodule "libs/benchmark"]
 	path = libs/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "libs/implot"]
+	path = libs/implot
+	url = https://github.com/epezent/implot.git

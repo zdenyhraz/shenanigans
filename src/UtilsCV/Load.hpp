@@ -43,3 +43,9 @@ inline std::vector<cv::Mat> LoadImages(const std::string& path)
 
   return images;
 }
+
+inline void ResizeImages(std::vector<cv::Mat>& images, cv::Size size)
+{
+  for (auto& image : images)
+    cv::resize(image, image, size);
+}

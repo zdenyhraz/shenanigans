@@ -141,6 +141,14 @@ target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_terminal PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_benchmark PRIVATE ${TORCH_LIBRARIES})
 
+# implot
+include_directories(libs/implot)
+file(GLOB SRC_IMPLOT CONFIGURE_DEPENDS libs/implot/*.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMPLOT})
+target_sources(shenanigans_test PRIVATE ${SRC_IMPLOT})
+target_sources(shenanigans_terminal PRIVATE ${SRC_IMPLOT})
+target_sources(shenanigans_benchmark PRIVATE ${SRC_IMPLOT})
+
 # imgui
 include_directories(libs/imgui)
 include_directories(libs/imgui/misc/cpp)

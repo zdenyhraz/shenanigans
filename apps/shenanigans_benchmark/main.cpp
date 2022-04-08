@@ -1,44 +1,45 @@
 #include "Fourier/Fourier.hpp"
+// state.PauseTiming();
+// state.ResumeTiming();
 
 using Input = std::vector<cv::Mat>;
 
-void OpenCVFFTComplex(const Input& images)
-{
-  cv::Mat fft;
-  for (const auto& image : images)
-    cv::dft(image, fft, cv::DFT_COMPLEX_OUTPUT);
-}
-
-void OpenCVFFTCSS(const Input& images)
-{
-  cv::Mat fft;
-  for (const auto& image : images)
-    cv::dft(image, fft);
-}
-
 static void OpenCVFFTComplexBenchmark(benchmark::State& state, const Input& images)
 {
+  cv::Mat fft;
   for (auto _ : state)
-    OpenCVFFTComplex(images);
+  {
+    for (const auto& image : images)
+      cv::dft(image, fft, cv::DFT_COMPLEX_OUTPUT);
+  }
 }
 
 static void OpenCVFFTCSSBenchmark(benchmark::State& state, const Input& images)
 {
-  // state.PauseTiming();
-  // state.ResumeTiming();
+  cv::Mat fft;
   for (auto _ : state)
-    OpenCVFFTCSS(images);
+  {
+    for (const auto& image : images)
+      cv::dft(image, fft);
+  }
 }
 
 int main(int argc, char** argv)
 try
 {
-  static constexpr usize iterations = 100;
-  static constexpr benchmark::TimeUnit timeunit = benchmark::kMicrosecond;
-  const auto images = LoadImages<f64>("../debug/ipcopt/train");
+  static constexpr auto timeunit = benchmark::kMillisecond;
+  static constexpr auto expmin = 19;
+  static constexpr auto expmax = 24;
+  static const auto exponents = Linspace<i32>(expmin, expmax, expmax - expmin + 1);
 
-  benchmark::RegisterBenchmark("OpenCV Complex", OpenCVFFTComplexBenchmark, images)->Iterations(iterations)->Unit(timeunit);
-  benchmark::RegisterBenchmark("OpenCV CSS", OpenCVFFTCSSBenchmark, images)->Iterations(iterations)->Unit(timeunit);
+  for (const auto exponent : exponents)
+  {
+    const auto size = 1 << exponent;
+    auto images = LoadImages<f64>("../debug/ipcopt/train");
+    ResizeImages(images, {size, 1});
+    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV Complex", size).c_str(), OpenCVFFTComplexBenchmark, images)->Unit(timeunit);
+    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV CCS", size).c_str(), OpenCVFFTCSSBenchmark, images)->Unit(timeunit);
+  }
 
   benchmark::Initialize(&argc, argv);
   benchmark::RunSpecifiedBenchmarks();

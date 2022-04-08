@@ -38,6 +38,8 @@
 #include <imgui_impl_opengl3.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <implot.h>
+#include <implot_internal.h>
 
 #include <omp.h>
 #include <pybind11/embed.h>
@@ -113,4 +115,5 @@ using namespace pybind11::literals;
 #include "UtilsCV/Math.hpp"
 #include "UtilsCV/Transform.hpp"
 
+#include "Plot/ImGuiPlot.hpp"
 #include "Plot/PyPlot.hpp"
