@@ -34,7 +34,8 @@ public:
   static void Plot(const std::string& name, Data&& data)
   {
     std::scoped_lock lock(mPlotsMutex);
-    mPlots[name] = {.name = name, .data = std::move(data)};
+    const auto plotName = fmt::format("##{}", name);
+    mPlots[plotName] = {.name = plotName, .data = std::move(data)};
   }
 
 private:

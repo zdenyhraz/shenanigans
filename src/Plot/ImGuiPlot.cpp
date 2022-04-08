@@ -2,38 +2,44 @@
 
 void ImGuiPlot::RenderPlot(const PlotData& plotData)
 {
-  if (ImGui::BeginTabItem(plotData.name.c_str()))
+  if (ImGui::BeginTabItem(plotData.name.c_str() + 2))
   {
-    if (ImPlot::BeginPlot(plotData.name.c_str(), ImVec2(-1, -1)))
-    {
-      if (std::holds_alternative<PlotData1D>(plotData.data))
-        RenderPlot1D(plotData.name, std::get<PlotData1D>(plotData.data));
-      else if (std::holds_alternative<PlotData2D>(plotData.data))
-        RenderPlot2D(plotData.name, std::get<PlotData2D>(plotData.data));
+    if (std::holds_alternative<PlotData1D>(plotData.data))
+      RenderPlot1D(plotData.name, std::get<PlotData1D>(plotData.data));
+    else if (std::holds_alternative<PlotData2D>(plotData.data))
+      RenderPlot2D(plotData.name, std::get<PlotData2D>(plotData.data));
 
-      ImPlot::EndPlot();
-    }
     ImGui::EndTabItem();
   }
 }
 
-void ImGuiPlot::RenderPlot1D(const std::string&, const PlotData1D& data)
+void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data)
 {
-  for (usize i = 0; i < data.ys.size(); ++i)
+  if (ImPlot::BeginPlot(name.c_str(), ImVec2(-1, -1)))
   {
-    const auto ylabelAuto = fmt::format("y{}", i);
-    const auto ylabel = i < data.ylabels.size() ? data.ylabels[i].c_str() : ylabelAuto.c_str();
-    const auto x = data.x.data();
-    const auto y = data.ys[i].data();
-    const auto n = data.ys[i].size();
-    ImPlot::PlotLine(ylabel, x, y, n);
+    for (usize i = 0; i < data.ys.size(); ++i)
+    {
+      const auto ylabelAuto = fmt::format("y{}", i);
+      const auto ylabel = i < data.ylabels.size() ? data.ylabels[i].c_str() : ylabelAuto.c_str();
+      const auto x = data.x.data();
+      const auto y = data.ys[i].data();
+      const auto n = data.ys[i].size();
+      ImPlot::PlotLine(ylabel, x, y, n);
+    }
+    ImPlot::EndPlot();
   }
 }
 
 void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data)
 {
   const auto& z = data.z;
-  ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, NULL, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+  if (ImPlot::BeginPlot(name.c_str(), ImVec2(1000, -1)))
+  {
+    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, NULL, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+    ImPlot::EndPlot();
+  }
+  ImGui::SameLine();
+  ImPlot::ColormapScale(name.c_str(), 0, 1, {150, -1}, IMPLOT_AUTO);
 }
 
 void ImGuiPlot::Render()
