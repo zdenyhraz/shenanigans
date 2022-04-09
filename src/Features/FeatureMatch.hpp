@@ -240,7 +240,7 @@ try
   std::vector<std::vector<cv::KeyPoint>> keypoints2_all(piccnt - 1);
 
 #pragma omp parallel for
-  for (i32 pic = 1; pic < piccnt - 1; pic++)
+  for (i32 pic = 1; pic < piccnt - 1; ++pic)
   {
     const std::string path1 = data.path + std::to_string(pic) + ".PNG";
     const std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";

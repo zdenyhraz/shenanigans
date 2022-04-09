@@ -30,10 +30,18 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  IPCWindow::Render();
-  IPCOptimizeWindow::Render();
-  DiffrotWindow::Render();
-  SwindWindow::Render();
+  if (ImGui::Begin("Shenanigans"))
+  {
+    if (ImGui::BeginTabBar("Windows"))
+    {
+      IPCWindow::Render();
+      IPCOptimizeWindow::Render();
+      DiffrotWindow::Render();
+      SwindWindow::Render();
+      ImGui::EndTabBar();
+    }
+    ImGui::End();
+  }
 
   ImGuiLogger::Render();
   ImGuiPlot::Render();
