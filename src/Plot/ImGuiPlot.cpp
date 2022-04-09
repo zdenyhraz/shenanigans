@@ -88,7 +88,6 @@ void ImGuiPlot::Debug()
 
 void ImGuiPlot::Debug1D()
 {
-  static usize debugindex = 0;
   static constexpr usize n = 1001;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
@@ -101,15 +100,13 @@ void ImGuiPlot::Debug1D()
     y2[i] = std::cos(2 * std::numbers::pi * x[i]);
   }
 
-  Plot(fmt::format("debug1d#{}", debugindex++), PlotData1D{.x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
+  Plot(fmt::format("debug1d#{}", mPlots.size()), PlotData1D{.x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 }
 
 void ImGuiPlot::Debug2D()
 {
-  static usize debugindex = 0;
   static constexpr usize n = 201;
-
-  Plot(fmt::format("debug2d#{}", debugindex++), PlotData2D{.z = Gaussian<f64>(n, n)});
+  Plot(fmt::format("debug2d#{}", mPlots.size()), PlotData2D{.z = Gaussian<f64>(n, n)});
   LOG_DEBUG("Added one debug2d plot");
 }
