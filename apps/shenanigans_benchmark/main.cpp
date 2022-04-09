@@ -54,6 +54,6 @@ catch (const std::exception& e)
 }
 catch (...)
 {
-  LOG_ERROR("Error: Unknown error");
+  LOG_UNKNOWN_EXCEPTION;
   return EXIT_FAILURE;
 }

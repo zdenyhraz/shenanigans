@@ -1,5 +1,4 @@
 #pragma once
-#include "IPCWindow.hpp"
 
 class Shenanigans
 {

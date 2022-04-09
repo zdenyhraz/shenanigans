@@ -3,6 +3,7 @@
 #include "IPCWindow.hpp"
 #include "IPCOptimizeWindow.hpp"
 #include "DiffrotWindow.hpp"
+#include "SwindWindow.hpp"
 
 void Shenanigans::Run()
 {
@@ -29,14 +30,17 @@ void Shenanigans::Run()
 
 void Shenanigans::Render()
 {
-  // ImGui::ShowDemoWindow();
-  ImPlot::ShowDemoWindow();
-  ImGuiLogger::Render();
   IPCWindow::Render();
   IPCOptimizeWindow::Render();
   DiffrotWindow::Render();
+  SwindWindow::Render();
+
+  ImGuiLogger::Render();
   ImGuiPlot::Render();
   PyPlot::Render();
+
+  // ImGui::ShowDemoWindow();
+  // ImPlot::ShowDemoWindow();
 }
 
 void Shenanigans::Initialize()
@@ -46,6 +50,7 @@ void Shenanigans::Initialize()
   IPCWindow::Initialize();
   IPCOptimizeWindow::Initialize();
   DiffrotWindow::Initialize();
+  SwindWindow::Initialize();
 }
 
 void Shenanigans::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

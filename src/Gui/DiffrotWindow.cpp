@@ -7,7 +7,7 @@ void DiffrotWindow::Initialize()
 
 void DiffrotWindow::Render()
 {
-  ImGui::Begin("Differential rotation");
+  ImGui::Begin("Diffrot");
 
   if (ImGui::Button("Calculate"))
     mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,

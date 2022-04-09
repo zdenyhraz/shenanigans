@@ -18,23 +18,23 @@ enum FeatureType
 
 struct FeatureMatchData
 {
-  FeatureType ftype;
-  f64 thresh;
-  i32 matchcnt;
-  f64 minSpeed;
-  f64 maxSpeed;
-  std::string path;
+  FeatureType ftype = SURF; // SURF
+  f32 thresh = 100;         // 100/200
+  i32 matchcnt = 1000;      // 1000
+  f32 minSpeed = 450;       // 450
+  f32 maxSpeed = 841;       // 841
+  std::string path = "../data/articles/swind/source/1/cropped/crop";
   std::string path1;
   std::string path2;
-  f64 overlapdistance;
-  bool drawOverlapCircles = false;
-  f64 ratioThreshold = 0.7;
-  f64 upscale = 1;
-  bool surfExtended = false;
-  bool surfUpright = false;
-  i32 nOctaves = 4;
-  i32 nOctaveLayers = 3;
-  bool mask = true;
+  f32 overlapdistance = 40;        // 40
+  bool drawOverlapCircles = false; // false
+  f32 ratioThreshold = 0.5;        // 0.4/0.5
+  f32 upscale = 1;                 // 1
+  bool surfExtended = false;       // false
+  bool surfUpright = true;         // true
+  i32 nOctaves = 4;                // 4
+  i32 nOctaveLayers = 3;           // 3
+  bool mask = true;                // true
 };
 
 inline cv::Point2f GetFeatureMatchShift(const cv::DMatch& match, const std::vector<cv::KeyPoint>& kp1, const std::vector<cv::KeyPoint>& kp2)
@@ -52,7 +52,7 @@ inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const FeatureMatchData& data)
   switch (data.ftype)
   {
   case FeatureType::SURF:
-    return cv::xfeatures2d::SURF::create(std::min(data.thresh, 500.), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
+    return cv::xfeatures2d::SURF::create(std::min(data.thresh, 500.f), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
   case FeatureType::SIFT:
     return cv::SIFT::create(0, std::max(data.nOctaveLayers, 1), 0, 1e5);
   }
@@ -266,7 +266,6 @@ try
     // filter matches using the Lowe's ratio test
     std::vector<cv::DMatch> matches;
     {
-      LOG_SCOPE("Filtering matches");
       for (usize i = 0; i < knn_matches.size(); i++)
         if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
           matches.push_back(knn_matches[i][0]);
@@ -274,7 +273,6 @@ try
 
     // get first best fits
     {
-      LOG_SCOPE("Sorting matches based on distance");
       std::sort(matches.begin(), matches.end(), [&](const cv::DMatch& a, const cv::DMatch& b) { return a.distance < b.distance; });
       matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (i32)matches.size()));
       matches_all[pic] = matches;
@@ -282,7 +280,6 @@ try
 
     if (0)
     {
-      LOG_SCOPE("Drawing matches");
       cv::Mat img_matches;
       drawMatches(img1, keypoints1, img2, keypoints2, matches, img_matches, cv::Scalar(0, 255, 255), cv::Scalar(0, 255, 0), std::vector<char>(), cv::DrawMatchesFlags::DEFAULT);
       Showimg(img_matches, "Good matches");
@@ -297,15 +294,17 @@ try
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({i++, pic, match, false});
 
-    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(), [&](const auto& a, const auto& b) {
-      const auto& [idx1, pic1, match1, ignore1] = a;
-      const auto& [idx2, pic2, match2, ignore2] = b;
-      const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
-      const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
-      const auto spd1 = Magnitude(shift1);
-      const auto spd2 = Magnitude(shift2);
-      return spd1 > spd2;
-    });
+    std::sort(matches_all_serialized.begin(), matches_all_serialized.end(),
+        [&](const auto& a, const auto& b)
+        {
+          const auto& [idx1, pic1, match1, ignore1] = a;
+          const auto& [idx2, pic2, match2, ignore2] = b;
+          const auto shift1 = GetFeatureMatchShift(match1, keypoints1_all[pic1], keypoints2_all[pic1]);
+          const auto shift2 = GetFeatureMatchShift(match2, keypoints1_all[pic2], keypoints2_all[pic2]);
+          const auto spd1 = Magnitude(shift1);
+          const auto spd2 = Magnitude(shift2);
+          return spd1 > spd2;
+        });
 
     usize newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)
@@ -341,11 +340,11 @@ try
   const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, false);
   const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, true);
 
-  Showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
-  Showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
+  // Showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
+  // Showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
 
-  Saveimg("Debug/arrowsIdx.png", arrowsIdx);
-  Saveimg("Debug/arrowsSpd.png", arrowsSpd);
+  Saveimg("../debug/swind/arrowsIdx.png", arrowsIdx);
+  Saveimg("../debug/swind/arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
@@ -380,15 +379,15 @@ try
         matches.push_back(knn_matches[i][0]);
   }
 
-  Plot2D::Set(fmt::format("{} I1", "featurematch"));
-  Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", "Debug", "featurematch"));
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot(img1);
+  // Plot2D::Set(fmt::format("{} I1", "featurematch"));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_I1.png", "Debug", "featurematch"));
+  // Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  // Plot2D::Plot(img1);
 
-  Plot2D::Set(fmt::format("{} I2", "featurematch"));
-  Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", "Debug", "featurematch"));
-  Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  Plot2D::Plot(img2);
+  // Plot2D::Set(fmt::format("{} I2", "featurematch"));
+  // Plot2D::SetSavePath(fmt::format("{}/{}_I2.png", "Debug", "featurematch"));
+  // Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
+  // Plot2D::Plot(img2);
 
   const auto arrows = DrawFeatureMatchArrows(img1, matches, keypoints1, keypoints2, data);
   Showimg(arrows, "matches", false, 0, 1, 1024);

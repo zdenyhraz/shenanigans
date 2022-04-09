@@ -30,12 +30,12 @@ public:
   static void Render();
   static void Clear();
 
-  template <typename Data>
-  static void Plot(const std::string& name, Data&& data)
+  template <typename T>
+  static void Plot(const std::string& name, T&& data)
   {
     std::scoped_lock lock(mPlotsMutex);
     const auto plotName = fmt::format("##{}", name);
-    mPlots[plotName] = {.name = plotName, .data = std::move(data)};
+    mPlots[plotName] = {.name = plotName, .data = std::forward<T>(data)};
   }
 
 private:
