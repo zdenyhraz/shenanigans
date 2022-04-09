@@ -24,6 +24,8 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data)
       const auto x = data.x.data();
       const auto y = data.ys[i].data();
       const auto n = data.ys[i].size();
+
+      ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
       ImPlot::PlotLine(ylabel, x, y, n);
     }
     ImPlot::EndPlot();
@@ -33,13 +35,17 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data)
 void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data)
 {
   const auto& z = data.z;
-  if (ImPlot::BeginPlot(name.c_str(), ImVec2(1000, -1)))
+  const f32 widthcb = 180;
+  const float width = ImGui::GetContentRegionAvail().x - widthcb - ImGui::GetStyle().ItemSpacing.x;
+  const float height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
+  if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
   {
-    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, NULL, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+    ImPlot::GetStyle().Colormap = ImPlotColormap_Jet;
+    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), 0, 1, {150, -1}, IMPLOT_AUTO);
+  ImPlot::ColormapScale(name.c_str(), 0, 1, {widthcb, height}, ImPlotColormap_Jet);
 }
 
 void ImGuiPlot::Render()
@@ -83,7 +89,7 @@ void ImGuiPlot::Debug()
 void ImGuiPlot::Debug1D()
 {
   static usize debugindex = 0;
-  static constexpr usize n = 1000;
+  static constexpr usize n = 1001;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
   std::vector<f64> y2(n);
@@ -102,7 +108,7 @@ void ImGuiPlot::Debug1D()
 void ImGuiPlot::Debug2D()
 {
   static usize debugindex = 0;
-  static constexpr usize n = 1000;
+  static constexpr usize n = 501;
 
   Plot(fmt::format("debug2d#{}", debugindex++), PlotData2D{.z = Gaussian<f64>(n, n)});
   LOG_DEBUG("Added one debug2d plot");
