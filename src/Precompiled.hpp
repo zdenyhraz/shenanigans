@@ -117,5 +117,5 @@ using namespace pybind11::literals;
 #include "UtilsCV/Math.hpp"
 #include "UtilsCV/Transform.hpp"
 
-#include "Plot/ImGuiPlot.hpp"
+#include "Plot/Plot.hpp"
 #include "Plot/PyPlot.hpp"

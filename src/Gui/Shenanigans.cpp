@@ -44,7 +44,7 @@ void Shenanigans::Render()
   }
 
   ImGuiLogger::Render();
-  ImGuiPlot::Render();
+  Plot::Render();
   PyPlot::Render();
 
   // ImGui::ShowDemoWindow();

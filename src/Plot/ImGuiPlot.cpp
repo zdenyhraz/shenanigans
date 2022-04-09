@@ -1,6 +1,6 @@
 #include "ImGuiPlot.hpp"
 
-void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData)
+void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData) const
 {
   if (ImGui::BeginTabItem(name.c_str() + 2))
   {
@@ -13,7 +13,7 @@ void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData)
   }
 }
 
-void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data)
+void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) const
 {
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(-1, -1)))
   {
@@ -32,7 +32,7 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data)
   }
 }
 
-void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data)
+void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) const
 {
   const auto& z = data.z;
   const f32 widthcb = 180;
@@ -82,12 +82,6 @@ void ImGuiPlot::Clear()
 
 void ImGuiPlot::Debug()
 {
-  Debug1D();
-  Debug2D();
-}
-
-void ImGuiPlot::Debug1D()
-{
   static constexpr usize n = 1001;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
@@ -102,11 +96,7 @@ void ImGuiPlot::Debug1D()
 
   Plot(fmt::format("debug1d#{}", mPlots.size()), PlotData1D{.x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
-}
 
-void ImGuiPlot::Debug2D()
-{
-  static constexpr usize n = 201;
   Plot(fmt::format("debug2d#{}", mPlots.size()), PlotData2D{.z = Gaussian<f64>(n, n)});
   LOG_DEBUG("Added one debug2d plot");
 }

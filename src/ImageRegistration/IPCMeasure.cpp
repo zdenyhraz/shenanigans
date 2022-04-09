@@ -79,16 +79,17 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
           "pcs_stddev"_a = ColStddevs<f64>(accuracyPCS), "ipc_error"_a = ColMeans<f64>(accuracyIPC), "ipc_stddev"_a = ColStddevs<f64>(accuracyIPC), "ipco_error"_a = ColMeans<f64>(accuracyIPCO),
           "ipco_stddev"_a = ColStddevs<f64>(accuracyIPCO)});
 
-  static constexpr auto xlabel = "x shift";
-  static constexpr auto ylabel = "y shift";
-  static constexpr auto zlabel = "error";
+  // static constexpr auto xlabel = "x shift";
+  // static constexpr auto ylabel = "y shift";
+  // static constexpr auto zlabel = "error";
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsX);
-  PyPlot::Plot("CC accuracy map", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("PC accuracy map", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("PCS accuracy map", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("IPC accuracy map", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
-  PyPlot::Plot("IPCO accuracy map", {.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = zlabel});
+
+  Plot::Plot("CC accuracy map", PlotData2D{.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot::Plot("PC accuracy map", PlotData2D{.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot::Plot("PCS accuracy map", PlotData2D{.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot::Plot("IPC accuracy map", PlotData2D{.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot::Plot("IPCO accuracy map", PlotData2D{.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
 
   if (progress)
     *progress = 0;
