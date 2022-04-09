@@ -1,13 +1,13 @@
 #include "ImGuiPlot.hpp"
 
-void ImGuiPlot::RenderPlot(const PlotData& plotData)
+void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData)
 {
-  if (ImGui::BeginTabItem(plotData.name.c_str() + 2))
+  if (ImGui::BeginTabItem(name.c_str() + 2))
   {
     if (std::holds_alternative<PlotData1D>(plotData.data))
-      RenderPlot1D(plotData.name, std::get<PlotData1D>(plotData.data));
+      RenderPlot1D(name, std::get<PlotData1D>(plotData.data));
     else if (std::holds_alternative<PlotData2D>(plotData.data))
-      RenderPlot2D(plotData.name, std::get<PlotData2D>(plotData.data));
+      RenderPlot2D(name, std::get<PlotData2D>(plotData.data));
 
     ImGui::EndTabItem();
   }
@@ -36,16 +36,16 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data)
 {
   const auto& z = data.z;
   const f32 widthcb = 180;
-  const float width = ImGui::GetContentRegionAvail().x - widthcb - ImGui::GetStyle().ItemSpacing.x;
-  const float height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
+  const f32 width = ImGui::GetContentRegionAvail().x - widthcb - ImGui::GetStyle().ItemSpacing.x;
+  const f32 height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
   {
     ImPlot::GetStyle().Colormap = ImPlotColormap_Jet;
-    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f64*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), 0, 1, {widthcb, height}, ImPlotColormap_Jet);
+  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, ImPlotColormap_Jet);
 }
 
 void ImGuiPlot::Render()
@@ -61,8 +61,8 @@ void ImGuiPlot::Render()
     if (ImGui::BeginTabBar("Plots"))
     {
       std::scoped_lock lock(mPlotsMutex);
-      for (const auto& [name, plot] : mPlots)
-        RenderPlot(plot);
+      for (const auto& [name, data] : mPlots)
+        RenderPlot(name, data);
 
       ImGui::EndTabBar();
     }
@@ -108,7 +108,7 @@ void ImGuiPlot::Debug1D()
 void ImGuiPlot::Debug2D()
 {
   static usize debugindex = 0;
-  static constexpr usize n = 501;
+  static constexpr usize n = 201;
 
   Plot(fmt::format("debug2d#{}", debugindex++), PlotData2D{.z = Gaussian<f64>(n, n)});
   LOG_DEBUG("Added one debug2d plot");
