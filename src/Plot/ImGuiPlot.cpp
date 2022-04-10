@@ -21,13 +21,11 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
     ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
     for (usize i = 0; i < data.ys.size(); ++i)
     {
-      const auto ylabelAuto = fmt::format("y{}", i);
-      const auto ylabel = i < data.ylabels.size() ? data.ylabels[i].c_str() : ylabelAuto.c_str();
+      const auto label = data.ylabels[i].c_str();
       const auto x = data.x.data();
       const auto y = data.ys[i].data();
       const auto n = data.ys[i].size();
-
-      ImPlot::PlotLine(ylabel, x, y, n);
+      ImPlot::PlotLine(label, x, y, n);
     }
     ImPlot::EndPlot();
   }
@@ -41,6 +39,7 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
   const f32 height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
   {
+    ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
     ImPlot::GetStyle().Colormap = data.cmap;
     ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();

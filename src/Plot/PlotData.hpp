@@ -29,6 +29,6 @@ struct PlotData2D
   f64 zmin = 0;
   f64 zmax = 1;
   PlotColormap cmap = Jet;
-  std::string xlabel;
-  std::string ylabel;
+  std::string xlabel = "x";
+  std::string ylabel = "y";
 };

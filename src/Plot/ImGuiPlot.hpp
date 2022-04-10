@@ -7,7 +7,26 @@ class ImGuiPlot : public Singleton<ImGuiPlot>
 public:
   struct PlotData
   {
-    PlotData(PlotData1D&& data1d) : data(std::move(data1d)) {}
+    PlotData(PlotData1D&& data1d)
+    {
+      if (data1d.ylabels.size() < data1d.ys.size())
+      {
+        const auto origsize = data1d.ylabels.size();
+        data1d.ylabels.resize(data1d.ys.size());
+        for (usize i = origsize; i < data1d.ys.size(); ++i)
+          data1d.ylabels[i] = fmt::format("y{}", i);
+      }
+
+      if (data1d.y2labels.size() < data1d.y2s.size())
+      {
+        const auto origsize = data1d.y2labels.size();
+        data1d.y2labels.resize(data1d.y2s.size());
+        for (usize i = origsize; i < data1d.y2s.size(); ++i)
+          data1d.y2labels[i] = fmt::format("y2-{}", i);
+      }
+
+      data = std::move(data1d);
+    }
 
     PlotData(PlotData2D&& data2d)
     {
