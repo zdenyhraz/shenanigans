@@ -282,22 +282,6 @@ try
     mOutputFile.open(mOutputFileDir + mName + ".txt", std::ios::out | std::ios::app);
     fmt::print(mOutputFile, "Evolution optimization '{}' started\n", mName);
   }
-
-  if (mPlotOutput)
-  {
-    // Plot1D::Set(fmt::format("Evolution ({})", mName));
-    // Plot1D::Clear();
-    // Plot1D::SetXlabel("generation");
-    // Plot1D::SetYlabel("objective function value");
-    // Plot1D::SetY2label("best-average relative similarity [%]");
-    // if (valid)
-    //   Plot1D::SetYnames({"obj", "valid"});
-    // else
-    //   Plot1D::SetYnames({"obj"});
-    // Plot1D::SetY2names({"%sim"});
-    // Plot1D::SetPens({Plot::pens[0], Plot::pens[2], Plot::pens[1]});
-    // Plot1D::SetYLogarithmic(true);
-  }
 }
 catch (const std::exception& e)
 {
@@ -352,7 +336,12 @@ try
   const auto result2 = valid(arg);
 
   if (result1 != result2)
-    throw std::runtime_error(fmt::format("Validation function is not consistent ({} != {})", result1, result2));
+  {
+    if (not mAllowInconsistent)
+      throw std::runtime_error(fmt::format("Validation function is not consistent ({} != {})", result1, result2));
+    else if (mConsoleOutput)
+      LOG_WARNING("Validation function is consistent, but that is currently allowed");
+  }
   else if (mConsoleOutput)
     LOG_DEBUG("Validation function is consistent");
 
@@ -407,10 +396,25 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
 
   if (mPlotOutput)
   {
-    // if (valid)
-    //   Plot1D::Plot(generation, {population.bestEntity.fitness, valid(population.bestEntity.params)}, {population.relativeDifference * 100});
-    // else
-    //   Plot1D::Plot(generation, population.bestEntity.fitness, population.relativeDifference * 100);
+    static std::vector<f64> gens;
+    static std::vector<f64> objvals;
+    static std::vector<f64> validvals;
+    static std::vector<f64> sims;
+
+    gens.push_back(generation);
+    objvals.push_back(population.bestEntity.fitness);
+    validvals.push_back(valid ? valid(population.bestEntity.params) : 0);
+    sims.push_back(population.relativeDifference * 100);
+
+    Plot1D(fmt::format("Evolution ({})", mName), {.x = gens,
+                                                     .ys = {objvals, validvals},
+                                                     .y2s = {sims},
+                                                     .ylabels = {"obj", "valid"},
+                                                     .y2labels = {"%sim"},
+                                                     .xlabel = "generation",
+                                                     .ylabel = "objective function value",
+                                                     .y2label = "best-average relative similarity [%]",
+                                                     .log = false});
   }
 }
 

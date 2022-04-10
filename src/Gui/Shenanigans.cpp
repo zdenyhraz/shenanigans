@@ -4,6 +4,7 @@
 #include "IPCOptimizeWindow.hpp"
 #include "DiffrotWindow.hpp"
 #include "SwindWindow.hpp"
+#include "StuffWindow.hpp"
 
 void Shenanigans::Run()
 {
@@ -38,6 +39,7 @@ void Shenanigans::Render()
       IPCOptimizeWindow::Render();
       DiffrotWindow::Render();
       SwindWindow::Render();
+      StuffWindow::Render();
       ImGui::EndTabBar();
     }
     ImGui::End();
@@ -59,6 +61,7 @@ void Shenanigans::Initialize()
   IPCOptimizeWindow::Initialize();
   DiffrotWindow::Initialize();
   SwindWindow::Initialize();
+  StuffWindow::Initialize();
 }
 
 void Shenanigans::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

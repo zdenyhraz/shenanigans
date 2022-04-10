@@ -68,6 +68,8 @@ public:
 
   void SetName(const std::string& optname) { mName = optname; }
 
+  void SetAllowInconsistent(bool allowInconsistent) { mAllowInconsistent = allowInconsistent; }
+
   static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
       const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
@@ -87,6 +89,7 @@ protected:
   bool mFileOutput = false;
   bool mPlotObjectiveFunctionLandscape = false;
   bool mSaveProgress = false;
+  bool mAllowInconsistent = false;
   usize mPlotObjectiveFunctionLandscapeIterations = 51;
   std::string mOutputFileDir;
   std::string mName;
