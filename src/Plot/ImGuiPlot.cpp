@@ -19,10 +19,10 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
   {
     ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), ImPlotAxisFlags_None, data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
     ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
+    const auto x = data.x.data();
     for (usize i = 0; i < data.ys.size(); ++i)
     {
       const auto label = data.ylabels[i].c_str();
-      const auto x = data.x.data();
       const auto y = data.ys[i].data();
       const auto n = data.ys[i].size();
       ImPlot::PlotLine(label, x, y, n);

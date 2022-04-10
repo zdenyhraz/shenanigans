@@ -50,7 +50,7 @@ void Shenanigans::Render()
   PyPlot::Render();
 
   // ImGui::ShowDemoWindow();
-  // ImPlot::ShowDemoWindow();
+  ImPlot::ShowDemoWindow();
 }
 
 void Shenanigans::Initialize()
