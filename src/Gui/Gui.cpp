@@ -55,8 +55,8 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.Fonts->AddFontFromFileTTF("../data/apps/CascadiaCode.ttf", scale * 19);
   io.IniFilename = "../data/apps/imgui.ini";
 
-  ImGui::StyleColorsDark();
-  ImPlot::StyleColorsDark();
+  ImGui::StyleColorsClassic();
+  ImPlot::StyleColorsClassic();
   ImGuiStyle& style = ImGui::GetStyle();
   style.ScaleAllSizes(scale);
   style.GrabRounding = 12;

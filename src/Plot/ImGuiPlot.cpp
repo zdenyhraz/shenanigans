@@ -53,7 +53,7 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
     ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
     ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
     ImPlot::SetupAxis(ImAxis_Y1, data.ylabel.c_str(), data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
-    ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back());
+    ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
     // ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
 
     if (data.y2s.size() != 0)
