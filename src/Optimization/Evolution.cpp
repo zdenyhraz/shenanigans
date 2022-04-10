@@ -403,7 +403,8 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
 
     gens.push_back(generation);
     objvals.push_back(population.bestEntity.fitness);
-    validvals.push_back(valid ? valid(population.bestEntity.params) : 0);
+    if (valid)
+      validvals.push_back(valid(population.bestEntity.params));
     sims.push_back(population.relativeDifference * 100);
 
     Plot1D(fmt::format("Evolution ({})", mName), {.x = gens,

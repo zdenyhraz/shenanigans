@@ -10,6 +10,8 @@ void IPCWindow::Render()
 {
   if (ImGui::BeginTabItem("IPC params"))
   {
+    ImGui::Separator();
+
     if (ImGui::Button("Update"))
       LaunchAsync(
           []()

@@ -8,6 +8,8 @@ void SwindWindow::Render()
 {
   if (ImGui::BeginTabItem("Swind"))
   {
+    ImGui::Separator();
+
     if (ImGui::Button("Calculate"))
       LaunchAsync([]() { featureMatch(mParameters); });
 

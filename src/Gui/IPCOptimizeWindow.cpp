@@ -9,6 +9,8 @@ void IPCOptimizeWindow::Render()
 {
   if (ImGui::BeginTabItem("IPC opt"))
   {
+    ImGui::Separator();
+
     if (ImGui::Button("Show"))
       LaunchAsync([]() { IPCDebug::ShowDebugStuff(IPCWindow::GetIPCOptimized(), mParameters.maxShift, mParameters.noiseStddev); });
 

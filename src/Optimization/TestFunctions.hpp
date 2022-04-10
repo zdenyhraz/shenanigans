@@ -49,14 +49,14 @@ inline f64 Rosenbrock(const std::vector<f64>& arg)
   return Sqr(a - x) + b * Sqr(y - Sqr(x));
 }
 
-template <f64 Stddev = 1.0>
+template <f64 Stddev = 0.1>
 inline f64 RosenbrockNoisy(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
   static constexpr f64 a = 1;
   static constexpr f64 b = 100;
-  return Sqr(a - x) + b * Sqr(y - Sqr(x)) + Random::Randn(0., Stddev);
+  return Random::Rand(1., 1. + Stddev) * (Sqr(a - x) + b * Sqr(y - Sqr(x)));
 }
 
 inline f64 Beale(const std::vector<f64>& arg)

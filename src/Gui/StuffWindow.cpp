@@ -10,6 +10,8 @@ void StuffWindow::Render()
 {
   if (ImGui::BeginTabItem("Stuff"))
   {
+    ImGui::Separator();
+
     if (ImGui::Button("Evolution optimization"))
       LaunchAsync([]() { EvolutionOptimization(false); });
 
@@ -26,7 +28,7 @@ void StuffWindow::EvolutionOptimization(bool meta)
   static constexpr i32 runs = 20;
   static constexpr i32 maxFunEvals = 1000;
   static constexpr f64 optimalFitness = -std::numeric_limits<f64>::max();
-  static constexpr f64 noiseStddev = 0.5;
+  static constexpr f64 noiseStddev = 0.3;
   Evolution Evo(N);
   Evo.mNP = 5 * N;
   Evo.mMutStrat = Evolution::RAND1;

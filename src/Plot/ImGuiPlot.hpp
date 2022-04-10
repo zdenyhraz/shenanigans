@@ -8,37 +8,8 @@ public:
   struct PlotData
   {
     PlotData() = default;
-
-    PlotData(PlotData1D&& data1d)
-    {
-      if (data1d.ylabels.size() < data1d.ys.size())
-      {
-        const auto origsize = data1d.ylabels.size();
-        data1d.ylabels.resize(data1d.ys.size());
-        for (usize i = origsize; i < data1d.ys.size(); ++i)
-          data1d.ylabels[i] = fmt::format("y{}", i);
-      }
-
-      if (data1d.y2labels.size() < data1d.y2s.size())
-      {
-        const auto origsize = data1d.y2labels.size();
-        data1d.y2labels.resize(data1d.y2s.size());
-        for (usize i = origsize; i < data1d.y2s.size(); ++i)
-          data1d.y2labels[i] = fmt::format("y2-{}", i);
-      }
-
-      data = std::move(data1d);
-    }
-
-    PlotData(PlotData2D&& data2d)
-    {
-      const auto [zmin, zmax] = MinMax(data2d.z);
-      data2d.zmin = zmin;
-      data2d.zmax = zmax;
-      data2d.z.convertTo(data2d.z, CV_32F);
-      cv::resize(data2d.z, data2d.z, cv::Size(501, 501));
-      data = std::move(data2d);
-    }
+    PlotData(PlotData1D&& data1d);
+    PlotData(PlotData2D&& data2d);
 
     std::variant<PlotData1D, PlotData2D> data;
   };
@@ -49,6 +20,7 @@ public:
   template <typename T>
   void Plot(const std::string& name, T&& data)
   {
+    LOG_TRACE("Adding plot {} ({})", name, mPlots.size());
     auto plotName = fmt::format("##{}", name);
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::find_if(mPlots.begin(), mPlots.end(), [&plotName](const auto& entry) { return entry.first == plotName; }); it != mPlots.end())

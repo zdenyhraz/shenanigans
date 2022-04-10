@@ -1,5 +1,38 @@
 #include "ImGuiPlot.hpp"
 
+ImGuiPlot::PlotData::PlotData(PlotData1D&& data1d)
+{
+  if (data1d.ylabels.size() < data1d.ys.size())
+  {
+    const auto origsize = data1d.ylabels.size();
+    data1d.ylabels.resize(data1d.ys.size());
+    for (usize i = origsize; i < data1d.ys.size(); ++i)
+      data1d.ylabels[i] = fmt::format("y{}", i);
+  }
+
+  if (data1d.y2labels.size() < data1d.y2s.size())
+  {
+    const auto origsize = data1d.y2labels.size();
+    data1d.y2labels.resize(data1d.y2s.size());
+    for (usize i = origsize; i < data1d.y2s.size(); ++i)
+      data1d.y2labels[i] = fmt::format("y2-{}", i);
+  }
+
+  LOG_TRACE("Added 1D plot with {} ys and {} y2s", data1d.ys.size(), data1d.y2s.size());
+  data = std::move(data1d);
+}
+
+ImGuiPlot::PlotData::PlotData(PlotData2D&& data2d)
+{
+  const auto [zmin, zmax] = MinMax(data2d.z);
+  data2d.zmin = zmin;
+  data2d.zmax = zmax;
+  data2d.z.convertTo(data2d.z, CV_32F);
+  cv::resize(data2d.z, data2d.z, cv::Size(501, 501));
+  LOG_TRACE("Added 2D plot with {} rows and {} cols", data2d.z.rows, data2d.z.cols);
+  data = std::move(data2d);
+}
+
 void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData) const
 {
   if (ImGui::BeginTabItem(name.c_str() + 2))
@@ -17,14 +50,38 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
 {
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(-1, -1)))
   {
-    ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), ImPlotAxisFlags_None, data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
     ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
+    ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
+    ImPlot::SetupAxis(ImAxis_Y1, data.ylabel.c_str(), data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
+    ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back());
+    // ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
+
+    if (data.y2s.size() != 0)
+    {
+      ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
+      // ImPlot::SetupAxisLimits(ImAxis_Y2, 0, 1);
+    }
     const auto x = data.x.data();
     for (usize i = 0; i < data.ys.size(); ++i)
     {
+      const auto n = data.ys[i].size();
+      if (n == 0)
+        continue;
+
       const auto label = data.ylabels[i].c_str();
       const auto y = data.ys[i].data();
-      const auto n = data.ys[i].size();
+      ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
+      ImPlot::PlotLine(label, x, y, n);
+    }
+    for (usize i = 0; i < data.y2s.size(); ++i)
+    {
+      const auto n = data.y2s[i].size();
+      if (n == 0)
+        continue;
+
+      const auto label = data.y2labels[i].c_str();
+      const auto y = data.y2s[i].data();
+      ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
       ImPlot::PlotLine(label, x, y, n);
     }
     ImPlot::EndPlot();
@@ -96,6 +153,6 @@ void ImGuiPlot::Debug()
   Plot(fmt::format("debug1d#{}", mPlots.size()), PlotData1D{.x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 
-  Plot(fmt::format("debug2d#{}", mPlots.size()), PlotData2D{.z = Gaussian<f64>(n, n)});
+  Plot(fmt::format("debug2d#{}", mPlots.size()), PlotData2D{.z = Gaussian<f64>(n, n) + Random::Rand()});
   LOG_DEBUG("Added one debug2d plot");
 }
