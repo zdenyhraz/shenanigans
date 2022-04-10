@@ -15,15 +15,15 @@ public:
     LogLevelCount
   };
 
-  static void SetLogLevel(LogLevel logLevel)
+  void SetLogLevel(LogLevel logLevel)
   {
     std::scoped_lock lock(mMutex);
     mLogLevel = logLevel;
   }
 
 protected:
-  inline static LogLevel mLogLevel = LogLevel::Trace;
-  inline static std::mutex mMutex;
+  LogLevel mLogLevel = LogLevel::Trace;
+  std::mutex mMutex;
 
-  static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
+  bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 };

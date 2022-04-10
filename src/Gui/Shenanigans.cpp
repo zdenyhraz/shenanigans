@@ -7,7 +7,7 @@
 
 void Shenanigans::Run()
 {
-  ImGuiLogger::SetFallback(false);
+  ImGuiLogger::Get().SetFallback(false);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
@@ -43,8 +43,8 @@ void Shenanigans::Render()
     ImGui::End();
   }
 
-  ImGuiLogger::Render();
-  Plot::Render();
+  ImGuiLogger::Get().Render();
+  ImGuiPlot::Get().Render();
   PyPlot::Render();
 
   // ImGui::ShowDemoWindow();

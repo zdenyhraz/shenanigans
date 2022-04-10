@@ -1,7 +1,8 @@
 #pragma once
 #include "PlotData.hpp"
+#include "Utils/Singleton.hpp"
 
-class ImGuiPlot
+class ImGuiPlot : public Singleton<ImGuiPlot>
 {
 public:
   struct PlotData

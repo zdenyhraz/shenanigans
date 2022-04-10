@@ -1,25 +1,13 @@
 #pragma once
 #include "Logger.hpp"
 #include "Utils/Utils.hpp"
+#include "Utils/Singleton.hpp"
 
-class TerminalLogger : public Logger
+class TerminalLogger : public Logger, public Singleton<TerminalLogger>
 {
 public:
   template <typename... Args>
-  static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(logLevel, fmt, std::forward<Args>(args)...);
-  }
-
-private:
-  static TerminalLogger& Get()
-  {
-    static TerminalLogger logger;
-    return logger;
-  }
-
-  template <typename... Args>
-  void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;

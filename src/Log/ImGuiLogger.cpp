@@ -18,7 +18,7 @@ static consteval std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelC
   return colors;
 }
 
-void ImGuiLogger::RenderInternal()
+void ImGuiLogger::Render()
 {
   ImGui::Begin("Log");
 
@@ -67,4 +67,17 @@ void ImGuiLogger::RenderInternal()
   ImGui::EndChild();
   ImGui::End();
   mActive = true;
+}
+
+void ImGuiLogger::Clear()
+{
+  std::scoped_lock lock(mMutex);
+  mTextBuffer.clear();
+  mLineOffsets.clear();
+  mLineOffsets.emplace_back(0, LogLevel::Trace);
+}
+
+void ImGuiLogger::SetFallback(bool forward)
+{
+  mFallback = forward;
 }

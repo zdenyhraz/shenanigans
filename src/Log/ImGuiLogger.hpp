@@ -1,10 +1,12 @@
 #pragma once
 #include "Logger.hpp"
 #include "TerminalLogger.hpp"
+#include "Utils/Singleton.hpp"
 
-class ImGuiLogger : public Logger
+class ImGuiLogger : public Logger, public Singleton<ImGuiLogger>
 {
   using FallbackLogger = TerminalLogger;
+
   ImGuiTextBuffer mTextBuffer;
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
   bool mActive = false;
@@ -12,27 +14,15 @@ class ImGuiLogger : public Logger
   static constexpr usize mMaxMessages = 5000;
 
 public:
-  template <typename... Args>
-  static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(logLevel, fmt, std::forward<Args>(args)...);
-  }
-
-  static void Render() { Get().RenderInternal(); }
-
-  static void SetFallback(bool forward) { Get().mFallback = forward; }
-
-private:
-  static ImGuiLogger& Get()
-  {
-    static ImGuiLogger logger;
-    return logger;
-  }
+  void Render();
+  void Clear();
+  void SetFallback(bool forward);
 
   template <typename... Args>
-  void LogMessage(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
   try
   {
+    std::scoped_lock lock(mMutex);
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
 
@@ -43,7 +33,7 @@ private:
     }
 
     if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
-      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
+      FallbackLogger::Get().Message(logLevel, fmt, std::forward<Args>(args)...);
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
     i32 oldSize = mTextBuffer.size();
@@ -54,15 +44,6 @@ private:
   }
   catch (const std::exception& e)
   {
-    FallbackLogger::Message(Logger::LogLevel::Error, "LogMessage error: {}", e.what());
+    FallbackLogger::Get().Message(Logger::LogLevel::Error, "LogMessage error: {}", e.what());
   }
-
-  void Clear()
-  {
-    mTextBuffer.clear();
-    mLineOffsets.clear();
-    mLineOffsets.emplace_back(0, LogLevel::Trace);
-  }
-
-  void RenderInternal();
 };

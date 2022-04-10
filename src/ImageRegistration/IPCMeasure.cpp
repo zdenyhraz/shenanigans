@@ -85,11 +85,11 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsX);
 
-  Plot::Plot("CC accuracy map", PlotData2D{.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot::Plot("PC accuracy map", PlotData2D{.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot::Plot("PCS accuracy map", PlotData2D{.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot::Plot("IPC accuracy map", PlotData2D{.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot::Plot("IPCO accuracy map", PlotData2D{.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot("CC accuracy map", PlotData2D{.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot("PC accuracy map", PlotData2D{.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot("PCS accuracy map", PlotData2D{.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot("IPC accuracy map", PlotData2D{.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot("IPCO accuracy map", PlotData2D{.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
 
   if (progress)
     *progress = 0;
