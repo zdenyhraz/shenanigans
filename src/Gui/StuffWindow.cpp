@@ -38,7 +38,7 @@ void StuffWindow::EvolutionOptimization(bool meta)
   Evo.SetParameterNames({"x", "y"});
   Evo.SetConsoleOutput(true);
   Evo.SetPlotOutput(true);
-  Evo.SetPlotObjectiveFunctionLandscape(true);
+  Evo.SetPlotObjectiveFunctionLandscape(false);
   Evo.SetPlotObjectiveFunctionLandscapeIterations(meta ? 51 : 301);
   Evo.SetSaveProgress(true);
   if (not meta)

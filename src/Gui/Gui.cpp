@@ -68,7 +68,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   }
 
   ImPlotStyle& plotStyle = ImPlot::GetStyle();
-  plotStyle.LineWeight = 5;
+  plotStyle.LineWeight = 7;
   plotStyle.Colormap = ImPlotColormap_Dark;
   // plotStyle.PlotDefaultSize = ImVec2(800, 800);
 

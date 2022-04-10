@@ -7,6 +7,8 @@ class ImGuiPlot : public Singleton<ImGuiPlot>
 public:
   struct PlotData
   {
+    PlotData() = default;
+
     PlotData(PlotData1D&& data1d)
     {
       if (data1d.ylabels.size() < data1d.ys.size())
