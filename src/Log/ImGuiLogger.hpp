@@ -13,48 +13,6 @@ class ImGuiLogger : public Logger
 
 public:
   template <typename... Args>
-  static void Trace(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Trace, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Function(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Function, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Debug(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Debug, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Info(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Info, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Success(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Success, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Warning(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Warning, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
-  static void Error(const std::string& fmt, Args&&... args)
-  {
-    Get().LogMessage(LogLevel::Error, fmt, std::forward<Args>(args)...);
-  }
-
-  template <typename... Args>
   static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
   {
     Get().LogMessage(logLevel, fmt, std::forward<Args>(args)...);
@@ -80,9 +38,8 @@ private:
 
     if (mLineOffsets.size() > mMaxMessages)
     {
-      Debug("Clearing message log ...");
       Clear();
-      Debug("Message log cleared after {} messages", mMaxMessages);
+      Message(Logger::LogLevel::Debug, "Message log cleared after {} messages", mMaxMessages);
     }
 
     if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
@@ -97,7 +54,7 @@ private:
   }
   catch (const std::exception& e)
   {
-    FallbackLogger::Error("LogMessage error: {}", e.what());
+    FallbackLogger::Message(Logger::LogLevel::Error, "LogMessage error: {}", e.what());
   }
 
   void Clear()

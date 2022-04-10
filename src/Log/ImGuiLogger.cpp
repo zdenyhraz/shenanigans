@@ -27,13 +27,13 @@ void ImGuiLogger::RenderInternal()
   ImGui::SameLine();
   if (ImGui::Button("Debug"))
   {
-    Trace("Trace message");
-    Function("Function message");
-    Debug("Debug message");
-    Info("Info message");
-    Success("Success message");
-    Warning("Warning message");
-    Error("Error message");
+    Message(LogLevel::Trace, "Trace message");
+    Message(LogLevel::Function, "Function message");
+    Message(LogLevel::Debug, "Debug message");
+    Message(LogLevel::Info, "Info message");
+    Message(LogLevel::Success, "Success message");
+    Message(LogLevel::Warning, "Warning message");
+    Message(LogLevel::Error, "Error message");
   }
   ImGui::SameLine();
   ImGui::Text("%.3f ms/frame (%.1f fps)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
