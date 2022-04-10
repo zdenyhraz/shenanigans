@@ -17,6 +17,8 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
 {
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(-1, -1)))
   {
+    ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), ImPlotAxisFlags_None, data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
+    ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
     for (usize i = 0; i < data.ys.size(); ++i)
     {
       const auto ylabelAuto = fmt::format("y{}", i);
@@ -25,7 +27,6 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
       const auto y = data.ys[i].data();
       const auto n = data.ys[i].size();
 
-      ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
       ImPlot::PlotLine(ylabel, x, y, n);
     }
     ImPlot::EndPlot();
@@ -40,12 +41,12 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
   const f32 height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
   {
-    ImPlot::GetStyle().Colormap = ImPlotColormap_Jet;
+    ImPlot::GetStyle().Colormap = data.cmap;
     ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, ImPlotColormap_Jet);
+  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, data.cmap);
 }
 
 void ImGuiPlot::Render()
@@ -66,7 +67,6 @@ void ImGuiPlot::Render()
 
       ImGui::EndTabBar();
     }
-
     ImGui::End();
   }
 }

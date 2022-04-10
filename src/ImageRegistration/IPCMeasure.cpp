@@ -28,7 +28,7 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   {
     cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
     AddNoise<f64>(image1, noiseStddev);
-    PyPlot::Plot("Image", {.z = image1, .cmap = "gray"});
+    Plot2D("Image", {.z = image1});
 
 #pragma omp parallel for
     for (i32 row = 0; row < iters; ++row)
@@ -79,17 +79,23 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
           "pcs_stddev"_a = ColStddevs<f64>(accuracyPCS), "ipc_error"_a = ColMeans<f64>(accuracyIPC), "ipc_stddev"_a = ColStddevs<f64>(accuracyIPC), "ipco_error"_a = ColMeans<f64>(accuracyIPCO),
           "ipco_stddev"_a = ColStddevs<f64>(accuracyIPCO)});
 
+  Plot1D("shift error", {.x = ColMeans<f64>(refShiftsX),
+                            .ys = {ColMeans<f64>(accuracyPC), ColMeans<f64>(accuracyPCS), ColMeans<f64>(accuracyIPC), ColMeans<f64>(accuracyIPCO)},
+                            .ylabels = {"pc", "pcs", "ipc", "ipco"},
+                            .xlabel = "reference shift x [px]",
+                            .ylabel = "error [px]"});
+
   // static constexpr auto xlabel = "x shift";
   // static constexpr auto ylabel = "y shift";
   // static constexpr auto zlabel = "error";
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsX);
 
-  Plot("CC accuracy map", PlotData2D{.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot("PC accuracy map", PlotData2D{.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot("PCS accuracy map", PlotData2D{.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot("IPC accuracy map", PlotData2D{.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
-  Plot("IPCO accuracy map", PlotData2D{.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot2D("CC acc", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot2D("PC acc", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot2D("PCS acc", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot2D("IPC acc", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
+  Plot2D("IPCO acc", {.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax});
 
   if (progress)
     *progress = 0;
