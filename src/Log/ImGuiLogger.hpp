@@ -15,8 +15,16 @@ class ImGuiLogger : public Logger, public Singleton<ImGuiLogger>
 
 public:
   void Render();
-  void Clear();
-  void SetFallback(bool forward);
+
+  void Clear()
+  {
+    std::scoped_lock lock(mMutex);
+    mTextBuffer.clear();
+    mLineOffsets.clear();
+    mLineOffsets.emplace_back(0, LogLevel::Trace);
+  }
+
+  void SetFallback(bool forward) { mFallback = forward; }
 
   template <typename... Args>
   void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
