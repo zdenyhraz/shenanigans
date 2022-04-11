@@ -1,8 +1,8 @@
 .vscode
 build
 debug
-libs/libtorch
 __pycache__
+libs/libtorch
+libs/fftw
 
 *.dump
-data/diffrot_*

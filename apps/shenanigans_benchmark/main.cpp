@@ -1,4 +1,6 @@
 #include "Fourier/Fourier.hpp"
+#include <fftw3.h>
+
 // state.PauseTiming();
 // state.ResumeTiming();
 
