@@ -13,7 +13,7 @@ static void OpenCVBenchmark(benchmark::State& state, std::vector<f32> input)
   std::vector<f32> output(input.size() / 2 + 1);
   for (auto _ : state)
   {
-    cv::dft(input, output);
+    cv::dft(input, output, cv::DFT_ROWS);
   }
 }
 
@@ -40,11 +40,13 @@ static void FFTWBenchmark(benchmark::State& state, std::vector<f32> input)
   fftwf_cleanup();
 }
 
+// --benchmark_out_format={json|console|csv}
+// --benchmark_out=<filename>
 int main(int argc, char** argv)
 try
 {
-  static constexpr auto expmin = 8;
-  static constexpr auto expmax = 24;
+  static constexpr auto expmin = 8;  // 8=512
+  static constexpr auto expmax = 24; // 24=16M
   static const auto exponents = Linspace<i32>(expmin, expmax, expmax - expmin + 1);
 
   for (const auto exponent : exponents)
@@ -54,7 +56,7 @@ try
     const auto input = GenerateRandomVector(size); // real
 
     benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV ccs", size).c_str(), OpenCVBenchmark, input)->Unit(timeunit);
-    benchmark::RegisterBenchmark(fmt::format("{:>8} | fftw r2c", size).c_str(), FFTWBenchmark, input)->Unit(timeunit);
+    benchmark::RegisterBenchmark(fmt::format("{:>8} | FFTW r2c", size).c_str(), FFTWBenchmark, input)->Unit(timeunit);
   }
 
   benchmark::Initialize(&argc, argv);
