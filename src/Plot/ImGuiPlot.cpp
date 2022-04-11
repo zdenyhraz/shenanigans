@@ -54,13 +54,8 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
     ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
     ImPlot::SetupAxis(ImAxis_Y1, data.ylabel.c_str(), data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
     ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
-    // ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
-
-    if (data.y2s.size() != 0)
-    {
+    if (not data.y2s.empty())
       ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
-      // ImPlot::SetupAxisLimits(ImAxis_Y2, 0, 1);
-    }
     const auto x = data.x.data();
     for (usize i = 0; i < data.ys.size(); ++i)
     {
@@ -98,7 +93,8 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
   {
     ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
     ImPlot::GetStyle().Colormap = data.cmap;
-    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+    ImPlot::PlotHeatmap(
+        name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();
   }
   ImGui::SameLine();

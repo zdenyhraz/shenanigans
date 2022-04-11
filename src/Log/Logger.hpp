@@ -25,5 +25,5 @@ protected:
   LogLevel mLogLevel = LogLevel::Trace;
   std::mutex mMutex;
 
-  bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
+  bool ShouldLog(LogLevel logLevel) const { return logLevel >= mLogLevel; }
 };

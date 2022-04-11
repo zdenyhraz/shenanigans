@@ -23,7 +23,7 @@ public:
     LOG_TRACE("Adding plot {} ({})", name, mPlots.size());
     auto plotName = fmt::format("##{}", name);
     std::scoped_lock lock(mPlotsMutex);
-    if (auto it = std::find_if(mPlots.begin(), mPlots.end(), [&plotName](const auto& entry) { return entry.first == plotName; }); it != mPlots.end())
+    if (auto it = std::ranges::find_if(mPlots, [&plotName](const auto& entry) { return entry.first == plotName; }); it != mPlots.end())
       it->second = std::forward<T>(data);
     else
       mPlots.emplace_back(std::move(plotName), std::forward<T>(data));
