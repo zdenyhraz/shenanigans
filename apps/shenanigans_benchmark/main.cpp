@@ -4,25 +4,22 @@
 // state.PauseTiming();
 // state.ResumeTiming();
 
-using Input = std::vector<cv::Mat>;
-
-static void OpenCVFFTComplexBenchmark(benchmark::State& state, const Input& images)
+std::vector<f32> GenerateRandomVector(usize size)
 {
-  cv::Mat fft;
-  for (auto _ : state)
-  {
-    for (const auto& image : images)
-      cv::dft(image, fft, cv::DFT_COMPLEX_OUTPUT);
-  }
+  std::vector<f32> vec(size);
+  for (auto& x : vec)
+    x = Random::Rand(0, 1);
+  return vec;
 }
 
-static void OpenCVFFTCSSBenchmark(benchmark::State& state, const Input& images)
+static void OpenCVFFTBenchmark(benchmark::State& state, std::vector<f32> input, std::vector<f32> output)
 {
-  cv::Mat fft;
+  cv::Mat inputWrapper(1, input.size(), GetMatType<f32>(), input.data());
+  cv::Mat outputWrapper(1, input.size(), GetMatType<f32>(2), output.data());
+
   for (auto _ : state)
   {
-    for (const auto& image : images)
-      cv::dft(image, fft);
+    cv::dft(inputWrapper, outputWrapper, cv::DFT_COMPLEX_OUTPUT);
   }
 }
 
@@ -37,10 +34,10 @@ try
   for (const auto exponent : exponents)
   {
     const auto size = 1 << exponent;
-    auto images = LoadImages<f64>("../debug/ipcopt/train");
-    ResizeImages(images, {size, 1});
-    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV Complex", size).c_str(), OpenCVFFTComplexBenchmark, images)->Unit(timeunit);
-    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV CCS", size).c_str(), OpenCVFFTCSSBenchmark, images)->Unit(timeunit);
+    const auto input = GenerateRandomVector(size);      // real
+    const auto output = GenerateRandomVector(size * 2); // complex
+
+    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV", size).c_str(), OpenCVFFTBenchmark, input, output)->Unit(timeunit);
   }
 
   benchmark::Initialize(&argc, argv);
