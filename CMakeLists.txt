@@ -184,6 +184,12 @@ target_link_libraries(shenanigans_test PRIVATE fftw3)
 target_link_libraries(shenanigans_terminal PRIVATE fftw3)
 target_link_libraries(shenanigans_benchmark PRIVATE fftw3)
 
+find_package(FFTW3f REQUIRED)
+target_link_libraries(shenanigans PRIVATE fftw3f)
+target_link_libraries(shenanigans_test PRIVATE fftw3f)
+target_link_libraries(shenanigans_terminal PRIVATE fftw3f)
+target_link_libraries(shenanigans_benchmark PRIVATE fftw3f)
+
 # custom
 include_directories(src)
 
