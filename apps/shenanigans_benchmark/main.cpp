@@ -55,7 +55,7 @@ try
     const auto size = 1 << exponent;
     const auto input = GenerateRandomVector(size); // real
 
-    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV ccs", size).c_str(), OpenCVBenchmark, input)->Unit(timeunit);
+    benchmark::RegisterBenchmark(fmt::format("{:>8} | OpenCV-IPP ccs", size).c_str(), OpenCVBenchmark, input)->Unit(timeunit);
     benchmark::RegisterBenchmark(fmt::format("{:>8} | FFTW r2c", size).c_str(), FFTWBenchmark, input)->Unit(timeunit);
   }
 
