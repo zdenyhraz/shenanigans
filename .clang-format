@@ -4,7 +4,7 @@ UseTab: Never
 Language: Cpp
 Standard: c++17
 BreakBeforeBraces: Allman
-ColumnLimit: 200
+ColumnLimit: 150
 PointerAlignment: Left
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
