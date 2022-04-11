@@ -10,12 +10,10 @@ std::vector<f32> GenerateRandomVector(usize size)
 
 static void OpenCVBenchmark(benchmark::State& state, std::vector<f32> input)
 {
-  cv::Mat inputWrapper(1, input.size(), GetMatType<f32>(1), input.data());
-  cv::Mat output;
-
+  std::vector<f32> output(input.size() / 2 + 1);
   for (auto _ : state)
   {
-    cv::dft(inputWrapper, output);
+    cv::dft(input, output);
   }
 }
 
