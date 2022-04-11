@@ -1,51 +1,10 @@
-#include "Fourier/Fourier.hpp"
 #include <fftw3.h>
-
-namespace fftw
-{
-template <typename T>
-class vector
-{
-  T* mData;
-  usize mSize;
-
-public:
-  vector(usize n)
-  {
-    if constexpr (std::is_same_v<T, f32>)
-      mData = fftwf_alloc_real(n);
-    if constexpr (std::is_same_v<T, fftwf_complex>)
-      mData = fftwf_alloc_complex(n);
-
-    if constexpr (std::is_same_v<T, f64>)
-      mData = fftw_alloc_real(n);
-    if constexpr (std::is_same_v<T, fftw_complex>)
-      mData = fftw_alloc_complex(n);
-
-    mSize = n;
-  }
-
-  ~vector()
-  {
-    if constexpr (std::is_same_v<T, f32> or std::is_same_v<T, fftwf_complex>)
-      fftwf_free(mData);
-    if constexpr (std::is_same_v<T, f64> or std::is_same_v<T, fftw_complex>)
-      fftw_free(mData);
-  }
-
-  vector(const vector& other) = delete;
-
-  T* data() const { return mData; }
-
-  usize size() const { return mSize; }
-};
-}
+#include "fftw_vector.hpp"
 
 std::vector<f32> GenerateRandomVector(usize size)
 {
   std::vector<f32> vec(size);
-  for (auto& x : vec)
-    x = Random::Rand(0, 1);
+  std::ranges::for_each(vec, [](auto& x) { x = Random::Rand(0, 1); });
   return vec;
 }
 
@@ -84,13 +43,13 @@ static void FFTWBenchmark(benchmark::State& state, std::vector<f32> input)
 int main(int argc, char** argv)
 try
 {
-  static constexpr auto timeunit = benchmark::kMillisecond;
-  static constexpr auto expmin = 19;
+  static constexpr auto expmin = 8;
   static constexpr auto expmax = 24;
   static const auto exponents = Linspace<i32>(expmin, expmax, expmax - expmin + 1);
 
   for (const auto exponent : exponents)
   {
+    const auto timeunit = exponent > 18 ? benchmark::kMillisecond : benchmark::kMicrosecond;
     const auto size = 1 << exponent;
     const auto input = GenerateRandomVector(size); // real
 
