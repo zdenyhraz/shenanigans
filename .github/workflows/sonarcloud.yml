@@ -64,9 +64,6 @@ jobs:
         if: steps.opencv-cache.outputs.cache-hit != 'true'
         run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
 
-      - name: FFTW install
-        run: sudo chmod 755 script/linux/setup_fftw.sh && ./script/linux/setup_fftw.sh
-
       - name: CMake configure
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
 
