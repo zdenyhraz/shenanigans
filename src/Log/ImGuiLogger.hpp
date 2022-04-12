@@ -9,12 +9,12 @@ class ImGuiLogger : public Logger, public Singleton<ImGuiLogger>
 
   ImGuiTextBuffer mTextBuffer;
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
-  bool mActive = false;
+  mutable bool mActive = false;
   bool mFallback = true;
   static constexpr usize mMaxMessages = 5000;
 
 public:
-  void Render();
+  void Render() const;
 
   void Clear()
   {
@@ -27,12 +27,12 @@ public:
   void SetFallback(bool forward) { mFallback = forward; }
 
   template <typename... Args>
-  void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  void Message(LogLevel logLevel, const std::string& fmt, Args&&... args) const
   try
   {
     std::scoped_lock lock(mMutex);
-    if (not ShouldLog(logLevel)) [[unlikely]]
-      return;
+    if (not ShouldLog(logLevel))
+      [[unlikely]] return;
 
     if (mLineOffsets.size() > mMaxMessages)
     {
