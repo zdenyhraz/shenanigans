@@ -7,7 +7,7 @@ std::vector<f32> GenerateRandomVector(usize size)
 
 static void OpenCVCCSBenchmark(benchmark::State& state, std::vector<f32> input)
 {
-  std::vector<f32> output(input.size() / 2 + 1);
+  std::vector<f32> output;
   for (auto _ : state)
   {
     cv::dft(input, output);
@@ -16,7 +16,7 @@ static void OpenCVCCSBenchmark(benchmark::State& state, std::vector<f32> input)
 
 static void OpenCVComplexBenchmark(benchmark::State& state, std::vector<f32> input)
 {
-  std::vector<std::complex<f32>> output(input.size());
+  std::vector<std::complex<f32>> output;
   for (auto _ : state)
   {
     cv::dft(input, output, cv::DFT_COMPLEX_OUTPUT);
