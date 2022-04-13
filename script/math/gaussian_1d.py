@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib_init
+import matplotlib_config
 
 
 def Gaussian(x, sigma, mu):
   return 1/(sigma*np.sqrt(2*np.pi))*np.exp(-0.5*np.power(x-mu, 2)/np.power(sigma, 2))
 
 
-matplotlib_init.matplotlib_init()
+matplotlib_config.init()
 n = 1001
 x = np.linspace(0, 1, n)
 linewidth = 3

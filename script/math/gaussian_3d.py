@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib_init
+import matplotlib_config
 
 
 def Gaussian(n, sigmax, sigmay, mux, muy):
@@ -14,7 +14,7 @@ def Gaussian(n, sigmax, sigmay, mux, muy):
   return z
 
 
-matplotlib_init.matplotlib_init()
+matplotlib_config.init()
 n = 101
 xmin = 0
 xmax = 1
