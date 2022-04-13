@@ -8,7 +8,7 @@ try
   LOG_DEBUG("Initializing Matplotlib ...");
   Python::Initialize();
   PYTHON_INTERPRETER_GUARD;
-  py::module::import("plot.init").attr("init")();
+  py::module::import("plot.matplotlib_init").attr("matplotlib_init")();
 }
 catch (const std::exception& e)
 {
