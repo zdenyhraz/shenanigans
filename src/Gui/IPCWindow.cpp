@@ -20,15 +20,15 @@ void IPCWindow::Render()
             UpdateIPCParameters(mIPCOptimized);
           });
 
-    ImGui::SliderInt("Width", &mParameters.Cols, 3, 512);
-    ImGui::SliderInt("Height", &mParameters.Rows, 3, 512);
+    ImGui::SliderInt("Width", &mParameters.Cols, 3, 4096, nullptr, ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderInt("Height", &mParameters.Rows, 3, 4096, nullptr, ImGuiSliderFlags_Logarithmic);
     ImGui::SliderFloat("BPL", &mParameters.BPL, 0, 1);
     ImGui::SliderFloat("BPH", &mParameters.BPH, 0, 2);
     ImGui::SliderInt("L2size", &mParameters.L2size, 3, 11);
     ImGui::SliderFloat("L1ratio", &mParameters.L1ratio, 0.1, 0.9);
     ImGui::SliderInt("L2Usize", &mParameters.L2Usize, 31, 501);
     ImGui::SliderInt("MaxIter", &mParameters.MaxIter, 1, 21);
-    ImGui::SliderFloat("CPeps", &mParameters.CPeps, 0, 0.1);
+    ImGui::SliderFloat("CPeps", &mParameters.CPeps, 0, 10, nullptr, ImGuiSliderFlags_Logarithmic);
     ImGui::SliderInt(
         "WindowType", &mParameters.WinT, 0, static_cast<i32>(IPC::WindowType::WindowTypeCount) - 1, IPCParameters::WindowTypes[mParameters.WinT]);
     ImGui::SliderInt("BandpassType", &mParameters.BPT, 0, static_cast<i32>(IPC::BandpassType::BandpassTypeCount) - 1,

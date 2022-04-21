@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 
 def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel, ylabel, zlabel, cmap):
@@ -12,7 +13,7 @@ def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel
                   interpolation='bilinear' if interp else 'none',
                   aspect='auto')
 
-  cbar = plt.colorbar(im)
+  cbar = plt.colorbar(im, format=ticker.FuncFormatter(lambda x, pox: '{:.1e}'.format(x)))
 
   if xlabel:
     plt.xlabel(xlabel)
