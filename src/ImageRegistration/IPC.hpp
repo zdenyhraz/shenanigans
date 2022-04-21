@@ -283,7 +283,8 @@ public:
         if (AccuracyReached(L1peak, L1mid))
         {
           if constexpr (ModeT == Mode::Debug)
-            IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
+            IPCDebug::DebugL1A(*this, L1, L3peak - L3mid,
+                L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
           return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
         }
       }
@@ -395,12 +396,14 @@ private:
 
   f64 LowpassEquation(i32 row, i32 col) const
   {
-    return std::exp(-1.0 / (2. * std::pow(mBPH, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
+    return std::exp(-1.0 / (2. * std::pow(mBPH, 2)) *
+                    (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
 
   f64 HighpassEquation(i32 row, i32 col) const
   {
-    return 1.0 - std::exp(-1.0 / (2. * std::pow(mBPL, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
+    return 1.0 - std::exp(-1.0 / (2. * std::pow(mBPL, 2)) *
+                          (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
 
   f64 BandpassGEquation(i32 row, i32 col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
@@ -521,7 +524,10 @@ private:
     return (L1size % 2) ? L1size : L1size + 1;
   }
 
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size)
+  {
+    return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size);
+  }
 
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
 
@@ -530,7 +536,10 @@ private:
     return peak.x - size.width / 2 < 0 or peak.y - size.height / 2 < 0 or peak.x + size.width / 2 >= mat.cols or peak.y + size.height / 2 >= mat.rows;
   }
 
-  static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
+  static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid)
+  {
+    return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5;
+  }
 
   template <Mode ModeT = Mode::Normal>
   static bool ReduceL2size(i32& L2size)

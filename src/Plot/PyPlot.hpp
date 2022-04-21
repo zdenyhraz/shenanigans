@@ -45,7 +45,7 @@ public:
   {
     cv::Mat z;
     f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
-    std::string xlabel = "x", ylabel = "y", zlabel = "z";
+    std::string xlabel = "x", ylabel = "y", zlabel = "";
     f64 aspectratio = 1;
     std::string cmap = "jet";
     std::string save;

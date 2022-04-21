@@ -31,6 +31,7 @@ void IPCDebug::DebugCrossPowerSpectrum(const IPC& ipc, const cv::Mat& crosspower
 void IPCDebug::DebugL3(const IPC& ipc, const cv::Mat& L3)
 {
   PyPlot::Plot(fmt::format("{} L3", ipc.mDebugName), {.z = L3});
+  // PyPlot::PlotSurf(fmt::format("{} L3 surf", ipc.mDebugName), {.z = L3});
 }
 
 void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
@@ -45,16 +46,20 @@ void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
   PyPlot::PlotSurf(fmt::format("{} L2U surf", ipc.mDebugName),
       {.z = L2U, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 
-  if (0)
+  if (false)
   {
     cv::Mat nearest, linear, cubic;
     cv::resize(L2, nearest, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
     cv::resize(L2, linear, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_LINEAR);
     cv::resize(L2, cubic, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_CUBIC);
 
-    PyPlot::Plot("IPCL2UN", {.z = nearest});
-    PyPlot::Plot("IPCL2UL", {.z = linear});
-    PyPlot::Plot("IPCL2UC", {.z = cubic});
+    PyPlot::Plot(fmt::format("{} L2U nearest", ipc.mDebugName), {.z = nearest});
+    PyPlot::Plot(fmt::format("{} L2U linear", ipc.mDebugName), {.z = linear});
+    PyPlot::Plot(fmt::format("{} L2U cubic", ipc.mDebugName), {.z = cubic});
+
+    PyPlot::PlotSurf(fmt::format("{} L2U nearest surf", ipc.mDebugName), {.z = nearest});
+    PyPlot::PlotSurf(fmt::format("{} L2U linear surf", ipc.mDebugName), {.z = linear});
+    PyPlot::PlotSurf(fmt::format("{} L2U cubic surf", ipc.mDebugName), {.z = cubic});
   }
 }
 
