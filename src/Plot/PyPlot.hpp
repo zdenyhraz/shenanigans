@@ -57,6 +57,7 @@ public:
   static void Plot(const std::string& name, PlotData2D&& data);
   static void PlotSurf(const std::string& name, PlotData3D&& data);
   static void Plot(const std::string& name, const std::string& type, py::dict&& data);
+  static void SetSave(bool save) { mSave = save; }
 
 private:
   inline static std::unordered_map<std::string, i32> mPlotIds;
@@ -64,6 +65,7 @@ private:
   inline static std::queue<PlotData> mPlotQueue;
   inline static std::mutex mPlotQueueMutex;
   inline static std::mutex mPlotIdMutex;
+  inline static bool mSave = false;
 
   static void PlotInternal(const PlotData& plotdata);
   static void ScheldulePlot(const std::string& name, const std::string& type, py::dict&& data);

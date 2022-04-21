@@ -129,8 +129,9 @@ try
     cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
     AddNoise<IPC::Float>(image1, noiseStdev);
     AddNoise<IPC::Float>(image2, noiseStdev);
+    PyPlot::SetSave(true);
     const auto ipcshift = ipc.Calculate<Debug>(image1, image2);
-
+    PyPlot::SetSave(false);
     LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
   }
 

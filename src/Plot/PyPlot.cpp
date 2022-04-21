@@ -104,7 +104,7 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData1D&& data)
   plotData["linestyle_y2s"] = std::move(data.linestyle_y2s);
   plotData["log"] = data.log;
   plotData["aspectratio"] = data.aspectratio;
-  plotData["save"] = std::move(data.save);
+  plotData["save"] = not data.save.empty() ? std::move(data.save) : (mSave ? fmt::format("../debug/plot/{}.png", name) : "");
   return plotData;
 }
 
@@ -124,7 +124,7 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData2D&& data)
   plotData["interp"] = data.interp;
   plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
-  plotData["save"] = std::move(data.save);
+  plotData["save"] = not data.save.empty() ? std::move(data.save) : (mSave ? fmt::format("../debug/plot/{}.png", name) : "");
   return plotData;
 }
 
@@ -143,7 +143,7 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData3D&& data)
   plotData["ymax"] = data.ymax;
   plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
-  plotData["save"] = std::move(data.save);
+  plotData["save"] = not data.save.empty() ? std::move(data.save) : (mSave ? fmt::format("../debug/plot/{}.png", name) : "");
   return plotData;
 }
 

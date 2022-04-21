@@ -26,6 +26,7 @@ def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel
   plt.tight_layout()
 
   if save:
+    print(f"Saving plot {title} to {save}")
     plt.savefig(save, bbox_inches='tight')
   else:
     plt.draw()
