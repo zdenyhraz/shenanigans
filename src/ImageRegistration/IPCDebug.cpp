@@ -42,7 +42,8 @@ void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
 {
-  PyPlot::PlotSurf(fmt::format("{} L2U surf", ipc.mDebugName), {.z = L2U, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+  PyPlot::PlotSurf(fmt::format("{} L2U surf", ipc.mDebugName),
+      {.z = L2U, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 
   if (0)
   {
@@ -65,7 +66,8 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot(fmt::format("{} L1B", ipc.mDebugName), {.z = mat, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+  PyPlot::Plot(fmt::format("{} L1B", ipc.mDebugName),
+      {.z = mat, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
 
 void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, f64 UC, bool last)
@@ -76,7 +78,8 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
   DrawCrosshairs(mat);
   DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot(fmt::format("{} L1A", ipc.mDebugName), {.z = mat, .save = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+  PyPlot::Plot(fmt::format("{} L1A", ipc.mDebugName),
+      {.z = mat, .save = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
 
 void IPCDebug::ShowDebugStuff(const IPC& ipc, f64 maxShift, f64 noiseStdev)
@@ -85,7 +88,10 @@ try
   PROFILE_FUNCTION;
   LOG_FUNCTION;
 
-  constexpr bool debugShift = true;
+  using enum IPC::Mode;
+
+  constexpr bool debugShift = false;
+  constexpr bool debugShift2 = true;
   constexpr bool debugAlign = false;
   constexpr bool debugGradualShift = false;
   constexpr bool debugWindow = false;
@@ -107,12 +113,25 @@ try
     AddNoise<IPC::Float>(image1, noiseStdev);
     AddNoise<IPC::Float>(image2, noiseStdev);
 
-    const auto ipcshift = ipc.Calculate<IPC::Mode::Debug>(image1, image2);
+    const auto ipcshift = ipc.Calculate<Debug>(image1, image2);
     const auto error = ipcshift - shift;
 
     LOG_INFO("Artificial shift = [{:.4f}, {:.4f}]", shift.x, shift.y);
     LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
     LOG_INFO("Error = [{:.4f}, {:.4f}]", error.x, error.y);
+  }
+
+  if constexpr (debugShift2)
+  {
+    auto image1 = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shape1.png");
+    auto image2 = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shapesf.png");
+    cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
+    cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
+    AddNoise<IPC::Float>(image1, noiseStdev);
+    AddNoise<IPC::Float>(image2, noiseStdev);
+    const auto ipcshift = ipc.Calculate<Debug>(image1, image2);
+
+    LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
   }
 
   if constexpr (debugAlign)
@@ -168,8 +187,9 @@ try
     cv::copyMakeBorder(w0, w0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
     cv::copyMakeBorder(r0, r0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
-    // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory + "/1DWindows.png");
-    // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))}, "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
+    // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
+    // + "/1DWindows.png"); Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))},
+    // "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
     // +
     // "/1DWindowsDFT.png");
 
@@ -212,12 +232,14 @@ try
     cv::copyMakeBorder(bpR, bpR0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
     cv::copyMakeBorder(bpG, bpG0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
-    // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory + "/1DBandpass.png");
-    // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1", "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
+    // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
+    // + "/1DBandpass.png"); Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1",
+    // "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
     // +
-    // "/1DBandpassIDFT.png"); Plot2D::Plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png"); Plot2D::Plot(bpG, "b3", "x", "y", "filter", 0, 1, 0, 1, 0,
-    // mDebugDirectory + "/2DBandpassG.png"); Plot2D::Plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png");
-    // Plot2D::Plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
+    // "/1DBandpassIDFT.png"); Plot2D::Plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png"); Plot2D::Plot(bpG,
+    // "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png"); Plot2D::Plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy",
+    // "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png"); Plot2D::Plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log
+    // IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
   }
 
   if constexpr (debugBandpassRinging)
