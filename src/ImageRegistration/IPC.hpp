@@ -51,8 +51,8 @@ public:
 private:
   i32 mRows = 0;
   i32 mCols = 0;
-  f64 mBPL = 0;
-  f64 mBPH = 1;
+  f64 mBPL = 0.01;
+  f64 mBPH = 1.0;
   i32 mL2size = 7;
   f64 mL1ratio = 0.45;
   f64 mL1ratioStep = 0.025;

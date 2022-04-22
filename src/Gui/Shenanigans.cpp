@@ -33,6 +33,8 @@ void Shenanigans::Render()
 {
   if (ImGui::Begin("Shenanigans"))
   {
+    ImGui::Checkbox("save plots", &mParameters.plotSave);
+    ImGui::Separator();
     if (ImGui::BeginTabBar("Windows"))
     {
       IPCWindow::Render();
@@ -51,6 +53,8 @@ void Shenanigans::Render()
 
   // ImGui::ShowDemoWindow();
   // ImPlot::ShowDemoWindow();
+
+  PyPlot::SetSave(mParameters.plotSave);
 }
 
 void Shenanigans::Initialize()
