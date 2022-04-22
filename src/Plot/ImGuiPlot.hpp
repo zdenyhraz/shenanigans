@@ -20,7 +20,6 @@ public:
   template <typename T>
   void Plot(const std::string& name, T&& data)
   {
-    LOG_TRACE("Adding plot {} ({})", name, mPlots.size());
     auto plotName = fmt::format("##{}", name);
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::ranges::find_if(mPlots, [&plotName](const auto& entry) { return entry.first == plotName; }); it != mPlots.end())

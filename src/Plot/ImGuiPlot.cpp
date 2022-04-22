@@ -18,7 +18,6 @@ ImGuiPlot::PlotData::PlotData(PlotData1D&& data1d)
       data1d.y2labels[i] = fmt::format("y2-{}", i);
   }
 
-  LOG_TRACE("Added 1D plot with {} ys and {} y2s", data1d.ys.size(), data1d.y2s.size());
   data = std::move(data1d);
 }
 
@@ -29,7 +28,6 @@ ImGuiPlot::PlotData::PlotData(PlotData2D&& data2d)
   data2d.zmax = zmax;
   data2d.z.convertTo(data2d.z, CV_32F);
   cv::resize(data2d.z, data2d.z, cv::Size(501, 501));
-  LOG_TRACE("Added 2D plot with {} rows and {} cols", data2d.z.rows, data2d.z.cols);
   data = std::move(data2d);
 }
 
