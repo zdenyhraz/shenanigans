@@ -81,7 +81,8 @@ try
     const f64 ymin = mLB[yParamIndex];
     const f64 ymax = mUB[yParamIndex];
     const auto baseParams = mLB + 0.5 * (mUB - mLB);
-    PlotObjectiveFunctionLandscape(obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName), &result);
+    PlotObjectiveFunctionLandscape(obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x",
+        "y", fmt::format("{} opt", mName), &result);
   }
 
   return result;
@@ -196,7 +197,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     const f64 ymax = evo.mUB[yParamIndex];
     const auto baseParams = std::vector<f64>{20., mCR, mF, (f64)RAND1, (f64)BIN};
     PlotObjectiveFunctionLandscape(metaObj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax,
-        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName), &metaOptResult);
+        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)),
+        fmt::format("{} metaopt", mName), &metaOptResult);
   }
 
   // save original settings and mute
@@ -208,7 +210,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   SetSaveProgress(true);
 
   // statistics B4 metaopt
-  LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
+  LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF,
+      GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsB4;
   for (usize run = 0; run < runsPerObj; run++)
     resultsB4.push_back(Optimize(obj));
@@ -221,7 +224,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<usize>(optimalMetaParams[MetaCrossoverStrategy]));
 
   // statistics A4 metaopt
-  LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
+  LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF,
+      GetMutationStrategyString(mMutStrat), GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsA4;
   for (usize run = 0; run < runsPerObj; run++)
     resultsA4.push_back(Optimize(obj));
@@ -260,14 +264,14 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     statsA4.averageFunctionEvaluations += (1.0 / runsPerObj) * resultsA4[run].functionEvaluations;
   }
 
-  LOG_INFO("Before metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)", statsB4.averageFitness, statsB4.averageFunctionEvaluations,
-      statsB4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
-  LOG_INFO("After metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)", statsA4.averageFitness, statsA4.averageFunctionEvaluations,
-      statsA4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
+  LOG_INFO("Before metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)",
+      statsB4.averageFitness, statsB4.averageFunctionEvaluations, statsB4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
+  LOG_INFO("After metaopt, reaching average fitness: {:.2e} took {:.0f} function evaluations ({:.0f}% of budget) on average ({} runs)",
+      statsA4.averageFitness, statsA4.averageFunctionEvaluations, statsA4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
 
   if (statsA4.averageFitness < statsB4.averageFitness)
-    LOG_SUCCESS(
-        "Metaopt with {} function evaluations budget improved average resulting fitness from {:.2e} to {:.2e} ({} runs)", maxFunEvals, statsB4.averageFitness, statsA4.averageFitness, runsPerObj);
+    LOG_SUCCESS("Metaopt with {} function evaluations budget improved average resulting fitness from {:.2e} to {:.2e} ({} runs)", maxFunEvals,
+        statsB4.averageFitness, statsA4.averageFitness, runsPerObj);
   else
     LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
 }
@@ -401,6 +405,14 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
     static std::vector<f64> validvals;
     static std::vector<f64> sims;
 
+    if (generation == 0)
+    {
+      gens.clear();
+      objvals.clear();
+      validvals.clear();
+      sims.clear();
+    }
+
     gens.push_back(generation);
     objvals.push_back(population.bestEntity.fitness);
     if (valid)
@@ -416,6 +428,15 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
                                                      .ylabel = "objective function value",
                                                      .y2label = "best-average relative similarity [%]",
                                                      .log = false});
+
+    if (false)
+      PyPlot::Plot(fmt::format("Evolution ({})", mName), {.x = gens,
+                                                             .ys = {objvals, validvals},
+                                                             .xlabel = "generation",
+                                                             .ylabel = "objective function value",
+                                                             .label_ys = {"obj", "valid"},
+                                                             .log = false,
+                                                             .save = "../debug/ipcopt/optprog.png"});
   }
 }
 
@@ -453,10 +474,12 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   if (population.functionEvaluations >= mMaxFunEvals) // maximum function evaluations exhausted
     return MaximumFunctionEvaluationsReached;
 
-  if (population.relativeDifferenceGenerationsOverThreshold > mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness
+  if (population.relativeDifferenceGenerationsOverThreshold >
+      mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness
     return NoImprovementReachedRel;
 
-  if (population.absoluteDifference < mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
+  if (population.absoluteDifference <
+      mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
     return NoImprovementReachedAbs;
 
   return NotTerminated;
@@ -519,7 +542,8 @@ usize Evolution::GetNumberOfParents()
   }
 }
 
-Evolution::Population::Population(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents, bool consoleOutput, bool saveProgress)
+Evolution::Population::Population(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents,
+    bool consoleOutput, bool saveProgress)
 try
 {
   PROFILE_FUNCTION;
@@ -556,7 +580,8 @@ void Evolution::Population::UpdateCrossoverParameters(usize eid, CrossoverStrate
   offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR);
 }
 
-void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB)
+void Evolution::Population::UpdateOffspring(
+    usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB)
 {
   PROFILE_FUNCTION;
   auto& newoffspring = offspring[eid];
@@ -568,11 +593,12 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
       switch (mutationStrategy)
       {
       case MutationStrategy::RAND1:
-        newoffspring.params[pid] =
-            entities[newoffspring.parentIndices[0]].params[pid] + F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]);
+        newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] +
+                                   F * (entities[newoffspring.parentIndices[1]].params[pid] - entities[newoffspring.parentIndices[2]].params[pid]);
         break;
       case MutationStrategy::BEST1:
-        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]);
+        newoffspring.params[pid] =
+            bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]);
         break;
       case MutationStrategy::RAND2:
         newoffspring.params[pid] = entities[newoffspring.parentIndices[0]].params[pid] +
@@ -580,7 +606,8 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
                                    F * (entities[newoffspring.parentIndices[3]].params[pid] - entities[newoffspring.parentIndices[4]].params[pid]);
         break;
       case MutationStrategy::BEST2:
-        newoffspring.params[pid] = bestEntity.params[pid] + F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) +
+        newoffspring.params[pid] = bestEntity.params[pid] +
+                                   F * (entities[newoffspring.parentIndices[0]].params[pid] - entities[newoffspring.parentIndices[1]].params[pid]) +
                                    F * (entities[newoffspring.parentIndices[2]].params[pid] - entities[newoffspring.parentIndices[3]].params[pid]);
         break;
       default:
@@ -684,8 +711,9 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
 
       for (usize eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
-        f64 avgDist = averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
-        if (avgDist < minAvgDist)                                                              // check if entity is distinct
+        f64 avgDist =
+            averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
+        if (avgDist < minAvgDist)                                                    // check if entity is distinct
         {
           distinctEntity = false;
           break; // needs to be distinct from all entities

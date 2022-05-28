@@ -4,7 +4,8 @@
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev, i32 iters, f64 testRatio, i32 popSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev,
+    i32 iters, f64 testRatio, i32 popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -23,8 +24,10 @@ try
   const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 
   // before
-  LOG_INFO("Running IPC parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} IPCshifts will be calculated", trainImages.size(),
-      testImages.size(), trainImagePairs.size(), testImagePairs.size(), popSize * trainImagePairs.size() + testImagePairs.size(), ipc.mCols, ipc.mRows);
+  LOG_INFO("Running IPC parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} "
+           "IPCshifts will be calculated",
+      trainImages.size(), testImages.size(), trainImagePairs.size(), testImagePairs.size(), popSize * trainImagePairs.size() + testImagePairs.size(),
+      ipc.mCols, ipc.mRows);
   ShowRandomImagePair(trainImagePairs);
   const auto referenceShifts = GetReferenceShifts(trainImagePairs);
   const auto shiftsPixel = GetPixelShifts(ipc, trainImagePairs);
@@ -120,7 +123,8 @@ std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirect
   return images;
 }
 
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev)
+std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(
+    const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -130,10 +134,12 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
   if (iters < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", iters));
 
-  if (const auto badimage = std::find_if(images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.mRows + maxShift or image.cols < ipc.mCols + maxShift; });
+  if (const auto badimage = std::find_if(
+          images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.mRows + maxShift or image.cols < ipc.mCols + maxShift; });
       badimage != images.end())
-    throw std::runtime_error(fmt::format("Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", badimage->rows,
-        badimage->cols, ipc.mRows + maxShift, ipc.mCols + maxShift));
+    throw std::runtime_error(fmt::format(
+        "Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
+        badimage->rows, badimage->cols, ipc.mRows + maxShift, ipc.mCols + maxShift));
 
   std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
   imagePairs.reserve(images.size() * Sqr(iters));
@@ -180,7 +186,8 @@ IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>
   return ipc;
 }
 
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(
+    const IPC& ipc_, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -214,7 +221,8 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
   };
 }
 
-std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize)
+std::vector<f64> IPCOptimization::CalculateOptimalParameters(
+    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -225,10 +233,12 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(const std::function
   Evolution evo(OptimizedParameterCount);
   evo.mNP = popSize;
   evo.mMutStrat = Evolution::BEST1;
+  evo.SetName("IPC");
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps", "L1WIN"});
   evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0};
-  evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
+  evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2.,
+      static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8, static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8,
+      1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return IPC::BandpassType2String(static_cast<IPC::BandpassType>((i32)val)); });
@@ -254,22 +264,25 @@ void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& o
   const auto ipcBefore = ipc;
   ipc = CreateIPCFromParams(ipc, optimalParameters);
 
-  LOG_SUCCESS("Final IPC BandpassType: {} -> {}", IPC::BandpassType2String(ipcBefore.GetBandpassType()), IPC::BandpassType2String(ipc.GetBandpassType()));
+  LOG_SUCCESS(
+      "Final IPC BandpassType: {} -> {}", IPC::BandpassType2String(ipcBefore.GetBandpassType()), IPC::BandpassType2String(ipc.GetBandpassType()));
   if (ipc.GetBandpassType() != IPC::BandpassType::None)
   {
     LOG_SUCCESS("Final IPC BandpassL: {:.2f} -> {:.2f}", ipcBefore.GetBandpassL(), ipc.GetBandpassL());
     LOG_SUCCESS("Final IPC BandpassH: {:.2f} -> {:.2f}", ipcBefore.GetBandpassH(), ipc.GetBandpassH());
   }
-  LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", IPC::InterpolationType2String(ipcBefore.GetInterpolationType()), IPC::InterpolationType2String(ipc.GetInterpolationType()));
+  LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", IPC::InterpolationType2String(ipcBefore.GetInterpolationType()),
+      IPC::InterpolationType2String(ipc.GetInterpolationType()));
   LOG_SUCCESS("Final IPC WindowType: {} -> {}", IPC::WindowType2String(ipcBefore.GetWindowType()), IPC::WindowType2String(ipc.GetWindowType()));
-  LOG_SUCCESS("Final IPC L1WindowType: {} -> {}", IPC::L1WindowType2String(ipcBefore.GetL1WindowType()), IPC::L1WindowType2String(ipc.GetL1WindowType()));
+  LOG_SUCCESS(
+      "Final IPC L1WindowType: {} -> {}", IPC::L1WindowType2String(ipcBefore.GetL1WindowType()), IPC::L1WindowType2String(ipc.GetL1WindowType()));
   LOG_SUCCESS("Final IPC L2Usize: {} -> {}", ipcBefore.GetL2Usize(), ipc.GetL2Usize());
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", ipcBefore.GetL1ratio(), ipc.GetL1ratio());
   LOG_SUCCESS("Final IPC CPeps: {:.2e} -> {:.2e}", ipcBefore.GetCrossPowerEpsilon(), ipc.GetCrossPowerEpsilon());
 }
 
-void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel, const std::vector<cv::Point2d>& shiftsNonit,
-    const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
+void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel,
+    const std::vector<cv::Point2d>& shiftsNonit, const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -333,7 +346,8 @@ std::vector<cv::Point2d> IPCOptimization::GetShifts(const IPC& ipc, const std::v
   return out;
 }
 
-std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(
+    const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
