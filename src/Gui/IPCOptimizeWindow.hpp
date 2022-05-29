@@ -9,9 +9,9 @@ struct IPCOptimizeParameters
   f32 maxShift = 2.0;
   f32 noiseStddev = 0.0;
   i32 iters = 101;
-  i32 optiters = 11;
+  i32 optiters = 101;
   f32 testRatio = 0.2;
-  i32 popSize = 6;
+  i32 popSize = 12;
 };
 
 class IPCOptimizeWindow

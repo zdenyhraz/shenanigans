@@ -149,9 +149,9 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
     cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
     AddNoise<IPC::Float>(image1, noiseStddev);
 
-    for (i32 row = 0; row < iters; ++row)
+    for (i32 col = 0; col < iters; ++col)
     {
-      for (i32 col = 0; col < iters; ++col)
+      for (i32 row = 0; row < iters; ++row)
       {
         const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * row / (iters - 1)));
         cv::Mat image2 = RoiCropMid(Shifted(image, shift), ipc.mCols, ipc.mRows);
@@ -161,13 +161,6 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
     }
   }
 
-  std::sort(imagePairs.begin(), imagePairs.end(),
-      [](const auto& a, const auto& b)
-      {
-        const auto& [img1a, img2a, shifta] = a;
-        const auto& [img1b, img2b, shiftb] = b;
-        return shifta.x < shiftb.x;
-      });
   return imagePairs;
 }
 

@@ -332,7 +332,7 @@ try
 {
   PROFILE_FUNCTION;
 
-  if (!valid)
+  if (not valid)
     return;
 
   const auto arg = 0.5 * (mLB + mUB);
@@ -349,7 +349,7 @@ try
   else if (mConsoleOutput)
     LOG_DEBUG("Validation function is consistent");
 
-  if (!isfinite(result1))
+  if (not std::isfinite(result1))
     throw std::runtime_error(fmt::format("Validation function is not finite"));
   else if (mConsoleOutput)
     LOG_DEBUG("Validation function is finite");
@@ -379,6 +379,7 @@ void Evolution::CheckBounds()
 void Evolution::CheckParameters()
 {
   PROFILE_FUNCTION;
+
   if (mMutStrat == MutationStrategyCount)
     throw std::runtime_error("Invalid mutation strategy");
 
@@ -389,14 +390,13 @@ void Evolution::CheckParameters()
 void Evolution::UpdateOutputs(usize generation, const Population& population, ValidationFunction valid)
 {
   PROFILE_FUNCTION;
-  if (population.bestEntity.fitness < population.previousFitness)
-  {
-    if (mFileOutput)
-      fmt::print(mOutputFile, "{}\n", GetOutputString(generation, population));
 
-    if (mConsoleOutput)
-      LOG_DEBUG(GetOutputString(generation, population));
-  }
+  if (mConsoleOutput)
+    LOG_DEBUG(GetOutputString(generation, population));
+
+  if (mFileOutput)
+    if (population.bestEntity.fitness < population.previousFitness)
+      fmt::print(mOutputFile, "{}\n", GetOutputString(generation, population));
 
   if (mPlotOutput)
   {
