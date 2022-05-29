@@ -146,6 +146,8 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateIm
 
   for (const auto& image : images)
   {
+    static i32 i = 0;
+    LOG_DEBUG("Creating {} shifted versions of image {}/{} ...", iters * iters, ++i, images.size());
     cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
     AddNoise<IPC::Float>(image1, noiseStddev);
 
