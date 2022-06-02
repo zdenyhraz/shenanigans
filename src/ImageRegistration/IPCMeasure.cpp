@@ -19,23 +19,28 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   cv::Mat accuracyIPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyIPCO = cv::Mat::zeros(iters, iters, GetMatType<f64>());
 
-  std::atomic<i32> progressi = 0;
   auto images = LoadImages<f64>(path);
+  const auto shiftOffset1 = cv::Point2d(0.3, 0.6);
+  const auto shiftOffset2 = cv::Point2d(0.1 * ipc.mCols, 0.1 * ipc.mRows);
+  LOG_DEBUG("Preprocessing {} images...", images.size());
   for (auto& image : images)
-    cv::resize(image, image, cv::Size(ipc.mCols + 2 * maxShift + 1, ipc.mRows + 2 * maxShift + 1));
+    cv::resize(image, image,
+        cv::Size(ipc.mCols + 2 * maxShift + 2 * shiftOffset1.x + 2 * shiftOffset2.x + 1,
+            ipc.mRows + 2 * maxShift + 2 * shiftOffset1.y + 2 * shiftOffset2.y + 1));
 
+  i32 imageidx = 0;
+  std::atomic<i32> progressidx = 0;
+  LOG_DEBUG("Calculating sub-pixel registration accuracy on {} images...", images.size());
   for (const auto& image : images)
   {
-    cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
+    cv::Mat image1 = RoiCropMid(Shifted(image, shiftOffset1), ipc.mCols, ipc.mRows);
     AddNoise<f64>(image1, noiseStddev);
-    Plot2D("Image", {.z = image1});
 
 #pragma omp parallel for
     for (i32 row = 0; row < iters; ++row)
     {
-      const f64 logprogress = ++progressi;
       if (progress)
-        *progress = logprogress / (iters * images.size());
+        *progress = static_cast<f32>(++progressidx) / (iters * images.size());
 
       auto refX = refShiftsX.ptr<f64>(row);
       auto refY = refShiftsY.ptr<f64>(row);
@@ -47,10 +52,11 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
       for (i32 col = 0; col < iters; ++col)
       {
-        const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1)));
+        const auto shift =
+            cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1))) + shiftOffset2;
         refX[col] = shift.x;
         refY[col] = shift.y;
-        cv::Mat image2 = RoiCropMid(Shifted(image, shift), ipc.mCols, ipc.mRows);
+        cv::Mat image2 = RoiCropMid(Shifted(image, shiftOffset1 + shift), ipc.mCols, ipc.mRows);
         AddNoise<f64>(image2, noiseStddev);
 
         accCC[col] += Magnitude(CrossCorrelation::Calculate(image1, image2) - shift);
@@ -58,8 +64,15 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
         accPCS[col] += Magnitude(cv::phaseCorrelate(image1, image2) - shift);
         accIPC[col] += Magnitude(ipc.Calculate(image1, image2) - shift);
         accIPCO[col] += Magnitude(ipcopt.Calculate(image1, image2) - shift);
+
+        if (row == 0 and col == 0 and imageidx == 0)
+        {
+          Plot2D("Image1", {.z = image1});
+          Plot2D("Image2", {.z = image2});
+        }
       }
     }
+    ++imageidx;
   }
 
   accuracyCC = QuantileFilter<f64>(accuracyCC / images.size(), 0, mQuanT);
