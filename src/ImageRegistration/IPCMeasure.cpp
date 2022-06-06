@@ -51,9 +51,45 @@ std::vector<ImagePair> IPCMeasure::CreateImagePairs(const IPC& ipc, const std::v
     }
   }
 
+  // monotonically increasing x shift for plots
+  std::sort(
+      imagePairs.begin(), imagePairs.end(), [](const auto& imagePair1, const auto& imagePair2) { return imagePair1.shift.x < imagePair2.shift.x; });
+
   if (progress)
     *progress = 0;
   return imagePairs;
+}
+
+ImageRegistrationDataset IPCMeasure::LoadImageRegistrationDataset(const std::string& path)
+{
+  PROFILE_FUNCTION;
+  LOG_FUNCTION;
+
+  std::ifstream file(fmt::format("{}/dataset.json", std::filesystem::weakly_canonical(path).string()));
+  json::json j;
+  file >> j;
+
+  ImageRegistrationDataset dataset;
+  dataset.rows = j["rows"];
+  dataset.cols = j["cols"];
+  dataset.imageCount = j["imageCount"];
+  dataset.iters = j["iters"];
+  dataset.maxShift = j["maxShift"];
+  dataset.noiseStddev = j["noiseStddev"];
+
+  for (i32 idx = 0; idx < dataset.imageCount * dataset.iters * dataset.iters; ++idx)
+  {
+    const std::string path1 = j["image1Paths"][idx];
+    const std::string path2 = j["image2Paths"][idx];
+    const std::pair<f64, f64> shift = j["shifts"][idx];
+    const i32 row = idx / dataset.iters;
+    const i32 col = idx % dataset.iters;
+
+    dataset.imagePairs.emplace_back(
+        LoadUnitFloatImage<IPC::Float>(path1), LoadUnitFloatImage<IPC::Float>(path2), cv::Point2d(shift.first, shift.second), row, col);
+  }
+
+  return dataset;
 }
 
 void IPCMeasure::GenerateRegistrationDataset(
@@ -78,13 +114,13 @@ void IPCMeasure::GenerateRegistrationDataset(
     std::filesystem::create_directory(datasetDir);
 
   std::vector<std::string> image1Paths, image2Paths;
-  std::vector<std::pair<double, double>> shifts;
+  std::vector<std::pair<f64, f64>> shifts;
   i32 idx = 0;
   for (auto& imagePair : imagePairs)
   {
     auto& image1 = imagePair.image1;
     auto& image2 = imagePair.image2;
-    const auto& shift = imagePair.shift;
+    const auto shift = imagePair.shift;
     const auto path1 = fmt::format("{}/pair{}_a.png", datasetDir, idx);
     const auto path2 = fmt::format("{}/pair{}_b.png", datasetDir, idx);
 
@@ -107,6 +143,7 @@ void IPCMeasure::GenerateRegistrationDataset(
   json::json datasetJson;
   datasetJson["rows"] = ipc.GetRows();
   datasetJson["cols"] = ipc.GetCols();
+  datasetJson["imageCount"] = images.size();
   datasetJson["iters"] = iters;
   datasetJson["maxShift"] = maxShiftAbs;
   datasetJson["noiseStddev"] = noiseStddev;
@@ -120,11 +157,13 @@ void IPCMeasure::GenerateRegistrationDataset(
     *progress = 0;
 }
 
-void IPCMeasure::MeasureAccuracy(
-    const IPC& ipc, const IPC& ipcopt, const std::string& path, i32 iters, f64 maxShiftAbs, f64 noiseStddev, f32* progress)
+void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::string& path, f32* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
+
+  const auto dataset = LoadImageRegistrationDataset(path);
+  const auto iters = dataset.iters;
 
   cv::Mat refShiftsX = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat refShiftsY = cv::Mat::zeros(iters, iters, GetMatType<f64>());
@@ -134,21 +173,9 @@ void IPCMeasure::MeasureAccuracy(
   cv::Mat accuracyIPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyIPCO = cv::Mat::zeros(iters, iters, GetMatType<f64>());
 
-  auto images = LoadImages<IPC::Float>(path);
-  const auto maxShift = cv::Point2d(maxShiftAbs, maxShiftAbs);
-  const auto shiftOffset1 = cv::Point2i(3, 3);
-  const auto shiftOffset2 = cv::Point2i(0.1 * ipc.mCols, 0.1 * ipc.mRows);
-
-  for (auto& image : images)
-    image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
-        ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
-
-  const auto imagePairs = CreateImagePairs(ipc, images, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev, progress);
-  LOG_DEBUG("Measuring {}% image registration accuracy on {} image pairs from {}...", mQuanT * 100, imagePairs.size(), path);
-
   std::atomic<i32> idx = 0;
 #pragma omp parallel for
-  for (const auto& imagePair : imagePairs)
+  for (const auto& imagePair : dataset.imagePairs)
   {
     const auto& image1 = imagePair.image1;
     const auto& image2 = imagePair.image2;
@@ -171,18 +198,18 @@ void IPCMeasure::MeasureAccuracy(
     }
 
     if (progress)
-      *progress = static_cast<f32>(idx + 1) / imagePairs.size();
+      *progress = static_cast<f32>(idx) / dataset.imagePairs.size();
 
     ++idx;
   }
 
   if (mQuanT < 1)
   {
-    accuracyCC = QuantileFilter<f64>(accuracyCC / images.size(), 0, mQuanT);
-    accuracyPC = QuantileFilter<f64>(accuracyPC / images.size(), 0, mQuanT);
-    accuracyPCS = QuantileFilter<f64>(accuracyPCS / images.size(), 0, mQuanT);
-    accuracyIPC = QuantileFilter<f64>(accuracyIPC / images.size(), 0, mQuanT);
-    accuracyIPCO = QuantileFilter<f64>(accuracyIPCO / images.size(), 0, mQuanT);
+    accuracyCC = QuantileFilter<f64>(accuracyCC / dataset.imageCount, 0, mQuanT);
+    accuracyPC = QuantileFilter<f64>(accuracyPC / dataset.imageCount, 0, mQuanT);
+    accuracyPCS = QuantileFilter<f64>(accuracyPCS / dataset.imageCount, 0, mQuanT);
+    accuracyIPC = QuantileFilter<f64>(accuracyIPC / dataset.imageCount, 0, mQuanT);
+    accuracyIPCO = QuantileFilter<f64>(accuracyIPCO / dataset.imageCount, 0, mQuanT);
   }
 
   LOG_SUCCESS("CC average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyCC), Stddev<f64>(accuracyCC));
@@ -207,6 +234,8 @@ void IPCMeasure::MeasureAccuracy(
   static constexpr auto ylabel = "reference shift y [px]";
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsY);
+  LOG_DEBUG("Plots shifts x limits: [{},{}]", xmin, xmax);
+  LOG_DEBUG("Plots shifts y limits: [{},{}]", ymin, ymax);
 
   Plot2D("CC accuracy", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
@@ -214,6 +243,8 @@ void IPCMeasure::MeasureAccuracy(
   Plot2D("IPC accuracy", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("IPCO accuracy", {.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
+  PyPlot::Plot("ref shifts x", {.z = refShiftsX, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  PyPlot::Plot("ref shifts y", {.z = refShiftsY, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("CC accuracy", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("PCS accuracy", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
