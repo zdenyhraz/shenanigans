@@ -30,6 +30,7 @@ void Shenanigans::Run()
 }
 
 void Shenanigans::Render()
+try
 {
   if (ImGui::Begin("Shenanigans"))
   {
@@ -55,6 +56,10 @@ void Shenanigans::Render()
   // ImPlot::ShowDemoWindow();
 
   PyPlot::SetSave(mParameters.plotSave);
+}
+catch (const std::exception& e)
+{
+  LOG_EXCEPTION(e);
 }
 
 void Shenanigans::Initialize()

@@ -15,13 +15,14 @@ void IPCOptimizeWindow::Render()
     ImGui::Text("%s", mProgressStatus.process.c_str());
 
     ImGui::Separator();
-
-    ImGui::InputText("##measure dataset dir", &mParameters.measureDirectory);
-    ImGui::SameLine();
     if (ImGui::Button("Measure"))
       LaunchAsync(
-          []() {
-            IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), mParameters.measureDirectory, &mProgressStatus.progress);
+          []()
+          {
+            IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(),
+                fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{}ns", IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows(),
+                    mParameters.iters, mParameters.noiseStddev),
+                &mProgressStatus.progress);
           });
 
     ImGui::Separator();

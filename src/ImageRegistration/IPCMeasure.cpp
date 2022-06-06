@@ -65,7 +65,16 @@ ImageRegistrationDataset IPCMeasure::LoadImageRegistrationDataset(const std::str
   PROFILE_FUNCTION;
   LOG_FUNCTION;
 
-  std::ifstream file(fmt::format("{}/dataset.json", std::filesystem::weakly_canonical(path).string()));
+  const auto datasetPath = std::filesystem::weakly_canonical(path).string();
+  const auto jsonPath = fmt::format("{}/dataset.json", datasetPath);
+
+  if (not std::filesystem::exists(std::filesystem::weakly_canonical(datasetPath)))
+    throw std::invalid_argument(fmt::format("Dataset directory {} does not exist", datasetPath));
+
+  if (not std::filesystem::exists(jsonPath))
+    throw std::invalid_argument(fmt::format("Dataset file {} does not exist", jsonPath));
+
+  std::ifstream file(jsonPath);
   json::json j;
   file >> j;
 
