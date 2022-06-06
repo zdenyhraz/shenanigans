@@ -237,8 +237,6 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   static constexpr auto ylabel = "reference shift y [px]";
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsY);
-  LOG_DEBUG("Plots shifts x limits: [{},{}]", xmin, xmax);
-  LOG_DEBUG("Plots shifts y limits: [{},{}]", ymin, ymax);
 
   Plot2D("CC accuracy", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
