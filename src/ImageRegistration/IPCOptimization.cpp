@@ -1,6 +1,5 @@
 #include "IPCOptimization.hpp"
 #include "IPC.hpp"
-#include "IPCMeasure.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
@@ -114,8 +113,7 @@ IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>
   return ipc;
 }
 
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(
-    const IPC& ipc_, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -126,9 +124,9 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
       return std::numeric_limits<f64>::max();
 
     f64 avgerror = 0;
-    for (const auto& [image1, image2, shift] : imagePairs)
+    for (const auto& imagePair : imagePairs)
     {
-      avgerror += Magnitude(ipc.Calculate(image1, image2) - shift);
+      avgerror += Magnitude(ipc.Calculate(imagePair.image1, imagePair.image2) - imagePair.shift);
     }
     return avgerror / imagePairs.size();
   };
@@ -261,51 +259,50 @@ void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shif
                                      .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
 }
 
-std::vector<cv::Point2d> IPCOptimization::GetShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IPCOptimization::GetShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
-  for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(ipc.Calculate(image1, image2));
+  for (const auto& imagePair : imagePairs)
+    out.push_back(ipc.Calculate(imagePair.image1, imagePair.image2));
 
   return out;
 }
 
-std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(
-    const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
-  for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(cv::phaseCorrelate(image1, image2));
+  for (const auto& imagePair : imagePairs)
+    out.push_back(cv::phaseCorrelate(imagePair.image1, imagePair.image2));
 
   return out;
 }
 
-std::vector<cv::Point2d> IPCOptimization::GetPixelShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IPCOptimization::GetPixelShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
-  for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(PhaseCorrelation::Calculate(image1, image2));
+  for (const auto& imagePair : imagePairs)
+    out.push_back(PhaseCorrelation::Calculate(imagePair.image1, imagePair.image2));
 
   return out;
 }
 
-std::vector<cv::Point2d> IPCOptimization::GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+std::vector<cv::Point2d> IPCOptimization::GetReferenceShifts(const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   std::vector<cv::Point2d> out;
   out.reserve(imagePairs.size());
 
-  for (const auto& [image1, image2, referenceShift] : imagePairs)
-    out.push_back(referenceShift);
+  for (const auto& imagePair : imagePairs)
+    out.push_back(imagePair.shift);
 
   return out;
 }
@@ -325,14 +322,14 @@ f64 IPCOptimization::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsRe
   return avgerror / shifts.size();
 }
 
-void IPCOptimization::ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs)
+void IPCOptimization::ShowRandomImagePair(const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
 
-  const auto& [img1, img2, shift] = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
+  const auto& imagePair = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
   cv::Mat concat;
-  cv::hconcat(img1, img2, concat);
+  cv::hconcat(imagePair.image1, imagePair.image2, concat);
   // Plot2D::Set("Random image pair");
   // Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
   // Plot2D::Plot("Random image pair", concat);

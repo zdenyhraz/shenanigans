@@ -4,8 +4,8 @@ struct IPCOptimizeParameters
 {
   std::string debugImage1Path = "../debug/shapes/shape1.png";
   std::string debugImage2Path = "../debug/shapes/shapesf.png";
-  std::string trainDirectory = "../debug/ipcopt_debug/train";
-  std::string testDirectory = "../debug/ipcopt_debug/test";
+  std::string trainDirectory = "../debug/ipcopt/train";
+  std::string testDirectory = "../debug/ipcopt/test";
   f32 maxShift = 2.5;
   f32 noiseStddev = 0.0;
   i32 iters = 101;

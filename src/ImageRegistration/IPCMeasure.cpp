@@ -5,8 +5,8 @@
 #include "PhaseCorrelation.hpp"
 #include "PhaseCorrelationUpscale.hpp"
 
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCMeasure::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images,
-    cv::Point2d maxShift, cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
+std::vector<ImagePair> IPCMeasure::CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift,
+    cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -22,7 +22,7 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCMeasure::CreateImagePa
     throw std::runtime_error(fmt::format("Input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
         badimage->rows, badimage->cols, ipc.mRows + maxShift.y, ipc.mCols + maxShift.x));
 
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
+  std::vector<ImagePair> imagePairs;
   imagePairs.reserve(images.size() * iters * iters);
   std::atomic<i32> progressidx = 0;
   for (const auto& image : images)
@@ -34,18 +34,19 @@ std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCMeasure::CreateImagePa
     AddNoise<IPC::Float>(image1, noiseStddev);
 
 #pragma omp parallel for
-    for (i32 col = 0; col < iters; ++col)
+    for (i32 row = 0; row < iters; ++row)
     {
-      for (i32 row = 0; row < iters; ++row)
+      for (i32 col = 0; col < iters; ++col)
       {
         if (progress)
           *progress = static_cast<f32>(++progressidx) / (images.size() * iters * iters);
 
-        const auto shift = cv::Point2d(maxShift.x * (-1.0 + 2.0 * col / (iters - 1)), maxShift.y * (-1.0 + 2.0 * row / (iters - 1))) + shiftOffset2;
+        const auto shift =
+            cv::Point2d(maxShift.x * (-1.0 + 2.0 * col / (iters - 1)), maxShift.y * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1))) + shiftOffset2;
         cv::Mat image2 = RoiCropMid(Shifted(image, shiftOffset1 + shift), ipc.mCols, ipc.mRows);
         AddNoise<IPC::Float>(image2, noiseStddev);
 #pragma omp critical
-        imagePairs.emplace_back(image1, image2, shift);
+        imagePairs.emplace_back(image1, image2, shift, row, col);
       }
     }
   }
@@ -80,31 +81,37 @@ void IPCMeasure::MeasureAccuracy(
           cv::Size(ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
               ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1)));
 
-  const auto imagePairs = CreateImagePairs(ipcopt, images, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev, progress);
+  const auto imagePairs = CreateImagePairs(ipc, images, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev, progress);
   LOG_DEBUG("Measuring {}% image registration accuracy on {} image pairs from {}...", mQuanT * 100, imagePairs.size(), path);
-  std::atomic<i32> progressidx = 0;
 
+  std::atomic<i32> idx = 0;
 #pragma omp parallel for
-  for (const auto& [image1, image2, shift] : imagePairs)
+  for (const auto& imagePair : imagePairs)
   {
-    // refX[col] = shift.x;
-    // refY[col] = shift.y;
-    // accCC[col] += Magnitude(CrossCorrelation::Calculate(image1, image2) - shift);
-    // accPC[col] += Magnitude(PhaseCorrelation::Calculate(image1, image2) - shift);
-    // accPCS[col] += Magnitude(cv::phaseCorrelate(image1, image2) - shift);
-    // accIPC[col] += Magnitude(ipc.Calculate(image1, image2) - shift);
-    // accIPCO[col] += Magnitude(ipcopt.Calculate(image1, image2) - shift);
+    const auto& image1 = imagePair.image1;
+    const auto& image2 = imagePair.image2;
+    const auto& shift = imagePair.shift;
+    const auto row = imagePair.row;
+    const auto col = imagePair.col;
 
-    if (progressidx == 0)
+    refShiftsX.at<f64>(row, col) = shift.x;
+    refShiftsY.at<f64>(row, col) = shift.y;
+    accuracyCC.at<f64>(row, col) += Magnitude(CrossCorrelation::Calculate(image1, image2) - shift);
+    accuracyPC.at<f64>(row, col) += Magnitude(PhaseCorrelation::Calculate(image1, image2) - shift);
+    accuracyPCS.at<f64>(row, col) += Magnitude(cv::phaseCorrelate(image1, image2) - shift);
+    accuracyIPC.at<f64>(row, col) += Magnitude(ipc.Calculate(image1, image2) - shift);
+    accuracyIPCO.at<f64>(row, col) += Magnitude(ipcopt.Calculate(image1, image2) - shift);
+
+    if (idx == 0)
     {
       Plot2D("Image1", {.z = image1});
       Plot2D("Image2", {.z = image2});
     }
 
     if (progress)
-      *progress = static_cast<f32>(progressidx + 1) / imagePairs.size();
+      *progress = static_cast<f32>(idx + 1) / imagePairs.size();
 
-    ++progressidx;
+    ++idx;
   }
 
   if (mQuanT < 1)

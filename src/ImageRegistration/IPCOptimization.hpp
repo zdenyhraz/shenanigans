@@ -1,4 +1,5 @@
 #pragma once
+#include "IPCMeasure.hpp"
 
 class IPC;
 
@@ -25,18 +26,17 @@ public:
 
 private:
   static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
-  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(
-      const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
+  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::vector<ImagePair>& imagePairs);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
   static std::vector<f64> CalculateOptimalParameters(
       const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize);
   static void ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters);
   static void ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel,
       const std::vector<cv::Point2d>& shiftsNonit, const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter);
-  static std::vector<cv::Point2d> GetShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
-  static std::vector<cv::Point2d> GetNonIterativeShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
-  static std::vector<cv::Point2d> GetPixelShifts(const IPC& ipc, const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
-  static std::vector<cv::Point2d> GetReferenceShifts(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
+  static std::vector<cv::Point2d> GetShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs);
+  static std::vector<cv::Point2d> GetNonIterativeShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs);
+  static std::vector<cv::Point2d> GetPixelShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs);
+  static std::vector<cv::Point2d> GetReferenceShifts(const std::vector<ImagePair>& imagePairs);
   static f64 GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shifts);
-  static void ShowRandomImagePair(const std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>>& imagePairs);
+  static void ShowRandomImagePair(const std::vector<ImagePair>& imagePairs);
 };
