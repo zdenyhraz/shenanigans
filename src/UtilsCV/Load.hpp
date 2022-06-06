@@ -2,7 +2,8 @@
 
 inline bool IsImagePath(const std::string& path)
 {
-  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or path.ends_with(".JPEG");
+  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or
+         path.ends_with(".JPEG");
 }
 
 template <typename T>
@@ -16,29 +17,28 @@ inline cv::Mat LoadUnitFloatImage(const std::string& path)
 }
 
 template <typename T>
-inline std::vector<cv::Mat> LoadImages(const std::string& path)
+inline std::vector<cv::Mat> LoadImages(const std::string& dirpath)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
-  LOG_INFO("Loading images from '{}'...", path);
+  LOG_INFO("Loading images from {}...", dirpath);
 
-  if (!std::filesystem::is_directory(path))
-    throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", path));
+  if (!std::filesystem::is_directory(dirpath))
+    throw std::runtime_error(fmt::format("{} is not a valid directory", dirpath));
 
   std::vector<cv::Mat> images;
-  for (const auto& entry : std::filesystem::directory_iterator(path))
+  for (const auto& entry : std::filesystem::directory_iterator(dirpath))
   {
-    const auto path = entry.path().string();
+    const auto filepath = entry.path().string();
 
-    if (not IsImagePath(path))
+    if (not IsImagePath(filepath))
     {
-      LOG_WARNING("Directory contains a non-image file {}", path);
+      LOG_WARNING("Directory {} contains a non-image file {}", dirpath, filepath);
       continue;
     }
 
-    auto image = LoadUnitFloatImage<T>(path);
-    images.push_back(image);
-    LOG_DEBUG("Loaded image {}", path);
+    images.push_back(LoadUnitFloatImage<T>(filepath));
+    LOG_DEBUG("Loaded image {}", filepath);
   }
 
   return images;

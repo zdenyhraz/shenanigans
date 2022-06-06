@@ -1,10 +1,11 @@
 #include "IPCOptimization.hpp"
 #include "IPC.hpp"
+#include "IPCMeasure.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift, f64 noiseStddev,
+void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShiftAbs, f64 noiseStddev,
     i32 iters, f64 testRatio, i32 popSize)
 try
 {
@@ -12,14 +13,18 @@ try
   LOG_FUNCTION;
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
-  const auto trainImages = LoadImages(trainDirectory);
-  const auto testImages = LoadImages(testDirectory);
+  const auto trainImages = LoadImages<IPC::Float>(trainDirectory);
+  const auto testImages = LoadImages<IPC::Float>(testDirectory);
 
   if (trainImages.empty())
     throw std::runtime_error("Empty training images vector");
 
-  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, iters, noiseStddev);
-  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, std::max(testRatio * iters, 1.), noiseStddev);
+  const auto maxShift = cv::Point2d(maxShiftAbs, maxShiftAbs);
+  const auto shiftOffset1 = cv::Point2d(0.3, 0.6);
+  const auto shiftOffset2 = cv::Point2d(0.1 * ipc.mCols, 0.1 * ipc.mRows);
+  const auto trainImagePairs = IPCMeasure::CreateImagePairs(ipc, trainImages, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev);
+  const auto testImagePairs =
+      IPCMeasure::CreateImagePairs(ipc, testImages, maxShift, shiftOffset1, shiftOffset2, std::max(testRatio * iters, 1.), noiseStddev);
   const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
   const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 
@@ -94,78 +99,6 @@ catch (const std::exception& e)
   LOG_EXCEPTION(e);
 }
 
-std::vector<cv::Mat> IPCOptimization::LoadImages(const std::string& imagesDirectory, f64 cropSizeRatio)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION;
-  LOG_INFO("Loading images from '{}'...", imagesDirectory);
-
-  if (!std::filesystem::is_directory(imagesDirectory))
-    throw std::runtime_error(fmt::format("Directory '{}' is not a valid directory", imagesDirectory));
-
-  std::vector<cv::Mat> images;
-  for (const auto& entry : std::filesystem::directory_iterator(imagesDirectory))
-  {
-    const std::string path = entry.path().string();
-
-    if (not IsImagePath(path))
-    {
-      LOG_WARNING("Directory contains a non-image file {}", path);
-      continue;
-    }
-
-    auto image = LoadUnitFloatImage<IPC::Float>(path);
-    if (cropSizeRatio < 1.0)
-      image = RoiCropMid(image, cropSizeRatio * image.cols, cropSizeRatio * image.rows);
-    images.push_back(image);
-    LOG_DEBUG("Loaded image {}", path);
-  }
-  return images;
-}
-
-std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> IPCOptimization::CreateImagePairs(
-    const IPC& ipc, const std::vector<cv::Mat>& images, f64 maxShift, i32 iters, f64 noiseStddev)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION;
-
-  if (maxShift <= 0)
-    throw std::runtime_error(fmt::format("Invalid max shift ({})", maxShift));
-  if (iters < 1)
-    throw std::runtime_error(fmt::format("Invalid iters per image ({})", iters));
-
-  if (const auto badimage = std::find_if(
-          images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.mRows + maxShift or image.cols < ipc.mCols + maxShift; });
-      badimage != images.end())
-    throw std::runtime_error(fmt::format(
-        "Could not optimize IPC parameters - input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
-        badimage->rows, badimage->cols, ipc.mRows + maxShift, ipc.mCols + maxShift));
-
-  std::vector<std::tuple<cv::Mat, cv::Mat, cv::Point2d>> imagePairs;
-  imagePairs.reserve(images.size() * Sqr(iters));
-
-  for (const auto& image : images)
-  {
-    static i32 i = 0;
-    LOG_DEBUG("Creating {} shifted versions of image {}/{} ...", iters * iters, ++i, images.size());
-    cv::Mat image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
-    AddNoise<IPC::Float>(image1, noiseStddev);
-
-    for (i32 col = 0; col < iters; ++col)
-    {
-      for (i32 row = 0; row < iters; ++row)
-      {
-        const auto shift = cv::Point2d(maxShift * (-1.0 + 2.0 * col / (iters - 1)), maxShift * (-1.0 + 2.0 * row / (iters - 1)));
-        cv::Mat image2 = RoiCropMid(Shifted(image, shift), ipc.mCols, ipc.mRows);
-        AddNoise<IPC::Float>(image2, noiseStddev);
-        imagePairs.push_back({image1, image2, shift});
-      }
-    }
-  }
-
-  return imagePairs;
-}
-
 IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>& params)
 {
   PROFILE_FUNCTION;
@@ -195,8 +128,7 @@ std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunc
     f64 avgerror = 0;
     for (const auto& [image1, image2, shift] : imagePairs)
     {
-      const auto error = ipc.Calculate(image1, image2) - shift;
-      avgerror += sqrt(error.x * error.x + error.y * error.y);
+      avgerror += Magnitude(ipc.Calculate(image1, image2) - shift);
     }
     return avgerror / imagePairs.size();
   };
