@@ -20,13 +20,11 @@ public:
     OptimizedParameterCount, // last
   };
 
-  static void Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShift = 2.0, f64 noiseStddev = 0.01,
-      i32 iters = 101, f64 testRatio = 0.2, i32 popSize = 42);
+  static void Optimize(IPC& ipc, const std::string& path, i32 popSize = 42);
   static void Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize = 42);
 
 private:
   static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
-  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::vector<ImagePair>& imagePairs);
   static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
   static std::vector<f64> CalculateOptimalParameters(
       const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize);

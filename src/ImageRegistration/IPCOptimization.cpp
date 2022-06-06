@@ -5,66 +5,28 @@
 #include "PhaseCorrelation.hpp"
 #include "ImageRegistrationDataset.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShiftAbs, f64 noiseStddev,
-    i32 iters, f64 testRatio, i32 popSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::string& path, i32 popSize)
 try
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
-  auto trainImages = LoadImages<IPC::Float>(trainDirectory);
-  auto testImages = LoadImages<IPC::Float>(testDirectory);
-
-  if (trainImages.empty())
-    throw std::runtime_error("Empty training images vector");
-
-  const auto maxShift = cv::Point2d(maxShiftAbs, maxShiftAbs);
-  const auto shiftOffset1 = cv::Point2d(0.0, 0.0);
-  const auto shiftOffset2 = cv::Point2d(std::floor(0.1 * ipc.mCols), std::floor(0.1 * ipc.mRows));
-
-  for (auto& image : trainImages)
-    image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
-        ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
-
-  for (auto& image : testImages)
-    image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
-        ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
-
-  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev);
-  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, shiftOffset1, shiftOffset2, std::max(testRatio * iters, 1.), noiseStddev);
-  const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
-  const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
-
-  // before
-  LOG_INFO("Running IPC parameter optimization on a set of {}/{} training/validation images with {}/{} image pairs - each generation, {} {}x{} "
-           "IPCshifts will be calculated",
-      trainImages.size(), testImages.size(), trainImagePairs.size(), testImagePairs.size(), popSize * trainImagePairs.size() + testImagePairs.size(),
-      ipc.mCols, ipc.mRows);
-  const auto referenceShifts = GetReferenceShifts(trainImagePairs);
-  const auto shiftsBefore = GetShifts(ipc, trainImagePairs);
-  const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
-
-  // opt
-  const auto optimalParameters = CalculateOptimalParameters(obj, valid, popSize);
-  if (optimalParameters.empty())
-    throw std::runtime_error("Optimization failed");
-
-  // after
-  auto ipcAfter = ipc;
-  ApplyOptimalParameters(ipcAfter, optimalParameters);
-  const auto shiftsAfter = GetShifts(ipcAfter, trainImagePairs);
-  const auto objAfter = GetAverageAccuracy(referenceShifts, shiftsAfter);
-
-  if (objAfter >= objBefore)
+  const auto dataset = LoadImageRegistrationDataset(path);
+  const auto obj = [&dataset](const IPC& ipc_)
   {
-    LOG_WARNING("Objective function value not improved ({}%), parameters unchanged", static_cast<i32>((objBefore - objAfter) / objBefore * 100));
-    return;
-  }
+    if (std::floor(ipc_.GetL2Usize() * ipc_.GetL1ratio()) < 3)
+      return std::numeric_limits<f64>::max();
 
-  LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
-  ApplyOptimalParameters(ipc, optimalParameters);
-  LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
+    f64 avgerror = 0;
+    for (const auto& imagePair : dataset.imagePairs)
+    {
+      avgerror += Magnitude(ipc_.Calculate(imagePair.image1, imagePair.image2) - imagePair.shift);
+    }
+    return avgerror / dataset.imagePairs.size();
+  };
+
+  return Optimize(ipc, obj, popSize);
 }
 catch (const std::exception& e)
 {
@@ -115,25 +77,6 @@ IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>
   ipc.SetL1ratio(params[L1ratioParameter]);
   ipc.SetCrossPowerEpsilon(params[CPepsParameter]);
   return ipc;
-}
-
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::vector<ImagePair>& imagePairs)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION;
-  return [&](const std::vector<f64>& params)
-  {
-    const auto ipc = CreateIPCFromParams(ipc_, params);
-    if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
-      return std::numeric_limits<f64>::max();
-
-    f64 avgerror = 0;
-    for (const auto& imagePair : imagePairs)
-    {
-      avgerror += Magnitude(ipc.Calculate(imagePair.image1, imagePair.image2) - imagePair.shift);
-    }
-    return avgerror / imagePairs.size();
-  };
 }
 
 std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::function<f64(const IPC&)>& obj)
