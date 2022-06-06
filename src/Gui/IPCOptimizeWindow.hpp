@@ -11,7 +11,7 @@ struct IPCOptimizeParameters
   f32 noiseStddev = 0.0;
   i32 iters = 51;
   f32 testRatio = 0.2;
-  i32 popSize = 12;
+  i32 popSize = 18;
 };
 
 class IPCOptimizeWindow

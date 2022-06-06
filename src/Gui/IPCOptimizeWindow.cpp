@@ -68,6 +68,6 @@ void IPCOptimizeWindow::Render()
 
 std::string IPCOptimizeWindow::GetCurrentDatasetPath()
 {
-  return fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{}ns", IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows(), mParameters.iters,
-      mParameters.noiseStddev);
+  return fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{:.3f}ns", IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows(),
+      mParameters.iters, mParameters.noiseStddev);
 }

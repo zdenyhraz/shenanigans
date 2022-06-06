@@ -114,7 +114,7 @@ void GenerateImageRegistrationDataset(
 
   auto imagePairs = CreateImagePairs(ipc, images, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev, progress);
   const auto datasetDir = fmt::format(
-      "{}/imreg_dataset_{}x{}_{}i_{}ns", std::filesystem::weakly_canonical(saveDir).string(), ipc.GetCols(), ipc.GetRows(), iters, noiseStddev);
+      "{}/imreg_dataset_{}x{}_{}i_{:.3f}ns", std::filesystem::weakly_canonical(saveDir).string(), ipc.GetCols(), ipc.GetRows(), iters, noiseStddev);
 
   if (not std::filesystem::exists(datasetDir))
     std::filesystem::create_directory(datasetDir);
