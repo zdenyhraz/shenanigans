@@ -24,8 +24,32 @@ void IPCOptimizeWindow::Render()
           []()
           {
             IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), mParameters.testDirectory, mParameters.iters,
-                mParameters.maxShift, mParameters.noiseStddev, &mProgress);
+                mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
           });
+
+    ImGui::SameLine();
+    if (ImGui::Button("Generate pairs"))
+      LaunchAsync(
+          []()
+          {
+            IPCMeasure::GenerateRegistrationDataset(IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.generateDirectory, mParameters.iters,
+                mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
+          });
+
+    ImGui::ProgressBar(mProgressStatus.progress, ImVec2(0.f, 0.f));
+    ImGui::SameLine();
+    ImGui::Text("%s", mProgressStatus.process.c_str());
+    ImGui::InputText("debug image1", &mParameters.debugImage1Path);
+    ImGui::InputText("debug image2", &mParameters.debugImage2Path);
+    ImGui::InputText("opt train dir", &mParameters.trainDirectory);
+    ImGui::InputText("opt test dir", &mParameters.testDirectory);
+    ImGui::InputText("generate pairs dir", &mParameters.generateDirectory);
+    ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);
+    ImGui::SliderFloat("noise stddev", &mParameters.noiseStddev, 0.0, 0.1, nullptr, ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderInt("iters", &mParameters.iters, 3, 201);
+    ImGui::SliderInt("opt iters", &mParameters.optiters, 3, 201);
+    ImGui::SliderFloat("test ratio", &mParameters.testRatio, 0.0, 1.0);
+    ImGui::SliderInt("popsize", &mParameters.popSize, 6, 60);
 
     ImGui::Separator();
     if (ImGui::Button("DebugShift"))
@@ -46,17 +70,6 @@ void IPCOptimizeWindow::Render()
     if (ImGui::Button("DebugGradual"))
       LaunchAsync([]() { IPCDebug::DebugGradualShift(IPCWindow::GetIPCOptimized(), mParameters.maxShift, mParameters.noiseStddev); });
 
-    ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
-    ImGui::InputText("debug image1", &mParameters.debugImage1Path);
-    ImGui::InputText("debug image2", &mParameters.debugImage2Path);
-    ImGui::InputText("opt train directory", &mParameters.trainDirectory);
-    ImGui::InputText("opt test directory", &mParameters.testDirectory);
-    ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);
-    ImGui::SliderFloat("noise stddev", &mParameters.noiseStddev, 0.0, 0.5);
-    ImGui::SliderInt("iters", &mParameters.iters, 3, 201);
-    ImGui::SliderInt("opt iters", &mParameters.optiters, 3, 201);
-    ImGui::SliderFloat("test ratio", &mParameters.testRatio, 0.0, 1.0);
-    ImGui::SliderInt("popsize", &mParameters.popSize, 6, 60);
     ImGui::EndTabItem();
   }
 }

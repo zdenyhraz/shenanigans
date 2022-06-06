@@ -12,15 +12,24 @@ try
   LOG_FUNCTION;
   LOG_DEBUG("Optimizing IPC for size [{}, {}]", ipc.mCols, ipc.mRows);
 
-  const auto trainImages = LoadImages<IPC::Float>(trainDirectory);
-  const auto testImages = LoadImages<IPC::Float>(testDirectory);
+  auto trainImages = LoadImages<IPC::Float>(trainDirectory);
+  auto testImages = LoadImages<IPC::Float>(testDirectory);
 
   if (trainImages.empty())
     throw std::runtime_error("Empty training images vector");
 
   const auto maxShift = cv::Point2d(maxShiftAbs, maxShiftAbs);
-  const auto shiftOffset1 = cv::Point2d(0.3, 0.6);
-  const auto shiftOffset2 = cv::Point2d(0.1 * ipc.mCols, 0.1 * ipc.mRows);
+  const auto shiftOffset1 = cv::Point2d(0.0, 0.0);
+  const auto shiftOffset2 = cv::Point2d(std::floor(0.1 * ipc.mCols), std::floor(0.1 * ipc.mRows));
+
+  for (auto& image : trainImages)
+    image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
+        ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
+
+  for (auto& image : testImages)
+    image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
+        ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
+
   const auto trainImagePairs = IPCMeasure::CreateImagePairs(ipc, trainImages, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev);
   const auto testImagePairs =
       IPCMeasure::CreateImagePairs(ipc, testImages, maxShift, shiftOffset1, shiftOffset2, std::max(testRatio * iters, 1.), noiseStddev);
@@ -32,13 +41,9 @@ try
            "IPCshifts will be calculated",
       trainImages.size(), testImages.size(), trainImagePairs.size(), testImagePairs.size(), popSize * trainImagePairs.size() + testImagePairs.size(),
       ipc.mCols, ipc.mRows);
-  ShowRandomImagePair(trainImagePairs);
   const auto referenceShifts = GetReferenceShifts(trainImagePairs);
-  const auto shiftsPixel = GetPixelShifts(ipc, trainImagePairs);
-  const auto shiftsNonit = GetNonIterativeShifts(ipc, trainImagePairs);
   const auto shiftsBefore = GetShifts(ipc, trainImagePairs);
   const auto objBefore = GetAverageAccuracy(referenceShifts, shiftsBefore);
-  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, {});
 
   // opt
   const auto optimalParameters = CalculateOptimalParameters(obj, valid, popSize);
@@ -59,7 +64,6 @@ try
 
   LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
   ApplyOptimalParameters(ipc, optimalParameters);
-  ShowOptimizationPlots(referenceShifts, shiftsPixel, shiftsNonit, shiftsBefore, shiftsAfter);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
@@ -206,59 +210,6 @@ void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& o
   LOG_SUCCESS("Final IPC CPeps: {:.2e} -> {:.2e}", ipcBefore.GetCrossPowerEpsilon(), ipc.GetCrossPowerEpsilon());
 }
 
-void IPCOptimization::ShowOptimizationPlots(const std::vector<cv::Point2d>& shiftsReference, const std::vector<cv::Point2d>& shiftsPixel,
-    const std::vector<cv::Point2d>& shiftsNonit, const std::vector<cv::Point2d>& shiftsBefore, const std::vector<cv::Point2d>& shiftsAfter)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION;
-
-  std::vector<f64> shiftsXReference, shiftsXReferenceError;
-  std::vector<f64> shiftsXPixel, shiftsXPixelError;
-  std::vector<f64> shiftsXNonit, shiftsXNonitError;
-  std::vector<f64> shiftsXBefore, shiftsXBeforeError;
-  std::vector<f64> shiftsXAfter, shiftsXAfterError;
-
-  for (usize i = 0; i < shiftsReference.size(); ++i)
-  {
-    const auto& referenceShift = shiftsReference[i];
-    const auto& shiftPixel = shiftsPixel[i];
-    const auto& shiftNonit = shiftsNonit[i];
-    const auto& shiftBefore = shiftsBefore[i];
-
-    shiftsXReference.push_back(referenceShift.x);
-    shiftsXReferenceError.push_back(0.0);
-
-    shiftsXPixel.push_back(shiftPixel.x);
-    shiftsXNonit.push_back(shiftNonit.x);
-    shiftsXBefore.push_back(shiftBefore.x);
-
-    shiftsXPixelError.push_back(shiftPixel.x - referenceShift.x);
-    shiftsXNonitError.push_back(shiftNonit.x - referenceShift.x);
-    shiftsXBeforeError.push_back(shiftBefore.x - referenceShift.x);
-
-    if (i < shiftsAfter.size())
-    {
-      const auto& shiftAfter = shiftsAfter[i];
-      shiftsXAfter.push_back(shiftAfter.x);
-      shiftsXAfterError.push_back(shiftAfter.x - referenceShift.x);
-    }
-  }
-
-  PyPlot::Plot("IPCshift", {.x = shiftsXReference,
-                               .ys = {shiftsXPixel, shiftsXNonit, shiftsXBefore, shiftsXAfter, shiftsXReference},
-                               .xlabel = "reference shift [px]",
-                               .ylabel = "calculated shift [px]",
-                               .label_ys = {"pc", "pcs", "ipc", "ipc opt", "ref"},
-                               .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
-
-  PyPlot::Plot("IPCshift error", {.x = shiftsXReference,
-                                     .ys = {shiftsXPixelError, shiftsXNonitError, shiftsXBeforeError, shiftsXAfterError, shiftsXReferenceError},
-                                     .xlabel = "reference shift [px]",
-                                     .ylabel = "error [px]",
-                                     .label_ys = {"pc", "pcs", "ipc", "ipc opt", "ref"},
-                                     .color_ys = {"k", "tab:orange", "m", "tab:green", "tab:blue"}});
-}
-
 std::vector<cv::Point2d> IPCOptimization::GetShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
 {
   PROFILE_FUNCTION;
@@ -267,30 +218,6 @@ std::vector<cv::Point2d> IPCOptimization::GetShifts(const IPC& ipc, const std::v
 
   for (const auto& imagePair : imagePairs)
     out.push_back(ipc.Calculate(imagePair.image1, imagePair.image2));
-
-  return out;
-}
-
-std::vector<cv::Point2d> IPCOptimization::GetNonIterativeShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
-{
-  PROFILE_FUNCTION;
-  std::vector<cv::Point2d> out;
-  out.reserve(imagePairs.size());
-
-  for (const auto& imagePair : imagePairs)
-    out.push_back(cv::phaseCorrelate(imagePair.image1, imagePair.image2));
-
-  return out;
-}
-
-std::vector<cv::Point2d> IPCOptimization::GetPixelShifts(const IPC& ipc, const std::vector<ImagePair>& imagePairs)
-{
-  PROFILE_FUNCTION;
-  std::vector<cv::Point2d> out;
-  out.reserve(imagePairs.size());
-
-  for (const auto& imagePair : imagePairs)
-    out.push_back(PhaseCorrelation::Calculate(imagePair.image1, imagePair.image2));
 
   return out;
 }
@@ -316,21 +243,7 @@ f64 IPCOptimization::GetAverageAccuracy(const std::vector<cv::Point2d>& shiftsRe
   f64 avgerror = 0;
   for (usize i = 0; i < shifts.size(); ++i)
   {
-    const auto error = shifts[i] - shiftsReference[i];
-    avgerror += std::sqrt(error.x * error.x + error.y * error.y);
+    avgerror += Magnitude(shifts[i] - shiftsReference[i]);
   }
   return avgerror / shifts.size();
-}
-
-void IPCOptimization::ShowRandomImagePair(const std::vector<ImagePair>& imagePairs)
-{
-  PROFILE_FUNCTION;
-  LOG_FUNCTION;
-
-  const auto& imagePair = imagePairs[static_cast<usize>(Random::Rand() * imagePairs.size())];
-  cv::Mat concat;
-  cv::hconcat(imagePair.image1, imagePair.image2, concat);
-  // Plot2D::Set("Random image pair");
-  // Plot2D::SetColorMapType(QCPColorGradient::gpGrayscale);
-  // Plot2D::Plot("Random image pair", concat);
 }

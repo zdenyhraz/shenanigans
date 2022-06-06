@@ -1,4 +1,5 @@
 #pragma once
+#include "Gui.hpp"
 
 struct IPCOptimizeParameters
 {
@@ -6,6 +7,7 @@ struct IPCOptimizeParameters
   std::string debugImage2Path = "../debug/shapes/shapesf.png";
   std::string trainDirectory = "../debug/ipcopt/train";
   std::string testDirectory = "../debug/ipcopt/test";
+  std::string generateDirectory = "../debug/ipcopt";
   f32 maxShift = 2.5;
   f32 noiseStddev = 0.0;
   i32 iters = 101;
@@ -22,5 +24,5 @@ public:
 
 private:
   inline static IPCOptimizeParameters mParameters;
-  inline static f32 mProgress = 0;
+  inline static ProgressStatus mProgressStatus;
 };

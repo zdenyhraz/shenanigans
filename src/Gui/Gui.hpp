@@ -1,5 +1,11 @@
 #pragma once
 
+struct ProgressStatus
+{
+  f32 progress = 0;
+  std::string process;
+};
+
 void GLFWInitialize();
 GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden = false);
 void GLFWInitializeGL(GLFWwindow* window);
