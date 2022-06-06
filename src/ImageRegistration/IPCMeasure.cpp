@@ -82,8 +82,8 @@ ImageRegistrationDataset IPCMeasure::LoadImageRegistrationDataset(const std::str
     const std::string path1 = j["image1Paths"][idx];
     const std::string path2 = j["image2Paths"][idx];
     const std::pair<f64, f64> shift = j["shifts"][idx];
-    const i32 row = idx / dataset.iters;
-    const i32 col = idx % dataset.iters;
+    const i32 row = j["coords"][idx][0];
+    const i32 col = j["coords"][idx][1];
 
     dataset.imagePairs.emplace_back(
         LoadUnitFloatImage<IPC::Float>(path1), LoadUnitFloatImage<IPC::Float>(path2), cv::Point2d(shift.first, shift.second), row, col);
@@ -115,6 +115,7 @@ void IPCMeasure::GenerateRegistrationDataset(
 
   std::vector<std::string> image1Paths, image2Paths;
   std::vector<std::pair<f64, f64>> shifts;
+  std::vector<std::pair<i32, i32>> coords;
   i32 idx = 0;
   for (auto& imagePair : imagePairs)
   {
@@ -134,6 +135,7 @@ void IPCMeasure::GenerateRegistrationDataset(
     image1Paths.emplace_back(path1);
     image2Paths.emplace_back(path2);
     shifts.emplace_back(shift.x, shift.y);
+    coords.emplace_back(imagePair.row, imagePair.col);
 
     if (progress)
       *progress = static_cast<f32>(++idx) / imagePairs.size();
@@ -150,6 +152,7 @@ void IPCMeasure::GenerateRegistrationDataset(
   datasetJson["image1Paths"] = image1Paths;
   datasetJson["image2Paths"] = image2Paths;
   datasetJson["shifts"] = shifts;
+  datasetJson["coords"] = coords;
   std::ofstream file(fmt::format("{}/dataset.json", datasetDir));
   file << datasetJson;
 

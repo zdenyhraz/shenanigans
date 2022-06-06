@@ -3,7 +3,7 @@
 
 struct IPCOptimizeParameters
 {
-  std::string measureDirectory = "../debug/ipcopt/imreg_dataset_64x64_11i_0ns";
+  std::string measureDirectory = "../debug/ipcopt/imreg_dataset_64x64_31i_0ns";
   std::string trainDirectory = "../debug/ipcopt/train";
   std::string generateDirectory = "../debug/ipcopt";
   std::string debugImage1Path = "../debug/shapes/shape1.png";
