@@ -3,6 +3,7 @@
 #include "Optimization/Evolution.hpp"
 #include "Filtering/Noise.hpp"
 #include "PhaseCorrelation.hpp"
+#include "ImageRegistrationDataset.hpp"
 
 void IPCOptimization::Optimize(IPC& ipc, const std::string& trainDirectory, const std::string& testDirectory, f64 maxShiftAbs, f64 noiseStddev,
     i32 iters, f64 testRatio, i32 popSize)
@@ -30,9 +31,8 @@ try
     image = RoiCropMid(image, ipc.mCols + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
         ipc.mRows + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
 
-  const auto trainImagePairs = IPCMeasure::CreateImagePairs(ipc, trainImages, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev);
-  const auto testImagePairs =
-      IPCMeasure::CreateImagePairs(ipc, testImages, maxShift, shiftOffset1, shiftOffset2, std::max(testRatio * iters, 1.), noiseStddev);
+  const auto trainImagePairs = CreateImagePairs(ipc, trainImages, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev);
+  const auto testImagePairs = CreateImagePairs(ipc, testImages, maxShift, shiftOffset1, shiftOffset2, std::max(testRatio * iters, 1.), noiseStddev);
   const auto obj = CreateObjectiveFunction(ipc, trainImagePairs);
   const auto valid = CreateObjectiveFunction(ipc, testImagePairs);
 

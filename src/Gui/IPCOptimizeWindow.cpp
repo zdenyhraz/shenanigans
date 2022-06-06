@@ -1,5 +1,6 @@
 #include "IPCOptimizeWindow.hpp"
 #include "IPCWindow.hpp"
+#include "ImageRegistration/ImageRegistrationDataset.hpp"
 
 void IPCOptimizeWindow::Initialize()
 {
@@ -45,7 +46,7 @@ void IPCOptimizeWindow::Render()
       LaunchAsync(
           []()
           {
-            IPCMeasure::GenerateRegistrationDataset(IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.generateDirectory, mParameters.iters,
+            GenerateImageRegistrationDataset(IPCWindow::GetIPC(), mParameters.trainDirectory, mParameters.generateDirectory, mParameters.iters,
                 mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
           });
 
