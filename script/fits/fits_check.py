@@ -12,8 +12,8 @@ print("---------- Header ----------")
 hdr = hdul[0].header
 i = 0
 for line in hdr:
-  print("{}: {}".format(line, hdr[i]))
-  i += 1
+    print("{}: {}".format(line, hdr[i]))
+    i += 1
 
 print("---------- Data ----------")
 fitsdata = np.transpose(np.rot90(hdul[0].data))  # assume the first extension is an image
@@ -43,8 +43,8 @@ plt.colorbar()
 plt.show()
 
 if False:
-  for r in range(0, fitsdata.shape[0]):
-    for c in range(0, fitsdata.shape[1]):
-      if not np.isnan(fitsdata[r, c]):
-        if fitsdata[r, c] != imdata[r, c]:
-          print("{} != {}".format(fitsdata[r, c], imdata[r, c]))
+    for r in range(0, fitsdata.shape[0]):
+        for c in range(0, fitsdata.shape[1]):
+            if not np.isnan(fitsdata[r, c]):
+                if fitsdata[r, c] != imdata[r, c]:
+                    print("{} != {}".format(fitsdata[r, c], imdata[r, c]))

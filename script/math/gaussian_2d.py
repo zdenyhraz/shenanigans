@@ -4,15 +4,15 @@ import matplotlib_config
 
 
 def Gaussian(sigmax, sigmay, mux, muy):
-  n = 101
-  z = np.zeros((n, n))
-  for r in range(0, z.shape[0]):
-    for c in range(0, z.shape[1]):
-      x = c/(z.shape[1]-1)
-      y = r/(z.shape[0]-1)
-      z[r][c] = 1 / (2 * np.pi * sigmax * sigmay) * np.exp(-0.5 *
-                                                           (np.power(x - mux, 2) / np.power(sigmax, 2) + (np.power(y - muy, 2) / np.power(sigmay, 2))))
-  return z
+    n = 101
+    z = np.zeros((n, n))
+    for r in range(0, z.shape[0]):
+        for c in range(0, z.shape[1]):
+            x = c/(z.shape[1]-1)
+            y = r/(z.shape[0]-1)
+            z[r][c] = 1 / (2 * np.pi * sigmax * sigmay) * np.exp(-0.5 *
+                                                                 (np.power(x - mux, 2) / np.power(sigmax, 2) + (np.power(y - muy, 2) / np.power(sigmay, 2))))
+    return z
 
 
 matplotlib_config.init()
