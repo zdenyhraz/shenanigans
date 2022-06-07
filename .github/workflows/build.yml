@@ -19,7 +19,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./opencv
-          key: ${{runner.os}}-opencv-cache-x
+          key: ${{runner.os}}-opencv-cache-v1
 
       - name: OpenCV install from cache
         if: steps.opencv-cache.outputs.cache-hit == 'true'
