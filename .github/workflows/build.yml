@@ -21,7 +21,12 @@ jobs:
           path: ./opencv
           key: ${{runner.os}}-opencv-cache
 
+      - name: OpenCV install from cache
+        if: steps.opencv-cache.outputs.cache-hit == 'true'
+        run: cd opencv/build && sudo ninja install
+
       - name: OpenCV install from source
+        if: steps.opencv-cache.outputs.cache-hit != 'true'
         run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
 
       - name: CMake configure
