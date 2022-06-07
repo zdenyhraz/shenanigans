@@ -55,8 +55,8 @@ try
     return;
   }
 
+  ipc = ipcAfter;
   LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
-  ApplyOptimalParameters(ipc, optimalParameters);
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
