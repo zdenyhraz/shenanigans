@@ -66,6 +66,7 @@ add_executable(shenanigans)
 add_executable(shenanigans_test)
 add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
+add_executable(shenanigans_icsw)
 
 # pybind11
 find_package(PythonLibs REQUIRED)
@@ -84,6 +85,8 @@ target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt-header-only)
+target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt-header-only)
+
 
 # gtest
 add_subdirectory(libs/gtest)
@@ -202,6 +205,10 @@ target_sources(shenanigans_terminal PRIVATE ${SRC_SHENANIGANS_TERMINAL_APP})
 # shenanigans_benchmark app sources
 file(GLOB SRC_SHENANIGANS_BENCHMARK_APP CONFIGURE_DEPENDS apps/shenanigans_benchmark/*.cpp)
 target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
+
+# shenanigans_icsw app sources
+file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
+target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
 
 # precompiled headers
 if (ENABLE_PCH)
