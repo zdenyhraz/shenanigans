@@ -10,13 +10,13 @@ std::string GetCurrentThreadId()
   std::stringstream ss;
   ss << std::this_thread::get_id();
   const auto str = ss.str();
-  return fmt::format("on thread x{}", str.c_str() + str.size() - 4);
+  return fmt::format("{}", str.c_str() + str.size() - 3);
 }
 
 template <typename Fmt, typename... Args>
 void Log(Fmt&& format, Args&&... args)
 {
-  fmt::print("{} {}\n", fmt::vformat(std::forward<Fmt>(format), fmt::make_format_args(std::forward<Args>(args)...)), GetCurrentThreadId());
+  fmt::print("[{}] {}\n", GetCurrentThreadId(), fmt::vformat(std::forward<Fmt>(format), fmt::make_format_args(std::forward<Args>(args)...)));
 }
 
 class ThreadLoop
