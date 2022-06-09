@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 
   Instrument instrument;
   instrument.Start();
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   instrument.Stop();
 
   fmt::print("ICSW stopped {}\n", GetCurrentThreadId());

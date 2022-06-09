@@ -5,10 +5,6 @@
 class Instrument
 {
 public:
-  Instrument() { fmt::print("Instrument()\n"); }
-
-  ~Instrument() { fmt::print("~Instrument()\n"); }
-
   void Start()
   {
     mThread.Start([this]() { MainLoop(); });
