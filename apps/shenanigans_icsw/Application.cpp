@@ -8,9 +8,7 @@ int main(int argc, char** argv)
   std::srand(std::time(nullptr));
 
   Instrument instrument;
-  instrument.Start();
   std::this_thread::sleep_for(std::chrono::seconds(1));
-  instrument.Stop();
 
   fmt::print("ICSW stopped {}\n", GetCurrentThreadId());
   return EXIT_SUCCESS;
