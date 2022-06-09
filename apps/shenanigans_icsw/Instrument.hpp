@@ -1,16 +1,14 @@
 #pragma once
 #include "SystemStatus.hpp"
 #include "ScanManager.hpp"
-#include "CommInterface.hpp"
 
 class Instrument
 {
 public:
-  Instrument() { mCommInterface.StartListening(); }
-  ~Instrument() { mCommInterface.StopListening(); }
+  SystemStatus& GetSystemStatus() { return mSystemStatus; }
+  ScanManager& GetScanManager() { return mScanManager; }
 
 private:
   SystemStatus mSystemStatus;
   ScanManager mScanManager;
-  CommInterface mCommInterface{mSystemStatus, mScanManager};
 };

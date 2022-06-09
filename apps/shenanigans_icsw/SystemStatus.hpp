@@ -2,7 +2,8 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
-#include "ThreadUtils.hpp"
+#include <fmt/format.h>
+#include "Utils.hpp"
 
 class SystemStatus
 {
@@ -25,9 +26,5 @@ private:
   double mCIDGasPressure = 0;
   double mTotalIonCurrent = 0;
 
-  void MonitoringLoop()
-  {
-    fmt::print("Monitoring... {}\n", GetCurrentThreadId());
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
+  void MonitoringLoop() { Log("Monitoring..."); }
 };

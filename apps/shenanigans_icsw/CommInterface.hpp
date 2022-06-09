@@ -1,11 +1,11 @@
 #pragma once
-#include "SystemStatus.hpp"
-#include "ScanManager.hpp"
+#include <fmt/format.h>
+#include "Instrument.hpp"
 
 class CommInterface
 {
 public:
-  CommInterface(SystemStatus& systemStatus, ScanManager& scanManager) : mSystemStatus(systemStatus), mScanManager(scanManager) {}
+  CommInterface(Instrument& instrument) : mInstrument(instrument) {}
 
   void StartListening()
   {
@@ -16,8 +16,7 @@ public:
 
 private:
   ThreadLoop mThread{"Listening loop"};
-  SystemStatus& mSystemStatus;
-  ScanManager& mScanManager;
+  Instrument& mInstrument;
 
   void ListeningLoop()
   {
@@ -31,20 +30,20 @@ private:
     switch (message)
     {
     case 0:
-      fmt::print("> Message received: Start system status monitoring {}\n", GetCurrentThreadId());
-      mSystemStatus.StartMonitoring();
+      Log(">>> Start system status monitoring");
+      mInstrument.GetSystemStatus().StartMonitoring();
       break;
     case 1:
-      fmt::print("> Message received: Stop system status monitoring {}\n", GetCurrentThreadId());
-      mSystemStatus.StopMonitoring();
+      Log(">>> Stop system status monitoring");
+      mInstrument.GetSystemStatus().StopMonitoring();
       break;
     case 2:
-      fmt::print("> Message received: Start scanning {}\n", GetCurrentThreadId());
-      mScanManager.StartScanning();
+      Log(">>> Start scanning");
+      mInstrument.GetScanManager().StartScanning();
       break;
     case 3:
-      fmt::print("> Message received: Stop scanning {}\n", GetCurrentThreadId());
-      mScanManager.StopScanning();
+      Log(">>> Stop scanning");
+      mInstrument.GetScanManager().StopScanning();
       break;
     default:
       break;

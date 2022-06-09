@@ -3,7 +3,7 @@
 #include <mutex>
 #include <string>
 #include <sstream>
-#include <functional>
+#include <fmt/format.h>
 
 std::string GetCurrentThreadId()
 {
@@ -11,6 +11,12 @@ std::string GetCurrentThreadId()
   ss << std::this_thread::get_id();
   const auto str = ss.str();
   return fmt::format("on thread x{}", str.c_str() + str.size() - 4);
+}
+
+template <typename Fmt, typename... Args>
+void Log(Fmt&& format, Args&&... args)
+{
+  fmt::print("{} {}\n", fmt::vformat(std::forward<Fmt>(format), fmt::make_format_args(std::forward<Args>(args)...)), GetCurrentThreadId());
 }
 
 class ThreadLoop
@@ -33,13 +39,13 @@ public:
     mThread = std::jthread(
         [this, function]()
         {
-          fmt::print("Thread '{}' started {}\n", mName, GetCurrentThreadId());
+          Log("Thread '{}' started", mName);
           while (mRunning)
           {
             function();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
           }
-          fmt::print("Thread '{}' stopped {}\n", mName, GetCurrentThreadId());
+          Log("Thread '{}' stopped", mName);
         });
   }
 
@@ -49,7 +55,6 @@ public:
       return;
 
     mRunning = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
 private:

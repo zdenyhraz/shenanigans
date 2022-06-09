@@ -1,15 +1,20 @@
 #include <fmt/format.h>
+#include "Utils.hpp"
 #include "Instrument.hpp"
-#include "ThreadUtils.hpp"
+#include "CommInterface.hpp"
 
 int main(int argc, char** argv)
 {
-  fmt::print("ICSW started {}\n", GetCurrentThreadId());
+  Log("ICSW started");
   std::srand(std::time(nullptr));
 
   Instrument instrument;
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  CommInterface commInterface(instrument);
 
-  fmt::print("ICSW stopped {}\n", GetCurrentThreadId());
+  commInterface.StartListening();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  commInterface.StopListening();
+
+  Log("ICSW stopped");
   return EXIT_SUCCESS;
 }

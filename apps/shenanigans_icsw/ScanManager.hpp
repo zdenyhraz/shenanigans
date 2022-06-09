@@ -2,7 +2,8 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
-#include "ThreadUtils.hpp"
+#include <fmt/format.h>
+#include "Utils.hpp"
 
 class ScanManager
 {
@@ -17,9 +18,5 @@ public:
 private:
   ThreadLoop mThread{"Scan loop"};
 
-  void ScanLoop()
-  {
-    fmt::print("Scanning... {}\n", GetCurrentThreadId());
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
+  void ScanLoop() { Log("Scanning..."); }
 };
