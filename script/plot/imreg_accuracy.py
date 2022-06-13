@@ -46,6 +46,7 @@ def plot(
     plt.tight_layout()
 
     if save:
+        print(f"Saving plot {title} to {save}")
         plt.savefig(save, bbox_inches='tight')
     else:
         plt.draw()

@@ -13,7 +13,8 @@ def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, interp, xlabel
                     interpolation='bilinear' if interp else 'none',
                     aspect='auto')
 
-    cbar = plt.colorbar(im, format=ticker.FuncFormatter(lambda x, pox: '{:.1e}'.format(x)))
+    #cbar = plt.colorbar(im, format=ticker.FuncFormatter(lambda x, pox: '{:.1e}'.format(x)))
+    cbar = plt.colorbar(im)
 
     if xlabel:
         plt.xlabel(xlabel)

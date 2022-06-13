@@ -20,15 +20,15 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   cv::Mat accuracyIPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyIPCO = cv::Mat::zeros(iters, iters, GetMatType<f64>());
 
-  std::atomic<i32> idx = 0;
+  std::atomic<usize> iprogress = 0;
 #pragma omp parallel for
-  for (const auto& imagePair : dataset.imagePairs)
+  for (usize idx = 0; idx < dataset.imagePairs.size(); ++idx)
   {
-    const auto& image1 = imagePair.image1;
-    const auto& image2 = imagePair.image2;
-    const auto& shift = imagePair.shift;
-    const auto row = imagePair.row;
-    const auto col = imagePair.col;
+    const auto& image1 = dataset.imagePairs[idx].image1;
+    const auto& image2 = dataset.imagePairs[idx].image2;
+    const auto& shift = dataset.imagePairs[idx].shift;
+    const auto row = dataset.imagePairs[idx].row;
+    const auto col = dataset.imagePairs[idx].col;
 
     refShiftsX.at<f64>(row, col) = shift.x;
     refShiftsY.at<f64>(row, col) = shift.y;
@@ -40,14 +40,20 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
     if (idx == 0)
     {
-      Plot2D("Image1", {.z = image1, .cmap = Gray});
-      Plot2D("Image2", {.z = image2, .cmap = Gray});
+      if (true)
+      {
+        PyPlot::Plot("Image1", {.z = image1, .cmap = "gray"});
+        PyPlot::Plot("Image2", {.z = image2, .cmap = "gray"});
+      }
+      else
+      {
+        Plot2D("Image1", {.z = image1, .cmap = Gray});
+        Plot2D("Image2", {.z = image2, .cmap = Gray});
+      }
     }
 
     if (progress)
-      *progress = static_cast<f32>(idx) / dataset.imagePairs.size();
-
-    ++idx;
+      *progress = static_cast<f32>(++iprogress) / dataset.imagePairs.size();
   }
 
   if (mQuanT < 1)
