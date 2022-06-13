@@ -14,7 +14,6 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
   cv::Mat refShiftsX = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat refShiftsY = cv::Mat::zeros(iters, iters, GetMatType<f64>());
-  cv::Mat accuracyCC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyPCS = cv::Mat::zeros(iters, iters, GetMatType<f64>());
   cv::Mat accuracyIPC = cv::Mat::zeros(iters, iters, GetMatType<f64>());
@@ -32,7 +31,6 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
     refShiftsX.at<f64>(row, col) = shift.x;
     refShiftsY.at<f64>(row, col) = shift.y;
-    accuracyCC.at<f64>(row, col) += Magnitude(CrossCorrelation::Calculate(image1, image2) - shift);
     accuracyPC.at<f64>(row, col) += Magnitude(PhaseCorrelation::Calculate(image1, image2) - shift);
     accuracyPCS.at<f64>(row, col) += Magnitude(cv::phaseCorrelate(image1, image2) - shift);
     accuracyIPC.at<f64>(row, col) += Magnitude(ipc.Calculate(image1, image2) - shift);
@@ -58,14 +56,12 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
   if (mQuanT < 1)
   {
-    accuracyCC = QuantileFilter<f64>(accuracyCC / dataset.imageCount, 0, mQuanT);
     accuracyPC = QuantileFilter<f64>(accuracyPC / dataset.imageCount, 0, mQuanT);
     accuracyPCS = QuantileFilter<f64>(accuracyPCS / dataset.imageCount, 0, mQuanT);
     accuracyIPC = QuantileFilter<f64>(accuracyIPC / dataset.imageCount, 0, mQuanT);
     accuracyIPCO = QuantileFilter<f64>(accuracyIPCO / dataset.imageCount, 0, mQuanT);
   }
 
-  LOG_SUCCESS("CC average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyCC), Stddev<f64>(accuracyCC));
   LOG_SUCCESS("PC average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyPC), Stddev<f64>(accuracyPC));
   LOG_SUCCESS("PCS average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyPCS), Stddev<f64>(accuracyPCS));
   LOG_SUCCESS("IPC average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyIPC), Stddev<f64>(accuracyIPC));
@@ -88,13 +84,11 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   const auto [xmin, xmax] = MinMax(refShiftsX);
   const auto [ymin, ymax] = MinMax(refShiftsY);
 
-  Plot2D("CC accuracy", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("PCS accuracy", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("IPC accuracy", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot2D("IPCO accuracy", {.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
-  PyPlot::Plot("CC accuracy", {.z = accuracyCC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("PCS accuracy", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot("IPC accuracy", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
