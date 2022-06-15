@@ -35,15 +35,6 @@ else()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
 endif()
 
-# status messages
-message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
-message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
-message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
-message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
-
 # ignore warnings from libs sources
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
 set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS "-w")
@@ -59,6 +50,16 @@ if(ENABLE_SANITIZER)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
+
+# status messages
+message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
+message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
+message(STATUS "CMAKE_CXX_COMPILER_LAUNCHER: " ${CMAKE_CXX_COMPILER_LAUNCHER})
+message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
+message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 
 # targets
 add_executable(shenanigans)
