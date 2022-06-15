@@ -14,16 +14,15 @@ set(ENABLE_PCH ON)
 if(DEFINED ENV{CI})
   set(ENABLE_PROFILING OFF)
   set(ENABLE_SANITIZER OFF)
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
   set(CMAKE_UNITY_BUILD OFF)
 endif()
 
-# compiler
+# compiler flags
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX")
 else()
-  set(CXX_FLAGS "-march=native -fopenmp -Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow -Wno-unused-parameter -Wno-missing-field-initializers")
+  set(CXX_FLAGS "-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow -Wno-unused-parameter -Wno-missing-field-initializers -fopenmp -march=native")
   set(CXX_FLAGS_DEBUG "-g -O0")
   set(CXX_FLAGS_RELEASE "-O3")
 
@@ -35,6 +34,15 @@ else()
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -w")
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
 endif()
+
+# status messages
+message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
+message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
+message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
+message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
+message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 
 # ignore warnings from libs sources
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
@@ -51,15 +59,6 @@ if(ENABLE_SANITIZER)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
   add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
-
-# status messages
-message(STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER_ID} " " ${CMAKE_CXX_COMPILER_VERSION})
-message(STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER_ID} " " ${CMAKE_C_COMPILER_VERSION})
-message(STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG})
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE})
-message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
-message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 
 # targets
 add_executable(shenanigans)
