@@ -72,7 +72,7 @@ Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https
 <img src="data/readme/optick.png" width="100%">
 
 ### Profiling with [Tracy](https://github.com/wolfpld/tracy)
-- install the required libraries `sudo apt-get -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
+- install the required libraries `sudo apt -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`
 - build the profiler via `make release -j12` in `./libs/tracy/profiler/build/unix/`
 - run the app with `ENABLE_PROFILING` defined
 - run `script/perf/tracy.sh` or `./libs/tracy/profiler/build/unix/Tracy-release` and click connect

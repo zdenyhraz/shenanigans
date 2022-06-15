@@ -12,7 +12,7 @@ jobs:
           submodules: true
 
       - name: Cppcheck install
-        run: sudo apt-get install -y cppcheck
+        run: sudo apt install -y cppcheck
 
       - name: Cppcheck run #--project=build/compile_commands.json
         run: |

@@ -69,9 +69,7 @@ add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
 
 # pybind11
-find_package(PythonLibs REQUIRED)
 add_subdirectory(libs/pybind11)
-include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories(libs/pybind11/include)
 target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
@@ -86,7 +84,6 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt-header-only)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt-header-only)
-
 
 # gtest
 add_subdirectory(libs/gtest)
