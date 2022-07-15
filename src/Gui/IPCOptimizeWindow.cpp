@@ -18,8 +18,9 @@ void IPCOptimizeWindow::Render()
     ImGui::Separator();
 
     if (ImGui::Button("Measure"))
-      LaunchAsync([]()
-          { IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), GetCurrentDatasetPath(), &mProgressStatus.progress); });
+      LaunchAsync([]() {
+        IPCMeasure::MeasureAccuracy(IPCWindow::GetIPC(), IPCWindow::GetIPCOptimized(), GetCurrentDatasetPath(), &mProgressStatus.progress);
+      });
     ImGui::SameLine();
     if (ImGui::Button("Optimize"))
       LaunchAsync([]() { IPCOptimization::Optimize(IPCWindow::GetIPCOptimized(), GetCurrentDatasetPath(), mParameters.popSize); });
@@ -29,12 +30,10 @@ void IPCOptimizeWindow::Render()
     ImGui::InputText("##generate dataset dir", &mParameters.generateDirectory);
     ImGui::SameLine();
     if (ImGui::Button("Generate pairs"))
-      LaunchAsync(
-          []()
-          {
-            GenerateImageRegistrationDataset(IPCWindow::GetIPC(), mParameters.imageDirectory, mParameters.generateDirectory, mParameters.iters,
-                mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
-          });
+      LaunchAsync([]() {
+        GenerateImageRegistrationDataset(IPCWindow::GetIPC(), mParameters.imageDirectory, mParameters.generateDirectory, mParameters.iters,
+            mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
+      });
 
     ImGui::Separator();
 
@@ -44,13 +43,14 @@ void IPCOptimizeWindow::Render()
       LaunchAsync([]() { IPCDebug::DebugShift(IPCWindow::GetIPCOptimized(), mParameters.maxShift, mParameters.noiseStddev); });
     ImGui::SameLine();
     if (ImGui::Button("DebugShift2"))
-      LaunchAsync(
-          []() {
-            IPCDebug::DebugShift2(IPCWindow::GetIPCOptimized(), mParameters.debugImage1Path, mParameters.debugImage2Path, mParameters.noiseStddev);
-          });
+      LaunchAsync([]() {
+        IPCDebug::DebugShift2(IPCWindow::GetIPCOptimized(), mParameters.debugImage1Path, mParameters.debugImage2Path, mParameters.noiseStddev);
+      });
     ImGui::SameLine();
     if (ImGui::Button("DebugAlign"))
-      LaunchAsync([]() { IPCDebug::DebugAlign(IPCWindow::GetIPCOptimized(), mParameters.noiseStddev); });
+      LaunchAsync([]() {
+        IPCDebug::DebugAlign(IPCWindow::GetIPCOptimized(), mParameters.debugImage1Path, mParameters.debugImage2Path, mParameters.noiseStddev);
+      });
     ImGui::SameLine();
     if (ImGui::Button("DebugGradual"))
       LaunchAsync([]() { IPCDebug::DebugGradualShift(IPCWindow::GetIPCOptimized(), mParameters.maxShift, mParameters.noiseStddev); });

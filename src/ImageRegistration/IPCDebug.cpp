@@ -122,22 +122,16 @@ void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const 
   LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
 }
 
-void IPCDebug::DebugAlign(const IPC& ipc, f64 noiseStdev)
+void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
 {
-  auto image1 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/304A.png");
-  auto image2 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
-  if (ipc.mRows != image1.rows or ipc.mCols != image1.cols)
-  {
-    image1 = RoiCrop(image1, image1.cols / 2, image1.rows / 2, ipc.mCols, ipc.mRows);
-    image2 = RoiCrop(image2, image1.cols / 2, image1.rows / 2, ipc.mCols, ipc.mRows);
-  }
-
+  auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
+  auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
+  cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
+  cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
   AddNoise<IPC::Float>(image1, noiseStdev);
   AddNoise<IPC::Float>(image2, noiseStdev);
-
-  Shift(image2, cv::Point2d(-950, 1050));
+  Shift(image2, cv::Point2d(-0.276 * ipc.GetCols(), 0.132 * ipc.GetRows()));
   Rotate(image2, 70, 1.2);
-
   const auto aligned = IPCAlign::Align(ipc, image1, image2);
 }
 

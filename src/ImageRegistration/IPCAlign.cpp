@@ -9,7 +9,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
-  if constexpr (false)
+  const bool debugMode = false;
+  if constexpr (debugMode)
     IPCDebug::DebugInputImages(ipc, image1, image2);
 
   const f64 gamma1 = 1.5;
@@ -42,10 +43,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   }
   cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
   f64 maxRadius = std::min(center.y, center.x);
-  warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
-  warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
+  cv::warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
+  cv::warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
 
-  if constexpr (false)
+  if constexpr (debugMode)
     Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition before", 0, 0, 1, 1000);
 
   // rotation and scale
@@ -53,13 +54,13 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   f64 rotation = -shiftR.y / image1.rows * 360;
   f64 scale = exp(shiftR.x * log(maxRadius) / image1.cols);
   Rotate(image2, -rotation, scale);
-  if constexpr (false)
+  if constexpr (debugMode)
     Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition after rotation+scale", 0, 0, 1, 1000);
 
   // translation
   auto shiftT = ipc.Calculate(image1, image2);
   Shift(image2, -shiftT);
-  if constexpr (false)
+  if constexpr (debugMode)
   {
     Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition result", 0, 0, 1, 1000);
     LOG_INFO("Evaluated rotation: {} deg", rotation);
