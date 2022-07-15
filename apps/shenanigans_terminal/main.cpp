@@ -3,8 +3,12 @@
 int main(int argc, char** argv)
 try
 {
-  LOG_FUNCTION;
-  RegressionModelTest();
+  // LOG_FUNCTION;
+  // RegressionModelTest();
+
+  const auto location = std::source_location::current();
+  LOG_DEBUG("[{}:{}] [{}] Hi mom", location.file_name(), location.line(), location.function_name());
+
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)
