@@ -126,12 +126,32 @@ void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const 
 void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
 {
   LOG_FUNCTION;
+
+  if constexpr (false) // create test images
+  {
+    auto image = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shape.png");
+    const auto shift = cv::Point2d(0.256 * image.cols, 0.232 * image.rows);
+    const auto scale = 1.43;
+    const auto rotation = 45;
+
+    Shift(image, -shift);
+    cv::Mat image1 = image.clone();
+    // AddNoise<IPC::Float>(image1, 0.05);
+    Saveimg("../debug/shapes/shape1.png", image1);
+    Shift(image, 1.5 * shift);
+    Rotate(image, rotation, scale);
+    cv::Mat image2 = image.clone();
+    // AddNoise<IPC::Float>(image2, 0.05);
+    Saveimg("../debug/shapes/shape2.png", image2);
+    return;
+  }
+
   auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
   auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
   cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
   cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
 
-  if (true) // histogram equalization
+  if (false) // histogram equalization
   {
     cv::normalize(image1, image1, 0, 255, cv::NORM_MINMAX);
     cv::normalize(image2, image2, 0, 255, cv::NORM_MINMAX);

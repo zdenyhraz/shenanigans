@@ -9,10 +9,12 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
-
   static constexpr bool debugMode = true;
   if constexpr (debugMode)
-    IPCDebug::DebugInputImages(ipc, image1, image2);
+  {
+    PyPlot::Plot("image1", {.z = image1, .cmap = "gray"});
+    PyPlot::Plot("image2", {.z = image2, .cmap = "gray"});
+  }
 
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
@@ -40,18 +42,26 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
       img2FTmp[col] = std::log(std::sqrt(re2 * re2 + im2 * im2));
     }
   }
+
+  if constexpr (debugMode)
+  {
+    PyPlot::Plot("image1 FT magn", {.z = img1FTm});
+    PyPlot::Plot("image2 FT magn", {.z = img2FTm});
+  }
+
   cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
   f64 maxRadius = std::min(center.y, center.x);
   cv::warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
   cv::warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
-  const auto gamma1 = 1.0;
-  const auto gamma2 = 1.0;
-  cv::Mat showImage;
+  cv::Mat showImageC;
   cv::Mat showImage2;
 
   if constexpr (debugMode)
   {
-    showImage = ColorComposition(image1, image2, gamma1, gamma2);
+    PyPlot::Plot("image1 FT magn log-polar", {.z = img1FTm});
+    PyPlot::Plot("image2 FT magn log-polar", {.z = img2FTm});
+
+    showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();
   }
 
@@ -62,7 +72,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   Rotate(image2, -rotation, scale);
   if constexpr (debugMode)
   {
-    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
   }
 
@@ -71,9 +81,9 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   Shift(image2, -shiftT);
   if constexpr (debugMode)
   {
-    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
-    Showimg(showImage, "Align process color composition");
+    Showimg(showImageC, "Align process color composition");
     Showimg(showImage2, "Align process image2");
 
     LOG_DEBUG("Evaluated shift: {}", shiftT);
