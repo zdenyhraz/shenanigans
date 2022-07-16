@@ -112,6 +112,7 @@ void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 
 void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
 {
+  LOG_FUNCTION;
   auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
   auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
   cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
@@ -124,19 +125,26 @@ void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const 
 
 void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
 {
+  LOG_FUNCTION;
   auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
   auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
   cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
   cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
   AddNoise<IPC::Float>(image1, noiseStdev);
   AddNoise<IPC::Float>(image2, noiseStdev);
-  Shift(image2, cv::Point2d(-0.276 * ipc.GetCols(), 0.132 * ipc.GetRows()));
-  Rotate(image2, 70, 1.2);
+  const auto shift = cv::Point2d(-0.176 * ipc.GetCols(), 0.132 * ipc.GetRows());
+  const auto scale = 1.2;
+  const auto rotation = 70;
+  Shift(image2, shift);
+  Rotate(image2, rotation, scale);
+  LOG_DEBUG("Artificial shift: {}", shift);
+  LOG_DEBUG("Artificial rotation/scale: {}/{}", rotation, scale);
   const auto aligned = IPCAlign::Align(ipc, image1, image2);
 }
 
 void IPCDebug::DebugGradualShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 {
+  LOG_FUNCTION;
   ipc.SetDebugDirectory("../debug/peakshift");
   const cv::Mat image1 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
   const cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows) + GetNoise<IPC::Float>(crop1.size(), noiseStdev);

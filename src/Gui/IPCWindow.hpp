@@ -3,8 +3,8 @@
 
 struct IPCParameters
 {
-  i32 Rows = 64;
-  i32 Cols = 64;
+  i32 Rows = 1024;
+  i32 Cols = 1024;
   f32 BPL = 0;
   f32 BPH = 1;
   i32 L2size = 7;

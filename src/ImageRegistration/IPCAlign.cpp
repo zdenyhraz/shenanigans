@@ -9,12 +9,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
-  const bool debugMode = false;
+  static constexpr bool debugMode = true;
   if constexpr (debugMode)
     IPCDebug::DebugInputImages(ipc, image1, image2);
 
-  const f64 gamma1 = 1.5;
-  const f64 gamma2 = 1.5;
   cv::Mat img1W = image1.clone();
   cv::Mat img2W = image2.clone();
   ipc.ApplyWindow(img1W);
@@ -45,27 +43,34 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   f64 maxRadius = std::min(center.y, center.x);
   cv::warpPolar(img1FTm, img1FTm, img1FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
   cv::warpPolar(img2FTm, img2FTm, img2FTm.size(), center, maxRadius, cv::INTER_LINEAR | cv::WARP_FILL_OUTLIERS | cv::WARP_POLAR_LOG); // semilog Polar
+  const auto gamma1 = 1.0;
+  const auto gamma2 = 1.0;
+  cv::Mat showImage;
 
   if constexpr (debugMode)
-    Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition before", 0, 0, 1, 1000);
+  {
+    showImage = ColorComposition(image1, image1 * 0, gamma1, gamma2);
+    cv::hconcat(showImage, ColorComposition(image2 * 0, image2, gamma1, gamma2), showImage);
+    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+  }
 
   // rotation and scale
   auto shiftR = ipc.Calculate(img1FTm, img2FTm);
   f64 rotation = -shiftR.y / image1.rows * 360;
-  f64 scale = exp(shiftR.x * log(maxRadius) / image1.cols);
+  f64 scale = std::exp(shiftR.x * std::log(maxRadius) / image1.cols);
   Rotate(image2, -rotation, scale);
   if constexpr (debugMode)
-    Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition after rotation+scale", 0, 0, 1, 1000);
+    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
 
   // translation
   auto shiftT = ipc.Calculate(image1, image2);
   Shift(image2, -shiftT);
   if constexpr (debugMode)
   {
-    Showimg(ColorComposition(image1, image2, gamma1, gamma2), "color composition result", 0, 0, 1, 1000);
-    LOG_INFO("Evaluated rotation: {} deg", rotation);
-    LOG_INFO("Evaluated scale: {}", 1. / scale);
-    LOG_INFO("Evaluated shift: {} px", shiftT);
+    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    Showimg(showImage, "Align process color composition");
+    LOG_DEBUG("Evaluated shift: {}", shiftT);
+    LOG_DEBUG("Evaluated rotation/scale: {:.3f}/{:.3f}", rotation, 1. / scale);
   }
   return image2;
 }
@@ -88,13 +93,13 @@ cv::Mat IPCAlign::ColorComposition(const cv::Mat& img1, const cv::Mat& img2, f64
 
     for (i32 col = 0; col < img1.cols; ++col)
     {
-      img1cp[col][0] = pow(img1clr[2] * img1p[col], 1. / gamma1);
-      img1cp[col][1] = pow(img1clr[1] * img1p[col], 1. / gamma1);
-      img1cp[col][2] = pow(img1clr[0] * img1p[col], 1. / gamma1);
+      img1cp[col][0] = std::pow(img1clr[2] * img1p[col], 1. / gamma1);
+      img1cp[col][1] = std::pow(img1clr[1] * img1p[col], 1. / gamma1);
+      img1cp[col][2] = std::pow(img1clr[0] * img1p[col], 1. / gamma1);
 
-      img2cp[col][0] = pow(img2clr[2] * img2p[col], 1. / gamma2);
-      img2cp[col][1] = pow(img2clr[1] * img2p[col], 1. / gamma2);
-      img2cp[col][2] = pow(img2clr[0] * img2p[col], 1. / gamma2);
+      img2cp[col][0] = std::pow(img2clr[2] * img2p[col], 1. / gamma2);
+      img2cp[col][1] = std::pow(img2clr[1] * img2p[col], 1. / gamma2);
+      img2cp[col][2] = std::pow(img2clr[0] * img2p[col], 1. / gamma2);
     }
   }
 
