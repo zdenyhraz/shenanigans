@@ -130,6 +130,34 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
   cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
   cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
+
+  if (true) // histogram equalization
+  {
+    cv::normalize(image1, image1, 0, 255, cv::NORM_MINMAX);
+    cv::normalize(image2, image2, 0, 255, cv::NORM_MINMAX);
+    image1.convertTo(image1, CV_8U);
+    image2.convertTo(image2, CV_8U);
+
+    if (true) // CLAHE
+    {
+      auto clahe = cv::createCLAHE();
+      clahe->setClipLimit(4);
+      clahe->setTilesGridSize({3, 3});
+      clahe->apply(image1, image1);
+      clahe->apply(image2, image2);
+    }
+    else // normal
+    {
+      cv::equalizeHist(image1, image1);
+      cv::equalizeHist(image2, image2);
+    }
+
+    image1.convertTo(image1, GetMatType<IPC::Float>());
+    image2.convertTo(image2, GetMatType<IPC::Float>());
+    cv::normalize(image1, image1, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(image2, image2, 0, 1, cv::NORM_MINMAX);
+  }
+
   AddNoise<IPC::Float>(image1, noiseStdev);
   AddNoise<IPC::Float>(image2, noiseStdev);
   const auto shift = cv::Point2d(-0.176 * ipc.GetCols(), 0.132 * ipc.GetRows());

@@ -9,6 +9,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
+
   static constexpr bool debugMode = true;
   if constexpr (debugMode)
     IPCDebug::DebugInputImages(ipc, image1, image2);
@@ -46,12 +47,12 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   const auto gamma1 = 1.0;
   const auto gamma2 = 1.0;
   cv::Mat showImage;
+  cv::Mat showImage2;
 
   if constexpr (debugMode)
   {
-    showImage = ColorComposition(image1, image1 * 0, gamma1, gamma2);
-    cv::hconcat(showImage, ColorComposition(image2 * 0, image2, gamma1, gamma2), showImage);
-    cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    showImage = ColorComposition(image1, image2, gamma1, gamma2);
+    showImage2 = image2.clone();
   }
 
   // rotation and scale
@@ -60,7 +61,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   f64 scale = std::exp(shiftR.x * std::log(maxRadius) / image1.cols);
   Rotate(image2, -rotation, scale);
   if constexpr (debugMode)
+  {
     cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    cv::hconcat(showImage2, image2, showImage2);
+  }
 
   // translation
   auto shiftT = ipc.Calculate(image1, image2);
@@ -68,7 +72,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   if constexpr (debugMode)
   {
     cv::hconcat(showImage, ColorComposition(image1, image2, gamma1, gamma2), showImage);
+    cv::hconcat(showImage2, image2, showImage2);
     Showimg(showImage, "Align process color composition");
+    Showimg(showImage2, "Align process image2");
+
     LOG_DEBUG("Evaluated shift: {}", shiftT);
     LOG_DEBUG("Evaluated rotation/scale: {:.3f}/{:.3f}", rotation, 1. / scale);
   }
