@@ -151,7 +151,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
   cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
 
-  if (false) // histogram equalization
+  if (true) // histogram equalization
   {
     cv::normalize(image1, image1, 0, 255, cv::NORM_MINMAX);
     cv::normalize(image2, image2, 0, 255, cv::NORM_MINMAX);
@@ -162,7 +162,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     {
       auto clahe = cv::createCLAHE();
       clahe->setClipLimit(4);
-      clahe->setTilesGridSize({3, 3});
+      clahe->setTilesGridSize({25, 25});
       clahe->apply(image1, image1);
       clahe->apply(image2, image2);
     }
@@ -176,6 +176,13 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     image2.convertTo(image2, GetMatType<IPC::Float>());
     cv::normalize(image1, image1, 0, 1, cv::NORM_MINMAX);
     cv::normalize(image2, image2, 0, 1, cv::NORM_MINMAX);
+  }
+
+  static constexpr bool save = true;
+  if constexpr (save)
+  {
+    Saveimg("../debug/input1.png", image1, false, cv::Size(1024, 1024));
+    Saveimg("../debug/input2.png", image2, false, cv::Size(1024, 1024));
   }
 
   AddNoise<IPC::Float>(image1, noiseStdev);

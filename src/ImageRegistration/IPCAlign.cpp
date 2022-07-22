@@ -10,6 +10,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
   static constexpr bool debugMode = true;
+  static constexpr bool save = true;
   if constexpr (debugMode)
   {
     PyPlot::Plot("image1", {.z = image1, .cmap = "gray"});
@@ -64,6 +65,11 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
     showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();
   }
+  if constexpr (save)
+  {
+    Saveimg("../debug/image12.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
+    Saveimg("../debug/image2.png", image2, false, cv::Size(1024, 1024));
+  }
 
   // rotation and scale
   auto shiftR = ipc.Calculate(img1FTm, img2FTm);
@@ -74,6 +80,11 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   {
     cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
+  }
+  if constexpr (save)
+  {
+    Saveimg("../debug/image12RS.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
+    Saveimg("../debug/image2RS.png", image2, false, cv::Size(1024, 1024));
   }
 
   // translation
@@ -88,6 +99,11 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
     LOG_DEBUG("Evaluated shift: {}", shiftT);
     LOG_DEBUG("Evaluated rotation/scale: {:.3f}/{:.3f}", rotation, 1. / scale);
+  }
+  if constexpr (save)
+  {
+    Saveimg("../debug/image12RSXY.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
+    Saveimg("../debug/image2RSXY.png", image2, false, cv::Size(1024, 1024));
   }
   return image2;
 }
