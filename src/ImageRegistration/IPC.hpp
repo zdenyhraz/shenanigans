@@ -224,6 +224,8 @@ public:
 
     // L3
     cv::Mat L3 = CalculateL3(std::move(crosspower));
+    if constexpr (false)
+      FalseCorrelationsRemoval(L3);
     cv::Point2d L3peak = GetPeak(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
     if constexpr (ModeT == Mode::Debug)
@@ -270,7 +272,8 @@ public:
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
         if constexpr (ModeT == Mode::Debug)
-          LOG_DEBUG("Iterative refinement {} L2Upeak: {}", iter, L2Upeak);
+          LOG_DEBUG("Iterative refinement {} L2Upeak: {} ({})", iter, L2Upeak,
+              L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size));
         if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
           break;
 
@@ -283,8 +286,11 @@ public:
         if (AccuracyReached(L1peak, L1mid))
         {
           if constexpr (ModeT == Mode::Debug)
+          {
             IPCDebug::DebugL1A(*this, L1, L3peak - L3mid,
                 L2Upeak - cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y)) - L2Umid, GetUpsampleCoeff(L2size), true);
+            LOG_DEBUG("Final IPC shift: {}", L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size));
+          }
           return L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size);
         }
       }
@@ -294,7 +300,8 @@ public:
     }
 
     if constexpr (ModeT == Mode::Debug)
-      LOG_WARNING("L1 failed to converge with all L1ratios, return non-iterative subpixel shift");
+      LOG_WARNING(
+          "L1 failed to converge with all L1ratios, return non-iterative subpixel shift: {}", GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size));
     return GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size);
   }
 
@@ -563,4 +570,6 @@ private:
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
     return L3peak - L3mid + L2peak - L2mid;
   }
+
+  void FalseCorrelationsRemoval(cv::Mat& L3) const;
 };

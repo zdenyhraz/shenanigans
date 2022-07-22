@@ -1,4 +1,5 @@
 #include "StuffWindow.hpp"
+#include "IPCWindow.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 
@@ -18,12 +19,16 @@ void StuffWindow::Render()
     if (ImGui::Button("Evolution meta optimization"))
       LaunchAsync([]() { EvolutionOptimization(true); });
 
+    if (ImGui::Button("False correlations removal"))
+      LaunchAsync([]() { FalseCorrelationsRemoval(); });
+
     ImGui::EndTabItem();
   }
 }
 
 void StuffWindow::EvolutionOptimization(bool meta)
 {
+  LOG_FUNCTION;
   static constexpr i32 N = 2;
   static constexpr i32 runs = 20;
   static constexpr i32 maxFunEvals = 1000;
@@ -50,4 +55,23 @@ void StuffWindow::EvolutionOptimization(bool meta)
     Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   else
     Evo.Optimize(OptimizationTestFunctions::Rosenbrock, OptimizationTestFunctions::RosenbrockNoisy<noiseStddev>);
+}
+
+void StuffWindow::FalseCorrelationsRemoval()
+{
+  LOG_FUNCTION;
+  auto& ipc = IPCWindow::GetIPC();
+  auto image1 = LoadUnitFloatImage<IPC::Float>("../data/articles/swind/source/1/cropped/crop1.PNG");
+  auto image2 = LoadUnitFloatImage<IPC::Float>("../data/articles/swind/source/1/cropped/crop9.PNG");
+
+  if (false) // crop
+  {
+    const auto centerx = 0.1;
+    const auto centery = 0.7;
+    const auto size = 2 * centerx * image1.cols;
+    image1 = RoiCrop(image1, centerx * image1.cols, centery * image1.rows, size, size);
+    image2 = RoiCrop(image2, centerx * image2.cols, centery * image2.rows, size, size);
+  }
+  ipc.SetSize(image1.size());
+  ipc.Calculate<IPC::Mode::Debug>(image1, image2);
 }

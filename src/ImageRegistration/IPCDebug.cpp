@@ -194,7 +194,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   Rotate(image2, rotation, scale);
   LOG_DEBUG("Artificial shift: {}", shift);
   LOG_DEBUG("Artificial rotation/scale: {}/{}", rotation, scale);
-  const auto aligned = IPCAlign::Align(ipc, image1, image2);
+  IPCAlign::Align(ipc, image1, image2);
 }
 
 void IPCDebug::DebugGradualShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)

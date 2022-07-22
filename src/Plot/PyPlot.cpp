@@ -60,7 +60,7 @@ void PyPlot::AddDefaultPlotData(const std::string& name, py::dict& plotData)
   if (not plotData.contains("aspectratio"))
     plotData["aspectratio"] = 1;
   if (not plotData.contains("save"))
-    plotData["save"] = mSave ? fmt::format("../debug/plot/{}.png", name) : "";
+    plotData["save"] = mSave ? fmt::format("../debug/{}.png", name) : "";
 }
 
 py::dict PyPlot::GetDefaultPlotData(const std::string& name)
