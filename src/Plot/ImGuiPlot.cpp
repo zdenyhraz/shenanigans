@@ -50,7 +50,9 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
   {
     ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
     ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
-    ImPlot::SetupAxis(ImAxis_Y1, data.ylabel.c_str(), data.log ? ImPlotAxisFlags_LogScale : ImPlotAxisFlags_None);
+    if (data.log)
+      ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
+
     ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
     if (not data.y2s.empty())
       ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
@@ -96,7 +98,7 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, data.cmap);
+  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, nullptr, data.cmap);
 }
 
 void ImGuiPlot::Render()

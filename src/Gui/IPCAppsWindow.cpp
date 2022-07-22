@@ -1,14 +1,14 @@
-#include "IPCOptimizeWindow.hpp"
+#include "IPCAppsWindow.hpp"
 #include "IPCWindow.hpp"
 #include "ImageRegistration/ImageRegistrationDataset.hpp"
 
-void IPCOptimizeWindow::Initialize()
+void IPCAppsWindow::Initialize()
 {
 }
 
-void IPCOptimizeWindow::Render()
+void IPCAppsWindow::Render()
 {
-  if (ImGui::BeginTabItem("IPC opt"))
+  if (ImGui::BeginTabItem("IPC apps"))
   {
     ImGui::Separator();
     ImGui::ProgressBar(mProgressStatus.progress, ImVec2(0.f, 0.f));
@@ -65,7 +65,7 @@ void IPCOptimizeWindow::Render()
   }
 }
 
-std::string IPCOptimizeWindow::GetCurrentDatasetPath()
+std::string IPCAppsWindow::GetCurrentDatasetPath()
 {
   return fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{:.3f}ns", IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows(),
       mParameters.iters, mParameters.noiseStddev);

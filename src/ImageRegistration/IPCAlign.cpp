@@ -10,7 +10,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
   static constexpr bool debugMode = true;
-  static constexpr bool save = true;
+  static constexpr bool save = false;
   if constexpr (debugMode)
   {
     PyPlot::Plot("image1", {.z = image1, .cmap = "gray"});
@@ -138,5 +138,5 @@ cv::Mat IPCAlign::ColorComposition(const cv::Mat& img1, const cv::Mat& img2, f64
 
   cv::normalize(img1c, img1c, 0, 1, cv::NORM_MINMAX);
   cv::normalize(img2c, img2c, 0, 1, cv::NORM_MINMAX);
-  return (img1c + img2c) / 2;
+  return img1c + img2c;
 }

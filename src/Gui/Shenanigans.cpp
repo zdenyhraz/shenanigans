@@ -1,7 +1,7 @@
 #include "Shenanigans.hpp"
 #include "Gui/Gui.hpp"
 #include "IPCWindow.hpp"
-#include "IPCOptimizeWindow.hpp"
+#include "IPCAppsWindow.hpp"
 #include "DiffrotWindow.hpp"
 #include "SwindWindow.hpp"
 #include "StuffWindow.hpp"
@@ -39,7 +39,7 @@ try
     if (ImGui::BeginTabBar("Windows"))
     {
       IPCWindow::Render();
-      IPCOptimizeWindow::Render();
+      IPCAppsWindow::Render();
       DiffrotWindow::Render();
       SwindWindow::Render();
       StuffWindow::Render();
@@ -67,7 +67,7 @@ void Shenanigans::Initialize()
   PROFILE_FUNCTION;
   PyPlot::Initialize();
   IPCWindow::Initialize();
-  IPCOptimizeWindow::Initialize();
+  IPCAppsWindow::Initialize();
   DiffrotWindow::Initialize();
   SwindWindow::Initialize();
   StuffWindow::Initialize();

@@ -14,7 +14,7 @@ struct IPCOptimizeParameters
   i32 popSize = 18;
 };
 
-class IPCOptimizeWindow
+class IPCAppsWindow
 {
 public:
   static void Initialize();

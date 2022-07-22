@@ -178,7 +178,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     cv::normalize(image2, image2, 0, 1, cv::NORM_MINMAX);
   }
 
-  static constexpr bool save = true;
+  static constexpr bool save = false;
   if constexpr (save)
   {
     Saveimg("../debug/input1.png", image1, false, cv::Size(1024, 1024));
