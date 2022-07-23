@@ -25,14 +25,16 @@ public:
 
     const auto beginUB = mMap.upper_bound(keyBegin);
     const auto endUB = mMap.upper_bound(keyEnd);
-    const auto endVal = std::prev(endUB)->second; // copy before erase
+    auto endVal = std::prev(endUB)->second; // copy val before erase
 
-    // erase everything inbetween keyBegin & keyEnd
+    // fix adjacent intervals with equal values
+
+    // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
     mMap.erase(beginUB, endUB);
 
-    // insert keyBegin & keyEnd (overwrite existing)
+    // insert keyBegin & keyEnd (overwrite existing elements)
     mMap.insert_or_assign(keyBegin, val);
-    mMap.insert_or_assign(keyEnd, endVal);
+    mMap.insert_or_assign(keyEnd, std::move(endVal));
   }
 
   // look-up of the value associated with key
@@ -64,7 +66,9 @@ public:
         LOG_DEBUG("[{}/{}] Adding interval [{}, {}) = {}", i + 1, n, begin, end, val);
     }
 
-    usize fails = 0;
+    usize lookupfails = 0;
+    usize adjacencyfails = 0;
+    u8 prev = map[0];
     for (int key = 0; key < 256; ++key)
     {
       if (map[key] == values[key])
@@ -74,12 +78,25 @@ public:
       else
       {
         LOG_ERROR("IntervalMap[{}] = {} != {} test NOK", key, map[key], values[key]);
-        ++fails;
+        ++lookupfails;
       }
+
+      if (key > 0 and map[key] == prev)
+      {
+        LOG_ERROR("IntervalMap[{}] = {} && IntervalMap[{}] = {} test NOK", key - 1, prev, key, map[key]);
+        ++adjacencyfails;
+      }
+      prev = map[key];
     }
-    if (fails == 0)
-      LOG_SUCCESS("Test passed! ({} fails)", fails);
+
+    if (lookupfails == 0)
+      LOG_SUCCESS("Lookup test passed! ({} fails)", lookupfails);
     else
-      LOG_ERROR("Test failed! ({} fails)", fails);
+      LOG_ERROR("Lookup test failed! ({} fails)", lookupfails);
+
+    if (adjacencyfails == 0)
+      LOG_SUCCESS("Adjacency test passed! ({} fails)", adjacencyfails);
+    else
+      LOG_ERROR("Adjacency test failed! ({} fails)", adjacencyfails);
   }
 };
