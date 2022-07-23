@@ -2,6 +2,7 @@
 #include "IPCWindow.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
+#include "Random/IntervalMap.hpp"
 
 void StuffWindow::Initialize()
 {
@@ -21,6 +22,9 @@ void StuffWindow::Render()
 
     if (ImGui::Button("False correlations removal"))
       LaunchAsync([]() { FalseCorrelationsRemoval(); });
+
+    if (ImGui::Button("Interval map test"))
+      LaunchAsync([]() { IntervalMap<int, std::string>::Test(); });
 
     ImGui::EndTabItem();
   }

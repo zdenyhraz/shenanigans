@@ -8,6 +8,7 @@
 
 void Shenanigans::Run()
 {
+  std::srand(std::time(nullptr));
   ImGuiLogger::Get().SetFallback(false);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, true);
