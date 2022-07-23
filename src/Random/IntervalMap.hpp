@@ -23,14 +23,16 @@ public:
     if (not(keyBegin < keyEnd))
       return;
 
-    const auto endVal = (--mMap.upper_bound(keyEnd))->second;
+    const auto beginUB = mMap.upper_bound(keyBegin);
+    const auto endUB = mMap.upper_bound(keyEnd);
+    const auto endVal = std::prev(endUB)->second; // copy before erase
 
-    // erase everything inbetween
-    mMap.erase(mMap.upper_bound(keyBegin), mMap.upper_bound(keyEnd));
+    // erase everything inbetween keyBegin & keyEnd
+    mMap.erase(beginUB, endUB);
 
-    // insert keyBegin & keyEnd, overwrite if already exists
-    mMap[keyBegin] = val;
-    mMap[keyEnd] = endVal;
+    // insert keyBegin & keyEnd (overwrite existing)
+    mMap.insert_or_assign(keyBegin, val);
+    mMap.insert_or_assign(keyEnd, endVal);
   }
 
   // look-up of the value associated with key
