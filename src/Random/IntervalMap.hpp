@@ -46,8 +46,7 @@ public:
   {
     LOG_FUNCTION;
     IntervalMap<u8, u8> map(0);
-    std::vector<u8> values;
-    values.resize(256);
+    std::array<u8, 256> values{};
 
     const int n = 1e7;
     for (int i = 0; i < n; ++i)
@@ -76,7 +75,6 @@ public:
         ++fails;
       }
     }
-    LOG_DEBUG("");
     if (fails == 0)
       LOG_SUCCESS("Test passed! ({} fails)", fails);
     else
