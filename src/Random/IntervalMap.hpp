@@ -28,8 +28,8 @@ public:
     const auto endIt = mMap.upper_bound(keyEnd);
     auto endVal = std::prev(endIt)->second; // copy val before erase
 
-    // do not insert if adjacent intervals already have the same value to avoid duplicate (redundant) keys
-    // keyBegin: always insert (update) if the keyBegin is the lowest
+    // do not insert if adjacent keys already have the same value to avoid redundant keys
+    // keyBegin: always insert (update) if the keyBegin is the lowest key
     // keyBegin: do not insert if previous key has the same value as val (backward redundancy with previous key)
     // keyEnd: do not insert if next key has the same value as endVal (forward redundancy with following key)
     // keyEnd: do not insert if endVal == val (backward redundancy with keyBegin)
@@ -39,7 +39,7 @@ public:
     // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
     mMap.erase(beginIt != mMap.begin() ? beginIt : std::next(beginIt), endIt);
 
-    // insert keyBegin & keyEnd (overwrite existing elements)
+    // conditionally insert keyBegin & keyEnd
     if (beginIns)
       mMap.insert_or_assign(keyBegin, val);
     if (endIns)
@@ -78,12 +78,12 @@ public:
     IntervalMap<u8, u8> map(0);
     std::array<u8, 256> values{};
 
-    const int nintervals = 1e3;
+    const int nintervals = 1e4;
     for (int i = 0; i < nintervals; ++i)
     {
       const u8 begin = rand() % 256;
       const u8 end = rand() % 256;
-      const u8 val = rand() % 5;
+      const u8 val = rand() % 3;
       for (int key = begin; key < end; ++key)
         values[key] = val;
       map.Assign(begin, end, val);
