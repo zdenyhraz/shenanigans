@@ -23,27 +23,53 @@ public:
     if (not(keyBegin < keyEnd))
       return;
 
-    const auto beginUB = mMap.upper_bound(keyBegin);
-    const auto endUB = mMap.upper_bound(keyEnd);
-    auto endVal = std::prev(endUB)->second; // copy val before erase
+    const auto prevMap = mMap; // debug copy
+    const auto beginIt = mMap.lower_bound(keyBegin);
+    const auto endIt = mMap.upper_bound(keyEnd);
+    auto endVal = std::prev(endIt)->second; // copy val before erase
 
-    // fix adjacent intervals with equal values
+    // do not insert if adjacent intervals already have the same value to avoid duplicate (redundant) keys
+    // keyBegin: always insert (update) if the keyBegin is the lowest
+    // keyBegin: do not insert if previous key has the same value as val (backward redundancy with previous key)
+    // keyEnd: do not insert if next key has the same value as endVal (forward redundancy with following key)
+    // keyEnd: do not insert if endVal == val (backward redundancy with keyBegin)
+    const bool beginIns = beginIt == mMap.begin() ? true : std::prev(beginIt)->second != val;
+    const bool endIns = (endIt == mMap.end() ? true : endIt->second != endVal) and endVal != val;
 
     // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
-    mMap.erase(beginUB, endUB);
+    mMap.erase(beginIt != mMap.begin() ? beginIt : std::next(beginIt), endIt);
 
     // insert keyBegin & keyEnd (overwrite existing elements)
-    mMap.insert_or_assign(keyBegin, val);
-    mMap.insert_or_assign(keyEnd, std::move(endVal));
+    if (beginIns)
+      mMap.insert_or_assign(keyBegin, val);
+    if (endIns)
+      mMap.insert_or_assign(keyEnd, std::move(endVal));
+
+    InternalTest(keyBegin, keyEnd, val, prevMap);
   }
 
   // look-up of the value associated with key
   const Val& operator[](const Key& key) const { return (--mMap.upper_bound(key))->second; }
 
-  void Print() const
+  const std::map<Key, Val>& GetMap() const { return mMap; }
+
+  void InternalTest(const Key& keyBegin, const Key& keyEnd, const Val& val, const std::map<Key, Val>& prevMap)
   {
-    for (const auto& [key, val] : mMap)
-      LOG_INFO("IntervalMap[{}] = {}", key, val);
+    auto prevVal = mMap.begin()->second;
+    for (const auto& [currkey, currval] : mMap)
+    {
+      if (currkey > 0 and currval == prevVal)
+      {
+        for (const auto& [keyy, vall] : prevMap)
+          LOG_DEBUG("IntervalMap Before[{}] = {}", keyy, vall);
+        LOG_DEBUG("> Inserting interval [{}, {}) = {}", keyBegin, keyEnd, val);
+        for (const auto& [keyy, vall] : mMap)
+          LOG_DEBUG("IntervalMap After[{}] = {}", keyy, vall);
+
+        throw std::runtime_error("Adjacency test failed");
+      }
+      prevVal = currval;
+    }
   }
 
   static void Test()
@@ -52,41 +78,44 @@ public:
     IntervalMap<u8, u8> map(0);
     std::array<u8, 256> values{};
 
-    const int n = 1e7;
-    for (int i = 0; i < n; ++i)
+    const int nintervals = 1e3;
+    for (int i = 0; i < nintervals; ++i)
     {
       const u8 begin = rand() % 256;
       const u8 end = rand() % 256;
-      const u8 val = rand() % 256;
+      const u8 val = rand() % 5;
       for (int key = begin; key < end; ++key)
         values[key] = val;
       map.Assign(begin, end, val);
-
-      if (n <= 1000)
-        LOG_DEBUG("[{}/{}] Adding interval [{}, {}) = {}", i + 1, n, begin, end, val);
     }
 
     usize lookupfails = 0;
-    usize adjacencyfails = 0;
-    u8 prev = map[0];
     for (int key = 0; key < 256; ++key)
     {
       if (map[key] == values[key])
       {
-        LOG_SUCCESS("IntervalMap[{}] = {} test OK", key, values[key]);
+        // LOG_SUCCESS("IntervalMap[{}] = {} test OK", key, values[key]);
       }
       else
       {
         LOG_ERROR("IntervalMap[{}] = {} != {} test NOK", key, map[key], values[key]);
         ++lookupfails;
       }
+    }
 
-      if (key > 0 and map[key] == prev)
+    usize adjacencyfails = 0;
+    auto prevKey = 0;
+    auto prevVal = map.GetMap().begin()->second;
+    for (const auto& [key, value] : map.GetMap())
+    {
+      LOG_DEBUG("IntervalMap internal map[{}] = {}", key, value);
+      if (key > 0 and value == prevVal)
       {
-        LOG_ERROR("IntervalMap[{}] = {} && IntervalMap[{}] = {} test NOK", key - 1, prev, key, map[key]);
+        LOG_ERROR("IntervalMap[{}/{}] = {} test NOK", key, prevKey, value);
         ++adjacencyfails;
       }
-      prev = map[key];
+      prevKey = key;
+      prevVal = value;
     }
 
     if (lookupfails == 0)
@@ -98,5 +127,8 @@ public:
       LOG_SUCCESS("Adjacency test passed! ({} fails)", adjacencyfails);
     else
       LOG_ERROR("Adjacency test failed! ({} fails)", adjacencyfails);
+
+    if (map.GetMap().begin()->first != 0)
+      LOG_ERROR("Missing first ([0]) element!");
   }
 };
