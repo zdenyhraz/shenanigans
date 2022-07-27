@@ -38,7 +38,7 @@ public:
     const bool endIns = (endIt == mMap.end() ? true : endIt->second != endVal) and endVal != val;
 
     // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
-    mMap.erase(beginIt == mMap.begin() ? std::next(beginIt) : beginIt, endIt);
+    mMap.erase(beginIt, endIt);
 
     // conditionally insert/assign keyBegin & keyEnd
     if (beginIns)
