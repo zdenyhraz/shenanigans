@@ -2,7 +2,7 @@
 #include <map>
 
 template <typename K, typename V>
-class interval_map
+class interval_map2
 {
 protected:
   std::map<K, V> m_map;
@@ -10,7 +10,7 @@ protected:
 public:
   // constructor associates whole range of K with val by inserting (K_min, val)
   // into the map
-  interval_map(V const& val) { m_map.insert(m_map.end(), std::make_pair(std::numeric_limits<K>::lowest(), val)); }
+  interval_map2(V const& val) { m_map.insert(m_map.end(), std::make_pair(std::numeric_limits<K>::lowest(), val)); }
 
   // Assign value val to interval [keyBegin, keyEnd).
   // Overwrite previous values in this interval.
