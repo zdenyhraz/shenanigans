@@ -16,7 +16,7 @@ public:
   // includes keyBegin, but excludes keyEnd.
   // If !( keyBegin < keyEnd ), this designates an empty interval,
   // and assign must do nothing.
-  void assign(K const& keyBegin, K const& keyEnd, V const& val)
+  void assign_orig(K const& keyBegin, K const& keyEnd, V const& val)
   {
     if (not(keyBegin < keyEnd))
       return;
@@ -43,6 +43,49 @@ public:
       m_map.insert_or_assign(keyBegin, val);
     if (endIns)
       m_map.insert_or_assign(keyEnd, std::move(endVal));
+  }
+
+  void assign(K const& keyBegin, K const& keyEnd, V const& val)
+  {
+    if (not(keyBegin < keyEnd))
+      return;
+
+    const auto beginIt = m_map.upper_bound(keyBegin);
+    auto it = beginIt;
+    V valEnd = beginIt == m_map.begin() ? m_valBegin : std::prev(beginIt)->second;
+
+    if (beginIt == m_map.begin() ? val != m_valBegin : val != std::prev(beginIt)->second)
+    {
+      it = m_map.insert_or_assign(beginIt, keyBegin, val);
+      it = (it != m_map.begin() and (it->second == std::prev(it)->second)) ? m_map.erase(it) : std::next(it);
+    }
+
+    while (it != m_map.end())
+    {
+      if (it->first < keyEnd)
+      {
+        valEnd = it->second;
+        it = m_map.erase(it);
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    if ((it == m_map.end() ? true : valEnd != it->second) and valEnd != val)
+    {
+      it = m_map.emplace_hint(it, keyEnd, valEnd);
+      if (it != m_map.begin() and (it->second == std::prev(it)->second))
+        m_map.erase(it);
+    }
+
+    if (false)
+    {
+      LOG_DEBUG("interval_map after [{},{})={}", keyBegin, keyEnd, val);
+      for (const auto& [key, value] : m_map)
+        LOG_DEBUG("interval_map[{}] = {}", key, value);
+    }
   }
 
   // look-up of the value associated with key

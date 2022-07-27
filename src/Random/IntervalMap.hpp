@@ -8,11 +8,12 @@ class IntervalMap
 {
 protected:
   std::map<Key, Val> mMap;
+  Val m_valBegin;
 
 public:
   // constructor associates whole range of K with val by inserting (K_min, val)
   // into the map
-  IntervalMap(const Val& val) { mMap.insert(mMap.end(), std::make_pair(std::numeric_limits<Key>::lowest(), val)); }
+  IntervalMap(const Val& val) : m_valBegin(val) {}
 
   // Assign value val to interval [keyBegin, keyEnd).
   // Overwrite previous values in this interval.
@@ -28,14 +29,14 @@ public:
     const auto prevMap = mMap; // debug copy
     const auto beginIt = mMap.lower_bound(keyBegin);
     const auto endIt = mMap.upper_bound(keyEnd);
-    auto endVal = std::prev(endIt)->second; // copy val before erase
+    auto endVal = endIt == mMap.begin() ? m_valBegin : std::prev(endIt)->second;
 
     // do not insert if adjacent keys already have the same value to avoid redundant keys
     // keyBegin: always insert (update) if the keyBegin is the lowest key
     // keyBegin: do not insert if previous key has the same value as val (backward redundancy with previous key)
     // keyEnd: do not insert if next key has the same value as endVal (forward redundancy with following key)
     // keyEnd: do not insert if endVal == val (backward redundancy with keyBegin)
-    const bool beginIns = beginIt == mMap.begin() ? true : std::prev(beginIt)->second != val;
+    const bool beginIns = beginIt == mMap.begin() ? val != m_valBegin : val != std::prev(beginIt)->second;
     const bool endIns = (endIt == mMap.end() ? true : endIt->second != endVal) and endVal != val;
 
     // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
@@ -47,11 +48,29 @@ public:
     if (endIns)
       mMap.insert_or_assign(keyEnd, std::move(endVal));
 
-    InternalTest(keyBegin, keyEnd, val, prevMap);
+    // InternalTest(keyBegin, keyEnd, val, prevMap);
+
+    if (false)
+    {
+      LOG_INFO("IntervalMap after [{},{})={}", keyBegin, keyEnd, val);
+      for (const auto& [key, value] : mMap)
+        LOG_INFO("IntervalMap[{}] = {}", key, value);
+    }
   }
 
   // look-up of the value associated with key
-  const Val& operator[](const Key& key) const { return (--mMap.upper_bound(key))->second; }
+  const Val& operator[](const Key& key) const
+  {
+    auto it = mMap.upper_bound(key);
+    if (it == mMap.begin())
+    {
+      return m_valBegin;
+    }
+    else
+    {
+      return (--it)->second;
+    }
+  }
 
   const std::map<Key, Val>& GetMap() const { return mMap; }
 
@@ -81,22 +100,44 @@ public:
     LOG_FUNCTION;
     const u8 valBegin = 123;
     IntervalMap<u8, u8> map(valBegin);
-    interval_map2<u8, u8> map2(valBegin);
     interval_map<u8, u8> map_main(valBegin);
     std::array<u8, 256> values;
     std::fill(values.begin(), values.end(), valBegin);
 
-    const int nintervals = 1e2;
+    const int nintervals = 1e4;
     for (int i = 0; i < nintervals; ++i)
     {
+      const auto map_backup = map.GetMap();
+      const auto map_main_backup = map_main.get_map();
+
       const u8 begin = rand() % 256;
       const u8 end = rand() % 256;
       const u8 val = rand() % 4;
       for (int key = begin; key < end; ++key)
         values[key] = val;
       map.Assign(begin, end, val);
-      map2.assign(begin, end, val);
       map_main.assign(begin, end, val);
+
+      if (map_main.get_map() != map.GetMap())
+      {
+        LOG_ERROR("interval_map/MyIntervalMap internals failed! (inserting [{},{})={})", begin, end, val);
+
+        for (const auto& [key, value] : map_backup)
+          LOG_INFO("IntervalMapBefore[{}] = {}", key, value);
+        LOG_INFO("");
+        for (const auto& [key, value] : map.GetMap())
+          LOG_INFO("IntervalMapAfter[{}] = {}", key, value);
+
+        LOG_TRACE("");
+
+        for (const auto& [key, value] : map_main_backup)
+          LOG_DEBUG("interval_map_before[{}] = {}", key, value);
+        LOG_DEBUG("");
+        for (const auto& [key, value] : map_main.get_map())
+          LOG_DEBUG("interval_map_after[{}] = {}", key, value);
+
+        throw std::runtime_error("fail");
+      }
     }
 
     usize lookupfails = 0;
@@ -108,7 +149,7 @@ public:
       }
       else
       {
-        LOG_ERROR("interval_map[{}] = {} != {} test NOK", key, map_main[key], values[key]);
+        // LOG_ERROR("interval_map[{}] = {} != {} test NOK", key, map_main[key], values[key]);
         ++lookupfails;
       }
     }
@@ -127,6 +168,9 @@ public:
       prevVal = val;
     }
 
+    for (const auto& [key, value] : map.GetMap())
+      LOG_INFO("IntervalMap[{}] = {}", key, value);
+
     for (const auto& [key, value] : map_main.get_map())
       LOG_DEBUG("interval_map[{}] = {}", key, value);
 
@@ -140,10 +184,10 @@ public:
     else
       LOG_ERROR("Adjacency test failed! ({} fails)", adjacencyfails);
 
-    if (map.GetMap() == map2.get_map())
-      LOG_SUCCESS("MyIntervalMap/interval_map2 internals passed! ({})", map.Size());
+    if (map_main.get_map() == map.GetMap())
+      LOG_SUCCESS("interval_map/MyIntervalMap internals passed! ({})", map.Size());
     else
-      LOG_ERROR("MyIntervalMap/interval_map2 internals failed! ({}/{})", map.Size(), map2.size());
+      LOG_ERROR("interval_map/MyIntervalMap internals failed! ({}/{})", map_main.get_map().size(), map.Size());
 
     if (const auto& [key, value] = *map_main.get_map().begin(); value != valBegin)
       LOG_SUCCESS("First element test passed! ({} != {})", value, valBegin);
