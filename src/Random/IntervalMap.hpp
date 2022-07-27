@@ -98,100 +98,92 @@ public:
   static void Test()
   {
     LOG_FUNCTION;
-    const u8 valBegin = 123;
-    IntervalMap<u8, u8> map(valBegin);
-    interval_map<u8, u8> map_main(valBegin);
-    std::array<u8, 256> values;
-    std::fill(values.begin(), values.end(), valBegin);
-
-    const int nintervals = 1e4;
-    for (int i = 0; i < nintervals; ++i)
+    const int ntrials = 2000;
+    for (int trial = 0; trial < ntrials; ++trial)
     {
-      const auto map_backup = map.GetMap();
-      const auto map_main_backup = map_main.get_map();
+      if (trial % (ntrials / 20) == 0)
+        LOG_DEBUG("Test trial {}/{}", trial + 1, ntrials);
+      const u8 valBegin = 123;
+      IntervalMap<u8, u8> map(valBegin);
+      interval_map<u8, u8> map_main(valBegin);
+      std::array<u8, 256> values;
+      std::fill(values.begin(), values.end(), valBegin);
 
-      const u8 begin = rand() % 256;
-      const u8 end = rand() % 256;
-      const u8 val = rand() % 4;
-      for (int key = begin; key < end; ++key)
-        values[key] = val;
-      map.Assign(begin, end, val);
-      map_main.assign(begin, end, val);
+      const int nintervals = 1e4;
+      for (int i = 0; i < nintervals; ++i)
+      {
+        const auto map_backup = map.GetMap();
+        const auto map_main_backup = map_main.get_map();
+
+        const u8 begin = rand() % 256;
+        const u8 end = rand() % 256;
+        const u8 val = rand() % 5;
+        for (int key = begin; key < end; ++key)
+          values[key] = val;
+        map.Assign(begin, end, val);
+        map_main.assign(begin, end, val);
+
+        if (map_main.get_map() != map.GetMap())
+        {
+          LOG_ERROR("interval_map/MyIntervalMap internals failed! (inserting [{},{})={})", begin, end, val);
+
+          for (const auto& [key, value] : map_backup)
+            LOG_INFO("IntervalMapBefore[{}] = {}", key, value);
+          LOG_INFO("");
+          for (const auto& [key, value] : map.GetMap())
+            LOG_INFO("IntervalMapAfter[{}] = {}", key, value);
+
+          LOG_TRACE("");
+
+          for (const auto& [key, value] : map_main_backup)
+            LOG_DEBUG("interval_map_before[{}] = {}", key, value);
+          LOG_DEBUG("");
+          for (const auto& [key, value] : map_main.get_map())
+            LOG_DEBUG("interval_map_after[{}] = {}", key, value);
+
+          throw std::runtime_error("maps not equal");
+        }
+      }
+
+      usize lookupfails = 0;
+      for (int key = 0; key < 256; ++key)
+        if (map_main[key] != values[key])
+          ++lookupfails;
+
+      usize adjacencyfails = 0;
+      u8 prevVal = valBegin;
+      for (const auto& [key, val] : map_main.get_map())
+      {
+        if (val == prevVal)
+          ++adjacencyfails;
+        prevVal = val;
+      }
+
+      if (lookupfails > 0 or adjacencyfails > 0)
+      {
+        for (const auto& [key, value] : map.GetMap())
+          LOG_INFO("IntervalMap[{}] = {}", key, value);
+
+        for (const auto& [key, value] : map_main.get_map())
+          LOG_DEBUG("interval_map[{}] = {}", key, value);
+      }
+
+      if (lookupfails > 0)
+        throw std::runtime_error(fmt::format("Lookup test failed! ({} fails)", lookupfails));
+
+      if (adjacencyfails > 0)
+        throw std::runtime_error(fmt::format("Adjacency test failed! ({} fails)", adjacencyfails));
 
       if (map_main.get_map() != map.GetMap())
-      {
-        LOG_ERROR("interval_map/MyIntervalMap internals failed! (inserting [{},{})={})", begin, end, val);
+        throw std::runtime_error(fmt::format("interval_map/MyIntervalMap internals failed! ({}/{})", map_main.get_map().size(), map.Size()));
 
-        for (const auto& [key, value] : map_backup)
-          LOG_INFO("IntervalMapBefore[{}] = {}", key, value);
-        LOG_INFO("");
-        for (const auto& [key, value] : map.GetMap())
-          LOG_INFO("IntervalMapAfter[{}] = {}", key, value);
-
-        LOG_TRACE("");
-
-        for (const auto& [key, value] : map_main_backup)
-          LOG_DEBUG("interval_map_before[{}] = {}", key, value);
-        LOG_DEBUG("");
-        for (const auto& [key, value] : map_main.get_map())
-          LOG_DEBUG("interval_map_after[{}] = {}", key, value);
-
-        throw std::runtime_error("fail");
-      }
+      if (const auto& [key, value] = *map_main.get_map().begin(); value == valBegin)
+        throw std::runtime_error(fmt::format("First element test failed!  ({} == {})", value, valBegin));
     }
 
-    usize lookupfails = 0;
-    for (int key = 0; key < 256; ++key)
-    {
-      if (map_main[key] == values[key])
-      {
-        // LOG_SUCCESS("IntervalMap[{}] = {} test OK", key, values[key]);
-      }
-      else
-      {
-        // LOG_ERROR("interval_map[{}] = {} != {} test NOK", key, map_main[key], values[key]);
-        ++lookupfails;
-      }
-    }
-
-    usize adjacencyfails = 0;
-    u8 prevKey = 0;
-    u8 prevVal = valBegin;
-    for (const auto& [key, val] : map_main.get_map())
-    {
-      if (val == prevVal)
-      {
-        LOG_ERROR("interval_map[{}/{}] = {} test NOK", key, prevKey, val);
-        ++adjacencyfails;
-      }
-      prevKey = key;
-      prevVal = val;
-    }
-
-    for (const auto& [key, value] : map.GetMap())
-      LOG_INFO("IntervalMap[{}] = {}", key, value);
-
-    for (const auto& [key, value] : map_main.get_map())
-      LOG_DEBUG("interval_map[{}] = {}", key, value);
-
-    if (lookupfails == 0)
-      LOG_SUCCESS("Lookup test passed!");
-    else
-      LOG_ERROR("Lookup test failed! ({} fails)", lookupfails);
-
-    if (adjacencyfails == 0)
-      LOG_SUCCESS("Adjacency test passed!");
-    else
-      LOG_ERROR("Adjacency test failed! ({} fails)", adjacencyfails);
-
-    if (map_main.get_map() == map.GetMap())
-      LOG_SUCCESS("interval_map/MyIntervalMap internals passed! ({})", map.Size());
-    else
-      LOG_ERROR("interval_map/MyIntervalMap internals failed! ({}/{})", map_main.get_map().size(), map.Size());
-
-    if (const auto& [key, value] = *map_main.get_map().begin(); value != valBegin)
-      LOG_SUCCESS("First element test passed! ({} != {})", value, valBegin);
-    else
-      LOG_ERROR("First element test failed!  ({} == {})", value, valBegin);
+    LOG_SUCCESS("First element test passed!");
+    LOG_SUCCESS("Lookup test passed!");
+    LOG_SUCCESS("Adjacency test passed!");
+    LOG_SUCCESS("interval_map/MyIntervalMap internals passed!");
   }
 };
