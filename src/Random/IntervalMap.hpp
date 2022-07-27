@@ -124,12 +124,12 @@ public:
     }
 
     if (lookupfails == 0)
-      LOG_SUCCESS("Lookup test passed! ({} fails)", lookupfails);
+      LOG_SUCCESS("Lookup test passed!");
     else
       LOG_ERROR("Lookup test failed! ({} fails)", lookupfails);
 
     if (adjacencyfails == 0)
-      LOG_SUCCESS("Adjacency test passed! ({} fails)", adjacencyfails);
+      LOG_SUCCESS("Adjacency test passed!");
     else
       LOG_ERROR("Adjacency test failed! ({} fails)", adjacencyfails);
 
