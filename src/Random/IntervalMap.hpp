@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include "IntervalMap2.hpp"
 
 template <typename Key, typename Val>
 class IntervalMap
@@ -37,9 +38,9 @@ public:
     const bool endIns = (endIt == mMap.end() ? true : endIt->second != endVal) and endVal != val;
 
     // erase everything inbetween keyBegin & keyEnd (overwrite previous values in this interval)
-    mMap.erase(beginIt != mMap.begin() ? beginIt : std::next(beginIt), endIt);
+    mMap.erase(beginIt == mMap.begin() ? std::next(beginIt) : beginIt, endIt);
 
-    // conditionally insert keyBegin & keyEnd
+    // conditionally insert/assign keyBegin & keyEnd
     if (beginIns)
       mMap.insert_or_assign(keyBegin, val);
     if (endIns)
@@ -72,10 +73,13 @@ public:
     }
   }
 
+  usize Size() const { return mMap.size(); }
+
   static void Test()
   {
     LOG_FUNCTION;
     IntervalMap<u8, u8> map(0);
+    interval_map<u8, u8> map2(0);
     std::array<u8, 256> values{};
 
     const int nintervals = 1e4;
@@ -87,6 +91,7 @@ public:
       for (int key = begin; key < end; ++key)
         values[key] = val;
       map.Assign(begin, end, val);
+      map2.assign(begin, end, val);
     }
 
     usize lookupfails = 0;
@@ -130,5 +135,10 @@ public:
 
     if (map.GetMap().begin()->first != 0)
       LOG_ERROR("Missing first ([0]) element!");
+
+    if (map.GetMap() == map2.get_map())
+      LOG_SUCCESS("MyIntervalMap/interval_map internals passed! ({})", map.Size());
+    else
+      LOG_ERROR("MyIntervalMap/interval_map internals failed! ({}/{})", map.Size(), map2.size());
   }
 };
