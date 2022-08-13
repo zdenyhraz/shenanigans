@@ -407,6 +407,23 @@ public:
     Showimg(imageclr, "meridian curve", false, 0, 1, 1200);
   }
 
+  static void PlotGradualIdStep(const IPC& ipc, i32 maxstep)
+  {
+    LOG_FUNCTION;
+    const std::string dataPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_day_2500";
+    const i32 idstart = 18933122;
+    const auto image1 =
+        RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
+
+    for (i32 idstep = 1; idstep <= maxstep; ++idstep)
+    {
+      const auto image2 = RoiCrop(
+          LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart + idstep)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
+      ipc.SetDebugName(fmt::format("{}s", idstep * 45));
+      ipc.Calculate<IPC::Mode::Debug>(image1, image2);
+    }
+  }
+
 private:
   static ImageHeader GetHeader(const std::string& path)
   {

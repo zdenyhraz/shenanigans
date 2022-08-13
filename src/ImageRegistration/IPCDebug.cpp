@@ -43,8 +43,11 @@ void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
 {
-  PyPlot::PlotSurf(fmt::format("{} L2U surf", ipc.mDebugName),
+  PyPlot::Plot(fmt::format("{} L2U", ipc.mDebugName),
       {.z = L2U, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+
+  PyPlot::PlotSurf(fmt::format("{} L2U surf", ipc.mDebugName),
+      {.z = L2U, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2Us_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 
   if (false)
   {
