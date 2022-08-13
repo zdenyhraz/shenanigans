@@ -12,11 +12,31 @@ void DiffrotWindow::Render()
     ImGui::Separator();
 
     if (ImGui::Button("Calculate"))
-      mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
-          ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
+      LaunchAsync(
+          []()
+          {
+            mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize,
+                mParameters.idstep, mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
+          });
+
     ImGui::SameLine();
     if (ImGui::Button("Plot meridian curve"))
-      DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27);
+      LaunchAsync([]() { DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27); });
+
+    ImGui::SameLine();
+    if (ImGui::Button("Show IPC"))
+      LaunchAsync(
+          []()
+          {
+            const auto image1 =
+                RoiCrop(cv::imread(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_UNCHANGED),
+                    4096 / 2, 4096 / 2, IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
+            const auto image2 = RoiCrop(cv::imread(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart + mParameters.idstep),
+                                            cv::IMREAD_GRAYSCALE | cv::IMREAD_UNCHANGED),
+                4096 / 2, 4096 / 2, IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
+
+            IPCWindow::GetIPC().Calculate<IPC::Mode::Debug>(image1, image2);
+          });
 
     ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
     ImGui::SliderInt("xsize", &mParameters.xsize, 1, 2500);
@@ -30,17 +50,22 @@ void DiffrotWindow::Render()
     ImGui::InputText("##load path", &mParameters.loadPath);
     ImGui::SameLine();
     if (ImGui::Button("Load"))
-      mDiffrotData.Load(mParameters.loadPath);
+      LaunchAsync([]() { mDiffrotData.Load(mParameters.loadPath); });
 
     ImGui::Separator();
 
     if (ImGui::Button("Optimize"))
-      DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, ToRadians(mParameters.thetamax),
-          mParameters.cadence, mParameters.idstart, mParameters.xsizeopt, mParameters.ysizeopt, mParameters.popsize);
+      LaunchAsync(
+          []()
+          {
+            DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep,
+                mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, mParameters.xsizeopt,
+                mParameters.ysizeopt, mParameters.popsize);
+          });
+
     ImGui::SliderInt("xsizeopt", &mParameters.xsizeopt, 1, 500);
     ImGui::SliderInt("ysizeopt", &mParameters.ysizeopt, 3, 201);
     ImGui::SliderInt("popsize", &mParameters.popsize, 6, 36);
-
     ImGui::EndTabItem();
   }
 }

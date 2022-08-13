@@ -474,13 +474,16 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   if (population.functionEvaluations >= mMaxFunEvals) // maximum function evaluations exhausted
     return MaximumFunctionEvaluationsReached;
 
-  if (population.relativeDifferenceGenerationsOverThreshold >
-      mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness
-    return NoImprovementReachedRel;
+  if (generation > 10)
+  {
+    if (population.relativeDifferenceGenerationsOverThreshold >
+        mRelativeDifferenceGenerationsOverThresholdThreshold) // best entity fitness is almost the same as the average generation fitness
+      return NoImprovementReachedRel;
 
-  if (population.absoluteDifference <
-      mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
-    return NoImprovementReachedAbs;
+    if (population.absoluteDifference <
+        mAbsoluteDifferenceThreshold) // best entity fitness is almost the same as the average generation fitness - no improvement (absolute)
+      return NoImprovementReachedAbs;
+  }
 
   return NotTerminated;
 }

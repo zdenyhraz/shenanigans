@@ -171,25 +171,34 @@ public:
     std::vector<f64> theta, fshiftx, fshifty, theta0, R;
   };
 
-  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  static DifferentialRotationData Calculate(
-      const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress = nullptr)
+  template <bool Managed = false> // executed automatically by some logic (e.g.
+                                  // optimization algorithm) instead of manually
+  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax,
+      i32 cadence, i32 idstart, f32* progress = nullptr)
   {
-    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
-      PROFILE_SCOPE(Imread);
-      return cv::imread(path, cv::IMREAD_UNCHANGED);
-    }};
+    PROFILE_FUNCTION;
+    if constexpr (not Managed)
+      LOG_FUNCTION;
+
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
+        {
+          PROFILE_SCOPE(Imread);
+          return cv::imread(path, cv::IMREAD_UNCHANGED);
+        }};
     DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
 
     return Calculate<Managed>(ipc, dataPath, xsize, ysize, idstep, idstride, thetamax, cadence, idstart, progress, imageCache, headerCache);
   }
 
-  template <bool Managed = false> // executed automatically by some logic (e.g. optimization algorithm) instead of manually
-  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress,
-      DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
+  template <bool Managed = false> // executed automatically by some logic (e.g.
+                                  // optimization algorithm) instead of manually
+  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax,
+      i32 cadence, i32 idstart, f32* progress, DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION;
+    if constexpr (not Managed)
+      LOG_FUNCTION;
+
     DifferentialRotationData data(xsize, ysize, idstep, idstride, thetamax, cadence, idstart);
     std::atomic<i32> progressi = 0;
     const auto tstep = idstep * cadence;
@@ -213,19 +222,21 @@ public:
         const auto [id1, id2] = ids[x];
         const auto path1 = fmt::format("{}/{}.png", dataPath, id1);
         const auto path2 = fmt::format("{}/{}.png", dataPath, id2);
-        if (std::filesystem::exists(path1) and std::filesystem::exists(path2))
-          [[likely]]
-          {
-            if constexpr (not Managed)
-              LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - {} ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-          }
-        else
-          [[unlikely]]
-          {
-            if constexpr (not Managed)
-              LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, skipping ...", logprogress / xsize * 100, logprogress, xsize, id1, id2);
-            continue;
-          }
+        if (std::filesystem::exists(path1) and std::filesystem::exists(path2)) [[likely]]
+        {
+          if constexpr (not Managed)
+            LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - "
+                      "{} ...",
+                logprogress / xsize * 100, logprogress, xsize, id1, id2);
+        }
+        else [[unlikely]]
+        {
+          if constexpr (not Managed)
+            LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, "
+                        "skipping ...",
+                logprogress / xsize * 100, logprogress, xsize, id1, id2);
+          continue;
+        }
 
         const auto image1 = imageCache.Get(path1);
         const auto image2 = imageCache.Get(path2);
@@ -239,8 +250,8 @@ public:
         data.theta0[xindex] = theta0;
         data.R[xindex] = R;
 
-        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax)
-          [[unlikely]] continue;
+        if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax) [[unlikely]]
+          continue;
 
         for (i32 y = 0; y < ysize; ++y)
         {
@@ -252,7 +263,8 @@ public:
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
-          const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
+          const auto omegax =
+              std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
           const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * RadPerSecToDegPerDay;
 
           data.shiftx.at<f32>(y, xindex) = shiftx;
@@ -281,28 +293,36 @@ public:
     return data;
   }
 
-  static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
+  static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart,
+      i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;
-    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples over the entire time span
+    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples
+                                                                                 // over the entire time span
     LOG_INFO("Optimization xsize: {}", xsizeopt);
     LOG_INFO("Optimization ysize: {}", ysizeopt);
     LOG_INFO("Optimization popsize: {}", popsize);
     LOG_INFO("Optimization idstride: {}", idstrideopt);
     const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
-    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path) {
-      PROFILE_SCOPE(Imread);
-      return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
-    }};
+    DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
+        {
+          PROFILE_SCOPE(Imread);
+          return LoadUnitFloatImage<IPC::Float>(path); // cache images already converted to desired format for IPC
+        }};
     DataCache<std::string, ImageHeader> headerCache{[](const std::string& path) { return GetHeader(path); }};
     imageCache.Reserve(ids);
     headerCache.Reserve(ids);
 
-    const auto dataBefore = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
-    const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
-    const auto obj = [&](const IPC& ipcopt) {
-      const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+    const auto dataBefore =
+        Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+    const auto predfit =
+        GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
+
+    const auto obj = [&](const IPC& ipcopt)
+    {
+      const auto dataopt =
+          Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
       if (dataopt.omegax.empty())
         return std::numeric_limits<f64>::infinity();
       const auto omegax = GetRowAverage(dataopt.omegax);
@@ -320,12 +340,14 @@ public:
     IPCOptimization::Optimize(ipc, obj, popsize);
     if (xsizeopt >= 100)
       SaveOptimizedParameters(ipc, fmt::format("{}/proc", dataPath), xsizeopt, ysizeopt, popsize);
-    const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+    const auto dataAfter =
+        Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
     PyPlot::Plot("Diffrot opt",
         {.x = ToDegrees(1) * dataAfter.theta,
             .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
-                sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
+                sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615),
+                GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
             .xlabel = "latitude [deg]",
             .ylabel = "average omega x [deg/day]",
             .label_ys = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"}});
@@ -334,7 +356,8 @@ public:
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, f64 timestep)
   {
     PROFILE_FUNCTION;
-    const auto image = cv::imread(fmt::format("{}/{}.png", dataPath, data.idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+    LOG_FUNCTION;
+    const auto image = cv::imread(fmt::format("{}/{}.png", dataPath, data.idstart), cv::IMREAD_GRAYSCALE | cv::IMREAD_UNCHANGED);
     const auto header = GetHeader(fmt::format("{}/{}.json", dataPath, data.idstart));
     const auto omegax = GetRowAverage(data.omegax);                            // [deg/day]
     const auto predx = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615); // [deg/day]
@@ -476,8 +499,9 @@ private:
                                    .label_y2 = "ipc y"});
     PyPlot::Plot("avgomega x", {
                                    .x = ToDegrees(1) * data.theta,
-                                   .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
-                                       GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
+                                   .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
+                                       polyfit(data.theta, GetRowAverage(data.omegax), 2), GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615),
+                                       GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
                                    .xlabel = "latitude [deg]",
                                    .ylabel = "average omega x [deg/day]",
                                    .label_ys = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
@@ -495,10 +519,42 @@ private:
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
     const f64 aspectratio = 2;
-    PyPlot::Plot("shift x", {.z = data.shiftx, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "shift x [px]", .aspectratio = aspectratio});
-    PyPlot::Plot("omega x", {.z = data.omegax, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega x [px]", .aspectratio = aspectratio});
-    PyPlot::Plot("shift y", {.z = data.shifty, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "shift y [px]", .aspectratio = aspectratio});
-    PyPlot::Plot("omega y", {.z = data.omegay, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel, .zlabel = "omega y [px]", .aspectratio = aspectratio});
+    PyPlot::Plot("shift x", {.z = data.shiftx,
+                                .xmin = xmin,
+                                .xmax = xmax,
+                                .ymin = ymin,
+                                .ymax = ymax,
+                                .xlabel = xlabel,
+                                .ylabel = ylabel,
+                                .zlabel = "shift x [px]",
+                                .aspectratio = aspectratio});
+    PyPlot::Plot("omega x", {.z = data.omegax,
+                                .xmin = xmin,
+                                .xmax = xmax,
+                                .ymin = ymin,
+                                .ymax = ymax,
+                                .xlabel = xlabel,
+                                .ylabel = ylabel,
+                                .zlabel = "omega x [px]",
+                                .aspectratio = aspectratio});
+    PyPlot::Plot("shift y", {.z = data.shifty,
+                                .xmin = xmin,
+                                .xmax = xmax,
+                                .ymin = ymin,
+                                .ymax = ymax,
+                                .xlabel = xlabel,
+                                .ylabel = ylabel,
+                                .zlabel = "shift y [px]",
+                                .aspectratio = aspectratio});
+    PyPlot::Plot("omega y", {.z = data.omegay,
+                                .xmin = xmin,
+                                .xmax = xmax,
+                                .ymin = ymin,
+                                .ymax = ymax,
+                                .xlabel = xlabel,
+                                .ylabel = ylabel,
+                                .zlabel = "omega y [px]",
+                                .aspectratio = aspectratio});
   }
 
   static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)

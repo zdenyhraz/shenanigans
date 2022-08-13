@@ -10,6 +10,7 @@ class IPC
 {
 public:
   using Float = f64;
+  inline static const cv::Point2d mDefaultDebugTrueShift{123.456, 123.456};
 
   enum class WindowType : u8
   {
@@ -69,7 +70,7 @@ private:
   mutable std::string mDebugName = "IPC";
   mutable std::string mDebugDirectory;
   mutable i32 mDebugIndex = 0;
-  mutable cv::Point2d mDebugTrueShift;
+  mutable cv::Point2d mDebugTrueShift = mDefaultDebugTrueShift;
 
   friend class IPCAlign;
   friend class IPCDebug;

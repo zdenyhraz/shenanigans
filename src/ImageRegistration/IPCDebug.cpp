@@ -69,7 +69,8 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(IPC::GetL1Window(ipc.mL1WinT, mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
+  if (ipc.mDebugTrueShift != ipc.mDefaultDebugTrueShift)
+    DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1B", ipc.mDebugName),
       {.z = mat, .save = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
@@ -81,7 +82,8 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
   mat = mat.mul(IPC::GetL1Window(ipc.mL1WinT, mat.rows));
   DrawCrosshairs(mat);
-  DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
+  if (ipc.mDebugTrueShift != ipc.mDefaultDebugTrueShift)
+    DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   PyPlot::Plot(fmt::format("{} L1A", ipc.mDebugName),
       {.z = mat, .save = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
