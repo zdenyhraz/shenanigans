@@ -27,6 +27,7 @@ else()
   add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function)
   add_compile_options("$<$<CONFIG:DEBUG>:-g;-O0>")
   add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+  add_compile_options("$<$<COMPILE_LANGUAGE:C>:-w>")
   add_link_options(-fopenmp -pthread)
 endif()
 
