@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.11)
 project(shenanigans)
 
 # variables
@@ -19,30 +19,26 @@ endif()
 
 # compiler flags
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Wall /WX")
+  add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp)
+  add_compile_options(/Wall /WX)
 else()
-  set(CXX_FLAGS "-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow -Wno-unused-parameter -Wno-missing-field-initializers -fopenmp -march=native")
-  set(CXX_FLAGS_DEBUG "-g -O0")
-  set(CXX_FLAGS_RELEASE "-O3")
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_DEBUG}")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CXX_FLAGS_RELEASE}")
-
-  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -w")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -w")
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -w")
+  add_compile_options(-march=native -fopenmp -pthread)
+  add_compile_options(-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow)
+  add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function)
+  add_compile_options("$<$<CONFIG:DEBUG>:-g;-O0>")
+  add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+  add_link_options(-fopenmp -pthread)
 endif()
 
-# ignore warnings from libs sources
+# ignore warnings from external sources
+add_compile_options("$<$<COMPILE_LANGUAGE:C>:-w>")
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
-set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS "-w")
+set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS -w)
 
 # ccache
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
-  set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
 endif()
 
 # sanitizer
