@@ -31,7 +31,6 @@ else()
 endif()
 
 # ignore warnings from external sources
-add_compile_options("$<$<COMPILE_LANGUAGE:C>:-w>")
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
 set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS -w)
 
@@ -75,11 +74,11 @@ target_link_libraries(shenanigans_benchmark PRIVATE pybind11::embed)
 # fmt
 add_subdirectory(libs/fmt)
 include_directories(libs/fmt/include)
-target_link_libraries(shenanigans PRIVATE fmt::fmt-header-only)
-target_link_libraries(shenanigans_test PRIVATE fmt::fmt-header-only)
-target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt-header-only)
-target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt-header-only)
-target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt-header-only)
+target_link_libraries(shenanigans PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_test PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
