@@ -64,6 +64,16 @@ add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
 
+# precompiled headers
+if (ENABLE_PCH)
+  set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+  set(SRC_PRECOMPILED src/Precompiled.hpp)
+  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
+endif()
+
 # pybind11
 add_subdirectory(libs/pybind11)
 include_directories(libs/pybind11/include)
@@ -203,12 +213,3 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
 
-# precompiled headers
-if (ENABLE_PCH)
-  set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-  set(SRC_PRECOMPILED src/Precompiled.hpp)
-  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
-endif()
