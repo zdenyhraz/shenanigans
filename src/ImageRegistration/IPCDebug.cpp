@@ -131,8 +131,12 @@ void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const 
 void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
 {
   LOG_FUNCTION;
+  static constexpr bool save = false;
+  static constexpr bool artificial = false;
+  static constexpr bool create = false;
+  ipc.SetDebugDirectory("../debug/");
 
-  if constexpr (false) // create test images
+  if constexpr (create) // create test images
   {
     auto image = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shape.png");
     const auto shift = cv::Point2d(0.256 * image.cols, 0.232 * image.rows);
@@ -153,10 +157,21 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
 
   auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
   auto image2 = LoadUnitFloatImage<IPC::Float>(image2Path);
-  cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
-  cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
 
-  if (true) // histogram equalization
+  if (image1.rows != image1.cols) // crop images to be square
+  {
+    const auto size = std::min({image1.rows, image1.cols, image2.rows, image2.cols});
+    image1 = RoiCropMid(image1, size, size);
+    image2 = RoiCropMid(image2, size, size);
+  }
+
+  if (image1.rows != ipc.GetRows() or image1.cols != ipc.GetCols())
+  {
+    cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
+    cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
+  }
+
+  if (false) // histogram equalization
   {
     cv::normalize(image1, image1, 0, 255, cv::NORM_MINMAX);
     cv::normalize(image2, image2, 0, 255, cv::NORM_MINMAX);
@@ -183,22 +198,26 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     cv::normalize(image2, image2, 0, 1, cv::NORM_MINMAX);
   }
 
-  static constexpr bool save = false;
   if constexpr (save)
   {
-    Saveimg("../debug/input1.png", image1, false, cv::Size(1024, 1024));
-    Saveimg("../debug/input2.png", image2, false, cv::Size(1024, 1024));
+    Saveimg("../debug/input1.png", image1, false, image1.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Saveimg("../debug/input2.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
   }
 
   AddNoise<IPC::Float>(image1, noiseStdev);
   AddNoise<IPC::Float>(image2, noiseStdev);
-  const auto shift = cv::Point2d(-0.176 * ipc.GetCols(), 0.132 * ipc.GetRows());
-  const auto scale = 1.2;
-  const auto rotation = 70;
-  Shift(image2, shift);
-  Rotate(image2, rotation, scale);
-  LOG_DEBUG("Artificial shift: {}", shift);
-  LOG_DEBUG("Artificial rotation/scale: {}/{}", rotation, scale);
+
+  if constexpr (artificial)
+  {
+    const auto shift = cv::Point2d(-0.176 * ipc.GetCols(), 0.132 * ipc.GetRows());
+    const auto scale = 1.2;
+    const auto rotation = 70;
+    Shift(image2, shift);
+    Rotate(image2, rotation, scale);
+    LOG_DEBUG("Artificial shift: {}", shift);
+    LOG_DEBUG("Artificial rotation/scale: {}/{}", rotation, scale);
+  }
+
   IPCAlign::Align(ipc, image1, image2);
 }
 

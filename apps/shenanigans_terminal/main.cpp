@@ -5,11 +5,14 @@ try
 {
   LOG_FUNCTION;
 
-  const f64 noiseStddev = 0;
+  PyPlot::SetSave(true);
 
-  IPC ipc(1024, 1024);
-  const auto image1Path = "../data/articles/ipc/pics/align/304A_proc.png";
-  const auto image2Path = "../data/articles/ipc/pics/align/171A_proc.png";
+  const auto image1Path = "/home/hrazdira/shenanigans/debug/tfs_2A.tif";
+  const auto image2Path = "/home/hrazdira/shenanigans/debug/tfs_2B.tif";
+  const f64 noiseStddev = 0;
+  const auto image = LoadUnitFloatImage<IPC::Float>(image1Path);
+  const auto size = std::min(image.rows, image.cols);
+  const auto ipc = IPC(size, size);
   IPCDebug::DebugAlign(ipc, image1Path, image2Path, noiseStddev);
 
   return EXIT_SUCCESS;

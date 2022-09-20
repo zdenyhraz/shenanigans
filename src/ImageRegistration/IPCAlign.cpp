@@ -9,8 +9,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
-  static constexpr bool debugMode = true;
-  static constexpr bool save = false;
+  static constexpr bool debugMode = false;
+  static constexpr bool save = true;
+  static constexpr auto IPCMode = IPC::Mode::Normal;
+
   if constexpr (debugMode)
   {
     PyPlot::Plot("image1", {.z = image1, .cmap = "gray"});
@@ -65,46 +67,58 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
     showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();
   }
+
   if constexpr (save)
   {
-    Saveimg("../debug/image12.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
-    Saveimg("../debug/image2.png", image2, false, cv::Size(1024, 1024));
+    Saveimg("../debug/image12.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Saveimg("../debug/image1.png", image1, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Saveimg("../debug/image2.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
   }
 
   // rotation and scale
-  auto shiftR = ipc.Calculate(img1FTm, img2FTm);
+  ipc.SetDebugName("AlignRS");
+  auto shiftR = ipc.Calculate<IPCMode>(img1FTm, img2FTm);
   f64 rotation = -shiftR.y / image1.rows * 360;
   f64 scale = std::exp(shiftR.x * std::log(maxRadius) / image1.cols);
   Rotate(image2, -rotation, scale);
+
   if constexpr (debugMode)
   {
     cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
   }
+
   if constexpr (save)
   {
-    Saveimg("../debug/image12RS.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
-    Saveimg("../debug/image2RS.png", image2, false, cv::Size(1024, 1024));
+    Saveimg("../debug/image12RS.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Saveimg("../debug/image2RS.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
   }
 
   // translation
-  auto shiftT = ipc.Calculate(image1, image2);
+  ipc.SetDebugName("AlignXY");
+  auto shiftT = ipc.Calculate<IPCMode>(image1, image2);
   Shift(image2, -shiftT);
+
   if constexpr (debugMode)
   {
     cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
     Showimg(showImageC, "Align process color composition");
     Showimg(showImage2, "Align process image2");
-
-    LOG_DEBUG("Evaluated shift: {}", shiftT);
-    LOG_DEBUG("Evaluated rotation/scale: {:.3f}/{:.3f}", rotation, 1. / scale);
   }
+
   if constexpr (save)
   {
-    Saveimg("../debug/image12RSXY.png", ColorComposition(image1, image2), false, cv::Size(1024, 1024));
-    Saveimg("../debug/image2RSXY.png", image2, false, cv::Size(1024, 1024));
+    Saveimg("../debug/image12RSXY.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Saveimg("../debug/image2RSXY.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
   }
+
+  if constexpr (debugMode or save)
+  {
+    LOG_DEBUG("Evaluated rotation/scale: {:.3f}/{:.3f}", rotation, 1. / scale);
+    LOG_DEBUG("Evaluated shift: {}", shiftT);
+  }
+
   return image2;
 }
 
