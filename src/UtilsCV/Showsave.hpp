@@ -1,7 +1,8 @@
 #pragma once
 #include "Colormap.hpp"
 
-inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void Showimg(
+    const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
@@ -18,19 +19,24 @@ inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, b
 
   if (sourceimg.channels() == 1)
   {
-    if (color)
-      sourceimg = QuantileColormap(sourceimg, quantileB, quantileT);
-    else if (quantileB != 0 or quantileT != 1)
+    if (quantileB != 0 or quantileT != 1)
       sourceimg = QuantileFilter<f32>(sourceimg, quantileB, quantileT);
+
+    if (color)
+    {
+      cv::Mat cmap;
+      cv::applyColorMap(sourceimg, cmap, cv::COLORMAP_JET);
+      sourceimg = cmap;
+    }
   }
 
   cv::imshow(windowname, sourceimg);
   cv::waitKey(1);
 }
 
-inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1,
+    i32 wRows = 600)
 {
-  // 1st image determines the main hconcat height
   i32 mainHeight = sourceimgIns[0].rows;
   std::vector<cv::Mat> sourceimgs;
   sourceimgs.reserve(sourceimgIns.size());
@@ -51,7 +57,8 @@ inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string&
   Showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
+inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false,
+    f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat img = sourceimgIn.clone();
 
@@ -68,10 +75,15 @@ inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bi
 
   if (img.channels() == 1)
   {
-    if (color)
-      img = QuantileColormap(img, quantileB, quantileT);
-    else if (quantileB != 0 or quantileT != 1)
+    if (quantileB != 0 or quantileT != 1)
       img = QuantileFilter<f32>(img, quantileB, quantileT);
+
+    if (color)
+    {
+      cv::Mat cmap;
+      cv::applyColorMap(img, cmap, cv::COLORMAP_JET);
+      img = cmap;
+    }
   }
 
   cv::imwrite(path, img);

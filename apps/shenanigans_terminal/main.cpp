@@ -5,14 +5,12 @@ try
 {
   LOG_FUNCTION;
 
-  PyPlot::Initialize();
-  PyPlot::SetSave(true);
-
   const auto imagePath = "../data/debug/shipwreck1.jpg";
   const auto image = LoadUnitFloatImage<f64>(imagePath);
-  const auto size = 10;
+  const auto blurSize = 21;
+  const auto stddevSize = 11;
 
-  DetectObjects(image, size);
+  DetectObjects(image, blurSize, stddevSize);
 
   return EXIT_SUCCESS;
 }
