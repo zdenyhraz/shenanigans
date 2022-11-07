@@ -1,19 +1,18 @@
-#include "ImageRegistration/IPC.hpp"
+#include "Random/ObjectDetection.hpp"
 
 int main(int argc, char** argv)
 try
 {
   LOG_FUNCTION;
 
+  PyPlot::Initialize();
   PyPlot::SetSave(true);
 
-  const auto image1Path = "/home/hrazdira/shenanigans/debug/tfs_1A.tif";
-  const auto image2Path = "/home/hrazdira/shenanigans/debug/tfs_1B.tif";
-  const f64 noiseStddev = 0;
-  const auto image = LoadUnitFloatImage<IPC::Float>(image1Path);
-  const auto size = std::min(image.rows, image.cols);
-  const auto ipc = IPC(size, size, 0, 0.5);
-  IPCDebug::DebugAlign(ipc, image1Path, image2Path, noiseStddev);
+  const auto imagePath = "../data/debug/shipwreck1.jpg";
+  const auto image = LoadUnitFloatImage<f64>(imagePath);
+  const auto size = 10;
+
+  DetectObjects(image, size);
 
   return EXIT_SUCCESS;
 }
