@@ -8,6 +8,16 @@ inline void DrawCrosshairs(cv::Mat& mat)
 
 inline void DrawCross(cv::Mat& mat, const cv::Point& point)
 {
-  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y - mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y + mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
-  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y + mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y - mat.cols / 30), cv::Scalar(0.0f), std::max(mat.cols / 100, 1), cv::LINE_AA);
+  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y - mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y + mat.cols / 30), cv::Scalar(0.0f),
+      std::max(mat.cols / 100, 1), cv::LINE_AA);
+  cv::line(mat, cv::Point(point.x - mat.cols / 30, point.y + mat.cols / 30), cv::Point(point.x + mat.cols / 30, point.y - mat.cols / 30), cv::Scalar(0.0f),
+      std::max(mat.cols / 100, 1), cv::LINE_AA);
+}
+
+inline void DrawPoint(cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, f32 size = 0.02, i32 thickness = 0)
+{
+  cv::line(mat, cv::Point(point.x - mat.cols * size, point.y - mat.cols * size), cv::Point(point.x + mat.cols * size, point.y + mat.cols * size), color,
+      thickness == 0 ? std::max(mat.cols / 100, 1) : thickness, cv::LINE_AA);
+  cv::line(mat, cv::Point(point.x - mat.cols * size, point.y + mat.cols * size), cv::Point(point.x + mat.cols * size, point.y - mat.cols * size), color,
+      thickness == 0 ? std::max(mat.cols / 100, 1) : thickness, cv::LINE_AA);
 }
