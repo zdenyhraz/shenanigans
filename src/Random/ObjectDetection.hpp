@@ -33,9 +33,11 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   LOG_DEBUG("Found {} objects", contours.size());
 
   std::vector<Object> objects;
+  const auto minWidth = 0;
+  const auto minHeight = 0;
   for (const auto& contour : contours)
   {
-    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < 20 and minRect.size.height < 20)
+    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minWidth and minRect.size.height < minHeight)
       continue;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
@@ -51,11 +53,11 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   cv::cvtColor(source, out, cv::COLOR_GRAY2BGR);
 
   const auto color = cv::Scalar(0, 0, 255);
-  const auto thickness = std::max(out.cols / 100, 1);
+  const auto thickness = std::clamp(out.cols / 100, 1, 5);
 
   for (const auto& object : objects)
   {
-    DrawPoint(out, object.center, color, 0.02, thickness);
+    // DrawPoint(out, object.center, color, 0.01, thickness);
     cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, color, thickness, cv::LINE_AA);
   }
 
