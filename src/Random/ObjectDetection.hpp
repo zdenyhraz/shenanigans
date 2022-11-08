@@ -35,6 +35,9 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   std::vector<Object> objects;
   for (const auto& contour : contours)
   {
+    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < 20 and minRect.size.height < 20)
+      continue;
+
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
     objects.emplace_back(center, contour);
   }
@@ -59,7 +62,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   return out;
 }
 
-inline void DetectObjectsStddev(const cv::Mat& source, i32 blurSize = 21, i32 stddevSize = 11, i32 objectSize = 50)
+inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.15, i32 blurSize = 21, i32 stddevSize = 11)
 {
   LOG_FUNCTION;
   cv::Mat blurred(source.size(), source.type());
@@ -82,17 +85,17 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 blurSize = 21, i32 st
   f32 minThreshold = 0.1; // stddev needs to be at least 0.1 for object pixels
   cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
 
-  const auto objectness = CalculateObjectness(stddevs);
-  const auto objectThreshold = 0.15;
+  const auto objectness = CalculateObjectness(stddevs, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
   Saveimg("../data/debug/stddev/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/stddev/stddev.png", stddevs, false, {0, 0}, true);
+  Saveimg("../data/debug/stddev/edges.png", stddevs, false, {0, 0}, true);
   Saveimg("../data/debug/stddev/objectness.png", objectness, false, {0, 0}, true);
   Saveimg("../data/debug/stddev/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
 }
 
-inline void DetectObjectsCanny(const cv::Mat& source, i32 blurSize, i32 sobelSize = 3, f32 lowThreshold = 0.3, f32 highThreshold = 0.9)
+inline void DetectObjectsCanny(
+    const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.03, i32 blurSize = 11, i32 sobelSize = 3, f32 lowThreshold = 0.3, f32 highThreshold = 0.9)
 {
   LOG_FUNCTION;
   cv::Mat blurred(source.size(), source.type());
@@ -104,12 +107,11 @@ inline void DetectObjectsCanny(const cv::Mat& source, i32 blurSize, i32 sobelSiz
   cv::Mat canny;
   cv::Canny(blurred, canny, lowThreshold * 255, highThreshold * 255, sobelSize);
 
-  const auto objectness = CalculateObjectness(canny);
-  const auto objectThreshold = 0.03;
+  const auto objectness = CalculateObjectness(canny, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
   Saveimg("../data/debug/canny/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/canny/canny.png", canny, false, {0, 0}, true);
+  Saveimg("../data/debug/canny/edges.png", canny, false, {0, 0}, true);
   Saveimg("../data/debug/canny/objectness.png", objectness, false, {0, 0}, true);
   Saveimg("../data/debug/canny/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
 }
