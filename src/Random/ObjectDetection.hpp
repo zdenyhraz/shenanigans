@@ -90,10 +90,10 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize = 50, f32 
   const auto objectness = CalculateObjectness(stddevs, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
-  Saveimg("../data/debug/stddev/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/stddev/edges.png", stddevs, false, {0, 0}, true);
-  Saveimg("../data/debug/stddev/objectness.png", objectness, false, {0, 0}, true);
-  Saveimg("../data/debug/stddev/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
+  Saveimg("../data/debug/ObjectDetection/stddev/blurred.png", blurred, false, {0, 0}, false);
+  Saveimg("../data/debug/ObjectDetection/stddev/edges.png", stddevs, false, {0, 0}, true);
+  Saveimg("../data/debug/ObjectDetection/stddev/objectness.png", objectness, false, {0, 0}, true);
+  Saveimg("../data/debug/ObjectDetection/stddev/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
 }
 
 inline void DetectObjectsCanny(
@@ -112,8 +112,8 @@ inline void DetectObjectsCanny(
   const auto objectness = CalculateObjectness(canny, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
-  Saveimg("../data/debug/canny/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/canny/edges.png", canny, false, {0, 0}, true);
-  Saveimg("../data/debug/canny/objectness.png", objectness, false, {0, 0}, true);
-  Saveimg("../data/debug/canny/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
+  Saveimg("../data/debug/ObjectDetection/canny/blurred.png", blurred, false, {0, 0}, false);
+  Saveimg("../data/debug/ObjectDetection/canny/edges.png", canny, false, {0, 0}, true);
+  Saveimg("../data/debug/ObjectDetection/canny/objectness.png", objectness, false, {0, 0}, true);
+  Saveimg("../data/debug/ObjectDetection/canny/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
 }
