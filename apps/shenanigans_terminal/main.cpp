@@ -26,22 +26,30 @@ void RunObjectDetection()
   }
 }
 
-void RunUnevenIllumination()
+void RunUnevenIlluminationCLAHE()
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
   const auto tileGridSize = 8;
   const auto clipLimit = 1;
-  CorrectUnevenIllumination(image, tileGridSize, clipLimit);
+  CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
+}
+
+void RunUnevenIlluminationHomomorphic()
+{
+  LOG_FUNCTION;
+  auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
+  for (auto cutoff = 0.001; cutoff <= 0.02; cutoff += 0.001)
+    CorrectUnevenIlluminationHomomorphic(image, cutoff);
 }
 
 int main(int argc, char** argv)
 try
 {
   LOG_FUNCTION;
-
   // RunObjectDetection();
-  RunUnevenIllumination();
+  // RunUnevenIlluminationCLAHE();
+  RunUnevenIlluminationHomomorphic();
 
   return EXIT_SUCCESS;
 }
