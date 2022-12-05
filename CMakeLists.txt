@@ -20,7 +20,7 @@ endif()
 # compiler flags
 if(MSVC)
   add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp)
-  add_compile_options(/Wall /WX)
+  #add_compile_options(/Wall /WX)
 else()
   add_compile_options(-march=native -fopenmp -pthread)
   add_compile_options(-Wall -Werror -Wfatal-errors -Wextra -Wpedantic -Wshadow)
@@ -33,7 +33,11 @@ endif()
 
 # ignore warnings from external sources
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
-set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS -w)
+if(MSVC)
+  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS /w)
+else()
+  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS -w)
+endif()
 
 # ccache
 find_program(CCACHE_FOUND ccache)
