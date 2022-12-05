@@ -3,6 +3,8 @@
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 #include "UtilsCV/Vectmat.hpp"
+#include "Random/ObjectDetection.hpp"
+#include "Random/UnevenIllumination.hpp"
 
 void StuffWindow::Initialize()
 {
@@ -14,20 +16,32 @@ void StuffWindow::Render()
   {
     ImGui::Separator();
 
+    if (ImGui::Button("ImGui demo"))
+      showImGuiDemoWindow = !showImGuiDemoWindow;
+    if (ImGui::Button("ImPlot demo"))
+      showImPlotDemoWindow = !showImPlotDemoWindow;
     if (ImGui::Button("Evolution optimization"))
       LaunchAsync([]() { EvolutionOptimization(false); });
-
     if (ImGui::Button("Evolution meta optimization"))
       LaunchAsync([]() { EvolutionOptimization(true); });
-
     if (ImGui::Button("False correlations removal"))
       LaunchAsync([]() { FalseCorrelationsRemoval(); });
-
     if (ImGui::Button("Plot test"))
       LaunchAsync([]() { PlotTest(); });
+    if (ImGui::Button("Object Detection"))
+      LaunchAsync([]() { ObjectDetection(); });
+    if (ImGui::Button("Uneven Illumination CLAHE"))
+      LaunchAsync([]() { UnevenIlluminationCLAHE(); });
+    if (ImGui::Button("Uneven Illumination Homomorphic"))
+      LaunchAsync([]() { UnevenIlluminationHomomorphic(); });
 
     ImGui::EndTabItem();
   }
+
+  if (showImGuiDemoWindow)
+    ImGui::ShowDemoWindow();
+  if (showImPlotDemoWindow)
+    ImPlot::ShowDemoWindow();
 }
 
 void StuffWindow::EvolutionOptimization(bool meta)
@@ -86,9 +100,53 @@ void StuffWindow::PlotTest()
   const auto gaussian1D = GetMidRow<f64>(gaussian2D);
   const auto x = Iota<f64>(0, gaussian1D.size());
 
-  // PyPlot::Plot("1D", {.x = x, .y = gaussian1D});
-  // PyPlot::Plot("2D", {.z = gaussian2D});
+  PyPlot::Plot("1D", {.x = x, .y = gaussian1D});
+  PyPlot::Plot("2D", {.z = gaussian2D});
 
   ImGuiPlot::Get().Plot("1D", PlotData1D{.x = x, .ys = {gaussian1D}});
   ImGuiPlot::Get().Plot("2D", PlotData2D{.z = gaussian2D});
+}
+
+void StuffWindow::ObjectDetection()
+{
+  LOG_FUNCTION;
+  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/rocks.png");
+  cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
+  image.convertTo(image, CV_8U);
+  const auto objectSize = image.cols / 50; // 50
+
+  if (true)
+  {
+    const auto objectThreshold = 0.01; // 0.15
+    const auto blurSize = 11;
+    const auto stddevSize = 9;
+    DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, stddevSize);
+  }
+
+  if (true)
+  {
+    const auto objectThreshold = 0.01; // 0.03
+    const auto blurSize = 11;
+    const auto sobelSize = 3;
+    const auto lowThreshold = 0.3;
+    const auto highThreshold = 3 * lowThreshold;
+    DetectObjectsCanny(image, objectSize, objectThreshold, blurSize, sobelSize, lowThreshold, highThreshold);
+  }
+}
+
+void StuffWindow::UnevenIlluminationCLAHE()
+{
+  LOG_FUNCTION;
+  auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
+  const auto tileGridSize = 8;
+  const auto clipLimit = 1;
+  CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
+}
+
+void StuffWindow::UnevenIlluminationHomomorphic()
+{
+  LOG_FUNCTION;
+  auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
+  for (auto cutoff = 0.001; cutoff <= 0.02; cutoff += 0.001)
+    CorrectUnevenIlluminationHomomorphic(image, cutoff);
 }

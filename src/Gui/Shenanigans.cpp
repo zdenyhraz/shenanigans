@@ -52,10 +52,6 @@ try
   ImGuiLogger::Get().Render();
   ImGuiPlot::Get().Render();
   PyPlot::Render();
-
-  // ImGui::ShowDemoWindow();
-  // ImPlot::ShowDemoWindow();
-
   PyPlot::SetSave(mParameters.plotSave);
 }
 catch (const std::exception& e)

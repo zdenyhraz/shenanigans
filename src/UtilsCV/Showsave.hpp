@@ -1,13 +1,11 @@
 #pragma once
 #include "Colormap.hpp"
 
-inline void Showimg(
-    const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
+inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   cv::Mat sourceimg = sourceimgIn.clone();
 
-  f64 colRowRatio = (f64)sourceimg.cols / (f64)sourceimg.rows;
-  i32 wCols = (f64)wRows * colRowRatio;
+  i32 wCols = static_cast<f32>(sourceimg.cols) * wRows / sourceimg.rows;
   cv::namedWindow(windowname, cv::WINDOW_NORMAL);
   cv::resizeWindow(windowname, wCols, wRows);
 
@@ -31,11 +29,10 @@ inline void Showimg(
   }
 
   cv::imshow(windowname, sourceimg);
-  cv::waitKey(1);
+  cv::waitKey(-1);
 }
 
-inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1,
-    i32 wRows = 600)
+inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)
 {
   i32 mainHeight = sourceimgIns[0].rows;
   std::vector<cv::Mat> sourceimgs;
@@ -57,8 +54,8 @@ inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string&
   Showimg(concatenated, windowname, color, quantileB, quantileT, wRows);
 }
 
-inline void Saveimg(const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false,
-    f64 quantileB = 0, f64 quantileT = 1)
+inline void Saveimg(
+    const std::string& path, const cv::Mat& sourceimgIn, bool bilinear = false, cv::Size size = cv::Size(0, 0), bool color = false, f64 quantileB = 0, f64 quantileT = 1)
 {
   cv::Mat img = sourceimgIn.clone();
 

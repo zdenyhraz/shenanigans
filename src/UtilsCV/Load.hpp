@@ -2,17 +2,16 @@
 
 inline bool IsImagePath(const std::string& path)
 {
-  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or
-         path.ends_with(".JPEG");
+  return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or path.ends_with(".JPEG");
 }
 
 template <typename T>
-inline cv::Mat LoadUnitFloatImage(const std::string& path)
+inline cv::Mat LoadUnitFloatImage(const std::filesystem::path path)
 {
   PROFILE_FUNCTION;
-  cv::Mat mat = cv::imread(path, cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  if (mat.empty())
-    [[unlikely]] throw std::runtime_error(fmt::format("Image '{}' not found", path));
+  cv::Mat mat = cv::imread(path.string(), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
+  if (mat.empty()) [[unlikely]]
+    throw std::runtime_error(fmt::format("Image '{}' not found", path.string()));
   mat.convertTo(mat, GetMatType<T>());
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;

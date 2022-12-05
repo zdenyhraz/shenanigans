@@ -90,12 +90,11 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize = 50, f32 
   const auto objectness = CalculateObjectness(stddevs, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
-  Saveimg("../data/debug/ObjectDetection/stddev/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/ObjectDetection/stddev/edges.png", stddevs, false, {0, 0}, true);
-  Saveimg("../data/debug/ObjectDetection/stddev/objectness.png", objectness, false, {0, 0}, true);
-  Saveimg("../data/debug/ObjectDetection/stddev/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
+  ImGuiPlot::Get().Plot("stddev-blurred", PlotData2D{.z = blurred, .cmap = Gray});
+  ImGuiPlot::Get().Plot("stddev-edges", PlotData2D{.z = stddevs, .cmap = Jet});
+  ImGuiPlot::Get().Plot("stddev-objectness", PlotData2D{.z = objectness, .cmap = Jet});
+  Showimg(DrawObjects(source, objects), "stddev-objects");
 }
-
 inline void DetectObjectsCanny(
     const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.03, i32 blurSize = 11, i32 sobelSize = 3, f32 lowThreshold = 0.3, f32 highThreshold = 0.9)
 {
@@ -112,8 +111,8 @@ inline void DetectObjectsCanny(
   const auto objectness = CalculateObjectness(canny, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
-  Saveimg("../data/debug/ObjectDetection/canny/blurred.png", blurred, false, {0, 0}, false);
-  Saveimg("../data/debug/ObjectDetection/canny/edges.png", canny, false, {0, 0}, true);
-  Saveimg("../data/debug/ObjectDetection/canny/objectness.png", objectness, false, {0, 0}, true);
-  Saveimg("../data/debug/ObjectDetection/canny/objects.png", DrawObjects(source, objects), false, {0, 0}, false);
+  ImGuiPlot::Get().Plot("canny-blurred", PlotData2D{.z = blurred, .cmap = Gray});
+  ImGuiPlot::Get().Plot("canny-edges", PlotData2D{.z = canny, .cmap = Jet});
+  ImGuiPlot::Get().Plot("canny-objectness", PlotData2D{.z = objectness, .cmap = Jet});
+  Showimg(DrawObjects(source, objects), "canny-objects");
 }
