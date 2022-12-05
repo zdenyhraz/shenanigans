@@ -21,7 +21,7 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
 
   std::atomic<usize> iprogress = 0;
 #pragma omp parallel for
-  for (usize idx = 0; idx < dataset.imagePairs.size(); ++idx)
+  for (i32 idx = 0; idx < dataset.imagePairs.size(); ++idx)
   {
     const auto& image1 = dataset.imagePairs[idx].image1;
     const auto& image2 = dataset.imagePairs[idx].image2;

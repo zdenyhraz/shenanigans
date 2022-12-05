@@ -2,6 +2,7 @@
 #include "IPCWindow.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
+#include "UtilsCV/Vectmat.hpp"
 
 void StuffWindow::Initialize()
 {
@@ -21,6 +22,9 @@ void StuffWindow::Render()
 
     if (ImGui::Button("False correlations removal"))
       LaunchAsync([]() { FalseCorrelationsRemoval(); });
+
+    if (ImGui::Button("Plot test"))
+      LaunchAsync([]() { PlotTest(); });
 
     ImGui::EndTabItem();
   }
@@ -74,4 +78,17 @@ void StuffWindow::FalseCorrelationsRemoval()
   }
   ipc.SetSize(image1.size());
   ipc.Calculate<IPC::Mode::Debug>(image1, image2);
+}
+
+void StuffWindow::PlotTest()
+{
+  const auto gaussian2D = Gaussian<f32>(101, Random::Rand<f32>(0, 31));
+  const auto gaussian1D = GetMidRow<f64>(gaussian2D);
+  const auto x = Iota<f64>(0, gaussian1D.size());
+
+  // PyPlot::Plot("1D", {.x = x, .y = gaussian1D});
+  // PyPlot::Plot("2D", {.z = gaussian2D});
+
+  ImGuiPlot::Get().Plot("1D", PlotData1D{.x = x, .ys = {gaussian1D}});
+  ImGuiPlot::Get().Plot("2D", PlotData2D{.z = gaussian2D});
 }

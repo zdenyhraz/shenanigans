@@ -1,11 +1,9 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
-import gi
 
 
 def init():
-    matplotlib.use('GTK3Agg')
+    #matplotlib.use('GTK3Agg')
     #print("Matplotlib is using the", matplotlib.get_backend(), "backend")
 
     FONT_SCALE = 2  # 1.3

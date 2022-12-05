@@ -53,7 +53,11 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
     if (data.log)
       ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
 
-    ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
+    if (not data.x.empty())
+      ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
+    else
+      ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
+
     if (not data.y2s.empty())
       ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
     const auto x = data.x.data();
@@ -85,7 +89,6 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
 
 void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) const
 {
-  const auto& z = data.z;
   const f32 widthcb = 180;
   const f32 width = ImGui::GetContentRegionAvail().x - widthcb - ImGui::GetStyle().ItemSpacing.x;
   const f32 height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
@@ -93,8 +96,7 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
   {
     ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
     ImPlot::GetStyle().Colormap = data.cmap;
-    ImPlot::PlotHeatmap(
-        name.c_str(), std::bit_cast<f32*>(z.data), z.rows, z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
     ImPlot::EndPlot();
   }
   ImGui::SameLine();

@@ -19,7 +19,7 @@ endif()
 
 # compiler flags
 if(MSVC)
-  add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp)
+  add_compile_options(/favor:INTEL64 /arch:SSE /arch:SSE2 /arch:AVX /arch:AVX2 /openmp /MT)
   #add_compile_options(/Wall /WX)
 else()
   add_compile_options(-march=native -fopenmp -pthread)

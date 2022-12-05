@@ -34,7 +34,7 @@ try
       PROFILE_SCOPE(EvolutionGeneration);
       gen++;
 #pragma omp parallel for
-      for (usize eid = 0; eid < mNP; ++eid)
+      for (i32 eid = 0; eid < mNP; ++eid)
       {
         population.UpdateDistinctParents(eid);
         population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
@@ -429,14 +429,12 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
                                                      .y2label = "best-average relative similarity [%]",
                                                      .log = false});
 
-    if (false)
-      PyPlot::Plot(fmt::format("Evolution ({})", mName), {.x = gens,
-                                                             .ys = {objvals, validvals},
-                                                             .xlabel = "generation",
-                                                             .ylabel = "objective function value",
-                                                             .label_ys = {"obj", "valid"},
-                                                             .log = false,
-                                                             .save = "../debug/ipcopt/optprog.png"});
+    PyPlot::Plot(fmt::format("Evolution ({})", mName), {.x = gens,
+                                                            .ys = {objvals, validvals},
+                                                            .xlabel = "generation",
+                                                            .ylabel = "objective function value",
+                                                            .label_ys = {"obj", "valid"},
+                                                            .log = false});
   }
 }
 
@@ -734,7 +732,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
   }
 
 #pragma omp parallel for
-  for (usize eid = 0; eid < NP; ++eid)
+  for (i32 eid = 0; eid < NP; ++eid)
   {
     entities[eid].fitness = obj(entities[eid].params);
 
