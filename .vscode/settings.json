@@ -1,5 +1,5 @@
 {
   "cmake.environment": {
-    "CMAKE_PREFIX_PATH": "${workspaceFolder}/../opencv/install"
+    "CMAKE_PREFIX_PATH": "${workspaceFolder}/../opencv/install/Release"
   }
 }
