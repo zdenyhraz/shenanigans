@@ -89,9 +89,9 @@ void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) co
 
 void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) const
 {
-  const f32 widthcb = 180;
-  const f32 width = ImGui::GetContentRegionAvail().x - widthcb - ImGui::GetStyle().ItemSpacing.x;
-  const f32 height = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.x;
+  const f32 height = ImGui::GetContentRegionAvail().y;
+  const f32 width = height / data.z.rows * data.z.cols * 1.1;
+  const f32 widthcb = height * 0.175f;
   if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
   {
     ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
@@ -100,7 +100,7 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height});
+  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height * 0.912f});
 }
 
 void ImGuiPlot::Render()
