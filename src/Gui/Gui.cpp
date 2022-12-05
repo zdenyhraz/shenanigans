@@ -115,7 +115,7 @@ void ImGuiSetStyle(ImGuiStyle& style)
   style.TabRounding = 0.0f;
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scalefactor)
 {
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing ImGui ...");
@@ -123,6 +123,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   ImGui::CreateContext();
   ImPlot::CreateContext();
 
+  float scale = scalefactor * glfwGetVideoMode(glfwGetPrimaryMonitor())->height / 1600;
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking

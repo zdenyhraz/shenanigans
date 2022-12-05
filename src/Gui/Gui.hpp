@@ -10,7 +10,7 @@ void GLFWInitialize();
 GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden = false);
 void GLFWInitializeGL(GLFWwindow* window);
 void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback);
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale = 2);
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scalefactor);
 void ImGuiNewFrame();
 void ImGuiRender(GLFWwindow* window, ImGuiIO& io);
 void ImGuiShutdown();
