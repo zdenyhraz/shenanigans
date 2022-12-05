@@ -100,7 +100,7 @@ void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) co
     ImPlot::EndPlot();
   }
   ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height}, nullptr, data.cmap);
+  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height});
 }
 
 void ImGuiPlot::Render()
