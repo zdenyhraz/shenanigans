@@ -115,7 +115,7 @@ void ImGuiSetStyle(ImGuiStyle& style)
   style.TabRounding = 0.0f;
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scalefactor)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
 {
   PROFILE_FUNCTION;
   LOG_DEBUG("Initializing ImGui ...");
@@ -123,12 +123,11 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scalefactor)
   ImGui::CreateContext();
   ImPlot::CreateContext();
 
-  float scale = scalefactor * glfwGetVideoMode(glfwGetPrimaryMonitor())->height / 1600;
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-  io.Fonts->AddFontFromFileTTF((GetProjectDirectoryPath() / "data/apps/CascadiaCode.ttf").string().c_str(), scale * 12);
+  io.Fonts->AddFontFromFileTTF((GetProjectDirectoryPath() / "data/apps/CascadiaCode.ttf").string().c_str(), scale * 10);
   static const std::string iniFilename = (GetProjectDirectoryPath() / "data/apps/imgui.ini").string();
   io.IniFilename = iniFilename.c_str();
 
