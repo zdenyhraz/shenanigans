@@ -23,13 +23,15 @@ inline void Showimg(const cv::Mat& sourceimgIn, const std::string& windowname, b
     if (color)
     {
       cv::Mat cmap;
+      cv::normalize(sourceimg, sourceimg, 0, 255, cv::NORM_MINMAX);
+      sourceimg.convertTo(sourceimg, CV_8U);
       cv::applyColorMap(sourceimg, cmap, cv::COLORMAP_JET);
       sourceimg = cmap;
     }
   }
 
   cv::imshow(windowname, sourceimg);
-  cv::waitKey(-1);
+  cv::waitKey(1);
 }
 
 inline void Showimg(const std::vector<cv::Mat>& sourceimgIns, const std::string& windowname, bool color = false, f64 quantileB = 0, f64 quantileT = 1, i32 wRows = 600)

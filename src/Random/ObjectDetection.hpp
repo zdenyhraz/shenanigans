@@ -26,6 +26,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   cv::Mat objectness8U = objectness.clone();
   cv::threshold(objectness8U, objectness8U, objectThreshold, 255, cv::THRESH_BINARY);
   objectness8U.convertTo(objectness8U, CV_8U);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness_thr.png").string(), objectness8U);
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
@@ -49,6 +50,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
 
 inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& objects)
 {
+  LOG_FUNCTION;
   cv::Mat out(source.size(), source.type());
   cv::cvtColor(source, out, cv::COLOR_GRAY2BGR);
 
@@ -64,7 +66,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   return out;
 }
 
-inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.15, i32 blurSize = 21, i32 stddevSize = 11)
+inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objectThreshold, i32 blurSize, i32 stddevSize)
 {
   LOG_FUNCTION;
   cv::Mat blurred(source.size(), source.type());
@@ -83,18 +85,22 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize = 50, f32 
       stddevs.at<f32>(r, c) = stddev[0];
     }
   }
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddevs.png").string(), stddevs, false, {0, 0}, true);
 
   f32 minThreshold = 0.1; // stddev needs to be at least 0.1 for object pixels
   cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
 
   const auto objectness = CalculateObjectness(stddevs, objectSize);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness.png").string(), objectness);
+
   const auto objects = CalculateObjects(objectness, objectThreshold);
 
-  ImGuiPlot::Get().Plot("stddev-blurred", PlotData2D{.z = blurred, .cmap = Gray});
-  ImGuiPlot::Get().Plot("stddev-edges", PlotData2D{.z = stddevs, .cmap = Jet});
-  ImGuiPlot::Get().Plot("stddev-objectness", PlotData2D{.z = objectness, .cmap = Jet});
-  Showimg(DrawObjects(source, objects), "stddev-objects");
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/blurred.png").string(), blurred);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddevs_thr.png").string(), stddevs, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness.png").string(), objectness, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string(), DrawObjects(source, objects));
 }
+
 inline void DetectObjectsCanny(
     const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.03, i32 blurSize = 11, i32 sobelSize = 3, f32 lowThreshold = 0.3, f32 highThreshold = 0.9)
 {
