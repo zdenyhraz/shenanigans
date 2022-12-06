@@ -26,7 +26,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   cv::Mat objectness8U = objectness.clone();
   cv::threshold(objectness8U, objectness8U, objectThreshold, 255, cv::THRESH_BINARY);
   objectness8U.convertTo(objectness8U, CV_8U);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness_thr.png").string(), objectness8U);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness_thr.png").string(), objectness8U, false, {0, 0}, true);
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
@@ -116,9 +116,4 @@ inline void DetectObjectsCanny(
 
   const auto objectness = CalculateObjectness(canny, objectSize);
   const auto objects = CalculateObjects(objectness, objectThreshold);
-
-  ImGuiPlot::Get().Plot("canny-blurred", PlotData2D{.z = blurred, .cmap = Gray});
-  ImGuiPlot::Get().Plot("canny-edges", PlotData2D{.z = canny, .cmap = Jet});
-  ImGuiPlot::Get().Plot("canny-objectness", PlotData2D{.z = objectness, .cmap = Jet});
-  Showimg(DrawObjects(source, objects), "canny-objects");
 }

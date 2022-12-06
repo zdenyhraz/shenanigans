@@ -15,25 +15,32 @@ void StuffWindow::Render()
   if (ImGui::BeginTabItem("Stuff"))
   {
     ImGui::Separator();
-
     if (ImGui::Button("ImGui demo"))
       showImGuiDemoWindow = !showImGuiDemoWindow;
     if (ImGui::Button("ImPlot demo"))
       showImPlotDemoWindow = !showImPlotDemoWindow;
+
+    ImGui::Separator();
     if (ImGui::Button("Evolution optimization"))
       LaunchAsync([]() { EvolutionOptimization(false); });
     if (ImGui::Button("Evolution meta optimization"))
       LaunchAsync([]() { EvolutionOptimization(true); });
     if (ImGui::Button("False correlations removal"))
       LaunchAsync([]() { FalseCorrelationsRemoval(); });
+
+    ImGui::Separator();
     if (ImGui::Button("Plot test"))
       LaunchAsync([]() { PlotTest(); });
-    if (ImGui::Button("Object Detection"))
-      LaunchAsync([]() { ObjectDetection(); });
+
+    ImGui::Separator();
     if (ImGui::Button("Uneven Illumination CLAHE"))
       LaunchAsync([]() { UnevenIlluminationCLAHE(); });
     if (ImGui::Button("Uneven Illumination Homomorphic"))
       LaunchAsync([]() { UnevenIlluminationHomomorphic(); });
+
+    ImGui::Separator();
+    if (ImGui::Button("Object Detection"))
+      LaunchAsync([]() { ObjectDetection(); });
 
     ImGui::EndTabItem();
   }
@@ -110,22 +117,22 @@ void StuffWindow::PlotTest()
 void StuffWindow::ObjectDetection()
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/rocks.png");
+  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/2.jpg");
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
   image.convertTo(image, CV_8U);
-  const auto objectSize = image.cols / 50; // 50
+  const auto objectSize = image.cols / 50;
 
   if (true)
   {
-    const auto objectThreshold = 0.01; // 0.15
+    const auto objectThreshold = 0.01; // 0.01
     const auto blurSize = 11;
     const auto stddevSize = 9;
     DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, stddevSize);
   }
 
-  if (true)
+  if (false)
   {
-    const auto objectThreshold = 0.01; // 0.03
+    const auto objectThreshold = 0.01;
     const auto blurSize = 11;
     const auto sobelSize = 3;
     const auto lowThreshold = 0.3;
