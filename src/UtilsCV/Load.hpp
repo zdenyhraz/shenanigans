@@ -9,6 +9,7 @@ template <typename T>
 inline cv::Mat LoadUnitFloatImage(const std::filesystem::path path)
 {
   PROFILE_FUNCTION;
+  LOG_FUNCTION;
   cv::Mat mat = cv::imread(path.string(), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
   if (mat.empty()) [[unlikely]]
     throw std::runtime_error(fmt::format("Image '{}' not found", path.string()));

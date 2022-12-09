@@ -13,6 +13,7 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize = 50)
   cv::normalize(edges, edgesNorm, 0, 1, cv::NORM_MINMAX);
 
   cv::Mat objectness = cv::Mat::zeros(edgesNorm.size(), CV_32F);
+#pragma omp parallel for
   for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
     for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
       objectness.at<f32>(r, c) = cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize))[0] / (objectSize * objectSize); // pixel average
@@ -26,7 +27,6 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   cv::Mat objectness8U = objectness.clone();
   cv::threshold(objectness8U, objectness8U, objectThreshold, 255, cv::THRESH_BINARY);
   objectness8U.convertTo(objectness8U, CV_8U);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness_thr.png").string(), objectness8U, false, {0, 0}, true);
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
@@ -76,6 +76,7 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objec
     cv::medianBlur(source, blurred, blurSize);
 
   cv::Mat stddevs = cv::Mat::zeros(blurred.size(), CV_32F);
+#pragma omp parallel for
   for (i32 r = stddevSize / 2; r < blurred.rows - stddevSize / 2; ++r)
   {
     for (i32 c = stddevSize / 2; c < blurred.cols - stddevSize / 2; ++c)
@@ -85,20 +86,18 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objec
       stddevs.at<f32>(r, c) = stddev[0];
     }
   }
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddevs.png").string(), stddevs, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs.png").string(), stddevs, false, {0, 0}, true);
 
   f32 minThreshold = 0.1; // stddev needs to be at least 0.1 for object pixels
   cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
 
   const auto objectness = CalculateObjectness(stddevs, objectSize);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness.png").string(), objectness);
-
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness.png").string(), objectness);
   const auto objects = CalculateObjects(objectness, objectThreshold);
-
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/blurred.png").string(), blurred);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddevs_thr.png").string(), stddevs, false, {0, 0}, true);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objectness.png").string(), objectness, false, {0, 0}, true);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string(), DrawObjects(source, objects));
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/blurred.png").string(), blurred);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs_thr.png").string(), stddevs, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness.png").string(), objectness, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objects.png").string(), DrawObjects(source, objects));
 }
 
 inline void DetectObjectsCanny(
@@ -115,5 +114,10 @@ inline void DetectObjectsCanny(
   cv::Canny(blurred, canny, lowThreshold * 255, highThreshold * 255, sobelSize);
 
   const auto objectness = CalculateObjectness(canny, objectSize);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objectness.png").string(), objectness);
   const auto objects = CalculateObjects(objectness, objectThreshold);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/blurred.png").string(), blurred);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/canny.png").string(), canny, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objectness.png").string(), objectness, false, {0, 0}, true);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objects.png").string(), DrawObjects(source, objects));
 }
