@@ -56,7 +56,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   cv::Mat out(source.size(), source.type());
   cv::cvtColor(source, out, cv::COLOR_GRAY2BGR);
 
-  const auto color = cv::Scalar(0, 0, 255);
+  const auto color = cv::Scalar(0, 0, 1);
   const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
 
   for (const auto& object : objects)
@@ -73,11 +73,7 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objec
   LOG_FUNCTION;
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/source.png").string(), source);
   cv::Mat blurred(source.size(), source.type());
-  if (true)
-    cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
-  else
-    cv::medianBlur(source, blurred, blurSize);
-
+  cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/blurred.png").string(), blurred);
   cv::Mat edges;
   cv::Sobel(blurred, edges, CV_32F, 1, 0, edgeSize);

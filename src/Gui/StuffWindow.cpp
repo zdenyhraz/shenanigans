@@ -117,7 +117,7 @@ void StuffWindow::PlotTest()
 void StuffWindow::ObjectDetection()
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/5.jpg");
+  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/3.jpg");
   const auto objectSize = 0.02 * image.rows;
   const auto blurSize = 0.005 * image.rows;
   const auto objectThreshold = 0.05;
