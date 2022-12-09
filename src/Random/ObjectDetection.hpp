@@ -17,9 +17,9 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
 #pragma omp parallel for
   for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
     for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
-      objectness.at<f32>(r, c) = cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0] / (objectSize * objectSize); // pixel average
+      objectness.at<f32>(r, c) = cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0];
 
-  return objectness;
+  return objectness / (objectSize * objectSize); // pixel average
 }
 
 inline f64 GetAverageAbsoluteDeviationY(const std::deque<cv::Point>& points)
@@ -60,6 +60,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   cv::Mat objectness8U = objectness.clone();
   cv::threshold(objectness8U, objectness8U, objectThreshold, 255, cv::THRESH_BINARY);
   objectness8U.convertTo(objectness8U, CV_8U);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness_thr.png").string(), objectness8U, false, {0, 0}, true);
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
@@ -67,12 +68,11 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   LOG_DEBUG("Found {} objects", contours.size());
 
   std::vector<Object> objects;
-  const auto minWidth = 0;
-  const auto minHeight = 0;
+  const auto minSize = 0.02 * objectness.rows;
   for (const auto& contour : contours)
   {
     // filter out small objects
-    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minWidth and minRect.size.height < minHeight)
+    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minSize and minRect.size.height < minSize)
       continue;
 
     // filter out horizontal sonar artefacts
@@ -113,6 +113,7 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objec
   else
     cv::medianBlur(source, blurred, blurSize);
 
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/blurred.png").string(), blurred);
   cv::Mat stddevs = cv::Mat::zeros(blurred.size(), CV_32F);
 #pragma omp parallel for
   for (i32 r = stddevSize / 2; r < blurred.rows - stddevSize / 2; ++r)
@@ -125,17 +126,12 @@ inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objec
     }
   }
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs.png").string(), stddevs, false, {0, 0}, true);
-  if (true)
-  {
-    f32 minThreshold = 0.1; // stddev needs to be at least 0.1 for object pixels
-    cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
-  }
-  const auto objectness = CalculateObjectness(stddevs, objectSize);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness.png").string(), objectness);
-  const auto objects = CalculateObjects(objectness, objectThreshold);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/blurred.png").string(), blurred);
+  f32 minThreshold = 0.05; // stddev needs to be at least 0.1 for object pixels
+  cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs_thr.png").string(), stddevs, false, {0, 0}, true);
+  const auto objectness = CalculateObjectness(stddevs, objectSize);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness.png").string(), objectness, false, {0, 0}, true);
+  const auto objects = CalculateObjects(objectness, objectThreshold);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objects.png").string(), DrawObjects(source, objects));
 }
 

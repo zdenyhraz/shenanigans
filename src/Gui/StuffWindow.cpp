@@ -117,15 +117,15 @@ void StuffWindow::PlotTest()
 void StuffWindow::ObjectDetection()
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/2.jpg");
+  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/4.jpg");
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
   image.convertTo(image, CV_8U);
-  const auto objectSize = 0.0156 * image.rows;
+  const auto objectSize = 0.02 * image.rows;
   const auto blurSize = 11;
 
   if (true)
   {
-    const auto objectThreshold = 0.01;
+    const auto objectThreshold = 0.05;
     const auto stddevSize = 9;
     DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, stddevSize);
   }
