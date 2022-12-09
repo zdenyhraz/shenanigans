@@ -22,22 +22,33 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   return objectness;
 }
 
-inline bool IsHorizontal(const std::vector<cv::Point>& contour, i32 maxConsecutivePoints, i32 consecutiveDistance)
+inline f64 GetAverageAbsoluteDeviationY(const std::deque<cv::Point>& points)
 {
-  i32 x = 0;
-  i32 consecutivePoints = 0;
+  const auto mean = std::accumulate(points.begin(), points.end(), 0., [](const auto sum, const auto& point) { return sum + point.y; }) / points.size();
+  const auto dev = std::accumulate(points.begin(), points.end(), 0., [&](const auto sum, const auto& point) { return sum + std::abs(point.y - mean); }) / points.size();
+  return dev;
+}
+
+inline bool IsHorizontal(const std::vector<cv::Point>& contour, i32 maxConsecutivePoints)
+{
+  std::deque<cv::Point> points;
   for (const auto& point : contour)
   {
-    if (std::abs(point.x - x) < consecutiveDistance)
-      ++consecutivePoints;
-    else
-    {
-      consecutivePoints = 0;
-      x = point.x;
-    }
+    points.push_front(point);
 
-    if (consecutivePoints > maxConsecutivePoints)
+    if (points.size() < maxConsecutivePoints)
+      continue;
+
+    if (points.size() > maxConsecutivePoints)
+      points.pop_back();
+
+    const auto pointSizeMultiplier = 0.01;
+    if (GetAverageAbsoluteDeviationY(points) < pointSizeMultiplier * points.size())
+    {
+      LOG_WARNING(
+          "AverageAbsoluteDeviationY: {:.1f} < {:.1f} on {}/{} pts ", GetAverageAbsoluteDeviationY(points), pointSizeMultiplier * points.size(), points.size(), contour.size());
       return true;
+    }
   }
 
   return false;
@@ -65,7 +76,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
       continue;
 
     // filter out horizontal sonar artefacts
-    if (IsHorizontal(contour, 0.015 * objectness.rows, 0.0014 * objectness.rows))
+    if (IsHorizontal(contour, 0.3 * contour.size()))
       continue;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
