@@ -121,19 +121,18 @@ void StuffWindow::ObjectDetection()
   cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
   image.convertTo(image, CV_8U);
   const auto objectSize = 0.0156 * image.rows;
+  const auto blurSize = 11;
 
   if (true)
   {
     const auto objectThreshold = 0.01;
-    const auto blurSize = 11;
     const auto stddevSize = 9;
     DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, stddevSize);
   }
 
-  if (true)
+  if (false)
   {
     const auto objectThreshold = 0.01;
-    const auto blurSize = 11;
     const auto sobelSize = 3;
     const auto lowThreshold = 0.3;
     const auto highThreshold = 3 * lowThreshold;
