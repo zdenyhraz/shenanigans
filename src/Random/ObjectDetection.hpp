@@ -22,13 +22,13 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   return objectness;
 }
 
-inline bool IsHorizontal(const std::vector<cv::Point>& contour, i32 maxConsecutivePoints)
+inline bool IsHorizontal(const std::vector<cv::Point>& contour, i32 maxConsecutivePoints, i32 consecutiveDistance)
 {
   i32 x = 0;
   i32 consecutivePoints = 0;
   for (const auto& point : contour)
   {
-    if (std::abs(point.x - x) < 5)
+    if (std::abs(point.x - x) < consecutiveDistance)
       ++consecutivePoints;
     else
     {
@@ -64,8 +64,8 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
     if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minWidth and minRect.size.height < minHeight)
       continue;
 
-    // filter out horizontal artefacts
-    if (IsHorizontal(contour, 0.014 * objectness.rows))
+    // filter out horizontal sonar artefacts
+    if (IsHorizontal(contour, 0.015 * objectness.rows, 0.0014 * objectness.rows))
       continue;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
