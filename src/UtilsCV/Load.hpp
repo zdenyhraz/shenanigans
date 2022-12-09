@@ -10,6 +10,7 @@ inline cv::Mat LoadUnitFloatImage(const std::filesystem::path path)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
+  LOG_DEBUG("Loading image {}...", path.string());
   cv::Mat mat = cv::imread(path.string(), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
   if (mat.empty()) [[unlikely]]
     throw std::runtime_error(fmt::format("Image '{}' not found", path.string()));
@@ -23,7 +24,7 @@ inline std::vector<cv::Mat> LoadImages(const std::string& dirpath)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
-  LOG_INFO("Loading images from '{}'...", dirpath);
+  LOG_DEBUG("Loading images from {}...", dirpath);
 
   if (!std::filesystem::is_directory(dirpath))
     throw std::runtime_error(fmt::format("'{}' is not a valid directory", dirpath));

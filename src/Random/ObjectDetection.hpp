@@ -55,7 +55,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   cv::cvtColor(source, out, cv::COLOR_GRAY2BGR);
 
   const auto color = cv::Scalar(0, 0, 255);
-  const auto thickness = std::clamp(out.cols / 100, 1, 5);
+  const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
 
   for (const auto& object : objects)
   {
