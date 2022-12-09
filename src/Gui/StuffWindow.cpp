@@ -117,27 +117,12 @@ void StuffWindow::PlotTest()
 void StuffWindow::ObjectDetection()
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f64>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/4.jpg");
-  cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
-  image.convertTo(image, CV_8U);
+  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/5.jpg");
   const auto objectSize = 0.02 * image.rows;
-  const auto blurSize = 11;
-
-  if (true)
-  {
-    const auto objectThreshold = 0.05;
-    const auto stddevSize = 9;
-    DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, stddevSize);
-  }
-
-  if (false)
-  {
-    const auto objectThreshold = 0.01;
-    const auto sobelSize = 3;
-    const auto lowThreshold = 0.3;
-    const auto highThreshold = 3 * lowThreshold;
-    DetectObjectsCanny(image, objectSize, objectThreshold, blurSize, sobelSize, lowThreshold, highThreshold);
-  }
+  const auto blurSize = 0.005 * image.rows;
+  const auto objectThreshold = 0.05;
+  const auto edgeSize = 9;
+  DetectObjectsStddev(image, objectSize, objectThreshold, blurSize, edgeSize);
 }
 
 void StuffWindow::UnevenIlluminationCLAHE()

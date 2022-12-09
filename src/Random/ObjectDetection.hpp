@@ -22,38 +22,6 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   return objectness / (objectSize * objectSize); // pixel average
 }
 
-inline f64 GetAverageAbsoluteDeviationY(const std::deque<cv::Point>& points)
-{
-  const auto mean = std::accumulate(points.begin(), points.end(), 0., [](const auto sum, const auto& point) { return sum + point.y; }) / points.size();
-  const auto dev = std::accumulate(points.begin(), points.end(), 0., [&](const auto sum, const auto& point) { return sum + std::abs(point.y - mean); }) / points.size();
-  return dev;
-}
-
-inline bool IsHorizontal(const std::vector<cv::Point>& contour, i32 maxConsecutivePoints)
-{
-  std::deque<cv::Point> points;
-  for (const auto& point : contour)
-  {
-    points.push_front(point);
-
-    if (points.size() < maxConsecutivePoints)
-      continue;
-
-    if (points.size() > maxConsecutivePoints)
-      points.pop_back();
-
-    const auto pointSizeMultiplier = 0.01;
-    if (GetAverageAbsoluteDeviationY(points) < pointSizeMultiplier * points.size())
-    {
-      LOG_WARNING(
-          "AverageAbsoluteDeviationY: {:.1f} < {:.1f} on {}/{} pts ", GetAverageAbsoluteDeviationY(points), pointSizeMultiplier * points.size(), points.size(), contour.size());
-      return true;
-    }
-  }
-
-  return false;
-}
-
 inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objectThreshold)
 {
   LOG_FUNCTION;
@@ -73,10 +41,6 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objec
   {
     // filter out small objects
     if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minSize and minRect.size.height < minSize)
-      continue;
-
-    // filter out horizontal sonar artefacts
-    if (IsHorizontal(contour, 0.3 * contour.size()))
       continue;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
@@ -104,55 +68,27 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   return out;
 }
 
-inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objectThreshold, i32 blurSize, i32 stddevSize)
+inline void DetectObjectsStddev(const cv::Mat& source, i32 objectSize, f32 objectThreshold, i32 blurSize, i32 edgeSize)
 {
   LOG_FUNCTION;
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/source.png").string(), source);
   cv::Mat blurred(source.size(), source.type());
-  if (0)
-    cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0, 0);
+  if (true)
+    cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
   else
     cv::medianBlur(source, blurred, blurSize);
 
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/blurred.png").string(), blurred);
-  cv::Mat stddevs = cv::Mat::zeros(blurred.size(), CV_32F);
-#pragma omp parallel for
-  for (i32 r = stddevSize / 2; r < blurred.rows - stddevSize / 2; ++r)
-  {
-    for (i32 c = stddevSize / 2; c < blurred.cols - stddevSize / 2; ++c)
-    {
-      cv::Scalar mean, stddev;
-      cv::meanStdDev(RoiCropRef(blurred, c, r, stddevSize, stddevSize), mean, stddev);
-      stddevs.at<f32>(r, c) = stddev[0];
-    }
-  }
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs.png").string(), stddevs, false, {0, 0}, true);
-  f32 minThreshold = 0.05; // stddev needs to be at least 0.1 for object pixels
-  cv::threshold(stddevs, stddevs, minThreshold * 255, 1, cv::THRESH_BINARY);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/stddevs_thr.png").string(), stddevs, false, {0, 0}, true);
-  const auto objectness = CalculateObjectness(stddevs, objectSize);
+  cv::Mat edges;
+  cv::Sobel(blurred, edges, CV_32F, 1, 0, edgeSize);
+  edges = cv::abs(edges);
+  cv::normalize(edges, edges, 0, 1, cv::NORM_MINMAX);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/edges.png").string(), edges, false, {0, 0}, true);
+  f32 minThreshold = 0.3; // edge needs to be at least 0.1 for object pixels
+  cv::threshold(edges, edges, minThreshold, 1, cv::THRESH_BINARY);
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/edges_thr.png").string(), edges, false, {0, 0}, true);
+  const auto objectness = CalculateObjectness(edges, objectSize);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objectness.png").string(), objectness, false, {0, 0}, true);
   const auto objects = CalculateObjects(objectness, objectThreshold);
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/stddev/objects.png").string(), DrawObjects(source, objects));
-}
-
-inline void DetectObjectsCanny(
-    const cv::Mat& source, i32 objectSize = 50, f32 objectThreshold = 0.03, i32 blurSize = 11, i32 sobelSize = 3, f32 lowThreshold = 0.3, f32 highThreshold = 0.9)
-{
-  LOG_FUNCTION;
-  cv::Mat blurred(source.size(), source.type());
-  if (0)
-    cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0, 0);
-  else
-    cv::medianBlur(source, blurred, blurSize);
-
-  cv::Mat canny;
-  cv::Canny(blurred, canny, lowThreshold * 255, highThreshold * 255, sobelSize);
-
-  const auto objectness = CalculateObjectness(canny, objectSize);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objectness.png").string(), objectness);
-  const auto objects = CalculateObjects(objectness, objectThreshold);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/blurred.png").string(), blurred);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/canny.png").string(), canny, false, {0, 0}, true);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objectness.png").string(), objectness, false, {0, 0}, true);
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/canny/objects.png").string(), DrawObjects(source, objects));
 }
