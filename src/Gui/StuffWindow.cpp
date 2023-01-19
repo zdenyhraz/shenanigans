@@ -117,7 +117,8 @@ void StuffWindow::PlotTest()
 void StuffWindow::ObjectDetection()
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/2.jpg");
+  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/lobsters.png");
+  // cv::resize(image, image, image.size() / 4);
   DetectObjectsEdge(image);
 }
 

@@ -70,13 +70,14 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
 inline void DetectObjectsEdge(const cv::Mat& source)
 {
   LOG_FUNCTION;
-  const auto objectSize = 0.02 * source.rows;
-  const auto blurSize = 0.005 * source.rows;
-  const auto edgeSizeTarget = static_cast<i32>(0.0025 * source.rows);
+  const auto objectSize = 0.05 * source.rows;                       // 0.02
+  const auto blurSizeTarget = static_cast<i32>(0.05 * source.rows); // 0.005
+  const auto blurSize = blurSizeTarget % 2 == 0 ? blurSizeTarget + 1 : blurSizeTarget;
+  const auto edgeSizeTarget = static_cast<i32>(0.0025 * source.rows); // 0.0025
   const auto edgeSize = edgeSizeTarget % 2 == 0 ? edgeSizeTarget + 1 : edgeSizeTarget;
-  const auto minObjectSize = 0.02 * source.rows;
-  const auto edgeThreshold = 0.3; // relative normalized
-  const auto objectnessThreshold = 0.01;
+  const auto minObjectSize = 0.02 * source.rows; // 0.02
+  const auto edgeThreshold = 0.7;                // 0.3 relative normalized
+  const auto objectnessThreshold = 0.01;         // 0.01
 
   Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/source.png").string(), source);
   cv::Mat blurred(source.size(), source.type());
