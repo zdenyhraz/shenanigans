@@ -9,8 +9,12 @@ if True:
   fig, axs = plt.subplots(1,3, figsize=(33,8))
   fig.canvas.manager.set_window_title(file)
 
+  if False:
+    weights = [ping.ping_chan_headers[0].Weight for ping in packets[pyxtf.XTFHeaderType.sonar]]
+    print(f"Weights: {weights}")
+
   # The function concatenate_channels concatenates all the individual pings for a channel, and returns it as a dense numpy array
-  image = pyxtf.concatenate_channel(packets[pyxtf.XTFHeaderType.sonar], file_header=header, channel=0, weighted=False)
+  image = pyxtf.concatenate_channel(packets[pyxtf.XTFHeaderType.sonar], file_header=header, channel=0, weighted=True)
 
   plot=axs[0].imshow(image, cmap='gray', aspect='auto')
   axs[0].title.set_text("raw")
@@ -32,25 +36,28 @@ if True:
   plt.colorbar(plot)
 
   plt.tight_layout()
-  fig, axs = plt.subplots(1,2, figsize=(22,8))
-  fig.canvas.manager.set_window_title(file)
-  plt.tight_layout()
-
-  row_max = image.max(axis=1)
-  image = image / row_max[:, np.newaxis]
-
-  plot=axs[0].imshow(image, cmap='gray', aspect='auto')
-  axs[0].title.set_text("+ row max norm")
-  plt.colorbar(plot)
-
-  row_sum = image.sum(axis=1)
-  image = image / row_sum[:, np.newaxis]
-
-  plot=axs[1].imshow(image, cmap='gray', aspect='auto')
-  axs[1].title.set_text("+ row max norm + row sum norm")
-  plt.colorbar(plot)
-
   plt.show()
+
+  if False:
+    fig, axs = plt.subplots(1,2, figsize=(22,8))
+    fig.canvas.manager.set_window_title(file)
+    row_max = image.max(axis=1)
+    image = image / row_max[:, np.newaxis]
+
+    plot=axs[0].imshow(image, cmap='gray', aspect='auto')
+    axs[0].title.set_text("+ row max norm")
+    plt.colorbar(plot)
+
+    row_sum = image.sum(axis=1)
+    image = image / row_sum[:, np.newaxis]
+
+    plot=axs[1].imshow(image, cmap='gray', aspect='auto')
+    axs[1].title.set_text("+ row max norm + row sum norm")
+    plt.colorbar(plot)
+
+    plt.tight_layout()
+    plt.show()
+
 else:
   directory = r'M:\Work\shenanigans\data\debug\ObjectDetection\xtf'
   fig = plt.figure()
