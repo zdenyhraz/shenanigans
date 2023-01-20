@@ -5,31 +5,51 @@ import os
 
 if True:
   file = r'M:\Work\shenanigans\data\debug\ObjectDetection\xtf\sasi-S-upper-20221102-144815-l38.xtf'
-
   (header, packets) = pyxtf.xtf_read(file)
+  fig, axs = plt.subplots(1,3, figsize=(33,8))
+  fig.canvas.manager.set_window_title(file)
 
   # The function concatenate_channels concatenates all the individual pings for a channel, and returns it as a dense numpy array
   image = pyxtf.concatenate_channel(packets[pyxtf.XTFHeaderType.sonar], file_header=header, channel=0, weighted=False)
-  print("image ", file, " shape: ",image.shape)
+
+  plot=axs[0].imshow(image, cmap='gray', aspect='auto')
+  axs[0].title.set_text("raw")
+  plt.colorbar(plot)
 
   upper_limit = 2 ** 14
   image.clip(0, upper_limit-1, out=image) # Clip to range (max cannot be used due to outliers) More robust methods are possible (through histograms / statistical outlier removal)
-  image = np.log10(image + 0.0001) # The sonar data is logarithmic (dB), add small value to avoid log10(0)
 
-  fig, (ax1, ax2,ax3) = plt.subplots(1,3, figsize=(30,10))
-  fig.canvas.manager.set_window_title(file)
-  row_sums = image.sum(axis=1)
-  image_normalized = image / row_sums[:, np.newaxis]
+  plot=axs[1].imshow(image, cmap='gray', aspect='auto')
+  axs[1].title.set_text(f"clip to {upper_limit}")
+  plt.colorbar(plot)
 
-  # row_sums = image.sum(axis=0)
-  # image = image / row_sums[np.newaxis,:]
+  logeps=0.0001
+  image = np.log10(image + logeps) # The sonar data is logarithmic (dB), add small value to avoid log10(0)
+  image.clip(0, np.log10(upper_limit), out=image)
 
-  # plt.imshow(image, cmap='gray', vmin=0, vmax=np.log10(upper_limit), aspect='auto') # waterfall-view
-  ax1.imshow(image, cmap='gray', aspect='auto') # waterfall-view
-  ax2.plot(row_sums[::-1],np.linspace(0,row_sums.shape[0]-1,num=row_sums.shape[0]))
-  ax3.imshow(image_normalized, cmap='gray', aspect='auto') # waterfall-view
+  plot=axs[2].imshow(image, cmap='gray', aspect='auto')
+  axs[2].title.set_text(f"clip + log10 (eps={logeps})")
+  plt.colorbar(plot)
 
   plt.tight_layout()
+  fig, axs = plt.subplots(1,2, figsize=(22,8))
+  fig.canvas.manager.set_window_title(file)
+  plt.tight_layout()
+
+  row_max = image.max(axis=1)
+  image = image / row_max[:, np.newaxis]
+
+  plot=axs[0].imshow(image, cmap='gray', aspect='auto')
+  axs[0].title.set_text("+ row max norm")
+  plt.colorbar(plot)
+
+  row_sum = image.sum(axis=1)
+  image = image / row_sum[:, np.newaxis]
+
+  plot=axs[1].imshow(image, cmap='gray', aspect='auto')
+  axs[1].title.set_text("+ row max norm + row sum norm")
+  plt.colorbar(plot)
+
   plt.show()
 else:
   directory = r'M:\Work\shenanigans\data\debug\ObjectDetection\xtf'
@@ -53,7 +73,7 @@ else:
     print("image ", file, " shape: ",image.shape)
 
     plt.clf()
-    plt.imshow(image, cmap='gray', vmin=0, vmax=np.log10(upper_limit), aspect='auto') # waterfall-view
+    plt.imshow(image, cmap='gray', vmin=0, vmax=np.log10(upper_limit), aspect='auto')
     plt.tight_layout()
     fig.canvas.manager.set_window_title(file)
     plt.draw()
