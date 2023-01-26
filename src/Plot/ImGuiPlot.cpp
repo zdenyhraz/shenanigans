@@ -102,7 +102,7 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 
 void ImGuiPlot::Debug()
 {
-  static constexpr usize n = 1001;
+  static constexpr usize n = 101;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
   std::vector<f64> y2(n);
@@ -117,6 +117,6 @@ void ImGuiPlot::Debug()
   Plot({.name = fmt::format("debug1d#{}", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 
-  Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Gaussian<f64>(n, n) + Random::Rand()});
+  Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Gaussian<f32>(n, n) + Random::Rand<f32>()});
   LOG_DEBUG("Added one debug2d plot");
 }

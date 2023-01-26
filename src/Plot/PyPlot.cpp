@@ -67,15 +67,13 @@ py::dict PyPlot::GetDefaultPlotData(const std::string& name)
 {
   py::dict plotData;
   plotData["name"] = name;
-  if (not plotData.contains("savepath"))
-    plotData["savepath"] = mSave ? fmt::format("../data/debug/{}.png", name) : "";
   return plotData;
 }
 
 py::dict PyPlot::GetPythonPlotData(const PlotData1D& data)
 {
   py::dict plotData = GetDefaultPlotData(data.name);
-  plotData["x"] = not data.x.empty() ? data.x : Iota(0., data.ys[0].size());
+  plotData["x"] = data.x;
   plotData["ys"] = data.ys;
   plotData["y2s"] = data.y2s;
   plotData["xlabel"] = data.xlabel;
@@ -89,15 +87,13 @@ py::dict PyPlot::GetPythonPlotData(const PlotData1D& data)
   plotData["y2linestyles"] = data.y2linestyles;
   plotData["log"] = data.log;
   plotData["aspectratio"] = data.aspectratio;
-  if (not data.savepath.empty())
-    plotData["savepath"] = data.savepath;
+  plotData["savepath"] = data.savepath;
   return plotData;
 }
 
 py::dict PyPlot::GetPythonPlotData(const PlotData2D& data)
 {
   py::dict plotData = GetDefaultPlotData(data.name);
-  data.z.convertTo(data.z, CV_32F);
   plotData["z"] = Python::ToNumpy<f32>(data.z);
   plotData["xlabel"] = data.xlabel;
   plotData["ylabel"] = data.ylabel;
@@ -109,8 +105,7 @@ py::dict PyPlot::GetPythonPlotData(const PlotData2D& data)
   plotData["interp"] = data.interpolate;
   plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = data.cmap;
-  if (not data.savepath.empty())
-    plotData["savepath"] = data.savepath;
+  plotData["savepath"] = data.savepath;
   return plotData;
 }
 

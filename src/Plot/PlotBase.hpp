@@ -18,22 +18,14 @@ class PlotBase
     mPlots2D.clear();
   }
 
-  void SchedulePlot(PlotData1D&& data)
+  template <class T>
+  void SchedulePlot(T&& data, std::vector<T>& vec)
   {
     std::scoped_lock lock(mPlotsMutex);
-    if (auto it = std::ranges::find_if(mPlots1D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots1D.end())
+    if (auto it = std::ranges::find_if(vec, [&data](const auto& entry) { return entry.name == data.name; }); it != vec.end())
       *it = std::move(data);
     else
-      mPlots1D.emplace_back(std::move(data));
-  }
-
-  void SchedulePlot(PlotData2D&& data)
-  {
-    std::scoped_lock lock(mPlotsMutex);
-    if (auto it = std::ranges::find_if(mPlots2D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots2D.end())
-      *it = std::move(data);
-    else
-      mPlots2D.emplace_back(std::move(data));
+      vec.emplace_back(std::move(data));
   }
 
 protected:
@@ -47,7 +39,26 @@ public:
   static void Render() { Singleton<T>::Get().RenderInternal(); }
   static void Clear() { Singleton<T>::Get().ClearInternal(); }
   static void SetSave(bool save) { Singleton<T>::Get().mSave = save; }
-  static void Plot(PlotData1D&& data) { Singleton<T>::Get().SchedulePlot(std::move(data)); }
-  static void Plot(PlotData2D&& data) { Singleton<T>::Get().SchedulePlot(std::move(data)); }
-  static void Plot(const std::string& name, const cv::Mat& z) { Singleton<T>::Get().SchedulePlot({.name = name, .z = z}); }
+
+  static void Plot(PlotData1D&& data)
+  {
+    if (data.x.empty())
+      data.x = Iota(0., data.ys[0].size());
+
+    Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots1D);
+  }
+
+  static void Plot(PlotData2D&& data)
+  {
+    if (data.z.channels() > 1)
+      throw std::invalid_argument("Multichannel image plots not supported");
+
+    if (data.savepath.empty() and Singleton<T>::Get().mSave)
+      data.savepath = fmt::format("../data/debug/{}.png", data.name);
+
+    data.z.convertTo(data.z, CV_32F);
+    Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
+  }
+
+  static void Plot(const std::string& name, const cv::Mat& z) { Plot({.name = name, .z = z}); }
 };
