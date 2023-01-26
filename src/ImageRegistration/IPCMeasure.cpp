@@ -40,8 +40,8 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
     {
       if (true)
       {
-        PyPlot::Plot("Image1", {.z = image1, .cmap = "gray"});
-        PyPlot::Plot("Image2", {.z = image2, .cmap = "gray"});
+        PyPlot::Plot({.name = "Image1", .z = image1, .cmap = "gray"});
+        PyPlot::Plot({.name = "Image2", .z = image2, .cmap = "gray"});
       }
       else
       {
@@ -67,10 +67,10 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   LOG_SUCCESS("IPC average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyIPC), Stddev<f64>(accuracyIPC));
   LOG_SUCCESS("IPCO average accuracy: {:.3f} ± {:.3f}", Mean<f64>(accuracyIPCO), Stddev<f64>(accuracyIPCO));
 
-  PyPlot::Plot("shift error", "imreg_accuracy",
-      py::dict{"x"_a = ColMeans<f64>(refShiftsX), "pc_error"_a = ColMeans<f64>(accuracyPC), "pc_stddev"_a = ColStddevs<f64>(accuracyPC), "pcs_error"_a = ColMeans<f64>(accuracyPCS),
-          "pcs_stddev"_a = ColStddevs<f64>(accuracyPCS), "ipc_error"_a = ColMeans<f64>(accuracyIPC), "ipc_stddev"_a = ColStddevs<f64>(accuracyIPC),
-          "ipco_error"_a = ColMeans<f64>(accuracyIPCO), "ipco_stddev"_a = ColStddevs<f64>(accuracyIPCO)});
+  PyPlot::PlotCustom(
+      "imreg_accuracy", py::dict{"name"_a = "shift error", "x"_a = ColMeans<f64>(refShiftsX), "pc_error"_a = ColMeans<f64>(accuracyPC), "pc_stddev"_a = ColStddevs<f64>(accuracyPC),
+                            "pcs_error"_a = ColMeans<f64>(accuracyPCS), "pcs_stddev"_a = ColStddevs<f64>(accuracyPCS), "ipc_error"_a = ColMeans<f64>(accuracyIPC),
+                            "ipc_stddev"_a = ColStddevs<f64>(accuracyIPC), "ipco_error"_a = ColMeans<f64>(accuracyIPCO), "ipco_stddev"_a = ColStddevs<f64>(accuracyIPCO)});
 
   Plot::Plot({.name = "shift error",
       .x = ColMeans<f64>(refShiftsX),
@@ -89,10 +89,10 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   Plot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
-  PyPlot::Plot("PC accuracy", {.z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot("PCS accuracy", {.z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot("IPC accuracy", {.z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot("IPCO accuracy", {.z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  PyPlot::Plot({.name = "PC accuracy", .z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  PyPlot::Plot({.name = "PCS accuracy", .z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  PyPlot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  PyPlot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
   if (progress)
     *progress = 0;

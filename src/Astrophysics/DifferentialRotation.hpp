@@ -173,8 +173,8 @@ public:
 
   template <bool Managed = false> // executed automatically by some logic (e.g.
                                   // optimization algorithm) instead of manually
-  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax,
-      i32 cadence, i32 idstart, f32* progress = nullptr)
+  static DifferentialRotationData Calculate(
+      const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress = nullptr)
   {
     PROFILE_FUNCTION;
     if constexpr (not Managed)
@@ -192,8 +192,8 @@ public:
 
   template <bool Managed = false> // executed automatically by some logic (e.g.
                                   // optimization algorithm) instead of manually
-  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax,
-      i32 cadence, i32 idstart, f32* progress, DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
+  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart,
+      f32* progress, DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
     if constexpr (not Managed)
@@ -263,8 +263,7 @@ public:
           const auto shift = ipc.Calculate(std::move(crop1), std::move(crop2));
           const auto shiftx = std::clamp(shift.x, shiftxmin, shiftxmax);
           const auto shifty = std::clamp(shift.y, -shiftymax, shiftymax);
-          const auto omegax =
-              std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
+          const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
           const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * RadPerSecToDegPerDay;
 
           data.shiftx.at<f32>(y, xindex) = shiftx;
@@ -293,8 +292,8 @@ public:
     return data;
   }
 
-  static void Optimize(IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart,
-      i32 xsizeopt, i32 ysizeopt, i32 popsize)
+  static void Optimize(
+      IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;
@@ -314,15 +313,12 @@ public:
     imageCache.Reserve(ids);
     headerCache.Reserve(ids);
 
-    const auto dataBefore =
-        Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
-    const auto predfit =
-        GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
+    const auto dataBefore = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+    const auto predfit = GetVectorAverage({GetPredictedOmegas(dataBefore.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(dataBefore.theta, 14.192, -1.70, -2.36)});
 
     const auto obj = [&](const IPC& ipcopt)
     {
-      const auto dataopt =
-          Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+      const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
       if (dataopt.omegax.empty())
         return std::numeric_limits<f64>::infinity();
       const auto omegax = GetRowAverage(dataopt.omegax);
@@ -340,17 +336,18 @@ public:
     IPCOptimization::Optimize(ipc, obj, popsize);
     if (xsizeopt >= 100)
       SaveOptimizedParameters(ipc, fmt::format("{}/proc", dataPath), xsizeopt, ysizeopt, popsize);
-    const auto dataAfter =
-        Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
+    const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
-    PyPlot::Plot("Diffrot opt",
-        {.x = ToDegrees(1) * dataAfter.theta,
-            .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
-                sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615),
-                GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
-            .xlabel = "latitude [deg]",
-            .ylabel = "average omega x [deg/day]",
-            .label_ys = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"}});
+    PyPlot::Plot({
+        .name = "Diffrot opt",
+        .x = ToDegrees(1) * dataAfter.theta,
+        .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
+            sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615),
+            GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
+        .ylabels = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+        .xlabel = "latitude [deg]",
+        .ylabel = "average omega x [deg/day]",
+    });
   }
 
   static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, f64 timestep)
@@ -412,13 +409,11 @@ public:
     LOG_FUNCTION;
     const std::string dataPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_day_2500";
     const i32 idstart = 18933122;
-    const auto image1 =
-        RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
+    const auto image1 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
 
     for (i32 idstep = 1; idstep <= maxstep; ++idstep)
     {
-      const auto image2 = RoiCrop(
-          LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart + idstep)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
+      const auto image2 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart + idstep)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
       ipc.SetDebugName(fmt::format("{}s", idstep * 45));
       ipc.Calculate<IPC::Mode::Debug>(image1, image2);
     }
@@ -498,80 +493,91 @@ private:
     const auto times = GetTimesInDays(data.idstep * data.cadence, data.idstride * data.cadence, data.xsize);
     PlotMeridianCurve(data, dataPath, 27);
 
-    PyPlot::Plot("fits params", {.x = times,
-                                    .ys = {data.fshiftx, data.fshifty},
-                                    .y2s = {ToDegrees(1) * data.theta0},
-                                    .xlabel = "time [days]",
-                                    .ylabel = "fits shift [px]",
-                                    .y2label = "theta0 [deg]",
-                                    .label_ys = {"center shift x", "center shift y"},
-                                    .label_y2s = {"theta0"}});
-    PyPlot::Plot("avgshift x", {.x = ToDegrees(1) * data.theta,
-                                   .y = GetRowAverage(data.shiftx),
-                                   .y2 = GetRowAverage(data.shifty),
-                                   .xlabel = "latitude [deg]",
-                                   .ylabel = "average shift x [px]",
-                                   .y2label = "average shift y [px]",
-                                   .label_y = "ipc x",
-                                   .label_y2 = "ipc y"});
-    PyPlot::Plot("avgomega x", {
-                                   .x = ToDegrees(1) * data.theta,
-                                   .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)),
-                                       polyfit(data.theta, GetRowAverage(data.omegax), 2), GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615),
-                                       GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
-                                   .xlabel = "latitude [deg]",
-                                   .ylabel = "average omega x [deg/day]",
-                                   .label_ys = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
-                               });
-    PyPlot::Plot("avgomega y", {
-                                   .x = ToDegrees(1) * data.theta,
-                                   .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
-                                   .xlabel = "latitude [deg]",
-                                   .ylabel = "average omega x [deg/day]",
-                                   .label_ys = {"ipc", "ipc polyfit"},
-                               });
+    PyPlot::Plot({
+        .name = "fits params",
+        .x = times,
+        .ys = {data.fshiftx, data.fshifty},
+        .y2s = {ToDegrees(1) * data.theta0},
+        .ylabels = {"center shift x", "center shift y"},
+        .y2labels = {"theta0"},
+        .xlabel = "time [days]",
+        .ylabel = "fits shift [px]",
+        .y2label = "theta0 [deg]",
+    });
+    PyPlot::Plot({
+        .name = "avgshift x",
+        .x = ToDegrees(1) * data.theta,
+        .ys = {GetRowAverage(data.shiftx)},
+        .y2s = {GetRowAverage(data.shifty)},
+        .ylabels = {"ipc x"},
+        .y2labels = {"ipc y"},
+        .xlabel = "latitude [deg]",
+        .ylabel = "average shift x [px]",
+        .y2label = "average shift y [px]",
+    });
+    PyPlot::Plot({
+        .name = "avgomega x",
+        .x = ToDegrees(1) * data.theta,
+        .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
+            GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
+        .ylabels = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+        .xlabel = "latitude [deg]",
+        .ylabel = "average omega x [deg/day]",
+    });
+    PyPlot::Plot({
+        .name = "avgomega y",
+        .x = ToDegrees(1) * data.theta,
+        .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
+        .ylabels = {"ipc", "ipc polyfit"},
+        .xlabel = "latitude [deg]",
+        .ylabel = "average omega x [deg/day]",
+    });
 
     const f64 xmin = times.front(), xmax = times.back();
     const f64 ymin = ToDegrees(data.theta.back()), ymax = ToDegrees(data.theta.front());
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
     const f64 aspectratio = 2;
-    PyPlot::Plot("shift x", {.z = data.shiftx,
-                                .xmin = xmin,
-                                .xmax = xmax,
-                                .ymin = ymin,
-                                .ymax = ymax,
-                                .xlabel = xlabel,
-                                .ylabel = ylabel,
-                                .zlabel = "shift x [px]",
-                                .aspectratio = aspectratio});
-    PyPlot::Plot("omega x", {.z = data.omegax,
-                                .xmin = xmin,
-                                .xmax = xmax,
-                                .ymin = ymin,
-                                .ymax = ymax,
-                                .xlabel = xlabel,
-                                .ylabel = ylabel,
-                                .zlabel = "omega x [px]",
-                                .aspectratio = aspectratio});
-    PyPlot::Plot("shift y", {.z = data.shifty,
-                                .xmin = xmin,
-                                .xmax = xmax,
-                                .ymin = ymin,
-                                .ymax = ymax,
-                                .xlabel = xlabel,
-                                .ylabel = ylabel,
-                                .zlabel = "shift y [px]",
-                                .aspectratio = aspectratio});
-    PyPlot::Plot("omega y", {.z = data.omegay,
-                                .xmin = xmin,
-                                .xmax = xmax,
-                                .ymin = ymin,
-                                .ymax = ymax,
-                                .xlabel = xlabel,
-                                .ylabel = ylabel,
-                                .zlabel = "omega y [px]",
-                                .aspectratio = aspectratio});
+    PyPlot::Plot({.name = "shift x",
+        .z = data.shiftx,
+        .xmin = xmin,
+        .xmax = xmax,
+        .ymin = ymin,
+        .ymax = ymax,
+        .xlabel = xlabel,
+        .ylabel = ylabel,
+        .zlabel = "shift x [px]",
+        .aspectratio = aspectratio});
+    PyPlot::Plot({.name = "omega x",
+        .z = data.omegax,
+        .xmin = xmin,
+        .xmax = xmax,
+        .ymin = ymin,
+        .ymax = ymax,
+        .xlabel = xlabel,
+        .ylabel = ylabel,
+        .zlabel = "omega x [px]",
+        .aspectratio = aspectratio});
+    PyPlot::Plot({.name = "shift y",
+        .z = data.shifty,
+        .xmin = xmin,
+        .xmax = xmax,
+        .ymin = ymin,
+        .ymax = ymax,
+        .xlabel = xlabel,
+        .ylabel = ylabel,
+        .zlabel = "shift y [px]",
+        .aspectratio = aspectratio});
+    PyPlot::Plot({.name = "omega y",
+        .z = data.omegay,
+        .xmin = xmin,
+        .xmax = xmax,
+        .ymin = ymin,
+        .ymax = ymax,
+        .xlabel = xlabel,
+        .ylabel = ylabel,
+        .zlabel = "omega y [px]",
+        .aspectratio = aspectratio});
   }
 
   static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)

@@ -24,7 +24,7 @@ void ImGuiPlot::RenderInternal()
   }
 }
 
-void ImGuiPlot::RenderInternal(const PlotData1D& data) const
+void ImGuiPlot::RenderInternal(const PlotData1D& data)
 {
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
@@ -71,7 +71,7 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data) const
   }
 }
 
-void ImGuiPlot::RenderInternal(const PlotData2D& data) const
+void ImGuiPlot::RenderInternal(const PlotData2D& data)
 {
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
@@ -100,31 +100,6 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
     return ImPlotColormap_Greys;
 
   return ImPlotColormap_Jet;
-}
-
-void ImGuiPlot::ClearInternal()
-{
-  std::scoped_lock lock(mPlotsMutex);
-  mPlots1D.clear();
-  mPlots2D.clear();
-}
-
-void ImGuiPlot::PlotInternal(PlotData1D&& data)
-{
-  std::scoped_lock lock(mPlotsMutex);
-  if (auto it = std::ranges::find_if(mPlots1D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots1D.end())
-    *it = std::move(data);
-  else
-    mPlots1D.emplace_back(std::move(data));
-}
-
-void ImGuiPlot::PlotInternal(PlotData2D&& data)
-{
-  std::scoped_lock lock(mPlotsMutex);
-  if (auto it = std::ranges::find_if(mPlots2D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots2D.end())
-    *it = std::move(data);
-  else
-    mPlots2D.emplace_back(std::move(data));
 }
 
 void ImGuiPlot::Debug()

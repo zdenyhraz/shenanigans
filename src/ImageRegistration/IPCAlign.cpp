@@ -15,8 +15,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    PyPlot::Plot("image1", {.z = image1, .cmap = "gray"});
-    PyPlot::Plot("image2", {.z = image2, .cmap = "gray"});
+    PyPlot::Plot({.name = "image1", .z = image1, .cmap = "gray"});
+    PyPlot::Plot({.name = "image2", .z = image2, .cmap = "gray"});
   }
 
   cv::Mat img1W = image1.clone();
@@ -48,8 +48,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    PyPlot::Plot("image1 FT magn", {.z = img1FTm});
-    PyPlot::Plot("image2 FT magn", {.z = img2FTm});
+    PyPlot::Plot("image1 FT magn", img1FTm);
+    PyPlot::Plot("image2 FT magn", img2FTm);
   }
 
   cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
@@ -61,8 +61,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    PyPlot::Plot("image1 FT magn log-polar", {.z = img1FTm});
-    PyPlot::Plot("image2 FT magn log-polar", {.z = img2FTm});
+    PyPlot::Plot("image1 FT magn log-polar", img1FTm);
+    PyPlot::Plot("image2 FT magn log-polar", img2FTm);
 
     showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();

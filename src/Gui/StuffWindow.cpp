@@ -107,8 +107,8 @@ void StuffWindow::PlotTest()
   const auto gaussian1D = GetMidRow<f64>(gaussian2D);
   const auto x = Iota<f64>(0, gaussian1D.size());
 
-  PyPlot::Plot("1D", {.x = x, .y = gaussian1D});
-  PyPlot::Plot("2D", {.z = gaussian2D});
+  PyPlot::Plot({.name = "1D", .x = x, .ys = {gaussian1D}});
+  PyPlot::Plot({.name = "2D", .z = gaussian2D});
 
   Plot::Plot({.name = "1D", .x = x, .ys = {gaussian1D}});
   Plot::Plot({.name = "2Da", .z = gaussian2D});

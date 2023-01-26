@@ -2,10 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, xlabel, ylabel, zlabel, cmap):
+def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, xlabel, ylabel, zlabel, cmap):
     fig = plt.figure(num=id)
     fig.set_figwidth(fig.get_figwidth()*aspectratio)
-    fig.canvas.manager.set_window_title(title)
     plt.clf()
 
     xsize = z.shape[0]
@@ -35,13 +34,13 @@ def plot(id, title, aspectratio, save, z, xmin, xmax, ymin, ymax, xlabel, ylabel
     if zlabel:
         cbar.set_label(zlabel)
 
-    plt.title(title)
+    plt.title(name)
     plt.set_cmap(cmap)
     plt.tight_layout()
 
-    if save:
-        print(f"Saving plot {title} to {save}")
-        plt.savefig(save, bbox_inches='tight')
+    if savepath:
+        print(f"Saving plot {name} to {savepath}")
+        plt.savefig(savepath, bbox_inches='tight')
     else:
         plt.draw()
         plt.pause(1e-9)

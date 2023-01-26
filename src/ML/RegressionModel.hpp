@@ -79,7 +79,7 @@ public:
         epochs.push_back(epochIndex);
         lossesTrainAvg.push_back(lossTrainAvg);
         lossesTestAvg.push_back(lossTestAvg);
-        PyPlot::Plot("RegressionModel training", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"train loss", "test loss"}});
+        PyPlot::Plot({.name = "RegressionModel training", .x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .ylabels = {"train loss", "test loss"}});
       }
     }
   }
@@ -100,6 +100,7 @@ void RegressionModelTest()
   torch::Tensor targetTensor = RegressionModelTestFunction(inputTensor);
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::Plot("RegressionModel predictions", {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .label_ys = {"target", "output"}});
+  PyPlot::Plot(
+      "RegressionModel predictions", {.x = ToStdVector<f64>(inputTensor), .ys = {ToStdVector<f64>(targetTensor), ToStdVector<f64>(outputTensor)}, .ylabels = {"target", "output"}});
   return;
 }

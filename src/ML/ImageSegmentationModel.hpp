@@ -78,7 +78,7 @@ public:
         epochs.push_back(epochIndex);
         lossesTrainAvg.push_back(lossTrainAvg);
         lossesTestAvg.push_back(lossTestAvg);
-        PyPlot::Plot("ImageSegmentationModel training", {.x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .label_ys = {"train loss", "test loss"}});
+        PyPlot::Plot({.name = "ImageSegmentationModel training", .x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .ylabels = {"train loss", "test loss"}});
       }
     }
   }
@@ -108,7 +108,7 @@ void ImageSegmentationModelTest()
   torch::Tensor inputTensor = ToTensor(input).reshape({1, ImageSegmentationModel::kImageChannels, ImageSegmentationModel::kImageHeight, ImageSegmentationModel::kImageWidth});
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::Plot("ImageSegmentationModel input", {.z = input, .cmap = "gray"});
-  PyPlot::Plot("ImageSegmentationModel target", {.z = target, .cmap = "gray"});
-  PyPlot::Plot("ImageSegmentationModel output", {.z = ToCVMat(outputTensor, input.size()), .cmap = "gray"});
+  PyPlot::Plot({.name = "ImageSegmentationModel input", .z = input, .cmap = "gray"});
+  PyPlot::Plot({.name = "ImageSegmentationModel target", .z = target, .cmap = "gray"});
+  PyPlot::Plot({.name = "ImageSegmentationModel output", .z = ToCVMat(outputTensor, input.size()), .cmap = "gray"});
 }

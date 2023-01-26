@@ -16,6 +16,7 @@ struct PlotData2D
   std::string zlabel = "z";
   bool colorbar = true;
   bool interpolate = false;
+  bool surf = false;
   f64 aspectratio = 1;
   std::string savepath;
 };
