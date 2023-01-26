@@ -70,6 +70,20 @@
   #define PROFILE_FRAME FrameMark
   #define PROFILE_FUNCTION ZoneScoped
   #define PROFILE_SCOPE(name) ZoneNamedN(name, #name, true)
+
+inline void* operator new(std::size_t count)
+{
+  auto ptr = malloc(count);
+  TracyAlloc(ptr, count);
+  return ptr;
+}
+
+inline void operator delete(void* ptr) noexcept
+{
+  TracyFree(ptr);
+  free(ptr);
+}
+
 #else
   #define PROFILE_FRAME
   #define PROFILE_FUNCTION

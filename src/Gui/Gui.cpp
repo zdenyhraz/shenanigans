@@ -176,7 +176,14 @@ void ImGuiRender(GLFWwindow* window, ImGuiIO& io)
   glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
   glClear(GL_COLOR_BUFFER_BIT);
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  RenderPlatformWindows(io);
+  HandleIO(window);
+  SwapBuffers(window);
+}
 
+void RenderPlatformWindows(ImGuiIO& io)
+{
+  PROFILE_FUNCTION;
   if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
   {
     GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -184,10 +191,17 @@ void ImGuiRender(GLFWwindow* window, ImGuiIO& io)
     ImGui::RenderPlatformWindowsDefault();
     glfwMakeContextCurrent(backup_current_context);
   }
+}
 
+void HandleIO(GLFWwindow* window)
+{
   if (ImGui::IsKeyPressed(ImGuiKey_Escape))
     GLFWCloseWindow(window);
+}
 
+void SwapBuffers(GLFWwindow* window)
+{
+  PROFILE_FUNCTION;
   glfwSwapBuffers(window);
 }
 

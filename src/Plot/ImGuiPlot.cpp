@@ -105,7 +105,7 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 
 void ImGuiPlot::Debug()
 {
-  static constexpr usize n = 1001;
+  static constexpr usize n = 101;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
   std::vector<f64> y2(n);
