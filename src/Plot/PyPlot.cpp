@@ -104,8 +104,8 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData1D&& data)
   plotData["linestyle_y2s"] = std::move(data.linestyle_y2s);
   plotData["log"] = data.log;
   plotData["aspectratio"] = data.aspectratio;
-  if (not data.save.empty())
-    plotData["save"] = std::move(data.save);
+  if (not data.savepath.empty())
+    plotData["save"] = std::move(data.savepath);
   return plotData;
 }
 
@@ -122,11 +122,11 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData2D&& data)
   plotData["xmax"] = data.xmax;
   plotData["ymin"] = data.ymin;
   plotData["ymax"] = data.ymax;
-  plotData["interp"] = data.interp;
+  plotData["interp"] = data.interpolate;
   plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
-  if (not data.save.empty())
-    plotData["save"] = std::move(data.save);
+  if (not data.savepath.empty())
+    plotData["save"] = std::move(data.savepath);
   return plotData;
 }
 
@@ -145,8 +145,8 @@ py::dict PyPlot::GetPlotData(const std::string& name, PlotData3D&& data)
   plotData["ymax"] = data.ymax;
   plotData["aspectratio"] = data.aspectratio;
   plotData["cmap"] = std::move(data.cmap);
-  if (not data.save.empty())
-    plotData["save"] = std::move(data.save);
+  if (not data.savepath.empty())
+    plotData["save"] = std::move(data.savepath);
   return plotData;
 }
 

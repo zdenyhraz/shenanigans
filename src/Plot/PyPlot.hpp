@@ -1,4 +1,5 @@
 #pragma once
+#include "PlotData2D.hpp"
 
 class PyPlot
 {
@@ -27,18 +28,7 @@ public:
     std::vector<std::string> linestyle_ys, linestyle_y2s;   // multi line styles
     bool log = false;                                       // logarithmic scale
     f64 aspectratio = 1;                                    // aspect ratio
-    std::string save;                                       // save path
-  };
-
-  struct PlotData2D
-  {
-    cv::Mat z;
-    f64 xmin = 0, xmax = 1, ymin = 0, ymax = 1;
-    std::string xlabel = "", ylabel = "", zlabel = "";
-    bool interp = false;
-    f64 aspectratio = 1;
-    std::string cmap = "jet";
-    std::string save;
+    std::string savepath;                                   // save path
   };
 
   struct PlotData3D
@@ -48,7 +38,7 @@ public:
     std::string xlabel = "x", ylabel = "y", zlabel = "";
     f64 aspectratio = 1;
     std::string cmap = "jet";
-    std::string save;
+    std::string savepath;
   };
 
   static void Initialize();
