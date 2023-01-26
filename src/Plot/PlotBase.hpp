@@ -72,6 +72,9 @@ public:
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
     data.z.convertTo(data.z, CV_32F);
+    const auto [zmin, zmax] = MinMax(data.z);
+    data.zmin = zmin;
+    data.zmax = zmax;
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
   }
 

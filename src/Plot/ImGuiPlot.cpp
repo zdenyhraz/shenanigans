@@ -77,18 +77,22 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
     const f32 height = ImGui::GetContentRegionAvail().y;
-    const f32 width = height / data.z.rows * data.z.cols * 1.1;
-    const f32 widthcb = height * 0.175f;
-    if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height)))
+    const f32 width = height;
+    const f32 widthcb = width * 0.15;
+    const f32 heightcb = height * 1;
+    static const ImPlotAxisFlags axesFlags = ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks;
+    if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height), ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText | ImPlotFlags_NoInputs))
     {
-      ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
+      ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), axesFlags, axesFlags);
       ImPlot::GetStyle().Colormap = GetColormap(data.cmap);
-      ImPlot::PlotHeatmap(data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+      ImPlot::PlotHeatmap(
+          data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
       ImPlot::EndPlot();
     }
     ImGui::SameLine();
     if (data.colorbar)
-      ImPlot::ColormapScale(data.name.c_str(), data.zmin, data.zmax, {widthcb, height * 0.912f});
+      ImPlot::ColormapScale("##NoLabel", data.zmin, data.zmax, ImVec2{widthcb, heightcb}, "%g", ImPlotColormapScaleFlags_NoLabel);
+
     ImGui::EndTabItem();
   }
 }
@@ -105,7 +109,7 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 
 void ImGuiPlot::Debug()
 {
-  static constexpr usize n = 101;
+  static constexpr usize n = 501;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
   std::vector<f64> y2(n);
@@ -120,6 +124,6 @@ void ImGuiPlot::Debug()
   Plot({.name = fmt::format("debug1d#{}", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 
-  Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Gaussian<f32>(n, n) + Random::Rand<f32>()});
+  Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n)});
   LOG_DEBUG("Added one debug2d plot");
 }
