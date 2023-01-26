@@ -1,109 +1,6 @@
 #include "ImGuiPlot.hpp"
 
-ImGuiPlot::PlotData::PlotData(PlotData1D&& data1d)
-{
-  if (data1d.ylabels.size() < data1d.ys.size())
-  {
-    const auto origsize = data1d.ylabels.size();
-    data1d.ylabels.resize(data1d.ys.size());
-    for (usize i = origsize; i < data1d.ys.size(); ++i)
-      data1d.ylabels[i] = fmt::format("y{}", i);
-  }
-
-  if (data1d.y2labels.size() < data1d.y2s.size())
-  {
-    const auto origsize = data1d.y2labels.size();
-    data1d.y2labels.resize(data1d.y2s.size());
-    for (usize i = origsize; i < data1d.y2s.size(); ++i)
-      data1d.y2labels[i] = fmt::format("y2-{}", i);
-  }
-
-  data = std::move(data1d);
-}
-
-ImGuiPlot::PlotData::PlotData(PlotData2D&& data2d)
-{
-  const auto [zmin, zmax] = MinMax(data2d.z);
-  data2d.zmin = zmin;
-  data2d.zmax = zmax;
-  data2d.z.convertTo(data2d.z, CV_32F);
-  cv::resize(data2d.z, data2d.z, cv::Size(501, 501));
-  data = std::move(data2d);
-}
-
-void ImGuiPlot::RenderPlot(const std::string& name, const PlotData& plotData) const
-{
-  if (ImGui::BeginTabItem(name.c_str() + 2))
-  {
-    if (std::holds_alternative<PlotData1D>(plotData.data))
-      RenderPlot1D(name, std::get<PlotData1D>(plotData.data));
-    else if (std::holds_alternative<PlotData2D>(plotData.data))
-      RenderPlot2D(name, std::get<PlotData2D>(plotData.data));
-
-    ImGui::EndTabItem();
-  }
-}
-
-void ImGuiPlot::RenderPlot1D(const std::string& name, const PlotData1D& data) const
-{
-  if (ImPlot::BeginPlot(name.c_str(), ImVec2(-1, -1)))
-  {
-    ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
-    ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
-    if (data.log)
-      ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
-
-    if (not data.x.empty())
-      ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
-    else
-      ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
-
-    if (not data.y2s.empty())
-      ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
-    const auto x = data.x.data();
-    for (usize i = 0; i < data.ys.size(); ++i)
-    {
-      const auto n = data.ys[i].size();
-      if (n == 0)
-        continue;
-
-      const auto label = data.ylabels[i].c_str();
-      const auto y = data.ys[i].data();
-      ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-      ImPlot::PlotLine(label, x, y, n);
-    }
-    for (usize i = 0; i < data.y2s.size(); ++i)
-    {
-      const auto n = data.y2s[i].size();
-      if (n == 0)
-        continue;
-
-      const auto label = data.y2labels[i].c_str();
-      const auto y = data.y2s[i].data();
-      ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-      ImPlot::PlotLine(label, x, y, n);
-    }
-    ImPlot::EndPlot();
-  }
-}
-
-void ImGuiPlot::RenderPlot2D(const std::string& name, const PlotData2D& data) const
-{
-  const f32 height = ImGui::GetContentRegionAvail().y;
-  const f32 width = height / data.z.rows * data.z.cols * 1.1;
-  const f32 widthcb = height * 0.175f;
-  if (ImPlot::BeginPlot(name.c_str(), ImVec2(width, height)))
-  {
-    ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
-    ImPlot::GetStyle().Colormap = data.cmap;
-    ImPlot::PlotHeatmap(name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
-    ImPlot::EndPlot();
-  }
-  ImGui::SameLine();
-  ImPlot::ColormapScale(name.c_str(), data.zmin, data.zmax, {widthcb, height * 0.912f});
-}
-
-void ImGuiPlot::Render()
+void ImGuiPlot::RenderInternal()
 {
   if (ImGui::Begin("Plot"))
   {
@@ -116,8 +13,10 @@ void ImGuiPlot::Render()
     if (ImGui::BeginTabBar("Plots"))
     {
       std::scoped_lock lock(mPlotsMutex);
-      for (const auto& [name, data] : mPlots)
-        RenderPlot(name, data);
+      for (const auto& data : mPlots1D)
+        RenderInternal(data);
+      for (const auto& data : mPlots2D)
+        RenderInternal(data);
 
       ImGui::EndTabBar();
     }
@@ -125,13 +24,97 @@ void ImGuiPlot::Render()
   }
 }
 
-void ImGuiPlot::Clear()
+void ImGuiPlot::RenderInternal(const PlotData1D& data) const
+{
+  if (ImGui::BeginTabItem(data.name.c_str()))
+  {
+    if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(-1, -1)))
+    {
+      ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
+      ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), ImPlotAxisFlags_None);
+      if (data.log)
+        ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
+
+      if (not data.x.empty())
+        ImPlot::SetupAxisLimits(ImAxis_X1, data.x.front(), data.x.back(), ImGuiCond_Always);
+      else
+        ImPlot::SetupAxisLimits(ImAxis_X1, 0, 1, ImGuiCond_Always);
+
+      if (not data.y2s.empty())
+        ImPlot::SetupAxis(ImAxis_Y2, data.y2label.c_str(), ImPlotAxisFlags_AuxDefault);
+      const auto x = data.x.data();
+      for (usize i = 0; i < data.ys.size(); ++i)
+      {
+        const auto n = data.ys[i].size();
+        if (n == 0)
+          continue;
+
+        const auto label = data.ylabels[i].c_str();
+        const auto y = data.ys[i].data();
+        ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
+        ImPlot::PlotLine(label, x, y, n);
+      }
+      for (usize i = 0; i < data.y2s.size(); ++i)
+      {
+        const auto n = data.y2s[i].size();
+        if (n == 0)
+          continue;
+
+        const auto label = data.y2labels[i].c_str();
+        const auto y = data.y2s[i].data();
+        ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
+        ImPlot::PlotLine(label, x, y, n);
+      }
+      ImPlot::EndPlot();
+    }
+    ImGui::EndTabItem();
+  }
+}
+
+void ImGuiPlot::RenderInternal(const PlotData2D& data) const
+{
+  if (ImGui::BeginTabItem(data.name.c_str()))
+  {
+    const f32 height = ImGui::GetContentRegionAvail().y;
+    const f32 width = height / data.z.rows * data.z.cols * 1.1;
+    const f32 widthcb = height * 0.175f;
+    if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height)))
+    {
+      ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
+      ImPlot::GetStyle().Colormap = data.cmap;
+      ImPlot::PlotHeatmap(data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
+      ImPlot::EndPlot();
+    }
+    ImGui::SameLine();
+    if (data.colorbar)
+      ImPlot::ColormapScale(data.name.c_str(), data.zmin, data.zmax, {widthcb, height * 0.912f});
+    ImGui::EndTabItem();
+  }
+}
+
+void ImGuiPlot::ClearInternal()
 {
   std::scoped_lock lock(mPlotsMutex);
-  const auto n = mPlots.size();
-  mPlots.clear();
-  if (n > 0)
-    LOG_DEBUG("Cleared {} plots", n);
+  mPlots1D.clear();
+  mPlots2D.clear();
+}
+
+void ImGuiPlot::PlotInternal(PlotData1D&& data)
+{
+  std::scoped_lock lock(mPlotsMutex);
+  if (auto it = std::ranges::find_if(mPlots1D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots1D.end())
+    *it = std::move(data);
+  else
+    mPlots1D.emplace_back(std::move(data));
+}
+
+void ImGuiPlot::PlotInternal(PlotData2D&& data)
+{
+  std::scoped_lock lock(mPlotsMutex);
+  if (auto it = std::ranges::find_if(mPlots2D, [&data](const auto& entry) { return entry.name == data.name; }); it != mPlots2D.end())
+    *it = std::move(data);
+  else
+    mPlots2D.emplace_back(std::move(data));
 }
 
 void ImGuiPlot::Debug()
@@ -148,9 +131,9 @@ void ImGuiPlot::Debug()
     y2[i] = std::cos(2 * std::numbers::pi * x[i]);
   }
 
-  Plot(fmt::format("debug1d#{}", mPlots.size()), PlotData1D{.x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
+  Plot({.name = fmt::format("debug1d#{}", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 
-  Plot(fmt::format("debug2d#{}", mPlots.size()), PlotData2D{.z = Gaussian<f64>(n, n) + Random::Rand()});
+  Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Gaussian<f64>(n, n) + Random::Rand()});
   LOG_DEBUG("Added one debug2d plot");
 }

@@ -2,6 +2,7 @@
 
 struct PlotData1D
 {
+  std::string name;
   std::vector<f64> x;
   std::vector<std::vector<f64>> ys;
   std::vector<std::vector<f64>> y2s;
@@ -11,24 +12,4 @@ struct PlotData1D
   std::string ylabel = "y";
   std::string y2label = "y2";
   bool log = false;
-};
-
-enum PlotColormap
-{
-  Jet = ImPlotColormap_Jet,
-  Gray = ImPlotColormap_Greys
-};
-
-struct PlotData2D
-{
-  cv::Mat z;
-  f64 xmin = 0;
-  f64 xmax = 1;
-  f64 ymin = 0;
-  f64 ymax = 1;
-  f64 zmin = 0;
-  f64 zmax = 1;
-  PlotColormap cmap = Jet;
-  std::string xlabel = "x";
-  std::string ylabel = "y";
 };

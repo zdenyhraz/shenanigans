@@ -3,7 +3,7 @@
 #include "TerminalLogger.hpp"
 #include "Utils/Singleton.hpp"
 
-class ImGuiLogger : public Logger, public Singleton<ImGuiLogger>
+class ImGuiLogger : public Logger
 {
   using FallbackLogger = TerminalLogger;
 
@@ -13,26 +13,17 @@ class ImGuiLogger : public Logger, public Singleton<ImGuiLogger>
   bool mFallback = true;
   static constexpr usize mMaxMessages = 5000;
 
-public:
-  void Render();
-
-  void Clear()
-  {
-    std::scoped_lock lock(mMutex);
-    mTextBuffer.clear();
-    mLineOffsets.clear();
-    mLineOffsets.emplace_back(0, LogLevel::Trace);
-  }
-
-  void SetFallback(bool forward) { mFallback = forward; }
+  void RenderInternal();
+  void ClearInternal();
+  void SetFallbackInternal(bool forward) { mFallback = forward; }
 
   template <typename... Args>
-  void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  void MessageInternal(LogLevel logLevel, const std::string& fmt, Args&&... args)
   try
   {
     std::scoped_lock lock(mMutex);
-    if (not ShouldLog(logLevel))
-      [[unlikely]] return;
+    if (not ShouldLog(logLevel)) [[unlikely]]
+      return;
 
     if (mLineOffsets.size() > mMaxMessages)
     {
@@ -40,8 +31,8 @@ public:
       Message(Logger::LogLevel::Debug, "Message log cleared after {} messages", mMaxMessages);
     }
 
-    if (mFallback and not mActive) // forward logging to the tfallback logger if this logger is is not being rendered
-      FallbackLogger::Get().Message(logLevel, fmt, std::forward<Args>(args)...);
+    if (mFallback and not mActive) // forward logging to the fallback logger if this logger is is not being rendered
+      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
     i32 oldSize = mTextBuffer.size();
@@ -52,6 +43,16 @@ public:
   }
   catch (const std::exception& e)
   {
-    FallbackLogger::Get().Message(Logger::LogLevel::Error, "LogMessage error: {}", e.what());
+    FallbackLogger::Message(Logger::LogLevel::Error, "LogMessage error: {}", e.what());
+  }
+
+public:
+  static void Render() { Singleton<ImGuiLogger>::Get().RenderInternal(); }
+  static void Clear() { Singleton<ImGuiLogger>::Get().ClearInternal(); }
+  static void SetFallback(bool forward) { Singleton<ImGuiLogger>::Get().SetFallbackInternal(forward); }
+  template <typename... Args>
+  static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  {
+    Singleton<ImGuiLogger>::Get().MessageInternal(logLevel, fmt, std::forward<Args>(args)...);
   }
 };

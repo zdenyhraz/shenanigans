@@ -110,8 +110,9 @@ void StuffWindow::PlotTest()
   PyPlot::Plot("1D", {.x = x, .y = gaussian1D});
   PyPlot::Plot("2D", {.z = gaussian2D});
 
-  ImGuiPlot::Get().Plot("1D", PlotData1D{.x = x, .ys = {gaussian1D}});
-  ImGuiPlot::Get().Plot("2D", PlotData2D{.z = gaussian2D});
+  Plot::Plot({.name = "1D", .x = x, .ys = {gaussian1D}});
+  Plot::Plot({.name = "2Da", .z = gaussian2D});
+  Plot::Plot("2Db", gaussian2D);
 }
 
 void StuffWindow::ObjectDetection()

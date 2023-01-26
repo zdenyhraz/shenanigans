@@ -5,11 +5,13 @@
 #include "DiffrotWindow.hpp"
 #include "SwindWindow.hpp"
 #include "StuffWindow.hpp"
+#include "Plot/ImGuiPlot.hpp"
+#include "Plot/PyPlot.hpp"
 
 void Shenanigans::Run()
 {
   std::srand(std::time(nullptr));
-  ImGuiLogger::Get().SetFallback(false);
+  ImGuiLogger::SetFallback(false);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
@@ -49,8 +51,8 @@ try
     ImGui::End();
   }
 
-  ImGuiLogger::Get().Render();
-  ImGuiPlot::Get().Render();
+  ImGuiLogger::Render();
+  ImGuiPlot::Render();
   PyPlot::Render();
   PyPlot::SetSave(mParameters.plotSave);
 }
