@@ -8,6 +8,7 @@ void IPCAppsWindow::Initialize()
 
 void IPCAppsWindow::Render()
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("IPC apps"))
   {
     ImGui::Separator();

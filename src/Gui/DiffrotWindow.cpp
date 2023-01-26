@@ -7,6 +7,7 @@ void DiffrotWindow::Initialize()
 
 void DiffrotWindow::Render()
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("Diffrot"))
   {
     ImGui::Separator();
@@ -15,8 +16,8 @@ void DiffrotWindow::Render()
       LaunchAsync(
           []()
           {
-            mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize,
-                mParameters.idstep, mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
+            mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep,
+                mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
           });
 
     ImGui::SameLine();
@@ -28,11 +29,10 @@ void DiffrotWindow::Render()
       LaunchAsync(
           []()
           {
-            const auto image1 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart)), 4096 / 2,
+            const auto image1 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart)), 4096 / 2, 4096 / 2,
+                IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
+            const auto image2 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart + mParameters.idstep)), 4096 / 2,
                 4096 / 2, IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
-            const auto image2 =
-                RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart + mParameters.idstep)),
-                    4096 / 2, 4096 / 2, IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
 
             IPCWindow::GetIPC().Calculate<IPC::Mode::Debug>(image1, image2);
           });
@@ -62,9 +62,8 @@ void DiffrotWindow::Render()
       LaunchAsync(
           []()
           {
-            DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep,
-                mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, mParameters.xsizeopt,
-                mParameters.ysizeopt, mParameters.popsize);
+            DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
+                ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, mParameters.xsizeopt, mParameters.ysizeopt, mParameters.popsize);
           });
 
     ImGui::SliderInt("xsizeopt", &mParameters.xsizeopt, 1, 500);

@@ -159,6 +159,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
 
 void ImGuiNewFrame()
 {
+  PROFILE_FUNCTION;
   glfwPollEvents();
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
@@ -167,6 +168,7 @@ void ImGuiNewFrame()
 
 void ImGuiRender(GLFWwindow* window, ImGuiIO& io)
 {
+  PROFILE_FUNCTION;
   ImGui::Render();
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);

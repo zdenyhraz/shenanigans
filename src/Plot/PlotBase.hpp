@@ -35,9 +35,24 @@ protected:
   bool mSave = false;
 
 public:
-  static void Initialize() { Singleton<T>::Get().InitializeInternal(); }
-  static void Render() { Singleton<T>::Get().RenderInternal(); }
-  static void Clear() { Singleton<T>::Get().ClearInternal(); }
+  static void Initialize()
+  {
+    PROFILE_FUNCTION;
+    Singleton<T>::Get().InitializeInternal();
+  }
+
+  static void Render()
+  {
+    PROFILE_FUNCTION;
+    Singleton<T>::Get().RenderInternal();
+  }
+
+  static void Clear()
+  {
+    PROFILE_FUNCTION;
+    Singleton<T>::Get().ClearInternal();
+  }
+
   static void SetSave(bool save) { Singleton<T>::Get().mSave = save; }
 
   static void Plot(PlotData1D&& data)

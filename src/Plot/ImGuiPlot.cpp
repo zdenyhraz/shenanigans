@@ -2,6 +2,7 @@
 
 void ImGuiPlot::RenderInternal()
 {
+  PROFILE_FUNCTION;
   if (ImGui::Begin("Plot"))
   {
     if (ImGui::Button("Clear"))
@@ -26,6 +27,7 @@ void ImGuiPlot::RenderInternal()
 
 void ImGuiPlot::RenderInternal(const PlotData1D& data)
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
     if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(-1, -1)))
@@ -71,6 +73,7 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
 
 void ImGuiPlot::RenderInternal(const PlotData2D& data)
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
     const f32 height = ImGui::GetContentRegionAvail().y;
@@ -102,7 +105,7 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 
 void ImGuiPlot::Debug()
 {
-  static constexpr usize n = 101;
+  static constexpr usize n = 1001;
   std::vector<f64> x(n);
   std::vector<f64> y1(n);
   std::vector<f64> y2(n);

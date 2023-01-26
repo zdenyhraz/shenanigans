@@ -47,7 +47,12 @@ class ImGuiLogger : public Logger
   }
 
 public:
-  static void Render() { Singleton<ImGuiLogger>::Get().RenderInternal(); }
+  static void Render()
+  {
+    PROFILE_FUNCTION;
+    Singleton<ImGuiLogger>::Get().RenderInternal();
+  }
+
   static void Clear() { Singleton<ImGuiLogger>::Get().ClearInternal(); }
   static void SetFallback(bool forward) { Singleton<ImGuiLogger>::Get().SetFallbackInternal(forward); }
   template <typename... Args>

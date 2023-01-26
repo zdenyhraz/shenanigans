@@ -12,6 +12,7 @@ void StuffWindow::Initialize()
 
 void StuffWindow::Render()
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("Stuff"))
   {
     ImGui::Separator();

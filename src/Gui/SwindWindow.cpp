@@ -6,6 +6,7 @@ void SwindWindow::Initialize()
 
 void SwindWindow::Render()
 {
+  PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("Swind"))
   {
     ImGui::Separator();

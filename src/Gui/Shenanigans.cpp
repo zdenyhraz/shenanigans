@@ -25,7 +25,7 @@ void Shenanigans::Run()
     ImGuiNewFrame();
     Render();
     ImGuiRender(window, io);
-    // PROFILE_FRAME;
+    PROFILE_FRAME;
   }
 
   ImGuiShutdown();
@@ -35,6 +35,7 @@ void Shenanigans::Run()
 void Shenanigans::Render()
 try
 {
+  PROFILE_FUNCTION;
   if (ImGui::Begin("Shenanigans"))
   {
     ImGui::Checkbox("save plots", &mParameters.plotSave);
