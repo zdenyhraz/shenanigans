@@ -107,12 +107,17 @@ void StuffWindow::PlotTest()
   const auto gaussian1D = GetMidRow<f64>(gaussian2D);
   const auto x = Iota<f64>(0, gaussian1D.size());
 
-  PyPlot::Plot({.name = "1D", .x = x, .ys = {gaussian1D}});
-  PyPlot::Plot({.name = "2D", .z = gaussian2D});
+  Plot::Plot({.name = "default1D", .x = x, .ys = {gaussian1D}});
+  Plot::Plot({.name = "default2Da", .z = gaussian2D});
+  Plot::Plot("default2Db", gaussian2D);
 
-  Plot::Plot({.name = "1D", .x = x, .ys = {gaussian1D}});
-  Plot::Plot({.name = "2Da", .z = gaussian2D});
-  Plot::Plot("2Db", gaussian2D);
+  PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
+  PyPlot::Plot({.name = "py2Da", .z = gaussian2D});
+  PyPlot::Plot("py2Db", gaussian2D);
+
+  ImGuiPlot::Plot({.name = "imgui1D", .x = x, .ys = {gaussian1D}});
+  ImGuiPlot::Plot({.name = "imgui2Da", .z = gaussian2D});
+  ImGuiPlot::Plot("imgui2Db", gaussian2D);
 }
 
 void StuffWindow::ObjectDetection()

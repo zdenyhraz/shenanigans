@@ -3,7 +3,7 @@ import matplotlib.ticker as ticker
 
 
 def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, interp, xlabel, ylabel, zlabel, cmap):
-    fig = plt.figure(num=id)
+    fig = plt.figure(num=name)
     fig.set_figwidth(fig.get_figwidth()*aspectratio)
     plt.clf()
 

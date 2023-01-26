@@ -49,10 +49,9 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
         if (n == 0)
           continue;
 
-        const auto label = data.ylabels[i].c_str();
         const auto y = data.ys[i].data();
         ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-        ImPlot::PlotLine(label, x, y, n);
+        ImPlot::PlotLine(data.ylabels.size() > i ? data.ylabels[i].c_str() : fmt::format("y{}", i).c_str(), x, y, n);
       }
       for (usize i = 0; i < data.y2s.size(); ++i)
       {
@@ -60,10 +59,9 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
         if (n == 0)
           continue;
 
-        const auto label = data.y2labels[i].c_str();
         const auto y = data.y2s[i].data();
         ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-        ImPlot::PlotLine(label, x, y, n);
+        ImPlot::PlotLine(data.y2labels.size() > i ? data.y2labels[i].c_str() : fmt::format("y{}", i).c_str(), x, y, n);
       }
       ImPlot::EndPlot();
     }
