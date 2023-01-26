@@ -81,7 +81,7 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data) const
     if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height)))
     {
       ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str());
-      ImPlot::GetStyle().Colormap = data.cmap;
+      ImPlot::GetStyle().Colormap = GetColormap(data.cmap);
       ImPlot::PlotHeatmap(data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImVec2(data.xmin, data.ymin), ImVec2(data.xmax, data.ymax));
       ImPlot::EndPlot();
     }
@@ -90,6 +90,16 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data) const
       ImPlot::ColormapScale(data.name.c_str(), data.zmin, data.zmax, {widthcb, height * 0.912f});
     ImGui::EndTabItem();
   }
+}
+
+ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
+{
+  if (cmap == "jet")
+    return ImPlotColormap_Jet;
+  if (cmap == "gray")
+    return ImPlotColormap_Greys;
+
+  return ImPlotColormap_Jet;
 }
 
 void ImGuiPlot::ClearInternal()

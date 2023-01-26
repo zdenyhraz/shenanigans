@@ -1,11 +1,5 @@
 #pragma once
 
-enum PlotColormap
-{
-  Jet = ImPlotColormap_Jet,
-  Gray = ImPlotColormap_Greys
-};
-
 struct PlotData2D
 {
   std::string name;
@@ -16,8 +10,12 @@ struct PlotData2D
   f64 ymax = 1;
   f64 zmin = 0;
   f64 zmax = 1;
-  PlotColormap cmap = Jet;
+  std::string cmap = "jet";
   std::string xlabel = "x";
   std::string ylabel = "y";
+  std::string zlabel = "z";
   bool colorbar = true;
+  bool interpolate = false;
+  f64 aspectratio = 1;
+  std::string savepath;
 };

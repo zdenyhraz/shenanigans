@@ -45,8 +45,8 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
       }
       else
       {
-        Plot::Plot({.name = "Image1", .z = image1, .cmap = Gray});
-        Plot::Plot({.name = "Image2", .z = image2, .cmap = Gray});
+        Plot::Plot({.name = "Image1", .z = image1, .cmap = "gray"});
+        Plot::Plot({.name = "Image2", .z = image2, .cmap = "gray"});
       }
     }
 

@@ -10,6 +10,7 @@ class ImGuiPlot : public PlotBase<ImGuiPlot>
   void RenderInternal();
   void RenderInternal(const PlotData1D& data) const;
   void RenderInternal(const PlotData2D& data) const;
+  static ImPlotColormap GetColormap(const std::string& cmap);
   void ClearInternal();
   void Debug();
 
