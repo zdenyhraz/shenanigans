@@ -1,18 +1,17 @@
 #pragma once
+#include "Window.hpp"
 
-class StuffWindow
+class StuffWindow : public Window
 {
+
+  void EvolutionOptimization(bool meta);
+  void PlotTest();
+  void UnevenIlluminationCLAHE();
+  void UnevenIlluminationHomomorphic();
+
+  bool showImGuiDemoWindow = false;
+  bool showImPlotDemoWindow = false;
+
 public:
-  static void Initialize();
-  static void Render();
-
-private:
-  inline static bool showImGuiDemoWindow = false;
-  inline static bool showImPlotDemoWindow = false;
-
-  static void EvolutionOptimization(bool meta);
-  static void FalseCorrelationsRemoval();
-  static void PlotTest();
-  static void UnevenIlluminationCLAHE();
-  static void UnevenIlluminationHomomorphic();
+  void Render() override;
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "Gui.hpp"
+#include "Window.hpp"
 #include "Random/ObjectDetection.hpp"
 
 struct ObjdetectParameters
@@ -9,12 +9,12 @@ struct ObjdetectParameters
   SobelObjectnessParameters soParams;
 };
 
-class ObjdetectWindow
+class ObjdetectWindow : public Window
 {
-  static void DetectObjects();
+  void DetectObjects();
 
-  inline static ObjdetectParameters mParameters;
+  ObjdetectParameters mParameters;
 
 public:
-  static void Render();
+  void Render() override;
 };

@@ -15,7 +15,7 @@ void IPCWindow::Render()
 
     if (ImGui::Button("Update"))
       LaunchAsync(
-          []()
+          [&]()
           {
             UpdateIPCParameters(mIPC);
             UpdateIPCParameters(mIPCOptimized);

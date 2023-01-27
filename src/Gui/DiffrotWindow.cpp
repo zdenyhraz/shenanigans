@@ -1,10 +1,6 @@
 #include "DiffrotWindow.hpp"
 #include "IPCWindow.hpp"
 
-void DiffrotWindow::Initialize()
-{
-}
-
 void DiffrotWindow::Render()
 {
   PROFILE_FUNCTION;
@@ -14,32 +10,32 @@ void DiffrotWindow::Render()
 
     if (ImGui::Button("Calculate"))
       LaunchAsync(
-          []()
+          [&]()
           {
-            mDiffrotData = DifferentialRotation::Calculate(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep,
-                mParameters.idstride, ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
+            mDiffrotData = DifferentialRotation::Calculate(mIPC, mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
+                ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, &mProgress);
           });
 
     ImGui::SameLine();
     if (ImGui::Button("Plot meridian curve"))
-      LaunchAsync([]() { DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27); });
+      LaunchAsync([&]() { DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27); });
 
     if (ImGui::Button("Show IPC"))
       LaunchAsync(
-          []()
+          [&]()
           {
-            const auto image1 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart)), 4096 / 2, 4096 / 2,
-                IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
+            const auto image1 =
+                RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart)), 4096 / 2, 4096 / 2, mIPC.GetCols(), mIPC.GetRows());
             const auto image2 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", mParameters.dataPath, mParameters.idstart + mParameters.idstep)), 4096 / 2,
-                4096 / 2, IPCWindow::GetIPC().GetCols(), IPCWindow::GetIPC().GetRows());
+                4096 / 2, mIPC.GetCols(), mIPC.GetRows());
 
-            IPCWindow::GetIPC().Calculate<IPC::Mode::Debug>(image1, image2);
+            mIPC.Calculate<IPC::Mode::Debug>(image1, image2);
           });
 
     ImGui::SameLine();
     if (ImGui::Button("Plot IPC gradual idstep"))
     {
-      LaunchAsync([]() { DifferentialRotation::PlotGradualIdStep(IPCWindow::GetIPC(), 15); });
+      LaunchAsync([&]() { DifferentialRotation::PlotGradualIdStep(mIPC, 15); });
     }
 
     ImGui::ProgressBar(mProgress, ImVec2(0.f, 0.f));
@@ -54,15 +50,15 @@ void DiffrotWindow::Render()
     ImGui::InputText("##load path", &mParameters.loadPath);
     ImGui::SameLine();
     if (ImGui::Button("Load"))
-      LaunchAsync([]() { mDiffrotData.Load(mParameters.loadPath); });
+      LaunchAsync([&]() { mDiffrotData.Load(mParameters.loadPath); });
 
     ImGui::Separator();
 
     if (ImGui::Button("Optimize"))
       LaunchAsync(
-          []()
+          [&]()
           {
-            DifferentialRotation::Optimize(IPCWindow::GetIPC(), mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
+            DifferentialRotation::Optimize(mIPC, mParameters.dataPath, mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride,
                 ToRadians(mParameters.thetamax), mParameters.cadence, mParameters.idstart, mParameters.xsizeopt, mParameters.ysizeopt, mParameters.popsize);
           });
 

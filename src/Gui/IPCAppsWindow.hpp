@@ -1,4 +1,5 @@
 #pragma once
+#include "Window.hpp"
 #include "Gui.hpp"
 
 struct IPCOptimizeParameters
@@ -14,15 +15,14 @@ struct IPCOptimizeParameters
   i32 popSize = 18;
 };
 
-class IPCAppsWindow
+class IPCAppsWindow : public Window
 {
+  std::string GetCurrentDatasetPath();
+  void FalseCorrelationsRemoval();
+
+  IPCOptimizeParameters mParameters;
+  ProgressStatus mProgressStatus;
+
 public:
-  static void Initialize();
-  static void Render();
-
-private:
-  inline static IPCOptimizeParameters mParameters;
-  inline static ProgressStatus mProgressStatus;
-
-  static std::string GetCurrentDatasetPath();
+  void Render() override;
 };

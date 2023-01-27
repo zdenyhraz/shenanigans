@@ -1,4 +1,5 @@
 #pragma once
+#include "Window.hpp"
 #include "Astrophysics/DifferentialRotation.hpp"
 
 struct DiffrotParameters
@@ -17,15 +18,13 @@ struct DiffrotParameters
   std::string loadPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_month_5000/xd.json";
 };
 
-class DiffrotWindow
+class DiffrotWindow : public Window
 {
-public:
-  static void Initialize();
-  static void Render();
-
-private:
-  inline static DiffrotParameters mParameters;
-  inline static DifferentialRotation::DifferentialRotationData mDiffrotData{
+  DiffrotParameters mParameters;
+  DifferentialRotation::DifferentialRotationData mDiffrotData{
       mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, mParameters.thetamax, mParameters.cadence, mParameters.idstart};
-  inline static f32 mProgress = 0;
+  f32 mProgress = 0;
+
+public:
+  void Render() override;
 };

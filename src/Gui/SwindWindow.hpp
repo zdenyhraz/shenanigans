@@ -1,14 +1,11 @@
 #pragma once
-
-#pragma once
+#include "Window.hpp"
 #include "Features/FeatureMatch.hpp"
 
-class SwindWindow
+class SwindWindow : public Window
 {
-public:
-  static void Initialize();
-  static void Render();
+  FeatureMatchData mParameters;
 
-private:
-  inline static FeatureMatchData mParameters;
+public:
+  void Render() override;
 };

@@ -1,4 +1,4 @@
-#include "Shenanigans.hpp"
+#include "Application.hpp"
 #include "Gui/Gui.hpp"
 #include "IPCWindow.hpp"
 #include "IPCAppsWindow.hpp"
@@ -6,10 +6,9 @@
 #include "SwindWindow.hpp"
 #include "StuffWindow.hpp"
 #include "ObjdetectWindow.hpp"
-#include "Plot/ImGuiPlot.hpp"
-#include "Plot/PyPlot.hpp"
+#include "Plot/Plot.hpp"
 
-void Shenanigans::Run()
+void Application::Run()
 {
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
@@ -19,8 +18,8 @@ void Shenanigans::Run()
   GLFWSetWindowCallback(window, KeyCallback);
   ImGuiIO& io = ImGuiInitialize(window, 1.5);
   Initialize();
-  LOG_DEBUG("Render loop started");
 
+  LOG_DEBUG("Render loop started");
   while (!glfwWindowShouldClose(window))
   {
     ImGuiNewFrame();
@@ -33,22 +32,19 @@ void Shenanigans::Run()
   GLFWShutdown(window);
 }
 
-void Shenanigans::Render()
+void Application::Render()
 try
 {
   PROFILE_FUNCTION;
   if (ImGui::Begin("Shenanigans"))
   {
-    ImGui::Checkbox("save plots", &mParameters.plotSave);
+    ImGui::Checkbox("Save plots", &mPlotSave);
     ImGui::Separator();
     if (ImGui::BeginTabBar("Windows"))
     {
-      IPCWindow::Render();
-      IPCAppsWindow::Render();
-      DiffrotWindow::Render();
-      SwindWindow::Render();
-      StuffWindow::Render();
-      ObjdetectWindow::Render();
+      for (const auto& window : mWindows)
+        window->Render();
+
       ImGui::EndTabBar();
     }
     ImGui::End();
@@ -57,25 +53,28 @@ try
   ImGuiLogger::Render();
   ImGuiPlot::Render();
   PyPlot::Render();
-  PyPlot::SetSave(mParameters.plotSave);
+  PyPlot::SetSave(mPlotSave);
 }
 catch (const std::exception& e)
 {
   LOG_EXCEPTION(e);
 }
 
-void Shenanigans::Initialize()
+void Application::Initialize()
 {
   PROFILE_FUNCTION;
-  PyPlot::Initialize();
-  IPCWindow::Initialize();
-  IPCAppsWindow::Initialize();
-  DiffrotWindow::Initialize();
-  SwindWindow::Initialize();
-  StuffWindow::Initialize();
+  mWindows.push_back(std::make_unique<IPCWindow>());
+  mWindows.push_back(std::make_unique<IPCAppsWindow>());
+  mWindows.push_back(std::make_unique<DiffrotWindow>());
+  mWindows.push_back(std::make_unique<SwindWindow>());
+  mWindows.push_back(std::make_unique<StuffWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectWindow>());
+
+  for (const auto& window : mWindows)
+    window->Initialize();
 }
 
-void Shenanigans::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GLFW_TRUE);

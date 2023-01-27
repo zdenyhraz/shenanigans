@@ -1,9 +1,5 @@
 #include "SwindWindow.hpp"
 
-void SwindWindow::Initialize()
-{
-}
-
 void SwindWindow::Render()
 {
   PROFILE_FUNCTION;
@@ -12,7 +8,7 @@ void SwindWindow::Render()
     ImGui::Separator();
 
     if (ImGui::Button("Calculate"))
-      LaunchAsync([]() { featureMatch(mParameters); });
+      LaunchAsync([&]() { featureMatch(mParameters); });
 
     ImGui::SliderFloat("thresh", &mParameters.thresh, 0, 500);
     ImGui::SliderInt("matchcnt", &mParameters.matchcnt, 100, 2000);

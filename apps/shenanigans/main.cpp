@@ -1,9 +1,10 @@
-#include "Gui/Shenanigans.hpp"
+#include "Gui/Application.hpp"
 
 int main(int argc, char** argv)
 try
 {
-  Shenanigans::Run();
+  Application app;
+  app.Run();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)

@@ -1,5 +1,6 @@
 #pragma once
 #include "ImageRegistration/IPC.hpp"
+#include "Window.hpp"
 
 struct IPCParameters
 {
@@ -22,18 +23,12 @@ struct IPCParameters
   static constexpr const char* L1WindowTypes[] = {"None", "Circular", "Gaussian"};
 };
 
-class IPCWindow
+class IPCWindow : public Window
 {
+  void UpdateIPCParameters(IPC& ipc);
+  IPCParameters mParameters;
+
 public:
-  static void Initialize();
-  static void Render();
-  static IPC& GetIPC() { return mIPC; }
-  static IPC& GetIPCOptimized() { return mIPCOptimized; }
-
-private:
-  inline static IPCParameters mParameters;
-  inline static IPC mIPC;
-  inline static IPC mIPCOptimized;
-
-  static void UpdateIPCParameters(IPC& ipc);
+  void Initialize() override;
+  void Render() override;
 };
