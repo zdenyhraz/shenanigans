@@ -73,16 +73,14 @@ inline std::vector<T> Iota(T first, usize size)
   return vec;
 }
 
-static std::filesystem::path GetProjectDirectoryPath()
+inline std::filesystem::path GetProjectDirectoryPath()
 {
   std::filesystem::path path = std::filesystem::current_path();
-  for (usize trial = 0; trial < 5; ++trial)
+  for (usize trial = 0; trial < 10; ++trial)
   {
     if (std::filesystem::exists(path / "src"))
       return path;
-    else
-      path = path.parent_path();
+    path = path.parent_path();
   }
-
   throw std::runtime_error("Could not find root project directory");
 }

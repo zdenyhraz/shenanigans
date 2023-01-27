@@ -6,14 +6,14 @@ inline bool IsImagePath(const std::string& path)
 }
 
 template <typename T>
-inline cv::Mat LoadUnitFloatImage(const std::filesystem::path path)
+inline cv::Mat LoadUnitFloatImage(const std::filesystem::path& path)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
   LOG_DEBUG("Loading image {}...", path.string());
+  if (not std::filesystem::exists(path))
+    throw std::invalid_argument(fmt::format("File {} does not exist", path.string()));
   cv::Mat mat = cv::imread(path.string(), cv::IMREAD_GRAYSCALE | cv::IMREAD_ANYDEPTH);
-  if (mat.empty()) [[unlikely]]
-    throw std::runtime_error(fmt::format("Image '{}' not found", path.string()));
   mat.convertTo(mat, GetMatType<T>());
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX);
   return mat;
