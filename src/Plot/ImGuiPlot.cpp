@@ -121,7 +121,7 @@ void ImGuiPlot::Debug()
     y2[i] = std::cos(2 * std::numbers::pi * x[i]);
   }
 
-  Plot({.name = fmt::format("debug1d#{}", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
+  ImGuiPlot::Plot({.name = fmt::format("debug1d#{}", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"y1", "y2"}});
   LOG_DEBUG("Added one debug1d plot");
 
   Plot({.name = fmt::format("debug2d#{}", mPlots2D.size()), .z = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n)});

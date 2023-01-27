@@ -25,7 +25,7 @@ void StuffWindow::Render()
     if (ImGui::Button("Evolution metaopt"))
       LaunchAsync([&]() { EvolutionOptimization(true); });
 
-    ImGui::Text("PyPlot & ImGuiPlot");
+    ImGui::Text("PyPlot & ImGuiPlot & CvPlot");
     if (ImGui::Button("Plot test"))
       LaunchAsync([&]() { PlotTest(); });
 
@@ -79,21 +79,18 @@ void StuffWindow::EvolutionOptimization(bool meta)
 void StuffWindow::PlotTest()
 {
   const int n = 101;
-  const auto gaussian2D = Random::Rand<f32>(1, 7) * Kirkl<f32>(n, n, Random::Rand<f32>(n / 20, n / 2));
+  const auto gaussian2D = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n);
   const auto gaussian1D = GetMidRow<f32>(gaussian2D);
   const auto x = Iota<f64>(0, gaussian1D.size());
 
-  Plot::Plot({.name = "default1D", .x = x, .ys = {gaussian1D}});
-  Plot::Plot({.name = "default2Da", .z = gaussian2D});
-  Plot::Plot("default2Db", gaussian2D);
+  ImGuiPlot::Plot({.name = "ig1D", .x = x, .ys = {gaussian1D}});
+  ImGuiPlot::Plot({.name = "ig2D", .z = gaussian2D});
 
-  PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
-  PyPlot::Plot({.name = "py2Da", .z = gaussian2D});
-  PyPlot::Plot("py2Db", gaussian2D);
+  // PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
+  // PyPlot::Plot({.name = "py2D", .z = gaussian2D});
 
-  ImGuiPlot::Plot({.name = "imgui1D", .x = x, .ys = {gaussian1D}});
-  ImGuiPlot::Plot({.name = "imgui2Da", .z = gaussian2D});
-  ImGuiPlot::Plot("imgui2Db", gaussian2D);
+  CvPlot::Plot({.name = "cv1D", .x = x, .ys = {gaussian1D}});
+  CvPlot::Plot({.name = "cv2D", .z = gaussian2D});
 }
 
 void StuffWindow::UnevenIlluminationCLAHE()
