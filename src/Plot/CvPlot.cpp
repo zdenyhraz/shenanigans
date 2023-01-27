@@ -30,6 +30,10 @@ void CvPlot::RenderInternal(const PlotData2D& data)
 
   if (not data.savepath.empty())
   {
+    cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
+    image.convertTo(image, CV_8U);
+    LOG_DEBUG("Saving image to {}", std::filesystem::weakly_canonical(data.savepath).string());
+    cv::imwrite(data.savepath, image);
   }
   else
   {
