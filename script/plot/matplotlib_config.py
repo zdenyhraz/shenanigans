@@ -6,13 +6,13 @@ def init():
     #matplotlib.use('GTK3Agg')
     #print("Matplotlib is using the", matplotlib.get_backend(), "backend")
 
-    FONT_SCALE = 2  # 1.3
+    FONT_SCALE = 1.5  # 1.5 normal 2 for LaTeX
     SMALL_SIZE = 8*FONT_SCALE
     MEDIUM_SIZE = 10*FONT_SCALE
     BIGGER_SIZE = 12*FONT_SCALE
     FIGSCALE = 1.3
-    FIGWIDTH = FIGSCALE*plt.rcParamsDefault["figure.figsize"][0]
     FIGHEIGHT = FIGSCALE*plt.rcParamsDefault["figure.figsize"][1]
+    FIGWIDTH = FIGHEIGHT*1.17
 
     plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
     plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title

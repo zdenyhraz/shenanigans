@@ -42,77 +42,55 @@ void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback)
 
 void ImGuiSetStyle(ImGuiStyle& style)
 {
-  constexpr auto ColorFromBytes = [](f32 r, f32 g, f32 b) { return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f); };
+  ImGui::StyleColorsDark();
+  ImPlot::StyleColorsAuto();
 
-  ImVec4* colors = style.Colors;
+  style.Alpha = 1.0f;
+  style.FrameRounding = 3.0f;
+  style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+  style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+  style.Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.94f);
+  style.Colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
+  style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.39f);
+  style.Colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.10f);
+  style.Colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
+  style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+  style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+  style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
+  style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
+  style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
+  style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
+  style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
+  style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
+  style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.59f, 0.59f, 1.00f);
+  style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
+  style.Colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+  style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
+  style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+  style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+  style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+  style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
+  style.Colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
+  style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+  style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+  style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
+  style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+  style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+  style.Colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
+  style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+  style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+  style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+  style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 
-  const ImVec4 bgColor = ColorFromBytes(37, 37, 38);
-  const ImVec4 lightBgColor = ColorFromBytes(82, 82, 85);
-  const ImVec4 veryLightBgColor = ColorFromBytes(90, 90, 95);
-
-  const ImVec4 panelColor = ColorFromBytes(51, 51, 55);
-  const ImVec4 panelHoverColor = ColorFromBytes(29, 151, 236);
-  const ImVec4 panelActiveColor = ColorFromBytes(0, 119, 200);
-
-  const ImVec4 textColor = ColorFromBytes(255, 255, 255);
-  const ImVec4 textDisabledColor = ColorFromBytes(151, 151, 151);
-  const ImVec4 borderColor = ColorFromBytes(78, 78, 78);
-
-  colors[ImGuiCol_Text] = textColor;
-  colors[ImGuiCol_TextDisabled] = textDisabledColor;
-  colors[ImGuiCol_TextSelectedBg] = panelActiveColor;
-  colors[ImGuiCol_WindowBg] = bgColor;
-  colors[ImGuiCol_ChildBg] = bgColor;
-  colors[ImGuiCol_PopupBg] = bgColor;
-  colors[ImGuiCol_Border] = borderColor;
-  colors[ImGuiCol_BorderShadow] = borderColor;
-  colors[ImGuiCol_FrameBg] = panelColor;
-  colors[ImGuiCol_FrameBgHovered] = panelHoverColor;
-  colors[ImGuiCol_FrameBgActive] = panelActiveColor;
-  colors[ImGuiCol_TitleBg] = bgColor;
-  colors[ImGuiCol_TitleBgActive] = bgColor;
-  colors[ImGuiCol_TitleBgCollapsed] = bgColor;
-  colors[ImGuiCol_MenuBarBg] = panelColor;
-  colors[ImGuiCol_ScrollbarBg] = panelColor;
-  colors[ImGuiCol_ScrollbarGrab] = lightBgColor;
-  colors[ImGuiCol_ScrollbarGrabHovered] = veryLightBgColor;
-  colors[ImGuiCol_ScrollbarGrabActive] = veryLightBgColor;
-  colors[ImGuiCol_CheckMark] = panelActiveColor;
-  colors[ImGuiCol_SliderGrab] = panelHoverColor;
-  colors[ImGuiCol_SliderGrabActive] = panelActiveColor;
-  colors[ImGuiCol_Button] = panelColor;
-  colors[ImGuiCol_ButtonHovered] = panelHoverColor;
-  colors[ImGuiCol_ButtonActive] = panelHoverColor;
-  colors[ImGuiCol_Header] = panelColor;
-  colors[ImGuiCol_HeaderHovered] = panelHoverColor;
-  colors[ImGuiCol_HeaderActive] = panelActiveColor;
-  colors[ImGuiCol_Separator] = borderColor;
-  colors[ImGuiCol_SeparatorHovered] = borderColor;
-  colors[ImGuiCol_SeparatorActive] = borderColor;
-  colors[ImGuiCol_ResizeGrip] = bgColor;
-  colors[ImGuiCol_ResizeGripHovered] = panelColor;
-  colors[ImGuiCol_ResizeGripActive] = lightBgColor;
-  colors[ImGuiCol_PlotLines] = panelActiveColor;
-  colors[ImGuiCol_PlotLinesHovered] = panelHoverColor;
-  colors[ImGuiCol_PlotHistogram] = panelActiveColor;
-  colors[ImGuiCol_PlotHistogramHovered] = panelHoverColor;
-  colors[ImGuiCol_ModalWindowDimBg] = bgColor;
-  colors[ImGuiCol_DragDropTarget] = bgColor;
-  colors[ImGuiCol_NavHighlight] = bgColor;
-  colors[ImGuiCol_DockingPreview] = panelActiveColor;
-  colors[ImGuiCol_Tab] = bgColor;
-  colors[ImGuiCol_TabActive] = panelActiveColor;
-  colors[ImGuiCol_TabUnfocused] = bgColor;
-  colors[ImGuiCol_TabUnfocusedActive] = panelActiveColor;
-  colors[ImGuiCol_TabHovered] = panelHoverColor;
-
-  style.WindowRounding = 0.0f;
-  style.ChildRounding = 0.0f;
-  style.FrameRounding = 0.0f;
-  style.GrabRounding = 0.0f;
-  style.PopupRounding = 0.0f;
-  style.ScrollbarRounding = 0.0f;
-  style.TabRounding = 0.0f;
+  for (int i = 0; i <= ImGuiCol_COUNT; i++)
+  {
+    ImVec4& col = style.Colors[i];
+    float H, S, V;
+    ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
+    if (S < 0.1f)
+      V = 1.0f - V;
+    ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
+  }
 }
 
 ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
@@ -131,8 +109,6 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   static const std::string iniFilename = (GetProjectDirectoryPath() / "data/apps/imgui.ini").string();
   io.IniFilename = iniFilename.c_str();
 
-  ImGui::StyleColorsDark();
-  ImPlot::StyleColorsDark();
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetStyle(style);
   style.ScaleAllSizes(scale);

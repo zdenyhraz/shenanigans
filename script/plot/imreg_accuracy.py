@@ -2,12 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot(
-        id, title, aspectratio, save, x, pc_error, pc_stddev, pcs_error, pcs_stddev, ipc_error, ipc_stddev, ipco_error,
-        ipco_stddev, log=False):
-    fig = plt.figure(num=id)
-    fig.set_figwidth(fig.get_figwidth()*aspectratio)
-    fig.canvas.manager.set_window_title(title)
+def plot(name, aspectratio, save, x, pc_error, pc_stddev, pcs_error, pcs_stddev, ipc_error, ipc_stddev, ipco_error, ipco_stddev, log=False):
+    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspectratio, plt.rcParams["figure.figsize"][1]])
     plt.clf()
     alpha = 0.3
     linewidth = 3
@@ -50,4 +46,4 @@ def plot(
         plt.savefig(save, bbox_inches='tight')
     else:
         plt.draw()
-        plt.pause(1e-9)
+        plt.pause(0.001)

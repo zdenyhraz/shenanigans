@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 
 def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, interp, xlabel, ylabel, zlabel, cmap):
-    fig = plt.figure(num=name)
-    fig.set_figwidth(fig.get_figwidth()*aspectratio)
+    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspectratio, plt.rcParams["figure.figsize"][1]])
     plt.clf()
 
     im = plt.imshow(z,
@@ -12,15 +10,12 @@ def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, interp, xlabel,
                     interpolation='bilinear' if interp else 'none',
                     aspect='auto')
 
-    #cbar = plt.colorbar(im, format=ticker.FuncFormatter(lambda x, pox: '{:.1e}'.format(x)))
-    cbar = plt.colorbar(im)
+    cbar = plt.colorbar(im, orientation='vertical', aspect=15, extend='both', pad=0.025)
 
     if xlabel:
         plt.xlabel(xlabel)
     if ylabel:
         plt.ylabel(ylabel)
-    if zlabel:
-        cbar.set_label(zlabel)
 
     plt.title(name)
     plt.set_cmap(cmap)
@@ -31,4 +26,4 @@ def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, interp, xlabel,
         plt.savefig(savepath, bbox_inches='tight')
     else:
         plt.draw()
-        plt.pause(1e-9)
+        plt.pause(0.001)

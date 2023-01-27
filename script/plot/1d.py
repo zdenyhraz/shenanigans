@@ -1,12 +1,9 @@
 import matplotlib.pyplot as plt
 
 
-def plot(name, aspectratio, savepath, x, ys, y2s, xlabel, ylabel, y2label, log, ycolors,
-         y2colors, ylinestyles, y2linestyles, ylabels, y2labels):
-    fig = plt.figure(num=name)
-    fig.set_figwidth(fig.get_figwidth()*aspectratio)
+def plot(name, aspectratio, savepath, x, ys, y2s, xlabel, ylabel, y2label, log, ycolors, y2colors, ylinestyles, y2linestyles, ylabels, y2labels):
+    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspectratio, plt.rcParams["figure.figsize"][1]])
     plt.clf()
-
     ax1 = fig.subplots()
     ax2 = ax1.twinx() if len(y2s) > 0 else None
     color_cycle = ax1._get_lines.prop_cycler
@@ -44,4 +41,4 @@ def plot(name, aspectratio, savepath, x, ys, y2s, xlabel, ylabel, y2label, log, 
         plt.savefig(savepath, bbox_inches='tight')
     else:
         plt.draw()
-        plt.pause(1e-9)
+        plt.pause(0.001)

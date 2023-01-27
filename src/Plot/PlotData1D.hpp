@@ -21,6 +21,6 @@ struct PlotData1D
   std::string ylabel = "y";
   std::string y2label = "y2";
   bool log = false;
-  f64 aspectratio = 1;
+  f64 aspectratio = 1.5;
   std::string savepath;
 };

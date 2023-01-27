@@ -33,7 +33,7 @@ void PyPlot::RenderInternal()
 
   while (not mPlotsCustom.empty())
   {
-    RenderInternal(mPlotsCustom.back().first, mPlotsCustom.back().second);
+    RenderInternal(mPlotsCustom.back().first, std::move(mPlotsCustom.back().second));
     mPlotsCustom.pop_back();
   }
 }
@@ -51,7 +51,7 @@ void PyPlot::RenderInternal(const PlotData2D& data)
   return RenderInternal("2d", GetPythonPlotData(data));
 }
 
-void PyPlot::RenderInternal(const std::string& type, const py::dict& data)
+void PyPlot::RenderInternal(const std::string& type, py::dict&& data)
 try
 {
   PROFILE_FUNCTION;

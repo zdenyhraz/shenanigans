@@ -3,10 +3,8 @@ import numpy as np
 
 
 def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, xlabel, ylabel, zlabel, cmap):
-    fig = plt.figure(num=id)
-    fig.set_figwidth(fig.get_figwidth()*aspectratio)
+    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspectratio, plt.rcParams["figure.figsize"][1]])
     plt.clf()
-
     xsize = z.shape[0]
     ysize = z.shape[1]
     n = 101
@@ -43,4 +41,4 @@ def plot(name, aspectratio, savepath, z, xmin, xmax, ymin, ymax, xlabel, ylabel,
         plt.savefig(savepath, bbox_inches='tight')
     else:
         plt.draw()
-        plt.pause(1e-9)
+        plt.pause(0.001)

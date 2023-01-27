@@ -15,7 +15,7 @@ public:
   void RenderInternal() override;
   void RenderInternal(const PlotData1D& data) override;
   void RenderInternal(const PlotData2D& data) override;
-  void RenderInternal(const std::string& type, const py::dict& data);
+  void RenderInternal(const std::string& type, py::dict&& data);
 
   static void PlotCustom(const std::string& type, py::dict&& data) { Singleton<PyPlot>::Get().ScheduleCustomPlot(type, std::move(data)); }
 };

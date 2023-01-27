@@ -104,8 +104,9 @@ void StuffWindow::FalseCorrelationsRemoval()
 
 void StuffWindow::PlotTest()
 {
-  const auto gaussian2D = Gaussian<f32>(101, Random::Rand<f32>(0, 31));
-  const auto gaussian1D = GetMidRow<f64>(gaussian2D);
+  const int n = 101;
+  const auto gaussian2D = Random::Rand<f32>(1, 7) * Kirkl<f32>(n, n, Random::Rand<f32>(n / 20, n / 2));
+  const auto gaussian1D = GetMidRow<f32>(gaussian2D);
   const auto x = Iota<f64>(0, gaussian1D.size());
 
   Plot::Plot({.name = "default1D", .x = x, .ys = {gaussian1D}});

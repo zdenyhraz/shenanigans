@@ -75,6 +75,7 @@ public:
     const auto [zmin, zmax] = MinMax(data.z);
     data.zmin = zmin;
     data.zmax = zmax;
+    data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
   }
 
