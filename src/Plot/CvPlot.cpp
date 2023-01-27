@@ -28,8 +28,14 @@ void CvPlot::RenderInternal(const PlotData2D& data)
     cv::normalize(image, image, 0, 1, cv::NORM_MINMAX);
   }
 
-  cv::imshow(data.name, image);
-  cv::waitKey(1);
+  if (not data.savepath.empty())
+  {
+  }
+  else
+  {
+    cv::imshow(data.name, image);
+    cv::waitKey(1);
+  }
 }
 
 cv::ColormapTypes CvPlot::GetColormap(const std::string& cmap)

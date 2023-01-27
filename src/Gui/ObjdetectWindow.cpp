@@ -6,7 +6,7 @@ void ObjdetectWindow::DetectObjects()
   auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / mParameters.imagePath);
   if (mParameters.imageSizeMultiplier != 1)
     cv::resize(image, image, cv::Size(mParameters.imageSizeMultiplier * image.cols, mParameters.imageSizeMultiplier * image.rows));
-  DetectObjectsSobelObjectness(image, mParameters.soParams);
+  std::ignore = DetectObjectsSobelObjectness(image, mParameters.soParams);
 }
 
 void ObjdetectWindow::Render()

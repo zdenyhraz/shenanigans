@@ -22,16 +22,12 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   return objectness / (objectSize * objectSize); // pixel average
 }
 
-inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 objectnessThreshold, f32 minObjectSize)
+inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectSize)
 {
   LOG_FUNCTION;
-  cv::Mat objectness8U = objectness.clone();
-  cv::threshold(objectness8U, objectness8U, objectnessThreshold, 255, cv::THRESH_BINARY);
-  objectness8U.convertTo(objectness8U, CV_8U);
-  Plot::Plot("objectness_thr", objectness8U);
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
-  cv::findContours(objectness8U, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+  cv::findContours(objectness, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
   LOG_DEBUG("Found {} objects", contours.size());
 
   std::vector<Object> objects;
@@ -66,6 +62,20 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   return out;
 }
 
+inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
+{
+  cv::Mat edgesX, edgesY;
+  cv::Sobel(source, edgesX, CV_32F, 1, 0, edgeSize, 1, 0, cv::BORDER_REPLICATE);
+  cv::Sobel(source, edgesY, CV_32F, 0, 1, edgeSize, 1, 0, cv::BORDER_REPLICATE);
+  edgesX = cv::abs(edgesX);
+  edgesY = cv::abs(edgesY);
+  cv::normalize(edgesX, edgesX, 0, 1, cv::NORM_MINMAX);
+  cv::normalize(edgesY, edgesY, 0, 1, cv::NORM_MINMAX);
+  cv::Mat edges = edgesX + edgesY;
+  cv::normalize(edges, edges, 0, 1, cv::NORM_MINMAX);
+  return edges;
+}
+
 inline i32 GetNearestOdd(i32 value)
 {
   return value % 2 == 0 ? value + 1 : value;
@@ -81,30 +91,37 @@ struct SobelObjectnessParameters
   f32 minObjectSizeMultiplier = 0.02; // 0.02
 };
 
-inline void DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
+inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
 {
   LOG_FUNCTION;
-  const auto blurSize = GetNearestOdd(params.blurSizeMultiplier * source.rows);
-  const auto edgeSize = GetNearestOdd(params.edgeSizeMultiplier * source.rows);
-
   Plot::Plot("source", source);
+
+  // blur for more robust edge detection
   cv::Mat blurred(source.size(), source.type());
+  const auto blurSize = GetNearestOdd(params.blurSizeMultiplier * source.rows);
   cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
   Plot::Plot("blurred", blurred);
-  cv::Mat edgesX, edgesY;
-  cv::Sobel(blurred, edgesX, CV_32F, 1, 0, edgeSize, 1, 0, cv::BORDER_REPLICATE);
-  cv::Sobel(blurred, edgesY, CV_32F, 0, 1, edgeSize, 1, 0, cv::BORDER_REPLICATE);
-  edgesX = cv::abs(edgesX);
-  edgesY = cv::abs(edgesY);
-  cv::normalize(edgesX, edgesX, 0, 1, cv::NORM_MINMAX);
-  cv::normalize(edgesY, edgesY, 0, 1, cv::NORM_MINMAX);
-  cv::Mat edges = edgesX + edgesY;
-  cv::normalize(edges, edges, 0, 1, cv::NORM_MINMAX);
+
+  // calclate absolute Sobel x/y edges
+  cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSizeMultiplier * source.rows));
   Plot::Plot("edges", edges);
+
+  // threshold the edges
   cv::threshold(edges, edges, params.edgeThreshold, 1, cv::THRESH_BINARY);
   Plot::Plot("edges_thr", edges);
-  const auto objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows);
+
+  // calculate objectness (local "edginess")
+  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows);
   Plot::Plot("objectness", objectness);
-  const auto objects = CalculateObjects(objectness, params.objectnessThreshold, params.minObjectSizeMultiplier * source.rows);
-  // Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string(), DrawObjects(source, objects));
+
+  // threshold objectness
+  cv::threshold(objectness, objectness, params.objectnessThreshold, 255, cv::THRESH_BINARY);
+  objectness.convertTo(objectness, CV_8U);
+  Plot::Plot("objectness_thr", objectness);
+
+  // calclate objects (find thresholded objectness contours)
+  const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
+  CvPlot::Plot({.name = "objects", .z = DrawObjects(source, objects), .savepath = (GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string()});
+
+  return objects;
 }

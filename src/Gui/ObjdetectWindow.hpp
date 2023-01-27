@@ -1,6 +1,6 @@
 #pragma once
 #include "Window.hpp"
-#include "Random/ObjectDetection.hpp"
+#include "ObjectDetection/SobelObjectness.hpp"
 
 class ObjdetectWindow : public Window
 {
