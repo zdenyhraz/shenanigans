@@ -5,6 +5,7 @@
 #include "DiffrotWindow.hpp"
 #include "SwindWindow.hpp"
 #include "StuffWindow.hpp"
+#include "ObjdetectWindow.hpp"
 #include "Plot/ImGuiPlot.hpp"
 #include "Plot/PyPlot.hpp"
 
@@ -16,7 +17,7 @@ void Shenanigans::Run()
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  ImGuiIO& io = ImGuiInitialize(window, 2.0);
+  ImGuiIO& io = ImGuiInitialize(window, 1.5);
   Initialize();
   LOG_DEBUG("Render loop started");
 
@@ -47,6 +48,7 @@ try
       DiffrotWindow::Render();
       SwindWindow::Render();
       StuffWindow::Render();
+      ObjdetectWindow::Render();
       ImGui::EndTabBar();
     }
     ImGui::End();

@@ -3,7 +3,6 @@
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 #include "UtilsCV/Vectmat.hpp"
-#include "Random/ObjectDetection.hpp"
 #include "Random/UnevenIllumination.hpp"
 
 void StuffWindow::Initialize()
@@ -44,10 +43,6 @@ void StuffWindow::Render()
     ImGui::SameLine();
     if (ImGui::Button("Homomorphic"))
       LaunchAsync([]() { UnevenIlluminationHomomorphic(); });
-
-    ImGui::Text("Object detection");
-    if (ImGui::Button("Sobel/Objectness"))
-      LaunchAsync([]() { ObjectDetection(); });
 
     ImGui::EndTabItem();
   }
@@ -126,14 +121,6 @@ void StuffWindow::PlotTest()
   ImGuiPlot::Plot({.name = "imgui1D", .x = x, .ys = {gaussian1D}});
   ImGuiPlot::Plot({.name = "imgui2Da", .z = gaussian2D});
   ImGuiPlot::Plot("imgui2Db", gaussian2D);
-}
-
-void StuffWindow::ObjectDetection()
-{
-  LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / "data/debug/ObjectDetection/input/lobsters.png");
-  // cv::resize(image, image, image.size() / 4);
-  DetectObjectsEdge(image);
 }
 
 void StuffWindow::UnevenIlluminationCLAHE()
