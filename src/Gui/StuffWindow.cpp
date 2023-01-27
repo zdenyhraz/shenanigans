@@ -16,31 +16,37 @@ void StuffWindow::Render()
   if (ImGui::BeginTabItem("Stuff"))
   {
     ImGui::Separator();
+    ImGui::Text("Demos");
     if (ImGui::Button("ImGui demo"))
       showImGuiDemoWindow = !showImGuiDemoWindow;
+    ImGui::SameLine();
     if (ImGui::Button("ImPlot demo"))
       showImPlotDemoWindow = !showImPlotDemoWindow;
 
-    ImGui::Separator();
-    if (ImGui::Button("Evolution optimization"))
+    ImGui::Text("Optimizers");
+    if (ImGui::Button("Evolution opt"))
       LaunchAsync([]() { EvolutionOptimization(false); });
-    if (ImGui::Button("Evolution meta optimization"))
+    ImGui::SameLine();
+    if (ImGui::Button("Evolution metaopt"))
       LaunchAsync([]() { EvolutionOptimization(true); });
-    if (ImGui::Button("False correlations removal"))
+
+    ImGui::Text("False correlations removal");
+    if (ImGui::Button("IPC/FCR"))
       LaunchAsync([]() { FalseCorrelationsRemoval(); });
 
-    ImGui::Separator();
+    ImGui::Text("PyPlot & ImGuiPlot");
     if (ImGui::Button("Plot test"))
       LaunchAsync([]() { PlotTest(); });
 
-    ImGui::Separator();
-    if (ImGui::Button("Uneven Illumination CLAHE"))
+    ImGui::Text("Uneven illumination compensation");
+    if (ImGui::Button("CLAHE"))
       LaunchAsync([]() { UnevenIlluminationCLAHE(); });
-    if (ImGui::Button("Uneven Illumination Homomorphic"))
+    ImGui::SameLine();
+    if (ImGui::Button("Homomorphic"))
       LaunchAsync([]() { UnevenIlluminationHomomorphic(); });
 
-    ImGui::Separator();
-    if (ImGui::Button("Object Detection"))
+    ImGui::Text("Object detection");
+    if (ImGui::Button("Sobel/Objectness"))
       LaunchAsync([]() { ObjectDetection(); });
 
     ImGui::EndTabItem();

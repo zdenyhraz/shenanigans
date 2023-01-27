@@ -24,7 +24,6 @@ void DiffrotWindow::Render()
     if (ImGui::Button("Plot meridian curve"))
       LaunchAsync([]() { DifferentialRotation::PlotMeridianCurve(mDiffrotData, mParameters.dataPath, 27); });
 
-    ImGui::SameLine();
     if (ImGui::Button("Show IPC"))
       LaunchAsync(
           []()
@@ -37,6 +36,7 @@ void DiffrotWindow::Render()
             IPCWindow::GetIPC().Calculate<IPC::Mode::Debug>(image1, image2);
           });
 
+    ImGui::SameLine();
     if (ImGui::Button("Plot IPC gradual idstep"))
     {
       LaunchAsync([]() { DifferentialRotation::PlotGradualIdStep(IPCWindow::GetIPC(), 15); });
