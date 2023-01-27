@@ -33,12 +33,14 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
   std::vector<Object> objects;
   for (const auto& contour : contours)
   {
+    const auto minRect = cv::minAreaRect(contour);
+
     // filter out small objects
-    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minObjectSize and minRect.size.height < minObjectSize)
+    if (minRect.size.width < minObjectSize and minRect.size.height < minObjectSize)
       continue;
 
     // filter out "needle" artifacts
-    if (const auto minRect = cv::minAreaRect(contour); minRect.size.width < minObjectSize or minRect.size.height < minObjectSize)
+    if (minRect.size.width < minObjectSize or minRect.size.height < minObjectSize)
       continue;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
@@ -69,11 +71,9 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
   cv::Sobel(source, edgesY, CV_32F, 0, 1, edgeSize, 1, 0, cv::BORDER_REPLICATE);
   edgesX = cv::abs(edgesX);
   edgesY = cv::abs(edgesY);
-  cv::normalize(edgesX, edgesX, 0, 1, cv::NORM_MINMAX);
-  cv::normalize(edgesY, edgesY, 0, 1, cv::NORM_MINMAX);
-  cv::Mat edges = edgesX + edgesY;
-  cv::normalize(edges, edges, 0, 1, cv::NORM_MINMAX);
-  return edges;
+  cv::normalize(edgesX, edgesX, 0, 0.5, cv::NORM_MINMAX);
+  cv::normalize(edgesY, edgesY, 0, 0.5, cv::NORM_MINMAX);
+  return edgesX + edgesY;
 }
 
 inline i32 GetNearestOdd(i32 value)
