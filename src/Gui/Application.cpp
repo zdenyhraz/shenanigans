@@ -16,7 +16,8 @@ void Application::Run()
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  ImGuiIO& io = ImGuiInitialize(window, 1.5);
+  const f32 scale = 2.0;
+  ImGuiIO& io = ImGuiInitialize(window, scale);
   Initialize();
 
   LOG_DEBUG("Render loop started");
