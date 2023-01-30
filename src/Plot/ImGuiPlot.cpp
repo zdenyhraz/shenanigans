@@ -102,7 +102,7 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
   if (cmap == "jet")
     return ImPlotColormap_Jet;
   if (cmap == "gray")
-    return ImPlotColormap_Greys;
+    return ImPlotColormap_Viridis;
 
   return ImPlotColormap_Jet;
 }

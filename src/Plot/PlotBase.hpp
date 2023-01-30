@@ -87,6 +87,7 @@ public:
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
+    data.z = data.z.clone();
     data.z.convertTo(data.z, CV_32F);
     const auto [zmin, zmax] = MinMax(data.z);
     data.zmin = zmin;

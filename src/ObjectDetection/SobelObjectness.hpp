@@ -73,7 +73,16 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
   edgesY = cv::abs(edgesY);
   cv::normalize(edgesX, edgesX, 0, 0.5, cv::NORM_MINMAX);
   cv::normalize(edgesY, edgesY, 0, 0.5, cv::NORM_MINMAX);
-  return edgesX + edgesY;
+  cv::Mat edges(edgesX.size(), CV_32F);
+  for (i32 r = 0; r < edges.rows; ++r)
+  {
+    auto edgesp = edges.ptr<f32>(r);
+    auto edgesXp = edgesX.ptr<f32>(r);
+    auto edgesYp = edgesY.ptr<f32>(r);
+    for (i32 c = 0; c < edges.cols; ++c)
+      edgesp[c] = std::clamp(edgesXp[c] + edgesYp[c], 0.f, 1.f);
+  }
+  return edges;
 }
 
 inline i32 GetNearestOdd(i32 value)
@@ -83,12 +92,12 @@ inline i32 GetNearestOdd(i32 value)
 
 struct SobelObjectnessParameters
 {
-  f32 objectSizeMultiplier = 0.05;    // 0.02
-  f32 blurSizeMultiplier = 0.05;      // 0.005
-  f32 edgeSizeMultiplier = 0.0025;    // 0.0025
-  f32 edgeThreshold = 0.7;            // 0.3 relative normalized
-  f32 objectnessThreshold = 0.01;     // 0.01
-  f32 minObjectSizeMultiplier = 0.02; // 0.02
+  f32 blurSizeMultiplier = 0.015;
+  f32 edgeSizeMultiplier = 0.0025;
+  f32 edgeThreshold = 0.16;
+  f32 objectSizeMultiplier = 0.02;
+  f32 objectnessThreshold = 0.05;
+  f32 minObjectSizeMultiplier = 0.02;
 };
 
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
@@ -122,6 +131,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   // calclate objects (find thresholded objectness contours)
   const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
   // CvPlot::Plot({.name = "objects", .z = DrawObjects(source, objects), .savepath = (GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string()});
+  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.jpg").string(), DrawObjects(source, objects));
 
   return objects;
 }
