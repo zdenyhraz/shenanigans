@@ -17,7 +17,6 @@ void ObjdetectWindow::Render()
     ImGui::Separator();
     ImGui::InputText("image path", &mParameters.imagePath);
     ImGui::SliderFloat("imageSizeMultiplier", &mParameters.imageSizeMultiplier, 0.1, 1);
-
     ImGui::Separator();
     ImGui::Text("Object detection via Sobel objectness");
     if (ImGui::Button("DetectObjects"))

@@ -40,7 +40,6 @@ try
   if (ImGui::Begin("Shenanigans"))
   {
     ImGui::Checkbox("Save plots", &mPlotSave);
-    ImGui::Separator();
     if (ImGui::BeginTabBar("Windows"))
     {
       for (const auto& window : mWindows)

@@ -1,10 +1,10 @@
 #pragma once
 
 template <typename T>
-inline void LaunchAsync(T fun)
+inline void LaunchAsync(T&& fun)
 {
   std::thread(
-      [&fun]()
+      [=]()
       {
         try
         {

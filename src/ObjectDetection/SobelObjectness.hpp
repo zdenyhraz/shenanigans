@@ -94,13 +94,13 @@ struct SobelObjectnessParameters
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
 {
   LOG_FUNCTION;
-  Plot::Plot("source", source);
+  Plot::Plot({.name = "source", .z = source, .cmap = "gray"});
 
   // blur for more robust edge detection
   cv::Mat blurred(source.size(), source.type());
   const auto blurSize = GetNearestOdd(params.blurSizeMultiplier * source.rows);
   cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
-  Plot::Plot("blurred", blurred);
+  Plot::Plot({.name = "blurred", .z = blurred, .cmap = "gray"});
 
   // calclate absolute Sobel x/y edges
   cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSizeMultiplier * source.rows));
@@ -121,7 +121,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
 
   // calclate objects (find thresholded objectness contours)
   const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
-  CvPlot::Plot({.name = "objects", .z = DrawObjects(source, objects), .savepath = (GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string()});
+  // CvPlot::Plot({.name = "objects", .z = DrawObjects(source, objects), .savepath = (GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string()});
 
   return objects;
 }
