@@ -71,8 +71,8 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
   cv::Sobel(source, edgesY, CV_32F, 0, 1, edgeSize, 1, 0, cv::BORDER_REPLICATE);
   edgesX = cv::abs(edgesX);
   edgesY = cv::abs(edgesY);
-  cv::normalize(edgesX, edgesX, 0, 0.5, cv::NORM_MINMAX);
-  cv::normalize(edgesY, edgesY, 0, 0.5, cv::NORM_MINMAX);
+  cv::normalize(edgesX, edgesX, 0, 1, cv::NORM_MINMAX);
+  cv::normalize(edgesY, edgesY, 0, 1, cv::NORM_MINMAX);
   cv::Mat edges(edgesX.size(), CV_32F);
   for (i32 r = 0; r < edges.rows; ++r)
   {
@@ -80,7 +80,7 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
     auto edgesXp = edgesX.ptr<f32>(r);
     auto edgesYp = edgesY.ptr<f32>(r);
     for (i32 c = 0; c < edges.cols; ++c)
-      edgesp[c] = std::clamp(edgesXp[c] + edgesYp[c], 0.f, 1.f);
+      edgesp[c] = std::max(edgesXp[c], edgesYp[c]);
   }
   return edges;
 }
@@ -96,7 +96,7 @@ struct SobelObjectnessParameters
   f32 edgeSizeMultiplier = 0.0025;
   f32 edgeThreshold = 0.16;
   f32 objectSizeMultiplier = 0.02;
-  f32 objectnessThreshold = 0.05;
+  f32 objectnessThreshold = 0.2;
   f32 minObjectSizeMultiplier = 0.02;
 };
 
@@ -116,7 +116,8 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("edges", edges);
 
   // threshold the edges
-  cv::threshold(edges, edges, params.edgeThreshold, 1, cv::THRESH_BINARY);
+  if (params.edgeThreshold > 0)
+    cv::threshold(edges, edges, params.edgeThreshold, 1, cv::THRESH_BINARY);
   Plot::Plot("edges_thr", edges);
 
   // calculate objectness (local "edginess")
