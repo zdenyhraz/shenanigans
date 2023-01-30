@@ -1,6 +1,6 @@
 #include "ObjdetectWindow.hpp"
 
-void ObjdetectWindow::DetectObjects()
+void ObjdetectWindow::DetectObjects() const
 {
   LOG_FUNCTION;
   auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / mParameters.imagePath);

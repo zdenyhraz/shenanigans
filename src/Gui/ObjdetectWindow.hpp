@@ -11,7 +11,7 @@ class ObjdetectWindow : public Window
     SobelObjectnessParameters soParams;
   };
 
-  void DetectObjects();
+  void DetectObjects() const;
 
   ObjdetectParameters mParameters;
 
