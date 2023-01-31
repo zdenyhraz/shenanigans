@@ -105,7 +105,7 @@ public:
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
       if (not data.z.isContinuous())
-        throw std::runtime_error("Cannot plot image with non-continuous data");
+        throw std::invalid_argument("Cannot plot image with non-continuous data");
     }
 
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);

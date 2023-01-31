@@ -77,7 +77,7 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
     const f32 height = ImGui::GetContentRegionAvail().y;
-    const f32 width = height;
+    const f32 width = height * data.aspectratio;
     const f32 heightcb = height;
     const f32 widthcb = heightcb * 0.15;
     static const ImPlotAxisFlags axesFlags = ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks;
