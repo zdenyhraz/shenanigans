@@ -1,4 +1,5 @@
 #pragma once
+#include "GLImage.hpp"
 
 struct PlotData2D
 {
@@ -19,4 +20,5 @@ struct PlotData2D
   bool surf = false;
   f64 aspectratio = 1;
   std::string savepath;
+  GLImage image;
 };

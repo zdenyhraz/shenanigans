@@ -78,19 +78,32 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
   {
     const f32 height = ImGui::GetContentRegionAvail().y;
     const f32 width = height;
-    const f32 widthcb = width * 0.15;
-    const f32 heightcb = height * 1;
+    const f32 heightcb = height;
+    const f32 widthcb = heightcb * 0.15;
     static const ImPlotAxisFlags axesFlags = ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks;
     if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height), ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText | ImPlotFlags_NoInputs))
     {
-      ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), axesFlags, axesFlags);
-      ImPlot::GetStyle().Colormap = GetColormap(data.cmap);
-      ImPlot::PlotHeatmap(
-          data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+      if (data.xlabel != "x" or data.ylabel != "y")
+        ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), axesFlags, axesFlags);
+
+      if (data.z.channels() == 1)
+      {
+        ImPlot::GetStyle().Colormap = GetColormap(data.cmap);
+        ImPlot::PlotHeatmap(
+            data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+      }
+
+      if (data.z.channels() == 3)
+      {
+        if (data.image.texid == 0)
+          data.image.Load(data.z); // has to run in main thread
+        ImPlot::PlotImage(data.name.c_str(), (void*)(intptr_t)data.image.texid, ImPlotPoint(0, 0), ImPlotPoint(1, 1));
+      }
+
       ImPlot::EndPlot();
     }
     ImGui::SameLine();
-    if (data.colorbar)
+    if (data.colorbar and data.z.channels() == 1)
       ImPlot::ColormapScale("##NoLabel", data.zmin, data.zmax, ImVec2{widthcb, heightcb}, "%g", ImPlotColormapScaleFlags_NoLabel);
 
     ImGui::EndTabItem();

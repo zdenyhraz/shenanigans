@@ -81,18 +81,33 @@ public:
 
   static void Plot(PlotData2D&& data)
   {
-    if (data.z.channels() > 1)
-      throw std::invalid_argument("Multichannel image plots not supported");
+    if (data.z.empty())
+      throw std::invalid_argument("Unable to plot empty data");
+    if (data.z.channels() != 1 and data.z.channels() != 3)
+      throw std::invalid_argument(fmt::format("{} channel plots not supported", data.z.channels()));
+
+    data.z = data.z.clone();
+    data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
 
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
-    data.z = data.z.clone();
-    data.z.convertTo(data.z, CV_32F);
-    const auto [zmin, zmax] = MinMax(data.z);
-    data.zmin = zmin;
-    data.zmax = zmax;
-    data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
+    if (data.z.channels() == 1)
+    {
+      data.z.convertTo(data.z, CV_32F);
+      const auto [zmin, zmax] = MinMax(data.z);
+      data.zmin = zmin;
+      data.zmax = zmax;
+    }
+
+    if (data.z.channels() == 3)
+    {
+      cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
+      data.z.convertTo(data.z, CV_8UC3);
+      if (not data.z.isContinuous())
+        throw std::runtime_error("Cannot plot image with non-continuous data");
+    }
+
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
   }
 

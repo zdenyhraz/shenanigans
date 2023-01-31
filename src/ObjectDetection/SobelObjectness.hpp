@@ -53,10 +53,13 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
 inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& objects)
 {
   LOG_FUNCTION;
-  cv::Mat out(source.size(), source.type());
-  cv::cvtColor(source, out, cv::COLOR_GRAY2BGR);
+  cv::Mat src = source.clone();
+  cv::normalize(src, src, 0, 255, cv::NORM_MINMAX);
+  src.convertTo(src, CV_8U);
+  cv::Mat out;
+  cv::applyColorMap(src, out, cv::COLORMAP_VIRIDIS);
 
-  const auto color = cv::Scalar(0, 0, 1);
+  const auto color = cv::Scalar(0, 0, 255);
   const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
   for (const auto& object : objects)
     cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, color, thickness, cv::LINE_AA);
@@ -131,8 +134,8 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
 
   // calclate objects (find thresholded objectness contours)
   const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
-  // CvPlot::Plot({.name = "objects", .z = DrawObjects(source, objects), .savepath = (GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.png").string()});
-  Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.jpg").string(), DrawObjects(source, objects));
+  Plot::Plot("objects", DrawObjects(source, objects));
+  // Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.jpg").string(), DrawObjects(source, objects));
 
   return objects;
 }
