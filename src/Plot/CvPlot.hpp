@@ -3,7 +3,6 @@
 
 class CvPlot : public PlotBase<CvPlot>
 {
-  static cv::ColormapTypes GetColormap(const std::string& cmap);
   void Debug();
 
 public:

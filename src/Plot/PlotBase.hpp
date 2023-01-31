@@ -3,6 +3,8 @@
 #include "PlotData2D.hpp"
 #include "Utils/Singleton.hpp"
 
+class ImGuiPlot;
+
 template <class T>
 class PlotBase
 {
@@ -92,20 +94,32 @@ public:
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
-    if (data.z.channels() == 1)
-    {
-      data.z.convertTo(data.z, CV_32F);
-      const auto [zmin, zmax] = MinMax(data.z);
-      data.zmin = zmin;
-      data.zmax = zmax;
-    }
-
     if (data.z.channels() == 3)
     {
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
       if (not data.z.isContinuous())
         throw std::invalid_argument("Cannot plot image with non-continuous data");
+      LOG_DEBUG("Plotting {}x{} data", data.z.cols, data.z.rows);
+    }
+
+    if (data.z.channels() == 1)
+    {
+      if constexpr (std::is_same_v<T, ImGuiPlot>)
+      {
+        cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
+        data.z.convertTo(data.z, CV_8U);
+        cv::Mat cmap;
+        cv::applyColorMap(data.z, cmap, GetColormap(data.cmap));
+        data.z = cmap;
+      }
+      else
+      {
+        data.z.convertTo(data.z, CV_32F);
+        const auto [zmin, zmax] = MinMax(data.z);
+        data.zmin = zmin;
+        data.zmax = zmax;
+      }
     }
 
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);

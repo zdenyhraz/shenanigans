@@ -67,3 +67,13 @@ constexpr std::vector<T> Linspace(f64 start, f64 end, usize n)
     vec[i] = start + static_cast<f64>(i) / (n - 1) * (end - start);
   return vec;
 }
+
+inline i32 GetNearestOdd(i32 value)
+{
+  return value % 2 == 0 ? value + 1 : value;
+}
+
+inline i32 GetNearestEven(i32 value)
+{
+  return value % 2 != 0 ? value + 1 : value;
+}

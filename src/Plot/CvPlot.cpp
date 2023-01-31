@@ -41,11 +41,3 @@ void CvPlot::RenderInternal(const PlotData2D& data)
     cv::waitKey(1);
   }
 }
-
-cv::ColormapTypes CvPlot::GetColormap(const std::string& cmap)
-{
-  if (cmap == "jet")
-    return cv::COLORMAP_JET;
-
-  return cv::COLORMAP_JET;
-}

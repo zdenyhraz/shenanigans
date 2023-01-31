@@ -88,11 +88,6 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
   return edges;
 }
 
-inline i32 GetNearestOdd(i32 value)
-{
-  return value % 2 == 0 ? value + 1 : value;
-}
-
 struct SobelObjectnessParameters
 {
   f32 blurSizeMultiplier = 0.015;

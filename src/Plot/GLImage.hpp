@@ -38,26 +38,11 @@ public:
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;
-    CheckGLError("GLImage::Load(const cv::Mat& z)");
     glGenTextures(1, &texid);
-    CheckGLError("glGenTextures");
     glBindTexture(GL_TEXTURE_2D, texid);
-    CheckGLError("glBindTexture");
-
-    if (true)
-    {
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      CheckGLError("glTexParameteri");
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      CheckGLError("glTexParameteri");
-
-      // #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-      //       glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-      //       CheckGLError("glPixelStorei");
-      // #endif
-    }
-
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, z.cols, z.rows, 0, GL_BGR, GetGLDataType(z), z.data);
-    CheckGLError("glTexImage2D");
   }
 };
