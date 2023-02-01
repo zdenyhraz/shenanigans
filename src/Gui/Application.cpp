@@ -16,16 +16,26 @@ void Application::Run()
   auto window = GLFWCreateWindow(1920, 1080, true);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
-  const f32 scale = 2.0;
+  static constexpr f32 scale = 2.0;
+  static constexpr f64 targetFPS = 60;
+  static constexpr f64 targetFrametime = 1. / targetFPS;
+  static constexpr bool limitFPS = true;
   ImGuiIO& io = ImGuiInitialize(window, scale);
   Initialize();
 
   LOG_DEBUG("Render loop started");
+  f64 lastUpdateTime = 0, elapsedTime = 0;
   while (!glfwWindowShouldClose(window))
   {
+    if constexpr (limitFPS)
+      if (elapsedTime = glfwGetTime() - lastUpdateTime; elapsedTime < targetFrametime)
+        std::this_thread::sleep_for(std::chrono::duration<f64>(targetFrametime - elapsedTime));
+
     ImGuiNewFrame();
     Render();
     ImGuiRender(window, io);
+    if constexpr (limitFPS)
+      lastUpdateTime += targetFrametime;
     PROFILE_FRAME;
   }
 
