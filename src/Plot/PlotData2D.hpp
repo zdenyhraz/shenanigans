@@ -12,7 +12,7 @@ struct PlotData2D
   f64 ymax = Default;
   f64 zmin = Default;
   f64 zmax = Default;
-  std::string cmap = "jet";
+  std::string cmap;
   std::string xlabel;
   std::string ylabel;
   std::string zlabel;

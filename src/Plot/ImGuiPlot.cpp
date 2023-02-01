@@ -84,8 +84,8 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
     if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(width, height), plotFlags))
     {
       ImPlot::SetupAxes(data.xlabel.c_str(), data.ylabel.c_str(), axesFlagsX, axesFlagsY);
-      ImPlot::SetupAxisLimits(ImAxis_X1, data.xmin, data.xmax, ImGuiCond_Once);
-      ImPlot::SetupAxisLimits(ImAxis_Y1, std::min(data.ymin, data.ymax), std::max(data.ymax, data.ymin), ImGuiCond_Once);
+      ImPlot::SetupAxisLimits(ImAxis_X1, data.xmin, data.xmax);
+      ImPlot::SetupAxisLimits(ImAxis_Y1, std::min(data.ymin, data.ymax), std::max(data.ymax, data.ymin));
       ImPlot::GetStyle().Colormap = GetColormap(data.cmap);
 
       if (data.z.channels() == 1)
@@ -116,12 +116,12 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 {
   if (cmap == "gray")
     return ImPlotColormap_Viridis;
-  if (cmap == "grey")
-    return ImPlotColormap_Viridis;
   if (cmap == "jet")
     return ImPlotColormap_Jet;
+  if (cmap == "viridis")
+    return ImPlotColormap_Viridis;
 
-  return ImPlotColormap_Jet;
+  return ImPlotColormap_Viridis;
 }
 
 void ImGuiPlot::Debug()

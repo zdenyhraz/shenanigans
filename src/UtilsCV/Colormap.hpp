@@ -21,11 +21,11 @@ inline cv::Scalar ColormapJet(f32 x, f32 valMin = 0, f32 valMax = 1, f32 val = 2
 inline cv::ColormapTypes GetColormap(const std::string& cmap)
 {
   if (cmap == "gray")
-    return cv::COLORMAP_VIRIDIS;
-  if (cmap == "grey")
-    return cv::COLORMAP_VIRIDIS;
+    return cv::COLORMAP_BONE;
   if (cmap == "jet")
     return cv::COLORMAP_JET;
+  if (cmap == "viridis")
+    return cv::COLORMAP_VIRIDIS;
 
-  return cv::COLORMAP_JET;
+  return cv::COLORMAP_VIRIDIS;
 }

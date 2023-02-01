@@ -4,6 +4,7 @@ struct Object
 {
   cv::Point center;
   std::vector<cv::Point> contour;
+  bool filtered = false;
 };
 
 inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
@@ -31,22 +32,27 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
   LOG_DEBUG("Found {} objects", contours.size());
 
   std::vector<Object> objects;
+  usize filteredCount = 0;
   for (const auto& contour : contours)
   {
     const auto minRect = cv::minAreaRect(contour);
+    bool filtered = false;
 
     // filter out small objects
     if (minRect.size.width < minObjectSize and minRect.size.height < minObjectSize)
-      continue;
+      filtered = true;
 
     // filter out "needle" artifacts
     if (minRect.size.width < minObjectSize or minRect.size.height < minObjectSize)
-      continue;
+      filtered = true;
+
+    if (filtered)
+      ++filteredCount;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
-    objects.emplace_back(center, contour);
+    objects.emplace_back(center, contour, filtered);
   }
-
+  LOG_DEBUG("Filtered {} objects", filteredCount);
   return objects;
 }
 
@@ -60,9 +66,10 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   cv::applyColorMap(src, out, cv::COLORMAP_VIRIDIS);
 
   const auto color = cv::Scalar(0, 0, 255);
-  const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
+  const auto colorFiltered = cv::Scalar(255, 0, 0);
+  const auto thickness = std::clamp(0.003 * out.rows, 1., 100.);
   for (const auto& object : objects)
-    cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, color, thickness, cv::LINE_AA);
+    cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, object.filtered ? colorFiltered : color, thickness, cv::LINE_AA);
 
   return out;
 }
@@ -101,13 +108,13 @@ struct SobelObjectnessParameters
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
 {
   LOG_FUNCTION;
-  Plot::Plot({.name = "source", .z = source, .cmap = "gray"});
+  Plot::Plot("source", source);
 
   // blur for more robust edge detection
   cv::Mat blurred(source.size(), source.type());
   const auto blurSize = GetNearestOdd(params.blurSizeMultiplier * source.rows);
   cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
-  Plot::Plot({.name = "blurred", .z = blurred, .cmap = "gray"});
+  Plot::Plot("blurred", blurred);
 
   // calclate absolute Sobel x/y edges
   cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSizeMultiplier * source.rows));
@@ -130,7 +137,6 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   // calclate objects (find thresholded objectness contours)
   const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
   Plot::Plot("objects", DrawObjects(source, objects));
-  // Saveimg((GetProjectDirectoryPath() / "data/debug/ObjectDetection/objects.jpg").string(), DrawObjects(source, objects));
 
   return objects;
 }
