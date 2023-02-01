@@ -86,8 +86,8 @@ void StuffWindow::PlotTest()
   ImGuiPlot::Plot({.name = "ig1D", .x = x, .ys = {gaussian1D}});
   ImGuiPlot::Plot({.name = "ig2D", .z = gaussian2D});
 
-  // PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
-  // PyPlot::Plot({.name = "py2D", .z = gaussian2D});
+  PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
+  PyPlot::Plot({.name = "py2D", .z = gaussian2D});
 
   CvPlot::Plot({.name = "cv1D", .x = x, .ys = {gaussian1D}});
   CvPlot::Plot({.name = "cv2D", .z = gaussian2D});

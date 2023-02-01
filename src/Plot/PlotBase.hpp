@@ -39,6 +39,7 @@ class PlotBase
   template <class PlotData>
   void SchedulePlot(PlotData&& data, std::vector<PlotData>& vec)
   {
+    PROFILE_FUNCTION;
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::ranges::find_if(vec, [&data](const auto& entry) { return entry.name == data.name; }); it != vec.end())
       *it = std::move(data);
@@ -76,8 +77,6 @@ public:
   static void Plot(PlotData1D&& data)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION;
-
     if (data.x.empty())
       data.x = Iota(0., data.ys[0].size());
 
@@ -87,8 +86,6 @@ public:
   static void Plot(PlotData2D&& data)
   {
     PROFILE_FUNCTION;
-    LOG_FUNCTION;
-
     if (data.z.empty())
       throw std::invalid_argument("Unable to plot empty data");
     if (not data.z.isContinuous())

@@ -12,7 +12,7 @@ try
   PROFILE_FUNCTION;
   if (mConsoleOutput)
   {
-    LOG_INFO("Running evolution...");
+    LOG_INFO("Running evolution");
   }
 
   CheckParameters();

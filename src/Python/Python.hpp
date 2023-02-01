@@ -12,7 +12,7 @@ public:
   {
     PROFILE_FUNCTION;
     PYTHON_INTERPRETER_GUARD;
-    LOG_DEBUG("Initializing Python ...");
+    LOG_DEBUG("Initializing Python");
     static py::scoped_interpreter guard{};
     const auto projectDirectory = GetProjectDirectoryPath();
     py::exec(fmt::format("import sys\r\nsys.path.append('{}')", (projectDirectory / "script").string())); // for Python module importing by C++

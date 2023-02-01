@@ -7,24 +7,34 @@ struct Object
   bool filtered = false;
 };
 
-inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
+inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize, bool gaussianObjectness)
 {
   LOG_FUNCTION;
-  cv::Mat edgesNorm(edges.size(), CV_32F);
+  cv::Mat edgesNorm(edges.size(), edges.type());
   cv::normalize(edges, edgesNorm, 0, 1, cv::NORM_MINMAX);
-  cv::Mat objectness = cv::Mat::zeros(edgesNorm.size(), CV_32F);
-  cv::Mat window = Kirkl<f32>(objectSize);
-  std::atomic<usize> progress = 0;
-  LOG_PROGRESS_NAME("CalculateObjectness");
-#pragma omp parallel for
-  for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
+  cv::Mat objectness(edgesNorm.size(), edgesNorm.type());
+
+  if (gaussianObjectness)
   {
-    LOG_PROGRESS(static_cast<f32>(++progress) / (edgesNorm.rows - objectSize));
-    for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
-      objectness.at<f32>(r, c) = cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0];
+    const auto blurSize = GetNearestOdd(1.7 * objectSize);
+    cv::GaussianBlur(edgesNorm, objectness, cv::Size(blurSize, blurSize), 0);
   }
-  LOG_PROGRESS_RESET;
-  return objectness / (objectSize * objectSize); // pixel average
+  else
+  {
+    cv::Mat window = Kirkl<f32>(objectSize);
+    std::atomic<usize> progress = 0;
+    const auto objectnessMultiplier = 1.0f / (objectSize * objectSize);
+    LOG_PROGRESS_NAME("CalculateObjectness");
+#pragma omp parallel for
+    for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
+    {
+      LOG_PROGRESS(static_cast<f32>(++progress) / (edgesNorm.rows - objectSize));
+      for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
+        objectness.at<f32>(r, c) = objectnessMultiplier * cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0];
+    }
+    LOG_PROGRESS_RESET;
+  }
+  return objectness; // pixel average
 }
 
 inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectSize)
@@ -80,6 +90,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
 
 inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
 {
+  LOG_FUNCTION;
   cv::Mat edgesX, edgesY;
   cv::Sobel(source, edgesX, CV_32F, 1, 0, std::clamp(edgeSize, 3, 31), 1, 0, cv::BORDER_REPLICATE);
   cv::Sobel(source, edgesY, CV_32F, 0, 1, std::clamp(edgeSize, 3, 31), 1, 0, cv::BORDER_REPLICATE);
@@ -104,6 +115,7 @@ struct SobelObjectnessParameters
   f32 blurSizeMultiplier = 0.015;
   f32 edgeSizeMultiplier = 0.0025;
   f32 edgeThreshold = 0.16;
+  bool gaussianObjectness = true;
   f32 objectSizeMultiplier = 0.02;
   f32 objectnessThreshold = 0.2;
   f32 minObjectSizeMultiplier = 0.02;
@@ -130,7 +142,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("edges_thr", edges);
 
   // calculate objectness (local "edginess")
-  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows);
+  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows, params.gaussianObjectness);
   Plot::Plot("objectness", objectness);
 
   // threshold objectness

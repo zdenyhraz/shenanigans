@@ -70,7 +70,7 @@ public:
       PROFILE_FUNCTION;
       LOG_FUNCTION;
       std::string path = fmt::format("{}/diffrot.json", dataPath);
-      LOG_DEBUG("Saving differential rotation results to {} ...", std::filesystem::weakly_canonical(path).string());
+      LOG_DEBUG("Saving differential rotation results to {}", std::filesystem::weakly_canonical(path).string());
       cv::FileStorage file(path, cv::FileStorage::WRITE);
       file << "xsize" << xsize;
       file << "ysize" << ysize;
@@ -143,7 +143,7 @@ public:
         const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
 
         if constexpr (not Managed)
-          LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f} ...", xindex1, x, xindex2, t);
+          LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f}", xindex1, x, xindex2, t);
 
         for (i32 y = 0; y < omegax.rows; ++y)
         {
@@ -226,14 +226,14 @@ public:
         {
           if constexpr (not Managed)
             LOG_DEBUG("[{:>3.0f}% :: {} / {}] Calculating diffrot profile {} - "
-                      "{} ...",
+                      "{}",
                 logprogress / xsize * 100, logprogress, xsize, id1, id2);
         }
         else [[unlikely]]
         {
           if constexpr (not Managed)
             LOG_WARNING("[{:>3.0f}% :: {} / {}] Could not load images {} - {}, "
-                        "skipping ...",
+                        "skipping",
                 logprogress / xsize * 100, logprogress, xsize, id1, id2);
           continue;
         }

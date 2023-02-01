@@ -16,7 +16,7 @@ cv::Mat computeFractal(Fractalset& fractalset)
 {
   cv::Mat Fractal = cv::Mat::zeros(fractalset.fractalHeight, fractalset.fractalWidth, CV_32F);
   std::complex<f64> startZ = 0. + 0.i;
-  std::cout << "Computing Fractal...";
+  std::cout << "Computing Fractal";
 #pragma omp parallel for
   for (i32 r = 0; r < fractalset.fractalHeight; r++)
   {

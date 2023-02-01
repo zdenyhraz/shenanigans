@@ -47,7 +47,7 @@ def DownloadAndSaveFITS(url, path):
 
 def SaveDataStatistics(stats, dir):
     statistics_path = "{}/statistics.json".format(dir)
-    print("[Finished] Writing data statistics to {} ...".format(statistics_path))
+    print("[Finished] Writing data statistics to {}".format(statistics_path))
     open(statistics_path, 'w').write(json.dumps(stats, indent=2, default=str))
 
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         i = 0
 
         if not os.path.isdir(dir):
-            print("[Init] Creating {} directory ...".format(dir))
+            print("[Init] Creating {} directory".format(dir))
             os.makedirs(dir)
 
         stats = {"parameters": parameters}
@@ -106,12 +106,12 @@ if __name__ == "__main__":
 
                 path = "{}/{}".format(dir, id)
                 if os.path.exists("{}.png".format(path)) and os.path.exists("{}.json".format(path)):
-                    print("[{:.1f}%: {} / {}] File {} already exists, skipping ...".format(float(i*100)/int(parameters["idcount"]),
-                                                                                           i, int(parameters["idcount"]), path))
+                    print("[{:.1f}%: {} / {}] File {} already exists, skipping".format(float(i*100)/int(parameters["idcount"]),
+                                                                                       i, int(parameters["idcount"]), path))
                     continue
 
                 url = GenerateFITSUrl(id)
-                print("[{:.1f}%: {} / {}] Processing file {} ...".format(float(i*100)/int(parameters["idcount"]),
+                print("[{:.1f}%: {} / {}] Processing file {}".format(float(i*100)/int(parameters["idcount"]),
                       i, int(parameters["idcount"]), path))
                 DownloadAndSaveFITS(url=url, path=path)
 

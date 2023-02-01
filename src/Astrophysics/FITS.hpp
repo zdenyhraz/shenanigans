@@ -49,7 +49,7 @@ private:
     }
     else
     {
-      // LOG_DEBUG("<loadfits> Loading file '{}'...", path);
+      // LOG_DEBUG("<loadfits> Loading file '{}', path);
       static constexpr i32 lineBytes = 80;
       static constexpr i32 linesMultiplier = 36;
       FitsParams params;

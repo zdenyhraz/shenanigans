@@ -5,7 +5,7 @@ void PyPlot::InitializeInternal()
 try
 {
   PROFILE_FUNCTION;
-  LOG_DEBUG("Initializing Matplotlib ...");
+  LOG_DEBUG("Initializing Matplotlib");
   Python::Initialize();
   PYTHON_INTERPRETER_GUARD;
   py::module::import("plot.matplotlib_config").attr("init")();
@@ -112,7 +112,7 @@ py::dict PyPlot::GetPythonPlotData(const PlotData2D& data)
 void PyPlot::ScheduleCustomPlot(const std::string& type, py::dict&& data)
 {
   std::scoped_lock lock(mPlotsMutex);
-  if (auto it = std::ranges::find_if(mPlotsCustom, [&data](const auto& entry) { return entry.second["name"].cast<std::string>() == data["name"].cast<std::string>(); });
+  if (auto it = std::ranges::find_if(mPlotsCustom, [&data](const auto& entry) { return entry.second["name"].template cast<std::string>() == data["name"].cast<std::string>(); });
       it != mPlotsCustom.end())
     it->second = std::move(data);
   else

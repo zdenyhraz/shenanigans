@@ -2,8 +2,8 @@
 #include "IPC.hpp"
 #include "Filtering/Noise.hpp"
 
-std::vector<ImagePair> CreateImagePairs(const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift, cv::Point2d shiftOffset1,
-    cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
+std::vector<ImagePair> CreateImagePairs(
+    const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift, cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -13,11 +13,11 @@ std::vector<ImagePair> CreateImagePairs(const IPC& ipc, const std::vector<cv::Ma
   if (iters < 1)
     throw std::runtime_error(fmt::format("Invalid iters per image ({})", iters));
 
-  if (const auto badimage = std::find_if(images.begin(), images.end(),
-          [&](const auto& image) { return image.rows < ipc.GetRows() + maxShift.y or image.cols < ipc.GetCols() + maxShift.x; });
+  if (const auto badimage =
+          std::find_if(images.begin(), images.end(), [&](const auto& image) { return image.rows < ipc.GetRows() + maxShift.y or image.cols < ipc.GetCols() + maxShift.x; });
       badimage != images.end())
-    throw std::runtime_error(fmt::format("Input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])",
-        badimage->rows, badimage->cols, ipc.GetRows() + maxShift.y, ipc.GetCols() + maxShift.x));
+    throw std::runtime_error(fmt::format("Input image is too small for specified IPC window size & max shift ratio ([{},{}] < [{},{}])", badimage->rows, badimage->cols,
+        ipc.GetRows() + maxShift.y, ipc.GetCols() + maxShift.x));
 
   std::vector<ImagePair> imagePairs;
   imagePairs.reserve(images.size() * iters * iters);
@@ -25,7 +25,7 @@ std::vector<ImagePair> CreateImagePairs(const IPC& ipc, const std::vector<cv::Ma
   i32 imageidx = 0;
   for (const auto& image : images)
   {
-    LOG_DEBUG("Creating {} image pairs from image {}/{} ...", iters * iters, ++imageidx, images.size());
+    LOG_DEBUG("Creating {} image pairs from image {}/{}", iters * iters, ++imageidx, images.size());
 
     cv::Mat image1 = RoiCropMid(Shifted(image, shiftOffset1), ipc.GetCols(), ipc.GetRows());
     AddNoise<IPC::Float>(image1, noiseStddev);
@@ -38,8 +38,7 @@ std::vector<ImagePair> CreateImagePairs(const IPC& ipc, const std::vector<cv::Ma
         if (progress)
           *progress = static_cast<f32>(++progressidx) / (images.size() * iters * iters);
 
-        const auto shift =
-            cv::Point2d(maxShift.x * (-1.0 + 2.0 * col / (iters - 1)), maxShift.y * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1))) + shiftOffset2;
+        const auto shift = cv::Point2d(maxShift.x * (-1.0 + 2.0 * col / (iters - 1)), maxShift.y * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1))) + shiftOffset2;
         cv::Mat image2 = RoiCropMid(Shifted(image, shiftOffset1 + shift), ipc.GetCols(), ipc.GetRows());
         AddNoise<IPC::Float>(image2, noiseStddev);
 #pragma omp critical
@@ -49,8 +48,7 @@ std::vector<ImagePair> CreateImagePairs(const IPC& ipc, const std::vector<cv::Ma
   }
 
   // monotonically increasing x shift for plots
-  std::sort(
-      imagePairs.begin(), imagePairs.end(), [](const auto& imagePair1, const auto& imagePair2) { return imagePair1.shift.x < imagePair2.shift.x; });
+  std::sort(imagePairs.begin(), imagePairs.end(), [](const auto& imagePair1, const auto& imagePair2) { return imagePair1.shift.x < imagePair2.shift.x; });
 
   if (progress)
     *progress = 0;
@@ -91,15 +89,13 @@ ImageRegistrationDataset LoadImageRegistrationDataset(const std::string& path)
     const i32 row = j["coords"][idx][0];
     const i32 col = j["coords"][idx][1];
 
-    dataset.imagePairs.emplace_back(
-        LoadUnitFloatImage<IPC::Float>(path1), LoadUnitFloatImage<IPC::Float>(path2), cv::Point2d(shift.first, shift.second), row, col);
+    dataset.imagePairs.emplace_back(LoadUnitFloatImage<IPC::Float>(path1), LoadUnitFloatImage<IPC::Float>(path2), cv::Point2d(shift.first, shift.second), row, col);
   }
 
   return dataset;
 }
 
-void GenerateImageRegistrationDataset(
-    const IPC& ipc, const std::string& path, const std::string& saveDir, i32 iters, f64 maxShiftAbs, f64 noiseStddev, f32* progress)
+void GenerateImageRegistrationDataset(const IPC& ipc, const std::string& path, const std::string& saveDir, i32 iters, f64 maxShiftAbs, f64 noiseStddev, f32* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -109,12 +105,10 @@ void GenerateImageRegistrationDataset(
   const auto shiftOffset1 = cv::Point2i(3, 3);
   const auto shiftOffset2 = cv::Point2i(0.1 * ipc.GetCols(), 0.1 * ipc.GetRows());
   for (auto& image : images)
-    image = RoiCropMid(image, ipc.GetCols() + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1),
-        ipc.GetRows() + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
+    image = RoiCropMid(image, ipc.GetCols() + 2. * (maxShift.x + shiftOffset1.x + shiftOffset2.x + 1), ipc.GetRows() + 2. * (maxShift.y + shiftOffset1.y + shiftOffset2.y + 1));
 
   auto imagePairs = CreateImagePairs(ipc, images, maxShift, shiftOffset1, shiftOffset2, iters, noiseStddev, progress);
-  const auto datasetDir = fmt::format(
-      "{}/imreg_dataset_{}x{}_{}i_{:.3f}ns", std::filesystem::weakly_canonical(saveDir).string(), ipc.GetCols(), ipc.GetRows(), iters, noiseStddev);
+  const auto datasetDir = fmt::format("{}/imreg_dataset_{}x{}_{}i_{:.3f}ns", std::filesystem::weakly_canonical(saveDir).string(), ipc.GetCols(), ipc.GetRows(), iters, noiseStddev);
 
   if (not std::filesystem::exists(datasetDir))
     std::filesystem::create_directory(datasetDir);
@@ -134,7 +128,7 @@ void GenerateImageRegistrationDataset(
     image1.convertTo(image1, CV_16U, 65535);
     image2.convertTo(image2, CV_16U, 65535);
 
-    LOG_DEBUG("Saving image pair {} & {}...", path1, path2);
+    LOG_DEBUG("Saving image pair {} & {}", path1, path2);
     cv::imwrite(path1, image1);
     cv::imwrite(path2, image2);
 
@@ -147,7 +141,7 @@ void GenerateImageRegistrationDataset(
       *progress = static_cast<f32>(++idx) / imagePairs.size();
   }
 
-  LOG_DEBUG("Generating dataset json file...");
+  LOG_DEBUG("Generating dataset json file");
   json::json datasetJson;
   datasetJson["rows"] = ipc.GetRows();
   datasetJson["cols"] = ipc.GetCols();

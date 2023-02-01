@@ -52,5 +52,4 @@ void IPCWindow::UpdateIPCParameters(IPC& ipc)
   ipc.SetBandpassType(static_cast<IPC::BandpassType>(mParameters.BPT));
   ipc.SetInterpolationType(static_cast<IPC::InterpolationType>(mParameters.IntT));
   ipc.SetL1WindowType(static_cast<IPC::L1WindowType>(mParameters.L1WinT));
-  LOG_DEBUG("IPC parameters updated");
 }

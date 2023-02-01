@@ -32,6 +32,7 @@ void ObjdetectWindow::Render()
     ImGui::SliderFloat("edgeThreshold", &mParameters.soParams.edgeThreshold, 0.0, 0.5);
 
     ImGui::Text("Objectness parameters");
+    ImGui::Checkbox("gaussianObjectness", &mParameters.soParams.gaussianObjectness);
     ImGui::SliderFloat("objectSizeMultiplier", &mParameters.soParams.objectSizeMultiplier, 0.001, 0.1);
     ImGui::SliderFloat("objectnessThreshold", &mParameters.soParams.objectnessThreshold, 0.001, 0.5);
 

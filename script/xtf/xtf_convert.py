@@ -12,7 +12,7 @@ for filename in os.listdir(directory):
     if not file.endswith('.xtf'):
         continue
 
-    print(f"Processing {savepath}...")
+    print(f"Processing {savepath}")
     (header, packets) = pyxtf.xtf_read(file)
 
     # The function concatenate_channels concatenates all the individual pings for a channel, and returns it as a dense numpy array

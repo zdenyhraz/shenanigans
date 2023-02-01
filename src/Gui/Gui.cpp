@@ -3,7 +3,7 @@
 void GLFWInitialize()
 {
   PROFILE_FUNCTION;
-  LOG_DEBUG("Initializing GLFW ...");
+  LOG_DEBUG("Initializing GLFW");
   auto GLFWErrorCallback = [](int error, const char* description) { LOG_ERROR("GLFWError {}: {}", error, description); };
   glfwSetErrorCallback(GLFWErrorCallback);
   if (not glfwInit())
@@ -13,7 +13,7 @@ void GLFWInitialize()
 GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
 {
   PROFILE_FUNCTION;
-  LOG_DEBUG("Creating window ...");
+  LOG_DEBUG("Creating window");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -28,7 +28,7 @@ GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
 void GLFWInitializeGL(GLFWwindow* window)
 {
   PROFILE_FUNCTION;
-  LOG_DEBUG("Initializing OpenGL ...");
+  LOG_DEBUG("Initializing OpenGL");
   glfwMakeContextCurrent(window);
   gladLoadGL();
   glfwSwapInterval(1);
@@ -96,7 +96,7 @@ void ImGuiSetStyle(ImGuiStyle& style)
 ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
 {
   PROFILE_FUNCTION;
-  LOG_DEBUG("Initializing ImGui ...");
+  LOG_DEBUG("Initializing ImGui");
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImPlot::CreateContext();
