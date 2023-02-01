@@ -11,7 +11,7 @@ void ImGuiPlot::RenderInternal()
     if (ImGui::Button("Debug"))
       Debug();
 
-    if (ImGui::BeginTabBar("Plots"))
+    if (ImGui::BeginTabBar("Plots", ImGuiTabBarFlags_AutoSelectNewTabs))
     {
       std::scoped_lock lock(mPlotsMutex);
       for (const auto& data : mPlots1D)
