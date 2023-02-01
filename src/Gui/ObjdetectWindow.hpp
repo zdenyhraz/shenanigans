@@ -6,7 +6,7 @@ class ObjdetectWindow : public Window
 {
   struct ObjdetectParameters
   {
-    std::string imagePath = "data/debug/ObjectDetection/input/main.tif";
+    std::string imagePath = "data/debug/ObjectDetection/tif/sasi-S-upper-20221102-144815-l38.tif";
     f32 imageSizeMultiplier = 0.25;
     SobelObjectnessParameters soParams;
   };
