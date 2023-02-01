@@ -12,14 +12,18 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   LOG_FUNCTION;
   cv::Mat edgesNorm(edges.size(), CV_32F);
   cv::normalize(edges, edgesNorm, 0, 1, cv::NORM_MINMAX);
-
   cv::Mat objectness = cv::Mat::zeros(edgesNorm.size(), CV_32F);
   cv::Mat window = Kirkl<f32>(objectSize);
+  std::atomic<usize> progress = 0;
+  LOG_PROGRESS_NAME("CalculateObjectness");
 #pragma omp parallel for
   for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
+  {
+    LOG_PROGRESS(static_cast<f32>(++progress) / (edgesNorm.rows - objectSize));
     for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
       objectness.at<f32>(r, c) = cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0];
-
+  }
+  LOG_PROGRESS_RESET;
   return objectness / (objectSize * objectSize); // pixel average
 }
 

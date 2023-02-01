@@ -8,12 +8,10 @@ void IPCAppsWindow::Render()
   if (ImGui::BeginTabItem("IPC apps"))
   {
     ImGui::Separator();
-    ImGui::ProgressBar(mProgressStatus.progress, ImVec2(0.f, 0.f));
     ImGui::SameLine();
-    ImGui::Text("%s", mProgressStatus.process.c_str());
     ImGui::Text("Accuracy measurement");
     if (ImGui::Button("Measure"))
-      LaunchAsync([&]() { IPCMeasure::MeasureAccuracy(mIPC, mIPCOptimized, GetCurrentDatasetPath(), &mProgressStatus.progress); });
+      LaunchAsync([&]() { IPCMeasure::MeasureAccuracy(mIPC, mIPCOptimized, GetCurrentDatasetPath()); });
 
     ImGui::Separator();
     ImGui::Text("Debug uils");
@@ -38,12 +36,8 @@ void IPCAppsWindow::Render()
     ImGui::InputText("##generate dataset dir", &mParameters.generateDirectory);
     ImGui::SameLine();
     if (ImGui::Button("Generate pairs"))
-      LaunchAsync(
-          [&]()
-          {
-            GenerateImageRegistrationDataset(
-                mIPC, mParameters.imageDirectory, mParameters.generateDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev, &mProgressStatus.progress);
-          });
+      LaunchAsync([&]()
+          { GenerateImageRegistrationDataset(mIPC, mParameters.imageDirectory, mParameters.generateDirectory, mParameters.iters, mParameters.maxShift, mParameters.noiseStddev); });
     ImGui::InputText("debug image1", &mParameters.debugImage1Path);
     ImGui::InputText("debug image2", &mParameters.debugImage2Path);
     ImGui::SliderFloat("max shift", &mParameters.maxShift, 0.5, 3.0);

@@ -4,7 +4,7 @@
 #include "PhaseCorrelation.hpp"
 #include "PhaseCorrelationUpscale.hpp"
 
-void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::string& path, f32* progress)
+void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::string& path)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -50,8 +50,7 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
       }
     }
 
-    if (progress)
-      *progress = static_cast<f32>(++iprogress) / dataset.imagePairs.size();
+    LOG_PROGRESS(static_cast<f32>(++iprogress) / dataset.imagePairs.size());
   }
 
   if (mQuanT < 1)
@@ -94,6 +93,5 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   PyPlot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   PyPlot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
-  if (progress)
-    *progress = 0;
+  LOG_PROGRESS_RESET;
 }

@@ -21,7 +21,6 @@ class IPCAppsWindow : public Window
   void FalseCorrelationsRemoval();
 
   IPCOptimizeParameters mParameters;
-  ProgressStatus mProgressStatus;
 
 public:
   void Render() override;

@@ -15,15 +15,20 @@ public:
     LogLevelCount
   };
 
-  void SetLogLevel(LogLevel logLevel)
+  static void SetLogLevel(LogLevel logLevel) { mLogLevel = logLevel; }
+  static void SetProgress(f32 progress) { mProgress = progress; }
+  static void SetProgressName(std::string_view progressName) { mProgressName = progressName; }
+  static void ResetProgress()
   {
-    std::scoped_lock lock(mMutex);
-    mLogLevel = logLevel;
+    mProgress = 0;
+    mProgressName.clear();
   }
 
 protected:
-  LogLevel mLogLevel = LogLevel::Trace;
-  std::mutex mMutex;
+  inline static LogLevel mLogLevel = LogLevel::Trace;
+  inline static f32 mProgress = 0;
+  inline static std::string mProgressName;
+  inline static std::mutex mMutex;
 
   bool ShouldLog(LogLevel logLevel) const { return logLevel >= mLogLevel; }
 };

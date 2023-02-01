@@ -11,3 +11,6 @@ using MainLogger = ImGuiLogger;
 #define LOG_ERROR(...) MainLogger::Message(Logger::LogLevel::Error, __VA_ARGS__)
 #define LOG_EXCEPTION(e) MainLogger::Message(Logger::LogLevel::Error, "{} error: {}", std::source_location::current().function_name(), e.what())
 #define LOG_UNKNOWN_EXCEPTION MainLogger::Message(Logger::LogLevel::Error, "{} error: Unknown error", std::source_location::current().function_name())
+#define LOG_PROGRESS(progress) MainLogger::SetProgress(progress)
+#define LOG_PROGRESS_NAME(progressName) MainLogger::SetProgressName(progressName)
+#define LOG_PROGRESS_RESET MainLogger::ResetProgress()

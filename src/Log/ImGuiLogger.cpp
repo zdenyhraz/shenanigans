@@ -37,6 +37,8 @@ void ImGuiLogger::RenderInternal()
   }
   ImGui::SameLine();
   ImGui::Text("%.0f ms/frame (%.0f fps)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+  ImGui::SameLine();
+  ImGui::ProgressBar(mProgress, ImVec2(-1, 0), mProgressName.c_str());
   ImGui::Separator();
   ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
