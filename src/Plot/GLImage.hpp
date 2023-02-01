@@ -36,8 +36,6 @@ public:
 
   void Load(const cv::Mat& z) const
   {
-    PROFILE_FUNCTION;
-    LOG_FUNCTION;
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

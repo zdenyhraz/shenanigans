@@ -90,12 +90,23 @@ public:
 
     data.z = data.z.clone();
     data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
+    if (data.xmin == PlotData2D::Default or data.xmax == PlotData2D::Default)
+    {
+      data.xmin = 0;
+      data.xmax = data.z.cols - 1;
+    }
+    if (data.ymin == PlotData2D::Default or data.ymax == PlotData2D::Default)
+    {
+      data.ymin = data.z.rows - 1;
+      data.ymax = 0;
+    }
 
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
     if (data.z.channels() == 3)
     {
+      data.colorbar = false;
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
       if (not data.z.isContinuous())
@@ -105,6 +116,10 @@ public:
 
     if (data.z.channels() == 1)
     {
+      data.z.convertTo(data.z, CV_32F);
+      const auto [zmin, zmax] = MinMax(data.z);
+      data.zmin = zmin;
+      data.zmax = zmax;
       if constexpr (std::is_same_v<T, ImGuiPlot>)
       {
         cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
@@ -112,13 +127,6 @@ public:
         cv::Mat cmap;
         cv::applyColorMap(data.z, cmap, GetColormap(data.cmap));
         data.z = cmap;
-      }
-      else
-      {
-        data.z.convertTo(data.z, CV_32F);
-        const auto [zmin, zmax] = MinMax(data.z);
-        data.zmin = zmin;
-        data.zmax = zmax;
       }
     }
 

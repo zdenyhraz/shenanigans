@@ -3,18 +3,19 @@
 
 struct PlotData2D
 {
+  static constexpr f64 Default = 0.12345;
   std::string name;
   cv::Mat z;
-  f64 xmin = 0;
-  f64 xmax = 1;
-  f64 ymin = 0;
-  f64 ymax = 1;
-  f64 zmin = 0;
-  f64 zmax = 1;
+  f64 xmin = Default;
+  f64 xmax = Default;
+  f64 ymin = Default;
+  f64 ymax = Default;
+  f64 zmin = Default;
+  f64 zmax = Default;
   std::string cmap = "jet";
-  std::string xlabel = "x";
-  std::string ylabel = "y";
-  std::string zlabel = "z";
+  std::string xlabel;
+  std::string ylabel;
+  std::string zlabel;
   bool colorbar = true;
   bool interpolate = false;
   bool surf = false;
