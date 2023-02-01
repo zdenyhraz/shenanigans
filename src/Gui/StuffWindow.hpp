@@ -3,7 +3,6 @@
 
 class StuffWindow : public Window
 {
-
   void EvolutionOptimization(bool meta);
   void PlotTest();
   void UnevenIlluminationCLAHE();
