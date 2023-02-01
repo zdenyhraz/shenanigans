@@ -42,9 +42,9 @@ class PlotBase
     PROFILE_FUNCTION;
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::ranges::find_if(vec, [&data](const auto& entry) { return entry.name == data.name; }); it != vec.end())
-      *it = std::move(data);
+      *it = std::forward<PlotData>(data);
     else
-      vec.emplace_back(std::move(data));
+      vec.emplace_back(std::forward<PlotData>(data));
   }
 
 protected:
