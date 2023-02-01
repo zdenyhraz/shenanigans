@@ -28,7 +28,7 @@ void ObjdetectWindow::Render()
     ImGui::SliderFloat("blurSizeMultiplier", &mParameters.soParams.blurSizeMultiplier, 0, 0.1);
 
     ImGui::Text("Edge detection parameters");
-    ImGui::SliderFloat("edgeSizeMultiplier", &mParameters.soParams.edgeSizeMultiplier, 0.001, 0.01);
+    ImGui::SliderFloat("edgeSizeMultiplier", &mParameters.soParams.edgeSizeMultiplier, 0.001, 0.05);
     ImGui::SliderFloat("edgeThreshold", &mParameters.soParams.edgeThreshold, 0.0, 0.5);
 
     ImGui::Text("Objectness parameters");

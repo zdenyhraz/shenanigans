@@ -77,8 +77,8 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
 inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
 {
   cv::Mat edgesX, edgesY;
-  cv::Sobel(source, edgesX, CV_32F, 1, 0, edgeSize, 1, 0, cv::BORDER_REPLICATE);
-  cv::Sobel(source, edgesY, CV_32F, 0, 1, edgeSize, 1, 0, cv::BORDER_REPLICATE);
+  cv::Sobel(source, edgesX, CV_32F, 1, 0, std::clamp(edgeSize, 3, 31), 1, 0, cv::BORDER_REPLICATE);
+  cv::Sobel(source, edgesY, CV_32F, 0, 1, std::clamp(edgeSize, 3, 31), 1, 0, cv::BORDER_REPLICATE);
   edgesX = cv::abs(edgesX);
   edgesY = cv::abs(edgesY);
   cv::normalize(edgesX, edgesX, 0, 1, cv::NORM_MINMAX);
