@@ -23,7 +23,7 @@ public:
     {
       mStartTime = clock::now();
       mFunName = funName;
-      MainLogger::Message(Logger::LogLevel::Function, "{} started", mFunName);
+      MainLogger::Message(Logger::LogLevel::Function, "> {}", mFunName);
     }
   }
 
@@ -32,7 +32,7 @@ public:
   ~LogFunction()
   {
     if constexpr (Show)
-      MainLogger::Message(Logger::LogLevel::Function, "{} finished ({})", mFunName, FormatDuration(clock::now() - mStartTime));
+      MainLogger::Message(Logger::LogLevel::Function, "< {} ({})", mFunName, FormatDuration(clock::now() - mStartTime));
   }
 
 private:
