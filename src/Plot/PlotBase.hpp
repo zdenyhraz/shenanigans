@@ -75,6 +75,9 @@ public:
 
   static void Plot(PlotData1D&& data)
   {
+    PROFILE_FUNCTION;
+    LOG_FUNCTION;
+
     if (data.x.empty())
       data.x = Iota(0., data.ys[0].size());
 
@@ -83,10 +86,15 @@ public:
 
   static void Plot(PlotData2D&& data)
   {
+    PROFILE_FUNCTION;
+    LOG_FUNCTION;
+
     if (data.z.empty())
       throw std::invalid_argument("Unable to plot empty data");
+    if (not data.z.isContinuous())
+      throw std::invalid_argument("Unable to plot non-continuous data");
     if (data.z.channels() != 1 and data.z.channels() != 3)
-      throw std::invalid_argument(fmt::format("{} channel plots not supported", data.z.channels()));
+      throw std::invalid_argument(fmt::format("Unable to plot {}-channel data", data.z.channels()));
 
     data.z = data.z.clone();
     data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
@@ -100,7 +108,6 @@ public:
       data.ymin = data.z.rows - 1;
       data.ymax = 0;
     }
-
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = fmt::format("../data/debug/{}.png", data.name);
 
@@ -109,9 +116,6 @@ public:
       data.colorbar = false;
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
-      if (not data.z.isContinuous())
-        throw std::invalid_argument("Cannot plot image with non-continuous data");
-      LOG_DEBUG("Plotting {}x{} data", data.z.cols, data.z.rows);
     }
 
     if (data.z.channels() == 1)
