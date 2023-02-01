@@ -113,9 +113,9 @@ public:
 
     if (data.z.channels() == 3)
     {
-      data.colorbar = false;
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
+      data.colorbar = false;
     }
 
     if (data.z.channels() == 1)
