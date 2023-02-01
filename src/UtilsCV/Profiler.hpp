@@ -31,7 +31,7 @@ public:
     for (usize nindex = 0; nindex < nsize; ++nindex)
     {
       usize n = data.nmin + nindex * data.nstep;
-      LOG_DEBUG("Profiling {} / {} , n, data.nmax);
+      LOG_DEBUG("Profiling {} / {}", n, data.nmax);
       ns[nindex] = n;
       X.at<f64>(nindex, 0) = 1;
       X.at<f64>(nindex, 1) = std::log(n);
