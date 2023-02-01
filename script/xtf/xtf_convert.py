@@ -8,7 +8,7 @@ directory = r'M:\Work\shenanigans\data\debug\ObjectDetection\xtf'
 for filename in os.listdir(directory):
     file = os.path.join(directory, filename)
     stem = os.path.basename(file).split('.')[0]
-    savepath = f'M:\Work\shenanigans\data\debug\ObjectDetection\input\{stem}.tif'
+    savepath = f'M:\Work\shenanigans\data\debug\ObjectDetection\{stem}.tif'
     if not file.endswith('.xtf'):
         continue
 
