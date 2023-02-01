@@ -2,71 +2,52 @@
 
 struct Object
 {
+  enum class Status
+  {
+    Valid,
+    BadArea,
+    BadWidth
+  };
+
   cv::Point center;
   std::vector<cv::Point> contour;
-  bool filtered = false;
+  Status status = Status::Valid;
 };
 
-inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize, bool gaussianObjectness)
+inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
 {
   LOG_FUNCTION;
   cv::Mat edgesNorm(edges.size(), edges.type());
   cv::normalize(edges, edgesNorm, 0, 1, cv::NORM_MINMAX);
   cv::Mat objectness(edgesNorm.size(), edgesNorm.type());
-
-  if (gaussianObjectness)
-  {
-    const auto blurSize = GetNearestOdd(1.7 * objectSize);
-    cv::GaussianBlur(edgesNorm, objectness, cv::Size(blurSize, blurSize), 0);
-  }
-  else
-  {
-    cv::Mat window = Kirkl<f32>(objectSize);
-    std::atomic<usize> progress = 0;
-    const auto objectnessMultiplier = 1.0f / (objectSize * objectSize);
-    LOG_PROGRESS_NAME("CalculateObjectness");
-#pragma omp parallel for
-    for (i32 r = objectSize / 2; r < edgesNorm.rows - objectSize / 2; ++r)
-    {
-      LOG_PROGRESS(static_cast<f32>(++progress) / (edgesNorm.rows - objectSize));
-      for (i32 c = objectSize / 2; c < edgesNorm.cols - objectSize / 2; ++c)
-        objectness.at<f32>(r, c) = objectnessMultiplier * cv::sum(RoiCropRef(edgesNorm, c, r, objectSize, objectSize).mul(window))[0];
-    }
-    LOG_PROGRESS_RESET;
-  }
-  return objectness; // pixel average
+  const auto blurSize = GetNearestOdd(1.7 * objectSize);
+  cv::GaussianBlur(edgesNorm, objectness, cv::Size(blurSize, blurSize), 0, 0, cv::BORDER_REPLICATE);
+  return objectness;
 }
 
-inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectSize)
+inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectArea, f32 minObjectWidth)
 {
   LOG_FUNCTION;
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
   cv::findContours(objectness, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
-  LOG_DEBUG("Found {} objects", contours.size());
-
   std::vector<Object> objects;
-  usize filteredCount = 0;
   for (const auto& contour : contours)
   {
-    const auto minRect = cv::minAreaRect(contour);
-    bool filtered = false;
+    const auto rect = cv::minAreaRect(contour);
+    using enum Object::Status;
+    Object::Status status = Valid;
 
-    // filter out small objects
-    if (minRect.size.width < minObjectSize and minRect.size.height < minObjectSize)
-      filtered = true;
-
-    // filter out "needle" artifacts
-    if (minRect.size.width < minObjectSize or minRect.size.height < minObjectSize)
-      filtered = true;
-
-    if (filtered)
-      ++filteredCount;
+    if (rect.size.width * rect.size.height < minObjectArea) // filter out small objects
+      status = BadArea;
+    else if (std::min(rect.size.width, rect.size.height) < minObjectWidth) // filter out "needle" artifacts
+      status = BadWidth;
+    else
+      status = Valid;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
-    objects.emplace_back(center, contour, filtered);
+    objects.emplace_back(center, contour, status);
   }
-  LOG_DEBUG("Filtered {} objects", filteredCount);
   return objects;
 }
 
@@ -79,12 +60,26 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   cv::Mat out;
   cv::applyColorMap(src, out, cv::COLORMAP_VIRIDIS);
 
-  const auto color = cv::Scalar(0, 0, 255);
-  const auto colorFiltered = cv::Scalar(255, 0, 0);
-  const auto thickness = std::clamp(0.003 * out.rows, 1., 100.);
+  const auto colorValid = cv::Scalar(0, 0, 255);
+  const auto colorBadArea = cv::Scalar(255, 0, 0);
+  const auto colorBadWidth = cv::Scalar(0, 165, 255);
+  const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
+  using enum Object::Status;
   for (const auto& object : objects)
-    cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, object.filtered ? colorFiltered : color, thickness, cv::LINE_AA);
-
+  {
+    switch (object.status)
+    {
+    case Valid:
+      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorValid, thickness, cv::LINE_AA);
+      break;
+    case BadArea:
+      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadArea, thickness, cv::LINE_AA);
+      break;
+    case BadWidth:
+      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadWidth, thickness, cv::LINE_AA);
+      break;
+    }
+  }
   return out;
 }
 
@@ -115,10 +110,10 @@ struct SobelObjectnessParameters
   f32 blurSizeMultiplier = 0.015;
   f32 edgeSizeMultiplier = 0.0025;
   f32 edgeThreshold = 0.16;
-  bool gaussianObjectness = true;
   f32 objectSizeMultiplier = 0.02;
-  f32 objectnessThreshold = 0.2;
-  f32 minObjectSizeMultiplier = 0.02;
+  f32 objectnessThreshold = 0.25;
+  f32 minObjectAreaMultiplier = 0.001;
+  f32 minObjectWidthMultiplier = 0.015;
 };
 
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
@@ -142,7 +137,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("edges_thr", edges);
 
   // calculate objectness (local "edginess")
-  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows, params.gaussianObjectness);
+  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows);
   Plot::Plot("objectness", objectness);
 
   // threshold objectness
@@ -151,7 +146,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("objectness_thr", objectness);
 
   // calclate objects (find thresholded objectness contours)
-  const auto objects = CalculateObjects(objectness, params.minObjectSizeMultiplier * source.rows);
+  const auto objects = CalculateObjects(objectness, params.minObjectAreaMultiplier * source.rows * source.rows, params.minObjectWidthMultiplier * source.rows);
   Plot::Plot("objects", DrawObjects(source, objects));
 
   return objects;

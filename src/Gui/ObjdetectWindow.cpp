@@ -24,20 +24,20 @@ void ObjdetectWindow::Render()
     if (ImGui::Button("Default"))
       LaunchAsync([&]() { mParameters = ObjdetectParameters(); });
     ImGui::InputText("image path", &mParameters.imagePath);
-    ImGui::SliderFloat("imageSizeMultiplier", &mParameters.imageSizeMultiplier, 0.1, 1);
-    ImGui::SliderFloat("blurSizeMultiplier", &mParameters.soParams.blurSizeMultiplier, 0, 0.1);
+    ImGui::SliderFloat("imageSize", &mParameters.imageSizeMultiplier, 0.1, 1);
+    ImGui::SliderFloat("blurSize", &mParameters.soParams.blurSizeMultiplier, 0, 0.1);
 
     ImGui::Text("Edge detection parameters");
-    ImGui::SliderFloat("edgeSizeMultiplier", &mParameters.soParams.edgeSizeMultiplier, 0.001, 0.05);
-    ImGui::SliderFloat("edgeThreshold", &mParameters.soParams.edgeThreshold, 0.0, 0.5);
+    ImGui::SliderFloat("edgeSize", &mParameters.soParams.edgeSizeMultiplier, 0.001, 0.1, "%.4f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("edgeThreshold", &mParameters.soParams.edgeThreshold, 0.0, 0.5, "%.4f");
 
     ImGui::Text("Objectness parameters");
-    ImGui::Checkbox("gaussianObjectness", &mParameters.soParams.gaussianObjectness);
-    ImGui::SliderFloat("objectSizeMultiplier", &mParameters.soParams.objectSizeMultiplier, 0.001, 0.1);
-    ImGui::SliderFloat("objectnessThreshold", &mParameters.soParams.objectnessThreshold, 0.001, 0.5);
+    ImGui::SliderFloat("objectSize", &mParameters.soParams.objectSizeMultiplier, 0.001, 0.1, "%.4f");
+    ImGui::SliderFloat("objectnessThreshold", &mParameters.soParams.objectnessThreshold, 0.001, 0.5, "%.4f");
 
     ImGui::Text("Object filtering");
-    ImGui::SliderFloat("minObjectSizeMultiplier", &mParameters.soParams.minObjectSizeMultiplier, 0, 0.1);
+    ImGui::SliderFloat("minObjectArea", &mParameters.soParams.minObjectAreaMultiplier, 0, 0.05, "%.4f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("minObjectWidth", &mParameters.soParams.minObjectWidthMultiplier, 0, 0.1, "%.4f");
     ImGui::EndTabItem();
   }
 }
