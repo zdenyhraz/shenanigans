@@ -36,8 +36,8 @@ class PlotBase
     mPlots2D.clear();
   }
 
-  template <class T>
-  void SchedulePlot(T&& data, std::vector<T>& vec)
+  template <class PlotData>
+  void SchedulePlot(PlotData&& data, std::vector<PlotData>& vec)
   {
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::ranges::find_if(vec, [&data](const auto& entry) { return entry.name == data.name; }); it != vec.end())
