@@ -51,7 +51,7 @@ try
   if (ImGui::Begin("Shenanigans"))
   {
     ImGui::Checkbox("Save plots", &mPlotSave);
-    if (ImGui::BeginTabBar("Windows"))
+    if (ImGui::BeginTabBar("Windows", ImGuiTabBarFlags_AutoSelectNewTabs))
     {
       for (const auto& window : mWindows)
         window->Render();

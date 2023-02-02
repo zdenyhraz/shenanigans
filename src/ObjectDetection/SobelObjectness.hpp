@@ -16,6 +16,7 @@ struct Object
 
 inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
 {
+  PROFILE_FUNCTION;
   LOG_FUNCTION;
   cv::Mat edgesNorm(edges.size(), edges.type());
   cv::normalize(edges, edgesNorm, 0, 1, cv::NORM_MINMAX);
@@ -27,6 +28,7 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
 
 inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectArea, f32 maxObjectElongatedness)
 {
+  PROFILE_FUNCTION;
   LOG_FUNCTION;
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
@@ -57,6 +59,7 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
 
 inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& objects)
 {
+  PROFILE_FUNCTION;
   LOG_FUNCTION;
   cv::Mat src = source.clone();
   cv::normalize(src, src, 0, 255, cv::NORM_MINMAX);
@@ -89,6 +92,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
 
 inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
 {
+  PROFILE_FUNCTION;
   LOG_FUNCTION;
   cv::Mat edgesX, edgesY;
   cv::Sobel(source, edgesX, CV_32F, 1, 0, std::clamp(edgeSize, 3, 31), 1, 0, cv::BORDER_REPLICATE);
@@ -122,16 +126,21 @@ struct SobelObjectnessParameters
 
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
 {
+  PROFILE_FUNCTION;
   LOG_FUNCTION;
   Plot::Plot("source", source);
 
   // blur for more robust edge detection
+  LOG_PROGRESS_NAME("Gaussian blur");
+  LOG_PROGRESS(1. / 5);
   cv::Mat blurred(source.size(), source.type());
   const auto blurSize = GetNearestOdd(params.blurSize * source.rows);
   cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
   Plot::Plot("blurred", blurred);
 
   // calclate absolute Sobel x/y edges
+  LOG_PROGRESS_NAME("Calculate edges");
+  LOG_PROGRESS(2. / 5);
   cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSize * source.rows));
   Plot::Plot("edges", edges);
 
@@ -141,17 +150,27 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("edges_thr", edges);
 
   // calculate objectness (local "edginess")
+  LOG_PROGRESS_NAME("Calculate objectness");
+  LOG_PROGRESS(3. / 5);
   cv::Mat objectness = CalculateObjectness(edges, params.objectSize * source.rows);
   Plot::Plot("objectness", objectness);
 
   // threshold objectness
+  LOG_PROGRESS_NAME("Threshold objectness");
+  LOG_PROGRESS(4. / 5);
   cv::threshold(objectness, objectness, params.objectnessThreshold, 255, cv::THRESH_BINARY);
   objectness.convertTo(objectness, CV_8U);
   Plot::Plot("objectness_thr", objectness);
 
   // calclate objects (find thresholded objectness contours)
+  LOG_PROGRESS_NAME("Calculate objects");
+  LOG_PROGRESS(5. / 5);
   const auto objects = CalculateObjects(objectness, params.minObjectArea * source.rows * source.rows, params.maxObjectElongatedness);
   Plot::Plot("objects", DrawObjects(source, objects));
 
+  LOG_DEBUG("Found {} valid objects", std::ranges::count_if(objects, [](const Object& object) { return object.status == Object::Status::Valid; }));
+  LOG_DEBUG("Found {} bad area objects", std::ranges::count_if(objects, [](const Object& object) { return object.status == Object::Status::BadArea; }));
+  LOG_DEBUG("Found {} bad elongatedness objects", std::ranges::count_if(objects, [](const Object& object) { return object.status == Object::Status::BadElongatedness; }));
+  LOG_PROGRESS_RESET;
   return objects;
 }
