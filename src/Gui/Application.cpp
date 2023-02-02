@@ -28,14 +28,15 @@ void Application::Run()
   while (!glfwWindowShouldClose(window))
   {
     if constexpr (limitFPS)
+    {
       if (elapsedTime = glfwGetTime() - lastUpdateTime; elapsedTime < targetFrametime)
         std::this_thread::sleep_for(std::chrono::duration<f64>(targetFrametime - elapsedTime));
+      lastUpdateTime += targetFrametime;
+    }
 
     ImGuiNewFrame();
     Render();
     ImGuiRender(window, io);
-    if constexpr (limitFPS)
-      lastUpdateTime += targetFrametime;
     PROFILE_FRAME;
   }
 

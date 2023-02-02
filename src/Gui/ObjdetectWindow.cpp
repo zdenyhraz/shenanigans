@@ -4,8 +4,8 @@ void ObjdetectWindow::DetectObjects() const
 {
   LOG_FUNCTION;
   auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath() / mParameters.imagePath);
-  if (mParameters.imageSizeMultiplier != 1)
-    cv::resize(image, image, cv::Size(mParameters.imageSizeMultiplier * image.cols, mParameters.imageSizeMultiplier * image.rows));
+  if (mParameters.imageSize != 1)
+    cv::resize(image, image, cv::Size(mParameters.imageSize * image.cols, mParameters.imageSize * image.rows));
   std::ignore = DetectObjectsSobelObjectness(image, mParameters.soParams);
 }
 
@@ -15,7 +15,7 @@ void ObjdetectWindow::Render()
   if (ImGui::BeginTabItem("Objdetect"))
   {
     ImGui::Separator();
-    ImGui::Text("Object detection via Sobel objectness");
+    ImGui::BulletText("Object detection via Sobel objectness");
     if (ImGui::Button("DetectObjects"))
       LaunchAsync([&]() { DetectObjects(); });
 
@@ -24,20 +24,22 @@ void ObjdetectWindow::Render()
     if (ImGui::Button("Default"))
       LaunchAsync([&]() { mParameters = ObjdetectParameters(); });
     ImGui::InputText("image path", &mParameters.imagePath);
-    ImGui::SliderFloat("imageSize", &mParameters.imageSizeMultiplier, 0.1, 1);
-    ImGui::SliderFloat("blurSize", &mParameters.soParams.blurSizeMultiplier, 0, 0.1);
+    ImGui::SliderFloat("image size", &mParameters.imageSizePercent, 10, 100, "%.0f%%");
+    ImGui::SliderFloat("blur size", &mParameters.blurSizePercent, 0, 10, "%.0f%%");
 
     ImGui::Text("Edge detection parameters");
-    ImGui::SliderFloat("edgeSize", &mParameters.soParams.edgeSizeMultiplier, 0.001, 0.1, "%.4f", ImGuiSliderFlags_Logarithmic);
-    ImGui::SliderFloat("edgeThreshold", &mParameters.soParams.edgeThreshold, 0.0, 0.5, "%.4f");
+    ImGui::SliderFloat("edge size", &mParameters.edgeSizePercent, 0.1, 10, "%.2f%%", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("edge threshold", &mParameters.edgeThresholdPercent, 0, 50, "%.0f%%");
 
     ImGui::Text("Objectness parameters");
-    ImGui::SliderFloat("objectSize", &mParameters.soParams.objectSizeMultiplier, 0.001, 0.1, "%.4f");
-    ImGui::SliderFloat("objectnessThreshold", &mParameters.soParams.objectnessThreshold, 0.001, 0.5, "%.4f");
+    ImGui::SliderFloat("object size", &mParameters.objectSizePercent, 1, 10, "%.1f%%");
+    ImGui::SliderFloat("objectness threshold", &mParameters.objectnessThresholdPercent, 1, 50, "%.0f%%");
 
     ImGui::Text("Object filtering");
-    ImGui::SliderFloat("minObjectArea", &mParameters.soParams.minObjectAreaMultiplier, 0, 0.05, "%.4f", ImGuiSliderFlags_Logarithmic);
-    ImGui::SliderFloat("minObjectWidth", &mParameters.soParams.minObjectWidthMultiplier, 0, 0.1, "%.4f");
+    ImGui::SliderFloat("min area", &mParameters.minObjectAreaPercent, 0, 5, "%.2f%%", ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("max elongatedness", &mParameters.soParams.maxObjectElongatedness, 3, 30, "%.1f");
+
+    mParameters.Update();
     ImGui::EndTabItem();
   }
 }

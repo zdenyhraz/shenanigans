@@ -6,7 +6,7 @@ struct Object
   {
     Valid,
     BadArea,
-    BadWidth
+    BadElongatedness
   };
 
   cv::Point center;
@@ -25,7 +25,7 @@ inline cv::Mat CalculateObjectness(const cv::Mat& edges, i32 objectSize)
   return objectness;
 }
 
-inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectArea, f32 minObjectWidth)
+inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minObjectArea, f32 maxObjectElongatedness)
 {
   LOG_FUNCTION;
   std::vector<std::vector<cv::Point>> contours;
@@ -35,13 +35,17 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
   for (const auto& contour : contours)
   {
     const auto rect = cv::minAreaRect(contour);
+    const f32 width = std::min(rect.size.width, rect.size.height);
+    const f32 height = std::max(rect.size.width, rect.size.height);
+    const f32 elongatedness = height / width;
+    const f32 area = width * height;
     using enum Object::Status;
     Object::Status status = Valid;
 
-    if (rect.size.width * rect.size.height < minObjectArea) // filter out small objects
+    if (elongatedness > maxObjectElongatedness) // filter out "needle" artifacts
+      status = BadElongatedness;
+    else if (area < minObjectArea) // filter out small objects
       status = BadArea;
-    else if (std::min(rect.size.width, rect.size.height) < minObjectWidth) // filter out "needle" artifacts
-      status = BadWidth;
     else
       status = Valid;
 
@@ -62,7 +66,7 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
 
   const auto colorValid = cv::Scalar(0, 0, 255);
   const auto colorBadArea = cv::Scalar(255, 0, 0);
-  const auto colorBadWidth = cv::Scalar(0, 165, 255);
+  const auto colorBadElongatedness = cv::Scalar(0, 165, 255);
   const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
   using enum Object::Status;
   for (const auto& object : objects)
@@ -75,8 +79,8 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
     case BadArea:
       cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadArea, thickness, cv::LINE_AA);
       break;
-    case BadWidth:
-      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadWidth, thickness, cv::LINE_AA);
+    case BadElongatedness:
+      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadElongatedness, thickness, cv::LINE_AA);
       break;
     }
   }
@@ -107,13 +111,13 @@ inline cv::Mat CalculateEdges(const cv::Mat& source, i32 edgeSize)
 
 struct SobelObjectnessParameters
 {
-  f32 blurSizeMultiplier = 0.015;
-  f32 edgeSizeMultiplier = 0.0025;
+  f32 blurSize = 0.015;
+  f32 edgeSize = 0.0025;
   f32 edgeThreshold = 0.16;
-  f32 objectSizeMultiplier = 0.02;
+  f32 objectSize = 0.02;
   f32 objectnessThreshold = 0.25;
-  f32 minObjectAreaMultiplier = 0.001;
-  f32 minObjectWidthMultiplier = 0.015;
+  f32 minObjectArea = 0.001;
+  f32 maxObjectElongatedness = 8;
 };
 
 inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, const SobelObjectnessParameters& params)
@@ -123,12 +127,12 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
 
   // blur for more robust edge detection
   cv::Mat blurred(source.size(), source.type());
-  const auto blurSize = GetNearestOdd(params.blurSizeMultiplier * source.rows);
+  const auto blurSize = GetNearestOdd(params.blurSize * source.rows);
   cv::GaussianBlur(source, blurred, cv::Size(blurSize, blurSize), 0);
   Plot::Plot("blurred", blurred);
 
   // calclate absolute Sobel x/y edges
-  cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSizeMultiplier * source.rows));
+  cv::Mat edges = CalculateEdges(blurred, GetNearestOdd(params.edgeSize * source.rows));
   Plot::Plot("edges", edges);
 
   // threshold the edges
@@ -137,7 +141,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("edges_thr", edges);
 
   // calculate objectness (local "edginess")
-  cv::Mat objectness = CalculateObjectness(edges, params.objectSizeMultiplier * source.rows);
+  cv::Mat objectness = CalculateObjectness(edges, params.objectSize * source.rows);
   Plot::Plot("objectness", objectness);
 
   // threshold objectness
@@ -146,7 +150,7 @@ inline std::vector<Object> DetectObjectsSobelObjectness(const cv::Mat& source, c
   Plot::Plot("objectness_thr", objectness);
 
   // calclate objects (find thresholded objectness contours)
-  const auto objects = CalculateObjects(objectness, params.minObjectAreaMultiplier * source.rows * source.rows, params.minObjectWidthMultiplier * source.rows);
+  const auto objects = CalculateObjects(objectness, params.minObjectArea * source.rows * source.rows, params.maxObjectElongatedness);
   Plot::Plot("objects", DrawObjects(source, objects));
 
   return objects;
