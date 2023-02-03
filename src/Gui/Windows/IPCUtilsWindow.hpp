@@ -1,6 +1,5 @@
 #pragma once
 #include "Window.hpp"
-#include "Gui.hpp"
 
 class IPCUtilsWindow : public Window
 {

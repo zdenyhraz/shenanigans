@@ -1,5 +1,4 @@
 #pragma once
-#include "Gui/Gui.hpp"
 
 class GLImage
 {
