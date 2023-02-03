@@ -1,5 +1,5 @@
 #include "Application.hpp"
-#include "Gui/Gui.hpp"
+#include "Gui.hpp"
 #include "Windows/IPCWindow.hpp"
 #include "Windows/IPCUtilsWindow.hpp"
 #include "Windows/DiffrotWindow.hpp"
