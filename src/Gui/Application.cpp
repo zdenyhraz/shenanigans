@@ -25,8 +25,7 @@ void Application::Run()
     SetWindowIcon(window);
   ImGuiIO& io = ImGuiInitialize(window, scale);
   Initialize();
-
-  LOG_DEBUG("Render loop started");
+  LOG_DEBUG("Ready");
   f64 lastUpdateTime = 0, elapsedTime = 0;
   while (!glfwWindowShouldClose(window))
   {
@@ -42,13 +41,11 @@ void Application::Run()
     ImGuiRender(window, io);
     PROFILE_FRAME;
   }
-
   ImGuiShutdown();
   GLFWShutdown(window);
 }
 
 void Application::Render()
-try
 {
   PROFILE_FUNCTION;
   if (ImGui::Begin("Shenanigans", nullptr, ImGuiWindowFlags_MenuBar))
@@ -82,23 +79,7 @@ try
   ImGuiLogger::Render();
   ImGuiPlot::Render();
   PyPlot::Render();
-}
-catch (const std::exception& e)
-{
-  LOG_EXCEPTION(e);
-}
-
-void Application::RenderDemoMenu()
-{
-  if (ImGui::BeginMenu("Demos"))
-  {
-    if (ImGui::MenuItem("ImGui demo", NULL, mShowImGuiDemoWindow))
-      mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
-    if (ImGui::MenuItem("ImPlot demo", NULL, mShowImPlotDemoWindow))
-      mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
-
-    ImGui::EndMenu();
-  }
+  CvPlot::Render();
 }
 
 void Application::RenderPlotMenu()
@@ -115,6 +96,19 @@ void Application::RenderPlotMenu()
       LaunchAsync([&]() { PyPlot::Debug(); });
     if (ImGui::MenuItem("Debug CvPlots"))
       LaunchAsync([&]() { CvPlot::Debug(); });
+
+    ImGui::EndMenu();
+  }
+}
+
+void Application::RenderDemoMenu()
+{
+  if (ImGui::BeginMenu("Demos"))
+  {
+    if (ImGui::MenuItem("ImGui demo", NULL, mShowImGuiDemoWindow))
+      mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
+    if (ImGui::MenuItem("ImPlot demo", NULL, mShowImPlotDemoWindow))
+      mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
 
     ImGui::EndMenu();
   }

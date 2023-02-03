@@ -9,23 +9,7 @@ template <class T>
 class PlotBase
 {
   virtual void InitializeInternal() {}
-  virtual void RenderInternal()
-  {
-    PROFILE_FUNCTION;
-    std::scoped_lock lock(mPlotsMutex);
-
-    while (not mPlots1D.empty())
-    {
-      RenderInternal(mPlots1D.back());
-      mPlots1D.pop_back();
-    }
-
-    while (not mPlots2D.empty())
-    {
-      RenderInternal(mPlots2D.back());
-      mPlots2D.pop_back();
-    }
-  }
+  virtual void RenderInternal() = 0;
   virtual void RenderInternal(const PlotData1D& data) = 0;
   virtual void RenderInternal(const PlotData2D& data) = 0;
 

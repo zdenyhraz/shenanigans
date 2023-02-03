@@ -11,7 +11,7 @@ class ImGuiLogger : public Logger
   std::vector<std::pair<int, LogLevel>> mLineOffsets;
   bool mActive = false;
   bool mFallback = true;
-  static constexpr usize mMaxMessages = 5000;
+  static constexpr usize mMaxMessages = 10000;
 
   void RenderInternal();
   void ClearInternal();
@@ -22,17 +22,17 @@ class ImGuiLogger : public Logger
   try
   {
     std::scoped_lock lock(mMutex);
-    if (not ShouldLog(logLevel)) [[unlikely]]
+    if (not ShouldLog(logLevel))
       return;
+
+    if (mFallback and not mActive) // forward logging to the fallback logger if this logger is is not being rendered
+      return FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     if (mLineOffsets.size() > mMaxMessages)
     {
       Clear();
       Message(Logger::LogLevel::Debug, "Message log cleared after {} messages", mMaxMessages);
     }
-
-    if (mFallback and not mActive) // forward logging to the fallback logger if this logger is is not being rendered
-      FallbackLogger::Message(logLevel, fmt, std::forward<Args>(args)...);
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
     i32 oldSize = mTextBuffer.size();

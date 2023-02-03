@@ -1,5 +1,23 @@
 #include "CvPlot.hpp"
 
+void CvPlot::RenderInternal()
+{
+  PROFILE_FUNCTION;
+  std::scoped_lock lock(mPlotsMutex);
+
+  while (not mPlots1D.empty())
+  {
+    RenderInternal(mPlots1D.back());
+    mPlots1D.pop_back();
+  }
+
+  while (not mPlots2D.empty())
+  {
+    RenderInternal(mPlots2D.back());
+    mPlots2D.pop_back();
+  }
+}
+
 void CvPlot::RenderInternal(const PlotData1D& data)
 {
   PROFILE_FUNCTION;
