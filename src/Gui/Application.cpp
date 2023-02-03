@@ -1,12 +1,12 @@
 #include "Application.hpp"
 #include "Gui/Gui.hpp"
-#include "IPCWindow.hpp"
-#include "IPCUtilsWindow.hpp"
-#include "DiffrotWindow.hpp"
-#include "SwindWindow.hpp"
-#include "RandomWindow.hpp"
-#include "ObjdetectWindow.hpp"
-#include "ToolsWindow.hpp"
+#include "Windows/IPCWindow.hpp"
+#include "Windows/IPCUtilsWindow.hpp"
+#include "Windows/DiffrotWindow.hpp"
+#include "Windows/SwindWindow.hpp"
+#include "Windows/RandomWindow.hpp"
+#include "Windows/ObjdetectWindow.hpp"
+#include "Windows/ToolsWindow.hpp"
 
 void Application::Run()
 {
