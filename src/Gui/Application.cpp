@@ -1,12 +1,12 @@
 #include "Application.hpp"
 #include "Gui/Gui.hpp"
 #include "IPCWindow.hpp"
-#include "IPCAppsWindow.hpp"
+#include "IPCUtilsWindow.hpp"
 #include "DiffrotWindow.hpp"
 #include "SwindWindow.hpp"
-#include "StuffWindow.hpp"
+#include "RandomWindow.hpp"
 #include "ObjdetectWindow.hpp"
-#include "Plot/Plot.hpp"
+#include "ToolsWindow.hpp"
 
 void Application::Run()
 {
@@ -51,9 +51,15 @@ void Application::Render()
 try
 {
   PROFILE_FUNCTION;
-  if (ImGui::Begin("Shenanigans"))
+  if (ImGui::Begin("Shenanigans", nullptr, ImGuiWindowFlags_MenuBar))
   {
-    ImGui::Checkbox("Save plots", &mPlotSave);
+    if (ImGui::BeginMenuBar())
+    {
+      RenderPlotMenu();
+      RenderDemoMenu();
+      ImGui::EndMenuBar();
+    }
+
     if (ImGui::BeginTabBar("Windows", ImGuiTabBarFlags_AutoSelectNewTabs))
     {
       for (const auto& window : mWindows)
@@ -64,25 +70,66 @@ try
     ImGui::End();
   }
 
+  if (mShowImGuiDemoWindow)
+    ImGui::ShowDemoWindow();
+  if (mShowImPlotDemoWindow)
+    ImPlot::ShowDemoWindow();
+
+  ImGuiPlot::SetSave(mPlotSave);
+  PyPlot::SetSave(mPlotSave);
+  CvPlot::SetSave(mPlotSave);
+
   ImGuiLogger::Render();
   ImGuiPlot::Render();
   PyPlot::Render();
-  PyPlot::SetSave(mPlotSave);
 }
 catch (const std::exception& e)
 {
   LOG_EXCEPTION(e);
 }
 
+void Application::RenderDemoMenu()
+{
+  if (ImGui::BeginMenu("Demos"))
+  {
+    if (ImGui::MenuItem("ImGui demo", NULL, mShowImGuiDemoWindow))
+      mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
+    if (ImGui::MenuItem("ImPlot demo", NULL, mShowImPlotDemoWindow))
+      mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
+
+    ImGui::EndMenu();
+  }
+}
+
+void Application::RenderPlotMenu()
+{
+  if (ImGui::BeginMenu("Plot"))
+  {
+    if (ImGui::MenuItem("Save plots", NULL, mPlotSave))
+      mPlotSave = !mPlotSave;
+    if (ImGui::MenuItem("Clear plots"))
+      LaunchAsync([&]() { Plot::Clear(); });
+    if (ImGui::MenuItem("Debug ImGuiPlots"))
+      LaunchAsync([&]() { ImGuiPlot::Debug(); });
+    if (ImGui::MenuItem("Debug PyPlots"))
+      LaunchAsync([&]() { PyPlot::Debug(); });
+    if (ImGui::MenuItem("Debug CvPlots"))
+      LaunchAsync([&]() { CvPlot::Debug(); });
+
+    ImGui::EndMenu();
+  }
+}
+
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
   mWindows.push_back(std::make_unique<IPCWindow>());
-  mWindows.push_back(std::make_unique<IPCAppsWindow>());
+  mWindows.push_back(std::make_unique<IPCUtilsWindow>());
   mWindows.push_back(std::make_unique<DiffrotWindow>());
   mWindows.push_back(std::make_unique<SwindWindow>());
-  mWindows.push_back(std::make_unique<StuffWindow>());
+  mWindows.push_back(std::make_unique<RandomWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
+  // mWindows.push_back(std::make_unique<ToolsWindow>());
 
   for (const auto& window : mWindows)
     window->Initialize();

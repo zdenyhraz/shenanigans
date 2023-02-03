@@ -6,7 +6,7 @@ void SwindWindow::Render()
   if (ImGui::BeginTabItem("Swind"))
   {
     ImGui::Separator();
-
+    ImGui::BulletText("Solar wind speed measurement");
     if (ImGui::Button("Calculate"))
       LaunchAsync([&]() { featureMatch(mParameters); });
 

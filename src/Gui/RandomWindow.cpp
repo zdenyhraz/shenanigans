@@ -1,41 +1,23 @@
-#include "StuffWindow.hpp"
-#include "IPCWindow.hpp"
+#include "RandomWindow.hpp"
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
-#include "UtilsCV/Vectmat.hpp"
 #include "Random/UnevenIllumination.hpp"
 
-void StuffWindow::Render()
+void RandomWindow::Render()
 {
   PROFILE_FUNCTION;
-  if (ImGui::BeginTabItem("Stuff"))
+  if (ImGui::BeginTabItem("Random"))
   {
     ImGui::Separator();
-    ImGui::Text("Demos");
-    if (ImGui::Button("ImGui demo"))
-      showImGuiDemoWindow = !showImGuiDemoWindow;
-    ImGui::SameLine();
-    if (ImGui::Button("ImPlot demo"))
-      showImPlotDemoWindow = !showImPlotDemoWindow;
 
-    ImGui::Text("Optimizers");
+    ImGui::BulletText("Optimizers");
     if (ImGui::Button("Evolution opt"))
       LaunchAsync([&]() { EvolutionOptimization(false); });
     ImGui::SameLine();
     if (ImGui::Button("Evolution metaopt"))
       LaunchAsync([&]() { EvolutionOptimization(true); });
 
-    ImGui::Text("Plot tools");
-    if (ImGui::Button("Clear plots"))
-      Plot::Clear();
-    ImGui::SameLine();
-    if (ImGui::Button("Debug plot"))
-      Plot::Debug();
-    ImGui::SameLine();
-    if (ImGui::Button("All plot test"))
-      LaunchAsync([&]() { PlotTest(); });
-
-    ImGui::Text("Uneven illumination compensation");
+    ImGui::BulletText("Uneven illumination compensation");
     if (ImGui::Button("CLAHE"))
       LaunchAsync([&]() { UnevenIlluminationCLAHE(); });
     ImGui::SameLine();
@@ -44,14 +26,9 @@ void StuffWindow::Render()
 
     ImGui::EndTabItem();
   }
-
-  if (showImGuiDemoWindow)
-    ImGui::ShowDemoWindow();
-  if (showImPlotDemoWindow)
-    ImPlot::ShowDemoWindow();
 }
 
-void StuffWindow::EvolutionOptimization(bool meta)
+void RandomWindow::EvolutionOptimization(bool meta)
 {
   LOG_FUNCTION;
   static constexpr i32 N = 2;
@@ -82,24 +59,7 @@ void StuffWindow::EvolutionOptimization(bool meta)
     Evo.Optimize(OptimizationTestFunctions::Rosenbrock, OptimizationTestFunctions::RosenbrockNoisy<noiseStddev>);
 }
 
-void StuffWindow::PlotTest()
-{
-  const int n = 101;
-  const auto gaussian2D = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n);
-  const auto gaussian1D = GetMidRow<f32>(gaussian2D);
-  const auto x = Iota<f64>(0, gaussian1D.size());
-
-  ImGuiPlot::Plot({.name = "ig1D", .x = x, .ys = {gaussian1D}});
-  ImGuiPlot::Plot({.name = "ig2D", .z = gaussian2D});
-
-  PyPlot::Plot({.name = "py1D", .x = x, .ys = {gaussian1D}});
-  PyPlot::Plot({.name = "py2D", .z = gaussian2D});
-
-  CvPlot::Plot({.name = "cv1D", .x = x, .ys = {gaussian1D}});
-  CvPlot::Plot({.name = "cv2D", .z = gaussian2D});
-}
-
-void StuffWindow::UnevenIlluminationCLAHE()
+void RandomWindow::UnevenIlluminationCLAHE()
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
@@ -108,7 +68,7 @@ void StuffWindow::UnevenIlluminationCLAHE()
   CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
 }
 
-void StuffWindow::UnevenIlluminationHomomorphic()
+void RandomWindow::UnevenIlluminationHomomorphic()
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");

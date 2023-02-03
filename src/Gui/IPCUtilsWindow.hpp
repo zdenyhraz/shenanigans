@@ -2,7 +2,7 @@
 #include "Window.hpp"
 #include "Gui.hpp"
 
-class IPCAppsWindow : public Window
+class IPCUtilsWindow : public Window
 {
   struct IPCOptimizeParameters
   {

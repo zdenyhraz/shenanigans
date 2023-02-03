@@ -1,19 +1,15 @@
-#include "IPCAppsWindow.hpp"
+#include "IPCUtilsWindow.hpp"
 #include "IPCWindow.hpp"
 #include "ImageRegistration/ImageRegistrationDataset.hpp"
 
-void IPCAppsWindow::Render()
+void IPCUtilsWindow::Render()
 {
   PROFILE_FUNCTION;
-  if (ImGui::BeginTabItem("IPC apps"))
+  if (ImGui::BeginTabItem("IPC utils"))
   {
     ImGui::Separator();
-    ImGui::SameLine();
-    ImGui::Text("Accuracy measurement");
-    if (ImGui::Button("Measure"))
-      LaunchAsync([&]() { IPCMeasure::MeasureAccuracy(mIPC, mIPCOptimized, GetCurrentDatasetPath()); });
+    ImGui::BulletText("Iterative phase correlation utils");
 
-    ImGui::Separator();
     ImGui::Text("Debug uils");
     if (ImGui::Button("DebugShift"))
       LaunchAsync([&]() { IPCDebug::DebugShift(mIPCOptimized, mParameters.maxShift, mParameters.noiseStddev); });
@@ -27,8 +23,9 @@ void IPCAppsWindow::Render()
     if (ImGui::Button("DebugGradual"))
       LaunchAsync([&]() { IPCDebug::DebugGradualShift(mIPCOptimized, mParameters.maxShift, mParameters.noiseStddev); });
 
-    ImGui::Separator();
-    ImGui::Text("IPC optimization");
+    ImGui::Text("IPC accuracy measurement/optimization");
+    if (ImGui::Button("Measure"))
+      LaunchAsync([&]() { IPCMeasure::MeasureAccuracy(mIPC, mIPCOptimized, GetCurrentDatasetPath()); });
     ImGui::SameLine();
     if (ImGui::Button("Optimize"))
       LaunchAsync([&]() { IPCOptimization::Optimize(mIPCOptimized, GetCurrentDatasetPath(), mParameters.popSize); });
@@ -46,7 +43,6 @@ void IPCAppsWindow::Render()
     ImGui::SliderFloat("test ratio", &mParameters.testRatio, 0.0, 1.0);
     ImGui::SliderInt("popsize", &mParameters.popSize, 6, 60);
 
-    ImGui::Separator();
     ImGui::Text("False correlations removal");
     if (ImGui::Button("IPC/FCR"))
       LaunchAsync([&]() { FalseCorrelationsRemoval(); });
@@ -54,12 +50,12 @@ void IPCAppsWindow::Render()
   }
 }
 
-std::string IPCAppsWindow::GetCurrentDatasetPath()
+std::string IPCUtilsWindow::GetCurrentDatasetPath()
 {
   return fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{:.3f}ns", mIPC.GetCols(), mIPC.GetRows(), mParameters.iters, mParameters.noiseStddev);
 }
 
-void IPCAppsWindow::FalseCorrelationsRemoval()
+void IPCUtilsWindow::FalseCorrelationsRemoval()
 {
   LOG_FUNCTION;
   auto image1 = LoadUnitFloatImage<IPC::Float>("../data/articles/swind/source/1/cropped/crop1.PNG");

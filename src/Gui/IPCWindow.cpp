@@ -12,7 +12,7 @@ void IPCWindow::Render()
   if (ImGui::BeginTabItem("IPC params"))
   {
     ImGui::Separator();
-
+    ImGui::BulletText("Iterative phase correlation parameters");
     if (ImGui::Button("Update"))
       LaunchAsync(
           [&]()

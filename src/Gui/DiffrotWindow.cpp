@@ -7,7 +7,7 @@ void DiffrotWindow::Render()
   if (ImGui::BeginTabItem("Diffrot"))
   {
     ImGui::Separator();
-
+    ImGui::BulletText("Solar differential rotation measurement");
     if (ImGui::Button("Calculate"))
       LaunchAsync(
           [&]()
