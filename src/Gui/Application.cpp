@@ -10,11 +10,11 @@
 
 void Application::Run()
 {
+  static constexpr bool hiddenWindow = true;
+  static constexpr bool limitFPS = true;
   static constexpr f32 scale = 2.0;
   static constexpr f64 targetFPS = 60;
   static constexpr f64 targetFrametime = 1. / targetFPS;
-  static constexpr bool limitFPS = true;
-  static constexpr bool hiddenWindow = true;
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
   GLFWInitialize();
