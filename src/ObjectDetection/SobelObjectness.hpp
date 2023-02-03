@@ -44,17 +44,29 @@ inline std::vector<Object> CalculateObjects(const cv::Mat& objectness, f32 minOb
     using enum Object::Status;
     Object::Status status = Valid;
 
-    if (elongatedness > maxObjectElongatedness) // filter out "needle" artifacts
-      status = BadElongatedness;
-    else if (area < minObjectArea) // filter out small objects
+    if (area < minObjectArea) // filter out small objects
       status = BadArea;
-    else
-      status = Valid;
+    else if (elongatedness > maxObjectElongatedness) // filter out "needle" artifacts
+      status = BadElongatedness;
 
     const auto center = std::accumulate(contour.begin(), contour.end(), cv::Point{0, 0}) / static_cast<i32>(contour.size());
     objects.emplace_back(center, contour, status);
   }
   return objects;
+}
+
+inline cv::Scalar GetObjectStatusColor(Object::Status status)
+{
+  using enum Object::Status;
+  switch (status)
+  {
+  case Valid:
+    return cv::Scalar(0, 0, 255);
+  case BadArea:
+    return cv::Scalar(255, 0, 0);
+  case BadElongatedness:
+    return cv::Scalar(0, 165, 255);
+  }
 }
 
 inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& objects)
@@ -66,27 +78,9 @@ inline cv::Mat DrawObjects(const cv::Mat& source, const std::vector<Object>& obj
   src.convertTo(src, CV_8U);
   cv::Mat out;
   cv::applyColorMap(src, out, cv::COLORMAP_VIRIDIS);
-
-  const auto colorValid = cv::Scalar(0, 0, 255);
-  const auto colorBadArea = cv::Scalar(255, 0, 0);
-  const auto colorBadElongatedness = cv::Scalar(0, 165, 255);
   const auto thickness = std::clamp(0.005 * out.rows, 1., 100.);
-  using enum Object::Status;
   for (const auto& object : objects)
-  {
-    switch (object.status)
-    {
-    case Valid:
-      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorValid, thickness, cv::LINE_AA);
-      break;
-    case BadArea:
-      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadArea, thickness, cv::LINE_AA);
-      break;
-    case BadElongatedness:
-      cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, colorBadElongatedness, thickness, cv::LINE_AA);
-      break;
-    }
-  }
+    cv::drawContours(out, std::vector<std::vector<cv::Point>>{object.contour}, -1, GetObjectStatusColor(object.status), thickness, cv::LINE_AA);
   return out;
 }
 

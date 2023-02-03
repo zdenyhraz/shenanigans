@@ -46,6 +46,7 @@ void Application::Run()
 }
 
 void Application::Render()
+try
 {
   PROFILE_FUNCTION;
   if (ImGui::Begin("Shenanigans", nullptr, ImGuiWindowFlags_MenuBar))
@@ -80,6 +81,14 @@ void Application::Render()
   ImGuiPlot::Render();
   PyPlot::Render();
   CvPlot::Render();
+}
+catch (const std::exception& e)
+{
+  LOG_EXCEPTION(e);
+}
+catch (...)
+{
+  LOG_UNKNOWN_EXCEPTION;
 }
 
 void Application::RenderPlotMenu()

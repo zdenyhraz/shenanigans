@@ -21,7 +21,7 @@ void CvPlot::RenderInternal()
 void CvPlot::RenderInternal(const PlotData1D& data)
 {
   PROFILE_FUNCTION;
-  throw std::runtime_error("CvPlot does not support 1D plots");
+  LOG_ERROR("CvPlot does not support 1D plots");
 }
 
 void CvPlot::RenderInternal(const PlotData2D& data)
@@ -49,7 +49,6 @@ void CvPlot::RenderInternal(const PlotData2D& data)
   if (not data.savepath.empty())
   {
     cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);
-    image.convertTo(image, CV_8U);
     LOG_DEBUG("Saving image to {}", std::filesystem::weakly_canonical(data.savepath).string());
     cv::imwrite(data.savepath, image);
   }

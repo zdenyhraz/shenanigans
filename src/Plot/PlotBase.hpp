@@ -4,6 +4,8 @@
 #include "Utils/Singleton.hpp"
 
 class ImGuiPlot;
+class PyPlot;
+class CvPlot;
 
 template <class T>
 class PlotBase
@@ -135,7 +137,7 @@ public:
       const auto [zmin, zmax] = MinMax(data.z);
       data.zmin = zmin;
       data.zmax = zmax;
-      if constexpr (std::is_same_v<T, ImGuiPlot>)
+      if constexpr (std::is_same_v<T, ImGuiPlot> or std::is_same_v<T, CvPlot>)
       {
         cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
         data.z.convertTo(data.z, CV_8U);
