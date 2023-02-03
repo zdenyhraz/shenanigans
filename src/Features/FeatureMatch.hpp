@@ -72,8 +72,8 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
   LOG_INFO("Feature data exported to {}", std::filesystem::weakly_canonical(pth).string());
 }
 
-inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all, const std::vector<std::vector<cv::KeyPoint>>& kp1_all,
-    const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
+inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all,
+    const std::vector<std::vector<cv::KeyPoint>>& kp1_all, const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -168,7 +168,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     textpos.x += text_xoffset * out.cols;
     textpos.y += text_yoffset * out.cols;
     arrowedLine(out, arrStart, arrEnd, color, arrow_thickness * out.cols, cv::LINE_AA, 0, 0.1);
-    putText(out, drawSpeed ? fmt::format("{} ({:.0f})", drawcounter, spd) : fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols, cv::LINE_AA);
+    putText(out, drawSpeed ? fmt::format("{} ({:.0f})", drawcounter, spd) : fmt::format("{}", drawcounter), textpos, 1, text_scale * out.cols, color, text_thickness * out.cols,
+        cv::LINE_AA);
 
     if (data.drawOverlapCircles)
       cv::circle(out, arrStart, data.upscale * data.overlapdistance, cv::Scalar(0, 255, 255), text_thickness * out.cols, cv::LINE_AA);
@@ -234,7 +235,7 @@ try
   PROFILE_FUNCTION;
   LOG_FUNCTION;
 
-  cv::Mat img_base = cv::imread(data.path + "5.PNG", cv::IMREAD_GRAYSCALE);
+  cv::Mat img_base = LoadImage(data.path + "5.PNG");
   std::vector<std::vector<cv::DMatch>> matches_all(piccnt - 1);
   std::vector<std::vector<cv::KeyPoint>> keypoints1_all(piccnt - 1);
   std::vector<std::vector<cv::KeyPoint>> keypoints2_all(piccnt - 1);
@@ -244,8 +245,8 @@ try
   {
     const std::string path1 = data.path + std::to_string(pic) + ".PNG";
     const std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
-    cv::Mat img1 = cv::imread(path1, cv::IMREAD_GRAYSCALE);
-    cv::Mat img2 = cv::imread(path2, cv::IMREAD_GRAYSCALE);
+    cv::Mat img1 = LoadImage(path1);
+    cv::Mat img2 = LoadImage(path2);
 
     LOG_DEBUG(fmt::format("Matching images {} & {}", path1, path2));
 

@@ -66,6 +66,8 @@ inline cv::Scalar GetObjectStatusColor(Object::Status status)
     return cv::Scalar(255, 0, 0);
   case BadElongatedness:
     return cv::Scalar(0, 165, 255);
+  default:
+    return cv::Scalar(0, 0, 255);
   }
 }
 
