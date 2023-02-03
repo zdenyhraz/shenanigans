@@ -10,16 +10,19 @@
 
 void Application::Run()
 {
-  std::srand(std::time(nullptr));
-  ImGuiLogger::SetFallback(false);
-  GLFWInitialize();
-  auto window = GLFWCreateWindow(1920, 1080, true);
-  GLFWInitializeGL(window);
-  GLFWSetWindowCallback(window, KeyCallback);
   static constexpr f32 scale = 2.0;
   static constexpr f64 targetFPS = 60;
   static constexpr f64 targetFrametime = 1. / targetFPS;
   static constexpr bool limitFPS = true;
+  static constexpr bool hiddenWindow = true;
+  std::srand(std::time(nullptr));
+  ImGuiLogger::SetFallback(false);
+  GLFWInitialize();
+  auto window = GLFWCreateWindow(1920, 1080, hiddenWindow);
+  GLFWInitializeGL(window);
+  GLFWSetWindowCallback(window, KeyCallback);
+  if constexpr (not hiddenWindow)
+    SetWindowIcon(window);
   ImGuiIO& io = ImGuiInitialize(window, scale);
   Initialize();
 
@@ -83,6 +86,16 @@ void Application::Initialize()
 
   for (const auto& window : mWindows)
     window->Initialize();
+}
+
+void Application::SetWindowIcon(GLFWwindow* window)
+{
+  cv::Mat icon = cv::imread((GetProjectDirectoryPath() / "data/apps/logo.png").string(), cv::IMREAD_COLOR);
+  cv::resize(icon, icon, cv::Size(32, 32));
+  cv::cvtColor(icon, icon, cv::COLOR_BGR2RGBA);
+  cv::normalize(icon, icon, 0, 255, cv::NORM_MINMAX);
+  icon.convertTo(icon, CV_8UC4);
+  GLFWSetWindowIcon(window, icon.cols, icon.rows, icon.data);
 }
 
 void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)

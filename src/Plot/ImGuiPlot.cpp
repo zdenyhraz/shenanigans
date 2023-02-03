@@ -5,12 +5,6 @@ void ImGuiPlot::RenderInternal()
   PROFILE_FUNCTION;
   if (ImGui::Begin("Plot"))
   {
-    if (ImGui::Button("Clear"))
-      Clear();
-    ImGui::SameLine();
-    if (ImGui::Button("Debug"))
-      Debug();
-
     if (ImGui::BeginTabBar("Plots", ImGuiTabBarFlags_AutoSelectNewTabs))
     {
       std::scoped_lock lock(mPlotsMutex);
@@ -122,35 +116,4 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
     return ImPlotColormap_Viridis;
 
   return ImPlotColormap_Viridis;
-}
-
-void ImGuiPlot::Debug()
-{
-  static constexpr usize n = 501;
-  const f64 y1A = Random::Rand<f64>(0.5, 1);
-  const f64 y2A = Random::Rand<f64>(0.5, 1);
-  const f64 y1F = Random::Rand<f64>(2, 5);
-  const f64 y2F = Random::Rand<f64>(2, 5);
-  std::vector<f64> x(n);
-  std::vector<f64> y1(n);
-  std::vector<f64> y2(n);
-  for (usize i = 0; i < n; ++i)
-  {
-    x[i] = static_cast<f64>(3 * i) / (n - 1);
-    y1[i] = y1A * std::sin(y1F * std::numbers::pi * x[i]);
-    y2[i] = y2A * std::cos(y2F * std::numbers::pi * x[i]);
-  }
-
-  ImGuiPlot::Plot({.name = fmt::format("debug1d({})", mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"Asin(fx)", "Acos(fx)"}});
-  LOG_DEBUG("Added one debug1d plot");
-
-  Plot({.name = fmt::format("debug2d({})", mPlots2D.size()),
-      .z = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n),
-      .xmin = -3,
-      .xmax = 3,
-      .ymin = -5,
-      .ymax = 5,
-      .xlabel = "xlabeeel",
-      .ylabel = "ylabeeel",
-      .zlabel = "zlabeeel"});
 }

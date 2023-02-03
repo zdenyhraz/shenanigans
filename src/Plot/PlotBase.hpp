@@ -72,6 +72,36 @@ public:
     Singleton<T>::Get().ClearInternal();
   }
 
+  static void Debug()
+  {
+    static constexpr usize n = 501;
+    const f64 y1A = Random::Rand<f64>(0.5, 1);
+    const f64 y2A = Random::Rand<f64>(0.5, 1);
+    const f64 y1F = Random::Rand<f64>(2, 5);
+    const f64 y2F = Random::Rand<f64>(2, 5);
+    std::vector<f64> x(n);
+    std::vector<f64> y1(n);
+    std::vector<f64> y2(n);
+    for (usize i = 0; i < n; ++i)
+    {
+      x[i] = static_cast<f64>(3 * i) / (n - 1);
+      y1[i] = y1A * std::sin(y1F * std::numbers::pi * x[i]);
+      y2[i] = y2A * std::cos(y2F * std::numbers::pi * x[i]);
+    }
+
+    Plot({.name = fmt::format("debug1d({})", Singleton<T>::Get().mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"Asin(fx)", "Acos(fx)"}});
+
+    Plot({.name = fmt::format("debug2d({})", Singleton<T>::Get().mPlots2D.size()),
+        .z = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n),
+        .xmin = -3,
+        .xmax = 3,
+        .ymin = -5,
+        .ymax = 5,
+        .xlabel = "xlabeeel",
+        .ylabel = "ylabeeel",
+        .zlabel = "zlabeeel"});
+  }
+
   static void SetSave(bool save) { Singleton<T>::Get().mSave = save; }
 
   static void Plot(PlotData1D&& data)

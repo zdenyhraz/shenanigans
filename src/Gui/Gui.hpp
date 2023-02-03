@@ -13,4 +13,5 @@ void SwapBuffers(GLFWwindow* window);
 void ImGuiShutdown();
 void GLFWShutdown(GLFWwindow* window);
 void GLFWCloseWindow(GLFWwindow* window);
+void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data);
 void CheckGLError(std::string_view name);

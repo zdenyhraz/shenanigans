@@ -202,6 +202,15 @@ void GLFWCloseWindow(GLFWwindow* window)
   glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data)
+{
+  GLFWimage image;
+  image.width = width;
+  image.height = height;
+  image.pixels = data;
+  glfwSetWindowIcon(window, 1, &image);
+}
+
 void CheckGLError(std::string_view name)
 {
   const auto error = glGetError();

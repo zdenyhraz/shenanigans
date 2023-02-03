@@ -16,13 +16,13 @@ void ObjdetectWindow::Render()
   {
     ImGui::Separator();
     ImGui::BulletText("Object detection via Sobel objectness");
-    if (ImGui::Button("DetectObjects"))
+    if (ImGui::Button("Detect objects"))
       LaunchAsync([&]() { DetectObjects(); });
-
-    ImGui::Text("Input parameters");
     ImGui::SameLine();
     if (ImGui::Button("Default"))
       LaunchAsync([&]() { mParameters = ObjdetectParameters(); });
+
+    ImGui::Text("Input parameters");
     ImGui::InputText("image path", &mParameters.imagePath);
     ImGui::SliderFloat("image size", &mParameters.imageSizePercent, 10, 100, "%.0f%%");
     ImGui::SliderFloat("blur size", &mParameters.blurSizePercent, 0, 10, "%.0f%%");

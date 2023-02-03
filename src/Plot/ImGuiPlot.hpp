@@ -4,7 +4,6 @@
 class ImGuiPlot : public PlotBase<ImGuiPlot>
 {
   static ImPlotColormap GetColormap(const std::string& cmap);
-  void Debug();
 
 public:
   void RenderInternal() override;

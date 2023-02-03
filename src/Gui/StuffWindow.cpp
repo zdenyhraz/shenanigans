@@ -25,8 +25,14 @@ void StuffWindow::Render()
     if (ImGui::Button("Evolution metaopt"))
       LaunchAsync([&]() { EvolutionOptimization(true); });
 
-    ImGui::Text("PyPlot & ImGuiPlot & CvPlot");
-    if (ImGui::Button("Plot test"))
+    ImGui::Text("Plot tools");
+    if (ImGui::Button("Clear plots"))
+      Plot::Clear();
+    ImGui::SameLine();
+    if (ImGui::Button("Debug plot"))
+      Plot::Debug();
+    ImGui::SameLine();
+    if (ImGui::Button("All plot test"))
       LaunchAsync([&]() { PlotTest(); });
 
     ImGui::Text("Uneven illumination compensation");
