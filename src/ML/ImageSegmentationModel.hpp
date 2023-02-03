@@ -78,7 +78,7 @@ public:
         epochs.push_back(epochIndex);
         lossesTrainAvg.push_back(lossTrainAvg);
         lossesTestAvg.push_back(lossTestAvg);
-        PyPlot::Plot({.name = "ImageSegmentationModel training", .x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .ylabels = {"train loss", "test loss"}});
+        Plot::Plot({.name = "ImageSegmentationModel training", .x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .ylabels = {"train loss", "test loss"}, .log = true});
       }
     }
   }
@@ -96,10 +96,11 @@ private:
 void ImageSegmentationModelTest()
 {
   ImageSegmentationModel model;
-  model.Train({.epochCount = 20, .batchSize = 8}, "../debug/AIA/171A.png", "../debug/AIA/171A.png");
+  const auto path = (GetProjectDirectoryPath() / "data/dissertation/dissimilar/input2.png").string();
+  model.Train({.epochCount = 20, .batchSize = 8}, path, path);
 
-  cv::Mat image = LoadUnitFloatImage<f32>("../debug/AIA/171A.png");
-  const cv::Size size(1024, 1024);
+  cv::Mat image = LoadUnitFloatImage<f32>(path);
+  const cv::Size size(image.rows / 4, image.rows / 4);
   const i32 x = image.cols / 2 + Random::Rand(-1., 1.) * (image.cols / 2 - size.width);
   const i32 y = image.rows / 2 + Random::Rand(-1., 1.) * (image.rows / 2 - size.height);
   cv::Mat input = RoiCrop(image, x, y, size.width, size.height);
@@ -108,7 +109,7 @@ void ImageSegmentationModelTest()
   torch::Tensor inputTensor = ToTensor(input).reshape({1, ImageSegmentationModel::kImageChannels, ImageSegmentationModel::kImageHeight, ImageSegmentationModel::kImageWidth});
   torch::Tensor outputTensor = model.Forward(inputTensor);
 
-  PyPlot::Plot({.name = "ImageSegmentationModel input", .z = input, .cmap = "gray"});
-  PyPlot::Plot({.name = "ImageSegmentationModel target", .z = target, .cmap = "gray"});
-  PyPlot::Plot({.name = "ImageSegmentationModel output", .z = ToCVMat(outputTensor, input.size()), .cmap = "gray"});
+  Plot::Plot("segmentation input", input);
+  Plot::Plot("segmentation target", target);
+  Plot::Plot("segmentation output", ToCVMat(outputTensor, input.size()));
 }

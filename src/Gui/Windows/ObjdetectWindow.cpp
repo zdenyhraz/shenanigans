@@ -1,4 +1,5 @@
 #include "ObjdetectWindow.hpp"
+#include "ML/ImageSegmentationModel.hpp"
 
 void ObjdetectWindow::DetectObjects() const
 {
@@ -39,7 +40,7 @@ void ObjdetectWindow::Render()
     ImGui::SliderFloat("min area", &mParameters.minObjectAreaPercent, 0, 5, "%.2f%%", ImGuiSliderFlags_Logarithmic);
     ImGui::SliderFloat("max elongatedness", &mParameters.soParams.maxObjectElongatedness, 3, 30, "%.1f");
 
-    mParameters.Update();
     ImGui::EndTabItem();
   }
+  mParameters.Update();
 }
