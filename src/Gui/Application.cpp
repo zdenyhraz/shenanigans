@@ -95,16 +95,16 @@ void Application::RenderPlotMenu()
 {
   if (ImGui::BeginMenu("Plot"))
   {
-    if (ImGui::MenuItem("Save plots", NULL, mPlotSave))
+    if (ImGui::MenuItem("Save plots", nullptr, mPlotSave))
       mPlotSave = !mPlotSave;
     if (ImGui::MenuItem("Clear plots"))
-      LaunchAsync([&]() { Plot::Clear(); });
+      LaunchAsync([]() { Plot::Clear(); });
     if (ImGui::MenuItem("Debug ImGuiPlots"))
-      LaunchAsync([&]() { ImGuiPlot::Debug(); });
+      LaunchAsync([]() { ImGuiPlot::Debug(); });
     if (ImGui::MenuItem("Debug PyPlots"))
-      LaunchAsync([&]() { PyPlot::Debug(); });
+      LaunchAsync([]() { PyPlot::Debug(); });
     if (ImGui::MenuItem("Debug CvPlots"))
-      LaunchAsync([&]() { CvPlot::Debug(); });
+      LaunchAsync([]() { CvPlot::Debug(); });
 
     ImGui::EndMenu();
   }
@@ -114,9 +114,9 @@ void Application::RenderDemoMenu()
 {
   if (ImGui::BeginMenu("Demos"))
   {
-    if (ImGui::MenuItem("ImGui demo", NULL, mShowImGuiDemoWindow))
+    if (ImGui::MenuItem("ImGui demo", nullptr, mShowImGuiDemoWindow))
       mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
-    if (ImGui::MenuItem("ImPlot demo", NULL, mShowImPlotDemoWindow))
+    if (ImGui::MenuItem("ImPlot demo", nullptr, mShowImPlotDemoWindow))
       mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
 
     ImGui::EndMenu();
