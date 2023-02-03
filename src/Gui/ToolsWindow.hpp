@@ -3,7 +3,6 @@
 
 class ToolsWindow : public Window
 {
-
 public:
   void Render() override;
 };
