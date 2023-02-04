@@ -55,6 +55,7 @@ try
     {
       RenderPlotMenu();
       RenderDemoMenu();
+      RenderThemeMenu();
       ImGui::EndMenuBar();
     }
 
@@ -118,6 +119,25 @@ void Application::RenderDemoMenu()
       mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
     if (ImGui::MenuItem("ImPlot demo", nullptr, mShowImPlotDemoWindow))
       mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
+
+    ImGui::EndMenu();
+  }
+}
+
+void Application::RenderThemeMenu()
+{
+  if (ImGui::BeginMenu("Theme"))
+  {
+    if (ImGui::MenuItem("Dark"))
+      ImGuiSetDarkTheme();
+    if (ImGui::MenuItem("Classic"))
+      ImGuiSetClassicTheme();
+    if (ImGui::MenuItem("DeepDark"))
+      ImGuiSetDeepDarkTheme();
+    if (ImGui::MenuItem("Hazel"))
+      ImGuiSetHazelTheme();
+    if (ImGui::MenuItem("Light"))
+      ImGuiSetLightTheme();
 
     ImGui::EndMenu();
   }
