@@ -20,6 +20,7 @@
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/last-commit/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/search?l=c%2B%2B"><img src="https://img.shields.io/github/languages/top/zdenyhraz/shenanigans"></a>
+<a href="https://github.com/zdenyhraz/shenanigans/blob/master/LICENSE"><img src="https://img.shields.io/github/license/zdenyhraz/shenanigans.svg"></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=ncloc"></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=bugs"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues-raw/zdenyhraz/shenanigans"></a>
