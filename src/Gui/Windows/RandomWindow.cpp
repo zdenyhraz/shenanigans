@@ -28,7 +28,7 @@ void RandomWindow::Render()
   }
 }
 
-void RandomWindow::EvolutionOptimization(bool meta)
+void RandomWindow::EvolutionOptimization(bool meta) const
 {
   LOG_FUNCTION;
   static constexpr i32 N = 2;
@@ -59,7 +59,7 @@ void RandomWindow::EvolutionOptimization(bool meta)
     Evo.Optimize(OptimizationTestFunctions::Rosenbrock, OptimizationTestFunctions::RosenbrockNoisy<noiseStddev>);
 }
 
-void RandomWindow::UnevenIlluminationCLAHE()
+void RandomWindow::UnevenIlluminationCLAHE() const
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
@@ -68,7 +68,7 @@ void RandomWindow::UnevenIlluminationCLAHE()
   CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
 }
 
-void RandomWindow::UnevenIlluminationHomomorphic()
+void RandomWindow::UnevenIlluminationHomomorphic() const
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");

@@ -16,8 +16,8 @@ class IPCUtilsWindow : public Window
     i32 popSize = 18;
   };
 
-  std::string GetCurrentDatasetPath();
-  void FalseCorrelationsRemoval();
+  std::string GetCurrentDatasetPath() const;
+  void FalseCorrelationsRemoval() const;
 
   IPCOptimizeParameters mParameters;
 

@@ -50,12 +50,12 @@ void IPCUtilsWindow::Render()
   }
 }
 
-std::string IPCUtilsWindow::GetCurrentDatasetPath()
+std::string IPCUtilsWindow::GetCurrentDatasetPath() const
 {
   return fmt::format("../debug/ipcopt/imreg_dataset_{}x{}_{}i_{:.3f}ns", mIPC.GetCols(), mIPC.GetRows(), mParameters.iters, mParameters.noiseStddev);
 }
 
-void IPCUtilsWindow::FalseCorrelationsRemoval()
+void IPCUtilsWindow::FalseCorrelationsRemoval() const
 {
   LOG_FUNCTION;
   auto image1 = LoadUnitFloatImage<IPC::Float>("../data/articles/swind/source/1/cropped/crop1.PNG");
