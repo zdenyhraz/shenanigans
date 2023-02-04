@@ -132,12 +132,10 @@ void Application::RenderThemeMenu()
       ImGuiSetDarkTheme();
     if (ImGui::MenuItem("Classic"))
       ImGuiSetClassicTheme();
-    if (ImGui::MenuItem("DeepDark"))
-      ImGuiSetDeepDarkTheme();
-    if (ImGui::MenuItem("Hazel"))
-      ImGuiSetHazelTheme();
     if (ImGui::MenuItem("Light"))
       ImGuiSetLightTheme();
+    if (ImGui::MenuItem("Hazel"))
+      ImGuiSetHazelTheme();
 
     ImGui::EndMenu();
   }

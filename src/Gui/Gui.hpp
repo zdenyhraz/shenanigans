@@ -18,6 +18,6 @@ void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data);
 void CheckGLError(std::string_view name);
 void ImGuiSetDarkTheme();
 void ImGuiSetClassicTheme();
-void ImGuiSetDeepDarkTheme();
-void ImGuiSetHazelTheme();
 void ImGuiSetLightTheme();
+void ImGuiSetHazelTheme();
+void ImPlotUpdatePlotTheme();

@@ -44,7 +44,7 @@ void ImGuiSetDefaultStyle()
 {
   PROFILE_FUNCTION;
   LOG_TRACE("Setting ImGui style");
-  ImGuiSetDeepDarkTheme();
+  ImGuiSetHazelTheme();
 }
 
 ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
@@ -209,73 +209,24 @@ void CheckGLError(std::string_view name)
 void ImGuiSetDarkTheme()
 {
   ImGui::StyleColorsDark();
-  ImPlot::StyleColorsAuto();
+  ImPlotUpdatePlotTheme();
 }
 
 void ImGuiSetClassicTheme()
 {
   ImGui::StyleColorsClassic();
-  ImPlot::StyleColorsAuto();
+  ImPlotUpdatePlotTheme();
 }
 
-void ImGuiSetDeepDarkTheme()
+void ImGuiSetLightTheme()
 {
-  ImGui::StyleColorsDark();
-  ImPlot::StyleColorsAuto();
-
-  auto& style = ImGui::GetStyle();
-  style.Alpha = 1.0f;
-  style.FrameRounding = 3.0f;
-  style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-  style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-  style.Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.94f);
-  style.Colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-  style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.39f);
-  style.Colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.10f);
-  style.Colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-  style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-  style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-  style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-  style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
-  style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
-  style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-  style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
-  style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
-  style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.59f, 0.59f, 1.00f);
-  style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-  style.Colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-  style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
-  style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-  style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-  style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-  style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-  style.Colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-  style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-  style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-  style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
-  style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-  style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-  style.Colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-  style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-  style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-  style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-  style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-
-  for (int i = 0; i <= ImGuiCol_COUNT; i++)
-  {
-    ImVec4& col = style.Colors[i];
-    float H, S, V;
-    ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
-    if (S < 0.1f)
-      V = 1.0f - V;
-    ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
-  }
+  ImGui::StyleColorsLight();
+  ImPlotUpdatePlotTheme();
 }
 
 void ImGuiSetHazelTheme()
 {
   ImGui::StyleColorsDark();
-  ImPlot::StyleColorsAuto();
 
   auto& colors = ImGui::GetStyle().Colors;
   colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
@@ -306,10 +257,39 @@ void ImGuiSetHazelTheme()
   colors[ImGuiCol_TitleBg] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
   colors[ImGuiCol_TitleBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
   colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+  ImPlotUpdatePlotTheme();
 }
 
-void ImGuiSetLightTheme()
+void ImPlotUpdatePlotTheme()
 {
-  ImGui::StyleColorsLight();
   ImPlot::StyleColorsAuto();
+  auto& style = ImGui::GetStyle();
+  auto& colors = style.Colors;
+  auto& plotStyle = ImPlot::GetStyle();
+  auto& plotColors = plotStyle.Colors;
+
+  plotStyle.MinorAlpha = 0.25f;
+  plotColors[ImPlotCol_Line] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_Fill] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_MarkerFill] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_ErrorBar] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_FrameBg] = ImVec4(0, 0, 0, 0);
+  plotColors[ImPlotCol_PlotBg] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_PlotBorder] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_LegendBg] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_LegendBorder] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_LegendText] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_TitleText] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_InlayText] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_PlotBorder] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_AxisText] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_AxisGrid] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_AxisTick] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_AxisBg] = ImVec4(0, 0, 0, 0);
+  plotColors[ImPlotCol_AxisBgHovered] = ImVec4(0, 0, 0, 0);
+  plotColors[ImPlotCol_AxisBgActive] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_Selection] = IMPLOT_AUTO_COL;
+  plotColors[ImPlotCol_Crosshairs] = IMPLOT_AUTO_COL;
 }
