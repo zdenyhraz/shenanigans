@@ -9,7 +9,7 @@ protected:
   inline static IPC mIPCOptimized;
 
 public:
-  virtual ~Window() {}
+  virtual ~Window() = default;
   virtual void Initialize() {}
   virtual void Render() = 0;
 };
