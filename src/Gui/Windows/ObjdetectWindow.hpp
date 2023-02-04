@@ -1,6 +1,8 @@
 #pragma once
 #include "Window.hpp"
-#include "ObjectDetection/SobelObjectness.hpp"
+#ifdef ENABLE_PRIVATE
+  #include "SobelObjectness.hpp"
+#endif
 
 class ObjdetectWindow : public Window
 {
