@@ -264,8 +264,8 @@ void ImGuiSetHazelTheme()
 void ImPlotUpdatePlotTheme()
 {
   ImPlot::StyleColorsAuto();
-  auto& style = ImGui::GetStyle();
-  auto& colors = style.Colors;
+  // auto& style = ImGui::GetStyle();
+  // auto& colors = style.Colors;
   auto& plotStyle = ImPlot::GetStyle();
   auto& plotColors = plotStyle.Colors;
 
