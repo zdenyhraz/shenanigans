@@ -5,9 +5,7 @@
 #include "Windows/DiffrotWindow.hpp"
 #include "Windows/SwindWindow.hpp"
 #include "Windows/RandomWindow.hpp"
-#ifdef ENABLE_PRIVATE
-  #include "Windows/ObjdetectWindow.hpp"
-#endif
+#include "Windows/ObjdetectWindow.hpp"
 
 void Application::Run()
 {
@@ -150,9 +148,7 @@ void Application::Initialize()
   mWindows.push_back(std::make_unique<DiffrotWindow>());
   mWindows.push_back(std::make_unique<SwindWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
-#ifdef ENABLE_PRIVATE
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
-#endif
 
   for (const auto& window : mWindows)
     window->Initialize();
