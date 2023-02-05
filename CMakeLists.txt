@@ -9,6 +9,7 @@ set(ENABLE_PROFILING OFF)
 set(ENABLE_SANITIZER OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
+set(ENABLE_PRIVATE ON)
 
 # ci variables
 if(DEFINED ENV{CI})
@@ -189,7 +190,7 @@ target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${libs/shenanigans_private}" REALPATH)
-if (EXISTS "${PATH_PRIVATE}" AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
+if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
   include_directories(libs/shenanigans_private/include)
   file(GLOB SRC_PRIVATE CONFIGURE_DEPENDS libs/shenanigans_private/src/*.cpp)
