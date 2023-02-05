@@ -190,14 +190,10 @@ target_link_libraries(shenanigans_terminal PRIVATE glad)
 target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # shenanigans_private
-get_filename_component(PATH_PRIVATE "${libs/shenanigans_private}" REALPATH)
+get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
-  include_directories(libs/shenanigans_private/include)
-  file(GLOB SRC_PRIVATE CONFIGURE_DEPENDS libs/shenanigans_private/src/*.cpp)
-  target_sources(shenanigans PRIVATE ${SRC_PRIVATE})
-  target_sources(shenanigans_test PRIVATE ${SRC_PRIVATE})
-  target_sources(shenanigans_terminal PRIVATE ${SRC_PRIVATE})
+  include_directories(src/NDA)
 endif()
 
 # custom
