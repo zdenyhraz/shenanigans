@@ -41,8 +41,8 @@ Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https
 ## [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
 <img src="data/readme/diffrot.png" width="100%">
 
-## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) - gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 128x128 image (standard vs [IPC](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7))
-<img src="data/readme/peakshift_L1B.gif" width="50%"><img src="data/readme/peakshift_L1A.gif" width="50%">
+## Subpixel shift / rotation / scale [image registration](https://en.wikipedia.org/wiki/Image_registration) of dissimilar images via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
+<img src="data/readme/align.png" width="100%">
 
 ## Visualization of [optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress on a given objective function landscape
 <img src="data/readme/rosenbrock_paths.png" width="100%">
