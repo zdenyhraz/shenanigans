@@ -29,7 +29,7 @@
 
 Semi-random funky stuff, mainly for my PhD experiments and [articles](#article-links). Contains calculations and algorithm implementations for various applied mathematics and astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, sub-pixel [image registration](https://en.wikipedia.org/wiki/Image_registration), non-convex [optimization](https://en.wikipedia.org/wiki/Mathematical_optimization).
 
-Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https://github.com/ocornut/imgui) GUI and [pybind11](https://github.com/pybind/pybind11) + [matplotlib](https://matplotlib.org/) plots. Uses [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [cuda](https://developer.nvidia.com/cuda-toolkit), [matplotlib](https://matplotlib.org/), [torch](https://pytorch.org/), [astropy](https://github.com/astropy/astropy), [spdlog](https://github.com/gabime/spdlog), [flamegraph](https://github.com/brendangregg/FlameGraph), [fmt](https://fmt.dev/latest/index.html), [googletest](https://github.com/google/googletest), [json](https://github.com/nlohmann/json), [optick](https://github.com/bombomby/optick), [pybind11](https://github.com/pybind/pybind11), [QCustomPlot](https://www.qcustomplot.com/), [tracy](https://github.com/wolfpld/tracy), [glad](https://glad.dav1d.de/), [GLFW](https://www.glfw.org/), [ImGui](https://github.com/ocornut/imgui). ***Examples below.***
+Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https://github.com/ocornut/imgui) GUI and [ImPlot](https://github.com/epezent/implot) / [pybind11](https://github.com/pybind/pybind11)+[matplotlib](https://matplotlib.org/) plots. Uses [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [cuda](https://developer.nvidia.com/cuda-toolkit), [matplotlib](https://matplotlib.org/), [torch](https://pytorch.org/), [astropy](https://github.com/astropy/astropy), [spdlog](https://github.com/gabime/spdlog), [flamegraph](https://github.com/brendangregg/FlameGraph), [fmt](https://fmt.dev/latest/index.html), [googletest](https://github.com/google/googletest), [json](https://github.com/nlohmann/json), [optick](https://github.com/bombomby/optick), [pybind11](https://github.com/pybind/pybind11), [QCustomPlot](https://www.qcustomplot.com/), [tracy](https://github.com/wolfpld/tracy), [glad](https://glad.dav1d.de/), [GLFW](https://www.glfw.org/), [ImGui](https://github.com/ocornut/imgui). ***Examples below.***
 
 ## Article links
 - 📌 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
@@ -38,39 +38,27 @@ Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https
 ## The [ImGui](https://github.com/ocornut/imgui/) GUI
 <img src="data/readme/gui.png" width="100%">
 
-## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) - gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 128x128 image (standard vs [IPC](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7))
-<img src="data/dissertation/refinement/peakshift_L1B.gif" width="50%"><img src="data/dissertation/refinement/peakshift_L1A.gif" width="50%">
-
 ## [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
-<p align="center">
-<img src="data/articles/diffrot/pics/gif/1.gif" width="43%">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="data/articles/diffrot/pics/gif/2.gif" width="43%">
-</p>
+<img src="data/readme/diffrot.png" width="100%">
+
+## Subpixel [image registration](https://en.wikipedia.org/wiki/Image_registration) via [Iterative Phase Correlation](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7) - gradual 2px shift via [bilinear interpolation](https://en.wikipedia.org/wiki/Bilinear_interpolation) of a 128x128 image (standard vs [IPC](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7))
+<img src="data/readme/peakshift_L1B.gif" width="50%"><img src="data/readme/peakshift_L1A.gif" width="50%">
 
 ## Visualization of [optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress on a given objective function landscape
-<img src="data/articles/optim/rosenbrock_paths.png" width="100%">
+<img src="data/readme/rosenbrock_paths.png" width="100%">
 
 ## Visualization of *meta*-[optimizer](https://en.wikipedia.org/wiki/Mathematical_optimization) progress and optimization improvement on a given *meta*-objective function landscape
-<img src="data/articles/optim/metaopt_paths.png" width="100%">
+<img src="data/readme/metaopt_paths.png" width="100%">
 
 ## Adaptive [histogram equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization)
-<img src="data/articles/random/aheq.PNG" width="100%">
-
-## [Convolution theorem](https://en.wikipedia.org/wiki/Convolution_theorem) aware frequency domain image filtering
-<img src="data/dissertation/bandpass/2DBandpassRingRIDFT.png" width="32%"> <img src="data/dissertation/bandpass/2DBandpassImageR.png" width="32%"> <img src="data/dissertation/bandpass/2DBandpassImageG.png" width="32%">
+<img src="data/readme/aheq.PNG" width="100%">
 
 ## Modeling of the [windowing effect](https://en.wikipedia.org/wiki/Window_function) on the [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
-<img src="data/dissertation/window/1DWindows.png" width="47%"> <img src="data/dissertation/window/1DWindowsDFT.png" width="47%">
-<img src="data/dissertation/window/2DWindowDFTR.png" width="32%"> <img src="data/dissertation/window/2DImageDFT.png" width="32%">  <img src="data/dissertation/window/2DImageWindowDFT.png" width="32%">
+<img src="data/readme/2DWindowDFTR.png" width="32%"> <img src="data/readme/2DImageDFT.png" width="32%">  <img src="data/readme/2DImageWindowDFT.png" width="32%">
 
 ## Profiling
 ### Profiling with [Valgrind](https://valgrind.org/) / [Callgrind](https://valgrind.org/docs/manual/cl-manual.html) / [Kcachegrind](http://kcachegrind.sourceforge.net/html/Documentation.html)
 - run `./script/perf/kcachegrind.sh`
-
-### Profiling with [Optick](https://github.com/bombomby/optick)
-- run the app with `ENABLE_PROFILING` defined
-- trace file is created when app terminates
-- run the Optick GUI app (only on Windows) and import the trace file from `build/`
-<img src="data/readme/optick.png" width="100%">
 
 ### Profiling with [Tracy](https://github.com/wolfpld/tracy)
 - install the required libraries `sudo apt -y install libglfw3-dev libgtk-3-dev libcapstone-dev libtbb-dev`

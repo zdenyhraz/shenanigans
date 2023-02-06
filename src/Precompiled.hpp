@@ -115,6 +115,7 @@ using namespace pybind11::literals;
 
 #include "Math/Functions.hpp"
 #include "Math/Transform.hpp"
+#include "Math/RNG.hpp"
 #include "Math/Statistics.hpp"
 
 #include "Utils/DateTime.hpp"

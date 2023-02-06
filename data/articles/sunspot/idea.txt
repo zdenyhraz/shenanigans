@@ -1,3 +1,0 @@
-- measuring material flows in the vincinity of sunspots via ipc
-- subtract rotation flow
-- arrows + contures + image (MATLAB)
