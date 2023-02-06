@@ -22,22 +22,6 @@ void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, i32 tileGridSize, i32 
   Plot::Plot("../data/debug/UnevenIllumination/CLAHE/output.png", imageCLAHE);
 }
 
-template <typename T>
-cv::Mat Butterworth(cv::Size size, f64 cutoff, i32 order)
-{
-  cv::Mat result(size, GetMatType<T>());
-  const auto D0 = cutoff * std::sqrt(Sqr(size.height / 2) + Sqr(size.width / 2));
-  for (i32 r = 0; r < size.height; ++r)
-  {
-    for (i32 c = 0; c < size.width; ++c)
-    {
-      const auto D = std::sqrt(Sqr(r - size.height / 2) + Sqr(c - size.width / 2));
-      result.at<T>(r, c) = 1 / (1 + std::pow(D / D0, 2 * order));
-    }
-  }
-  return result;
-}
-
 void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.001)
 {
   cv::Mat imageLAB;

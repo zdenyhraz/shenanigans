@@ -1,6 +1,7 @@
 #pragma once
 
-inline std::vector<f64> inverseMappingZH(const std::vector<std::vector<f64>>& trialInputs, const std::vector<std::vector<f64>>& trialOutputs, const std::vector<f64>& desiredOutput, i32 degree)
+inline std::vector<f64> InverseMapping(
+    const std::vector<std::vector<f64>>& trialInputs, const std::vector<std::vector<f64>>& trialOutputs, const std::vector<f64>& desiredOutput, i32 degree)
 {
   // assuming input dimension is the same as output dimension for existence and uniqueness
   i32 N = trialInputs[0].size();
@@ -68,7 +69,7 @@ inline std::vector<f64> inverseMappingZH(const std::vector<std::vector<f64>>& tr
   return desiredInput;
 }
 
-inline std::vector<f64> inverseMappingTestTransfer(std::vector<f64> arg)
+inline std::vector<f64> InverseMappingTest(const std::vector<f64>& arg)
 {
   auto result = arg;
   auto N = arg.size();

@@ -9,20 +9,25 @@ void RandomWindow::Render()
   if (ImGui::BeginTabItem("Random"))
   {
     ImGui::Separator();
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Optimizers"))
+    {
+      if (ImGui::Button("Evolution opt"))
+        LaunchAsync([&]() { EvolutionOptimization(false); });
+      ImGui::SameLine();
+      if (ImGui::Button("Evolution metaopt"))
+        LaunchAsync([&]() { EvolutionOptimization(true); });
+    }
 
-    ImGui::BulletText("Optimizers");
-    if (ImGui::Button("Evolution opt"))
-      LaunchAsync([&]() { EvolutionOptimization(false); });
-    ImGui::SameLine();
-    if (ImGui::Button("Evolution metaopt"))
-      LaunchAsync([&]() { EvolutionOptimization(true); });
-
-    ImGui::BulletText("Uneven illumination compensation");
-    if (ImGui::Button("CLAHE"))
-      LaunchAsync([&]() { UnevenIlluminationCLAHE(); });
-    ImGui::SameLine();
-    if (ImGui::Button("Homomorphic"))
-      LaunchAsync([&]() { UnevenIlluminationHomomorphic(); });
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Uneven illumination compensation"))
+    {
+      if (ImGui::Button("CLAHE"))
+        LaunchAsync([&]() { UnevenIlluminationCLAHE(); });
+      ImGui::SameLine();
+      if (ImGui::Button("Homomorphic"))
+        LaunchAsync([&]() { UnevenIlluminationHomomorphic(); });
+    }
 
     ImGui::EndTabItem();
   }
