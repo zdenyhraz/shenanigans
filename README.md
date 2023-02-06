@@ -35,7 +35,7 @@ Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https
 - 📌 [Iterative Phase Correlation Algorithm for High-precision Subpixel Image Registration](https://iopscience.iop.org/article/10.3847/1538-4365/ab63d7)
 - 🪐 [Measuring Solar Differential Rotation with an Iterative Phase Correlation Method](https://iopscience.iop.org/article/10.3847/1538-4365/abc702)
 
-## The [ImGui](https://github.com/ocornut/imgui/) GUI
+## The [ImGui](https://github.com/ocornut/imgui/)+[ImPlot](https://github.com/epezent/implot) GUI
 <img src="data/readme/gui.png" width="100%">
 
 ## [Solar photosphere](https://en.wikipedia.org/wiki/Photosphere) [differential rotation](https://en.wikipedia.org/wiki/Differential_rotation) measurements from [SDO/HMI](http://hmi.stanford.edu/) continuum images
