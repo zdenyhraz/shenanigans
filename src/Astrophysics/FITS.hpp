@@ -221,7 +221,7 @@ private:
       Plot::Plot("circleL", RoiCrop(imgc, 250, 0.5 * 4096, 500, 500));
       Plot::Plot("circleR", RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500));
       Plot::Plot("circleT", RoiCrop(imgc, 0.5 * 4096, 250, 500, 500));
-      Plot::Plot("circleB", RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), );
+      Plot::Plot("circleB", RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500));
     }
   }
 
