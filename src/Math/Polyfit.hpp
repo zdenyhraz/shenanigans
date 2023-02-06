@@ -1,6 +1,6 @@
 #pragma once
 
-inline std::vector<f64> polyfitcore1d(const std::vector<f64>& xdata, const std::vector<f64>& ydata, i32 degree)
+inline std::vector<f64> PolynomialFit(const std::vector<f64>& xdata, const std::vector<f64>& ydata, i32 degree)
 {
   i32 datacnt = ydata.size();
   cv::Mat X = cv::Mat::zeros(datacnt, degree + 1, CV_32F); // matice planu
@@ -23,19 +23,15 @@ inline std::vector<f64> polyfitcore1d(const std::vector<f64>& xdata, const std::
   return fit;
 }
 
-inline std::vector<f64> polyfit(const std::vector<f64>& ydata, i32 degree)
+inline std::vector<f64> PolynomialFit(const std::vector<f64>& ydata, i32 degree)
 {
   std::vector<f64> xdata(ydata.size());
   std::iota(xdata.begin(), xdata.end(), 1);
-  return polyfitcore1d(xdata, ydata, degree);
+  return PolynomialFit(xdata, ydata, degree);
 }
 
-inline std::vector<f64> polyfit(const std::vector<f64>& xdata, const std::vector<f64>& ydata, i32 degree)
-{
-  return polyfitcore1d(xdata, ydata, degree);
-}
-
-inline cv::Mat polyfitcore2d(const std::vector<f64>& xdata, const std::vector<f64>& ydata, const std::vector<f64>& zdata, i32 degree, f64 xmin, f64 xmax, f64 ymin, f64 ymax, f64 xcnt, f64 ycnt)
+inline cv::Mat PolynomialFit(
+    const std::vector<f64>& xdata, const std::vector<f64>& ydata, const std::vector<f64>& zdata, i32 degree, f64 xmin, f64 xmax, f64 ymin, f64 ymax, f64 xcnt, f64 ycnt)
 {
   i32 datacnt = ydata.size();
   cv::Mat X = cv::Mat::zeros(datacnt, 2 * degree + 1, CV_32F); // matice planu
@@ -86,12 +82,7 @@ inline cv::Mat polyfitcore2d(const std::vector<f64>& xdata, const std::vector<f6
   return fit;
 }
 
-inline cv::Mat polyfit(const std::vector<f64>& xdata, const std::vector<f64>& ydata, const std::vector<f64>& zdata, i32 degree, f64 xmin, f64 xmax, f64 ymin, f64 ymax, f64 xcnt, f64 ycnt)
-{
-  return polyfitcore2d(xdata, ydata, zdata, degree, xmin, xmax, ymin, ymax, xcnt, ycnt);
-}
-
-inline std::vector<f64> polyfitCoeffs(const std::vector<f64>& xdata, const std::vector<f64>& ydata, i32 degree)
+inline std::vector<f64> PolynomialFitCoefficients(const std::vector<f64>& xdata, const std::vector<f64>& ydata, i32 degree)
 {
   i32 datacnt = ydata.size();
   cv::Mat X = cv::Mat::zeros(datacnt, degree + 1, CV_32F); // matice planu

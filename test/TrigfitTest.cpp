@@ -12,7 +12,7 @@ TEST(TrigfitTest, Fit)
     y[i] = c0 + c1 * std::pow(std::sin(x[i]), 2) + c2 * std::pow(std::sin(x[i]), 4);
   }
 
-  const auto fy = sin2sin4fit(x, y);
+  const auto fy = TrigonometricFit(x, y);
   ASSERT_EQ(fy.size(), n);
   for (i32 i = 0; i < n; ++i)
     ASSERT_NEAR(fy[i], y[i], 1e-5);
@@ -30,7 +30,7 @@ TEST(TrigfitTest, Coeffs)
     y[i] = c0 + c1 * std::pow(std::sin(x[i]), 2) + c2 * std::pow(std::sin(x[i]), 4);
   }
 
-  const auto fc = sin2sin4fitCoeffs(x, y);
+  const auto fc = TrigonometricFitCoefficients(x, y);
   ASSERT_EQ(fc.size(), 3);
   ASSERT_NEAR(fc[0], c0, 1e-4);
   ASSERT_NEAR(fc[1], c1, 1e-4);

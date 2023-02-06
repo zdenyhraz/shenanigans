@@ -322,7 +322,7 @@ public:
       if (dataopt.omegax.empty())
         return std::numeric_limits<f64>::infinity();
       const auto omegax = GetRowAverage(dataopt.omegax);
-      const auto omegaxfit = polyfit(dataopt.theta, omegax, 2);
+      const auto omegaxfit = PolynomialFit(dataopt.theta, omegax, 2);
 
       f64 ret = 0;
       for (usize i = 0; i < omegaxfit.size(); ++i)
@@ -341,10 +341,10 @@ public:
     PyPlot::Plot({
         .name = "Diffrot opt",
         .x = ToDegrees(1) * dataAfter.theta,
-        .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), polyfit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
-            sin2sin4fit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615),
+        .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), PolynomialFit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
+            TrigonometricFit(dataAfter.theta, GetRowAverage(dataAfter.omegax)), GetPredictedOmegas(dataAfter.theta, 14.296, -1.847, -2.615),
             GetPredictedOmegas(dataAfter.theta, 14.192, -1.70, -2.36)},
-        .ylabels = {"ipc", "ipc opt", "ipc opt polyfit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+        .ylabels = {"ipc", "ipc opt", "ipc opt PolynomialFit", "ipc opt trigfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
         .xlabel = "latitude [deg]",
         .ylabel = "average omega x [deg/day]",
     });
@@ -518,17 +518,17 @@ private:
     PyPlot::Plot({
         .name = "avgomega x",
         .x = ToDegrees(1) * data.theta,
-        .ys = {GetRowAverage(data.omegax), sin2sin4fit(data.theta, GetRowAverage(data.omegax)), polyfit(data.theta, GetRowAverage(data.omegax), 2),
+        .ys = {GetRowAverage(data.omegax), TrigonometricFit(data.theta, GetRowAverage(data.omegax)), PolynomialFit(data.theta, GetRowAverage(data.omegax), 2),
             GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615), GetPredictedOmegas(data.theta, 14.192, -1.70, -2.36)},
-        .ylabels = {"ipc", "ipc trigfit", "ipc polyfit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
+        .ylabels = {"ipc", "ipc trigfit", "ipc PolynomialFit", "Derek A. Lamb (2017)", "Howard et al. (1983)"},
         .xlabel = "latitude [deg]",
         .ylabel = "average omega x [deg/day]",
     });
     PyPlot::Plot({
         .name = "avgomega y",
         .x = ToDegrees(1) * data.theta,
-        .ys = {GetRowAverage(data.omegay), polyfit(data.theta, GetRowAverage(data.omegay), 3)},
-        .ylabels = {"ipc", "ipc polyfit"},
+        .ys = {GetRowAverage(data.omegay), PolynomialFit(data.theta, GetRowAverage(data.omegay), 3)},
+        .ylabels = {"ipc", "ipc PolynomialFit"},
         .xlabel = "latitude [deg]",
         .ylabel = "average omega x [deg/day]",
     });

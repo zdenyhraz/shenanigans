@@ -113,7 +113,6 @@ using namespace pybind11::literals;
 #include "Log/Log.hpp"
 #include "Log/LogFunction.hpp"
 
-#include "Math/Math.hpp"
 #include "Math/Functions.hpp"
 #include "Math/Transform.hpp"
 #include "Math/Statistics.hpp"

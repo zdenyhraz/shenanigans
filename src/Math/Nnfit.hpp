@@ -1,6 +1,6 @@
 #pragma once
 
-inline i32 findNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
+inline i32 FindNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
 {
   i32 idx = 0;
   f64 mindist = std::numeric_limits<f64>::max();
@@ -17,7 +17,7 @@ inline i32 findNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Poi
   return idx;
 }
 
-inline cv::Mat nnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt)
+inline cv::Mat NearestNeighborFit(const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt)
 {
   cv::Mat out = cv::Mat::zeros(ycnt, xcnt, CV_32F);
   for (i32 r = 0; r < out.rows; r++)
@@ -27,13 +27,13 @@ inline cv::Mat nnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64>
       f64 x = xmin + ((f32)c / (out.cols - 1)) * (xmax - xmin);
       f64 y = ymin + ((f32)r / (out.rows - 1)) * (ymax - ymin);
       cv::Point2f pt(x, y);
-      out.at<f32>(r, c) = zdata[findNearestNeighborIndex(pts, pt)];
+      out.at<f32>(r, c) = zdata[FindNearestNeighborIndex(pts, pt)];
     }
   }
   return out;
 }
 
-inline void updateHighest(std::vector<std::pair<i32, f64>>& proxidxs, i32 idx, f64 val)
+inline void UpdateHighest(std::vector<std::pair<i32, f64>>& proxidxs, i32 idx, f64 val)
 {
   i32 maxidx = 0;
   f64 maxval = 0;
@@ -52,7 +52,8 @@ inline void updateHighest(std::vector<std::pair<i32, f64>>& proxidxs, i32 idx, f
   }
 }
 
-inline cv::Mat wnnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt, i32 proxpts = 10, f64 proxcoeff = 7)
+inline cv::Mat WeightedNearestNeighborFit(
+    const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt, i32 proxpts = 10, f64 proxcoeff = 7)
 {
   cv::Mat out = cv::Mat::zeros(ycnt, xcnt, CV_32F);
   proxpts = std::min(proxpts, (i32)pts.size());
@@ -78,7 +79,7 @@ inline cv::Mat wnnfit(const std::vector<cv::Point2f>& pts, const std::vector<f64
         if (i < static_cast<usize>(proxpts))
           proxidxs.push_back(std::make_pair(i, distance));
         else
-          updateHighest(proxidxs, i, distance);
+          UpdateHighest(proxidxs, i, distance);
       }
 
       // weighted average

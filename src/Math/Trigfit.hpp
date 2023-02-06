@@ -1,6 +1,6 @@
 #pragma once
 
-inline std::vector<f64> sin2sin4fit(const std::vector<f64>& xdata, const std::vector<f64>& ydata)
+inline std::vector<f64> TrigonometricFit(const std::vector<f64>& xdata, const std::vector<f64>& ydata)
 {
   i32 datacnt = ydata.size();
   cv::Mat X = cv::Mat::zeros(datacnt, 3, CV_32F); // matice planu
@@ -23,7 +23,7 @@ inline std::vector<f64> sin2sin4fit(const std::vector<f64>& xdata, const std::ve
   return fit;
 }
 
-inline std::vector<f64> sin2sin4fitCoeffs(const std::vector<f64>& xdata, const std::vector<f64>& ydata)
+inline std::vector<f64> TrigonometricFitCoefficients(const std::vector<f64>& xdata, const std::vector<f64>& ydata)
 {
   i32 datacnt = ydata.size();
   cv::Mat X = cv::Mat::zeros(datacnt, 3, CV_32F); // matice planu

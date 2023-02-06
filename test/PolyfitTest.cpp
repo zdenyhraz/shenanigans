@@ -12,7 +12,7 @@ TEST(PolyfitTest, Fit)
     y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
   }
 
-  const auto fy = polyfit(x, y, 2);
+  const auto fy = PolynomialFit(x, y, 2);
   ASSERT_EQ(fy.size(), n);
   for (i32 i = 0; i < n; ++i)
     ASSERT_NEAR(fy[i], y[i], 1e-5);
@@ -30,7 +30,7 @@ TEST(PolyfitTest, Coeffs)
     y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
   }
 
-  const auto fc = polyfitCoeffs(x, y, 2);
+  const auto fc = PolynomialFitCoefficients(x, y, 2);
   ASSERT_EQ(fc.size(), 3);
   ASSERT_NEAR(fc[0], c0, 1e-4);
   ASSERT_NEAR(fc[1], c1, 1e-4);
