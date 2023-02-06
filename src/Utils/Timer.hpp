@@ -1,5 +1,5 @@
 #pragma once
-#define TIMER(name) std::unique_ptr<Timer> t = std::make_unique<Timer>(name);
+#define TIMER(name) Timer timer(name);
 
 class Timer
 {

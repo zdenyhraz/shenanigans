@@ -1,4 +1,4 @@
-#include "Math/Trigfit.hpp"
+#include "Math/TrigonometricFit.hpp"
 
 TEST(TrigfitTest, Fit)
 {

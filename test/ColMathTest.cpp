@@ -1,3 +1,5 @@
+#include "Math/Statistics.hpp"
+
 TEST(ColMathTest, ColMeansOdd)
 {
   cv::Mat mat(3, 2, CV_64F);

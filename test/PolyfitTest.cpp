@@ -1,4 +1,4 @@
-#include "Math/Polyfit.hpp"
+#include "Math/PolynomialFit.hpp"
 
 TEST(PolyfitTest, Fit)
 {

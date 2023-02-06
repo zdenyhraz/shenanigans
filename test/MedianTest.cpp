@@ -1,3 +1,5 @@
+#include "Math/Statistics.hpp"
+
 TEST(MedianTest, Odd)
 {
   std::vector<i32> vec{9, 8, 5, 2, 1};

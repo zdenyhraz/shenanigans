@@ -1,7 +1,7 @@
 #pragma once
 #include "ImageRegistration/IPC.hpp"
-#include "Math/Polyfit.hpp"
-#include "Math/Trigfit.hpp"
+#include "Math/PolynomialFit.hpp"
+#include "Math/TrigonometricFit.hpp"
 #include "Utils/DataCache.hpp"
 #include "Filtering/Median.hpp"
 
