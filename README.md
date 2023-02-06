@@ -53,9 +53,6 @@ Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https
 ## Adaptive [histogram equalization](https://en.wikipedia.org/wiki/Adaptive_histogram_equalization)
 <img src="data/readme/aheq.PNG" width="100%">
 
-## Modeling of the [windowing effect](https://en.wikipedia.org/wiki/Window_function) on the [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform)
-<img src="data/readme/2DWindowDFTR.png" width="32%"> <img src="data/readme/2DImageDFT.png" width="32%">  <img src="data/readme/2DImageWindowDFT.png" width="32%">
-
 ## Profiling
 ### Profiling with [Valgrind](https://valgrind.org/) / [Callgrind](https://valgrind.org/docs/manual/cl-manual.html) / [Kcachegrind](http://kcachegrind.sourceforge.net/html/Documentation.html)
 - run `./script/perf/kcachegrind.sh`

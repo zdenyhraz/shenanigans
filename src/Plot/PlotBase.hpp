@@ -129,7 +129,9 @@ public:
     {
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
       data.z.convertTo(data.z, CV_8UC3);
-      data.colorbar = false;
+      // data.colorbar = false;
+      data.zmin = 0;
+      data.zmax = 1;
     }
 
     if (data.z.channels() == 1)
