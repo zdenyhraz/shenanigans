@@ -16,7 +16,7 @@ enum FeatureType
   SIFT,
 };
 
-struct FeatureMatchData
+struct SolarWindSpeedParameters
 {
   FeatureType ftype = SURF; // SURF
   f32 thresh = 100;         // 100/200
@@ -47,7 +47,7 @@ inline std::pair<cv::Point2f, cv::Point2f> GetFeatureMatchPoints(const cv::DMatc
   return std::make_pair(kp1[match.queryIdx].pt, kp2[match.trainIdx].pt);
 }
 
-inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const FeatureMatchData& data)
+inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const SolarWindSpeedParameters& data)
 {
   switch (data.ftype)
   {
@@ -73,7 +73,7 @@ inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::P
 }
 
 inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all,
-    const std::vector<std::vector<cv::KeyPoint>>& kp1_all, const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const FeatureMatchData& data, bool drawSpeed)
+    const std::vector<std::vector<cv::KeyPoint>>& kp1_all, const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const SolarWindSpeedParameters& data, bool drawSpeed)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -182,7 +182,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 }
 
 inline cv::Mat DrawFeatureMatchArrows(
-    const cv::Mat& img, const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& kp1, const std::vector<cv::KeyPoint>& kp2, const FeatureMatchData& data)
+    const cv::Mat& img, const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& kp1, const std::vector<cv::KeyPoint>& kp2, const SolarWindSpeedParameters& data)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -229,7 +229,7 @@ inline cv::Mat DrawFeatureMatchArrows(
   return out;
 }
 
-inline void featureMatch(const FeatureMatchData& data)
+inline void MeasureSolarWindSpeed(const SolarWindSpeedParameters& data)
 try
 {
   PROFILE_FUNCTION;
@@ -352,7 +352,7 @@ catch (const std::exception& e)
   LOG_EXCEPTION(e);
 }
 
-inline void featureMatch2pic(const FeatureMatchData& data)
+inline void featureMatch2pic(const SolarWindSpeedParameters& data)
 try
 {
   cv::Mat img1 = cv::imread(data.path1, cv::IMREAD_GRAYSCALE);

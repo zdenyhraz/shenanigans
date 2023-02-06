@@ -1,8 +1,9 @@
 #pragma once
 #include "Window.hpp"
 #include "Astrophysics/DifferentialRotation.hpp"
+#include "Astrophysics/SolarWindSpeed.hpp"
 
-class DiffrotWindow : public Window
+class AstroWindow : public Window
 {
   struct DiffrotParameters
   {
@@ -20,10 +21,11 @@ class DiffrotWindow : public Window
     std::string loadPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_month_5000/xd.json";
   };
 
-  DiffrotParameters mParameters;
-  DifferentialRotation::DifferentialRotationData mDiffrotData{
-      mParameters.xsize, mParameters.ysize, mParameters.idstep, mParameters.idstride, mParameters.thetamax, mParameters.cadence, mParameters.idstart};
+  DiffrotParameters mDiffrotParameters;
+  DifferentialRotation::DifferentialRotationData mDiffrotData{mDiffrotParameters.xsize, mDiffrotParameters.ysize, mDiffrotParameters.idstep, mDiffrotParameters.idstride,
+      mDiffrotParameters.thetamax, mDiffrotParameters.cadence, mDiffrotParameters.idstart};
   f32 mProgress = 0;
+  SolarWindSpeedParameters mSwindParameters;
 
 public:
   void Render() override;

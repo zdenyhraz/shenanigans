@@ -1,9 +1,7 @@
 #include "Application.hpp"
 #include "Gui.hpp"
 #include "Windows/IPCWindow.hpp"
-#include "Windows/IPCUtilsWindow.hpp"
-#include "Windows/DiffrotWindow.hpp"
-#include "Windows/SwindWindow.hpp"
+#include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
 
@@ -91,6 +89,18 @@ catch (...)
   LOG_UNKNOWN_EXCEPTION;
 }
 
+void Application::Initialize()
+{
+  PROFILE_FUNCTION;
+  mWindows.push_back(std::make_unique<IPCWindow>());
+  mWindows.push_back(std::make_unique<AstroWindow>());
+  mWindows.push_back(std::make_unique<RandomWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectWindow>());
+
+  for (const auto& window : mWindows)
+    window->Initialize();
+}
+
 void Application::RenderPlotMenu()
 {
   if (ImGui::BeginMenu("Plot"))
@@ -138,20 +148,6 @@ void Application::RenderThemeMenu()
 
     ImGui::EndMenu();
   }
-}
-
-void Application::Initialize()
-{
-  PROFILE_FUNCTION;
-  mWindows.push_back(std::make_unique<IPCWindow>());
-  mWindows.push_back(std::make_unique<IPCUtilsWindow>());
-  mWindows.push_back(std::make_unique<DiffrotWindow>());
-  mWindows.push_back(std::make_unique<SwindWindow>());
-  mWindows.push_back(std::make_unique<RandomWindow>());
-  mWindows.push_back(std::make_unique<ObjdetectWindow>());
-
-  for (const auto& window : mWindows)
-    window->Initialize();
 }
 
 void Application::SetWindowIcon(GLFWwindow* window)
