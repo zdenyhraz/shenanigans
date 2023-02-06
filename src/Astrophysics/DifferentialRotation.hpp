@@ -3,7 +3,7 @@
 #include "Math/PolynomialFit.hpp"
 #include "Math/TrigonometricFit.hpp"
 #include "Utils/DataCache.hpp"
-#include "Filtering/Median.hpp"
+#include "ImageProcessing/MedianBlur.hpp"
 
 class DifferentialRotation
 {

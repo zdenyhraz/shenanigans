@@ -1,7 +1,7 @@
 #include "IPCOptimization.hpp"
 #include "IPC.hpp"
 #include "Optimization/Evolution.hpp"
-#include "Filtering/Noise.hpp"
+#include "ImageProcessing/Noise.hpp"
 #include "PhaseCorrelation.hpp"
 #include "ImageRegistrationDataset.hpp"
 
@@ -108,9 +108,8 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(
   evo.SetName("IPC");
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps", "L1WIN"});
   evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0};
-  evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2.,
-      static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8, static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8,
-      1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
+  evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
+      static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
   evo.SetParameterValueToNameFunction("BP", [](f64 val) { return IPC::BandpassType2String(static_cast<IPC::BandpassType>((i32)val)); });
@@ -136,18 +135,15 @@ void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& o
   const auto ipcBefore = ipc;
   ipc = CreateIPCFromParams(ipc, optimalParameters);
 
-  LOG_SUCCESS(
-      "Final IPC BandpassType: {} -> {}", IPC::BandpassType2String(ipcBefore.GetBandpassType()), IPC::BandpassType2String(ipc.GetBandpassType()));
+  LOG_SUCCESS("Final IPC BandpassType: {} -> {}", IPC::BandpassType2String(ipcBefore.GetBandpassType()), IPC::BandpassType2String(ipc.GetBandpassType()));
   if (ipc.GetBandpassType() != IPC::BandpassType::None)
   {
     LOG_SUCCESS("Final IPC BandpassL: {:.2f} -> {:.2f}", ipcBefore.GetBandpassL(), ipc.GetBandpassL());
     LOG_SUCCESS("Final IPC BandpassH: {:.2f} -> {:.2f}", ipcBefore.GetBandpassH(), ipc.GetBandpassH());
   }
-  LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", IPC::InterpolationType2String(ipcBefore.GetInterpolationType()),
-      IPC::InterpolationType2String(ipc.GetInterpolationType()));
+  LOG_SUCCESS("Final IPC InterpolationType: {} -> {}", IPC::InterpolationType2String(ipcBefore.GetInterpolationType()), IPC::InterpolationType2String(ipc.GetInterpolationType()));
   LOG_SUCCESS("Final IPC WindowType: {} -> {}", IPC::WindowType2String(ipcBefore.GetWindowType()), IPC::WindowType2String(ipc.GetWindowType()));
-  LOG_SUCCESS(
-      "Final IPC L1WindowType: {} -> {}", IPC::L1WindowType2String(ipcBefore.GetL1WindowType()), IPC::L1WindowType2String(ipc.GetL1WindowType()));
+  LOG_SUCCESS("Final IPC L1WindowType: {} -> {}", IPC::L1WindowType2String(ipcBefore.GetL1WindowType()), IPC::L1WindowType2String(ipc.GetL1WindowType()));
   LOG_SUCCESS("Final IPC L2Usize: {} -> {}", ipcBefore.GetL2Usize(), ipc.GetL2Usize());
   LOG_SUCCESS("Final IPC L1ratio: {:.2f} -> {:.2f}", ipcBefore.GetL1ratio(), ipc.GetL1ratio());
   LOG_SUCCESS("Final IPC CPeps: {:.2e} -> {:.2e}", ipcBefore.GetCrossPowerEpsilon(), ipc.GetCrossPowerEpsilon());

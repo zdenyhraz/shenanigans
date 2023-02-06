@@ -1,4 +1,4 @@
-#include "Filtering/Median.hpp"
+#include "ImageProcessing/MedianBlur.hpp"
 
 TEST(MedianBlur, OpenCVEquality)
 {

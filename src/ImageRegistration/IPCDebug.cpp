@@ -1,6 +1,6 @@
 #include "IPCDebug.hpp"
 #include "IPC.hpp"
-#include "Filtering/Noise.hpp"
+#include "ImageProcessing/Noise.hpp"
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {

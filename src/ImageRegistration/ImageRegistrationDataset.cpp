@@ -1,6 +1,6 @@
 #include "ImageRegistrationDataset.hpp"
 #include "IPC.hpp"
-#include "Filtering/Noise.hpp"
+#include "ImageProcessing/Noise.hpp"
 
 std::vector<ImagePair> CreateImagePairs(
     const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift, cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
