@@ -1,34 +1,5 @@
 #pragma once
 
-template <typename T>
-inline consteval i32 GetMatType(i32 channels = 1)
-{
-  if constexpr (std::is_same_v<T, f32>)
-    switch (channels)
-    {
-    case 1:
-      return CV_32F;
-    case 2:
-      return CV_32FC2;
-    case 3:
-      return CV_32FC3;
-    case 4:
-      return CV_32FC4;
-    }
-  if constexpr (std::is_same_v<T, f64>)
-    switch (channels)
-    {
-    case 1:
-      return CV_64F;
-    case 2:
-      return CV_64FC2;
-    case 3:
-      return CV_64FC3;
-    case 4:
-      return CV_64FC4;
-    }
-}
-
 inline cv::Mat LoadImage(const std::filesystem::path& path)
 {
   PROFILE_FUNCTION;
