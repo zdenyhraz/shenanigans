@@ -149,7 +149,7 @@ private:
     cv::Mat xd = mat.clone();
     cv::cvtColor(xd, xd, cv::COLOR_GRAY2BGR);
     cv::circle(xd, cv::Point(mat.cols / 2, mat.rows / 2), params.R, cv::Scalar(0, 0, 65535), 5);
-    Showimg(xd, "xd");
+    Plot::Plot("xd", xd);
   }
 
   static void DebugCircles(const cv::Mat& mat, const FitsParams& params)
@@ -217,11 +217,11 @@ private:
 
     if constexpr (0) // show
     {
-      Showimg(RoiCrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100), "circleC");
-      Showimg(RoiCrop(imgc, 250, 0.5 * 4096, 500, 500), "circleL");
-      Showimg(RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500), "circleR");
-      Showimg(RoiCrop(imgc, 0.5 * 4096, 250, 500, 500), "circleT");
-      Showimg(RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), "circleB");
+      Plot::Plot("circleC", RoiCrop(imgc, 0.5 * 4096, 0.5 * 4096, 100, 100));
+      Plot::Plot("circleL", RoiCrop(imgc, 250, 0.5 * 4096, 500, 500));
+      Plot::Plot("circleR", RoiCrop(imgc, 4096 - 250, 0.5 * 4096, 500, 500));
+      Plot::Plot("circleT", RoiCrop(imgc, 0.5 * 4096, 250, 500, 500));
+      Plot::Plot("circleB", RoiCrop(imgc, 0.5 * 4096, 4096 - 250, 500, 500), );
     }
   }
 

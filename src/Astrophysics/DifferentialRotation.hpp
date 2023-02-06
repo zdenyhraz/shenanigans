@@ -1,7 +1,7 @@
 #pragma once
 #include "ImageRegistration/IPC.hpp"
-#include "Fit/Polyfit.hpp"
-#include "Fit/Trigfit.hpp"
+#include "Math/Polyfit.hpp"
+#include "Math/Trigfit.hpp"
 #include "Utils/DataCache.hpp"
 #include "Filtering/Median.hpp"
 
@@ -401,7 +401,7 @@ public:
       cv::line(imageclrz, pt1z, pt2z, colorpred, thickness, cv::LINE_AA);
     }
 
-    Showimg(imageclr, "meridian curve", false, 0, 1, 1200);
+    Plot::Plot("meridian curve", imageclr);
   }
 
   static void PlotGradualIdStep(const IPC& ipc, i32 maxstep)

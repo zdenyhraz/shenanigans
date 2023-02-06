@@ -14,7 +14,7 @@ void IPCWindow::Render()
   {
     ImGui::Separator();
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Iterative phase correlation parameters"))
+    if (ImGui::CollapsingHeader("Iterative Phase correlation parameters"))
     {
       if (ImGui::Button("Update"))
         LaunchAsync(
@@ -41,7 +41,7 @@ void IPCWindow::Render()
     }
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Iterative phase correlation utils"))
+    if (ImGui::CollapsingHeader("Iterative Phase correlation utils"))
     {
       ImGui::Text("Debug uils");
       if (ImGui::Button("DebugShift"))

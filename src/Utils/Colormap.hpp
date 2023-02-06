@@ -1,5 +1,4 @@
 #pragma once
-#include "Math.hpp"
 
 inline cv::Scalar ColormapJet(f32 x, f32 valMin = 0, f32 valMax = 1, f32 val = 255)
 {

@@ -1,5 +1,4 @@
 #pragma once
-#include "UtilsCV/Vectmat.hpp"
 
 template <typename I, typename O>
 inline void EstimateComplexity(const std::function<O(const std::vector<I>&)>& f, usize nMin = 1000, usize nMax = 10000, usize nIters = 21, usize timeIters = 3)

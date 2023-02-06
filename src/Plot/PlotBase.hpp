@@ -2,6 +2,7 @@
 #include "PlotData1D.hpp"
 #include "PlotData2D.hpp"
 #include "Utils/Singleton.hpp"
+#include "Utils/Colormap.hpp"
 
 class ImGuiPlot;
 class PyPlot;

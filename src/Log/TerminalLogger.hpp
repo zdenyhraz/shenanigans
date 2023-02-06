@@ -1,7 +1,7 @@
 #pragma once
 #include "Logger.hpp"
-#include "Utils/Utils.hpp"
 #include "Utils/Singleton.hpp"
+#include "Utils/DateTime.hpp"
 
 class TerminalLogger : public Logger
 {

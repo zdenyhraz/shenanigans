@@ -23,10 +23,10 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   cv::Mat img2W = image2.clone();
   ipc.ApplyWindow(img1W);
   ipc.ApplyWindow(img2W);
-  cv::Mat img1FT = Fourier::fft(img1W);
-  cv::Mat img2FT = Fourier::fft(img2W);
-  Fourier::fftshift(img1FT);
-  Fourier::fftshift(img2FT);
+  cv::Mat img1FT = FFT(img1W);
+  cv::Mat img2FT = FFT(img2W);
+  FFTShift(img1FT);
+  FFTShift(img2FT);
   cv::Mat img1FTm = cv::Mat(img1FT.size(), GetMatType<IPC::Float>());
   cv::Mat img2FTm = cv::Mat(img2FT.size(), GetMatType<IPC::Float>());
   for (i32 row = 0; row < img1FT.rows; ++row)
@@ -48,8 +48,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    PyPlot::Plot("image1 FT magn", img1FTm);
-    PyPlot::Plot("image2 FT magn", img2FTm);
+    PyPlot::Plot("image1 FT Magnitude", img1FTm);
+    PyPlot::Plot("image2 FT Magnitude", img2FTm);
   }
 
   cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
@@ -61,8 +61,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    PyPlot::Plot("image1 FT magn log-polar", img1FTm);
-    PyPlot::Plot("image2 FT magn log-polar", img2FTm);
+    PyPlot::Plot("image1 FT Magnitude log-polar", img1FTm);
+    PyPlot::Plot("image2 FT Magnitude log-polar", img2FTm);
 
     showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();
@@ -70,9 +70,9 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (save)
   {
-    Saveimg("../debug/image12.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
-    Saveimg("../debug/image1.png", image1, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
-    Saveimg("../debug/image2.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Plot::Plot("../debug/image12.png", ColorComposition(image1, image2));
+    Plot::Plot("../debug/image1.png", image1);
+    Plot::Plot("../debug/image2.png", image2);
   }
 
   // rotation and scale
@@ -90,8 +90,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (save)
   {
-    Saveimg("../debug/image12RS.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
-    Saveimg("../debug/image2RS.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Plot::Plot("../debug/image12RS.png", ColorComposition(image1, image2));
+    Plot::Plot("../debug/image2RS.png", image2);
   }
 
   // translation
@@ -103,14 +103,14 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   {
     cv::hconcat(showImageC, ColorComposition(image1, image2), showImageC);
     cv::hconcat(showImage2, image2, showImage2);
-    Showimg(showImageC, "Align process color composition");
-    Showimg(showImage2, "Align process image2");
+    Plot::Plot("Align process color composition", showImageC);
+    Plot::Plot("Align process image2", showImage2);
   }
 
   if constexpr (save)
   {
-    Saveimg("../debug/image12RSXY.png", ColorComposition(image1, image2), false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
-    Saveimg("../debug/image2RSXY.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Plot::Plot("../debug/image12RSXY.png", ColorComposition(image1, image2));
+    Plot::Plot("../debug/image2RSXY.png", image2);
   }
 
   if constexpr (debugMode or save)

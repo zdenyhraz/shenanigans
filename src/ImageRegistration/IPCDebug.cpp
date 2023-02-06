@@ -1,7 +1,6 @@
 #include "IPCDebug.hpp"
 #include "IPC.hpp"
 #include "Filtering/Noise.hpp"
-#include "UtilsCV/Vectmat.hpp"
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
@@ -12,20 +11,20 @@ void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv:
 void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const cv::Mat& dft2)
 {
   auto plot1 = dft1.clone();
-  Fourier::fftshift(plot1);
-  PyPlot::Plot(fmt::format("{} DFT1lm", ipc.mDebugName), Fourier::logmagn(plot1));
-  PyPlot::Plot(fmt::format("{} DFT1p", ipc.mDebugName), Fourier::phase(plot1));
+  FFTShift(plot1);
+  PyPlot::Plot(fmt::format("{} DFT1lm", ipc.mDebugName), LogMagnitude(plot1));
+  PyPlot::Plot(fmt::format("{} DFT1p", ipc.mDebugName), Phase(plot1));
 
   auto plot2 = dft2.clone();
-  Fourier::fftshift(plot2);
-  PyPlot::Plot(fmt::format("{} DFT2lm", ipc.mDebugName), Fourier::logmagn(plot2));
-  PyPlot::Plot(fmt::format("{} DFT2p", ipc.mDebugName), Fourier::phase(plot2));
+  FFTShift(plot2);
+  PyPlot::Plot(fmt::format("{} DFT2lm", ipc.mDebugName), LogMagnitude(plot2));
+  PyPlot::Plot(fmt::format("{} DFT2p", ipc.mDebugName), Phase(plot2));
 }
 
 void IPCDebug::DebugCrossPowerSpectrum(const IPC& ipc, const cv::Mat& crosspower)
 {
-  PyPlot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), Fourier::fftshift(Fourier::magn(crosspower)));
-  PyPlot::Plot(fmt::format("{} CP phase", ipc.mDebugName), Fourier::fftshift(Fourier::phase(crosspower)));
+  PyPlot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), FFTShift(Magnitude(crosspower)));
+  PyPlot::Plot(fmt::format("{} CP Phase", ipc.mDebugName), FFTShift(Phase(crosspower)));
 }
 
 void IPCDebug::DebugL3(const IPC& ipc, const cv::Mat& L3)
@@ -151,12 +150,12 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     Shift(image, -shift);
     cv::Mat image1 = image.clone();
     // AddNoise<IPC::Float>(image1, 0.05);
-    Saveimg("../debug/shapes/shape1.png", image1);
+    Plot::Plot("../debug/shapes/shape1.png", image1);
     Shift(image, 1.5 * shift);
     Rotate(image, rotation, scale);
     cv::Mat image2 = image.clone();
     // AddNoise<IPC::Float>(image2, 0.05);
-    Saveimg("../debug/shapes/shape2.png", image2);
+    Plot::Plot("../debug/shapes/shape2.png", image2);
     return;
   }
 
@@ -205,8 +204,8 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
 
   if constexpr (save)
   {
-    Saveimg("../debug/input1.png", image1, false, image1.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
-    Saveimg("../debug/input2.png", image2, false, image2.rows >= 256 ? cv::Size(0, 0) : cv::Size(1024, 1024));
+    Plot::Plot("../debug/input1.png", image1);
+    Plot::Plot("../debug/input2.png", image2);
   }
 
   AddNoise<IPC::Float>(image1, noiseStdev);
@@ -262,7 +261,7 @@ void IPCDebug::DebugWindow(const IPC& ipc)
   cv::copyMakeBorder(r0, r0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
   // Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(r0), GetMidRow(w0)}, "1DWindows", "x", "window", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
-  // + "/1DWindows.png"); Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(Fourier::fftlogmagn(r0)), GetMidRow(Fourier::fftlogmagn(w0))},
+  // + "/1DWindows.png"); Plot1D::Plot(GetIota(w0.cols, 1), {GetMidRow(FFTLogMagnitude(r0)), GetMidRow(FFTLogMagnitude(w0))},
   // "1DWindowsDFT", "fx", "log DFT", {"cv::Rect", "Hann"}, Plot::pens, mDebugDirectory
   // +
   // "/1DWindowsDFT.png");
@@ -273,11 +272,11 @@ void IPCDebug::DebugWindow(const IPC& ipc)
   // Plot2D::SetSavePath("IPCdebug2D", mDebugDirectory + "/2DImageWindow.png");
   // Plot2D::Plot("IPCdebug2D", imgw);
 
-  // Plot2D::Plot(Fourier::fftlogmagn(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
-  // Plot2D::Plot(Fourier::fftlogmagn(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
+  // Plot2D::Plot(FFTLogMagnitude(r0), "2DWindowDFTR", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTR.png");
+  // Plot2D::Plot(FFTLogMagnitude(w0), "2DWindowDFTH", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindowDFTH.png");
   // Plot2D::Plot(w, "2DWindow", "x", "y", "window", 0, 1, 0, 1, 0, mDebugDirectory + "/2DWindow.png");
-  // Plot2D::Plot(Fourier::fftlogmagn(img), "2DImageDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
-  // Plot2D::Plot(Fourier::fftlogmagn(imgw), "2DImageWindowDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
+  // Plot2D::Plot(FFTLogMagnitude(img), "2DImageDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageDFT.png");
+  // Plot2D::Plot(FFTLogMagnitude(imgw), "2DImageWindowDFT", "fx", "fy", "log DFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DImageWindowDFT.png");
 }
 
 void IPCDebug::DebugBandpass(const IPC& ipc)
@@ -307,20 +306,20 @@ void IPCDebug::DebugBandpass(const IPC& ipc)
   cv::copyMakeBorder(bpG, bpG0, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar::all(0));
 
   // Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(bpR0), GetMidRow(bpG0)}, "b0", "x", "filter", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
-  // + "/1DBandpass.png"); Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(Fourier::ifftlogmagn(bpR0)), GetMidRow(Fourier::ifftlogmagn(bpG0))}, "b1",
+  // + "/1DBandpass.png"); Plot1D::Plot(GetIota(bpR0.cols, 1), {GetMidRow(IFFTLogMagnitude(bpR0)), GetMidRow(IFFTLogMagnitude(bpG0))}, "b1",
   // "fx", "log IDFT", {"cv::Rect", "Gauss"}, Plot::pens, mDebugDirectory
   // +
   // "/1DBandpassIDFT.png"); Plot2D::Plot(bpR, "b2", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassR.png"); Plot2D::Plot(bpG,
-  // "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png"); Plot2D::Plot(Fourier::ifftlogmagn(bpR0, 10), "b4", "fx", "fy",
-  // "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png"); Plot2D::Plot(Fourier::ifftlogmagn(bpG0, 10), "b5", "fx", "fy", "log
+  // "b3", "x", "y", "filter", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassG.png"); Plot2D::Plot(IFFTLogMagnitude(bpR0, 10), "b4", "fx", "fy",
+  // "log IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassRIDFT.png"); Plot2D::Plot(IFFTLogMagnitude(bpG0, 10), "b5", "fx", "fy", "log
   // IDFT", 0, 1, 0, 1, 0, mDebugDirectory + "/2DBandpassGIDFT.png");
 }
 
 void IPCDebug::DebugBandpassRinging(const IPC& ipc)
 {
   cv::Mat img = RoiCrop(LoadUnitFloatImage<IPC::Float>("../data/test.png"), 4098 / 2, 4098 / 2, ipc.mCols, ipc.mRows);
-  cv::Mat fftR = Fourier::fft(img);
-  cv::Mat fftG = Fourier::fft(img);
+  cv::Mat fftR = FFT(img);
+  cv::Mat fftG = FFT(img);
   cv::Mat filterR = cv::Mat(img.size(), GetMatType<IPC::Float>());
   cv::Mat filterG = cv::Mat(img.size(), GetMatType<IPC::Float>());
 
@@ -339,17 +338,17 @@ void IPCDebug::DebugBandpassRinging(const IPC& ipc)
     }
   }
 
-  Fourier::ifftshift(filterR);
-  Fourier::ifftshift(filterG);
+  IFFTShift(filterR);
+  IFFTShift(filterG);
 
-  cv::Mat filterRc = Fourier::dupchansc(filterR);
-  cv::Mat filterGc = Fourier::dupchansc(filterG);
+  cv::Mat filterRc = DuplicateChannelsCopy(filterR);
+  cv::Mat filterGc = DuplicateChannelsCopy(filterG);
 
   cv::multiply(fftR, filterRc, fftR);
   cv::multiply(fftG, filterGc, fftG);
 
-  cv::Mat imgfR = Fourier::ifft(fftR);
-  cv::Mat imgfG = Fourier::ifft(fftG);
+  cv::Mat imgfR = IFFT(fftR);
+  cv::Mat imgfG = IFFT(fftG);
 
   cv::normalize(imgfR, imgfR, 0.0, 1.0, cv::NORM_MINMAX);
   cv::normalize(imgfG, imgfG, 0.0, 1.0, cv::NORM_MINMAX);

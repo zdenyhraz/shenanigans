@@ -5,6 +5,18 @@
 #include "Windows/RandomWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
 
+void Application::Initialize()
+{
+  PROFILE_FUNCTION;
+  mWindows.push_back(std::make_unique<IPCWindow>());
+  mWindows.push_back(std::make_unique<AstroWindow>());
+  mWindows.push_back(std::make_unique<RandomWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectWindow>());
+
+  for (const auto& window : mWindows)
+    window->Initialize();
+}
+
 void Application::Run()
 {
   static constexpr bool hiddenWindow = true;
@@ -87,18 +99,6 @@ catch (const std::exception& e)
 catch (...)
 {
   LOG_UNKNOWN_EXCEPTION;
-}
-
-void Application::Initialize()
-{
-  PROFILE_FUNCTION;
-  mWindows.push_back(std::make_unique<IPCWindow>());
-  mWindows.push_back(std::make_unique<AstroWindow>());
-  mWindows.push_back(std::make_unique<RandomWindow>());
-  mWindows.push_back(std::make_unique<ObjdetectWindow>());
-
-  for (const auto& window : mWindows)
-    window->Initialize();
 }
 
 void Application::RenderPlotMenu()

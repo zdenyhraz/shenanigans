@@ -1,4 +1,4 @@
-#include "Fit/Trigfit.hpp"
+#include "Math/Trigfit.hpp"
 
 TEST(TrigfitTest, Fit)
 {

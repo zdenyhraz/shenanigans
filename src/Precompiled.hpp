@@ -99,10 +99,10 @@ using i32 = int32_t;
 using u32 = uint32_t;
 using i64 = int64_t;
 using u64 = uint64_t;
+using usize = size_t;
 using f32 = float;
 using f64 = double;
 using f128 = long double;
-using usize = size_t;
 
 namespace py = pybind11;
 namespace json = nlohmann;
@@ -113,20 +113,22 @@ using namespace pybind11::literals;
 #include "Log/Log.hpp"
 #include "Log/LogFunction.hpp"
 
-#include "Utils/Utils.hpp"
+#include "Math/Math.hpp"
+#include "Math/Functions.hpp"
+#include "Math/Transform.hpp"
+#include "Math/Statistics.hpp"
+
+#include "Utils/DateTime.hpp"
+#include "Utils/Operators.hpp"
+#include "Utils/Filesystem.hpp"
 #include "Utils/Timer.hpp"
 #include "Utils/Formatters.hpp"
 #include "Utils/Random.hpp"
-#include "Utils/Math.hpp"
 #include "Utils/ThreadUtils.hpp"
-#include "UtilsCV/Utils.hpp"
-#include "UtilsCV/Crop.hpp"
-#include "UtilsCV/Draw.hpp"
-#include "UtilsCV/Showsave.hpp"
-#include "UtilsCV/Formatters.hpp"
-#include "UtilsCV/Load.hpp"
-#include "UtilsCV/Math.hpp"
-#include "UtilsCV/Transform.hpp"
+#include "Utils/Crop.hpp"
+#include "Utils/Draw.hpp"
+#include "Utils/Load.hpp"
+#include "Utils/Vectmat.hpp"
 
 #include "Plot/Plot.hpp"
 #include "Plot/PyPlot.hpp"

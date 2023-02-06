@@ -2,6 +2,7 @@
 #include "Logger.hpp"
 #include "TerminalLogger.hpp"
 #include "Utils/Singleton.hpp"
+#include "Utils/DateTime.hpp"
 
 class ImGuiLogger : public Logger
 {

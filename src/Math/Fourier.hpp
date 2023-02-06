@@ -1,22 +1,20 @@
 #pragma once
 
-namespace Fourier
-{
-inline cv::Mat fft(cv::Mat&& img)
+inline cv::Mat FFT(cv::Mat&& img)
 {
   PROFILE_FUNCTION;
   cv::dft(img, img, cv::DFT_COMPLEX_OUTPUT);
   return img;
 }
 
-inline cv::Mat ifft(cv::Mat&& fft)
+inline cv::Mat IFFT(cv::Mat&& FFT)
 {
   PROFILE_FUNCTION;
-  cv::dft(fft, fft, cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
-  return fft;
+  cv::dft(FFT, FFT, cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
+  return FFT;
 }
 
-inline cv::Mat gpufft(cv::Mat&& img)
+inline cv::Mat GPUFFT(cv::Mat&& img)
 {
   PROFILE_FUNCTION;
   /*
@@ -28,39 +26,39 @@ inline cv::Mat gpufft(cv::Mat&& img)
   return img;
 }
 
-inline cv::Mat gpuifft(cv::Mat&& fft)
+inline cv::Mat GPUIFFT(cv::Mat&& FFT)
 {
   PROFILE_FUNCTION;
   /*
   cv::cuda::GpuMat fftGpu;
-  fftGpu.upload(fft);
+  fftGpu.upload(FFT);
   cv::cuda::dft(fftGpu, fftGpu, fftGpu.size(), cv::DFT_INVERSE | cv::DFT_SCALE | cv::DFT_REAL_OUTPUT);
-  fftGpu.download(fft);
+  fftGpu.download(FFT);
   */
-  return fft;
+  return FFT;
 }
 
-inline cv::Mat fft(cv::Mat& img)
+inline cv::Mat FFT(cv::Mat& img)
 {
-  return fft(img.clone());
+  return FFT(img.clone());
 }
 
-inline cv::Mat ifft(cv::Mat& fft)
+inline cv::Mat IFFT(cv::Mat& FFT)
 {
-  return ifft(fft.clone());
+  return IFFT(FFT.clone());
 }
 
-inline cv::Mat gpufft(cv::Mat& img)
+inline cv::Mat GPUFFT(cv::Mat& img)
 {
-  return gpufft(img.clone());
+  return GPUFFT(img.clone());
 }
 
-inline cv::Mat gpuifft(cv::Mat& fft)
+inline cv::Mat GPUIFFT(cv::Mat& FFT)
 {
-  return gpuifft(fft.clone());
+  return GPUIFFT(FFT.clone());
 }
 
-inline void fftshift(cv::Mat& mat)
+inline void FFTShift(cv::Mat& mat)
 {
   PROFILE_FUNCTION;
   i32 cx = mat.cols / 2;
@@ -79,13 +77,13 @@ inline void fftshift(cv::Mat& mat)
   tmp.copyTo(q2);
 }
 
-inline cv::Mat fftshift(cv::Mat&& mat)
+inline cv::Mat FFTShift(cv::Mat&& mat)
 {
-  fftshift(mat);
+  FFTShift(mat);
   return mat;
 }
 
-inline void ifftshift(cv::Mat& mat)
+inline void IFFTShift(cv::Mat& mat)
 {
   PROFILE_FUNCTION;
   i32 cx = mat.cols / 2;
@@ -104,7 +102,7 @@ inline void ifftshift(cv::Mat& mat)
   tmp.copyTo(q1);
 }
 
-inline cv::Mat dupchansc(const cv::Mat& img)
+inline cv::Mat DuplicateChannelsCopy(const cv::Mat& img)
 {
   cv::Mat out;
   cv::Mat planes[] = {img, img};
@@ -112,7 +110,7 @@ inline cv::Mat dupchansc(const cv::Mat& img)
   return out;
 }
 
-inline cv::Mat dupchansz(const cv::Mat& img)
+inline cv::Mat DuplicateChannelsZero(const cv::Mat& img)
 {
   cv::Mat out;
   cv::Mat planes[] = {img, cv::Mat::zeros(img.size(), CV_32F)};
@@ -120,7 +118,7 @@ inline cv::Mat dupchansz(const cv::Mat& img)
   return out;
 }
 
-inline cv::Mat logmagn(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat LogMagnitude(const cv::Mat& img, i32 logs = 1)
 {
   PROFILE_FUNCTION;
   cv::Mat mag;
@@ -143,7 +141,7 @@ inline cv::Mat logmagn(const cv::Mat& img, i32 logs = 1)
   return mag;
 }
 
-inline cv::Mat magn(const cv::Mat& img)
+inline cv::Mat Magnitude(const cv::Mat& img)
 {
   PROFILE_FUNCTION;
   if (img.channels() != 2)
@@ -156,11 +154,11 @@ inline cv::Mat magn(const cv::Mat& img)
   return mgn;
 }
 
-inline cv::Mat phase(const cv::Mat& img)
+inline cv::Mat Phase(const cv::Mat& img)
 {
   PROFILE_FUNCTION;
   if (img.channels() != 2)
-    throw std::runtime_error("Need two channels for phase info");
+    throw std::runtime_error("Need two channels for Phase info");
 
   cv::Mat phs;
   cv::Mat planes[2];
@@ -169,19 +167,26 @@ inline cv::Mat phase(const cv::Mat& img)
   return phs;
 }
 
-inline cv::Mat fftlogmagn(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat FFTLogMagnitude(const cv::Mat& img, i32 logs = 1)
 {
   PROFILE_FUNCTION;
-  cv::Mat out = fft(img.clone());
-  fftshift(out);
-  return logmagn(out, logs);
+  cv::Mat out = FFT(img.clone());
+  FFTShift(out);
+  return LogMagnitude(out, logs);
 }
 
-inline cv::Mat ifftlogmagn(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat IFFTLogMagnitude(const cv::Mat& img, i32 logs = 1)
 {
   PROFILE_FUNCTION;
-  cv::Mat out = ifft(dupchansz(img));
-  fftshift(out);
-  return logmagn(out, logs);
+  cv::Mat out = IFFT(DuplicateChannelsZero(img));
+  FFTShift(out);
+  return LogMagnitude(out, logs);
 }
+
+template <typename T>
+inline cv::Mat Hanning(cv::Size size)
+{
+  cv::Mat mat;
+  cv::createHanningWindow(mat, size, GetMatType<T>());
+  return mat;
 }

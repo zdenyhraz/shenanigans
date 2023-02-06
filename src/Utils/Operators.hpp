@@ -1,17 +1,5 @@
 #pragma once
 
-template <typename T = f64>
-inline auto Zerovect(i32 N, T value = 0.)
-{
-  return std::vector<T>(N, value);
-}
-
-template <typename T = f64>
-inline auto Zerovect2(i32 N, i32 M, T value = 0.)
-{
-  return std::vector<std::vector<T>>(N, Zerovect(M, value));
-}
-
 template <typename T>
 inline std::vector<T> operator+(const std::vector<T>& vec1, const std::vector<T>& vec2)
 {
@@ -53,34 +41,4 @@ inline std::vector<T> operator*(f64 val, const std::vector<T>& vec)
   for (usize i = 0; i < vec.size(); i++)
     result[i] = val * vec[i];
   return result;
-}
-
-inline std::string GetCurrentDate()
-{
-  return fmt::format("{:%Y-%b-%d}", fmt::localtime(std::time(nullptr)));
-}
-
-inline std::string GetCurrentTime()
-{
-  return fmt::format("{:%H:%M:%S}", fmt::localtime(std::time(nullptr)));
-}
-
-template <typename T>
-inline std::vector<T> Iota(T first, usize size)
-{
-  std::vector<T> vec(size);
-  std::iota(vec.begin(), vec.end(), first);
-  return vec;
-}
-
-inline std::filesystem::path GetProjectDirectoryPath()
-{
-  std::filesystem::path path = std::filesystem::current_path();
-  for (usize trial = 0; trial < 10; ++trial)
-  {
-    if (std::filesystem::exists(path / "src"))
-      return path;
-    path = path.parent_path();
-  }
-  throw std::runtime_error("Could not find root project directory");
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Fourier/Fourier.hpp"
+#include "Math/Fourier.hpp"
 
 class PhaseCorrelation
 {
@@ -50,7 +50,7 @@ private:
   static cv::Mat CalculateFourierTransform(cv::Mat&& image)
   {
     PROFILE_FUNCTION;
-    return Fourier::fft(std::move(image));
+    return FFT(std::move(image));
   }
 
   static cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2)
@@ -76,8 +76,8 @@ private:
   static cv::Mat CalculateL3(cv::Mat&& crosspower)
   {
     PROFILE_FUNCTION;
-    cv::Mat L3 = Fourier::ifft(std::move(crosspower));
-    Fourier::fftshift(L3);
+    cv::Mat L3 = IFFT(std::move(crosspower));
+    FFTShift(L3);
     return L3;
   }
 

@@ -3,8 +3,8 @@
 
 class Application
 {
-  void Render();
   void Initialize();
+  void Render();
   void RenderPlotMenu();
   void RenderDemoMenu();
   void RenderThemeMenu();

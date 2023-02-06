@@ -283,7 +283,7 @@ try
     {
       cv::Mat img_matches;
       drawMatches(img1, keypoints1, img2, keypoints2, matches, img_matches, cv::Scalar(0, 255, 255), cv::Scalar(0, 255, 0), std::vector<char>(), cv::DrawMatchesFlags::DEFAULT);
-      Showimg(img_matches, "Good matches");
+      Plot::Plot("Good matches", img_matches);
     }
   }
 
@@ -341,11 +341,8 @@ try
   const auto arrowsIdx = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, false);
   const auto arrowsSpd = DrawFeatureMatchArrows(img_base, matches_all_serialized, keypoints1_all, keypoints2_all, data, true);
 
-  // Showimg(arrowsIdx, "Match arrows idx", false, 0, 1, 1200);
-  // Showimg(arrowsSpd, "Match arrows spd", false, 0, 1, 1200);
-
-  Saveimg("../debug/swind/arrowsIdx.png", arrowsIdx);
-  Saveimg("../debug/swind/arrowsSpd.png", arrowsSpd);
+  Plot::Plot("arrowsIdx.png", arrowsIdx);
+  Plot::Plot("arrowsSpd.png", arrowsSpd);
 }
 catch (const std::exception& e)
 {
@@ -391,8 +388,7 @@ try
   // Plot2D::Plot(img2);
 
   const auto arrows = DrawFeatureMatchArrows(img1, matches, keypoints1, keypoints2, data);
-  Showimg(arrows, "matches", false, 0, 1, 1024);
-  Saveimg("Debug/featurematch_ARR.png", arrows);
+  Plot::Plot("matches", arrows);
 }
 catch (const std::exception& e)
 {
