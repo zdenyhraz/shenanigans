@@ -18,8 +18,8 @@ void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, i32 tileGridSize, i32 
   cv::cvtColor(imageLAB, imageCLAHE, cv::COLOR_Lab2BGR);
   cv::rectangle(imageCLAHE, cv::Rect(0, 0, tileGridSize, tileGridSize), cv::Scalar(0, 0, 255), imageCLAHE.rows * 0.005);
 
-  Plot::Plot("../data/debug/UnevenIllumination/CLAHE/input.png", image);
-  Plot::Plot("../data/debug/UnevenIllumination/CLAHE/output.png", imageCLAHE);
+  Plot::Plot("../data/UnevenIllumination/CLAHE/input.png", image);
+  Plot::Plot("../data/UnevenIllumination/CLAHE/output.png", imageCLAHE);
 }
 
 void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.001)
@@ -50,5 +50,5 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
   cv::Mat result;
   cv::cvtColor(imageLAB, result, cv::COLOR_Lab2BGR);
 
-  Plot::Plot(fmt::format("../data/debug/UnevenIllumination/Homomorphic/output_{:.3f}.png", cutoff), result);
+  Plot::Plot(fmt::format("../data/UnevenIllumination/Homomorphic/output_{:.3f}.png", cutoff), result);
 }

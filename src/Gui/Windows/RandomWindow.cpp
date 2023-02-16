@@ -67,7 +67,7 @@ void RandomWindow::EvolutionOptimization(bool meta) const
 void RandomWindow::UnevenIlluminationCLAHE() const
 {
   LOG_FUNCTION;
-  auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
+  auto image = cv::imread("../data/UnevenIllumination/input.jpg");
   const auto tileGridSize = 8;
   const auto clipLimit = 1;
   CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
@@ -76,7 +76,7 @@ void RandomWindow::UnevenIlluminationCLAHE() const
 void RandomWindow::UnevenIlluminationHomomorphic() const
 {
   LOG_FUNCTION;
-  auto image = cv::imread("../data/debug/UnevenIllumination/input.jpg");
+  auto image = cv::imread("../data/UnevenIllumination/input.jpg");
   for (auto cutoff = 0.001; cutoff <= 0.02; cutoff += 0.001)
     CorrectUnevenIlluminationHomomorphic(image, cutoff);
 }

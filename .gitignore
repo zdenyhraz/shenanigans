@@ -1,6 +1,9 @@
-build
-debug
-__pycache__
+build/
+__pycache__/
+data/
+!data/apps
+!data/readme
+
 libs/libtorch
 libs/fftw
 
