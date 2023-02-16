@@ -7,7 +7,7 @@ inline cv::Mat LoadImage(const std::filesystem::path& path)
   LOG_DEBUG("Loading image {}", path.string());
   if (not std::filesystem::exists(path))
     throw std::invalid_argument(fmt::format("File {} does not exist", path.string()));
-  cv::Mat mat = cv::imread(path.string(), cv::IMREAD_ANYDEPTH);
+  cv::Mat mat = cv::imread(path.string());
   return mat;
 }
 

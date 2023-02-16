@@ -19,5 +19,8 @@ cv::Mat ToCVMat(torch::Tensor x, cv::Size size)
 
 torch::Tensor ToTensor(const cv::Mat& image)
 {
-  return torch::from_blob(image.data, {image.rows * image.cols});
+  if (image.channels() == 1)
+    return torch::from_blob(image.data, {image.rows * image.cols});
+
+  return torch::from_blob(image.data, {image.channels(), image.rows * image.cols});
 }

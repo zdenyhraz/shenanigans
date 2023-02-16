@@ -56,8 +56,32 @@ inline i32 GetNearestEven(i32 value)
 }
 
 template <typename T>
-inline consteval i32 GetMatType(i32 channels = 1)
+inline constexpr i32 GetMatType(i32 channels = 1)
 {
+  if constexpr (std::is_same_v<T, u8>)
+    switch (channels)
+    {
+    case 1:
+      return CV_8U;
+    case 2:
+      return CV_8UC2;
+    case 3:
+      return CV_8UC3;
+    case 4:
+      return CV_8UC4;
+    }
+  if constexpr (std::is_same_v<T, u16>)
+    switch (channels)
+    {
+    case 1:
+      return CV_16U;
+    case 2:
+      return CV_16UC2;
+    case 3:
+      return CV_16UC3;
+    case 4:
+      return CV_16UC4;
+    }
   if constexpr (std::is_same_v<T, f32>)
     switch (channels)
     {
@@ -82,6 +106,7 @@ inline consteval i32 GetMatType(i32 channels = 1)
     case 4:
       return CV_64FC4;
     }
+  return CV_32F;
 }
 
 template <typename T>
