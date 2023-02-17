@@ -62,6 +62,8 @@
 #include <opencv2/xfeatures2d.hpp>
 // #include <opencv2/core/cuda.hpp>
 // #include <opencv2/cudaarithm.hpp>
+#include <opencv2/dnn.hpp>
+#include <opencv2/dnn/all_layers.hpp>
 
 #ifdef ENABLE_PROFILING
   #include <Tracy.hpp>
