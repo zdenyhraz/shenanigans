@@ -1,6 +1,6 @@
 #pragma once
 
-inline void preprocess(cv::Mat& frame, cv::dnn::Net& net, cv::Size inpSize, float scale, const cv::Scalar& mean, bool swapRB)
+inline void Preprocess(cv::Mat& frame, cv::dnn::Net& net, cv::Size inpSize, float scale, const cv::Scalar& mean, bool swapRB)
 {
   static cv::Mat blob;
   if (inpSize.width <= 0)
@@ -22,7 +22,7 @@ inline void preprocess(cv::Mat& frame, cv::dnn::Net& net, cv::Size inpSize, floa
   net.setInput(blob, "", scale, mean);
 }
 
-void drawPred(int classId, float conf, int left, int top, int right, int bottom, cv::Mat& frame, const std::vector<std::string>& classes)
+void DrawPred(int classId, float conf, int left, int top, int right, int bottom, cv::Mat& frame, const std::vector<std::string>& classes)
 {
   const auto boxThickness = std::clamp(0.007 * frame.rows, 1., 100.);
   const auto fontThickness = std::clamp(0.003 * frame.rows, 1., 100.);
@@ -35,11 +35,8 @@ void drawPred(int classId, float conf, int left, int top, int right, int bottom,
   cv::rectangle(frame, cv::Point(left, top), cv::Point(right, bottom), color, boxThickness);
 
   std::string label = fmt::format("{:.2f}", conf);
-  if (!classes.empty())
-  {
-    CV_Assert(classId < (int)classes.size());
+  if (not classes.empty())
     label = classes[classId] + ": " + label;
-  }
 
   cv::Size labelSize = cv::getTextSize(label, font, fontScale, fontThickness, nullptr);
   cv::rectangle(
@@ -48,7 +45,7 @@ void drawPred(int classId, float conf, int left, int top, int right, int bottom,
       fontThickness, cv::LINE_AA);
 }
 
-void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net& net, int backend, float confThreshold, float nmsThreshold, const std::vector<std::string>& classes)
+void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net& net, int backend, float confThreshold, float nmsThreshold, const std::vector<std::string>& classes)
 {
   static std::vector<int> outLayers = net.getUnconnectedOutLayers();
   static std::string outLayerType = net.getLayer(outLayers[0])->type;
@@ -61,7 +58,6 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
     // Network produces output blob with a shape 1x1xNx7 where N is a number of
     // detections and an every detection is a vector of values
     // [batchId, classId, confidence, left, top, right, bottom]
-    CV_Assert(outs.size() > 0);
     for (size_t k = 0; k < outs.size(); k++)
     {
       float* data = (float*)outs[k].data;
@@ -70,22 +66,22 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
         float confidence = data[i + 2];
         if (confidence > confThreshold)
         {
-          int left = (int)data[i + 3];
-          int top = (int)data[i + 4];
-          int right = (int)data[i + 5];
-          int bottom = (int)data[i + 6];
+          int left = data[i + 3];
+          int top = data[i + 4];
+          int right = data[i + 5];
+          int bottom = data[i + 6];
           int width = right - left + 1;
           int height = bottom - top + 1;
           if (width <= 2 || height <= 2)
           {
-            left = (int)(data[i + 3] * frame.cols);
-            top = (int)(data[i + 4] * frame.rows);
-            right = (int)(data[i + 5] * frame.cols);
-            bottom = (int)(data[i + 6] * frame.rows);
+            left = data[i + 3] * frame.cols;
+            top = data[i + 4] * frame.rows;
+            right = data[i + 5] * frame.cols;
+            bottom = data[i + 6] * frame.rows;
             width = right - left + 1;
             height = bottom - top + 1;
           }
-          classIds.push_back((int)(data[i + 1]) - 1); // Skip 0th background class id.
+          classIds.push_back(data[i + 1] - 1); // Skip 0th background class id.
           boxes.push_back(cv::Rect(left, top, width, height));
           confidences.push_back(confidence);
         }
@@ -99,7 +95,7 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
       // Network produces output blob with a shape NxC where N is a number of
       // detected objects and C is a number of classes + 4 where the first 4
       // numbers are [center_x, center_y, width, height]
-      float* data = (float*)outs[i].data;
+      float* data = std::bit_cast<float*>(outs[i].data);
       for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
       {
         cv::Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
@@ -108,10 +104,10 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
         cv::minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
         if (confidence > confThreshold)
         {
-          int centerX = (int)(data[0] * frame.cols);
-          int centerY = (int)(data[1] * frame.rows);
-          int width = (int)(data[2] * frame.cols);
-          int height = (int)(data[3] * frame.rows);
+          int centerX = data[0] * frame.cols;
+          int centerY = data[1] * frame.rows;
+          int width = data[2] * frame.cols;
+          int height = data[3] * frame.rows;
           int left = centerX - width / 2;
           int top = centerY - height / 2;
 
@@ -127,16 +123,13 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
 
   // NMS is used inside Region layer only on DNN_BACKEND_OPENCV for another backends we need NMS in sample
   // or NMS is required if number of outputs > 1
-  if (outLayers.size() > 1 || (outLayerType == "Region" && backend != cv::dnn::DNN_BACKEND_OPENCV))
+  if (outLayers.size() > 1 or (outLayerType == "Region" and backend != cv::dnn::DNN_BACKEND_OPENCV))
   {
     std::map<int, std::vector<size_t>> class2indices;
     for (size_t i = 0; i < classIds.size(); i++)
-    {
       if (confidences[i] >= confThreshold)
-      {
         class2indices[classIds[i]].push_back(i);
-      }
-    }
+
     std::vector<cv::Rect> nmsBoxes;
     std::vector<float> nmsConfidences;
     std::vector<int> nmsClassIds;
@@ -168,7 +161,7 @@ void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
   for (size_t idx = 0; idx < boxes.size(); ++idx)
   {
     cv::Rect box = boxes[idx];
-    drawPred(classIds[idx], confidences[idx], box.x, box.y, box.x + box.width, box.y + box.height, frame, classes);
+    DrawPred(classIds[idx], confidences[idx], box.x, box.y, box.x + box.width, box.y + box.height, frame, classes);
   }
 }
 
@@ -198,10 +191,10 @@ void DetectObjectsYOLOv3CV(const cv::Mat& image, const std::filesystem::path& mo
   std::vector<cv::String> outNames = net.getUnconnectedOutLayersNames();
 
   cv::Mat frame = image.clone();
-  preprocess(frame, net, inputSize, scale, mean, swapRB);
+  Preprocess(frame, net, inputSize, scale, mean, swapRB);
   std::vector<cv::Mat> outs;
   net.forward(outs, outNames);
-  postprocess(frame, outs, net, backend, confThreshold, nmsThreshold, classes);
+  Postprocess(frame, outs, net, backend, confThreshold, nmsThreshold, classes);
 
   Plot::Plot("objects DNN", frame);
 }
