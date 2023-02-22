@@ -1,4 +1,5 @@
 #pragma once
+#include "Draw.hpp"
 
 inline void Preprocess(cv::Mat& frame, cv::dnn::Net& net, cv::Size inpSize, float scale, const cv::Scalar& mean, bool swapRB)
 {
@@ -20,29 +21,6 @@ inline void Preprocess(cv::Mat& frame, cv::dnn::Net& net, cv::Size inpSize, floa
   cv::dnn::blobFromImage(frame, blob, 1.0, inpSize, cv::Scalar(), swapRB, false, CV_8U);
 
   net.setInput(blob, "", scale, mean);
-}
-
-void DrawPred(int classId, float conf, int left, int top, int right, int bottom, cv::Mat& frame, const std::vector<std::string>& classes)
-{
-  const auto boxThickness = std::clamp(0.007 * frame.rows, 1., 100.);
-  const auto fontThickness = std::clamp(0.003 * frame.rows, 1., 100.);
-  const auto color = cv::Scalar(Random::Rand<i32>(100, 255), Random::Rand<i32>(100, 255), Random::Rand<i32>(100, 255));
-  const f64 fontScale = 1.5 * frame.rows / 1600;
-  const auto font = cv::FONT_HERSHEY_SIMPLEX;
-  const f64 labelPaddingX = 0.2;
-  const f64 labelPaddingY = 0.5;
-
-  cv::rectangle(frame, cv::Point(left, top), cv::Point(right, bottom), color, boxThickness);
-
-  std::string label = fmt::format("{:.2f}", conf);
-  if (not classes.empty())
-    label = classes[classId] + ": " + label;
-
-  cv::Size labelSize = cv::getTextSize(label, font, fontScale, fontThickness, nullptr);
-  cv::rectangle(
-      frame, cv::Point(left - 0.5 * boxThickness, top - labelSize.height * (1. + labelPaddingY)), cv::Point(left + labelSize.width * (1. + labelPaddingX), top), color, cv::FILLED);
-  cv::putText(frame, label, cv::Point(left + 0.5 * labelPaddingX * labelSize.width, top - 0.5 * labelPaddingY * labelSize.height), font, fontScale, cv::Scalar::all(0),
-      fontThickness, cv::LINE_AA);
 }
 
 void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net& net, int backend, float confThreshold, float nmsThreshold, const std::vector<std::string>& classes)
@@ -159,10 +137,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
   }
 
   for (size_t idx = 0; idx < boxes.size(); ++idx)
-  {
-    cv::Rect box = boxes[idx];
-    DrawPred(classIds[idx], confidences[idx], box.x, box.y, box.x + box.width, box.y + box.height, frame, classes);
-  }
+    DrawPrediction(frame, boxes[idx], classes[classIds[idx]], confidences[idx]);
 }
 
 void DetectObjectsYOLOv3CV(const cv::Mat& image, const std::filesystem::path& modelPath, const std::filesystem::path& configPath, const std::string& framework,
@@ -196,5 +171,5 @@ void DetectObjectsYOLOv3CV(const cv::Mat& image, const std::filesystem::path& mo
   net.forward(outs, outNames);
   Postprocess(frame, outs, net, backend, confThreshold, nmsThreshold, classes);
 
-  Plot::Plot("objects DNN", frame);
+  Plot::Plot("YOLOv3CV objects", frame);
 }

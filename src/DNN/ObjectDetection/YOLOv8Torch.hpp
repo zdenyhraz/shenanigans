@@ -1,4 +1,5 @@
 #pragma once
+#include "Draw.hpp"
 
 cv::Mat RGB2BGR(const cv::Mat& rgb)
 {
@@ -7,7 +8,7 @@ cv::Mat RGB2BGR(const cv::Mat& rgb)
   return bgr;
 }
 
-void DetectObjectsYOLOv8(const cv::Mat& image, const std::filesystem::path& networkPath, f32 confidenceThreshold)
+void DetectObjectsYOLOv8Torch(const cv::Mat& image, const std::filesystem::path& networkPath, f32 confidenceThreshold)
 {
   LOG_FUNCTION;
   LOG_DEBUG("Loading network {}", networkPath.string());
@@ -68,18 +69,13 @@ void DetectObjectsYOLOv8(const cv::Mat& image, const std::filesystem::path& netw
       const i32 y = outputTensor[0][1][i].item<f32>();
       const i32 w = outputTensor[0][2][i].item<f32>();
       const i32 h = outputTensor[0][3][i].item<f32>();
-      const f32 conf = outputTensor[0][4][i].item<f32>();
+      const f32 confidence = outputTensor[0][4][i].item<f32>();
 
-      if (conf < confidenceThreshold)
+      if (confidence < confidenceThreshold)
         continue;
 
-      LOG_DEBUG("Object {} xywh: [{},{},{},{}] conf: {}", i, x, y, w, h, conf);
-
-      cv::Rect rect(x, y, w, h);
-      cv::Scalar color(1, 0, 0);
-
-      cv::rectangle(inputCV, rect, color);
+      DrawPrediction(inputCV, cv::Rect(x, y, w, h), "xddd", confidence);
     }
-    Plot::Plot("output", RGB2BGR(inputCV));
+    Plot::Plot("YOLOv8Torch objects", RGB2BGR(inputCV));
   }
 }

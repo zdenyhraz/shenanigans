@@ -1,4 +1,5 @@
 #pragma once
+#include "Draw.hpp"
 
 struct Detection
 {
@@ -9,10 +10,9 @@ struct Detection
   cv::Rect box{};
 };
 
-void DetectObjectsYOLOv8CV(const cv::Mat& input, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath)
+void DetectObjectsYOLOv8CV(const cv::Mat& input, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, float confidenceThreshold)
 {
   cv::Size2f modelShape{640, 640};
-  float modelConfidenseThreshold{0.25};
   float modelScoreThreshold{0.45};
   float modelNMSThreshold{0.50};
 
@@ -97,7 +97,7 @@ void DetectObjectsYOLOv8CV(const cv::Mat& input, const std::filesystem::path& mo
     {
       float confidence = data[4];
 
-      if (confidence >= modelConfidenseThreshold)
+      if (confidence >= confidenceThreshold)
       {
         float* classes_scores = data + 5;
 
@@ -154,5 +154,8 @@ void DetectObjectsYOLOv8CV(const cv::Mat& input, const std::filesystem::path& mo
     detections.push_back(result);
   }
 
-  // return detections;
+  for (const auto& detection : detections)
+    DrawPrediction(modelInput, detection.box, detection.className, detection.confidence);
+
+  Plot::Plot("YOLOv8CV objects", modelInput);
 }
