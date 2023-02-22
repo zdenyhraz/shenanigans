@@ -95,7 +95,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
       // Network produces output blob with a shape NxC where N is a number of
       // detected objects and C is a number of classes + 4 where the first 4
       // numbers are [center_x, center_y, width, height]
-      float* data = std::bit_cast<float*>(outs[i].data);
+      float* data = reinterpret_cast<float*>(outs[i].data);
       for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
       {
         cv::Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
