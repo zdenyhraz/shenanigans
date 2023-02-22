@@ -1,7 +1,7 @@
 #pragma once
 #include "Formatters.hpp"
 
-template <typename T>
+template <typename T = f32>
 inline std::vector<T> ToStdVector(torch::Tensor x)
 {
   std::vector<f32> xvec(x.data_ptr<f32>(), x.data_ptr<f32>() + x.numel());

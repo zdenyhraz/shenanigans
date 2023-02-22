@@ -13,11 +13,11 @@ void DrawPrediction(cv::Mat& frame, cv::Rect rect, std::string_view classname, f
 
   cv::rectangle(frame, rect, color, boxThickness);
 
-  std::string label = fmt::format("{}: {:.2f}", classname, confidence);
+  std::string label = fmt::format("{}: {:.1f}%", classname, confidence * 100);
   cv::Size labelSize = cv::getTextSize(label, font, fontScale, fontThickness, nullptr);
   cv::rectangle(frame, cv::Point(rect.tl().x - 0.5 * boxThickness, rect.tl().y - labelSize.height * (1. + labelPaddingY)),
       cv::Point(rect.tl().x + labelSize.width * (1. + labelPaddingX), rect.tl().y), color, cv::FILLED);
   cv::putText(frame, label, cv::Point(rect.tl().x + 0.5 * labelPaddingX * labelSize.width, rect.tl().y - 0.5 * labelPaddingY * labelSize.height), font, fontScale,
       cv::Scalar::all(0), fontThickness, cv::LINE_AA);
-  LOG_DEBUG("Detection: {} ({:.3f})", classname, confidence);
+  LOG_DEBUG("Detection: {} ({:.1f}%) xywh: [{},{},{},{}]", classname, confidence * 100, rect.x, rect.y, rect.width, rect.height);
 }
