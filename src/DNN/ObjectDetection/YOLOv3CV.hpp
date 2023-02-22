@@ -60,7 +60,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
     // [batchId, classId, confidence, left, top, right, bottom]
     for (size_t k = 0; k < outs.size(); k++)
     {
-      float* data = (float*)outs[k].data;
+      float* data = reinterpret_cast<float*>(outs[k].data);
       for (size_t i = 0; i < outs[k].total(); i += 7)
       {
         float confidence = data[i + 2];
@@ -112,7 +112,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
           int top = centerY - height / 2;
 
           classIds.push_back(classIdPoint.x);
-          confidences.push_back((float)confidence);
+          confidences.push_back(confidence);
           boxes.push_back(cv::Rect(left, top, width, height));
         }
       }
