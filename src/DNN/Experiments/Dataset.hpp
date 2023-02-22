@@ -1,5 +1,4 @@
 #pragma once
-#include "Utils.hpp"
 
 class Dataset : public torch::data::Dataset<Dataset>
 {

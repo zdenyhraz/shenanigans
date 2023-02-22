@@ -132,6 +132,7 @@ using namespace pybind11::literals;
 #include "Utils/Draw.hpp"
 #include "Utils/Load.hpp"
 #include "Utils/Vectmat.hpp"
+#include "Utils/DNNUtils.hpp"
 
 #include "Plot/Plot.hpp"
 #include "Plot/PyPlot.hpp"
