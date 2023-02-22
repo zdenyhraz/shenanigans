@@ -1,12 +1,12 @@
 #pragma once
 
-inline std::filesystem::path GetProjectDirectoryPath()
+inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath = "")
 {
   std::filesystem::path path = std::filesystem::current_path();
   for (usize trial = 0; trial < 10; ++trial)
   {
     if (std::filesystem::exists(path / "src"))
-      return path;
+      return relpath.empty() ? path : path / relpath;
     path = path.parent_path();
   }
   throw std::runtime_error("Could not find root project directory");
