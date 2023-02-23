@@ -1,6 +1,14 @@
 #pragma once
 #include "Draw.hpp"
 
+struct ObjectDetection
+{
+  cv::Rect box;
+  f32 confidence;
+  i32 classid;
+  std::string className;
+};
+
 std::vector<std::string> LoadClassNames(const std::filesystem::path& classesPath)
 {
   LOG_FUNCTION;
@@ -40,15 +48,25 @@ torch::Tensor Forward(torch::jit::script::Module& model, std::vector<torch::jit:
   return model.forward(inputs).toTensor();
 }
 
-cv::Mat Postprocess(torch::Tensor& output, f32 confidenceThreshold, f32 NMSThreshold, const std::vector<std::string>& classes, cv::Point2f imageScale, const cv::Mat source)
+cv::Mat DrawDetections(const cv::Mat source, const std::vector<ObjectDetection>& objects)
+{
+  LOG_FUNCTION;
+  auto image = source.clone();
+  for (const auto& object : objects)
+    DrawPrediction(image, object.box, object.className, object.confidence);
+  return image;
+}
+
+std::vector<ObjectDetection> Postprocess(
+    torch::Tensor& output, f32 confidenceThreshold, f32 NMSThreshold, const std::vector<std::string>& classes, cv::Point2f imageScale, const cv::Mat source)
 {
   LOG_FUNCTION;
   LOG_DEBUG("Raw output tensor size: [{},{},{},{}]", output.sizes()[0], output.sizes()[1], output.sizes()[2], output.sizes()[3]);
   output = output[0].transpose(0, 1); // ignore batch dim + transpose object & box+scores dim
   LOG_DEBUG("Processed output tensor size: [{},{},{},{}]", output.sizes()[0], output.sizes()[1], output.sizes()[2], output.sizes()[3]);
-  std::vector<i32> classids;
-  std::vector<f32> confidences;
   std::vector<cv::Rect> boxes;
+  std::vector<f32> confidences;
+  std::vector<i32> classids;
   const i64 objectCount = output.sizes()[0];
   for (i64 i = 0; i < objectCount; ++i)
   {
@@ -68,18 +86,18 @@ cv::Mat Postprocess(torch::Tensor& output, f32 confidenceThreshold, f32 NMSThres
     i32 width = w * imageScale.x;
     i32 height = h * imageScale.y;
 
-    classids.push_back(classid);
-    confidences.push_back(confidence);
     boxes.push_back(cv::Rect(left, top, width, height));
+    confidences.push_back(confidence);
+    classids.push_back(classid);
   }
 
   std::vector<i32> boxesIdx;
   cv::dnn::NMSBoxes(boxes, confidences, confidenceThreshold, NMSThreshold, boxesIdx);
 
-  auto image = source.clone();
+  std::vector<ObjectDetection> objects;
   for (const auto idx : boxesIdx)
-    DrawPrediction(image, boxes[idx], classes[classids[idx]], confidences[idx]);
-  return image;
+    objects.emplace_back(boxes[idx], confidences[idx], classids[idx], classes[classids[idx]]);
+  return objects;
 }
 
 void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, f32 confidenceThreshold, f32 NMSThreshold)
@@ -91,7 +109,6 @@ void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path
   auto model = LoadModel(modelPath);
   auto inputs = Preprocess(source, modelShape);
   auto output = Forward(model, inputs);
-  const auto image = Postprocess(output, confidenceThreshold, NMSThreshold, classes, imageScale, source);
-
-  Plot::Plot("YOLOv8Torch objects", image);
+  const auto objects = Postprocess(output, confidenceThreshold, NMSThreshold, classes, imageScale, source);
+  Plot::Plot("YOLOv8Torch objects", DrawDetections(source, objects));
 }
