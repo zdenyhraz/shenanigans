@@ -29,10 +29,10 @@ class ObjdetectWindow : public Window
     }
   };
 
-  std::string modelPath = "data/DNN/yolov8/yolov8n";
+  std::string modelPath = "data/DNN/yolov8/yolov8x";
   std::string imagePath = "data/ObjectDetection/cats2.jpg";
   std::string classesPath = "data/DNN/yolov8/coco.names";
-  f32 confidenceThreshold = 0.25;
+  f32 confidenceThreshold = 0.05;
   f32 NMSThreshold = 0.5;
 
   void DetectObjectsSO() const;

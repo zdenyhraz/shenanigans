@@ -1,10 +1,8 @@
 #pragma once
 #include "Draw.hpp"
 
-void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, f32 confidenceThreshold, f32 NMSThreshold)
+std::vector<std::string> LoadClassNames(const std::filesystem::path& classesPath)
 {
-  LOG_FUNCTION;
-  cv::Size modelShape{640, 640};
   std::vector<std::string> classes;
   std::ifstream inputFile(classesPath);
   if (inputFile.is_open())
@@ -14,6 +12,14 @@ void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path
       classes.push_back(classLine);
     inputFile.close();
   }
+  return classes;
+}
+
+void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, f32 confidenceThreshold, f32 NMSThreshold)
+{
+  LOG_FUNCTION;
+  const auto modelShape = cv::Size(640, 640);
+  const auto classes = LoadClassNames(classesPath);
 
   cv::Mat image = source.clone();
   cv::Mat blob;
@@ -42,14 +48,12 @@ void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path
   outputTensor = outputTensor[0].transpose(0, 1); // ignore batch dim + transpose object & box+scores dim
   LOG_DEBUG("Processed output tensor size: [{},{},{},{}]", outputTensor.sizes()[0], outputTensor.sizes()[1], outputTensor.sizes()[2], outputTensor.sizes()[3]);
   const i64 objectCount = outputTensor.sizes()[0];
-  const i64 classCount = outputTensor.sizes()[1] - 4; // box[x,y,w,h] + class scores
-
   std::vector<i32> classids;
   std::vector<f32> confidences;
   std::vector<cv::Rect> boxes;
   for (i64 i = 0; i < objectCount; ++i)
   {
-    const usize classid = torch::argmax(outputTensor[i].slice(0, 4)).item<f32>();
+    const usize classid = torch::argmax(outputTensor[i].slice(0, 4)).item<f32>(); // box[x,y,w,h] + class scores
     const f32 confidence = outputTensor[i].slice(0, 4)[classid].item<f32>();
 
     if (confidence < confidenceThreshold)

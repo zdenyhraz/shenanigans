@@ -75,7 +75,6 @@ void DetectObjectsYOLOv8CV(const cv::Mat& source, const std::filesystem::path& m
 
       if (maxClassScore > confidenceThreshold)
       {
-
         f32 x = data[0];
         f32 y = data[1];
         f32 w = data[2];
@@ -124,7 +123,6 @@ void DetectObjectsYOLOv8CV(const cv::Mat& source, const std::filesystem::path& m
         }
       }
     }
-
     data += dimensions;
   }
 
