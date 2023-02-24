@@ -4,49 +4,49 @@
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
-  PyPlot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "gray"});
-  PyPlot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "gray"});
+  Plot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "gray"});
+  Plot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "gray"});
 }
 
 void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const cv::Mat& dft2)
 {
   auto plot1 = dft1.clone();
   FFTShift(plot1);
-  PyPlot::Plot(fmt::format("{} DFT1lm", ipc.mDebugName), LogMagnitude(plot1));
-  PyPlot::Plot(fmt::format("{} DFT1p", ipc.mDebugName), Phase(plot1));
+  Plot::Plot(fmt::format("{} DFT1lm", ipc.mDebugName), LogMagnitude(plot1));
+  Plot::Plot(fmt::format("{} DFT1p", ipc.mDebugName), Phase(plot1));
 
   auto plot2 = dft2.clone();
   FFTShift(plot2);
-  PyPlot::Plot(fmt::format("{} DFT2lm", ipc.mDebugName), LogMagnitude(plot2));
-  PyPlot::Plot(fmt::format("{} DFT2p", ipc.mDebugName), Phase(plot2));
+  Plot::Plot(fmt::format("{} DFT2lm", ipc.mDebugName), LogMagnitude(plot2));
+  Plot::Plot(fmt::format("{} DFT2p", ipc.mDebugName), Phase(plot2));
 }
 
 void IPCDebug::DebugCrossPowerSpectrum(const IPC& ipc, const cv::Mat& crosspower)
 {
-  PyPlot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), FFTShift(Magnitude(crosspower)));
-  PyPlot::Plot(fmt::format("{} CP Phase", ipc.mDebugName), FFTShift(Phase(crosspower)));
+  Plot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), FFTShift(Magnitude(crosspower)));
+  Plot::Plot(fmt::format("{} CP Phase", ipc.mDebugName), FFTShift(Phase(crosspower)));
 }
 
 void IPCDebug::DebugL3(const IPC& ipc, const cv::Mat& L3)
 {
-  PyPlot::Plot({.name = fmt::format("{} L3", ipc.mDebugName), .z = L3});
-  PyPlot::Plot({.name = fmt::format("{} L3 surf", ipc.mDebugName), .z = L3, .surf = true});
+  Plot::Plot({.name = fmt::format("{} L3", ipc.mDebugName), .z = L3});
+  Plot::Plot({.name = fmt::format("{} L3 surf", ipc.mDebugName), .z = L3, .surf = true});
 }
 
 void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 {
   auto plot = L2.clone();
   cv::resize(plot, plot, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot(fmt::format("{} L2", ipc.mDebugName), plot);
+  Plot::Plot(fmt::format("{} L2", ipc.mDebugName), plot);
 }
 
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
 {
-  PyPlot::Plot({.name = fmt::format("{} L2U", ipc.mDebugName),
+  Plot::Plot({.name = fmt::format("{} L2U", ipc.mDebugName),
       .z = L2U,
       .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 
-  PyPlot::Plot({.name = fmt::format("{} L2U surf", ipc.mDebugName),
+  Plot::Plot({.name = fmt::format("{} L2U surf", ipc.mDebugName),
       .z = L2U,
       .surf = true,
       .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2Us_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
@@ -58,13 +58,13 @@ void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
     cv::resize(L2, linear, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_LINEAR);
     cv::resize(L2, cubic, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_CUBIC);
 
-    PyPlot::Plot(fmt::format("{} L2U nearest", ipc.mDebugName), nearest);
-    PyPlot::Plot(fmt::format("{} L2U linear", ipc.mDebugName), linear);
-    PyPlot::Plot(fmt::format("{} L2U cubic", ipc.mDebugName), cubic);
+    Plot::Plot(fmt::format("{} L2U nearest", ipc.mDebugName), nearest);
+    Plot::Plot(fmt::format("{} L2U linear", ipc.mDebugName), linear);
+    Plot::Plot(fmt::format("{} L2U cubic", ipc.mDebugName), cubic);
 
-    PyPlot::Plot({.name = fmt::format("{} L2U nearest surf", ipc.mDebugName), .z = nearest, .surf = true});
-    PyPlot::Plot({.name = fmt::format("{} L2U linear surf", ipc.mDebugName), .z = linear, .surf = true});
-    PyPlot::Plot({.name = fmt::format("{} L2U cubic surf", ipc.mDebugName), .z = cubic, .surf = true});
+    Plot::Plot({.name = fmt::format("{} L2U nearest surf", ipc.mDebugName), .z = nearest, .surf = true});
+    Plot::Plot({.name = fmt::format("{} L2U linear surf", ipc.mDebugName), .z = linear, .surf = true});
+    Plot::Plot({.name = fmt::format("{} L2U cubic surf", ipc.mDebugName), .z = cubic, .surf = true});
   }
 }
 
@@ -77,7 +77,7 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
   if (ipc.mDebugTrueShift != ipc.mDefaultDebugTrueShift)
     DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot({.name = fmt::format("{} L1B", ipc.mDebugName),
+  Plot::Plot({.name = fmt::format("{} L1B", ipc.mDebugName),
       .z = mat,
       .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
@@ -91,7 +91,7 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
   if (ipc.mDebugTrueShift != ipc.mDefaultDebugTrueShift)
     DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  PyPlot::Plot({.name = fmt::format("{} L1A", ipc.mDebugName),
+  Plot::Plot({.name = fmt::format("{} L1A", ipc.mDebugName),
       .z = mat,
       .savepath = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }

@@ -73,8 +73,8 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     minLoc = minLocf;
   }
 
-  PyPlot::Plot({.name = fmt::format("Objective function landscape: {} raw surf", funName), .z = landscape, .surf = true});
-  PyPlot::Plot({.name = fmt::format("Objective function landscape: {} log surf", funName), .z = landscapeLog, .surf = true});
+  Plot::Plot({.name = fmt::format("Objective function landscape: {} raw surf", funName), .z = landscape, .surf = true});
+  Plot::Plot({.name = fmt::format("Objective function landscape: {} log surf", funName), .z = landscapeLog, .surf = true});
 
   static constexpr f64 pointSizeMultiplierMin = 0.01;
   static constexpr f64 pointSizeMultiplierBest = 0.008;
@@ -168,7 +168,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   DrawCircledPoint(landscape, minLoc, pointColorMin, pointSizeMin, pointThickness);
   DrawCircledPoint(landscapeLog, minLoc, pointColorMinLog, pointSizeMin, pointThickness);
 
-  PyPlot::Plot({.name = fmt::format("Objective function landscape: {} raw", funName),
+  Plot::Plot({.name = fmt::format("Objective function landscape: {} raw", funName),
       .z = landscape,
       .xmin = xmin,
       .xmax = xmax,
@@ -177,7 +177,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       .xlabel = xName,
       .ylabel = yName,
       .zlabel = "obj"});
-  PyPlot::Plot({.name = fmt::format("Objective function landscape: {} log", funName),
+  Plot::Plot({.name = fmt::format("Objective function landscape: {} log", funName),
       .z = landscapeLog,
       .xmin = xmin,
       .xmax = xmax,

@@ -4,7 +4,7 @@ template <typename T>
 inline void LaunchAsync(T&& fun)
 {
   std::thread(
-      [=]()
+      [fun]()
       {
         try
         {

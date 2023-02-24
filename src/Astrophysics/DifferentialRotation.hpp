@@ -338,7 +338,7 @@ public:
       SaveOptimizedParameters(ipc, fmt::format("{}/proc", dataPath), xsizeopt, ysizeopt, popsize);
     const auto dataAfter = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
 
-    PyPlot::Plot({
+    Plot::Plot({
         .name = "Diffrot opt",
         .x = ToDegrees(1) * dataAfter.theta,
         .ys = {GetRowAverage(dataBefore.omegax), GetRowAverage(dataAfter.omegax), PolynomialFit(dataAfter.theta, GetRowAverage(dataAfter.omegax), 2),
@@ -493,7 +493,7 @@ private:
     const auto times = GetTimesInDays(data.idstep * data.cadence, data.idstride * data.cadence, data.xsize);
     PlotMeridianCurve(data, dataPath, 27);
 
-    PyPlot::Plot({
+    Plot::Plot({
         .name = "fits params",
         .x = times,
         .ys = {data.fshiftx, data.fshifty},
@@ -504,7 +504,7 @@ private:
         .ylabel = "fits shift [px]",
         .y2label = "theta0 [deg]",
     });
-    PyPlot::Plot({
+    Plot::Plot({
         .name = "avgshift x",
         .x = ToDegrees(1) * data.theta,
         .ys = {GetRowAverage(data.shiftx)},
@@ -515,7 +515,7 @@ private:
         .ylabel = "average shift x [px]",
         .y2label = "average shift y [px]",
     });
-    PyPlot::Plot({
+    Plot::Plot({
         .name = "avgomega x",
         .x = ToDegrees(1) * data.theta,
         .ys = {GetRowAverage(data.omegax), TrigonometricFit(data.theta, GetRowAverage(data.omegax)), PolynomialFit(data.theta, GetRowAverage(data.omegax), 2),
@@ -524,7 +524,7 @@ private:
         .xlabel = "latitude [deg]",
         .ylabel = "average omega x [deg/day]",
     });
-    PyPlot::Plot({
+    Plot::Plot({
         .name = "avgomega y",
         .x = ToDegrees(1) * data.theta,
         .ys = {GetRowAverage(data.omegay), PolynomialFit(data.theta, GetRowAverage(data.omegay), 3)},
@@ -538,7 +538,7 @@ private:
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
     const f64 aspectratio = 2;
-    PyPlot::Plot({.name = "shift x",
+    Plot::Plot({.name = "shift x",
         .z = data.shiftx,
         .xmin = xmin,
         .xmax = xmax,
@@ -548,7 +548,7 @@ private:
         .ylabel = ylabel,
         .zlabel = "shift x [px]",
         .aspectratio = aspectratio});
-    PyPlot::Plot({.name = "omega x",
+    Plot::Plot({.name = "omega x",
         .z = data.omegax,
         .xmin = xmin,
         .xmax = xmax,
@@ -558,7 +558,7 @@ private:
         .ylabel = ylabel,
         .zlabel = "omega x [px]",
         .aspectratio = aspectratio});
-    PyPlot::Plot({.name = "shift y",
+    Plot::Plot({.name = "shift y",
         .z = data.shifty,
         .xmin = xmin,
         .xmax = xmax,
@@ -568,7 +568,7 @@ private:
         .ylabel = ylabel,
         .zlabel = "shift y [px]",
         .aspectratio = aspectratio});
-    PyPlot::Plot({.name = "omega y",
+    Plot::Plot({.name = "omega y",
         .z = data.omegay,
         .xmin = xmin,
         .xmax = xmax,

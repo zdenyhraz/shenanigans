@@ -69,9 +69,9 @@ void IPC::FalseCorrelationsRemoval(cv::Mat& L3) const
 {
   const auto radius = 5;
   const auto kirkl = 1. - Kirkl<Float>(L3.rows, L3.cols, radius);
-  PyPlot::Plot("FCR L3 raw", L3);
-  PyPlot::Plot({.name = "L2U raw", .z = CalculateL2U(CalculateL2(L3, cv::Point2d(L3.cols / 2, L3.rows / 2), 39)), .surf = true});
+  Plot::Plot("FCR L3 raw", L3);
+  Plot::Plot({.name = "L2U raw", .z = CalculateL2U(CalculateL2(L3, cv::Point2d(L3.cols / 2, L3.rows / 2), 39)), .surf = true});
   cv::multiply(L3, kirkl, L3);
-  PyPlot::Plot({.name = "L2U fcr", .z = CalculateL2U(CalculateL2(L3, cv::Point2d(L3.cols / 2, L3.rows / 2), 39)), .surf = true});
+  Plot::Plot({.name = "L2U fcr", .z = CalculateL2U(CalculateL2(L3, cv::Point2d(L3.cols / 2, L3.rows / 2), 39)), .surf = true});
   throw std::runtime_error("stap xd");
 }

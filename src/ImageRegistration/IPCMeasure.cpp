@@ -41,8 +41,8 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
     {
       if (true)
       {
-        PyPlot::Plot({.name = "Image1", .z = image1, .cmap = "gray"});
-        PyPlot::Plot({.name = "Image2", .z = image2, .cmap = "gray"});
+        Plot::Plot({.name = "Image1", .z = image1, .cmap = "gray"});
+        Plot::Plot({.name = "Image2", .z = image2, .cmap = "gray"});
       }
       else
       {
@@ -89,10 +89,10 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
   Plot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
   Plot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
-  PyPlot::Plot({.name = "PC accuracy", .z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot({.name = "PCS accuracy", .z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
-  PyPlot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  Plot::Plot({.name = "PC accuracy", .z = accuracyPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  Plot::Plot({.name = "PCS accuracy", .z = accuracyPCS, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  Plot::Plot({.name = "IPC accuracy", .z = accuracyIPC, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
+  Plot::Plot({.name = "IPCO accuracy", .z = accuracyIPCO, .xmin = xmin, .xmax = xmax, .ymin = ymin, .ymax = ymax, .xlabel = xlabel, .ylabel = ylabel});
 
   LOG_PROGRESS_RESET;
 }

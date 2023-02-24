@@ -430,7 +430,7 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
         .y2label = "best-average relative similarity [%]",
         .log = false});
 
-    PyPlot::Plot({.name = fmt::format("Evolution ({})", mName),
+    Plot::Plot({.name = fmt::format("Evolution ({})", mName),
         .x = gens,
         .ys = {objvals, validvals},
         .ylabels = {"obj", "valid"},

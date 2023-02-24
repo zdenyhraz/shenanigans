@@ -69,7 +69,7 @@ public:
     // append fit data and labels to the end
     durations.insert(durations.end(), durationfits.begin(), durationfits.end());
     label_ys.insert(label_ys.end(), label_y2s.begin(), label_y2s.end());
-    PyPlot::Plot({.name = "Profiling", .x = ns, .ys = durations, .xlabel = "n", .ylabel = fmt::format("mean time per call ({}) [us]", data.iters), .ylabels = label_ys});
+    Plot::Plot({.name = "Profiling", .x = ns, .ys = durations, .xlabel = "n", .ylabel = fmt::format("mean time per call ({}) [us]", data.iters), .ylabels = label_ys});
   }
 
   template <typename O, typename I>
