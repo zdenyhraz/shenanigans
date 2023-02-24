@@ -29,8 +29,9 @@ class ObjdetectWindow : public Window
     }
   };
 
-  std::string modelPath = "data/DNN/yolov8/yolov8x";
   std::string imagePath = "data/ObjectDetection/cats2.jpg";
+  SobelObjectnessWindowParameters mSOParameters;
+  std::string modelPath = "data/DNN/yolov8/yolov8x";
   std::string classesPath = "data/DNN/yolov8/coco.names";
   f32 confidenceThreshold = 0.05;
   f32 NMSThreshold = 0.5;
@@ -39,8 +40,6 @@ class ObjdetectWindow : public Window
   void DetectObjectsYOLOv3CVW() const;
   void DetectObjectsYOLOv8CVW() const;
   void DetectObjectsYOLOv8TorchW() const;
-
-  SobelObjectnessWindowParameters mSOParameters;
 
 public:
   void Render() override;

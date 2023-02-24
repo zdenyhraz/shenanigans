@@ -16,8 +16,8 @@ void ObjdetectWindow::DetectObjectsYOLOv3CVW() const
 {
   LOG_FUNCTION;
   const auto image = LoadImage(GetProjectDirectoryPath(imagePath));
-  DetectObjectsYOLOv3CV(
-      image, GetProjectDirectoryPath(modelPath + ".weights"), GetProjectDirectoryPath(modelPath + ".cfg"), "Darknet", GetProjectDirectoryPath(classesPath), confidenceThreshold);
+  DetectObjectsYOLOv3CV(image, GetProjectDirectoryPath("data/DNN/yolov3/yolov3.weights"), GetProjectDirectoryPath("data/DNN/yolov3/yolov3.cfg"), "Darknet",
+      GetProjectDirectoryPath("data/DNN/yolov3/coco.names"), confidenceThreshold);
 }
 
 void ObjdetectWindow::DetectObjectsYOLOv8CVW() const
