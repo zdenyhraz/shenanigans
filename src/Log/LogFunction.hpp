@@ -1,7 +1,9 @@
 #pragma once
 #include "Log.hpp"
 
-#define LOG_FUNCTION LogFunction logFunction(std::source_location::current().function_name())
+#define LOG_FUNCTION                                                                                                                                                               \
+  LogFunction logFunction(fmt::format("{} | {}:{}", std::source_location::current().function_name(),                                                                               \
+      std::filesystem::path(std::source_location::current().file_name()).filename().string(), std::source_location::current().line()))
 #define LOG_FUNCTION_IF(show) LogFunction<show> logFunction(std::source_location::current().function_name())
 
 #define LOG_SCOPE(funName) LogFunction logScope(funName)

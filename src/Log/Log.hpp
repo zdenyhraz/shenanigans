@@ -14,3 +14,7 @@ using MainLogger = ImGuiLogger;
 #define LOG_PROGRESS(progress) MainLogger::SetProgress(progress)
 #define LOG_PROGRESS_NAME(progressName) MainLogger::SetProgressName(progressName)
 #define LOG_PROGRESS_RESET MainLogger::ResetProgress()
+#define LOG_VARIABLE(variable)                                                                                                                                                     \
+  MainLogger::Message(                                                                                                                                                             \
+      Logger::LogLevel::Debug, fmt::format("{}: {} | {}:{}", #variable, variable, std::filesystem::path(std::source_location::current().file_name()).filename().string(),          \
+                                   std::source_location::current().line()))
