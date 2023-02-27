@@ -38,16 +38,8 @@ inline std::vector<cv::Mat> LoadImages(const std::string& dirpath)
   std::vector<cv::Mat> images;
   for (const auto& entry : std::filesystem::directory_iterator(dirpath))
   {
-    const auto filepath = entry.path().string();
-
-    if (not IsImagePath(filepath))
-    {
-      LOG_WARNING("Directory '{}' contains a non-image file '{}'", dirpath, filepath);
-      continue;
-    }
-
-    images.push_back(LoadUnitFloatImage<T>(filepath));
-    LOG_DEBUG("Loaded image '{}'", filepath);
+    images.push_back(LoadUnitFloatImage<T>(entry.path()));
+    LOG_DEBUG("Loaded image '{}'", entry.path().string());
   }
 
   return images;
