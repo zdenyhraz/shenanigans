@@ -29,7 +29,9 @@ class ObjdetectWindow : public Window
     }
   };
 
-  std::string imagePath = "data/ObjectDetection/cats2.jpg";
+  std::string imagePath = "data/ObjectDetection/sonar/tif/sasi-S-upper-20221102-145528-l38.tif";
+  std::string imageDirectoryPath = "data/ObjectDetection/sonar/tif";
+  std::string saveDirectoryPath = "data/ObjectDetection/sonar/results";
   SobelObjectnessWindowParameters mSOParameters;
   std::string modelPath = "data/DNN/yolov8/yolov8x";
   std::string classesPath = "data/DNN/yolov8/coco.names";
@@ -37,6 +39,7 @@ class ObjdetectWindow : public Window
   f32 NMSThreshold = 0.5;
 
   void DetectObjectsSO() const;
+  void DetectObjectsSODirectory() const;
   void DetectObjectsYOLOv3CVW() const;
   void DetectObjectsYOLOv8CVW() const;
   void DetectObjectsYOLOv8TorchW() const;

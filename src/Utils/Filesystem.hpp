@@ -16,3 +16,11 @@ inline bool IsImagePath(const std::string& path)
 {
   return path.ends_with(".png") or path.ends_with(".PNG") or path.ends_with(".jpg") or path.ends_with(".JPG") or path.ends_with(".jpeg") or path.ends_with(".JPEG");
 }
+
+inline usize GetFileCount(const std::filesystem::path& dirpath)
+{
+  usize count = 0;
+  for (const auto& entry : std::filesystem::directory_iterator(dirpath))
+    ++count;
+  return count;
+}

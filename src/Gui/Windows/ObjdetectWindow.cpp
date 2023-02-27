@@ -12,6 +12,25 @@ void ObjdetectWindow::DetectObjectsSO() const
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams);
 }
 
+void ObjdetectWindow::DetectObjectsSODirectory() const
+{
+  LOG_FUNCTION;
+  if (not std::filesystem::exists(GetProjectDirectoryPath(saveDirectoryPath)))
+    std::filesystem::create_directory(GetProjectDirectoryPath(saveDirectoryPath));
+  const auto fileCount = GetFileCount(GetProjectDirectoryPath(imageDirectoryPath));
+  for (const auto& entry : std::filesystem::directory_iterator(GetProjectDirectoryPath(imageDirectoryPath)))
+  {
+    static usize fileIndex = 0;
+    LOG_PROGRESS_NAME(entry.path().string());
+    LOG_PROGRESS(static_cast<f32>(++fileIndex) / fileCount);
+
+    auto image = LoadUnitFloatImage<f32>(entry.path());
+    if (mSOParameters.imageSize != 1)
+      cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
+    std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams, GetProjectDirectoryPath(saveDirectoryPath) / entry.path().filename());
+  }
+}
+
 void ObjdetectWindow::DetectObjectsYOLOv3CVW() const
 {
   LOG_FUNCTION;
@@ -41,15 +60,20 @@ void ObjdetectWindow::Render()
   {
     ImGui::Separator();
     ImGui::InputText("image path", &imagePath);
+    ImGui::InputText("image directory path", &imageDirectoryPath);
+    ImGui::InputText("save directory path", &saveDirectoryPath);
 
-    // ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
     {
-      if (ImGui::Button("Detect objects"))
-        LaunchAsync([&]() { DetectObjectsSO(); });
-      ImGui::SameLine();
       if (ImGui::Button("Default"))
         LaunchAsync([&]() { mSOParameters = SobelObjectnessWindowParameters(); });
+      ImGui::SameLine();
+      if (ImGui::Button("Detect objects image"))
+        LaunchAsync([&]() { DetectObjectsSO(); });
+      ImGui::SameLine();
+      if (ImGui::Button("Detect objects directory"))
+        LaunchAsync([&]() { DetectObjectsSODirectory(); });
 
       ImGui::Text("Input parameters");
       ImGui::SliderFloat("image size", &mSOParameters.imageSizePercent, 10, 100, "%.0f%%");
@@ -64,6 +88,7 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThresholdPercent, 1, 50, "%.0f%%");
 
       ImGui::Text("Object filtering");
+      ImGui::Checkbox("show filtered", &mSOParameters.soParams.showFiltered);
       ImGui::SliderFloat("min area", &mSOParameters.minObjectAreaPercent, 0, 5, "%.2f%%", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("max elongatedness", &mSOParameters.soParams.maxObjectElongatedness, 3, 30, "%.1f");
     }
