@@ -27,16 +27,15 @@
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues-closed/zdenyhraz/shenanigans"></a>
-<br>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=ncloc"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/search?l=c%2B%2B"><img src="https://img.shields.io/github/languages/top/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/languages/code-size/zdenyhraz/shenanigans"></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/tags"><img src="https://img.shields.io/github/v/tag/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commits-since/zdenyhraz/shenanigans/latest"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/releases"><img src="https://img.shields.io/github/v/release/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/blob/master/LICENSE.md"><img src="https://img.shields.io/github/license/zdenyhraz/shenanigans.svg"></a>
+<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans"></a>
+<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/languages/code-size/zdenyhraz/shenanigans"></a>
 </p>
 
 
