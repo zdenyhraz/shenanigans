@@ -53,7 +53,7 @@ void DetectObjectsYOLOv8CV(const cv::Mat& source, const std::filesystem::path& m
     LOG_DEBUG("Processed output size: [{},{}]", output.size[0], output.size[1]);
     LOG_DEBUG("Processed output rc: [{},{}]", output.rows, output.cols);
   }
-  f32* data = reinterpret_cast<f32*>(output.data);
+  auto data = reinterpret_cast<f32*>(output.data);
 
   f32 x_factor = static_cast<f32>(input.cols) / modelShape.width;
   f32 y_factor = static_cast<f32>(input.rows) / modelShape.height;

@@ -38,7 +38,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
     // [batchId, classId, confidence, left, top, right, bottom]
     for (size_t k = 0; k < outs.size(); k++)
     {
-      float* data = reinterpret_cast<float*>(outs[k].data);
+      auto data = reinterpret_cast<float*>(outs[k].data);
       for (size_t i = 0; i < outs[k].total(); i += 7)
       {
         float confidence = data[i + 2];
@@ -73,7 +73,7 @@ void Postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs, cv::dnn::Net&
       // Network produces output blob with a shape NxC where N is a number of
       // detected objects and C is a number of classes + 4 where the first 4
       // numbers are [center_x, center_y, width, height]
-      float* data = reinterpret_cast<float*>(outs[i].data);
+      auto data = reinterpret_cast<float*>(outs[i].data);
       for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
       {
         cv::Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
@@ -146,8 +146,8 @@ void DetectObjectsYOLOv3CV(const cv::Mat& image, const std::filesystem::path& mo
   LOG_FUNCTION;
   float nmsThreshold = 0.2;
   std::vector<std::string> classes;
-  float scale = 1. / 255.;
-  cv::Scalar mean = cv::Scalar(0);
+  const float scale = 1. / 255.;
+  const auto mean = cv::Scalar(0);
   bool swapRB = true;
   cv::Size inputSize(416, 416);
 

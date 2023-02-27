@@ -48,7 +48,7 @@ torch::Tensor Forward(torch::jit::script::Module& model, std::vector<torch::jit:
   return model.forward(inputs).toTensor();
 }
 
-cv::Mat DrawDetections(const cv::Mat source, const std::vector<ObjectDetection>& objects)
+cv::Mat DrawDetections(const cv::Mat& source, const std::vector<ObjectDetection>& objects)
 {
   LOG_FUNCTION;
   auto image = source.clone();
@@ -57,8 +57,7 @@ cv::Mat DrawDetections(const cv::Mat source, const std::vector<ObjectDetection>&
   return image;
 }
 
-std::vector<ObjectDetection> Postprocess(
-    torch::Tensor& output, f32 confidenceThreshold, f32 NMSThreshold, const std::vector<std::string>& classes, cv::Point2f imageScale, const cv::Mat source)
+std::vector<ObjectDetection> Postprocess(torch::Tensor& output, f32 confidenceThreshold, f32 NMSThreshold, const std::vector<std::string>& classes, cv::Point2f imageScale)
 {
   LOG_FUNCTION;
   LOG_DEBUG("Raw output tensor size: [{},{},{},{}]", output.sizes()[0], output.sizes()[1], output.sizes()[2], output.sizes()[3]);
@@ -109,6 +108,6 @@ void DetectObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path
   auto model = LoadModel(modelPath);
   auto inputs = Preprocess(source, modelShape);
   auto output = Forward(model, inputs);
-  const auto objects = Postprocess(output, confidenceThreshold, NMSThreshold, classes, imageScale, source);
+  const auto objects = Postprocess(output, confidenceThreshold, NMSThreshold, classes, imageScale);
   Plot::Plot("YOLOv8Torch objects", DrawDetections(source, objects));
 }
