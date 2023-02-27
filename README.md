@@ -1,22 +1,25 @@
 # Zdeny's shenanigans 🪐
 
 <p align="center">
-<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/images/project_badges/sonarcloud-black.svg"/></a>
-<br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml/badge.svg"/></a>
 <!-- <a href="https://codecov.io/gh/zdenyhraz/shenanigans"><img src="https://codecov.io/gh/zdenyhraz/shenanigans/branch/master/graph/badge.svg?token=2CD71S18CG"/></a> -->
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
-<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=alert_status"/></a>
 <br>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=alert_status"/></a>
 <a href="https://www.codacy.com/gh/zdenyhraz/shenanigans/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdenyhraz/shenanigans&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=sqale_rating"/></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=reliability_rating"/></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=security_rating"/></a>
+<br>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=vulnerabilities"/></a>
 <a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=bugs"/></a>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=duplicated_lines_density"/></a>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=sqale_index"/></a>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/api/project_badges/measure?project=zdenyhraz_shenanigans&metric=code_smells"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/last-commit/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
@@ -29,9 +32,11 @@
 <a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans"></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/tags"><img src="https://img.shields.io/github/v/tag/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/releases"><img src="https://img.shields.io/github/v/release/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commits-since/zdenyhraz/shenanigans/latest"></a>
+<a href="https://github.com/zdenyhraz/shenanigans/releases"><img src="https://img.shields.io/github/v/release/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/blob/master/LICENSE.md"><img src="https://img.shields.io/github/license/zdenyhraz/shenanigans.svg"></a>
+<br>
+<a href="https://sonarcloud.io/summary/new_code?id=zdenyhraz_shenanigans"><img src="https://sonarcloud.io/images/project_badges/sonarcloud-black.svg"/></a>
 </p>
 
 
