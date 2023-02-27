@@ -9,14 +9,14 @@ class ImGuiLogger : public Logger
   using FallbackLogger = TerminalLogger;
 
   ImGuiTextBuffer mTextBuffer;
-  std::vector<std::pair<int, LogLevel>> mLineOffsets;
+  std::vector<std::pair<int, LogLevel>> mLineOffsets{{0, LogLevel::Trace}};
   bool mActive = false;
-  bool mFallback = true;
+  bool mFallback = false;
   static constexpr usize mMaxMessages = 10000;
 
   void RenderInternal();
   void ClearInternal();
-  void SetFallbackInternal(bool forward) { mFallback = forward; }
+  void SetFallbackInternal(bool fallback) { mFallback = fallback; }
 
   template <typename... Args>
   void MessageInternal(LogLevel logLevel, const std::string& fmt, Args&&... args)

@@ -3,17 +3,16 @@
 void GLFWInitialize()
 {
   PROFILE_FUNCTION;
-  LOG_TRACE("Initializing GLFW");
   auto GLFWErrorCallback = [](int error, const char* description) { LOG_ERROR("GLFWError {}: {}", error, description); };
   glfwSetErrorCallback(GLFWErrorCallback);
   if (not glfwInit())
     throw std::runtime_error("GLFW initialization failed");
+  LOG_DEBUG("GLFW version: {}", glfwGetVersionString());
 }
 
 GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
 {
   PROFILE_FUNCTION;
-  LOG_TRACE("Creating window");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -28,7 +27,6 @@ GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
 void GLFWInitializeGL(GLFWwindow* window)
 {
   PROFILE_FUNCTION;
-  LOG_TRACE("Initializing OpenGL");
   glfwMakeContextCurrent(window);
   gladLoadGL();
   glfwSwapInterval(1);
@@ -43,17 +41,16 @@ void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback)
 void ImGuiSetDefaultStyle()
 {
   PROFILE_FUNCTION;
-  LOG_TRACE("Setting ImGui style");
   ImGuiSetHazelTheme();
 }
 
 ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
 {
   PROFILE_FUNCTION;
-  LOG_TRACE("Initializing ImGui");
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImPlot::CreateContext();
+  LOG_DEBUG("ImGui version: {}", IMGUI_VERSION);
 
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
@@ -158,7 +155,6 @@ void GLFWCloseWindow(GLFWwindow* window)
 
 void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data)
 {
-  LOG_TRACE("Setting window icon");
   GLFWimage image;
   image.width = width;
   image.height = height;

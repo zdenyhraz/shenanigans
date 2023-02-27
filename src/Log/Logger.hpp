@@ -16,7 +16,7 @@ public:
   };
 
 protected:
-  inline static std::mutex mMutex;
+  inline static std::recursive_mutex mMutex;
   inline static LogLevel mLogLevel = LogLevel::Trace;
   inline static f32 mProgress = 0;
   inline static std::string mProgressName;
