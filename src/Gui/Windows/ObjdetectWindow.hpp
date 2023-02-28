@@ -13,8 +13,7 @@ class ObjdetectWindow : public Window
     f32 blurSizePercent = soParams.blurSize * 100;
     f32 edgeSizePercent = soParams.edgeSize * 100;
     f32 edgeThresholdPercent = soParams.edgeThreshold * 100;
-    f32 objectSizePercent = soParams.objectSize * 100;
-    f32 objectnessThresholdPercent = soParams.objectnessThreshold * 100;
+    f32 objectnessRadiusPercent = soParams.objectnessRadius * 100;
     f32 minObjectAreaPercent = soParams.minObjectArea * 100;
 
     void Update()
@@ -23,8 +22,7 @@ class ObjdetectWindow : public Window
       soParams.blurSize = blurSizePercent / 100;
       soParams.edgeSize = edgeSizePercent / 100;
       soParams.edgeThreshold = edgeThresholdPercent / 100;
-      soParams.objectSize = objectSizePercent / 100;
-      soParams.objectnessThreshold = objectnessThresholdPercent / 100;
+      soParams.objectnessRadius = objectnessRadiusPercent / 100;
       soParams.minObjectArea = minObjectAreaPercent / 100;
     }
   };

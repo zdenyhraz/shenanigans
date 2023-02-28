@@ -84,8 +84,8 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("edge threshold", &mSOParameters.edgeThresholdPercent, 0, 50, "%.0f%%");
 
       ImGui::Text("Objectness parameters");
-      ImGui::SliderFloat("object size", &mSOParameters.objectSizePercent, 1, 10, "%.1f%%");
-      ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThresholdPercent, 1, 50, "%.0f%%");
+      ImGui::SliderFloat("objectness radius", &mSOParameters.objectnessRadiusPercent, 1, 10, "%.1f%%");
+      ImGui::SliderFloat("objectness threshold", &mSOParameters.soParams.objectnessThreshold, 0, 1, "%.2f");
 
       ImGui::Text("Object filtering");
       ImGui::Checkbox("show filtered", &mSOParameters.soParams.showFiltered);
