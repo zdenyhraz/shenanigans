@@ -80,8 +80,7 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("blur size", &mSOParameters.blurSizePercent, 0, 10, "%.0f%%");
 
       ImGui::Text("Edge detection parameters");
-      ImGui::SliderFloat("edge size", &mSOParameters.edgeSizePercent, 0.1, 10, "%.2f%%", ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderFloat("edge threshold", &mSOParameters.edgeThresholdPercent, 0, 50, "%.0f%%");
+      ImGui::SliderFloat("edge size", &mSOParameters.soParams.edgeSize, 3, 31, "%.0f");
 
       ImGui::Text("Objectness parameters");
       ImGui::SliderFloat("objectness radius", &mSOParameters.objectnessRadiusPercent, 1, 10, "%.1f%%");
