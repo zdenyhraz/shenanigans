@@ -8,7 +8,7 @@ void ObjdetectWindow::DetectObjectsSO() const
   LOG_FUNCTION;
   if (imagePath.empty())
     filePathGenerator.Reset();
-  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : imagePath);
+  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
   if (mSOParameters.imageSize != 1)
     cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams);
