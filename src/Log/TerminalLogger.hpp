@@ -6,7 +6,7 @@
 class TerminalLogger : public Logger
 {
   template <typename... Args>
-  void MessageInternal(LogLevel logLevel, const std::string& fmt, Args&&... args) const
+  void MessageInternal(LogLevel logLevel, std::string_view fmt, Args&&... args) const
   {
     if (not ShouldLog(logLevel)) [[unlikely]]
       return;
@@ -16,7 +16,7 @@ class TerminalLogger : public Logger
 
 public:
   template <typename... Args>
-  static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  static void Message(LogLevel logLevel, std::string_view fmt, Args&&... args)
   {
     Singleton<TerminalLogger>::Get().MessageInternal(logLevel, fmt, std::forward<Args>(args)...);
   }

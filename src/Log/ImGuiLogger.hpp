@@ -19,7 +19,7 @@ class ImGuiLogger : public Logger
   void SetFallbackInternal(bool fallback) { mFallback = fallback; }
 
   template <typename... Args>
-  void MessageInternal(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  void MessageInternal(LogLevel logLevel, std::string_view fmt, Args&&... args)
   try
   {
     std::scoped_lock lock(mMutex);
@@ -57,7 +57,7 @@ public:
   static void Clear() { Singleton<ImGuiLogger>::Get().ClearInternal(); }
   static void SetFallback(bool forward) { Singleton<ImGuiLogger>::Get().SetFallbackInternal(forward); }
   template <typename... Args>
-  static void Message(LogLevel logLevel, const std::string& fmt, Args&&... args)
+  static void Message(LogLevel logLevel, std::string_view fmt, Args&&... args)
   {
     Singleton<ImGuiLogger>::Get().MessageInternal(logLevel, fmt, std::forward<Args>(args)...);
   }

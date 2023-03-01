@@ -6,7 +6,9 @@
 void ObjdetectWindow::DetectObjectsSO() const
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f32>(GetProjectDirectoryPath(imagePath));
+  if (imagePath.empty())
+    filePathGenerator.Reset();
+  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : imagePath);
   if (mSOParameters.imageSize != 1)
     cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams);
@@ -69,10 +71,18 @@ void ObjdetectWindow::Render()
       if (ImGui::Button("Default"))
         LaunchAsync([&]() { mSOParameters = SobelObjectnessWindowParameters(); });
       ImGui::SameLine();
-      if (ImGui::Button("Detect objects image"))
+      if (ImGui::Button("Detect objects"))
         LaunchAsync([&]() { DetectObjectsSO(); });
       ImGui::SameLine();
-      if (ImGui::Button("Detect objects directory"))
+      if (ImGui::Button("Detect objects next"))
+        LaunchAsync(
+            [&]()
+            {
+              imagePath = filePathGenerator.GetNextFilePath().string();
+              DetectObjectsSO();
+            });
+      ImGui::SameLine();
+      if (ImGui::Button("Detect objects dir"))
         LaunchAsync([&]() { DetectObjectsSODirectory(); });
 
       ImGui::Text("Input parameters");
