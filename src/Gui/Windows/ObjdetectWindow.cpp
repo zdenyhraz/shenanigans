@@ -1,7 +1,7 @@
 #include "ObjdetectWindow.hpp"
-#include "DNN/ObjectDetection/YOLOv3CV.hpp"
 #include "DNN/ObjectDetection/YOLOv8CV.hpp"
 #include "DNN/ObjectDetection/YOLOv8Torch.hpp"
+#include "DNN/ObjectSegmentation/YOLOv8Torch.hpp"
 
 void ObjdetectWindow::DetectObjectsSO() const
 {
@@ -33,14 +33,6 @@ void ObjdetectWindow::DetectObjectsSODirectory() const
   }
 }
 
-void ObjdetectWindow::DetectObjectsYOLOv3CVW() const
-{
-  LOG_FUNCTION;
-  const auto image = LoadImage(GetProjectDirectoryPath(imagePath));
-  DetectObjectsYOLOv3CV(image, GetProjectDirectoryPath("data/DNN/yolov3/yolov3.weights"), GetProjectDirectoryPath("data/DNN/yolov3/yolov3.cfg"), "Darknet",
-      GetProjectDirectoryPath("data/DNN/yolov3/coco.names"), confidenceThreshold);
-}
-
 void ObjdetectWindow::DetectObjectsYOLOv8CVW() const
 {
   LOG_FUNCTION;
@@ -55,6 +47,13 @@ void ObjdetectWindow::DetectObjectsYOLOv8TorchW() const
   DetectObjectsYOLOv8Torch(image, GetProjectDirectoryPath(modelPath + ".torchscript"), GetProjectDirectoryPath(classesPath), confidenceThreshold, NMSThreshold);
 }
 
+void ObjdetectWindow::DetectObjectsYOLOv8SegTorchW() const
+{
+  LOG_FUNCTION;
+  const auto image = LoadImage(GetProjectDirectoryPath(imagePath));
+  SegmentObjectsYOLOv8Torch(image, GetProjectDirectoryPath(modelPath + "-seg.torchscript"), GetProjectDirectoryPath(classesPath), confidenceThreshold, NMSThreshold);
+}
+
 void ObjdetectWindow::Render()
 {
   PROFILE_FUNCTION;
@@ -65,7 +64,7 @@ void ObjdetectWindow::Render()
     ImGui::InputText("image directory path", &imageDirectoryPath);
     ImGui::InputText("save directory path", &saveDirectoryPath);
 
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    // ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
     {
       if (ImGui::Button("Default"))
@@ -110,15 +109,15 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("confidence threshold", &confidenceThreshold, 0, 1, "%.2f");
       ImGui::SliderFloat("NMS threshold", &NMSThreshold, 0, 1, "%.2f");
 
-      ImGui::Text("YOLOv3");
-      if (ImGui::Button("YOLOv3 OpenCV"))
-        LaunchAsync([&]() { DetectObjectsYOLOv3CVW(); });
       ImGui::Text("YOLOv8");
       if (ImGui::Button("YOLOv8 OpenCV"))
         LaunchAsync([&]() { DetectObjectsYOLOv8CVW(); });
       ImGui::SameLine();
       if (ImGui::Button("YOLOv8 Torch"))
         LaunchAsync([&]() { DetectObjectsYOLOv8TorchW(); });
+      ImGui::SameLine();
+      if (ImGui::Button("YOLOv8-seg Torch"))
+        LaunchAsync([&]() { DetectObjectsYOLOv8SegTorchW(); });
     }
 
     ImGui::EndTabItem();

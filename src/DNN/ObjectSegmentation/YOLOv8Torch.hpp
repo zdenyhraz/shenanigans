@@ -1,5 +1,6 @@
 #pragma once
-#include "Draw.hpp"
+#include <DNN/ObjectDetection/YOLOv8Torch.hpp>
+#include <DNN/ObjectDetection/Draw.hpp>
 
 void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, f32 confidenceThreshold, f32 NMSThreshold)
 {
@@ -19,8 +20,7 @@ void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::pat
   cv::Mat blob;
   cv::dnn::blobFromImage(image, blob, 1.0 / 255.0, modelShape, cv::Scalar(), true);
   torch::Tensor input = torch::from_blob(blob.data, {1, 3, modelShape.width, modelShape.height});
-  f32 scaleX = static_cast<f32>(image.cols) / modelShape.width;
-  f32 scaleY = static_cast<f32>(image.rows) / modelShape.height;
+  const auto imageScale = cv::Point2f(static_cast<f32>(source.cols) / modelShape.width, static_cast<f32>(source.rows) / modelShape.height);
 
   LOG_DEBUG("Input tensor size: [{},{},{},{}]", input.sizes()[0], input.sizes()[1], input.sizes()[2], input.sizes()[3]);
   std::vector<torch::jit::IValue> inputs;
@@ -31,18 +31,57 @@ void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::pat
     LOG_SCOPE("Load network");
     module = torch::jit::load(modelPath.string());
   }
-  torch::jit::IValue output;
+  torch::jit::IValue outputTuple;
   {
     LOG_SCOPE("Forward");
-    output = module.forward(inputs);
+    outputTuple = module.forward(inputs);
   }
 
-  torch::Tensor t1 = output.toTuple()->elements()[0].toTensor();
-  torch::Tensor t2 = output.toTuple()->elements()[1].toTensor();
+  torch::Tensor output = outputTuple.toTuple()->elements()[0].toTensor(); //(batch_size, num_boxes, num_classes + 4 + num_masks)
+  torch::Tensor masks = outputTuple.toTuple()->elements()[1].toTensor();
+  LOG_DEBUG("Output tensor1 size: [{},{},{},{}]", output.sizes()[0], output.sizes()[1], output.sizes()[2], output.sizes()[3]);
+  LOG_DEBUG("Output tensor2 size: [{},{},{},{}]", masks.sizes()[0], masks.sizes()[1], masks.sizes()[2], masks.sizes()[3]);
+  output = output[0].transpose(0, 1); // ignore batch dim + transpose object & box+scores dim
 
-  LOG_DEBUG("Output tensor1 size: [{},{},{},{}]", t1.sizes()[0], t1.sizes()[1], t1.sizes()[2], t1.sizes()[3]);
-  LOG_DEBUG("Output tensor2 size: [{},{},{},{}]", t2.sizes()[0], t2.sizes()[1], t2.sizes()[2], t2.sizes()[3]);
-  for (i32 i = 0; i < t2.sizes()[1]; ++i)
-    Plot::Plot(fmt::format("seg {}", i), ToCVMat(t2[0][i], cv::Size(t2.sizes()[2], t2.sizes()[3])));
-}
+  std::vector<cv::Rect> boxes;
+  std::vector<f32> confidences;
+  std::vector<i32> classids;
+  const i64 objectCount = output.sizes()[0];
+  for (i64 i = 0; i < objectCount; ++i)
+  {
+    //! this is wrong, output needs to be parsed like in utils.ops.non_max_suppression for masks
+    const usize classid = 0;  // TODO
+    const f32 confidence = 0; // TODO
+    if (confidence < confidenceThreshold)
+      continue;
+
+    const auto x = 0; // TODO
+    const auto y = 0; // TODO
+    const auto w = 0; // TODO
+    const auto h = 0; // TODO
+
+    i32 left = (x - 0.5 * w) * imageScale.x;
+    i32 top = (y - 0.5 * h) * imageScale.y;
+    i32 width = w * imageScale.x;
+    i32 height = h * imageScale.y;
+
+    boxes.push_back(cv::Rect(left, top, width, height));
+    confidences.push_back(confidence);
+    classids.push_back(classid);
+  }
+
+  std::vector<i32> boxesIdx;
+  cv::dnn::NMSBoxes(boxes, confidences, confidenceThreshold, NMSThreshold, boxesIdx);
+
+  std::vector<ObjectDetection> objects;
+  for (const auto idx : boxesIdx)
+    objects.emplace_back(boxes[idx], confidences[idx], classids[idx], "xdd");
+
+  Plot::Plot("YOLOv8Torch objects", DrawDetections(source, objects));
+  for (i32 i = 0; i < masks.sizes()[1]; ++i)
+  {
+    auto segmask = ToCVMat(masks[0][i], cv::Size(masks.sizes()[2], masks.sizes()[3]));
+    cv::resize(segmask, segmask, source.size());
+    Plot::Plot(fmt::format("seg {}", i), segmask);
+  }
 }

@@ -23,7 +23,7 @@ class ObjdetectWindow : public Window
     }
   };
 
-  std::string imagePath = "data/ObjectDetection/sonar/tif/sasi-S-upper-20221102-144815-l38.tif";
+  std::string imagePath = "data/ObjectDetection/cats/cats2.jpg";
   std::string imageDirectoryPath = "data/ObjectDetection/sonar/tif";
   std::string saveDirectoryPath = "data/ObjectDetection/sonar/results";
   mutable FilePathGenerator filePathGenerator{GetProjectDirectoryPath(imageDirectoryPath).string()};
@@ -35,9 +35,9 @@ class ObjdetectWindow : public Window
 
   void DetectObjectsSO() const;
   void DetectObjectsSODirectory() const;
-  void DetectObjectsYOLOv3CVW() const;
   void DetectObjectsYOLOv8CVW() const;
   void DetectObjectsYOLOv8TorchW() const;
+  void DetectObjectsYOLOv8SegTorchW() const;
 
 public:
   void Render() override;
