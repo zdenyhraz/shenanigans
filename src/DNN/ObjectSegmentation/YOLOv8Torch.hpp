@@ -26,16 +26,8 @@ void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::pat
   std::vector<torch::jit::IValue> inputs;
   inputs.push_back(input);
 
-  torch::jit::script::Module module;
-  {
-    LOG_SCOPE("Load network");
-    module = torch::jit::load(modelPath.string());
-  }
-  torch::jit::IValue outputTuple;
-  {
-    LOG_SCOPE("Forward");
-    outputTuple = module.forward(inputs);
-  }
+  auto model = torch::jit::load(modelPath.string());
+  auto outputTuple = model.forward(inputs);
 
   torch::Tensor output = outputTuple.toTuple()->elements()[0].toTensor(); //(batch_size, num_boxes, num_classes + 4 + num_masks)
   torch::Tensor masks = outputTuple.toTuple()->elements()[1].toTensor();
@@ -49,7 +41,7 @@ void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::pat
   const i64 objectCount = output.sizes()[0];
   for (i64 i = 0; i < objectCount; ++i)
   {
-    //! this is wrong, output needs to be parsed like in utils.ops.non_max_suppression for masks
+    //! TODO: this is wrong, output needs to be parsed like in utils.ops.non_max_suppression for masks
     const usize classid = 0;  // TODO
     const f32 confidence = 0; // TODO
     if (confidence < confidenceThreshold)
