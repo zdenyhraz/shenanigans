@@ -6,8 +6,6 @@
 void ObjdetectWindow::DetectObjectsSO() const
 {
   LOG_FUNCTION;
-  if (imagePath.empty())
-    filePathGenerator.Reset();
   auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
   if (mSOParameters.imageSize != 1)
     cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
@@ -78,6 +76,11 @@ void ObjdetectWindow::Render()
             [&]()
             {
               imagePath = filePathGenerator.GetNextFilePath().string();
+              if (imagePath.empty())
+              {
+                filePathGenerator.Reset();
+                imagePath = filePathGenerator.GetNextFilePath().string();
+              }
               DetectObjectsSO();
             });
       ImGui::SameLine();
