@@ -3,7 +3,7 @@
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
-  std::vector<f64> boundsRange = mUB - mLB;
+  std::vector<f64> boundsRange = mUpperBounds - mLowerBounds;
   f64 initialStep = *std::max_element(boundsRange.begin(), boundsRange.end()) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
@@ -13,7 +13,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
   std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, Zerovect(N, 0.));
   for (i32 run = 0; run < multistartMaxCnt; run++)
     for (usize indexParam = 0; indexParam < N; indexParam++)
-      mainPointsInitial[run][indexParam] = Random::Rand(mLB[indexParam], mUB[indexParam]); // idk dude
+      mainPointsInitial[run][indexParam] = Random::Rand(mLowerBounds[indexParam], mUpperBounds[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
@@ -51,7 +51,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
         {
           pattern[dim][pm] = mainPoint;
           pattern[dim][pm][dim] += pm == 0 ? step : -step;
-          pattern[dim][pm][dim] = ClampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLB[dim], mUB[dim]);
+          pattern[dim][pm][dim] = ClampSmooth(pattern[dim][pm][dim], mainPoint[dim], mLowerBounds[dim], mUpperBounds[dim]);
 
           // evaluate vertices
           patternFitness[dim][pm] = obj(pattern[dim][pm]);
@@ -71,7 +71,7 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunct
               {
                 std::vector<f64> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
-                testPoint[dim] = ClampSmooth(testPoint[dim], mainPoint[dim], mLB[dim], mUB[dim]);
+                testPoint[dim] = ClampSmooth(testPoint[dim], mainPoint[dim], mLowerBounds[dim], mUpperBounds[dim]);
                 testPointFitness = obj(testPoint);
                 funEvalsThisRun++;
 

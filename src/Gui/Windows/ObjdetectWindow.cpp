@@ -12,6 +12,15 @@ void ObjdetectWindow::DetectObjectsSO() const
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams);
 }
 
+SobelObjectnessParameters ObjdetectWindow::OptimizeSOParameters() const
+{
+  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
+  if (mSOParameters.imageSize != 1)
+    cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
+  const auto objects = DetectObjectsSobelObjectness(image, SobelObjectnessParameters());
+  return OptimizeSobelObjectnessParameters({{image, objects}});
+}
+
 void ObjdetectWindow::DetectObjectsSODirectory() const
 {
   LOG_FUNCTION;
@@ -67,6 +76,9 @@ void ObjdetectWindow::Render()
     {
       if (ImGui::Button("Default"))
         LaunchAsync([&]() { mSOParameters = SobelObjectnessWindowParameters(); });
+      ImGui::SameLine();
+      if (ImGui::Button("Optimize"))
+        LaunchAsync([&]() { mSOParameters.soParams = OptimizeSOParameters(); });
       ImGui::SameLine();
       if (ImGui::Button("Detect objects"))
         LaunchAsync([&]() { DetectObjectsSO(); });

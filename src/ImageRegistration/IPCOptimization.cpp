@@ -107,8 +107,8 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(
   evo.mMutStrat = Evolution::BEST1;
   evo.SetName("IPC");
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps", "L1WIN"});
-  evo.mLB = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0};
-  evo.mUB = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
+  evo.mLowerBounds = {0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0};
+  evo.mUpperBounds = {static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
       static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8};
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);

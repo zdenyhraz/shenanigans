@@ -50,8 +50,16 @@ public:
   }
   void SetPlotObjectiveFunctionLandscape(bool PlotObjectiveFunctionLandscape) { mPlotObjectiveFunctionLandscape = PlotObjectiveFunctionLandscape; }
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
-  void SetPlotObjectiveFunctionLandscapeIterations(i32 PlotObjectiveFunctionLandscapeIterations) { mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations; }
-  void SetParameterNames(const std::vector<std::string>& ParameterNames) { mParameterNames = ParameterNames; };
+  void SetPlotObjectiveFunctionLandscapeIterations(i32 PlotObjectiveFunctionLandscapeIterations)
+  {
+    mPlotObjectiveFunctionLandscapeIterations = PlotObjectiveFunctionLandscapeIterations;
+  }
+  void SetParameterNames(const std::vector<std::string>& ParameterNames)
+  {
+    if (ParameterNames.size() != N)
+      throw std::runtime_error(fmt::format("Invalid parameter name count ({}!={})", ParameterNames.size(), N));
+    mParameterNames = ParameterNames;
+  };
   void SetParameterValueToNameFunction(usize ParameterIndex, const std::function<std::string(f64)>& fun)
   {
     if (ParameterIndex < N)
@@ -66,23 +74,40 @@ public:
     LOG_WARNING("Parameter name {} not defined, ignoring value -> name function", ParameterName);
   }
 
-  void SetName(const std::string& optname) { mName = optname; }
-
   void SetAllowInconsistent(bool allowInconsistent) { mAllowInconsistent = allowInconsistent; }
+  void SetName(const std::string& optname) { mName = optname; }
+  void SetLowerBounds(const std::vector<f64>& lowerBounds) { mLowerBounds = lowerBounds; }
+  void SetUpperBounds(const std::vector<f64>& upperBounds) { mUpperBounds = upperBounds; }
+  usize GetParameterIndex(const std::string& parameterName)
+  {
+    const auto idx = std::ranges::find(mParameterNames, parameterName);
+    if (idx == mParameterNames.end())
+      throw std::runtime_error(fmt::format("Unknown parameter '{}'", parameterName));
+    return idx - mParameterNames.begin();
+  }
+  void SetBounds(const std::string& parameterName, f64 lower, f64 upper)
+  {
+    const auto index = GetParameterIndex(parameterName);
+    mLowerBounds[index] = lower;
+    mUpperBounds[index] = upper;
+  }
 
-  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin, f64 ymax,
-      const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
+  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin,
+      f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
   usize N = 1;                                            // the problem dimension
-  std::vector<f64> mLB;                                   // lower search space bounds
-  std::vector<f64> mUB;                                   // upper search space bounds
+  std::vector<f64> mLowerBounds;                          // lower search space bounds
+  std::vector<f64> mUpperBounds;                          // upper search space bounds
   f64 mOptimalFitness = -std::numeric_limits<f64>::max(); // satisfactory function value
   usize mMaxFunEvals = std::numeric_limits<i32>::max();   // maximum # of function evaluations
   usize maxGen = 1000;                                    // maximum # of algorithm iterations
 
 protected:
   static const char* GetTerminationReasonString(const TerminationReason& reason);
-  static f64 ClampSmooth(f64 x_new, f64 x_prev, f64 clampMin, f64 clampMax) { return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new; }
+  static f64 ClampSmooth(f64 x_new, f64 x_prev, f64 clampMin, f64 clampMax)
+  {
+    return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
+  }
 
   bool mConsoleOutput = true;
   bool mPlotOutput = true;

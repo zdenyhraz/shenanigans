@@ -26,9 +26,10 @@ public:
   };
 
   explicit Evolution(usize N_, const std::string& optname = "default");
-  OptimizationResult Optimize(ObjectiveFunction obj, ValidationFunction valid = nullptr) override;
-  void MetaOptimize(
-      ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, usize runsPerObj = 3, usize maxFunEvals = 10000, f64 optimalFitness = -std::numeric_limits<f64>::max());
+  OptimizationResult Optimize(
+      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) override;
+  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, usize runsPerObj = 3, usize maxFunEvals = 10000,
+      f64 optimalFitness = -std::numeric_limits<f64>::max());
 
   usize mNP = 4;
   f64 mF = 0.65;

@@ -22,7 +22,7 @@ try
   CheckValidationFunctionNormality(valid);
 
   usize gen = 0;
-  Population population(mNP, N, obj, mLB, mUB, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
+  Population population(mNP, N, obj, mLowerBounds, mUpperBounds, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   TerminationReason termReason = NotTerminated;
   UpdateOutputs(gen, population, valid);
@@ -38,7 +38,7 @@ try
       {
         population.UpdateDistinctParents(eid);
         population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
-        population.UpdateOffspring(eid, mMutStrat, obj, mF, mLB, mUB);
+        population.UpdateOffspring(eid, mMutStrat, obj, mF, mLowerBounds, mUpperBounds);
       }
       population.functionEvaluations += mNP;
       population.PerformSelection();
@@ -76,11 +76,11 @@ try
   {
     const usize xParamIndex = 0;
     const usize yParamIndex = 1;
-    const f64 xmin = mLB[xParamIndex];
-    const f64 xmax = mUB[xParamIndex];
-    const f64 ymin = mLB[yParamIndex];
-    const f64 ymax = mUB[yParamIndex];
-    const auto baseParams = mLB + 0.5 * (mUB - mLB);
+    const f64 xmin = mLowerBounds[xParamIndex];
+    const f64 xmax = mUpperBounds[xParamIndex];
+    const f64 ymin = mLowerBounds[yParamIndex];
+    const f64 ymax = mUpperBounds[yParamIndex];
+    const auto baseParams = mLowerBounds + 0.5 * (mUpperBounds - mLowerBounds);
     PlotObjectiveFunctionLandscape(
         obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName), &result);
   }
@@ -144,8 +144,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
       evo.mNP = metaparams[MetaNP];
       evo.mCR = metaparams[MetaCR];
       evo.mF = metaparams[MetaF];
-      evo.mLB = mLB;
-      evo.mUB = mUB;
+      evo.mLowerBounds = mLowerBounds;
+      evo.mUpperBounds = mUpperBounds;
       evo.mMaxFunEvals = maxFunEvals;
       evo.mOptimalFitness = optimalFitness;
       evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<usize>(metaparams[MetaMutationStrategy]));
@@ -172,8 +172,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mMutStrat = BEST1;
   evo.mCrossStrat = BIN;
   evo.mMaxFunEvals = 5000;
-  evo.mLB = {7, 0.1, 0.2, 0, 0};
-  evo.mUB = {30. * N, 1, 1.5, -1e-6 + static_cast<f64>(MutationStrategyCount), -1e-6 + static_cast<f64>(CrossoverStrategyCount)};
+  evo.mLowerBounds = {7, 0.1, 0.2, 0, 0};
+  evo.mUpperBounds = {30. * N, 1, 1.5, -1e-6 + static_cast<f64>(MutationStrategyCount), -1e-6 + static_cast<f64>(CrossoverStrategyCount)};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
   evo.SetFileOutput(false);
@@ -191,10 +191,10 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     // plot metaopt surface
     const usize xParamIndex = MetaNP;
     const usize yParamIndex = MetaMutationStrategy;
-    const f64 xmin = evo.mLB[xParamIndex];
-    const f64 xmax = evo.mUB[xParamIndex];
-    const f64 ymin = evo.mLB[yParamIndex];
-    const f64 ymax = evo.mUB[yParamIndex];
+    const f64 xmin = evo.mLowerBounds[xParamIndex];
+    const f64 xmax = evo.mUpperBounds[xParamIndex];
+    const f64 ymin = evo.mLowerBounds[yParamIndex];
+    const f64 ymax = evo.mUpperBounds[yParamIndex];
     const auto baseParams = std::vector<f64>{20., mCR, mF, (f64)RAND1, (f64)BIN};
     PlotObjectiveFunctionLandscape(metaObj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax,
         GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName),
@@ -297,7 +297,7 @@ try
 {
   PROFILE_FUNCTION;
 
-  const auto arg = 0.5 * (mLB + mUB);
+  const auto arg = 0.5 * (mLowerBounds + mUpperBounds);
   const auto result1 = obj(arg);
   const auto result2 = obj(arg);
 
@@ -335,7 +335,7 @@ try
   if (not valid)
     return;
 
-  const auto arg = 0.5 * (mLB + mUB);
+  const auto arg = 0.5 * (mLowerBounds + mUpperBounds);
   const auto result1 = valid(arg);
   const auto result2 = valid(arg);
 
@@ -368,12 +368,12 @@ void Evolution::CheckBounds()
 {
   PROFILE_FUNCTION;
 
-  if (mLB.size() != mUB.size())
+  if (mLowerBounds.size() != mUpperBounds.size())
     throw std::runtime_error(fmt::format("Parameter bound sizes do not match"));
-  if (mLB.size() != N)
-    throw std::runtime_error(fmt::format("Invalid lower parameter bound size: {} != {}", mLB.size(), N));
-  if (mUB.size() != N)
-    throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUB.size(), N));
+  if (mLowerBounds.size() != N)
+    throw std::runtime_error(fmt::format("Invalid lower parameter bound size: {} != {}", mLowerBounds.size(), N));
+  if (mUpperBounds.size() != N)
+    throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUpperBounds.size(), N));
 }
 
 void Evolution::CheckParameters()

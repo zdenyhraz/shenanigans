@@ -44,8 +44,8 @@ void RandomWindow::EvolutionOptimization(bool meta) const
   Evolution Evo(N);
   Evo.mNP = 5 * N;
   Evo.mMutStrat = Evolution::RAND1;
-  Evo.mLB = Zerovect(N, -5.0);
-  Evo.mUB = Zerovect(N, +5.0);
+  Evo.mLowerBounds = Zerovect(N, -5.0);
+  Evo.mUpperBounds = Zerovect(N, +5.0);
   Evo.mMaxFunEvals = maxFunEvals;
   Evo.mOptimalFitness = optimalFitness;
   Evo.SetName("debug");
