@@ -11,6 +11,5 @@ struct PatternSearch : public OptimizationAlgorithm
 
   explicit PatternSearch(i32 N_) : OptimizationAlgorithm(N_) {}
 
-  OptimizationResult Optimize(
-      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) override;
+  OptimizationResult Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid = std::nullopt) override;
 };

@@ -26,8 +26,9 @@ public:
   };
 
   explicit Evolution(usize N_, const std::string& optname = "default");
-  OptimizationResult Optimize(
-      ObjectiveFunction obj, ValidationFunction valid = [](const std::vector<f64>&) { return 0; }) override;
+
+  OptimizationResult Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid = std::nullopt) override;
+
   void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, usize runsPerObj = 3, usize maxFunEvals = 10000,
       f64 optimalFitness = -std::numeric_limits<f64>::max());
 
@@ -94,13 +95,12 @@ private:
   };
 
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
-  void CheckValidationFunctionNormality(ValidationFunction valid);
   void CheckBounds();
   void CheckParameters();
   usize GetNumberOfParents();
-  void InitializeOutputs(ValidationFunction valid);
+  void InitializeOutputs();
   void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
-  void UpdateOutputs(usize generation, const Population& population, ValidationFunction valid);
+  void UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid);
   TerminationReason CheckTerminationCriterions(const Population& population, usize generation);
   std::string GetOutputString(usize generation, const Population& population);
   static const char* GetMutationStrategyString(MutationStrategy strategy);

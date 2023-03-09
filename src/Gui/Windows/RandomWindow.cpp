@@ -44,19 +44,15 @@ void RandomWindow::EvolutionOptimization(bool meta) const
   Evolution Evo(N);
   Evo.mNP = 5 * N;
   Evo.mMutStrat = Evolution::RAND1;
-  Evo.mLowerBounds = Zerovect(N, -5.0);
-  Evo.mUpperBounds = Zerovect(N, +5.0);
-  Evo.mMaxFunEvals = maxFunEvals;
-  Evo.mOptimalFitness = optimalFitness;
+  Evo.SetLowerBounds(Zerovect(N, -5.0));
+  Evo.SetUpperBounds(Zerovect(N, +5.0));
+  Evo.SetMaxFunEvals(maxFunEvals);
+  Evo.SetOptimalFitness(optimalFitness);
   Evo.SetName("debug");
   Evo.SetParameterNames({"x", "y"});
   Evo.SetConsoleOutput(true);
   Evo.SetPlotOutput(true);
-  Evo.SetPlotObjectiveFunctionLandscape(false);
-  Evo.SetPlotObjectiveFunctionLandscapeIterations(meta ? 51 : 301);
   Evo.SetSaveProgress(true);
-  if (not meta)
-    Evo.SetAllowInconsistent(true);
 
   if (meta)
     Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);

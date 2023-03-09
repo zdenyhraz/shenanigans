@@ -6,7 +6,7 @@ Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorit
   PROFILE_FUNCTION;
 }
 
-OptimizationAlgorithm::OptimizationResult Evolution::Optimize(ObjectiveFunction obj, ValidationFunction valid)
+OptimizationAlgorithm::OptimizationResult Evolution::Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid)
 try
 {
   PROFILE_FUNCTION;
@@ -16,10 +16,9 @@ try
   }
 
   CheckParameters();
-  InitializeOutputs(valid);
+  InitializeOutputs();
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
-  CheckValidationFunctionNormality(valid);
 
   usize gen = 0;
   Population population(mNP, N, obj, mLowerBounds, mUpperBounds, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
@@ -71,19 +70,6 @@ try
   result.bestFitnessProgress = population.bestFitnessProgress;
   result.bestParametersProgress = population.bestParametersProgress;
   result.evaluatedParameters = population.evaluatedParameters;
-
-  if (mPlotObjectiveFunctionLandscape)
-  {
-    const usize xParamIndex = 0;
-    const usize yParamIndex = 1;
-    const f64 xmin = mLowerBounds[xParamIndex];
-    const f64 xmax = mUpperBounds[xParamIndex];
-    const f64 ymin = mLowerBounds[yParamIndex];
-    const f64 ymax = mUpperBounds[yParamIndex];
-    const auto baseParams = mLowerBounds + 0.5 * (mUpperBounds - mLowerBounds);
-    PlotObjectiveFunctionLandscape(
-        obj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax, "x", "y", fmt::format("{} opt", mName), &result);
-  }
 
   return result;
 }
@@ -177,7 +163,6 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
   evo.SetFileOutput(false);
-  evo.SetPlotObjectiveFunctionLandscape(false);
   evo.SetSaveProgress(true);
 
   // calculate metaopt parameters
@@ -186,25 +171,9 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   if (optimalMetaParams.size() != MetaParameterCount)
     return;
 
-  if (mPlotObjectiveFunctionLandscape)
-  {
-    // plot metaopt surface
-    const usize xParamIndex = MetaNP;
-    const usize yParamIndex = MetaMutationStrategy;
-    const f64 xmin = evo.mLowerBounds[xParamIndex];
-    const f64 xmax = evo.mUpperBounds[xParamIndex];
-    const f64 ymin = evo.mLowerBounds[yParamIndex];
-    const f64 ymax = evo.mUpperBounds[yParamIndex];
-    const auto baseParams = std::vector<f64>{20., mCR, mF, (f64)RAND1, (f64)BIN};
-    PlotObjectiveFunctionLandscape(metaObj, baseParams, mPlotObjectiveFunctionLandscapeIterations, xParamIndex, yParamIndex, xmin, xmax, ymin, ymax,
-        GetMetaParameterString(static_cast<MetaParameter>(xParamIndex)), GetMetaParameterString(static_cast<MetaParameter>(yParamIndex)), fmt::format("{} metaopt", mName),
-        &metaOptResult);
-  }
-
   // save original settings and mute
   const auto consoleOutput = mConsoleOutput;
   const auto plotOutput = mPlotOutput;
-  const auto plotObjFunLandscape = mPlotObjectiveFunctionLandscape;
   const auto saveProgress = mSaveProgress;
   Mute();
   SetSaveProgress(true);
@@ -244,7 +213,6 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   // restore original settings
   SetConsoleOutput(consoleOutput);
   SetPlotOutput(plotOutput);
-  SetPlotObjectiveFunctionLandscape(plotObjFunLandscape);
   SetSaveProgress(saveProgress);
 
   struct OptimizationPerformanceStatistics
@@ -276,7 +244,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
 }
 
-void Evolution::InitializeOutputs(ValidationFunction valid)
+void Evolution::InitializeOutputs()
 try
 {
   PROFILE_FUNCTION;
@@ -327,43 +295,6 @@ catch (const std::exception& e)
   throw std::runtime_error(fmt::format("Objective function is not normal: {}", e.what()));
 }
 
-void Evolution::CheckValidationFunctionNormality(ValidationFunction valid)
-try
-{
-  PROFILE_FUNCTION;
-
-  if (not valid)
-    return;
-
-  const auto arg = 0.5 * (mLowerBounds + mUpperBounds);
-  const auto result1 = valid(arg);
-  const auto result2 = valid(arg);
-
-  if (result1 != result2)
-  {
-    if (not mAllowInconsistent)
-      throw std::runtime_error(fmt::format("Validation function is not consistent ({} != {})", result1, result2));
-    else if (mConsoleOutput)
-      LOG_WARNING("Validation function is consistent, but that is currently allowed");
-  }
-  else if (mConsoleOutput)
-    LOG_DEBUG("Validation function is consistent");
-
-  if (not std::isfinite(result1))
-    throw std::runtime_error(fmt::format("Validation function is not finite"));
-  else if (mConsoleOutput)
-    LOG_DEBUG("Validation function is finite");
-
-  if (result1 < 0)
-    throw std::runtime_error(fmt::format("Validation function is not positive"));
-  else if (mConsoleOutput)
-    LOG_DEBUG("Validation function is positive");
-}
-catch (const std::exception& e)
-{
-  throw std::runtime_error(fmt::format("Validation function is not normal: {}", e.what()));
-}
-
 void Evolution::CheckBounds()
 {
   PROFILE_FUNCTION;
@@ -387,7 +318,7 @@ void Evolution::CheckParameters()
     throw std::runtime_error("Invalid crossover strategy");
 }
 
-void Evolution::UpdateOutputs(usize generation, const Population& population, ValidationFunction valid)
+void Evolution::UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid)
 {
   PROFILE_FUNCTION;
 
@@ -416,7 +347,7 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, Va
     gens.push_back(generation);
     objvals.push_back(population.bestEntity.fitness);
     if (valid)
-      validvals.push_back(valid(population.bestEntity.params));
+      validvals.push_back(valid.value()(population.bestEntity.params));
     sims.push_back(population.relativeDifference * 100);
 
     Plot::Plot({.name = fmt::format("Evolution ({})", mName),

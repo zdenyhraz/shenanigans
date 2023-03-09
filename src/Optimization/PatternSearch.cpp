@@ -1,6 +1,6 @@
 #include "PatternSearch.hpp"
 
-OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(ObjectiveFunction obj, ValidationFunction valid)
+OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
   std::vector<f64> boundsRange = mUpperBounds - mLowerBounds;
