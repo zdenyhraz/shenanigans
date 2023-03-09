@@ -11,12 +11,9 @@ try
 {
   PROFILE_FUNCTION;
   if (mConsoleOutput)
-  {
     LOG_INFO("Running evolution");
-  }
 
   CheckParameters();
-  InitializeOutputs();
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
 
@@ -162,7 +159,6 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mUpperBounds = {30. * N, 1, 1.5, -1e-6 + static_cast<f64>(MutationStrategyCount), -1e-6 + static_cast<f64>(CrossoverStrategyCount)};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
-  evo.SetFileOutput(false);
   evo.SetSaveProgress(true);
 
   // calculate metaopt parameters
@@ -244,22 +240,6 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
 }
 
-void Evolution::InitializeOutputs()
-try
-{
-  PROFILE_FUNCTION;
-
-  if (mFileOutput)
-  {
-    mOutputFile.open(mOutputFileDir + mName + ".txt", std::ios::out | std::ios::app);
-    fmt::print(mOutputFile, "Evolution optimization '{}' started\n", mName);
-  }
-}
-catch (const std::exception& e)
-{
-  throw std::runtime_error(fmt::format("Could not initialize outputs: {}", e.what()));
-}
-
 void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
 try
 {
@@ -325,10 +305,6 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, co
   if (mConsoleOutput)
     LOG_DEBUG(GetOutputString(generation, population));
 
-  if (mFileOutput)
-    if (population.bestEntity.fitness < population.previousFitness)
-      fmt::print(mOutputFile, "{}\n", GetOutputString(generation, population));
-
   if (mPlotOutput)
   {
     static std::vector<f64> gens;
@@ -375,12 +351,6 @@ void Evolution::UninitializeOutputs(const Population& population, TerminationRea
 try
 {
   PROFILE_FUNCTION;
-  if (mFileOutput)
-  {
-    fmt::print(mOutputFile, "Evolution optimization '{}' ended\n", mName);
-    fmt::print(mOutputFile, "Evolution result: {}\n", GetOutputString(generation, population));
-    mOutputFile.close();
-  }
 
   if (mConsoleOutput)
   {

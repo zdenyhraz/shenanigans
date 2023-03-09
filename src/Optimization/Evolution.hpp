@@ -98,7 +98,6 @@ private:
   void CheckBounds();
   void CheckParameters();
   usize GetNumberOfParents();
-  void InitializeOutputs();
   void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
   void UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid);
   TerminationReason CheckTerminationCriterions(const Population& population, usize generation);

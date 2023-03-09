@@ -35,11 +35,8 @@ protected:
   usize maxGen = 1000;                                    // maximum # of algorithm iterations
   bool mConsoleOutput = true;
   bool mPlotOutput = true;
-  bool mFileOutput = false;
   bool mSaveProgress = false;
-  std::string mOutputFileDir;
   std::string mName;
-  std::ofstream mOutputFile;
   std::vector<std::string> mParameterNames;
   std::vector<std::function<std::string(f64)>> mParameterValueToNameFunctions;
 
@@ -75,20 +72,11 @@ public:
   {
     SetConsoleOutput(false);
     SetPlotOutput(false);
-    SetFileOutput(false);
   }
 
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
 
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
-
-  void SetFileOutput(bool FileOutput) { mFileOutput = FileOutput; }
-
-  void SetFileOutputDir(const std::string& dir)
-  {
-    mOutputFileDir = dir;
-    mFileOutput = true;
-  }
 
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
 
