@@ -65,20 +65,13 @@ public:
       f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
   void SetMaxFunEvals(usize maxFunEvals) { mMaxFunEvals = maxFunEvals; }
-
   void SetOptimalFitness(f64 optimalFitness) { mOptimalFitness = optimalFitness; }
-
-  void Mute()
-  {
-    SetConsoleOutput(false);
-    SetPlotOutput(false);
-  }
-
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
-
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
-
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
+  void SetName(const std::string& optname) { mName = optname; }
+  void SetLowerBounds(const std::vector<f64>& lowerBounds) { mLowerBounds = lowerBounds; }
+  void SetUpperBounds(const std::vector<f64>& upperBounds) { mUpperBounds = upperBounds; }
 
   void SetParameterNames(const std::vector<std::string>& ParameterNames)
   {
@@ -102,16 +95,16 @@ public:
     LOG_WARNING("Parameter name {} not defined, ignoring value -> name function", ParameterName);
   }
 
-  void SetName(const std::string& optname) { mName = optname; }
-
-  void SetLowerBounds(const std::vector<f64>& lowerBounds) { mLowerBounds = lowerBounds; }
-
-  void SetUpperBounds(const std::vector<f64>& upperBounds) { mUpperBounds = upperBounds; }
-
   void SetBounds(const std::string& parameterName, f64 lower, f64 upper)
   {
     const auto index = GetParameterIndex(parameterName);
     mLowerBounds[index] = lower;
     mUpperBounds[index] = upper;
+  }
+
+  void Mute()
+  {
+    SetConsoleOutput(false);
+    SetPlotOutput(false);
   }
 };
