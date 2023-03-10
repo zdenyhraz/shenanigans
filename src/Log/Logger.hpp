@@ -1,5 +1,11 @@
 #pragma once
 
+template <typename... Args>
+std::string CreateMessage(std::string_view fmt, Args&&... args)
+{
+  return fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...));
+}
+
 class Logger
 {
 public:

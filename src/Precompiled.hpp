@@ -34,6 +34,7 @@
 #include <bit>
 #include <ranges>
 #include <future>
+#include <stacktrace>
 
 #define ImDrawIdx unsigned int
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -116,16 +117,16 @@ using namespace std::chrono_literals;
 using namespace pybind11::literals;
 
 #include "Log/Log.hpp"
-#include "Log/LogFunction.hpp"
 
 #include "Math/Functions.hpp"
 #include "Math/Transform.hpp"
 #include "Math/RNG.hpp"
 #include "Math/Statistics.hpp"
 
+#include "Utils/Filesystem.hpp"
+#include "Utils/Exception.hpp"
 #include "Utils/DateTime.hpp"
 #include "Utils/Operators.hpp"
-#include "Utils/Filesystem.hpp"
 #include "Utils/Timer.hpp"
 #include "Utils/Formatters.hpp"
 #include "Utils/ThreadUtils.hpp"

@@ -1,16 +1,7 @@
 #pragma once
-#include "Log.hpp"
+#include "Logger.hpp"
 
-#define LOG_FUNCTION                                                                                                                                                               \
-  LogFunction logFunction(fmt::format("{} | {}:{}", std::source_location::current().function_name(),                                                                               \
-      std::filesystem::relative(std::filesystem::path(std::source_location::current().file_name()), GetProjectDirectoryPath("src")).string(),                                      \
-      std::source_location::current().line()))
-#define LOG_FUNCTION_IF(show) LogFunction<show> logFunction(std::source_location::current().function_name())
-
-#define LOG_SCOPE(funName) LogFunction logScope(funName)
-#define LOG_SCOPE_IF(show, funName) LogFunction<show> logScope(funName)
-
-template <bool Show = true>
+template <class MainLogger, bool Show = true>
 class LogFunction
 {
   using clock = std::chrono::high_resolution_clock;

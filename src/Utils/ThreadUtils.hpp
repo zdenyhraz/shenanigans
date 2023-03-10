@@ -10,6 +10,10 @@ inline void LaunchAsync(T&& fun)
         {
           fun();
         }
+        catch (const ShenanigansException& e)
+        {
+          e.Log();
+        }
         catch (const std::exception& e)
         {
           LOG_EXCEPTION(e);

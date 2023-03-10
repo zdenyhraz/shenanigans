@@ -7,6 +7,10 @@ try
   app.Run();
   return EXIT_SUCCESS;
 }
+catch (const ShenanigansException& e)
+{
+  e.Log();
+}
 catch (const std::exception& e)
 {
   LOG_EXCEPTION(e);

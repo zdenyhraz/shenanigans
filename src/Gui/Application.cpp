@@ -34,7 +34,7 @@ void Application::Run()
     SetWindowIcon(window);
   ImGuiIO& io = ImGuiInitialize(window, scale);
   Initialize();
-  LOG_DEBUG("Ready");
+  LOG_SUCCESS("Ready");
   f64 lastUpdateTime = 0, elapsedTime = 0;
   while (!glfwWindowShouldClose(window))
   {
@@ -91,6 +91,10 @@ try
   ImGuiPlot::Render();
   PyPlot::Render();
   CvPlot::Render();
+}
+catch (const ShenanigansException& e)
+{
+  e.Log();
 }
 catch (const std::exception& e)
 {
