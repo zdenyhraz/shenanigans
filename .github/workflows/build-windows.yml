@@ -13,6 +13,11 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Setup windows
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: install wget
+
+      - name: Setup torch
         run: ./script/windows/setup_torch.bat
 
       - name: OpenCV cache
