@@ -1,4 +1,4 @@
-name: build
+name: build-linux
 
 on: [push,pull_request]
 
@@ -34,4 +34,4 @@ jobs:
         run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
 
       - name: CMake build
-        run: cmake --build ./build --config Release --target shenanigans -j 6
+        run: cmake --build ./build --config Release --target shenanigans -j 8

@@ -1,0 +1,37 @@
+name: build-windows
+
+on: [push,pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Setup windows
+        run: ./script/windows/setup_torch.bat
+
+      - name: OpenCV cache
+        id: opencv-cache
+        uses: actions/cache@v3
+        with:
+          path: ./opencv
+          key: ${{runner.os}}-opencv-cache-v4
+
+      - name: OpenCV install from cache
+        if: steps.opencv-cache.outputs.cache-hit == 'true'
+        run: cd opencv/build && sudo cmake install
+
+      - name: OpenCV install from source
+        if: steps.opencv-cache.outputs.cache-hit != 'true'
+        run: ./script/windows/setup_opencv.bat
+
+      - name: CMake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build
+
+      - name: CMake build
+        run: cmake --build ./build --config Release --target shenanigans -j 8
