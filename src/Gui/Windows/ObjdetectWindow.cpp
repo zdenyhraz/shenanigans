@@ -7,10 +7,6 @@ void ObjdetectWindow::DetectObjectsSO() const
 {
   LOG_FUNCTION;
 
-  auto x = 1.2345;
-  LOG_VARIABLE(x);
-  throw EXCEPTION("lmaoo exception devet {}", 9);
-
   auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
   if (mSOParameters.imageSize != 1)
     cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
