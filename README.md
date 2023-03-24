@@ -6,6 +6,7 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test.yml/badge.svg"/></a>
+<br>
 <!-- <a href="https://codecov.io/gh/zdenyhraz/shenanigans"><img src="https://codecov.io/gh/zdenyhraz/shenanigans/branch/master/graph/badge.svg?token=2CD71S18CG"/></a> -->
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sonarcloud.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
@@ -32,7 +33,6 @@
 <a href="https://github.com/zdenyhraz/shenanigans/search?l=c%2B%2B"><img src="https://img.shields.io/github/languages/top/zdenyhraz/shenanigans"></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/tags"><img src="https://img.shields.io/github/v/tag/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commits-since/zdenyhraz/shenanigans/latest"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/releases"><img src="https://img.shields.io/github/v/release/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/blob/master/LICENSE.md"><img src="https://img.shields.io/github/license/zdenyhraz/shenanigans.svg"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans"></a>
