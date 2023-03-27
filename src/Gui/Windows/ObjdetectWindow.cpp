@@ -112,7 +112,9 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("objectness threshold", &mSOParameters.soParams.objectnessThreshold, 0, 1, "%.2f");
 
       ImGui::Text("Object filtering");
-      ImGui::Checkbox("show filtered", &mSOParameters.soParams.showFiltered);
+      ImGui::Checkbox("draw filtered", &mSOParameters.soParams.drawFiltered);
+      ImGui::Checkbox("draw bboxes", &mSOParameters.soParams.drawBboxes);
+      ImGui::Checkbox("draw contours", &mSOParameters.soParams.drawContours);
       ImGui::SliderFloat("min area", &mSOParameters.minObjectAreaPercent, 0, 5, "%.2f%%", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("max elongatedness", &mSOParameters.soParams.maxObjectElongatedness, 3, 30, "%.1f");
     }
