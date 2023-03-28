@@ -6,18 +6,13 @@
 void ObjdetectWindow::DetectObjectsSO() const
 {
   LOG_FUNCTION;
-
   auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
-  if (mSOParameters.imageSize != 1)
-    cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
-  std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams);
+  std::ignore = DetectObjectsSobelObjectness(image, mSOParameters);
 }
 
 SobelObjectnessParameters ObjdetectWindow::OptimizeSOParameters() const
 {
   auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
-  if (mSOParameters.imageSize != 1)
-    cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
   const auto objects = DetectObjectsSobelObjectness(image, SobelObjectnessParameters());
   return OptimizeSobelObjectnessParameters({{image, objects}});
 }
@@ -37,7 +32,7 @@ void ObjdetectWindow::DetectObjectsSODirectory() const
     auto image = LoadUnitFloatImage<f32>(entry.path());
     if (mSOParameters.imageSize != 1)
       cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
-    std::ignore = DetectObjectsSobelObjectness(image, mSOParameters.soParams, GetProjectDirectoryPath(saveDirectoryPath) / entry.path().filename());
+    std::ignore = DetectObjectsSobelObjectness(image, mSOParameters, GetProjectDirectoryPath(saveDirectoryPath) / entry.path().filename());
   }
 }
 
@@ -76,10 +71,10 @@ void ObjdetectWindow::Render()
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
     {
       if (ImGui::Button("Default"))
-        LaunchAsync([&]() { mSOParameters = SobelObjectnessWindowParameters(); });
+        LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
       ImGui::SameLine();
       if (ImGui::Button("Optimize"))
-        LaunchAsync([&]() { mSOParameters.soParams = OptimizeSOParameters(); });
+        LaunchAsync([&]() { mSOParameters = OptimizeSOParameters(); });
       ImGui::SameLine();
       if (ImGui::Button("Detect objects"))
         LaunchAsync([&]() { DetectObjectsSO(); });
@@ -101,22 +96,24 @@ void ObjdetectWindow::Render()
         LaunchAsync([&]() { DetectObjectsSODirectory(); });
 
       ImGui::Text("Input parameters");
-      ImGui::SliderFloat("image size", &mSOParameters.imageSizePercent, 10, 100, "%.0f%%");
-      ImGui::SliderFloat("blur size", &mSOParameters.blurSizePercent, 0, 10, "%.0f%%");
+      ImGui::SliderInt("image size", &mSOParameters.imageSize, 256, 4096);
+      ImGui::SliderFloat("blur size", &mSOParameters.blurSize, 0, 0.1, "%.2f%%");
 
       ImGui::Text("Edge detection parameters");
-      ImGui::SliderFloat("edge size", &mSOParameters.soParams.edgeSize, 3, 31, "%.0f");
+      ImGui::SliderInt("edge size", &mSOParameters.edgeSize, 3, 31);
 
       ImGui::Text("Objectness parameters");
-      ImGui::SliderFloat("objectness radius", &mSOParameters.objectnessRadiusPercent, 1, 10, "%.1f%%");
-      ImGui::SliderFloat("objectness threshold", &mSOParameters.soParams.objectnessThreshold, 0, 1, "%.2f");
+      ImGui::SliderFloat("objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.2f%%");
+      ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.2f");
 
       ImGui::Text("Object filtering");
-      ImGui::Checkbox("draw filtered", &mSOParameters.soParams.drawFiltered);
-      ImGui::Checkbox("draw bboxes", &mSOParameters.soParams.drawBboxes);
-      ImGui::Checkbox("draw contours", &mSOParameters.soParams.drawContours);
-      ImGui::SliderFloat("min area", &mSOParameters.minObjectAreaPercent, 0, 5, "%.2f%%", ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderFloat("max elongatedness", &mSOParameters.soParams.maxObjectElongatedness, 3, 30, "%.1f");
+      ImGui::Checkbox("draw filtered", &mSOParameters.drawFiltered);
+      ImGui::SameLine();
+      ImGui::Checkbox("draw bboxes", &mSOParameters.drawBboxes);
+      ImGui::SameLine();
+      ImGui::Checkbox("draw contours", &mSOParameters.drawContours);
+      ImGui::SliderFloat("min area", &mSOParameters.minObjectArea, 0, 0.05, "%.2f%%", ImGuiSliderFlags_Logarithmic);
+      ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
     }
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
@@ -140,5 +137,4 @@ void ObjdetectWindow::Render()
 
     ImGui::EndTabItem();
   }
-  mSOParameters.Update();
 }
