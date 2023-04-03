@@ -39,8 +39,11 @@ protected:
   std::vector<PlotData2D> mPlots2D;
   std::mutex mPlotsMutex;
   bool mSave = false;
+  bool mShouldPlot = true;
 
 public:
+  static bool ShouldPlot() { return Singleton<T>::Get().mShouldPlot; }
+
   static void Initialize()
   {
     PROFILE_FUNCTION;
@@ -91,9 +94,13 @@ public:
 
   static void SetSave(bool save) { Singleton<T>::Get().mSave = save; }
 
+  static void SetPlot(bool shouldPlot) { Singleton<T>::Get().mShouldPlot = shouldPlot; }
+
   static void Plot(PlotData1D&& data)
   {
     PROFILE_FUNCTION;
+    if (not ShouldPlot())
+      return;
     if (data.x.empty())
       data.x = Iota(0., data.ys[0].size());
 
@@ -103,6 +110,8 @@ public:
   static void Plot(PlotData2D&& data)
   {
     PROFILE_FUNCTION;
+    if (not ShouldPlot())
+      return;
     if (data.z.empty())
       throw std::invalid_argument("Unable to plot empty data");
     if (not data.z.isContinuous())
@@ -153,5 +162,10 @@ public:
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
   }
 
-  static void Plot(const std::string& name, const cv::Mat& z) { Plot({.name = name, .z = z}); }
+  static void Plot(const std::string& name, const cv::Mat& z)
+  {
+    if (not ShouldPlot())
+      return;
+    Plot({.name = name, .z = z});
+  }
 };

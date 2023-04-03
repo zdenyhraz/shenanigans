@@ -6,13 +6,13 @@
 void ObjdetectWindow::DetectObjectsSO() const
 {
   LOG_FUNCTION;
-  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
+  const auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters);
 }
 
 SobelObjectnessParameters ObjdetectWindow::OptimizeSOParameters() const
 {
-  auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
+  const auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
   const auto objects = DetectObjectsSobelObjectness(image, SobelObjectnessParameters());
   return OptimizeSobelObjectnessParameters({{image, objects}});
 }
@@ -20,19 +20,14 @@ SobelObjectnessParameters ObjdetectWindow::OptimizeSOParameters() const
 void ObjdetectWindow::DetectObjectsSODirectory() const
 {
   LOG_FUNCTION;
-  if (not std::filesystem::exists(GetProjectDirectoryPath(saveDirectoryPath)))
-    std::filesystem::create_directory(GetProjectDirectoryPath(saveDirectoryPath));
   const auto fileCount = GetFileCount(GetProjectDirectoryPath(imageDirectoryPath));
   for (const auto& entry : std::filesystem::directory_iterator(GetProjectDirectoryPath(imageDirectoryPath)))
   {
     static usize fileIndex = 0;
     LOG_PROGRESS_NAME(entry.path().string());
     LOG_PROGRESS(static_cast<f32>(++fileIndex) / fileCount);
-
-    auto image = LoadUnitFloatImage<f32>(entry.path());
-    if (mSOParameters.imageSize != 1)
-      cv::resize(image, image, cv::Size(mSOParameters.imageSize * image.cols, mSOParameters.imageSize * image.rows));
-    std::ignore = DetectObjectsSobelObjectness(image, mSOParameters, GetProjectDirectoryPath(saveDirectoryPath) / entry.path().filename());
+    const auto image = LoadUnitFloatImage<f32>(entry.path());
+    std::ignore = DetectObjectsSobelObjectness(image, mSOParameters);
   }
 }
 
@@ -65,7 +60,6 @@ void ObjdetectWindow::Render()
     ImGui::Separator();
     ImGui::InputText("image path", &imagePath);
     ImGui::InputText("image directory path", &imageDirectoryPath);
-    ImGui::InputText("save directory path", &saveDirectoryPath);
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
