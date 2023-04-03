@@ -8,7 +8,7 @@ class TerminalLogger : public Logger
   template <typename... Args>
   void MessageInternal(LogLevel logLevel, std::string_view fmt, Args&&... args) const
   {
-    if (not ShouldLog(logLevel)) [[unlikely]]
+    if (not ShouldLog(logLevel))
       return;
 
     fmt::print("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));

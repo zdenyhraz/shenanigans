@@ -9,7 +9,7 @@ inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath = 
       return relpath.empty() ? path : path / relpath;
     path = path.parent_path();
   }
-  throw std::runtime_error("Could not find root project directory");
+  return std::filesystem::current_path();
 }
 
 inline usize GetFileCount(const std::filesystem::path& dirpath)
