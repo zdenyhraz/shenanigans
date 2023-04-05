@@ -10,13 +10,6 @@ void ObjdetectWindow::DetectObjectsSO() const
   std::ignore = DetectObjectsSobelObjectness(image, mSOParameters);
 }
 
-SobelObjectnessParameters ObjdetectWindow::OptimizeSOParameters() const
-{
-  const auto image = LoadUnitFloatImage<f32>(imagePath.starts_with("data/") ? GetProjectDirectoryPath(imagePath) : std::filesystem::path(imagePath));
-  const auto objects = DetectObjectsSobelObjectness(image, SobelObjectnessParameters());
-  return OptimizeSobelObjectnessParameters({{image, objects}});
-}
-
 void ObjdetectWindow::DetectObjectsSODirectory() const
 {
   LOG_FUNCTION;
@@ -60,6 +53,7 @@ void ObjdetectWindow::Render()
     ImGui::Separator();
     ImGui::InputText("image path", &imagePath);
     ImGui::InputText("image directory path", &imageDirectoryPath);
+    ImGui::InputText("object directory path", &objectDirectoryPath);
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
@@ -68,7 +62,7 @@ void ObjdetectWindow::Render()
         LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
       ImGui::SameLine();
       if (ImGui::Button("Optimize"))
-        LaunchAsync([&]() { mSOParameters = OptimizeSOParameters(); });
+        LaunchAsync([&]() { mSOParameters = OptimizeSobelObjectnessParameters(GetProjectDirectoryPath(objectDirectoryPath)); });
       ImGui::SameLine();
       if (ImGui::Button("Detect objects"))
         LaunchAsync([&]() { DetectObjectsSO(); });
@@ -98,7 +92,7 @@ void ObjdetectWindow::Render()
 
       ImGui::Text("Objectness parameters");
       ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
-      ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.2f");
+      ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.3f");
 
       ImGui::Text("Object filtering");
       ImGui::Checkbox("draw filtered", &mSOParameters.drawFiltered);
