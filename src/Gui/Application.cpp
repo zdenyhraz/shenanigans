@@ -4,6 +4,7 @@
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
+#include "Windows/TACWindow.hpp"
 
 void Application::Initialize()
 {
@@ -12,6 +13,7 @@ void Application::Initialize()
   mWindows.push_back(std::make_unique<AstroWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
+  mWindows.push_back(std::make_unique<TACWindow>());
 
   for (const auto& window : mWindows)
     window->Initialize();
