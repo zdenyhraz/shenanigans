@@ -20,7 +20,7 @@ using MainLogger = ImGuiLogger;
 #define LOG_PROGRESS(progress) MainLogger::SetProgress(progress)
 #define LOG_PROGRESS_NAME(progressName) MainLogger::SetProgressName(progressName)
 #define LOG_PROGRESS_RESET MainLogger::ResetProgress()
-#define LOG_VARIABLE(variable) MainLogger::Message(Logger::LogLevel::Info, fmt::format("{}/{}: {} {}", SOURCE_FUNCTION, #variable, variable, SOURCE_LOCATION))
+#define LOG_VARIABLE(variable) MainLogger::Message(Logger::LogLevel::Info, fmt::format("{}: {} {}", #variable, variable, SOURCE_LOCATION))
 #define LOG_FUNCTION LogFunction<MainLogger> logFunction(fmt::format("{} {}", SOURCE_FUNCTION, SOURCE_LOCATION))
 #define LOG_FUNCTION_IF(show) LogFunction<MainLogger, show> logFunction(fmt::format("{} {}", SOURCE_FUNCTION, SOURCE_LOCATION))
 #define LOG_SCOPE(funName) LogFunction<MainLogger> logScope(funName)
