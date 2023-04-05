@@ -91,13 +91,13 @@ void ObjdetectWindow::Render()
 
       ImGui::Text("Input parameters");
       ImGui::SliderInt("image size", &mSOParameters.imageSize, 256, 4096);
-      ImGui::SliderFloat("blur size", &mSOParameters.blurSize, 0, 0.1, "%.2f%%");
+      ImGui::SliderFloat("relative blur size", &mSOParameters.blurSize, 0, 0.1, "%.3f");
 
       ImGui::Text("Edge detection parameters");
       ImGui::SliderInt("edge size", &mSOParameters.edgeSize, 3, 31);
 
       ImGui::Text("Objectness parameters");
-      ImGui::SliderFloat("objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.2f%%");
+      ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.2f");
 
       ImGui::Text("Object filtering");
@@ -106,7 +106,7 @@ void ObjdetectWindow::Render()
       ImGui::Checkbox("draw bboxes", &mSOParameters.drawBboxes);
       ImGui::SameLine();
       ImGui::Checkbox("draw contours", &mSOParameters.drawContours);
-      ImGui::SliderFloat("min area", &mSOParameters.minObjectArea, 0, 0.05, "%.2f%%", ImGuiSliderFlags_Logarithmic);
+      ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.05, "%.3f", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
     }
 
