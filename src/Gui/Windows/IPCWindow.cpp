@@ -43,7 +43,7 @@ void IPCWindow::Render()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Iterative Phase correlation utils"))
     {
-      ImGui::Text("Debug uils");
+      ImGui::BulletText("Debug utils");
       if (ImGui::Button("DebugShift"))
         LaunchAsync([&]() { IPCDebug::DebugShift(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
       ImGui::SameLine();
@@ -56,7 +56,7 @@ void IPCWindow::Render()
       if (ImGui::Button("DebugGradual"))
         LaunchAsync([&]() { IPCDebug::DebugGradualShift(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
 
-      ImGui::Text("IPC accuracy measurement/optimization");
+      ImGui::BulletText("IPC accuracy measurement/optimization");
       if (ImGui::Button("Measure"))
         LaunchAsync([&]() { IPCMeasure::MeasureAccuracy(mIPC, mIPCOptimized, GetCurrentDatasetPath()); });
       ImGui::SameLine();
@@ -80,7 +80,7 @@ void IPCWindow::Render()
       ImGui::SliderFloat("test ratio", &mOptimizeParameters.testRatio, 0.0, 1.0);
       ImGui::SliderInt("popsize", &mOptimizeParameters.popSize, 6, 60);
 
-      ImGui::Text("False correlations removal");
+      ImGui::BulletText("False correlations removal");
       if (ImGui::Button("IPC/FCR"))
         LaunchAsync([&]() { FalseCorrelationsRemoval(); });
     }

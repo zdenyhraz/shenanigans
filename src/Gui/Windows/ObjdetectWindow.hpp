@@ -5,8 +5,9 @@
 class ObjdetectWindow : public Window
 {
   std::string imagePath = "data/ObjectDetection/sonar/tif/sasi-S-upper-20221102-143803-l38.tif";
-  std::string imageDirectoryPath = "data/ObjectDetection/sonar/tif";
-  std::string objectDirectoryPath = "data/ObjectDetection/sonar/tac";
+  std::string imageDirectoryPath = "data/ObjectDetection/sonar/interesting";
+  std::string optimizeImageDirectoryPath = "data/ObjectDetection/sonar/tif";
+  std::string optimizeObjectDirectoryPath = "data/ObjectDetection/sonar/tac";
   mutable FilePathGenerator filePathGenerator{GetProjectDirectoryPath(imageDirectoryPath).string()};
   SobelObjectnessParameters mSOParameters;
   std::string modelPath = "data/DNN/yolov8/yolov8x";

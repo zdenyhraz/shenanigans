@@ -51,18 +51,10 @@ void ObjdetectWindow::Render()
   if (ImGui::BeginTabItem("Objdetect"))
   {
     ImGui::Separator();
-    ImGui::InputText("image path", &imagePath);
-    ImGui::InputText("image directory path", &imageDirectoryPath);
-    ImGui::InputText("object directory path", &objectDirectoryPath);
-
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via Sobel objectness"))
     {
-      if (ImGui::Button("Default"))
-        LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
-      ImGui::SameLine();
-      if (ImGui::Button("Optimize"))
-        LaunchAsync([&]() { mSOParameters = OptimizeSobelObjectnessParameters(GetProjectDirectoryPath(objectDirectoryPath)); });
+      ImGui::BulletText("Image source");
       ImGui::SameLine();
       if (ImGui::Button("Detect objects"))
         LaunchAsync([&]() { DetectObjectsSO(); });
@@ -82,29 +74,36 @@ void ObjdetectWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("Detect objects dir"))
         LaunchAsync([&]() { DetectObjectsSODirectory(); });
+      ImGui::InputText("image", &imagePath);
+      ImGui::InputText("image directory", &imageDirectoryPath);
 
-      ImGui::Text("Input parameters");
+      ImGui::BulletText("Parameter optimization");
+      ImGui::SameLine();
+      if (ImGui::Button("Optimize"))
+        LaunchAsync([&]()
+            { mSOParameters = OptimizeSobelObjectnessParameters(GetProjectDirectoryPath(optimizeImageDirectoryPath), GetProjectDirectoryPath(optimizeObjectDirectoryPath)); });
+      ImGui::InputText("optimize image directory", &optimizeImageDirectoryPath);
+      ImGui::InputText("optimize object directory", &optimizeObjectDirectoryPath);
+
+      ImGui::BulletText("Parameters");
+      ImGui::SameLine();
+      if (ImGui::Button("Default"))
+        LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
       ImGui::SliderInt("image size", &mSOParameters.imageSize, 256, 4096);
       ImGui::SliderFloat("relative blur size", &mSOParameters.blurSize, 0, 0.1, "%.3f");
-
-      ImGui::Text("Edge detection parameters");
       ImGui::SliderInt("edge size", &mSOParameters.edgeSize, 3, 31);
-
-      ImGui::Text("Objectness parameters");
       ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.3f");
-
-      ImGui::Text("Object filtering");
+      ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.05, "%.3f", ImGuiSliderFlags_Logarithmic);
+      ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
       ImGui::Checkbox("draw filtered", &mSOParameters.drawFiltered);
       ImGui::SameLine();
       ImGui::Checkbox("draw bboxes", &mSOParameters.drawBboxes);
       ImGui::SameLine();
       ImGui::Checkbox("draw contours", &mSOParameters.drawContours);
-      ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.05, "%.3f", ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
     }
 
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    // ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via DNN"))
     {
       ImGui::InputText("model path", &modelPath);
@@ -112,7 +111,7 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("confidence threshold", &confidenceThreshold, 0, 1, "%.2f");
       ImGui::SliderFloat("NMS threshold", &NMSThreshold, 0, 1, "%.2f");
 
-      ImGui::Text("YOLOv8");
+      ImGui::BulletText("YOLOv8");
       if (ImGui::Button("YOLOv8 OpenCV"))
         LaunchAsync([&]() { DetectObjectsYOLOv8CVW(); });
       ImGui::SameLine();
