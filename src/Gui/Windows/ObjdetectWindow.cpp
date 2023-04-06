@@ -91,7 +91,6 @@ void ObjdetectWindow::Render()
         LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
       ImGui::SliderInt("image size", &mSOParameters.imageSize, 256, 4096);
       ImGui::SliderFloat("relative blur size", &mSOParameters.blurSize, 0, 0.1, "%.3f");
-      ImGui::SliderInt("edge size", &mSOParameters.edgeSize, 3, 31);
       ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 1, "%.3f");
       ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.05, "%.3f", ImGuiSliderFlags_Logarithmic);
