@@ -5,7 +5,7 @@
 class ObjdetectWindow : public Window
 {
   std::string imagePath = "data/ObjectDetection/sonar/interesting/sasi-S-upper-20221102-143803-l38.tif";
-  std::string imageDirectoryPath = "data/ObjectDetection/sonar/interesting";
+  std::string imageDirectoryPath = "data/ObjectDetection/sonar/tif";
   std::string optimizeImageDirectoryPath = "data/ObjectDetection/sonar/tif";
   std::string optimizeObjectDirectoryPath = "data/ObjectDetection/sonar/tac";
   mutable FilePathGenerator filePathGenerator{GetProjectDirectoryPath(imageDirectoryPath).string()};

@@ -94,13 +94,15 @@ void ObjdetectWindow::Render()
       ImGui::SliderFloat("relative edge size", &mSOParameters.edgeSize, 0.001, 0.1, "%.3f", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 0.3, "%.3f", ImGuiSliderFlags_Logarithmic);
+      ImGui::SliderFloat("shadow threshold", &mSOParameters.shadowThreshold, 0, 1, "%.3f", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.1, "%.3f");
       ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
       ImGui::Checkbox("draw filtered", &mSOParameters.drawFiltered);
       ImGui::SameLine();
       ImGui::Checkbox("draw bboxes", &mSOParameters.drawBboxes);
-      ImGui::SameLine();
       ImGui::Checkbox("draw contours", &mSOParameters.drawContours);
+      ImGui::SameLine();
+      ImGui::Checkbox("draw shadow contours", &mSOParameters.drawShadowContours);
     }
 
     // ImGui::SetNextItemOpen(true, ImGuiCond_Once);
