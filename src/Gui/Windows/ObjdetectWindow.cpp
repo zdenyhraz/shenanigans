@@ -89,20 +89,26 @@ void ObjdetectWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("Default"))
         LaunchAsync([&]() { mSOParameters = SobelObjectnessParameters(); });
-      ImGui::SliderInt("image size", &mSOParameters.imageSize, 256, 4096);
-      ImGui::SliderFloat("relative blur size", &mSOParameters.blurSize, 0, 0.1, "%.3f");
-      ImGui::SliderFloat("relative edge size", &mSOParameters.edgeSize, 0.001, 0.1, "%.3f", ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderFloat("relative objectness radius", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
+      ImGui::SameLine();
+      ImGui::Checkbox("calculate shadows", &mSOParameters.calculateShadows);
+      ImGui::SliderInt("image size [px]", &mSOParameters.imageSize, 256, 4096);
+      ImGui::SliderFloat("blur size [%]", &mSOParameters.blurSize, 0, 0.1, "%.3f");
+      ImGui::SliderFloat("edge size [%]", &mSOParameters.edgeSize, 0.001, 0.1, "%.3f", ImGuiSliderFlags_Logarithmic);
+      ImGui::SliderFloat("objectness radius [%]", &mSOParameters.objectnessRadius, 0.01, 0.1, "%.3f");
       ImGui::SliderFloat("objectness threshold", &mSOParameters.objectnessThreshold, 0, 0.3, "%.3f", ImGuiSliderFlags_Logarithmic);
       ImGui::SliderFloat("shadow threshold", &mSOParameters.shadowThreshold, 0, 1, "%.3f", ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderFloat("relative min area", &mSOParameters.minObjectArea, 0, 0.1, "%.3f");
+      ImGui::SliderFloat("shadow morphex [%]", &mSOParameters.shadowMorphex, 0, 0.01, "%.3f");
+      ImGui::SliderFloat("min area [%]", &mSOParameters.minObjectArea, 0, 0.1, "%.3f");
       ImGui::SliderFloat("max elongatedness", &mSOParameters.maxObjectElongatedness, 3, 30, "%.1f");
-      ImGui::Checkbox("draw filtered", &mSOParameters.drawFiltered);
+
+      ImGui::BulletText("Draw parameters");
+      ImGui::Checkbox("filtered", &mSOParameters.drawFiltered);
       ImGui::SameLine();
-      ImGui::Checkbox("draw bboxes", &mSOParameters.drawBboxes);
-      ImGui::Checkbox("draw contours", &mSOParameters.drawContours);
+      ImGui::Checkbox("bboxes", &mSOParameters.drawBboxes);
       ImGui::SameLine();
-      ImGui::Checkbox("draw shadow contours", &mSOParameters.drawShadowContours);
+      ImGui::Checkbox("contours", &mSOParameters.drawContours);
+      ImGui::SameLine();
+      ImGui::Checkbox("shadow contours", &mSOParameters.drawShadowContours);
     }
 
     // ImGui::SetNextItemOpen(true, ImGuiCond_Once);
