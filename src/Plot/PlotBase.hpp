@@ -132,7 +132,7 @@ public:
       data.ymax = 0;
     }
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
-      data.savepath = fmt::format("../data/debug/{}.png", data.name);
+      data.savepath = GetProjectDirectoryPath(fmt::format("data/debug/{}.png", data.name)).string();
 
     if (data.z.channels() == 3)
     {

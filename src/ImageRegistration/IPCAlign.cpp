@@ -9,7 +9,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, const cv::Mat& image1, const cv::Mat& im
 cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 {
   PROFILE_FUNCTION;
-  static constexpr bool debugMode = false;
+  static constexpr bool debugMode = true;
   static constexpr bool save = true;
   static constexpr auto IPCMode = IPC::Mode::Normal;
 
@@ -48,6 +48,7 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
+
     Plot::Plot("image1 FT Magnitude", img1FTm);
     Plot::Plot("image2 FT Magnitude", img2FTm);
   }

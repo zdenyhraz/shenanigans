@@ -24,32 +24,28 @@ void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const
 void IPCDebug::DebugCrossPowerSpectrum(const IPC& ipc, const cv::Mat& crosspower)
 {
   Plot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), FFTShift(Magnitude(crosspower)));
-  Plot::Plot(fmt::format("{} CP Phase", ipc.mDebugName), FFTShift(Phase(crosspower)));
+  Plot::Plot({.name = fmt::format("{} CP Phase", ipc.mDebugName), .z = FFTShift(Phase(crosspower)), .cmap = "jet"});
 }
 
 void IPCDebug::DebugL3(const IPC& ipc, const cv::Mat& L3)
 {
-  Plot::Plot({.name = fmt::format("{} L3", ipc.mDebugName), .z = L3});
-  Plot::Plot({.name = fmt::format("{} L3 surf", ipc.mDebugName), .z = L3, .surf = true});
+  Plot::Plot({.name = fmt::format("{} L3", ipc.mDebugName), .z = L3, .cmap = "jet"});
 }
 
 void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 {
   auto plot = L2.clone();
   cv::resize(plot, plot, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  Plot::Plot(fmt::format("{} L2", ipc.mDebugName), plot);
+  Plot::Plot(
+      {.name = fmt::format("{} L2", ipc.mDebugName), .z = plot, .xmin = 0, .xmax = static_cast<f32>(L2.cols - 1), .ymin = 0, .ymax = static_cast<f32>(L2.rows - 1), .cmap = "jet"});
 }
 
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
 {
   Plot::Plot({.name = fmt::format("{} L2U", ipc.mDebugName),
       .z = L2U,
+      .cmap = "jet",
       .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
-
-  Plot::Plot({.name = fmt::format("{} L2U surf", ipc.mDebugName),
-      .z = L2U,
-      .surf = true,
-      .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2Us_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 
   if (false)
   {
@@ -61,10 +57,6 @@ void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
     Plot::Plot(fmt::format("{} L2U nearest", ipc.mDebugName), nearest);
     Plot::Plot(fmt::format("{} L2U linear", ipc.mDebugName), linear);
     Plot::Plot(fmt::format("{} L2U cubic", ipc.mDebugName), cubic);
-
-    Plot::Plot({.name = fmt::format("{} L2U nearest surf", ipc.mDebugName), .z = nearest, .surf = true});
-    Plot::Plot({.name = fmt::format("{} L2U linear surf", ipc.mDebugName), .z = linear, .surf = true});
-    Plot::Plot({.name = fmt::format("{} L2U cubic surf", ipc.mDebugName), .z = cubic, .surf = true});
   }
 }
 
@@ -79,6 +71,7 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   Plot::Plot({.name = fmt::format("{} L1B", ipc.mDebugName),
       .z = mat,
+      .cmap = "jet",
       .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
 
@@ -90,15 +83,20 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
   DrawCrosshairs(mat);
   if (ipc.mDebugTrueShift != ipc.mDefaultDebugTrueShift)
     DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
-  cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
+  // cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   Plot::Plot({.name = fmt::format("{} L1A", ipc.mDebugName),
       .z = mat,
+      .xmin = 0,
+      .xmax = static_cast<f32>(L1.cols - 1),
+      .ymin = 0,
+      .ymax = static_cast<f32>(L1.rows - 1),
+      .cmap = "jet",
       .savepath = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
 }
 
 void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 {
-  const auto image = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
+  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/UnevenIllumination/input.jpg"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
   cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
       std::clamp(Random::Rand() * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
@@ -138,7 +136,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   static constexpr bool save = false;
   static constexpr bool artificial = false;
   static constexpr bool create = false;
-  ipc.SetDebugDirectory("../debug/");
+  ipc.SetDebugDirectory(GetProjectDirectoryPath("data/ImageRegistration").string());
 
   if constexpr (create) // create test images
   {
@@ -173,33 +171,6 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   {
     cv::resize(image1, image1, cv::Size(ipc.GetCols(), ipc.GetRows()));
     cv::resize(image2, image2, cv::Size(ipc.GetCols(), ipc.GetRows()));
-  }
-
-  if (false) // histogram equalization
-  {
-    cv::normalize(image1, image1, 0, 255, cv::NORM_MINMAX);
-    cv::normalize(image2, image2, 0, 255, cv::NORM_MINMAX);
-    image1.convertTo(image1, CV_8U);
-    image2.convertTo(image2, CV_8U);
-
-    if (true) // CLAHE
-    {
-      auto clahe = cv::createCLAHE();
-      clahe->setClipLimit(4);
-      clahe->setTilesGridSize({25, 25});
-      clahe->apply(image1, image1);
-      clahe->apply(image2, image2);
-    }
-    else // normal
-    {
-      cv::equalizeHist(image1, image1);
-      cv::equalizeHist(image2, image2);
-    }
-
-    image1.convertTo(image1, GetMatType<IPC::Float>());
-    image2.convertTo(image2, GetMatType<IPC::Float>());
-    cv::normalize(image1, image1, 0, 1, cv::NORM_MINMAX);
-    cv::normalize(image2, image2, 0, 1, cv::NORM_MINMAX);
   }
 
   if constexpr (save)

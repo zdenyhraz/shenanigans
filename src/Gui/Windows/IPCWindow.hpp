@@ -6,8 +6,8 @@ class IPCWindow : public Window
 {
   struct IPCParameters
   {
-    i32 Rows = 32;
-    i32 Cols = 32;
+    i32 Rows = 512;
+    i32 Cols = 512;
     f32 BPL = 0;
     f32 BPH = 1;
     i32 L2size = 7;
@@ -29,8 +29,8 @@ class IPCWindow : public Window
   {
     std::string imageDirectory = "../debug/ipcopt/train";
     std::string generateDirectory = "../debug/ipcopt";
-    std::string debugImage1Path = "../debug/AIA/304A.png";
-    std::string debugImage2Path = "../debug/AIA/171A.png";
+    std::string debugImage1Path = "data/debug/1.png";
+    std::string debugImage2Path = "data/debug/2.png";
     f32 maxShift = 2.5;
     f32 noiseStddev = 0.0;
     i32 iters = 51;
