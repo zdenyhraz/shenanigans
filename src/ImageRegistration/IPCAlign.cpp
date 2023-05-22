@@ -49,8 +49,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
   if constexpr (debugMode)
   {
 
-    Plot::Plot("image1 FT Magnitude", img1FTm);
-    Plot::Plot("image2 FT Magnitude", img2FTm);
+    Plot::Plot({.name = "image1 DFT log-magnitude", .z = img1FTm, .cmap = "jet"});
+    Plot::Plot({.name = "image2 DFT log-magnitude", .z = img2FTm, .cmap = "jet"});
   }
 
   cv::Point2d center(0.5 * image1.cols, 0.5 * image1.rows);
@@ -62,8 +62,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-    Plot::Plot("image1 FT Magnitude log-polar", img1FTm);
-    Plot::Plot("image2 FT Magnitude log-polar", img2FTm);
+    Plot::Plot({.name = "image1 DFT log-magnitude log-polar", .z = img1FTm, .cmap = "jet"});
+    Plot::Plot({.name = "image2 DFT log-magnitude log-polar", .z = img2FTm, .cmap = "jet"});
 
     showImageC = ColorComposition(image1, image2);
     showImage2 = image2.clone();
@@ -71,9 +71,9 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (save)
   {
-    Plot::Plot("../debug/image12.png", ColorComposition(image1, image2));
-    Plot::Plot("../debug/image1.png", image1);
-    Plot::Plot("../debug/image2.png", image2);
+    Plot::Plot("misaligned ccomp", ColorComposition(image1, image2));
+    Plot::Plot("image1.png", image1);
+    Plot::Plot("image2.png", image2);
   }
 
   // rotation and scale
@@ -91,8 +91,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (save)
   {
-    Plot::Plot("../debug/image12RS.png", ColorComposition(image1, image2));
-    Plot::Plot("../debug/image2RS.png", image2);
+    Plot::Plot("rot/scale aligned ccomp", ColorComposition(image1, image2));
+    Plot::Plot("rot/scale aligned image2", image2);
   }
 
   // translation
@@ -110,8 +110,8 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (save)
   {
-    Plot::Plot("../debug/image12RSXY.png", ColorComposition(image1, image2));
-    Plot::Plot("../debug/image2RSXY.png", image2);
+    Plot::Plot("fully aligned ccomp", ColorComposition(image1, image2));
+    Plot::Plot("fully aligned image2", image2);
   }
 
   if constexpr (debugMode or save)

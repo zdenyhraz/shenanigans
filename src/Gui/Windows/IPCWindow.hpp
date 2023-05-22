@@ -29,8 +29,8 @@ class IPCWindow : public Window
   {
     std::string imageDirectory = "../debug/ipcopt/train";
     std::string generateDirectory = "../debug/ipcopt";
-    std::string debugImage1Path = "data/debug/1.png";
-    std::string debugImage2Path = "data/debug/2.png";
+    std::string debugImage1Path = "data/debug/artificial1.png";
+    std::string debugImage2Path = "data/debug/artificial2.png";
     f32 maxShift = 2.5;
     f32 noiseStddev = 0.0;
     i32 iters = 51;

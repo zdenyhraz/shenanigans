@@ -4,8 +4,8 @@
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
-  Plot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "gray"});
-  Plot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "gray"});
+  Plot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "grey"});
+  Plot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "grey"});
 }
 
 void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const cv::Mat& dft2)
@@ -23,7 +23,7 @@ void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const
 
 void IPCDebug::DebugCrossPowerSpectrum(const IPC& ipc, const cv::Mat& crosspower)
 {
-  Plot::Plot(fmt::format("{} CP magnitude", ipc.mDebugName), FFTShift(Magnitude(crosspower)));
+  Plot::Plot({.name = fmt::format("{} CP magnitude", ipc.mDebugName), .z = FFTShift(Magnitude(crosspower)), .cmap = "jet"});
   Plot::Plot({.name = fmt::format("{} CP Phase", ipc.mDebugName), .z = FFTShift(Phase(crosspower)), .cmap = "jet"});
 }
 
@@ -54,9 +54,9 @@ void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
     cv::resize(L2, linear, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_LINEAR);
     cv::resize(L2, cubic, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_CUBIC);
 
-    Plot::Plot(fmt::format("{} L2U nearest", ipc.mDebugName), nearest);
-    Plot::Plot(fmt::format("{} L2U linear", ipc.mDebugName), linear);
-    Plot::Plot(fmt::format("{} L2U cubic", ipc.mDebugName), cubic);
+    Plot::Plot({.name = fmt::format("{} L2U nearest", ipc.mDebugName), .z = nearest, .cmap = "jet"});
+    Plot::Plot({.name = fmt::format("{} L2U linear", ipc.mDebugName), .z = linear, .cmap = "jet"});
+    Plot::Plot({.name = fmt::format("{} L2U cubic", ipc.mDebugName), .z = cubic, .cmap = "jet"});
   }
 }
 
@@ -96,10 +96,15 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
 
 void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 {
-  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/UnevenIllumination/input.jpg"));
+  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/171A.png"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
+  // cv::Point2d shift(maxShift, -maxShift);
+
   cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
       std::clamp(Random::Rand() * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
+  // cv::Point2i point(std::clamp(0.45 * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
+  //     std::clamp(0.5 * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
+
   cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
   cv::Mat imageShifted;
   cv::warpAffine(image, imageShifted, Tmat, image.size());
@@ -136,24 +141,30 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   static constexpr bool save = false;
   static constexpr bool artificial = false;
   static constexpr bool create = false;
-  ipc.SetDebugDirectory(GetProjectDirectoryPath("data/ImageRegistration").string());
+  ipc.SetDebugDirectory(GetProjectDirectoryPath("data/debug").string());
 
   if constexpr (create) // create test images
   {
-    auto image = LoadUnitFloatImage<IPC::Float>("../debug/shapes/shape.png");
-    const auto shift = cv::Point2d(0.256 * image.cols, 0.232 * image.rows);
+    auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/304A.png"));
+    auto imagee = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/171A.png"));
+
+    image.convertTo(image, CV_8U, 255);
+    imagee.convertTo(imagee, CV_8U, 255);
+
+    const auto shift = cv::Point2d(0.256 * ipc.mCols, -0.232 * ipc.mRows);
     const auto scale = 1.43;
     const auto rotation = 45;
 
-    Shift(image, -shift);
-    cv::Mat image1 = image.clone();
-    // AddNoise<IPC::Float>(image1, 0.05);
-    Plot::Plot("../debug/shapes/shape1.png", image1);
-    Shift(image, 1.5 * shift);
-    Rotate(image, rotation, scale);
-    cv::Mat image2 = image.clone();
-    // AddNoise<IPC::Float>(image2, 0.05);
-    Plot::Plot("../debug/shapes/shape2.png", image2);
+    const auto image1 = RoiCropMid(image, ipc.mCols, ipc.mRows);
+    Shift(imagee, shift);
+    Rotate(imagee, rotation, scale);
+    const auto image2 = RoiCropMid(imagee, ipc.mCols, ipc.mRows);
+
+    Plot::Plot("image1", image1);
+    Plot::Plot("image2", image2);
+
+    cv::imwrite(GetProjectDirectoryPath("data/debug/artificialx1.png").string(), image1);
+    cv::imwrite(GetProjectDirectoryPath("data/debug/artificialx2.png").string(), image2);
     return;
   }
 
