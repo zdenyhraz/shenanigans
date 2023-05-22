@@ -48,7 +48,12 @@ void IPCWindow::Render()
         LaunchAsync([&]() { IPCDebug::DebugShift(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
       ImGui::SameLine();
       if (ImGui::Button("DebugShift2"))
-        LaunchAsync([&]() { IPCDebug::DebugShift2(mIPCOptimized, mOptimizeParameters.debugImage1Path, mOptimizeParameters.debugImage2Path, mOptimizeParameters.noiseStddev); });
+        LaunchAsync(
+            [&]()
+            {
+              IPCDebug::DebugShift2(mIPCOptimized, GetProjectDirectoryPath(mOptimizeParameters.debugImage1Path).string(),
+                  GetProjectDirectoryPath(mOptimizeParameters.debugImage2Path).string(), mOptimizeParameters.noiseStddev);
+            });
       ImGui::SameLine();
       if (ImGui::Button("DebugAlign"))
         LaunchAsync(

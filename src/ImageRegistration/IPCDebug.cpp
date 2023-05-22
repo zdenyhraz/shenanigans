@@ -4,8 +4,8 @@
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
-  Plot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "grey"});
-  Plot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "grey"});
+  Plot::Plot({.name = fmt::format("{} I1", ipc.mDebugName), .z = image1, .cmap = "gray"});
+  Plot::Plot({.name = fmt::format("{} I2", ipc.mDebugName), .z = image2, .cmap = "gray"});
 }
 
 void IPCDebug::DebugFourierTransforms(const IPC& ipc, const cv::Mat& dft1, const cv::Mat& dft2)
@@ -96,7 +96,7 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
 
 void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
 {
-  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/171A.png"));
+  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/star.png"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
   // cv::Point2d shift(maxShift, -maxShift);
 
