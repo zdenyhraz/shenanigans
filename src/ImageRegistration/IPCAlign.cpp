@@ -48,7 +48,6 @@ cv::Mat IPCAlign::Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2)
 
   if constexpr (debugMode)
   {
-
     Plot::Plot({.name = "image1 DFT log-magnitude", .z = img1FTm, .cmap = "jet"});
     Plot::Plot({.name = "image2 DFT log-magnitude", .z = img2FTm, .cmap = "jet"});
   }

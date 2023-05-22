@@ -9,64 +9,74 @@
 class IPC
 {
 public:
+  // algorithm floating point precision, use 64-bit for most accurate results, 32-bit for performance
   using Float = f64;
-  inline static const cv::Point2d mDefaultDebugTrueShift{123.456, 123.456};
 
+  // input image DFT window type
   enum class WindowType : u8
   {
-    None,
-    Hann,
+    None,           // no DFT window applied
+    Hann,           // Hann window
     WindowTypeCount // last
   };
 
+  // cross-power spectrum bandpass filter type
   enum class BandpassType : u8
   {
-    None,
-    Rectangular,
-    Gaussian,
+    None,             // no filtering applied
+    Rectangular,      // bandpass filter with sharp edges
+    Gaussian,         // bandpass filter with smooth edges
     BandpassTypeCount // last
   };
 
+  // correlation interpolation type
   enum class InterpolationType : u8
   {
-    NearestNeighbor,
-    Linear,
-    Cubic,
+    NearestNeighbor,       // nearest neighbor interpolation
+    Linear,                // bilinear interpolation
+    Cubic,                 // bicubic interpolation
     InterpolationTypeCount // last
   };
 
+  // L1 window (mask) type (used to compute correlation centroids)
   enum class L1WindowType : u8
   {
-    None,
-    Circular,
-    Gaussian,
+    None,             // no window applied
+    Circular,         // circular mask with sharp edges
+    Gaussian,         // gaussian mask with smooth edges
     L1WindowTypeCount // last
   };
 
+  // IPC execution mode
   enum class Mode : u8
   {
-    Normal,
-    Debug
+    Normal, // normal mode
+    Debug   // special mode used for debugging and plotting
   };
 
+  // debug helper
+  inline static const cv::Point2d mDefaultDebugTrueShift{123.456, 123.456};
+
 private:
-  i32 mRows = 0;
-  i32 mCols = 0;
-  f64 mBPL = 0.01;
-  f64 mBPH = 1.0;
-  i32 mL2size = 7;
-  f64 mL1ratio = 0.45;
-  f64 mL1ratioStep = 0.025;
-  i32 mL2Usize = 357;
-  i32 mMaxIter = 10;
-  f64 mCPeps = 0;
-  BandpassType mBPT = BandpassType::Gaussian;
-  InterpolationType mIntT = InterpolationType::Linear;
-  WindowType mWinT = WindowType::Hann;
-  L1WindowType mL1WinT = L1WindowType::Circular;
-  cv::Mat mBP;
-  cv::Mat mWin;
-  cv::Mat mL1Win;
+  i32 mRows = 0;                                       // the height of registered images
+  i32 mCols = 0;                                       // the width of registered images
+  f64 mBPL = 0.01;                                     // low frequency bandpass cutoff
+  f64 mBPH = 1.0;                                      // high frequency bandpass cutoff
+  i32 mL2size = 7;                                     // size of the maximum correlation neighborhood L2
+  i32 mL2Usize = 357;                                  // size of the upsampled maximum correlation neighborhood L2U
+  f64 mL1ratio = 0.45;                                 // size ratio of the L1 centroid neighborhood in relation to L2U
+  f64 mL1ratioStep = 0.025;                            // L1 size ratio step used when reducing L1 size due to centroid divergence
+  i32 mMaxIter = 10;                                   // maximum number of iterative refinement iterations
+  f64 mCPeps = 0;                                      // cross-power normalization epsilon used to avoid division by values close to zero
+  BandpassType mBPT = BandpassType::Gaussian;          // cross-power spectrum bandpass filter type
+  InterpolationType mIntT = InterpolationType::Linear; // correlation interpolation type
+  WindowType mWinT = WindowType::Hann;                 // input image DFT window type
+  L1WindowType mL1WinT = L1WindowType::Circular;       // L1 window (mask) type (used to compute correlation centroids)
+  cv::Mat mBP;                                         // normalized bandpass mask applied to the cross-power spectrum
+  cv::Mat mWin;                                        // window mask applied to input images
+  cv::Mat mL1Win;                                      // L1 window mask
+
+  // debugging and plotting helpers
   mutable std::string mDebugName = "IPC";
   mutable std::string mDebugDirectory;
   mutable i32 mDebugIndex = 0;
@@ -181,6 +191,7 @@ public:
   f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
   f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
+  // calculate the subpixel image shift between image1 and image2
   template <Mode ModeT = Mode::Normal>
   cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2) const
   {
@@ -188,101 +199,115 @@ public:
     return Calculate<ModeT>(image1.clone(), image2.clone());
   }
 
+  // calculate the subpixel image shift between image1 and image2
   template <Mode ModeT = Mode::Normal>
   cv::Point2d Calculate(cv::Mat&& image1, cv::Mat&& image2) const
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION_IF(ModeT == Mode::Debug);
 
+    // verify that input images are the correct size
     if (image1.size() != cv::Size(mCols, mRows)) [[unlikely]]
       throw std::invalid_argument(fmt::format("Invalid image size ({} != {})", image1.size(), cv::Size(mCols, mRows)));
 
+    // verify that input images are the same size
     if (image1.size() != image2.size()) [[unlikely]]
       throw std::invalid_argument(fmt::format("Image sizes differ ({} != {})", image1.size(), image2.size()));
 
+    // only single channel images are supported
     if (image1.channels() != 1 or image2.channels() != 1) [[unlikely]]
       throw std::invalid_argument("Multichannel images are not supported");
 
+    // convert input images to common data type and value range
     ConvertToUnitFloat(image1);
     ConvertToUnitFloat(image2);
     if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugInputImages(*this, image1, image2);
 
-    // windowing
+    // apply DFT window to input images
     ApplyWindow(image1);
     ApplyWindow(image2);
 
-    // ffts
+    // compute the DFTs of input images
     auto dft1 = CalculateFourierTransform(std::move(image1));
     auto dft2 = CalculateFourierTransform(std::move(image2));
     if constexpr (ModeT == Mode::Debug and false)
       IPCDebug::DebugFourierTransforms(*this, dft1, dft2);
 
-    // cross-power
+    // compute the normalized & bandpass-filtered cross-power spectrum
     auto crosspower = CalculateCrossPowerSpectrum(std::move(dft1), std::move(dft2));
     if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugCrossPowerSpectrum(*this, crosspower);
 
-    // L3
+    // compute the phase correlation landscape (L3) by applying inverse DFT to the cross-power spectrum
     cv::Mat L3 = CalculateL3(std::move(crosspower));
-    if constexpr (false)
+    if constexpr (ModeT == Mode::Debug and false)
       FalseCorrelationsRemoval(L3);
+
+    // calculate the maximum correlation location
     cv::Point2d L3peak = GetPeak(L3);
     cv::Point2d L3mid(L3.cols / 2, L3.rows / 2);
     if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL3(*this, L3);
 
-    // reduce the L2size as long as the L2 is out of bounds, return pixel level estimation accuracy if it cannot be reduced anymore
+    // reduce the L2size as long as the L2 is out of bounds of L3, return pixel level estimation accuracy if it cannot be reduced anymore
     i32 L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
 
-    // L2
+    // extract the L2 maximum correlation neighborhood
     cv::Mat L2 = CalculateL2(L3, L3peak, L2size);
     cv::Point2d L2mid(L2.cols / 2, L2.rows / 2);
     if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL2(*this, L2);
 
-    // L2U
+    // upsample L2 maximum correlation neighborhood to get L2U
     cv::Mat L2U = CalculateL2U(L2);
     cv::Point2d L2Umid(L2U.cols / 2, L2U.rows / 2);
     if constexpr (ModeT == Mode::Debug)
       IPCDebug::DebugL2U(*this, L2, L2U);
 
-    // L1
+    // initialize L1 centroid neighborhood parameters
     i32 L1size;
     cv::Mat L1, L1Win;
     cv::Point2d L2Upeak, L1mid, L1peak;
 
+    // run the iterative refinement algorithm using the specified L1 ratio, gradually decrease L1 ratio if convergence is not achieved
     for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
       if constexpr (ModeT == Mode::Debug)
         LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
-      L2Upeak = L2Umid; // reset L2U peak position
-      L1size = GetL1size(L2U.cols, L1ratio);
-      L1mid = cv::Point2d(L1size / 2, L1size / 2);
-      L1Win = mL1Win.cols == L1size ? mL1Win : GetL1Window(mL1WinT, L1size);
+      L2Upeak = L2Umid;                                                      // reset the accumulated L2U peak position
+      L1size = GetL1size(L2U.cols, L1ratio);                                 // calculate the current L1 size
+      L1mid = cv::Point2d(L1size / 2, L1size / 2);                           // update the L1 mid position
+      L1Win = mL1Win.cols == L1size ? mL1Win : GetL1Window(mL1WinT, L1size); // update the L1 window if necessary
 
       if constexpr (ModeT == Mode::Debug and false)
         IPCDebug::DebugL1B(*this, L2U, L1size, L3peak - L3mid, GetUpsampleCoeff(L2size));
 
+      // perform the iterative refinement algorithm
       for (i32 iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
         if constexpr (ModeT == Mode::Debug)
           LOG_DEBUG("Iterative refinement {} L2Upeak: {} ({})", iter, L2Upeak, L3peak - L3mid + (L2Upeak - L2Umid + L1peak - L1mid) / GetUpsampleCoeff(L2size));
+
+        // verify that the L1 region is withing the upsampled L2U region
         if (IsOutOfBounds(L2Upeak, L2U, L1size)) [[unlikely]]
           break;
-
+        // extract the L1 region
         L1 = CalculateL1(L2U, L2Upeak, L1size);
         if constexpr (ModeT == Mode::Debug)
           IPCDebug::DebugL1A(*this, L1, L3peak - L3mid, L2Upeak - L2Umid, GetUpsampleCoeff(L2size));
+        // calculate the centroid location using the specified L1 mask
         L1peak = GetPeakSubpixel<true>(L1, L1Win);
+        // add the contribution of the current iteration to the accumulated L2U peak location
         L2Upeak += cv::Point2d(std::round(L1peak.x - L1mid.x), std::round(L1peak.y - L1mid.y));
 
+        // check for convergence
         if (AccuracyReached(L1peak, L1mid))
         {
           if constexpr (ModeT == Mode::Debug)
@@ -301,6 +326,8 @@ public:
 
     if constexpr (ModeT == Mode::Debug)
       LOG_WARNING("L1 failed to converge with all L1ratios, return non-iterative subpixel shift: {}", GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size));
+
+    // iterative refinement failed to converge,return non-iterative subpixel shift
     return GetSubpixelShift<ModeT>(L3, L3peak, L3mid, L2size);
   }
 
