@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(shenanigans)
+project(shenanigans LANGUAGES CXX)
 
 # variables
 set(CMAKE_CXX_STANDARD 23)
@@ -87,6 +87,7 @@ target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_terminal PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_benchmark PRIVATE pybind11::embed)
+pybind11_add_module(pyipc apps/pyipc/pyipc.cpp)
 
 # fmt
 add_subdirectory(libs/fmt)
@@ -96,6 +97,7 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
+target_link_libraries(pyipc PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
@@ -111,6 +113,7 @@ target_link_libraries(shenanigans PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_test PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_terminal PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_benchmark PRIVATE benchmark::benchmark)
+target_link_libraries(pyipc PRIVATE benchmark::benchmark)
 
 # json
 add_subdirectory(libs/json)
@@ -143,6 +146,7 @@ target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
+target_link_libraries(pyipc PRIVATE ${OpenCV_LIBS})
 
 # torch
 find_package(Torch REQUIRED HINTS libs/libtorch)
@@ -152,6 +156,7 @@ target_link_libraries(shenanigans PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_terminal PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_benchmark PRIVATE ${TORCH_LIBRARIES})
+target_link_libraries(pyipc PRIVATE ${TORCH_LIBRARIES})
 
 # implot
 include_directories(libs/implot)
@@ -181,6 +186,7 @@ target_link_libraries(shenanigans PRIVATE glfw)
 target_link_libraries(shenanigans_test PRIVATE glfw)
 target_link_libraries(shenanigans_terminal PRIVATE glfw)
 target_link_libraries(shenanigans_benchmark PRIVATE glfw)
+target_link_libraries(pyipc PRIVATE glfw)
 
 # glad
 add_subdirectory(libs/glad)
@@ -188,6 +194,7 @@ target_link_libraries(shenanigans PRIVATE glad)
 target_link_libraries(shenanigans_test PRIVATE glad)
 target_link_libraries(shenanigans_terminal PRIVATE glad)
 target_link_libraries(shenanigans_benchmark PRIVATE glad)
+target_link_libraries(pyipc PRIVATE glad)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
@@ -225,4 +232,3 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
-
