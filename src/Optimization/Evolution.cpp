@@ -391,10 +391,10 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
 std::string Evolution::GetOutputString(usize generation, const Population& population)
 {
   PROFILE_FUNCTION;
-  std::string value = fmt::format("Gen {} ({:.2e}) [", generation, population.bestEntity.fitness);
+  std::string value = fmt::format("Gen {} ({}) [", generation, population.bestEntity.fitness);
   for (usize param = 0; param < population.bestEntity.params.size(); ++param)
     value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](population.bestEntity.params[param]));
-  value += fmt::format("] diff: {:.2f}% ({:.2e})", population.relativeDifference * 100, population.absoluteDifference);
+  value += fmt::format("] diff: {:.1f}% ({:.2e})", population.relativeDifference * 100, population.absoluteDifference);
   return value;
 }
 
