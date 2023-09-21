@@ -22,7 +22,8 @@ public:
     {
       const auto x = image.cols / 2 + Random::Rand(-1, 1) * (image.cols / 2 - imageSize.width);
       const auto y = image.rows / 2 + Random::Rand(-1, 1) * (image.rows / 2 - imageSize.height);
-      cv::Mat input = RoiCrop(image, x, y, imageSize.width, imageSize.height);
+      cv::Mat input = RoiCropRep<f32>(image, x, y, image.cols * 0.7, image.rows * 0.7);
+      cv::resize(input, input, cv::Size(imageSize.width, imageSize.height));
       cv::Mat target = ImageSegmentationModelTestFunction(input);
 
       mInputs[i] = torch::from_blob(input.data, {nChannels, imageSize.height, imageSize.width});

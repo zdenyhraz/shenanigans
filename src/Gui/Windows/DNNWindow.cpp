@@ -1,4 +1,6 @@
 #include "DNNWindow.hpp"
+#include "DNN/Experiments/ImageSegmentationModel.hpp"
+#include "DNN/Experiments/RegressionModel.hpp"
 #include "DNN/ObjectDetection/YOLOv8CV.hpp"
 #include "DNN/ObjectDetection/YOLOv8Torch.hpp"
 #include "DNN/ObjectSegmentation/YOLOv8Torch.hpp"
@@ -29,6 +31,19 @@ void DNNWindow::Render()
   PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("DNN"))
   {
+    ImGui::Separator();
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("ML experiments"))
+    {
+      static i32 modelWidth = 128;
+      if (ImGui::Button("Regression model test"))
+        LaunchAsync([&]() { RegressionModelTest(modelWidth); });
+      ImGui::SliderInt("model width", &modelWidth, 16, 1024);
+
+      if (ImGui::Button("Image segmentation model test"))
+        LaunchAsync([&]() { ImageSegmentationModelTest(); });
+    }
+
     ImGui::Separator();
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Object detection via DNN"))
