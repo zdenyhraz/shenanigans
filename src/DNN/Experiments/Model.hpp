@@ -32,7 +32,6 @@ public:
       f32 lossTrainAvg = 0, lossTestAvg = 0;
 
       {
-        i64 batchTrainIndex = 0;
         for (auto& batchTrain : *dataloaderTrain)
         {
           optimizer.zero_grad();
@@ -41,22 +40,19 @@ public:
           lossTrainAvg += lossTrain.item<f32>();
           lossTrain.backward();
           optimizer.step();
-          ++batchTrainIndex;
         }
-        lossTrainAvg /= batchTrainIndex;
+        lossTrainAvg /= std::distance(dataloaderTrain->begin(), dataloaderTrain->end());
       }
 
       {
         torch::NoGradGuard noGrad;
-        i64 batchTestIndex = 0;
         for (auto& batchTest : *dataloaderTest)
         {
           torch::Tensor predictionTest = Forward(batchTest.data);
           torch::Tensor lossTest = torch::mse_loss(predictionTest, batchTest.target);
           lossTestAvg += lossTest.item<f32>();
-          ++batchTestIndex;
         }
-        lossTestAvg /= batchTestIndex;
+        lossTestAvg /= std::distance(dataloaderTest->begin(), dataloaderTest->end());
       }
 
       if (options.logProgress and epochIndex % (options.epochCount / options.logProgressCount) == 0)
@@ -73,6 +69,8 @@ public:
         Plot::Plot({.name = "RegressionModel training", .x = epochs, .ys = {lossesTrainAvg, lossesTestAvg}, .ylabels = {"train loss", "test loss"}});
       }
     }
+    if (options.saveNetwork)
+      torch::save(shared_from_this(), "../debug/ANN/net_final.pt");
   }
 
 private:
