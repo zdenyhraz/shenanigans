@@ -19,6 +19,13 @@ inline usize GetFileCount(const std::filesystem::path& dirpath)
   return std::ranges::count_if(std::filesystem::directory_iterator(dirpath), [](const auto& entry) { return entry.is_regular_file(); });
 }
 
+inline usize GetDirectoryCount(const std::filesystem::path& dirpath)
+{
+  if (not std::filesystem::is_directory(dirpath))
+    throw std::invalid_argument(fmt::format("{} is not a valid directory", dirpath.string()));
+  return std::ranges::count_if(std::filesystem::directory_iterator(dirpath), [](const auto& entry) { return entry.is_directory(); });
+}
+
 class FilePathGenerator
 {
   std::string mDirPath;

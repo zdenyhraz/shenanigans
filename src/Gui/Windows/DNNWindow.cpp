@@ -1,6 +1,7 @@
 #include "DNNWindow.hpp"
 #include "DNN/Experiments/ImageSegmentationModel.hpp"
 #include "DNN/Experiments/RegressionModel.hpp"
+#include "DNN/Experiments/ImageClassificationModel.hpp"
 #include "DNN/ObjectDetection/YOLOv8CV.hpp"
 #include "DNN/ObjectDetection/YOLOv8Torch.hpp"
 #include "DNN/ObjectSegmentation/YOLOv8Torch.hpp"
@@ -42,6 +43,9 @@ void DNNWindow::Render()
 
       if (ImGui::Button("Image segmentation model test"))
         LaunchAsync([&]() { ImageSegmentationModelTest(); });
+
+      if (ImGui::Button("Image classification model test"))
+        LaunchAsync([&]() { ImageClassificationModelTest(); });
     }
 
     ImGui::Separator();

@@ -37,11 +37,9 @@ private:
 void ImageSegmentationModelTest()
 {
   ImageSegmentationModel model;
-  const auto path = GetProjectDirectoryPath() / "data/ObjectDetection/cats/cats2.jpg";
-  auto datasetTrain =
-      ImageSegmentationDataset(path.string(), {ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight}, 64).map(torch::data::transforms::Stack<>());
-  auto datasetTest =
-      ImageSegmentationDataset(path.string(), {ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight}, 16).map(torch::data::transforms::Stack<>());
+  const auto path = GetProjectDirectoryPath("data/ObjectDetection/cats/cats2.jpg");
+  auto datasetTrain = ImageSegmentationDataset(path.string(), {ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight}, 64);
+  auto datasetTest = ImageSegmentationDataset(path.string(), {ImageSegmentationModel::kImageWidth, ImageSegmentationModel::kImageHeight}, 16);
 
   model.Train({.epochCount = 20, .batchSize = 8}, datasetTrain, datasetTest);
 

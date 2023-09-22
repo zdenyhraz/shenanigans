@@ -21,8 +21,10 @@ public:
   template <typename DatasetT>
   void Train(const TrainOptions& options, DatasetT&& datasetTrain, DatasetT&& datasetTest)
   {
-    auto dataloaderTrain = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain), options.batchSize);
-    auto dataloaderTest = torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest), options.batchSize);
+    auto dataloaderTrain =
+        torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTrain.map(torch::data::transforms::Stack<>())), options.batchSize);
+    auto dataloaderTest =
+        torch::data::make_data_loader<torch::data::samplers::SequentialSampler>(std::move(datasetTest.map(torch::data::transforms::Stack<>())), options.batchSize);
 
     torch::optim::Adam optimizer(parameters(), options.learningRate);
     std::vector<f64> epochs, lossesTrainAvg, lossesTestAvg;

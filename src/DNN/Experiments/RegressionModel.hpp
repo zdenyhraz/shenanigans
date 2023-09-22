@@ -35,8 +35,8 @@ private:
 void RegressionModelTest(i32 modelWidth)
 {
   RegressionModel model(modelWidth);
-  auto datasetTrain = RegressionDataset("128", RegressionModel::kInputSize, RegressionModel::kOutputSize).map(torch::data::transforms::Stack<>());
-  auto datasetTest = RegressionDataset("16", RegressionModel::kInputSize, RegressionModel::kOutputSize).map(torch::data::transforms::Stack<>());
+  auto datasetTrain = RegressionDataset("128", RegressionModel::kInputSize, RegressionModel::kOutputSize);
+  auto datasetTest = RegressionDataset("16", RegressionModel::kInputSize, RegressionModel::kOutputSize);
   model.Train({.epochCount = 50, .plotProgress = true}, datasetTrain, datasetTest);
   i64 n = 1001;
   torch::Tensor inputTensor = torch::linspace(0, 1, n).reshape({n, 1});
