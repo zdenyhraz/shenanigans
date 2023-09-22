@@ -30,6 +30,20 @@ class ImageClassificationModel(nn.Module):
         x = self.fc3(x)
         return x
 
+    def accuracy(self, dataset, log_predictions=False, class_names=None):
+        model.eval()
+        with torch.no_grad():
+            accuracy = 0
+            for input, target in dataset:
+                device = next(self.parameters()).device
+                input = torch.unsqueeze(input, 0).to(device)
+                pred_class = torch.argmax(self.forward(input))
+                accuracy += pred_class == target
+                if log_predictions:
+                    if class_names:
+                        print(f"Prediction: {class_names[pred_class]}:{pred_class} | target: {class_names[target]}:{target}")
+            return accuracy/len(dataset)
+
 
 class ImageClassificationDataset(torch.utils.data.Dataset):
     def __init__(self, dataset_directory, image_size):
@@ -77,5 +91,5 @@ if __name__ == "__main__":
     dataset = ImageClassificationDataset("data/DNN/objdetect/HISAS", image_size=512)
     model = ImageClassificationModel(dataset.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, learn_rate=0.0001, batch_size=16, test_ratio=0.2, device=device)
+    options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, learn_rate=0.0005, batch_size=8, test_ratio=0.1, device=device)
     train.train(model, dataset, options)

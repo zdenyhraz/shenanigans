@@ -26,8 +26,10 @@ def train(model, dataset, options):
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=True)
     model.to(options.device)
+    model.train()
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
 
+    print(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     print(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: {options.device}")
     losses_train, losses_test = [], []
     for epoch in range(options.num_epochs):
@@ -41,6 +43,9 @@ def train(model, dataset, options):
             plot_train(epoch, losses_train, losses_test)
 
     print('Training finished')
+    print(
+        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, class_names=dataset.class_names):.1%}")
+
     if options.save_model:
         torch.save(model.state_dict(), "model.pth")
     if options.plot_progress:
