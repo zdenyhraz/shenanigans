@@ -35,7 +35,7 @@ def train(model, dataset, options):
     losses_train, losses_test = [], []
 
     if options.plot_progress:
-        fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1, sharex=True)
+        fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
@@ -111,6 +111,6 @@ def plot_loss(fig, axs, epoch, losses_train, losses_test, accuracies_train, accu
     ax2.legend()
     ax2.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
 
-    # plt.tight_layout()
+    plt.tight_layout()
     plt.draw()
     plt.pause(1e-4)
