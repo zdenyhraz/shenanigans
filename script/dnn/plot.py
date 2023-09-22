@@ -18,5 +18,30 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rcParams["figure.figsize"] = (FIGWIDTH, FIGHEIGHT)
 
 
-def create_fig(name, aspect_ratio):
-    return plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
+def create_fig(name, aspect_ratio, position=None):
+    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
+    if position:
+        import matplotlib
+        backend = matplotlib.get_backend()
+        if backend == 'TkAgg':
+            fig.canvas.manager.window.wm_geometry("+%d+%d" % position)
+        elif backend == 'WXAgg':
+            fig.canvas.manager.window.SetPosition(position)
+        else:
+            # This works for QT and GTK
+            # You can also use window.setGeometry
+            fig.canvas.manager.window.move(position)
+
+    return fig
+
+
+def fig_size(fig):
+    return fig.get_size_inches()*fig.dpi
+
+
+def fig_width(fig):
+    return fig.get_size_inches()[0]*fig.dpi
+
+
+def fig_height(fig):
+    return fig.get_size_inches()[1]*fig.dpi

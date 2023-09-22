@@ -34,9 +34,9 @@ def train(model, dataset, options):
     accuracies_train, accuracies_test = [], []
     losses_train, losses_test = [], []
     if options.plot_progress:
-        loss_fig = plot.create_fig("model loss", 1.5)
+        loss_fig = plot.create_fig("model loss", 1.3, (100, 100))
         if options.measure_accuracy:
-            accuracy_fig = plot.create_fig("model accuracy", 1.5)
+            accuracy_fig = plot.create_fig("model accuracy", 1.3, (100+plot.fig_width(loss_fig)*1.02, 100))
 
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
@@ -105,6 +105,7 @@ def plot_loss(fig, epoch, losses_train, losses_test):
     plt.ylabel("loss")
     plt.yscale("log")
     plt.legend()
+    plt.tight_layout()
     plt.draw()
     plt.pause(1e-4)
 
@@ -119,5 +120,6 @@ def plot_accuracy(fig, epoch, accuracies_train, accuracies_test):
     plt.ylabel("accuracy")
     plt.legend()
     plt.gca().yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
+    plt.tight_layout()
     plt.draw()
     plt.pause(1e-4)
