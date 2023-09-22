@@ -4,6 +4,7 @@ import torch.utils.data
 import matplotlib.pyplot as plt
 import numpy as np
 import log
+import plot
 
 
 class TrainOptions:
@@ -27,12 +28,13 @@ def train(model, dataset, options):
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=True)
     model.to(options.device)
-    model.train()
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
 
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
     losses_train, losses_test = [], []
+    if options.plot_progress:
+        plot.create_fig("model training", 1.5)
     for epoch in range(options.num_epochs):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
 
@@ -54,6 +56,7 @@ def train(model, dataset, options):
 
 
 def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device):
+    model.train()
     loss_train = 0.0
     for inputs, targets in train_loader:
         inputs = inputs.to(device)
@@ -80,9 +83,8 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
 def plot_train(epoch, losses_train, losses_test):
     plt.clf()
     plotx = np.arange(0, epoch+1, 1)
-    plt.plot(plotx, losses_train, linewidth=3, color="blue", label="train loss")
-    plt.plot(plotx, losses_test, linewidth=3, color="green", label="test loss")
-    # plt.xticks(plotx)
+    plt.plot(plotx, losses_train, linewidth=4, label="train loss")
+    plt.plot(plotx, losses_test, linewidth=4, label="test loss")
     plt.xlabel("epoch")
     plt.ylabel("loss")
     plt.yscale("log")
