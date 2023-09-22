@@ -3,6 +3,7 @@ import torch.optim as optim
 import torch.utils.data
 import matplotlib.pyplot as plt
 import numpy as np
+import log
 
 
 class TrainOptions:
@@ -29,21 +30,21 @@ def train(model, dataset, options):
     model.train()
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
 
-    print(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
-    print(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: {options.device}")
+    log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
+    log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
     losses_train, losses_test = [], []
     for epoch in range(options.num_epochs):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
 
         if options.log_progress:
-            print(f"Epoch {epoch} | TrainLoss {loss_train:.2e} | TestLoss {loss_test:.2e}")
+            log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e}")
         if options.plot_progress:
             losses_train.append(loss_train)
             losses_test.append(loss_test)
             plot_train(epoch, losses_train, losses_test)
 
-    print('Training finished')
-    print(
+    log.info('Training finished')
+    log.info(
         f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, class_names=dataset.class_names):.1%}")
 
     if options.save_model:
