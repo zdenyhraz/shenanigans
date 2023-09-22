@@ -19,4 +19,4 @@ plt.rcParams["figure.figsize"] = (FIGWIDTH, FIGHEIGHT)
 
 
 def create_fig(name, aspect_ratio):
-    return plt.figure(num="model training", figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
+    return plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
