@@ -17,7 +17,10 @@ class TrainOptions:
 
 
 def train(model, dataset, options):
-    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [len(dataset)*(1-options.test_ratio), len(dataset)*options.test_ratio])
+    test_size = int(len(dataset)*options.test_ratio)
+    train_size = len(dataset)-test_size
+    print(f"Training started: train_size: {train_size}, test_size: {test_size}")
+    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=True)
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
@@ -27,7 +30,7 @@ def train(model, dataset, options):
         if options.log_progress:
             print("Epoch {} | TrainLoss {:.2e} | TestLoss {:.2e}", epoch, loss_train, loss_test)
 
-    print('Finished Training')
+    print('Training finished')
     if options.save_model:
         torch.save(model.state_dict(), "model.pth")
 
@@ -48,4 +51,4 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion):
         loss = criterion(outputs, targets)
         loss_test += loss.item()*inputs.size(0)
 
-    return loss_train/len(train_loader.sampler), loss_test/len(test_loader.sampler)  # sample-average loss
+    return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
