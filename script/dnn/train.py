@@ -9,7 +9,7 @@ import plot
 
 
 class TrainOptions:
-    def __init__(self, num_epochs=10, learn_rate=5e-1, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), measure_accuracy=False):
+    def __init__(self, num_epochs=10, learn_rate=5e-4, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), measure_accuracy=False):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
         self.save_model = save_model
@@ -31,14 +31,15 @@ def train(model, dataset, options):
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=True)
     model.to(options.device)
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
-    accuracies_train, accuracies_test = [], []
-    losses_train, losses_test = [], []
 
     if options.plot_progress:
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
+    accuracies_train, accuracies_test = [], []
+    losses_train, losses_test = [], []
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
+
     for epoch in range(options.num_epochs):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
 
@@ -62,7 +63,9 @@ def train(model, dataset, options):
         f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, class_names=dataset.class_names):.1%}")
 
     if options.save_model:
-        torch.save(model.state_dict(), "model.pth")
+        savepath = "idk.pth"
+        log.info(f"Saving model to {savepath}")
+        torch.save(model.state_dict(), savepath)
     if options.plot_progress:
         plt.show()
 
@@ -93,8 +96,8 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
 
 
 def plot_loss(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test):
-    plotx = np.arange(0, epoch+1, 1)
     (ax1, ax2) = axs
+    plotx = np.arange(0, epoch+1, 1)
 
     ax1.clear()
     ax1.plot(plotx, losses_train, linewidth=4, label="train loss")
