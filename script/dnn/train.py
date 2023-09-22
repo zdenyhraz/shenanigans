@@ -33,10 +33,9 @@ def train(model, dataset, options):
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
     accuracies_train, accuracies_test = [], []
     losses_train, losses_test = [], []
+
     if options.plot_progress:
-        loss_fig = plot.create_fig("model loss", 1.3, (100, 100))
-        if options.measure_accuracy:
-            accuracy_fig = plot.create_fig("model accuracy", 1.3, (100+plot.fig_width(loss_fig)*1.02, 100))
+        fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1, sharex=True)
 
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
     log.info(f"Training started: train_size: {train_size}, test_size: {test_size}, batch_size: {options.batch_size}, device: '{options.device}'")
@@ -56,9 +55,7 @@ def train(model, dataset, options):
         if options.plot_progress:
             losses_train.append(loss_train)
             losses_test.append(loss_test)
-            plot_loss(loss_fig, epoch, losses_train, losses_test)
-            if options.measure_accuracy:
-                plot_accuracy(accuracy_fig, epoch, accuracies_train, accuracies_test)
+            plot_loss(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test)
 
     log.info('Training finished')
     log.info(
@@ -95,31 +92,25 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
 
 
-def plot_loss(fig, epoch, losses_train, losses_test):
-    plt.figure(fig.number)
-    plt.clf()
+def plot_loss(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test):
     plotx = np.arange(0, epoch+1, 1)
-    plt.plot(plotx, losses_train, linewidth=4, label="train loss")
-    plt.plot(plotx, losses_test, linewidth=4, label="test loss")
-    plt.xlabel("epoch")
-    plt.ylabel("loss")
-    plt.yscale("log")
-    plt.legend()
-    plt.tight_layout()
-    plt.draw()
-    plt.pause(1e-4)
+    (ax1, ax2) = axs
 
+    ax1.clear()
+    ax1.plot(plotx, losses_train, linewidth=4, label="train loss")
+    ax1.plot(plotx, losses_test, linewidth=4, label="test loss")
+    ax1.set_ylabel("loss")
+    ax1.set_yscale("log")
+    ax1.legend()
 
-def plot_accuracy(fig, epoch, accuracies_train, accuracies_test):
-    plt.figure(fig.number)
-    plt.clf()
-    plotx = np.arange(0, epoch+1, 1)
-    plt.plot(plotx, accuracies_train, linewidth=4, label="train accuracy")
-    plt.plot(plotx, accuracies_test, linewidth=4, label="test accuracy")
-    plt.xlabel("epoch")
-    plt.ylabel("accuracy")
-    plt.legend()
-    plt.gca().yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
-    plt.tight_layout()
+    ax2.clear()
+    ax2.plot(plotx, accuracies_train, linewidth=4, label="train accuracy")
+    ax2.plot(plotx, accuracies_test, linewidth=4, label="test accuracy")
+    ax2.set_xlabel("epoch")
+    ax2.set_ylabel("accuracy")
+    ax2.legend()
+    ax2.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
+
+    # plt.tight_layout()
     plt.draw()
     plt.pause(1e-4)

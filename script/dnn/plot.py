@@ -18,8 +18,13 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rcParams["figure.figsize"] = (FIGWIDTH, FIGHEIGHT)
 
 
-def create_fig(name, aspect_ratio, position=None):
-    fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
+def create_fig(name, num_rows, num_cols, aspect_ratio=1, position=None, sharex=False):
+    if num_rows == 1 and num_cols == 1:
+        fig = plt.figure(num=name, figsize=[plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]])
+    else:
+        fig, axs = plt.subplots(num_rows, num_cols, layout='constrained', num=name, figsize=[
+            plt.rcParams["figure.figsize"][0]*aspect_ratio, plt.rcParams["figure.figsize"][1]], sharex=sharex)
+
     if position:
         import matplotlib
         backend = matplotlib.get_backend()
@@ -32,7 +37,7 @@ def create_fig(name, aspect_ratio, position=None):
             # You can also use window.setGeometry
             fig.canvas.manager.window.move(position)
 
-    return fig
+    return fig, axs
 
 
 def fig_size(fig):
