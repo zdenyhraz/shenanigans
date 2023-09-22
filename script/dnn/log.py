@@ -6,9 +6,8 @@ import logging
 class CustomFormatter(logging.Formatter):
     grey = "\x1b[38;20m"
     blue = '\033[94m'
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
     green = '\033[32m'
+    yellow = "\x1b[33;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
     # format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
@@ -54,7 +53,7 @@ def error(message):
 
 
 if __name__ == "__main__":
-    log.debug("debug ahojky broo")
-    log.info("info ahojky broo")
-    log.warning("warning ahojky broo")
-    log.error("error ahojky broo")
+    log.debug("debug ahojky broo h3h3h3")
+    log.info("info ahojky broo h3h3h3")
+    log.warning("warning ahojky broo h3h3h3")
+    log.error("error ahojky broo h3h3h3")
