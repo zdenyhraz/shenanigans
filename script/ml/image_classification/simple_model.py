@@ -53,7 +53,7 @@ class ImageClassificationModel(nn.Module):
 
 if __name__ == "__main__":
     if False:
-        dataset = ImageClassificationDataset("data/ml/image_classification/datasets/HISAS", transform=transforms.Compose([
+        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS", transform=transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((512, 512), antialias=True)
         ]))
@@ -66,6 +66,6 @@ if __name__ == "__main__":
 
     model = ImageClassificationModel(len(dataset.classes))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+    options = train.TrainOptions(num_epochs=20, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=0.0005, batch_size=8, test_ratio=0.1, device=device, measure_accuracy=True)
     train.train(model, dataset, options)

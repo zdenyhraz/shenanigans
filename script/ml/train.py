@@ -62,7 +62,7 @@ def train(model, dataset, options):
 
     log.info('Training finished')
     log.info(
-        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, class_names=dataset.class_names):.1%}")
+        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, classes=dataset.classes):.1%}")
 
     if options.save_model:
         model_name = "gigachad"

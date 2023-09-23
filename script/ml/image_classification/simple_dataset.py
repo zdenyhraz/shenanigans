@@ -8,16 +8,16 @@ import log  # nopep8
 
 
 class ImageClassificationDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset_directory, transform):
+    def __init__(self, root, transform):
         self.transform = transform
         self.samples = []
         self.classes = []
-        log.debug(f"Loading ImageClassificationDataset from {dataset_directory}")
-        if not os.path.isdir(dataset_directory):
-            raise ValueError(f"'{dataset_directory}' is not a directory")
+        log.debug(f"Loading ImageClassificationDataset from {root}")
+        if not os.path.isdir(root):
+            raise ValueError(f"'{root}' is not a directory")
 
-        for class_directory in os.listdir(dataset_directory):
-            class_directory = os.path.join(dataset_directory, class_directory)
+        for class_directory in os.listdir(root):
+            class_directory = os.path.join(root, class_directory)
             if not os.path.isdir(class_directory):
                 continue
             class_name = Path(class_directory).stem
