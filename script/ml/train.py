@@ -28,6 +28,14 @@ class TrainOptions:
         self.augment_transform = augment_transform
 
 
+class TrainStatistics:
+    def __init__(self):
+        self.accuracies_train = []
+        self.accuracies_test = []
+        self.losses_train = []
+        self.losses_test = []
+
+
 def train(model, dataset_raw, options):
     # torchsummary.summary(model, (1, 128, 128), device="cpu")
     train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
@@ -50,9 +58,7 @@ def train(model, dataset_raw, options):
     if options.plot_progress:
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
-    accuracies_train, accuracies_test = [], []
-    losses_train, losses_test = [], []
-
+    stats = TrainStatistics()
     log.info(f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}'")
     for epoch in range(options.num_epochs) if options.log_progress else tqdm(range(options.num_epochs)):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
@@ -60,17 +66,17 @@ def train(model, dataset_raw, options):
         if options.measure_accuracy:
             accuracy_train = model.accuracy(train_dataset_raw)
             accuracy_test = model.accuracy(test_dataset_raw)
-            accuracies_train.append(accuracy_train)
-            accuracies_test.append(accuracy_test)
+            stats.accuracies_train.append(accuracy_train)
+            stats.accuracies_test.append(accuracy_test)
         if options.log_progress:
             if options.measure_accuracy:
                 log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e} | train_accuracy {accuracy_train:.1%}, | test_accuracy {accuracy_test:.1%}")
             else:
                 log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e}")
         if options.plot_progress:
-            losses_train.append(loss_train)
-            losses_test.append(loss_test)
-            plot_progress(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test)
+            stats.losses_train.append(loss_train)
+            stats.losses_test.append(loss_test)
+            plot_progress(fig, axs, epoch, stats)
 
     log.info('Training finished')
     log.info(f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
@@ -82,7 +88,7 @@ def train(model, dataset_raw, options):
         torch.save(model.state_dict(), savepath)
 
 
-def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device):
+def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device,):
     model.train()
     loss_train = 0.0
     for inputs, targets in train_loader:
@@ -107,21 +113,21 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
 
 
-def plot_progress(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test):
+def plot_progress(fig, axs, epoch, stats):
     (ax1, ax2) = axs
     plotx = np.arange(0, epoch+1, 1)
 
     ax1.clear()
-    ax1.plot(plotx, losses_train, linewidth=4, label="train loss")
-    ax1.plot(plotx, losses_test, linewidth=4, label="test loss")
+    ax1.plot(plotx, stats.losses_train, linewidth=4, label="train loss")
+    ax1.plot(plotx, stats.losses_test, linewidth=4, label="test loss")
     ax1.set_ylabel("loss")
     ax1.set_yscale("log")
     ax1.legend()
 
     ax2.clear()
-    ax2.plot(plotx, accuracies_train, linewidth=4, label="train accuracy")
-    ax2.plot(plotx, accuracies_test, linewidth=4, label="test accuracy")
-    ax2.set_xlabel("epoch")
+    ax2.plot(plotx, stats.accuracies_train, linewidth=4, label="train accuracy")
+    ax2.plot(plotx, stats.accuracies_test, linewidth=4, label="test accuracy")
+    ax2.set_xlabel("batch")
     ax2.set_ylabel("accuracy")
     ax2.legend()
     ax2.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
