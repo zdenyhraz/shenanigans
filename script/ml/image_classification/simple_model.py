@@ -22,12 +22,12 @@ class ImageClassificationModel(nn.Module):
         self.conv1 = nn.Conv2d(1, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(16*125*125, 120)  # for 512x512
+        self.fc1 = nn.Linear(16*29*29, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
         self.transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize((512, 512), antialias=True),
+            transforms.Resize((128, 128), antialias=True),
             transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))
         ])
 
@@ -76,16 +76,20 @@ class ImageClassificationModel(nn.Module):
 if __name__ == "__main__":
     if False:
         dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS")
-    else:
+    elif False:
         dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
+    else:
+        dataset = datasets.MNIST(root="data/ml/image_classification/datasets", download=True)
+
     model = ImageClassificationModel(len(dataset.classes))
     dataset.transform = model.transform
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     use_augment = False
     augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
-        size=(512, 512), scale=(0.5, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
-    options = train.TrainOptions(num_epochs=20, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=5e-4, batch_size=8, test_ratio=0.2, device=device, measure_accuracy=True, augment_transform=augment_transform)
+        size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    options = train.TrainOptions(num_epochs=1, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+                                 learn_rate=5e-4, batch_size=32, test_ratio=0.2, device=device, log_progress=True, measure_accuracy=True, augment_transform=augment_transform)
+    model.predict_plot(dataset, 4)
     train.train(model, dataset, options)
     model.predict_plot(dataset, 4)

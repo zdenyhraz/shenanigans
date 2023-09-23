@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
 import torchvision.transforms as transforms
+import torchsummary
+from tqdm import tqdm
 import copy
 import log
 import plot
@@ -27,6 +29,7 @@ class TrainOptions:
 
 
 def train(model, dataset_raw, options):
+    # torchsummary.summary(model, (1, 128, 128), device="cpu")
     train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
 
@@ -51,7 +54,7 @@ def train(model, dataset_raw, options):
     losses_train, losses_test = [], []
 
     log.info(f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}'")
-    for epoch in range(options.num_epochs):
+    for epoch in range(options.num_epochs) if options.log_progress else tqdm(range(options.num_epochs)):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
 
         if options.measure_accuracy:
@@ -70,8 +73,7 @@ def train(model, dataset_raw, options):
             plot_progress(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test)
 
     log.info('Training finished')
-    log.info(
-        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw, log_predictions=True, classes=dataset.classes):.1%}, test_dataset {model.accuracy(test_dataset_raw, log_predictions=True, classes=dataset.classes):.1%}")
+    log.info(f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
 
     if options.save_model:
         model_name = "gigachad"
