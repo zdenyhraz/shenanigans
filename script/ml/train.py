@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
 import torchvision.transforms as transforms
+import copy
 import log
 import plot
 
 
 class TrainOptions:
-    def __init__(self, num_epochs=10, learn_rate=5e-4, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), measure_accuracy=False, data_augmentation=True):
+    def __init__(self, num_epochs=10, learn_rate=5e-4, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), measure_accuracy=False, augment_transform=None):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
         self.save_model = save_model
@@ -22,19 +23,21 @@ class TrainOptions:
         self.test_ratio = test_ratio
         self.device = device
         self.measure_accuracy = measure_accuracy
-        self.data_augmentation = data_augmentation
+        self.augment_transform = augment_transform
 
 
-def train(model, dataset, options):
+def train(model, dataset_raw, options):
+    train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
+    log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
+
+    if options.augment_transform:
+        dataset = copy.deepcopy(dataset)
+        dataset.transform = transforms.Compose([dataset.transform, options.augment_transform])
+        log.debug(f"Using data agumentation transforms:\n{options.augment_transform}")
+    else:
+        dataset = dataset_raw
+
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-options.test_ratio), options.test_ratio])
-    log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset):.1%}")
-    if options.data_augmentation:
-        original_transform = train_dataset.dataset.transform
-        augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
-            size=(512, 512), scale=(0.5, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)])  # transforms.RandomRotation(180)
-        train_dataset.dataset.transform = transforms.Compose([train_dataset.dataset.transform, augment_transform])
-        log.debug(f"Using data agumentation transforms:\n{augment_transform}")
-
     num_workers = 0  # 0 = os.cpu_count()
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=False, num_workers=num_workers)
@@ -52,8 +55,8 @@ def train(model, dataset, options):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
 
         if options.measure_accuracy:
-            accuracy_train = model.accuracy(train_dataset)
-            accuracy_test = model.accuracy(test_dataset)
+            accuracy_train = model.accuracy(train_dataset_raw)
+            accuracy_test = model.accuracy(test_dataset_raw)
             accuracies_train.append(accuracy_train)
             accuracies_test.append(accuracy_test)
         if options.log_progress:
@@ -67,18 +70,14 @@ def train(model, dataset, options):
             plot_progress(fig, axs, epoch, losses_train, losses_test, accuracies_train, accuracies_test)
 
     log.info('Training finished')
-    if options.data_augmentation:
-        train_dataset.dataset.transform = original_transform
     log.info(
-        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset, log_predictions=True, classes=dataset.classes):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, classes=dataset.classes):.1%}")
+        f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw, log_predictions=True, classes=dataset.classes):.1%}, test_dataset {model.accuracy(test_dataset_raw, log_predictions=True, classes=dataset.classes):.1%}")
 
     if options.save_model:
         model_name = "gigachad"
         savepath = f"data/runs/{model_name}.pth"
         log.info(f"Saving model to {savepath}")
         torch.save(model.state_dict(), savepath)
-    if options.plot_progress:
-        plt.show()  # keep plot visible after training finished
 
 
 def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device):

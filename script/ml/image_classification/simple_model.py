@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import skimage.io as io
 import numpy as np
 import sys
-sys.path.append('script/ml')  # nopep8
+sys.path.append('script/ml')
 import log  # nopep8
 import train  # nopep8
 import plot  # nopep8
@@ -25,6 +25,10 @@ class ImageClassificationModel(nn.Module):
         self.fc1 = nn.Linear(16*125*125, 120)  # for 512x512
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Resize((512, 512), antialias=True),
+            transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))])
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -57,7 +61,7 @@ class ImageClassificationModel(nn.Module):
 
         return accuracy/len(dataset)
 
-    def plot_prediction(self, dataset, num_samples):
+    def predict_plot(self, dataset, num_samples):
         fig, axs = plot.create_fig("sample model predictions", 1, num_samples)
         for idx, dataidx in enumerate(torch.randint(0, len(dataset), (num_samples,))):
             image = dataset[dataidx][0]
@@ -69,19 +73,18 @@ class ImageClassificationModel(nn.Module):
 
 
 if __name__ == "__main__":
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize((512, 512), antialias=True),
-        transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))])
     if False:
-        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS", transform=transform)
+        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS")
     else:
-        dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", transform=transform, loader=lambda path: io.imread(path))
+        dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
-
     model = ImageClassificationModel(len(dataset.classes))
+    dataset.transform = model.transform
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    options = train.TrainOptions(num_epochs=10, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=0.0005, batch_size=8, test_ratio=0.1, device=device, measure_accuracy=True, data_augmentation=False)
+    use_augment = False
+    augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
+        size=(512, 512), scale=(0.5, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
+    options = train.TrainOptions(num_epochs=20, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+                                 learn_rate=5e-4, batch_size=8, test_ratio=0.2, device=device, measure_accuracy=True, augment_transform=augment_transform)
     train.train(model, dataset, options)
-    model.plot_prediction(dataset, 4)
+    model.predict_plot(dataset, 4)
