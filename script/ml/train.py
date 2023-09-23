@@ -63,7 +63,8 @@ def train(model, dataset, options):
         f"Model accuracy after training: train_dataset {model.accuracy(train_dataset):.1%}, test_dataset {model.accuracy(test_dataset, log_predictions=True, class_names=dataset.class_names):.1%}")
 
     if options.save_model:
-        savepath = "idk.pth"
+        model_name = "gigachad"
+        savepath = f"data/runs/{model_name}.pth"
         log.info(f"Saving model to {savepath}")
         torch.save(model.state_dict(), savepath)
     if options.plot_progress:

@@ -1,6 +1,6 @@
 #pragma once
-#include <DNN/ObjectDetection/YOLOv8Torch.hpp>
-#include <DNN/ObjectDetection/Draw.hpp>
+#include <ML/ObjectDetection/YOLOv8Torch.hpp>
+#include <ML/ObjectDetection/Draw.hpp>
 
 void SegmentObjectsYOLOv8Torch(const cv::Mat& source, const std::filesystem::path& modelPath, const std::filesystem::path& classesPath, f32 confidenceThreshold, f32 NMSThreshold)
 {

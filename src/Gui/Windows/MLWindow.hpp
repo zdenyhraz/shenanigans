@@ -1,7 +1,7 @@
 #pragma once
 #include "Gui/Windows/Window.hpp"
 
-class DNNWindow : public Window
+class MLWindow : public Window
 {
   std::string imagePath = "data/ObjectDetection/sonar/interesting/sasi-S-upper-20221102-143803-l38.tif";
   std::string modelPath = "data/DNN/yolov8/yolov8x";

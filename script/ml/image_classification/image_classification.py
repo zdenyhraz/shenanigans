@@ -1,14 +1,17 @@
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.utils.data
-import os.path
-from pathlib import Path
-import cv2
-import skimage.io as io
+
+import sys
 import torchvision.transforms as transforms
-import log
-import train
+import skimage.io as io
+import cv2
+from pathlib import Path
+import os.path
+import torch.utils.data
+import torch.optim as optim
+import torch.nn.functional as F
+import torch.nn as nn
+sys.path.append('script/ML')
+import log  # nopep8
+import train  # nopep8
 
 
 class ImageClassificationModel(nn.Module):
@@ -90,7 +93,7 @@ class ImageClassificationDataset(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
-    dataset = ImageClassificationDataset("data/DNN/objdetect/HISAS", image_size=512)
+    dataset = ImageClassificationDataset("data/ml/image_classification/datasets/HISAS", image_size=512)
     model = ImageClassificationModel(dataset.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,

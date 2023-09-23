@@ -3,7 +3,7 @@
 #include "Windows/IPCWindow.hpp"
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
-#include "Windows/DNNWindow.hpp"
+#include "Windows/MLWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
 
 void Application::Initialize()
@@ -12,7 +12,7 @@ void Application::Initialize()
   mWindows.push_back(std::make_unique<IPCWindow>());
   mWindows.push_back(std::make_unique<AstroWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
-  mWindows.push_back(std::make_unique<DNNWindow>());
+  mWindows.push_back(std::make_unique<MLWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
 
   for (const auto& window : mWindows)
