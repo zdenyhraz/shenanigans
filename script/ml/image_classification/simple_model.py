@@ -28,7 +28,8 @@ class ImageClassificationModel(nn.Module):
         self.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((512, 512), antialias=True),
-            transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))])
+            transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))
+        ])
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))

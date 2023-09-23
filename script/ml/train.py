@@ -31,7 +31,7 @@ def train(model, dataset_raw, options):
     log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
 
     if options.augment_transform:
-        dataset = copy.deepcopy(dataset)
+        dataset = copy.deepcopy(dataset_raw)
         dataset.transform = transforms.Compose([dataset.transform, options.augment_transform])
         log.debug(f"Using data agumentation transforms:\n{options.augment_transform}")
     else:
@@ -75,7 +75,7 @@ def train(model, dataset_raw, options):
 
     if options.save_model:
         model_name = "gigachad"
-        savepath = f"data/runs/{model_name}.pth"
+        savepath = f"data/ml/{model_name}.pth"
         log.info(f"Saving model to {savepath}")
         torch.save(model.state_dict(), savepath)
 
