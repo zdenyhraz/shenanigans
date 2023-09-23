@@ -4,6 +4,7 @@ import torch.utils.data
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
+import os
 import log
 import plot
 
@@ -27,8 +28,9 @@ def train(model, dataset, options):
     test_size = int(len(dataset)*options.test_ratio)
     train_size = len(dataset)-test_size
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
-    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=True)
+    num_workers = 0  # os.cpu_count()
+    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True, num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=False, num_workers=num_workers)
     model.to(options.device)
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
 
