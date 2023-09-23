@@ -36,8 +36,8 @@ class ImageClassificationModel(nn.Module):
         x = self.pool(F.relu(self.conv2(x)))
         x = torch.flatten(x, 1)  # flatten all dimensions except batch
         # log.debug(f"Forward shape flatten: {x.shape}")
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = F.dropout(F.relu(self.fc1(x)), p=0.0, training=self.training)
+        x = F.dropout(F.relu(self.fc2(x)), p=0.0, training=self.training)
         x = self.fc3(x)
         return x
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    options = train.TrainOptions(num_epochs=10, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+    options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=5e-4, batch_size=8, test_ratio=0.2, device=device, log_progress=True, measure_accuracy=True, augment_transform=augment_transform)
     train.train(model, dataset, options)
     model.predict_plot(dataset, 4)

@@ -76,7 +76,7 @@ def train(model, dataset_raw, options):
         if options.plot_progress:
             stats.losses_train.append(loss_train)
             stats.losses_test.append(loss_test)
-            plot_progress(fig, axs, epoch, stats)
+            plot_progress(fig, axs, stats)
 
     log.info('Training finished')
     log.info(f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
@@ -113,21 +113,20 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
 
 
-def plot_progress(fig, axs, epoch, stats):
+def plot_progress(fig, axs, stats):
     (ax1, ax2) = axs
-    plotx = np.arange(0, epoch+1, 1)
 
     ax1.clear()
-    ax1.plot(plotx, stats.losses_train, linewidth=4, label="train loss")
-    ax1.plot(plotx, stats.losses_test, linewidth=4, label="test loss")
+    ax1.plot(stats.losses_train, linewidth=4, label="train loss")
+    ax1.plot(stats.losses_test, linewidth=4, label="test loss")
     ax1.set_ylabel("loss")
     ax1.set_yscale("log")
     ax1.legend()
 
     ax2.clear()
-    ax2.plot(plotx, stats.accuracies_train, linewidth=4, label="train accuracy")
-    ax2.plot(plotx, stats.accuracies_test, linewidth=4, label="test accuracy")
-    ax2.set_xlabel("batch")
+    ax2.plot(stats.accuracies_train, linewidth=4, label="train accuracy")
+    ax2.plot(stats.accuracies_test, linewidth=4, label="test accuracy")
+    ax2.set_xlabel("epoch")
     ax2.set_ylabel("accuracy")
     ax2.legend()
     ax2.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(xmax=1.0))
