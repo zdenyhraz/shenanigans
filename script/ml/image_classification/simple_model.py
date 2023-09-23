@@ -6,11 +6,14 @@ import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from simple_dataset import ImageClassificationDataset
+import matplotlib.pyplot as plt
 import skimage.io as io
+import numpy as np
 import sys
 sys.path.append('script/ml')  # nopep8
 import log  # nopep8
 import train  # nopep8
+import plot  # nopep8
 
 
 class ImageClassificationModel(nn.Module):
@@ -33,39 +36,52 @@ class ImageClassificationModel(nn.Module):
         x = self.fc3(x)
         return x
 
+    def predict(self, image):
+        device = next(self.parameters()).device
+        input = torch.unsqueeze(image, 0).to(device)
+        output = torch.softmax(torch.squeeze(self.forward(input)), 0)
+        return torch.argmax(output), torch.max(output)
+
     def accuracy(self, dataset, log_predictions=False, classes=None):
         model.eval()
         with torch.no_grad():
             accuracy = 0
             for input, target_class in dataset:
-                device = next(self.parameters()).device
-                input = torch.unsqueeze(input, 0).to(device)
-                pred_class = torch.argmax(self.forward(input))
+                pred_class, confidence = self.predict(input)
                 accuracy += 1 if pred_class == target_class else 0
                 if log_predictions and classes:
                     if pred_class == target_class:
-                        log.debug(f"[match] '{classes[target_class]}' predicted as '{classes[pred_class]}'")
+                        log.debug(f"[match] '{classes[target_class]}' predicted as '{classes[pred_class]}' with {confidence:.1%} confidence")
                     else:
-                        log.warning(f"[mismatch] '{classes[target_class]}' predicted as '{classes[pred_class]}'")
+                        log.warning(f"[mismatch] '{classes[target_class]}' predicted as '{classes[pred_class]}' with {confidence:.1%} confidence")
 
         return accuracy/len(dataset)
 
+    def plot_prediction(self, dataset, num_samples):
+        fig, axs = plot.create_fig("sample model predictions", 1, num_samples)
+        for idx, dataidx in enumerate(torch.randint(0, len(dataset), (num_samples,))):
+            image = dataset[dataidx][0]
+            axs[idx].imshow(torch.squeeze(image), interpolation='none', cmap="viridis")
+            pred_class, confidence = self.predict(image)
+            axs[idx].set_title(f"{dataset.classes[pred_class]} {confidence:.1%}")
+        plt.tight_layout()
+        plt.show()
+
 
 if __name__ == "__main__":
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Resize((512, 512), antialias=True),
+        transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))])
     if False:
-        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS", transform=transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Resize((512, 512), antialias=True)
-        ]))
+        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS", transform=transform)
     else:
-        dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", transform=transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Resize((512, 512), antialias=True)
-        ]), loader=lambda path: io.imread(path)
-        )
+        dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", transform=transform, loader=lambda path: io.imread(path))
+        # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
 
     model = ImageClassificationModel(len(dataset.classes))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    options = train.TrainOptions(num_epochs=20, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=0.0005, batch_size=8, test_ratio=0.1, device=device, measure_accuracy=True)
+    options = train.TrainOptions(num_epochs=10, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+                                 learn_rate=0.0005, batch_size=8, test_ratio=0.1, device=device, measure_accuracy=True, data_augmentation=False)
     train.train(model, dataset, options)
+    model.plot_prediction(dataset, 4)
