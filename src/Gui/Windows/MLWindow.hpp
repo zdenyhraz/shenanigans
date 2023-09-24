@@ -4,8 +4,8 @@
 class MLWindow : public Window
 {
   std::string imagePath = "data/ObjectDetection/sonar/interesting/sasi-S-upper-20221102-143803-l38.tif";
-  std::string modelPath = "data/DNN/yolov8/yolov8x";
-  std::string classesPath = "data/DNN/yolov8/coco.names";
+  std::string modelPath = "data/ml/object_detection/runs/yolov8/yolov8x";
+  std::string classesPath = "data/ml/object_detection/runs/yolov8/coco.names";
   f32 confidenceThreshold = 0.05;
   f32 NMSThreshold = 0.5;
 
