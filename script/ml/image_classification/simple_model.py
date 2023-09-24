@@ -1,4 +1,5 @@
 
+from predict import predict_plot
 import torch.utils.data
 import torch.optim as optim
 import torch.nn.functional as F
@@ -6,12 +7,12 @@ import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from simple_dataset import ImageClassificationDataset
+from accuracy import accuracy
 import matplotlib.pyplot as plt
 import skimage.io as io
 import numpy as np
 import sys
 sys.path.append('script/ml')
-import log  # nopep8
 import train  # nopep8
 import plot  # nopep8
 
@@ -41,37 +42,6 @@ class ImageClassificationModel(nn.Module):
         x = self.fc3(x)
         return x
 
-    def predict(self, image):
-        device = next(self.parameters()).device
-        input = torch.unsqueeze(image, 0).to(device)
-        output = torch.softmax(torch.squeeze(self.forward(input)), 0)
-        return torch.argmax(output), torch.max(output)
-
-    def accuracy(self, dataset, log_predictions=False, classes=None):
-        model.eval()
-        with torch.no_grad():
-            accuracy = 0
-            for input, target_class in dataset:
-                pred_class, confidence = self.predict(input)
-                accuracy += 1 if pred_class == target_class else 0
-                if log_predictions and classes:
-                    if pred_class == target_class:
-                        log.debug(f"[match] '{classes[target_class]}' predicted as '{classes[pred_class]}' with {confidence:.1%} confidence")
-                    else:
-                        log.warning(f"[mismatch] '{classes[target_class]}' predicted as '{classes[pred_class]}' with {confidence:.1%} confidence")
-
-        return accuracy/len(dataset)
-
-    def predict_plot(self, dataset, num_samples):
-        fig, axs = plot.create_fig("sample model predictions", 1, num_samples)
-        for idx, dataidx in enumerate(torch.randint(0, len(dataset), (num_samples,))):
-            image = dataset[dataidx][0]
-            axs[idx].imshow(torch.squeeze(image), interpolation='none', cmap="viridis")
-            pred_class, confidence = self.predict(image)
-            axs[idx].set_title(f"{dataset.classes[pred_class]} {confidence:.1%}")
-        plt.tight_layout()
-        plt.show()
-
 
 if __name__ == "__main__":
     if False:
@@ -82,13 +52,14 @@ if __name__ == "__main__":
     else:
         dataset = datasets.MNIST(root="data/ml/image_classification/datasets", download=True)
 
-    model = ImageClassificationModel(len(dataset.classes))
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = ImageClassificationModel(len(dataset.classes)).to(device)
     dataset.transform = model.transform
     use_augment = False
     augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=5e-4, batch_size=8, test_ratio=0.2, device=device, log_progress=True, measure_accuracy=True, augment_transform=augment_transform)
+                                 learn_rate=1e-3, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
     train.train(model, dataset, options)
-    model.predict_plot(dataset, 4)
+    predict_plot(model, dataset, 4)

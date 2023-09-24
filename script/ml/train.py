@@ -13,9 +13,10 @@ import plot
 
 
 class TrainOptions:
-    def __init__(self, num_epochs=10, learn_rate=5e-4, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), measure_accuracy=False, augment_transform=None):
+    def __init__(self, num_epochs, learn_rate, accuracy_fn, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), augment_transform=None):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
+        self.accuracy_fn = accuracy_fn
         self.save_model = save_model
         self.log_progress = log_progress
         self.plot_progress = plot_progress
@@ -24,22 +25,26 @@ class TrainOptions:
         self.batch_size = batch_size
         self.test_ratio = test_ratio
         self.device = device
-        self.measure_accuracy = measure_accuracy
         self.augment_transform = augment_transform
 
 
 class TrainStatistics:
     def __init__(self):
-        self.accuracies_train = []
-        self.accuracies_test = []
-        self.losses_train = []
-        self.losses_test = []
+        self.acc_train = []
+        self.acc_test = []
+        self.loss_train = []
+        self.loss_test = []
 
 
 def train(model, dataset_raw, options):
+    model.to(options.device)
     # torchsummary.summary(model, (1, 128, 128), device="cpu")
+    num_workers = 0  # 0 = os.cpu_count()
+    # raw datasets and dataloaders (with no augmentations) for accuracy measurements, with large batch sizes for faster accuracy computation
     train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
-    log.info(f"Model accuracy before training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
+    train_loader_raw = torch.utils.data.DataLoader(dataset=train_dataset_raw, batch_size=64, shuffle=True, num_workers=num_workers)
+    test_loader_raw = torch.utils.data.DataLoader(dataset=test_dataset_raw, batch_size=64, shuffle=False, num_workers=num_workers)
+    log.info(f"Model accuracy before training: train_dataset {options.accuracy_fn(model, train_loader_raw):.1%}, test_dataset {options.accuracy_fn(model,  test_loader_raw):.1%}")
 
     if options.augment_transform:
         dataset = copy.deepcopy(dataset_raw)
@@ -49,37 +54,31 @@ def train(model, dataset_raw, options):
         dataset = dataset_raw
 
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-options.test_ratio), options.test_ratio])
-    num_workers = 0  # 0 = os.cpu_count()
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=options.batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=options.batch_size, shuffle=False, num_workers=num_workers)
-    model.to(options.device)
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
 
     if options.plot_progress:
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
     stats = TrainStatistics()
-    log.info(f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}'")
+    log.info(
+        f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
     for epoch in range(options.num_epochs) if options.log_progress else tqdm(range(options.num_epochs)):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
-
-        if options.measure_accuracy:
-            accuracy_train = model.accuracy(train_dataset_raw)
-            accuracy_test = model.accuracy(test_dataset_raw)
-            stats.accuracies_train.append(accuracy_train)
-            stats.accuracies_test.append(accuracy_test)
+        accuracy_train = options.accuracy_fn(model, train_loader_raw)
+        accuracy_test = options.accuracy_fn(model, test_loader_raw)
+        stats.acc_train.append(accuracy_train)
+        stats.acc_test.append(accuracy_test)
         if options.log_progress:
-            if options.measure_accuracy:
-                log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e} | train_accuracy {accuracy_train:.1%}, | test_accuracy {accuracy_test:.1%}")
-            else:
-                log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e}")
+            log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e} | train_acc {accuracy_train:.1%}, | test_acc {accuracy_test:.1%}")
         if options.plot_progress:
-            stats.losses_train.append(loss_train)
-            stats.losses_test.append(loss_test)
+            stats.loss_train.append(loss_train)
+            stats.loss_test.append(loss_test)
             plot_progress(fig, axs, stats)
 
     log.info('Training finished')
-    log.info(f"Model accuracy after training: train_dataset {model.accuracy(train_dataset_raw):.1%}, test_dataset {model.accuracy(test_dataset_raw):.1%}")
+    log.info(f"Model accuracy after training: train_dataset {accuracy_train:.1%}, test_dataset {accuracy_test:.1%}")
 
     if options.save_model:
         model_name = "gigachad"
@@ -117,15 +116,15 @@ def plot_progress(fig, axs, stats):
     (ax1, ax2) = axs
 
     ax1.clear()
-    ax1.plot(stats.losses_train, linewidth=4, label="train loss")
-    ax1.plot(stats.losses_test, linewidth=4, label="test loss")
+    ax1.plot(stats.loss_train, linewidth=4, label="train loss")
+    ax1.plot(stats.loss_test, linewidth=4, label="test loss")
     ax1.set_ylabel("loss")
     ax1.set_yscale("log")
     ax1.legend()
 
     ax2.clear()
-    ax2.plot(stats.accuracies_train, linewidth=4, label="train accuracy")
-    ax2.plot(stats.accuracies_test, linewidth=4, label="test accuracy")
+    ax2.plot(stats.acc_train, linewidth=4, label="train accuracy")
+    ax2.plot(stats.acc_test, linewidth=4, label="test accuracy")
     ax2.set_xlabel("epoch")
     ax2.set_ylabel("accuracy")
     ax2.legend()
