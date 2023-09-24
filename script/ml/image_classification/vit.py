@@ -13,7 +13,6 @@ sys.path.append('script/ml')
 import train  # nopep8
 
 if __name__ == "__main__":
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = models.vit_b_16(weights="DEFAULT")
     dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
         transforms.ToTensor(),
@@ -28,9 +27,9 @@ if __name__ == "__main__":
 
     # replace classification layer
     model.heads = nn.Linear(768, len(dataset.classes))
-    model.to(device)
     print(model)
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=1e-3, accuracy_fn=accuracy, batch_size=batch_size, test_ratio=0.2, device=device)

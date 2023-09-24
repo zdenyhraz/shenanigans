@@ -14,7 +14,6 @@ import numpy as np
 import sys
 sys.path.append('script/ml')
 import train  # nopep8
-import plot  # nopep8
 
 
 class ImageClassificationModel(nn.Module):
@@ -44,9 +43,7 @@ class ImageClassificationModel(nn.Module):
 
 
 if __name__ == "__main__":
-    if False:
-        dataset = ImageClassificationDataset(root="data/ml/image_classification/datasets/HISAS")
-    elif True:
+    if True:
         dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
     else:
