@@ -1,5 +1,5 @@
 
-from predict import predict, predict_plot
+from predict import predict_plot
 import torch.utils.data
 import torch.optim as optim
 import torch.nn.functional as F
@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from simple_dataset import ImageClassificationDataset
-from accuracy import accuracy
+from accuracy import accuracy, accuracy_metric
 import matplotlib.pyplot as plt
 import skimage.io as io
 import numpy as np
@@ -57,8 +57,7 @@ if __name__ == "__main__":
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, accuracy_fn=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
+                                 learn_rate=1e-3, accuracy_fn=accuracy_metric, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
 
-    # predict(model, dataset[0][0])
+    train.train(model, dataset, options)
     predict_plot(model, dataset, 4)
-    # train.train(model, dataset, options)
