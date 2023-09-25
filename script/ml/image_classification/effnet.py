@@ -34,6 +34,6 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, accuracy_fn=accuracy, batch_size=batch_size, test_ratio=0.2, device=device)
-    predict_plot(model, dataset, 4)
+                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device)
     train.train(model, dataset, options)
+    predict_plot(model, dataset, 4)

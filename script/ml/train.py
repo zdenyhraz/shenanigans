@@ -13,10 +13,10 @@ import plot
 
 
 class TrainOptions:
-    def __init__(self, num_epochs, learn_rate, accuracy_fn, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), augment_transform=None):
+    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), augment_transform=None):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
-        self.accuracy_fn = accuracy_fn
+        self.acc_metric = acc_metric
         self.save_model = save_model
         self.log_progress = log_progress
         self.plot_progress = plot_progress
@@ -44,7 +44,7 @@ def train(model, dataset_raw, options):
     train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
     train_loader_raw = torch.utils.data.DataLoader(dataset=train_dataset_raw, batch_size=64, shuffle=True, num_workers=num_workers)
     test_loader_raw = torch.utils.data.DataLoader(dataset=test_dataset_raw, batch_size=64, shuffle=False, num_workers=num_workers)
-    log.info(f"Model accuracy before training: train_dataset {options.accuracy_fn(model, train_loader_raw):.1%}, test_dataset {options.accuracy_fn(model,  test_loader_raw):.1%}")
+    log.info(f"Model accuracy before training: train_dataset {options.acc_metric(model, train_loader_raw):.1%}, test_dataset {options.acc_metric(model,  test_loader_raw):.1%}")
 
     if options.augment_transform:
         dataset = copy.deepcopy(dataset_raw)
@@ -66,8 +66,8 @@ def train(model, dataset_raw, options):
         f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
     for epoch in range(options.num_epochs) if options.log_progress else tqdm(range(options.num_epochs)):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
-        accuracy_train = options.accuracy_fn(model, train_loader_raw)
-        accuracy_test = options.accuracy_fn(model, test_loader_raw)
+        accuracy_train = options.acc_metric(model, train_loader_raw)
+        accuracy_test = options.acc_metric(model, test_loader_raw)
         stats.acc_train.append(accuracy_train)
         stats.acc_test.append(accuracy_test)
         if options.log_progress:
