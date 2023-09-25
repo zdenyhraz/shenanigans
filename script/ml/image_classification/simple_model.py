@@ -1,5 +1,5 @@
 
-from predict import predict_plot
+from predict import predict, predict_plot
 import torch.utils.data
 import torch.optim as optim
 import torch.nn.functional as F
@@ -22,12 +22,12 @@ class ImageClassificationModel(nn.Module):
         self.conv1 = nn.Conv2d(1, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(16*29*29, 120)
+        self.fc1 = nn.Linear(16*53*53, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
         self.transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Resize((128, 128), antialias=True),
+            transforms.Resize((224, 224), antialias=True),
             transforms.Normalize(np.mean([0.485, 0.456, 0.406]), np.mean([0.229, 0.224, 0.225]))
         ])
 
@@ -57,6 +57,8 @@ if __name__ == "__main__":
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
-    train.train(model, dataset, options)
+                                 learn_rate=1e-3, accuracy_fn=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
+
+    # predict(model, dataset[0][0])
     predict_plot(model, dataset, 4)
+    # train.train(model, dataset, options)

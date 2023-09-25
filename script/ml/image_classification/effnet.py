@@ -13,10 +13,10 @@ sys.path.append('script/ml')
 import train  # nopep8
 
 if __name__ == "__main__":
-    weights = models.ViT_B_16_Weights.DEFAULT
+    weights = models.EfficientNet_B0_Weights.DEFAULT
     transform = weights.transforms()
     print(f"Model transform: {transform}")
-    model = models.vit_b_16(weights="DEFAULT")
+    model = models.efficientnet_b0(weights=weights)
     dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((224, 224), antialias=True),
@@ -29,12 +29,11 @@ if __name__ == "__main__":
         param.requires_grad = False
 
     # replace classification layer
-    model.heads = nn.Linear(768, len(dataset.classes))
-    print(model)
+    model.classifier = nn.Sequential(nn.Dropout(p=0.2, inplace=True), nn.Linear(1280, len(dataset.classes)))
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
-    options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+    options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=1e-3, accuracy_fn=accuracy, batch_size=batch_size, test_ratio=0.2, device=device)
-    train.train(model, dataset, options)
     predict_plot(model, dataset, 4)
+    train.train(model, dataset, options)
