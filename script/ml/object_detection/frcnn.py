@@ -9,7 +9,7 @@ import plot  # nopep8
 img = read_image("data/ml/object_detection/datasets/cats/cats2.jpg")
 
 if True:
-    weights = torchvision.models.detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+    weights = torchvision.models.detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT  # 91 classes
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.9)  # , num_classes=7
 else:
     weights = torchvision.models.detection.RetinaNet_ResNet50_FPN_Weights.DEFAULT

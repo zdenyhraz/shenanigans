@@ -11,14 +11,15 @@ import copy
 import log
 import plot
 
+bar_format = "{desc:<7}[{n_fmt:^4}/{total_fmt:^4}]: {percentage:3.0f}%|{bar:20}| [{elapsed}<{remaining}, {rate_inv_fmt}{postfix}]"
+
 
 class TrainOptions:
-    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, log_progress=True, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), augment_transform=None):
+    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), augment_transform=None):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
         self.acc_metric = acc_metric
         self.save_model = save_model
-        self.log_progress = log_progress
         self.plot_progress = plot_progress
         self.criterion = criterion
         self.optimizer = optimizer
@@ -64,14 +65,20 @@ def train(model, dataset_raw, options):
     stats = TrainStatistics()
     log.info(
         f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
-    for epoch in range(options.num_epochs) if options.log_progress else tqdm(range(options.num_epochs)):
+
+    loss_train, loss_test, accuracy_train, accuracy_test = np.inf, np.inf, 0, 0
+    loop = tqdm(range(options.num_epochs), total=options.num_epochs, colour="green", bar_format=bar_format, unit="epoch")
+    loop.set_description("Epoch")
+    loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=accuracy_train, acc_test=accuracy_test)
+    for epoch in loop:
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
         accuracy_train = options.acc_metric(model, train_loader_raw)
         accuracy_test = options.acc_metric(model, test_loader_raw)
         stats.acc_train.append(accuracy_train)
         stats.acc_test.append(accuracy_test)
-        if options.log_progress:
-            log.debug(f"[Epoch {epoch}] train_loss {loss_train:.2e} | test_loss {loss_test:.2e} | train_acc {accuracy_train:.1%}, | test_acc {accuracy_test:.1%}")
+
+        loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=accuracy_train, acc_test=accuracy_test)
+
         if options.plot_progress:
             stats.loss_train.append(loss_train)
             stats.loss_test.append(loss_test)
@@ -89,8 +96,11 @@ def train(model, dataset_raw, options):
 
 def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device,):
     model.train()
+
     loss_train = 0.0
-    for inputs, targets in train_loader:
+    loop = tqdm(enumerate(train_loader), total=len(train_loader), leave=False, colour="#0E86D4", bar_format=bar_format, unit="batch")
+    loop.set_description("Batch")
+    for batchidx, [inputs, targets] in loop:
         inputs = inputs.to(device)
         targets = targets.to(device)
         optimizer.zero_grad()
@@ -99,15 +109,19 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
         loss.backward()
         optimizer.step()
         loss_train += loss.item()*inputs.size(0)
+        loop.set_postfix(loss_train=loss.item())
 
     with torch.no_grad():
         loss_test = 0.0
-        for inputs, targets in test_loader:
+        loop = tqdm(enumerate(test_loader), total=len(test_loader), leave=False, colour="#7F00FF", bar_format=bar_format, unit="batch")
+        loop.set_description("BatchT")
+        for batchidx, [inputs, targets] in loop:
             inputs = inputs.to(device)
             targets = targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss_test += loss.item()*inputs.size(0)
+            loop.set_postfix(loss_test=loss.item())
 
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
 

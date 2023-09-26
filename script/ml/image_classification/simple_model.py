@@ -57,7 +57,7 @@ if __name__ == "__main__":
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, log_progress=True, augment_transform=augment_transform)
+                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, augment_transform=augment_transform, plot_progress=False)
 
     train.train(model, dataset, options)
     predict_plot(model, dataset, 4)
