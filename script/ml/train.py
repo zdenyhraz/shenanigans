@@ -39,7 +39,7 @@ class TrainStatistics:
 
 def train(model, dataset_raw, options):
     model.to(options.device)
-    # torchsummary.summary(model, (1, 128, 128), device="cpu")
+    # torchsummary.summary(model, (1, 224, 224), device=options.device)
     num_workers = 0  # 0 = os.cpu_count()
     # raw datasets and dataloaders (with no augmentations) for accuracy measurements, with large batch sizes for faster accuracy computation
     train_dataset_raw, test_dataset_raw = torch.utils.data.random_split(dataset_raw, [(1-options.test_ratio), options.test_ratio])
