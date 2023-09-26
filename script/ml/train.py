@@ -62,10 +62,10 @@ def train(model, dataset_raw, options):
     if options.plot_progress:
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
-    stats = TrainStatistics()
     log.info(
         f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
 
+    stats = TrainStatistics()
     loss_train, loss_test, accuracy_train, accuracy_test = np.inf, np.inf, 0, 0
     loop = tqdm(range(options.num_epochs), total=options.num_epochs, colour="green", bar_format=bar_format, unit="epoch")
     loop.set_description(f"Epoch [0/{options.num_epochs}]")
@@ -74,13 +74,13 @@ def train(model, dataset_raw, options):
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
         accuracy_train = options.acc_metric(model, train_loader_raw)
         accuracy_test = options.acc_metric(model, test_loader_raw)
-        stats.acc_train.append(accuracy_train)
-        stats.acc_test.append(accuracy_test)
 
         loop.set_description(f"Epoch [{epoch+1}/{options.num_epochs}]")
         loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=accuracy_train, acc_test=accuracy_test)
 
         if options.plot_progress:
+            stats.acc_test.append(accuracy_test)
+            stats.acc_train.append(accuracy_train)
             stats.loss_train.append(loss_train)
             stats.loss_test.append(loss_test)
             plot_progress(fig, axs, stats)
