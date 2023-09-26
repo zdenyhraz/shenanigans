@@ -111,7 +111,7 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
         loss.backward()
         optimizer.step()
         loss_train += loss.item()*inputs.size(0)
-        loop.set_description(f"Batch train [{batchidx+1}/{num_batches}]")
+        loop.set_description(f"Batch [{batchidx+1}/{num_batches}]")
         loop.set_postfix(loss_train=loss.item())
 
     with torch.no_grad():
@@ -125,7 +125,7 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss_test += loss.item()*inputs.size(0)
-            loop.set_description(f"Batch test [{batchidx+1}/{num_batches}]")
+            loop.set_description(f"Batch [{batchidx+1}/{num_batches}]")
             loop.set_postfix(loss_test=loss.item())
 
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
