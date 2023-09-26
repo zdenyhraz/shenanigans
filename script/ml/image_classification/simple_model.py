@@ -43,7 +43,7 @@ class ImageClassificationModel(nn.Module):
 
 
 if __name__ == "__main__":
-    if True:
+    if False:
         dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
     else:

@@ -11,7 +11,7 @@ import copy
 import log
 import plot
 
-bar_format = "{desc:<7}[{n_fmt:^4}/{total_fmt:^4}]: {percentage:3.0f}%|{bar:20}| [{elapsed}<{remaining}, {rate_inv_fmt}{postfix}]"
+bar_format = "{desc}{percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining},{rate_inv_fmt}{postfix}]"
 
 
 class TrainOptions:
@@ -68,7 +68,7 @@ def train(model, dataset_raw, options):
 
     loss_train, loss_test, accuracy_train, accuracy_test = np.inf, np.inf, 0, 0
     loop = tqdm(range(options.num_epochs), total=options.num_epochs, colour="green", bar_format=bar_format, unit="epoch")
-    loop.set_description("Epoch")
+    loop.set_description(f"Epoch [0/{options.num_epochs}]")
     loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=accuracy_train, acc_test=accuracy_test)
     for epoch in loop:
         loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
@@ -77,6 +77,7 @@ def train(model, dataset_raw, options):
         stats.acc_train.append(accuracy_train)
         stats.acc_test.append(accuracy_test)
 
+        loop.set_description(f"Epoch [{epoch+1}/{options.num_epochs}]")
         loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=accuracy_train, acc_test=accuracy_test)
 
         if options.plot_progress:
@@ -98,7 +99,8 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
     model.train()
 
     loss_train = 0.0
-    loop = tqdm(enumerate(train_loader), total=len(train_loader), leave=False, colour="#0E86D4", bar_format=bar_format, unit="batch")
+    num_batches = len(train_loader)
+    loop = tqdm(enumerate(train_loader), total=num_batches, leave=False, colour="#0E86D4", bar_format=bar_format, unit="batch")
     loop.set_description("Batch")
     for batchidx, [inputs, targets] in loop:
         inputs = inputs.to(device)
@@ -109,11 +111,13 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
         loss.backward()
         optimizer.step()
         loss_train += loss.item()*inputs.size(0)
+        loop.set_description(f"Batch train [{batchidx+1}/{num_batches}]")
         loop.set_postfix(loss_train=loss.item())
 
     with torch.no_grad():
         loss_test = 0.0
-        loop = tqdm(enumerate(test_loader), total=len(test_loader), leave=False, colour="#7F00FF", bar_format=bar_format, unit="batch")
+        num_batches = len(test_loader)
+        loop = tqdm(enumerate(test_loader), total=num_batches, leave=False, colour="#7F00FF", bar_format=bar_format, unit="batch")
         loop.set_description("BatchT")
         for batchidx, [inputs, targets] in loop:
             inputs = inputs.to(device)
@@ -121,6 +125,7 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss_test += loss.item()*inputs.size(0)
+            loop.set_description(f"Batch test [{batchidx+1}/{num_batches}]")
             loop.set_postfix(loss_test=loss.item())
 
     return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)  # sample-average loss
