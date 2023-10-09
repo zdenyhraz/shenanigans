@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from simple_dataset import ImageClassificationDataset
-from accuracy import accuracy, accuracy_metric
+from accuracy import accuracy
 import matplotlib.pyplot as plt
 import skimage.io as io
 import numpy as np
@@ -43,7 +43,7 @@ class ImageClassificationModel(nn.Module):
 
 
 if __name__ == "__main__":
-    if False:
+    if True:
         dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
     else:
@@ -51,13 +51,13 @@ if __name__ == "__main__":
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = ImageClassificationModel(len(dataset.classes)).to(device)
-    dataset.transform = model.transform
     use_augment = False
     augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
+    dataset.transform = transforms.Compose([model.transform, augment_transform]) if augment_transform else model.transform
     batch_size = int(np.clip(0.05*len(dataset), 1, 32))
     options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, augment_transform=augment_transform, plot_progress=False)
+                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, plot_progress=True)
 
     train.train(model, dataset, options)
     predict_plot(model, dataset, 4)
