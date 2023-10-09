@@ -57,14 +57,15 @@ if __name__ == "__main__":
     dataset.transform = transforms.Compose([model.transform, augment_transform]) if augment_transform else model.transform
     test_ratio = 0.2
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-test_ratio), test_ratio])
-    batch_size = int(np.clip(0.05*len(train_dataset), 1, 32))
+    batch_size = train.get_batch_size(train_dataset)
+    num_epochs = train.get_num_epochs(train_dataset, batch_size, 500)
     num_workers = 0  # 0 = os.cpu_count()
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-    options = train.TrainOptions(num_epochs=3, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+    options = train.TrainOptions(num_epochs=num_epochs, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=True)
 
     train.train(model, train_loader, test_loader, options)
-    if (len(test_dataset) <= 100):
+    if (False and len(test_dataset) <= 100):
         predict.predict_all(model, test_dataset)
     predict.predict_plot(model, test_dataset, 4)  # sample predictions on test dataset

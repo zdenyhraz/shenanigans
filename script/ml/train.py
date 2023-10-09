@@ -34,6 +34,14 @@ class TrainStatistics:
         self.loss_test = []
 
 
+def get_batch_size(train_dataset):
+    return int(np.clip(2**(int(0.05*len(train_dataset) - 1)).bit_length(), 1, 32))
+
+
+def get_num_epochs(train_dataset, batch_size, steps=500):
+    return int(np.clip(steps*batch_size/len(train_dataset), 1, 1000))
+
+
 def accuracy_model(model, loader, acc_metric):
     model.eval()
     device = next(model.parameters()).device

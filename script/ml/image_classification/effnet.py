@@ -6,7 +6,7 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 import skimage.io as io
 import numpy as np
-from predict import predict_plot
+import predict
 from accuracy import accuracy
 import sys
 sys.path.append('script/ml')
@@ -14,26 +14,32 @@ import train  # nopep8
 
 if __name__ == "__main__":
     weights = models.EfficientNet_B0_Weights.DEFAULT
-    transform = weights.transforms()
-    print(f"Model transform: {transform}")
+    print(f"Model transform: {weights.transforms()}")
     model = models.efficientnet_b0(weights=weights)
     dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((224, 224), antialias=True),
         transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
-        transform
+        weights.transforms()  # resize, normalize, etc
     ]))
 
     # freeze
-    for param in model.parameters():
-        param.requires_grad = False
+    if True:
+        for param in model.parameters():
+            param.requires_grad = False
 
     # replace classification layer
     model.classifier = nn.Sequential(nn.Dropout(p=0.2, inplace=True), nn.Linear(1280, len(dataset.classes)))
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    batch_size = int(np.clip(0.05*len(dataset), 1, 32))
-    options = train.TrainOptions(num_epochs=50, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device)
-    train.train(model, dataset, options)
-    predict_plot(model, dataset, 4)
+    test_ratio = 0.2
+    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-test_ratio), test_ratio])
+    batch_size = train.get_batch_size(train_dataset)
+    num_epochs = train.get_num_epochs(train_dataset, batch_size, 500)
+    num_workers = 0  # 0 = os.cpu_count()
+    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    options = train.TrainOptions(num_epochs=num_epochs, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=True)
+
+    train.train(model, train_loader, test_loader, options)
+    predict.predict_plot(model, test_dataset, 4)  # sample predictions on test dataset
