@@ -15,7 +15,7 @@ bar_format = "{desc}{percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<
 
 
 class TrainOptions:
-    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, batch_size=16, test_ratio=0.2, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
+    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
         self.acc_metric = acc_metric
@@ -23,8 +23,6 @@ class TrainOptions:
         self.plot_progress = plot_progress
         self.criterion = criterion
         self.optimizer = optimizer
-        self.batch_size = batch_size
-        self.test_ratio = test_ratio
         self.device = device
 
 
@@ -36,21 +34,31 @@ class TrainStatistics:
         self.loss_test = []
 
 
-def train(model, dataset, options):
+def accuracy_model(model, loader, acc_metric):
+    model.eval()
+    device = next(model.parameters()).device
+    acc = 0
+    with torch.no_grad():
+        for inputs, targets in loader:
+            inputs = inputs.to(device)
+            targets = targets.to(device)
+            acc += acc_metric(model(inputs), targets)*inputs.size(0)
+
+    return acc/len(loader.dataset)
+
+
+def train(model, train_loader, test_loader, options):
     model.to(options.device)
     # torchsummary.summary(model, (1, 224, 224), device=options.device)
-    num_workers = 0  # 0 = os.cpu_count()
-    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-options.test_ratio), options.test_ratio])
-    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=64, shuffle=True, num_workers=num_workers)
-    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=64, shuffle=False, num_workers=num_workers)
     optimizer = options.optimizer(model.parameters(), lr=options.learn_rate)
-    # log.info(f"Model accuracy before training: train_dataset {options.acc_metric(model, train_loader):.1%}, test_dataset {options.acc_metric(model,  test_loader_raw):.1%}")
+    log.info(
+        f"Model accuracy before training: train_dataset {accuracy_model(model, train_loader, options.acc_metric):.1%}, test_dataset {accuracy_model(model, test_loader, options.acc_metric):.1%}")
 
     if options.plot_progress:
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
     log.info(
-        f"Training started: train_size: {len(train_dataset)}, test_size: {len(test_dataset)}, batch_size: {options.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
+        f"Training started: train_size: {len(train_loader.dataset)}, test_size: {len(test_loader.dataset)}, batch_size: {train_loader.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
 
     stats = TrainStatistics()
     loss_train, loss_test, acc_train, acc_test = np.inf, np.inf, 0, 0
@@ -81,7 +89,6 @@ def train(model, dataset, options):
 
 def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device, acc_metric):
     model.train()
-
     loss_train = 0.0
     acc_train = 0.0
     num_batches = len(train_loader)

@@ -1,5 +1,5 @@
 
-from predict import predict_plot
+import predict
 import torch.utils.data
 import torch.optim as optim
 import torch.nn.functional as F
@@ -43,7 +43,7 @@ class ImageClassificationModel(nn.Module):
 
 
 if __name__ == "__main__":
-    if True:
+    if False:
         dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path))
         # torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.UNCHANGED)
     else:
@@ -55,9 +55,16 @@ if __name__ == "__main__":
     augment_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=0.5), transforms.RandomResizedCrop(
         size=(128, 128), scale=(0.7, 1.0), ratio=(1, 1), antialias=True), transforms.RandomRotation(180)]) if use_augment else None
     dataset.transform = transforms.Compose([model.transform, augment_transform]) if augment_transform else model.transform
-    batch_size = int(np.clip(0.05*len(dataset), 1, 32))
-    options = train.TrainOptions(num_epochs=30, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, batch_size=batch_size, test_ratio=0.2, device=device, plot_progress=True)
+    test_ratio = 0.2
+    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-test_ratio), test_ratio])
+    batch_size = int(np.clip(0.05*len(train_dataset), 1, 32))
+    num_workers = 0  # 0 = os.cpu_count()
+    train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    options = train.TrainOptions(num_epochs=3, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
+                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=True)
 
-    train.train(model, dataset, options)
-    predict_plot(model, dataset, 4)
+    train.train(model, train_loader, test_loader, options)
+    if (len(test_dataset) <= 100):
+        predict.predict_all(model, test_dataset)
+    predict.predict_plot(model, test_dataset, 4)  # sample predictions on test dataset

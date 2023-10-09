@@ -15,7 +15,7 @@ def predict(model, image):
 
 
 def predict_plot(model, dataset, num_samples):
-    fig, axs = plot.create_fig("sample model predictions", 1, num_samples)
+    fig, axs = plot.create_fig("Sample model predictions on test dataset", 1, num_samples)
     for idx, dataidx in enumerate(torch.randint(0, len(dataset), (num_samples,))):
         image = dataset[dataidx][0]
         dims = image.dim()
@@ -33,6 +33,15 @@ def predict_plot(model, dataset, num_samples):
             plt.close(fig)
             return
         class_id, conf = predict(model, image)
-        axs[idx].set_title(f"{dataset.classes[class_id]} {conf:.1%}")
+        axs[idx].set_title(f"{dataset.dataset.classes[class_id]} {conf:.1%}")
     plt.tight_layout()
     plt.show()
+
+
+def predict_all(model, dataset):
+    for idx, [image, target] in enumerate(dataset):
+        class_id, score = predict(model, image)
+        if class_id == target:
+            log.info(f"[{idx+1}/{len(dataset)}]: Predicted '{dataset.dataset.classes[target]}' as '{dataset.dataset.classes[class_id]}' {score:.1%}")
+        else:
+            log.warning(f"[{idx+1}/{len(dataset)}]: Predicted '{dataset.dataset.classes[target]}' as '{dataset.dataset.classes[class_id]}' {score:.1%}")
