@@ -30,7 +30,7 @@ if __name__ == "__main__":
         ]))
 
     # freeze
-    freeze = True
+    freeze = False
     if freeze:
         for param in model.parameters():
             param.requires_grad = False
