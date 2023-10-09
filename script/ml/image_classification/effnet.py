@@ -16,14 +16,22 @@ if __name__ == "__main__":
     weights = models.EfficientNet_B0_Weights.DEFAULT
     print(f"Model transform: {weights.transforms()}")
     model = models.efficientnet_b0(weights=weights)
-    dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
-        weights.transforms()  # resize, normalize, etc
-    ]))
+    if False:
+        dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
+            weights.transforms()  # resize, normalize, etc
+        ]))
+    else:
+        dataset = datasets.MNIST(root="data/ml/image_classification/datasets", download=True, transform=transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Lambda(lambda x: x.repeat(3, 1, 1)),
+            weights.transforms()  # resize, normalize, etc
+        ]))
 
     # freeze
-    if True:
+    freeze = True
+    if freeze:
         for param in model.parameters():
             param.requires_grad = False
 
@@ -39,7 +47,7 @@ if __name__ == "__main__":
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     options = train.TrainOptions(num_epochs=num_epochs, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=True)
+                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=False)
 
     train.train(model, train_loader, test_loader, options)
     predict.predict_plot(model, test_dataset, 4)  # sample predictions on test dataset

@@ -66,7 +66,7 @@ def train(model, train_loader, test_loader, options):
         fig, axs = plot.create_fig("model training", 2, 1, aspect_ratio=1.4, sharex=True, position=(100, 100))
 
     log.info(
-        f"Training started: train_size: {len(train_loader.dataset)}, test_size: {len(test_loader.dataset)}, batch_size: {train_loader.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}")
+        f"Training started: train_size: {len(train_loader.dataset)}, test_size: {len(test_loader.dataset)}, batch_size: {train_loader.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}, num_epochs: {options.num_epochs}")
 
     stats = TrainStatistics()
     loss_train, loss_test, acc_train, acc_test = np.inf, np.inf, 0, 0
