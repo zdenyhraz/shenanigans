@@ -63,7 +63,7 @@ if __name__ == "__main__":
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     options = train.TrainOptions(num_epochs=num_epochs, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
-                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=False)
+                                 learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=False, use_best_model=True)
     train.train(model, train_loader, test_loader, options)
     if (False and len(test_dataset) <= 100):
         predict.predict_all(model, test_dataset)

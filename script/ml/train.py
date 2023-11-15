@@ -6,6 +6,7 @@ import matplotlib.ticker
 import numpy as np
 import torchvision.transforms as transforms
 from tqdm import tqdm
+import copy
 import log
 import plot
 
@@ -13,7 +14,7 @@ bar_format = "{desc}{percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<
 
 
 class TrainOptions:
-    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')):
+    def __init__(self, num_epochs, learn_rate, acc_metric, save_model=False, plot_progress=True, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'), use_best_model=True):
         self.num_epochs = num_epochs
         self.learn_rate = learn_rate
         self.acc_metric = acc_metric
@@ -22,6 +23,7 @@ class TrainOptions:
         self.criterion = criterion
         self.optimizer = optimizer
         self.device = device
+        self.use_best_model = use_best_model
 
 
 class TrainStatistics:
@@ -67,7 +69,7 @@ def train(model, train_loader, test_loader, options):
         f"Training started: train_size: {len(train_loader.dataset)}, test_size: {len(test_loader.dataset)}, batch_size: {train_loader.batch_size}, device: '{options.device}', learn_rate: {options.learn_rate}, num_epochs: {options.num_epochs}")
 
     stats = TrainStatistics()
-    loss_train, loss_test, acc_train, acc_test = np.inf, np.inf, 0, 0
+    loss_train, loss_test, acc_train, acc_test, acc_train_best, acc_test_best = np.inf, np.inf, 0, 0, -1, -1
     loop = tqdm(range(options.num_epochs), total=options.num_epochs, colour="green", bar_format=bar_format, unit="epoch")
     loop.set_description(f"Epoch [0/{options.num_epochs}]")
     loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=acc_train, acc_test=acc_test)
@@ -78,6 +80,12 @@ def train(model, train_loader, test_loader, options):
         loop.set_description(f"Epoch [{epoch+1}/{options.num_epochs}]")
         loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=acc_train, acc_test=acc_test)
 
+        if options.use_best_model and acc_test > acc_test_best:
+            model_best = copy.deepcopy(model)
+            epoch_best = epoch
+            acc_train_best = acc_train
+            acc_test_best = acc_test
+
         if options.plot_progress:
             stats.acc_test.append(acc_test)
             stats.acc_train.append(acc_train)
@@ -85,8 +93,13 @@ def train(model, train_loader, test_loader, options):
             stats.loss_test.append(loss_test)
             plot_progress(fig, axs, stats)
 
+    if options.use_best_model:
+        model = model_best
+        acc_train = acc_train_best
+        acc_test = acc_test_best
+
     log.info('Training finished')
-    log.info(f"Model accuracy after training: train_dataset {acc_train:.1%}, test_dataset {acc_test:.1%}")
+    log.info(f"{f'Best model accuracy (epoch {epoch_best+1}/{options.num_epochs})' if options.use_best_model else 'Model accuracy'} after training: train_dataset {acc_train:.1%}, test_dataset {acc_test:.1%}")
 
     if options.save_model:
         model_name = "gigachad"
