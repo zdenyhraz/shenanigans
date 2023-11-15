@@ -5,9 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
 import torchvision.transforms as transforms
-import torchsummary
 from tqdm import tqdm
-import copy
 import log
 import plot
 
@@ -74,7 +72,9 @@ def train(model, train_loader, test_loader, options):
     loop.set_description(f"Epoch [0/{options.num_epochs}]")
     loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=acc_train, acc_test=acc_test)
     for epoch in loop:
-        loss_train, loss_test, acc_train, acc_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device, options.acc_metric)
+        loss_train, loss_test = train_one_epoch(model, train_loader, test_loader, optimizer, options.criterion, options.device)
+        acc_train = accuracy_model(model, train_loader, options.acc_metric)
+        acc_test = accuracy_model(model, test_loader, options.acc_metric)
         loop.set_description(f"Epoch [{epoch+1}/{options.num_epochs}]")
         loop.set_postfix(loss_train=loss_train, loss_test=loss_test, acc_train=acc_train, acc_test=acc_test)
 
@@ -95,10 +95,9 @@ def train(model, train_loader, test_loader, options):
         torch.save(model.state_dict(), savepath)
 
 
-def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device, acc_metric):
+def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, device):
     model.train()
     loss_train = 0.0
-    acc_train = 0.0
     num_batches = len(train_loader)
     loop = tqdm(enumerate(train_loader), total=num_batches, leave=False, colour="#0E86D4", bar_format=bar_format, unit="batch")
     loop.set_description("Batch")
@@ -108,17 +107,14 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, targets)
-        acc = acc_metric(outputs, targets)
         loss.backward()
         optimizer.step()
         loss_train += loss.item()*inputs.size(0)
-        acc_train += acc*inputs.size(0)
         loop.set_description(f"Batch [{batchidx+1}/{num_batches}]")
-        loop.set_postfix(loss_train=loss.item(), acc_train=acc)
+        loop.set_postfix(loss_train=loss.item())
 
     with torch.no_grad():
         loss_test = 0.0
-        acc_test = 0.0
         num_batches = len(test_loader)
         loop = tqdm(enumerate(test_loader), total=num_batches, leave=False, colour="#7F00FF", bar_format=bar_format, unit="batch")
         loop.set_description("BatchT")
@@ -127,14 +123,12 @@ def train_one_epoch(model, train_loader, test_loader, optimizer, criterion, devi
             targets = targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
-            acc = acc_metric(outputs, targets)
             loss_test += loss.item()*inputs.size(0)
-            acc_test += acc*inputs.size(0)
             loop.set_description(f"Batch [{batchidx+1}/{num_batches}]")
-            loop.set_postfix(loss_test=loss.item(), acc_test=acc)
+            loop.set_postfix(loss_test=loss.item())
 
     # sample-average loss & average accuracy
-    return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset), acc_train/len(train_loader.dataset), acc_test/len(test_loader.dataset)
+    return loss_train/len(train_loader.dataset), loss_test/len(test_loader.dataset)
 
 
 def plot_progress(fig, axs, stats):

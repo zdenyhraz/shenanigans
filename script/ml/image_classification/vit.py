@@ -16,7 +16,7 @@ if __name__ == "__main__":
     weights = models.ViT_B_16_Weights.DEFAULT
     transform = weights.transforms()
     print(f"Model transform: {transform}")
-    model = models.vit_b_16(weights="DEFAULT")
+    model = models.vit_b_16(weights=weights)
     dataset = datasets.ImageFolder(root="data/ml/image_classification/datasets/HISAS", loader=lambda path: io.imread(path), transform=transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((224, 224), antialias=True),

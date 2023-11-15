@@ -58,13 +58,12 @@ if __name__ == "__main__":
     test_ratio = 0.2
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [(1-test_ratio), test_ratio])
     batch_size = train.get_batch_size(train_dataset)
-    num_epochs = train.get_num_epochs(train_dataset, batch_size, 500)
+    num_epochs = train.get_num_epochs(train_dataset, batch_size, 500)  # 500
     num_workers = 0  # 0 = os.cpu_count()
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     options = train.TrainOptions(num_epochs=num_epochs, criterion=nn.CrossEntropyLoss(), optimizer=optim.Adam,
                                  learn_rate=1e-3, acc_metric=accuracy, device=device, plot_progress=False)
-
     train.train(model, train_loader, test_loader, options)
     if (False and len(test_dataset) <= 100):
         predict.predict_all(model, test_dataset)
