@@ -31,7 +31,6 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
 
   cv::Mat lightness = LABplanes[0].clone();
   lightness.convertTo(lightness, GetMatType<f64>());
-  cv::Mat lightness_input = lightness.clone();
 
   cv::log(lightness, lightness);
   cv::Mat FFT = FFT(lightness);
@@ -41,7 +40,6 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
   lightness = IFFT(FFT);
   cv::exp(lightness, lightness);
 
-  cv::Mat lightness_output = lightness.clone();
   cv::normalize(lightness, lightness, 0, 255, cv::NORM_MINMAX);
   lightness.convertTo(lightness, LABplanes[0].type());
   LABplanes[0] = lightness;
