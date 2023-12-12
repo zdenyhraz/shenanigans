@@ -11,7 +11,7 @@ class TerminalLogger : public Logger
     if (not ShouldLog(logLevel))
       return;
 
-    fmt::print("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
+    fmt::print("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(args...)));
   }
 
 public:

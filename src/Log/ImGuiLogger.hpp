@@ -35,7 +35,7 @@ class ImGuiLogger : public Logger
       Message(Logger::LogLevel::Debug, "Message log cleared after {} messages", mMaxMessages);
     }
 
-    std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(std::forward<Args>(args)...)));
+    std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(args...)));
     i32 oldSize = mTextBuffer.size();
     mTextBuffer.append(message.c_str(), message.c_str() + message.size());
     for (i32 newSize = mTextBuffer.size(); oldSize < newSize; ++oldSize)
