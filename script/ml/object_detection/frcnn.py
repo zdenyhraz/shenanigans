@@ -10,13 +10,13 @@ img = read_image("data/ml/object_detection/datasets/cats/cats2.jpg")
 
 if True:  # RCNN
     weights = torchvision.models.detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT  # 91 classes
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.9)  # , num_classes=7
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.4)  # , num_classes=7
 elif True:  # RetinaNet
     weights = torchvision.models.detection.RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT
-    model = torchvision.models.detection.retinanet_resnet50_fpn_v2(eights=weights, box_score_thresh=0.9)
+    model = torchvision.models.detection.retinanet_resnet50_fpn_v2(eights=weights, box_score_thresh=0.1)
 elif True:  # SSD
     weights = torchvision.models.detection.SSD300_VGG16_Weights.DEFAULT
-    model = torchvision.models.detection.ssd300_vgg16(eights=weights, box_score_thresh=0.9)
+    model = torchvision.models.detection.ssd300_vgg16(eights=weights, box_score_thresh=0.1)
 
 model.eval()
 print(model)
