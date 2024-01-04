@@ -3,6 +3,8 @@
 template <typename T>
 inline f64 GetQuantile(const std::vector<T>& vec, f64 quan)
 {
+  if (vec.empty())
+    return 0;
   std::vector<T> out = vec;
   std::sort(out.begin(), out.end());
   return out[(usize)(quan * (out.size() - 1))];
