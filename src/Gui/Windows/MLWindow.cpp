@@ -5,6 +5,7 @@
 #include "ML/ObjectDetection/YOLOv8CV.hpp"
 #include "ML/ObjectDetection/YOLOv8Torch.hpp"
 #include "ML/ObjectSegmentation/YOLOv8Torch.hpp"
+#include "NDA/FaceDetector.hpp"
 
 void MLWindow::DetectObjectsYOLOv8CVW() const
 {
@@ -41,11 +42,14 @@ void MLWindow::Render()
         LaunchAsync([&]() { RegressionModelTest(modelWidth); });
       ImGui::SliderInt("model width", &modelWidth, 16, 1024);
 
-      if (ImGui::Button("Image segmentation model test"))
+      if (ImGui::Button("Image segmentation model"))
         LaunchAsync([&]() { ImageSegmentationModelTest(); });
 
-      if (ImGui::Button("Image classification model test"))
+      if (ImGui::Button("Image classification model"))
         LaunchAsync([&]() { ImageClassificationModelTest(); });
+
+      if (ImGui::Button("Face detector OpenCV"))
+        LaunchAsync([&]() { FaceDetectorTest(); });
     }
 
     ImGui::Separator();
