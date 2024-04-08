@@ -31,3 +31,6 @@
 [submodule "src/NDA"]
 	path = src/NDA
 	url = git@github.com:zdenyhraz/shenanigans_private.git
+[submodule "libs/zmq"]
+	path = libs/zmq
+	url = https://github.com/zeromq/cppzmq.git
