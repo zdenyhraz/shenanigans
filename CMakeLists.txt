@@ -196,6 +196,12 @@ target_link_libraries(shenanigans_terminal PRIVATE glad)
 target_link_libraries(shenanigans_benchmark PRIVATE glad)
 target_link_libraries(pyipc PRIVATE glad)
 
+# zmq
+find_package(ZeroMQ)
+include_directories(${ZeroMQ_INCLUDE_DIR})
+find_package(cppzmq HINTS libs/zmq)
+include_directories(libs/zmq)
+
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")

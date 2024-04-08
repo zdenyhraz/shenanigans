@@ -5,7 +5,6 @@
 #include "ML/ObjectDetection/YOLOv8CV.hpp"
 #include "ML/ObjectDetection/YOLOv8Torch.hpp"
 #include "ML/ObjectSegmentation/YOLOv8Torch.hpp"
-#include "NDA/FaceDetector.hpp"
 
 void MLWindow::DetectObjectsYOLOv8CVW() const
 {
@@ -47,9 +46,6 @@ void MLWindow::Render()
 
       if (ImGui::Button("Image classification model"))
         LaunchAsync([&]() { ImageClassificationModelTest(); });
-
-      if (ImGui::Button("Face detector OpenCV"))
-        LaunchAsync([&]() { FaceDetectorTest(); });
     }
 
     ImGui::Separator();
