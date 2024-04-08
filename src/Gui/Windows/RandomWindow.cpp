@@ -2,6 +2,7 @@
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 #include "Random/UnevenIllumination.hpp"
+#include "Microservice/Workflow.hpp"
 
 void RandomWindow::Render()
 {
@@ -27,6 +28,13 @@ void RandomWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("Homomorphic"))
         LaunchAsync([&]() { UnevenIlluminationHomomorphic(); });
+    }
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Microservice architecture"))
+    {
+      if (ImGui::Button("MicroserviceArch"))
+        LaunchAsync([&]() { MicroserviceArch(); });
     }
 
     ImGui::EndTabItem();
@@ -75,4 +83,13 @@ void RandomWindow::UnevenIlluminationHomomorphic() const
   auto image = cv::imread("../data/UnevenIllumination/input.jpg");
   for (auto cutoff = 0.001; cutoff <= 0.02; cutoff += 0.001)
     CorrectUnevenIlluminationHomomorphic(image, cutoff);
+}
+
+void RandomWindow::MicroserviceArch() const
+{
+  LOG_FUNCTION;
+
+  Workflow workflow;
+  workflow.Build();
+  workflow.Run();
 }
