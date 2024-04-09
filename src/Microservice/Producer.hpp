@@ -1,22 +1,21 @@
 #pragma once
+#include "Microservice.hpp"
 #include "Consumer.hpp"
 
-template <class Output>
-class Producer
+template <class T>
+class Producer : public virtual Microservice
 {
-  std::vector<std::reference_wrapper<Consumer<Output>>> consumers;
+  std::vector<std::reference_wrapper<Consumer<T>>> consumers;
 
 protected:
-  void Produce(Output& output)
+  void Notify(T& output)
   {
     for (const auto& consumer : consumers)
-      consumer.get().Consume(output);
+      consumer.get().Process(output);
   }
 
 public:
-  template <typename T>
-  void AddConsumer(Consumer<T>& consumer)
-  {
-    consumers.emplace_back(consumer);
-  }
+  using Output = T;
+
+  void AddConsumer(Consumer<T>& consumer) { consumers.emplace_back(consumer); }
 };

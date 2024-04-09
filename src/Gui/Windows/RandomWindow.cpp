@@ -88,8 +88,8 @@ void RandomWindow::UnevenIlluminationHomomorphic() const
 void RandomWindow::MicroserviceArch() const
 {
   LOG_FUNCTION;
-
   Workflow workflow;
-  workflow.Build();
-  workflow.Run();
+  // workflow.Build();
+  // workflow.Run();
+  workflow.TestManual();
 }

@@ -1,9 +1,11 @@
 #pragma once
 #include "Microservice.hpp"
 
-template <class Input>
-class Consumer
+template <class T>
+class Consumer : public virtual Microservice
 {
 public:
-  virtual void Consume(Input& input) = 0;
+  using Input = T;
+
+  virtual void Process(T& input) = 0;
 };
