@@ -7,5 +7,5 @@ class Consumer : public virtual Microservice
 public:
   using Input = T;
 
-  virtual void Process(T& input) = 0;
+  virtual void Process(T& data) = 0;
 };

@@ -1,9 +1,9 @@
 #pragma once
 
-struct Node // TODO!:placeholder for imgui blueprint node editor/json config
+struct Node
 {
-  std::string kind;
   std::string name;
+  std::string kind;
   std::vector<Node*> inputs;
   std::vector<Node*> outputs;
 };

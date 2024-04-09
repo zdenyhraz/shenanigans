@@ -5,17 +5,13 @@
 template <class T>
 class Producer : public virtual Microservice
 {
-  std::vector<std::reference_wrapper<Consumer<T>>> consumers;
-
 protected:
-  void Notify(T& output)
+  void Notify(T& data)
   {
-    for (const auto& consumer : consumers)
-      consumer.get().Process(output);
+    for (const auto& output : outputs)
+      dynamic_cast<Consumer<T>*>(output.get())->Process(data);
   }
 
 public:
   using Output = T;
-
-  void AddConsumer(Consumer<T>& consumer) { consumers.emplace_back(consumer); }
 };

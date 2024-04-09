@@ -1,7 +1,7 @@
 #pragma once
 #include "Producer.hpp"
 
-class LoadImageMircroservice : public Producer<cv::Mat>
+class LoadImageMicroservice : public Producer<cv::Mat>
 {
 public:
   void Process() // TODO!: somehow work out these "entry points" - no input

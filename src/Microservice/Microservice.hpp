@@ -1,19 +1,14 @@
 #pragma once
-#include "Node.hpp"
 
 class Microservice
 {
-  std::string name;
-
 public:
-  virtual void Build(const Node& node) // TODO: pure virtual =0 ?
-  {
-    if (not node.outputs.empty())
-    {
-      for (const auto& outputNode : node.outputs)
-      {
-        // microservice.AddConsumer();
-      }
-    }
-  }
+  std::string name;
+  std::string kind;
+  std::vector<std::shared_ptr<Microservice>> inputs;
+  std::vector<std::shared_ptr<Microservice>> outputs;
+
+  virtual ~Microservice() = default;
+  void AddInput(std::shared_ptr<Microservice> input) { inputs.emplace_back(input); }
+  void AddOutput(std::shared_ptr<Microservice> output) { outputs.emplace_back(output); }
 };

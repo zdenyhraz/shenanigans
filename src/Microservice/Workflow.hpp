@@ -20,9 +20,16 @@ class Workflow
   static void RegisterMicroservices()
   {
     // TODO!: add specific microservice parameters
-    RegisterMicroservice<LoadImageMircroservice>("load_image");
-    RegisterMicroservice<BlurMicroservice>("blur");
+    RegisterMicroservice<LoadImageMicroservice>("load_image");
+    RegisterMicroservice<BlurMicroservice>("blur_image");
     RegisterMicroservice<ShowImageMicroservice>("show_image");
+  }
+
+  static std::shared_ptr<Microservice> CreateMicroservice(const std::string& kind)
+  {
+    if (not microserviceFactory.contains(kind))
+      throw std::invalid_argument(fmt::format("Microservice of kind '{}' not registered", kind));
+    return microserviceFactory[kind]();
   }
 
 public:
@@ -37,20 +44,24 @@ public:
     {
       if (microservices.contains(node.name))
         throw std::invalid_argument(fmt::format("Duplicate microservice name '{}'", node.name));
-      if (not microserviceFactory.contains(node.kind))
-        throw std::invalid_argument(fmt::format("Microservice of kind '{}' not registered", node.kind));
 
-      microservices[node.name] = microserviceFactory[node.kind]();
+      auto ms = CreateMicroservice(node.kind);
+      ms->name = node.name;
+      ms->kind = node.kind;
+      microservices[node.name] = ms;
     }
 
-    // step 2: add the input / output links
+    // step 2: add the input / output microservice links
     for (const auto& node : nodes)
     {
       if (node.inputs.empty() and node.outputs.empty())
         LOG_WARNING("Node '{}' () - node does not have any input or output connections", node.name, node.kind);
 
-      // TODO: two-step approach: initialize all nodes from factory and then build them
-      // TODO: make this mandatory vritual func, probably in Microservice class
+      for (const auto& inputNode : node.inputs)
+        microservices[node.name]->AddInput(microservices[inputNode->name]);
+      for (const auto& outputNode : node.outputs)
+        microservices[node.name]->AddOutput(microservices[outputNode->name]);
+
       // ms->Build(node);
     }
   }
@@ -64,17 +75,18 @@ public:
 
   void TestManual()
   {
-    LoadImageMircroservice load;
-    BlurMicroservice blur1;
-    BlurMicroservice blur2;
-    BlurMicroservice blur3;
-    ShowImageMicroservice show;
+    RegisterMicroservices();
+    auto load = CreateMicroservice("load_image");
+    auto blur1 = CreateMicroservice("blur_image");
+    auto blur2 = CreateMicroservice("blur_image");
+    auto blur3 = CreateMicroservice("blur_image");
+    auto show = CreateMicroservice("show_image");
 
-    load.AddConsumer(blur1);
-    blur1.AddConsumer(blur2);
-    blur2.AddConsumer(blur3);
-    blur3.AddConsumer(show);
+    load->AddOutput(blur1);
+    blur1->AddOutput(blur2);
+    blur2->AddOutput(blur3);
+    blur3->AddOutput(show);
 
-    load.Process();
+    dynamic_cast<LoadImageMicroservice*>(load.get())->Process();
   }
 };
