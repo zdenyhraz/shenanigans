@@ -1,43 +1,25 @@
 #pragma once
 #include "Node.hpp"
+#include "Consumer.hpp"
+#include "Producer.hpp"
+#include "Entrypoint.hpp"
 #include "Microservice.hpp"
-#include "Microservices/LoadImageMicroservice.hpp"
-#include "Microservices/BlurMicroservice.hpp"
-#include "Microservices/ShowImageMicroservice.hpp"
+#include "MicroserviceRegistry.hpp"
 
 class Workflow
 {
-  inline static std::unordered_map<std::string, std::function<std::shared_ptr<Microservice>()>> microserviceFactory;
   std::unordered_map<std::string, std::shared_ptr<Microservice>> microservices;
-
-  template <class T>
-  static void RegisterMicroservice(const std::string& kind)
-  {
-    static_assert(std::is_base_of_v<Microservice, T>);
-    microserviceFactory[kind] = []() { return std::make_unique<T>(); };
-  }
-
-  static void RegisterMicroservices()
-  {
-    // TODO!: add specific microservice parameters
-    RegisterMicroservice<LoadImageMicroservice>("load_image");
-    RegisterMicroservice<BlurMicroservice>("blur_image");
-    RegisterMicroservice<ShowImageMicroservice>("show_image");
-  }
-
-  static std::shared_ptr<Microservice> CreateMicroservice(const std::string& kind)
-  {
-    if (not microserviceFactory.contains(kind))
-      throw std::invalid_argument(fmt::format("Microservice of kind '{}' not registered", kind));
-    return microserviceFactory[kind]();
-  }
+  std::string name;
 
 public:
-  void Build()
-  {
-    RegisterMicroservices(); // TODO!: static func call, call once somewhere
+  Workflow(const std::string name) : name(name) {}
 
-    std::vector<Node> nodes; // TODO!: import this from json or blueprint GUI or something
+  void Build(const std::vector<Node>& nodes)
+  {
+    LOG_FUNCTION;
+
+    if (nodes.empty())
+      throw std::invalid_argument(fmt::format("Cannot build workflow '{}' - node vector empty", name));
 
     // step 1: create the microservices
     for (const auto& node : nodes)
@@ -45,7 +27,7 @@ public:
       if (microservices.contains(node.name))
         throw std::invalid_argument(fmt::format("Duplicate microservice name '{}'", node.name));
 
-      auto ms = CreateMicroservice(node.kind);
+      auto ms = MicroserviceRegistry::CreateMicroservice(node.kind);
       ms->name = node.name;
       ms->kind = node.kind;
       microservices[node.name] = ms;
@@ -54,33 +36,36 @@ public:
     // step 2: add the input / output microservice links
     for (const auto& node : nodes)
     {
+      auto ms = microservices[node.name];
+
       if (node.inputs.empty() and node.outputs.empty())
-        LOG_WARNING("Node '{}' () - node does not have any input or output connections", node.name, node.kind);
+        LOG_WARNING("Node {}({}) does not have any input or output connections", node.name, node.kind);
+
+      if (node.inputs.empty() and not dynamic_cast<Entrypoint*>(ms.get()))
+        throw std::runtime_error(fmt::format("Node {}({}) does not have any input connections and is not an entrypoint", node.name, node.kind));
 
       for (const auto& inputNode : node.inputs)
-        microservices[node.name]->AddInput(microservices[inputNode->name]);
+        ms->AddInput(microservices[inputNode->name]);
       for (const auto& outputNode : node.outputs)
-        microservices[node.name]->AddOutput(microservices[outputNode->name]);
-
-      // ms->Build(node);
+        ms->AddOutput(microservices[outputNode->name]);
     }
   }
 
   void Run()
   {
-    // TODO!: somehow work out these "entry points" - no input
-    // TODO: call Process() on all entry points
-    // for (const auto& microservice : microservices | std::views::filter([](const auto& ms) { return ms. }))
+    LOG_FUNCTION;
+    for (const auto& [name, ms] : microservices | std::views::filter([](const auto& pair) { return pair.second->inputs.empty(); }))
+      dynamic_cast<Entrypoint*>(ms.get())->Process();
   }
 
-  void TestManual()
+  static void TestManual()
   {
-    RegisterMicroservices();
-    auto load = CreateMicroservice("load_image");
-    auto blur1 = CreateMicroservice("blur_image");
-    auto blur2 = CreateMicroservice("blur_image");
-    auto blur3 = CreateMicroservice("blur_image");
-    auto show = CreateMicroservice("show_image");
+    LOG_FUNCTION;
+    auto load = MicroserviceRegistry::CreateMicroservice("load_image");
+    auto blur1 = MicroserviceRegistry::CreateMicroservice("blur_image");
+    auto blur2 = MicroserviceRegistry::CreateMicroservice("blur_image");
+    auto blur3 = MicroserviceRegistry::CreateMicroservice("blur_image");
+    auto show = MicroserviceRegistry::CreateMicroservice("show_image");
 
     load->AddOutput(blur1);
     blur1->AddOutput(blur2);

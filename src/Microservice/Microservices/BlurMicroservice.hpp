@@ -4,7 +4,7 @@
 
 class BlurMicroservice : public Consumer<cv::Mat>, public Producer<cv::Mat>
 {
-  void Process(cv::Mat& image) override
+  void Process(cv::Mat& image) const override
   {
     cv::GaussianBlur(image, image, cv::Size(29, 29), 17);
     Notify(image);

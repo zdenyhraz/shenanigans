@@ -3,5 +3,5 @@
 
 class ShowImageMicroservice : public Consumer<cv::Mat>
 {
-  void Process(cv::Mat& image) override { Plot::Plot("baboon", image); }
+  void Process(cv::Mat& image) const override { Plot::Plot("baboon", image); }
 };

@@ -1,10 +1,10 @@
 #pragma once
 #include "Producer.hpp"
 
-class LoadImageMicroservice : public Producer<cv::Mat>
+class LoadImageMicroservice : public Entrypoint, public Producer<cv::Mat>
 {
 public:
-  void Process() // TODO!: somehow work out these "entry points" - no input
+  void Process() const override
   {
     auto image = cv::imread(GetProjectDirectoryPath("test/data/baboon.png").string());
     Notify(image);

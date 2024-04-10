@@ -33,8 +33,11 @@ void RandomWindow::Render()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Microservice architecture"))
     {
-      if (ImGui::Button("MicroserviceArch"))
-        LaunchAsync([&]() { MicroserviceArch(); });
+      if (ImGui::Button("Test manual"))
+        LaunchAsync([&]() { MicroserviceTestManual(); });
+      ImGui::SameLine();
+      if (ImGui::Button("Test nodes"))
+        LaunchAsync([&]() { MicroserviceTestNodes(); });
     }
 
     ImGui::EndTabItem();
@@ -85,11 +88,19 @@ void RandomWindow::UnevenIlluminationHomomorphic() const
     CorrectUnevenIlluminationHomomorphic(image, cutoff);
 }
 
-void RandomWindow::MicroserviceArch() const
+void RandomWindow::MicroserviceTestManual() const
 {
   LOG_FUNCTION;
-  Workflow workflow;
-  // workflow.Build();
-  // workflow.Run();
-  workflow.TestManual();
+  MicroserviceRegistry::Initialize();
+  Workflow::TestManual();
+}
+
+void RandomWindow::MicroserviceTestNodes() const
+{
+  LOG_FUNCTION;
+  MicroserviceRegistry::Initialize();
+  std::vector<Node> nodes;
+  Workflow workflow("nodes");
+  workflow.Build(nodes);
+  workflow.Run();
 }
