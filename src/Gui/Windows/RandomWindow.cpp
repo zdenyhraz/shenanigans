@@ -119,8 +119,9 @@ void RandomWindow::NetworkingTestSubscriber() const
 {
   LOG_FUNCTION;
   zmq::context_t context(1);
-  zmq::socket_t subscriber(context, ZMQ_SUB);
-  subscriber.connect("tcp://localhost:5555");
+  zmq::socket_t subscriber(context, zmq::socket_type::sub);
+  subscriber.bind("tcp://*:5555");
+  // subscriber.connect("tcp://localhost:5555");
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   FPSCounter<20> fpscounter;
 
@@ -149,8 +150,9 @@ void RandomWindow::NetworkingTestFeedback() const
 {
   LOG_FUNCTION;
   zmq::context_t context(1);
-  zmq::socket_t replier(context, ZMQ_REP);
-  replier.connect("tcp://localhost:5555");
+  zmq::socket_t replier(context, zmq::socket_type::rep);
+  replier.bind("tcp://*:5555");
+  // replier.connect("tcp://localhost:5555");
   FPSCounter<20> fpscounter;
 
   while (true)
