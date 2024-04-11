@@ -69,6 +69,7 @@ add_executable(shenanigans_test)
 add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
+add_executable(shenanigans_clarity)
 
 # precompiled headers
 if (ENABLE_PCH)
@@ -78,6 +79,7 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(shenanigans_clarity PRIVATE src/NDA/Clarity/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -97,6 +99,7 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_clarity PRIVATE fmt::fmt)
 target_link_libraries(pyipc PRIVATE fmt::fmt)
 
 # gtest
@@ -145,6 +148,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
+target_link_libraries(shenanigans_clarity PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
 target_link_libraries(pyipc PRIVATE ${OpenCV_LIBS})
 
@@ -209,7 +213,7 @@ include_directories(${ZeroMQ_INCLUDE_DIR})
 find_package(cppzmq HINTS libs/zmq)
 include_directories(libs/zmq)
 target_link_libraries(shenanigans PRIVATE cppzmq)
-
+target_link_libraries(shenanigans_clarity PRIVATE cppzmq)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
@@ -247,3 +251,7 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
+
+# shenanigans_clarity app sources
+file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS apps/shenanigans_clarity/*.cpp)
+target_sources(shenanigans_clarity PRIVATE ${SRC_SHENANIGANS_CLARITY_APP})
