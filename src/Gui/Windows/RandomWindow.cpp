@@ -120,9 +120,10 @@ void RandomWindow::NetworkingTestSubscriber() const
   LOG_FUNCTION;
   zmq::context_t context(1);
   zmq::socket_t subscriber(context, zmq::socket_type::sub);
-  subscriber.bind("tcp://*:5555");
-  // subscriber.connect("tcp://localhost:5555");
+  subscriber.connect("tcp://localhost:5555");
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+  int hwm = 1;
+  subscriber.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
   FPSCounter<20> fpscounter;
 
   while (true)
@@ -132,7 +133,7 @@ void RandomWindow::NetworkingTestSubscriber() const
     subscriber.recv(&message);
 
     cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
-    // std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(100ms);
 
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
@@ -151,8 +152,7 @@ void RandomWindow::NetworkingTestFeedback() const
   LOG_FUNCTION;
   zmq::context_t context(1);
   zmq::socket_t replier(context, zmq::socket_type::rep);
-  replier.bind("tcp://*:5555");
-  // replier.connect("tcp://localhost:5555");
+  replier.connect("tcp://localhost:5555");
   FPSCounter<20> fpscounter;
 
   while (true)
@@ -162,7 +162,7 @@ void RandomWindow::NetworkingTestFeedback() const
     replier.recv(&message);
 
     cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
-    // std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(100ms);
 
     // Send acknowledgment to C#
     replier.send(zmq::str_buffer("Frame processed"), zmq::send_flags::dontwait);
