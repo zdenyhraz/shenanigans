@@ -120,26 +120,31 @@ void RandomWindow::NetworkingTestIPC() const
   LOG_FUNCTION;
   zmq::context_t context(1);
   zmq::socket_t subscriber(context, ZMQ_SUB);
-  subscriber.connect("ipc:///video_feed");
+  subscriber.connect("ipc:///tmp/test_video");
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
-
-  cv::Mat frame;
-  cv::namedWindow("Received Video", cv::WINDOW_NORMAL);
+  FPSCounter<20> fpscounter;
 
   while (true)
   {
+    LOG_SCOPE("NetworkingTestIPCLoop");
+    const auto start = std::chrono::high_resolution_clock::now();
     zmq::message_t message;
     subscriber.recv(&message);
-    LOG_DEBUG("Recieved message with size: {} ({})", message.size(), message.data());
 
-    // Convert zmq::message_t to cv::Mat without copying data
-    cv::Mat frame(1, message.size(), CV_8UC1, message.data());
-    frame = frame.reshape(3);
+    // frame = cv::imdecode(cv::Mat(1, message.size(), CV_8UC1, message.data()), cv::IMREAD_UNCHANGED);
+    // frame.reshape(3, 480);
+    cv::Mat frame = cv::Mat(cv::Size(1920, 1080), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
+    fpscounter.RegisterDuration(duration.count());
 
-    LOG_DEBUG("Mat size: {}x{}", frame.cols, frame.rows);
+    cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
     cv::imshow("Received Video", frame);
-    cv::waitKey(1);
+    if (cv::waitKey(1) == 'q')
+      break;
   }
+
+  cv::destroyAllWindows();
 }
 
 void RandomWindow::NetworkingTestTCP() const
@@ -156,18 +161,18 @@ void RandomWindow::NetworkingTestTCP() const
     const auto start = std::chrono::high_resolution_clock::now();
     zmq::message_t message;
     subscriber.recv(&message);
-    // LOG_DEBUG("Recieved message with size: {}", message.size());
 
     // frame = cv::imdecode(cv::Mat(1, message.size(), CV_8UC1, message.data()), cv::IMREAD_UNCHANGED);
     // frame.reshape(3, 480);
-    cv::Mat frame = cv::Mat(cv::Size(1920, 1080), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+    cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
     fpscounter.RegisterDuration(duration.count());
 
     cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
     cv::imshow("Received Video", frame);
-    cv::waitKey(1);
+    if (cv::waitKey(1) == 'q')
+      break;
   }
 
   cv::destroyAllWindows();
