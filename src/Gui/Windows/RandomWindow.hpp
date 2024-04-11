@@ -8,8 +8,8 @@ class RandomWindow : public Window
   void UnevenIlluminationHomomorphic() const;
   void MicroserviceTestManual() const;
   void MicroserviceTestNodes() const;
-  void NetworkingTestIPC() const;
-  void NetworkingTestTCP() const;
+  void NetworkingTestSubscriber() const;
+  void NetworkingTestFeedback() const;
 
 public:
   void Render() override;

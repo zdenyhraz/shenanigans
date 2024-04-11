@@ -44,11 +44,11 @@ void RandomWindow::Render()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Networking via ZMQ"))
     {
-      if (ImGui::Button("Video IPC"))
-        LaunchAsync([&]() { NetworkingTestIPC(); });
+      if (ImGui::Button("TCP Subscriber"))
+        LaunchAsync([&]() { NetworkingTestSubscriber(); });
       ImGui::SameLine();
-      if (ImGui::Button("Video TCP"))
-        LaunchAsync([&]() { NetworkingTestTCP(); });
+      if (ImGui::Button("TCP feedback"))
+        LaunchAsync([&]() { NetworkingTestFeedback(); });
     }
     ImGui::EndTabItem();
   }
@@ -115,39 +115,7 @@ void RandomWindow::MicroserviceTestNodes() const
   workflow.Run();
 }
 
-void RandomWindow::NetworkingTestIPC() const
-{
-  LOG_FUNCTION;
-  zmq::context_t context(1);
-  zmq::socket_t subscriber(context, ZMQ_SUB);
-  subscriber.connect("ipc:///tmp/test_video");
-  subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
-  FPSCounter<20> fpscounter;
-
-  while (true)
-  {
-    LOG_SCOPE("NetworkingTestIPCLoop");
-    const auto start = std::chrono::high_resolution_clock::now();
-    zmq::message_t message;
-    subscriber.recv(&message);
-
-    // frame = cv::imdecode(cv::Mat(1, message.size(), CV_8UC1, message.data()), cv::IMREAD_UNCHANGED);
-    // frame.reshape(3, 480);
-    cv::Mat frame = cv::Mat(cv::Size(1920, 1080), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
-    fpscounter.RegisterDuration(duration.count());
-
-    cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
-    cv::imshow("Received Video", frame);
-    if (cv::waitKey(1) == 'q')
-      break;
-  }
-
-  cv::destroyAllWindows();
-}
-
-void RandomWindow::NetworkingTestTCP() const
+void RandomWindow::NetworkingTestSubscriber() const
 {
   LOG_FUNCTION;
   zmq::context_t context(1);
@@ -162,9 +130,9 @@ void RandomWindow::NetworkingTestTCP() const
     zmq::message_t message;
     subscriber.recv(&message);
 
-    // frame = cv::imdecode(cv::Mat(1, message.size(), CV_8UC1, message.data()), cv::IMREAD_UNCHANGED);
-    // frame.reshape(3, 480);
     cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+    // std::this_thread::sleep_for(100ms);
+
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
     fpscounter.RegisterDuration(duration.count());
@@ -174,6 +142,37 @@ void RandomWindow::NetworkingTestTCP() const
     if (cv::waitKey(1) == 'q')
       break;
   }
+  cv::destroyAllWindows();
+}
 
+void RandomWindow::NetworkingTestFeedback() const
+{
+  LOG_FUNCTION;
+  zmq::context_t context(1);
+  zmq::socket_t replier(context, ZMQ_REP);
+  replier.connect("tcp://localhost:5555");
+  FPSCounter<20> fpscounter;
+
+  while (true)
+  {
+    const auto start = std::chrono::high_resolution_clock::now();
+    zmq::message_t message;
+    replier.recv(&message);
+
+    cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+    // std::this_thread::sleep_for(100ms);
+
+    // Send acknowledgment to C#
+    replier.send(zmq::str_buffer("Frame processed"), zmq::send_flags::dontwait);
+
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
+    fpscounter.RegisterDuration(duration.count());
+
+    cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
+    cv::imshow("Received Video", frame);
+    if (cv::waitKey(1) == 'q')
+      break;
+  }
   cv::destroyAllWindows();
 }
