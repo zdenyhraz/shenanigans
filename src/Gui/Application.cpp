@@ -5,6 +5,7 @@
 #include "Windows/RandomWindow.hpp"
 #include "Windows/MLWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
+#include "Windows/NodeEditorWindow.hpp"
 
 void Application::Initialize()
 {
@@ -14,6 +15,7 @@ void Application::Initialize()
   mWindows.push_back(std::make_unique<RandomWindow>());
   mWindows.push_back(std::make_unique<MLWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
+  mWindows.push_back(std::make_unique<NodeEditorWindow>());
 
   for (const auto& window : mWindows)
     window->Initialize();

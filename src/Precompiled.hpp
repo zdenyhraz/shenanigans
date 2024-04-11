@@ -59,6 +59,8 @@
 #include <torch/torch.h>
 #include <torch/script.h>
 #include <benchmark/benchmark.h>
+
+#define ZMQ_STATIC
 #include <zmq.hpp>
 
 #include <opencv2/opencv.hpp>

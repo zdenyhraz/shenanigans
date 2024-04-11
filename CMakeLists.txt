@@ -177,6 +177,11 @@ target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
+#imgui-nodes
+include_directories(libs/imgui-nodes)
+file(GLOB SRC_IMGUI_NODES CONFIGURE_DEPENDS libs/imgui-nodes/*.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES})
+
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -197,10 +202,14 @@ target_link_libraries(shenanigans_benchmark PRIVATE glad)
 target_link_libraries(pyipc PRIVATE glad)
 
 # zmq
+add_compile_definitions(ZMQ_STATIC)
 find_package(ZeroMQ)
 include_directories(${ZeroMQ_INCLUDE_DIR})
+#target_link_libraries(shenanigans PRIVATE ZeroMQ)
 find_package(cppzmq HINTS libs/zmq)
 include_directories(libs/zmq)
+target_link_libraries(shenanigans PRIVATE cppzmq)
+
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)

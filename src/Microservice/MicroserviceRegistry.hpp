@@ -14,7 +14,7 @@ public:
   static void RegisterMicroservice(const std::string& kind)
   {
     static_assert(std::is_base_of_v<Microservice, T>);
-    microserviceFactory[kind] = []() { return std::make_unique<T>(); };
+    microserviceFactory[kind] = []() { return std::make_shared<T>(); };
   }
 
   static void RegisterMicroservices()
@@ -26,10 +26,13 @@ public:
     RegisterMicroservice<ShowImageMicroservice>("show_image");
   }
 
-  static std::shared_ptr<Microservice> CreateMicroservice(const std::string& kind)
+  static std::shared_ptr<Microservice> CreateMicroservice(const std::string& kind, const std::string& name)
   {
     if (not microserviceFactory.contains(kind))
       throw std::invalid_argument(fmt::format("Microservice of kind '{}' not registered", kind));
-    return microserviceFactory[kind]();
+    auto ms = microserviceFactory[kind]();
+    ms->kind = kind;
+    ms->name = name;
+    return ms;
   }
 };

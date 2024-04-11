@@ -7,6 +7,6 @@ public:
   void Process() const override
   {
     auto image = cv::imread(GetProjectDirectoryPath("test/data/baboon.png").string());
-    Notify(image);
+    Submit(image);
   }
 };
