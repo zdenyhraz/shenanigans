@@ -34,3 +34,6 @@
 [submodule "libs/zmq"]
 	path = libs/zmq
 	url = https://github.com/zeromq/cppzmq.git
+[submodule "libs/imgui-nodes"]
+	path = libs/imgui-nodes
+	url = https://github.com/thedmd/imgui-node-editor.git
