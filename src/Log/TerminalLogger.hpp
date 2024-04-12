@@ -24,7 +24,7 @@ class TerminalLogger : public Logger
     names[static_cast<usize>(Logger::LogLevel::Trace)] = "\033[1;34m";
     names[static_cast<usize>(Logger::LogLevel::Function)] = "\033[1;34m";
     names[static_cast<usize>(Logger::LogLevel::Debug)] = "\033[1;34m";
-    names[static_cast<usize>(Logger::LogLevel::Info)] = "\033[1;35m";
+    names[static_cast<usize>(Logger::LogLevel::Info)] = "\033[1;32m";
     names[static_cast<usize>(Logger::LogLevel::Success)] = "\033[0;32m";
     names[static_cast<usize>(Logger::LogLevel::Warning)] = "\033[0;33m";
     names[static_cast<usize>(Logger::LogLevel::Error)] = "\033[1;31m";
