@@ -54,6 +54,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <fmt/chrono.h>
+#include <fmt/std.h>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <torch/torch.h>

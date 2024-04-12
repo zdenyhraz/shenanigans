@@ -3,9 +3,10 @@
 int main(int argc, char** argv)
 try
 {
-  LOG_FUNCTION;
   ClarityApp app;
   app.Run();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  app.Shutdown();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)
