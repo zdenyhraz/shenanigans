@@ -3,7 +3,7 @@
 #include "Optimization/TestFunctions.hpp"
 #include "Random/UnevenIllumination.hpp"
 #include "Microservice/Workflow.hpp"
-#include "Utils/FPSCounter.hpp"
+#include "Utils/FrameAverager.hpp"
 
 void RandomWindow::Render()
 {
@@ -124,7 +124,7 @@ void RandomWindow::NetworkingTestSubscriber() const
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   int hwm = 1;
   subscriber.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-  FPSCounter<20> fpscounter;
+  FrameAverager<20> fps;
 
   while (true)
   {
@@ -137,9 +137,9 @@ void RandomWindow::NetworkingTestSubscriber() const
 
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
-    fpscounter.RegisterDuration(duration.count());
+    fps.Register(1. / duration.count());
 
-    cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
+    cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
     cv::imshow("Received Video", frame);
     if (cv::waitKey(1) == 'q')
       break;
@@ -153,7 +153,7 @@ void RandomWindow::NetworkingTestFeedback() const
   zmq::context_t context(1);
   zmq::socket_t replier(context, zmq::socket_type::rep);
   replier.connect("tcp://localhost:5555");
-  FPSCounter<20> fpscounter;
+  FrameAverager<20> fps;
 
   while (true)
   {
@@ -169,9 +169,9 @@ void RandomWindow::NetworkingTestFeedback() const
 
     const auto end = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
-    fpscounter.RegisterDuration(duration.count());
+    fps.Register(1. / duration.count());
 
-    cv::putText(frame, fmt::format("{:.0f}", fpscounter.GetFPS()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
+    cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
     cv::imshow("Received Video", frame);
     if (cv::waitKey(1) == 'q')
       break;
