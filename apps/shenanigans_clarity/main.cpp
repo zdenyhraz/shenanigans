@@ -6,8 +6,10 @@ try
   ClarityApp app;
   app.Run();
   std::this_thread::sleep_for(std::chrono::seconds(2));
+  app.SimulateReceivingMessages();
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   app.SimulateIncomingMessages();
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   app.Shutdown();
   return EXIT_SUCCESS;
 }
