@@ -70,6 +70,7 @@ add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
 add_executable(shenanigans_clarity)
+add_executable(shenanigans_clarity_test)
 
 # precompiled headers
 if (ENABLE_PCH)
@@ -80,6 +81,7 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_clarity PRIVATE src/NDA/Clarity/Precompiled.hpp)
+  target_precompile_headers(shenanigans_clarity_test PRIVATE src/NDA/Clarity/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -89,7 +91,6 @@ target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_terminal PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_benchmark PRIVATE pybind11::embed)
-pybind11_add_module(pyipc apps/pyipc/pyipc.cpp)
 
 # fmt
 add_subdirectory(libs/fmt)
@@ -100,14 +101,15 @@ target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_clarity PRIVATE fmt::fmt)
-target_link_libraries(pyipc PRIVATE fmt::fmt)
+target_link_libraries(shenanigans_clarity_test PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
 include_directories(libs/gtest/googletest/include)
 enable_testing()
 include(GoogleTest)
-target_link_libraries(shenanigans_test PRIVATE GTest::gtest)
+target_link_libraries(shenanigans_test PRIVATE GTest::gtest GTest::gtest_main)
+target_link_libraries(shenanigans_clarity_test PRIVATE GTest::gtest GTest::gtest_main)
 
 # benchmark
 set(BENCHMARK_ENABLE_TESTING OFF)
@@ -116,7 +118,6 @@ target_link_libraries(shenanigans PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_test PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_terminal PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_benchmark PRIVATE benchmark::benchmark)
-target_link_libraries(pyipc PRIVATE benchmark::benchmark)
 
 # json
 add_subdirectory(libs/json)
@@ -149,8 +150,8 @@ target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_clarity PRIVATE ${OpenCV_LIBS})
+target_link_libraries(shenanigans_clarity_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
-target_link_libraries(pyipc PRIVATE ${OpenCV_LIBS})
 
 # torch
 find_package(Torch REQUIRED HINTS libs/libtorch)
@@ -160,7 +161,6 @@ target_link_libraries(shenanigans PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_terminal PRIVATE ${TORCH_LIBRARIES})
 target_link_libraries(shenanigans_benchmark PRIVATE ${TORCH_LIBRARIES})
-target_link_libraries(pyipc PRIVATE ${TORCH_LIBRARIES})
 
 # implot
 include_directories(libs/implot)
@@ -185,6 +185,9 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 include_directories(libs/imgui-nodes)
 file(GLOB SRC_IMGUI_NODES CONFIGURE_DEPENDS libs/imgui-nodes/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES})
+target_sources(shenanigans_test PRIVATE ${SRC_IMGUI_NODES})
+target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI_NODES})
+target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI_NODES})
 
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -195,7 +198,6 @@ target_link_libraries(shenanigans PRIVATE glfw)
 target_link_libraries(shenanigans_test PRIVATE glfw)
 target_link_libraries(shenanigans_terminal PRIVATE glfw)
 target_link_libraries(shenanigans_benchmark PRIVATE glfw)
-target_link_libraries(pyipc PRIVATE glfw)
 
 # glad
 add_subdirectory(libs/glad)
@@ -203,7 +205,6 @@ target_link_libraries(shenanigans PRIVATE glad)
 target_link_libraries(shenanigans_test PRIVATE glad)
 target_link_libraries(shenanigans_terminal PRIVATE glad)
 target_link_libraries(shenanigans_benchmark PRIVATE glad)
-target_link_libraries(pyipc PRIVATE glad)
 
 # zmq
 add_compile_definitions(ZMQ_STATIC)
@@ -214,12 +215,15 @@ find_package(cppzmq HINTS libs/zmq)
 include_directories(libs/zmq)
 target_link_libraries(shenanigans PRIVATE cppzmq)
 target_link_libraries(shenanigans_clarity PRIVATE cppzmq)
+target_link_libraries(shenanigans_clarity_test PRIVATE cppzmq)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
   include_directories(src/NDA)
+  target_include_directories(shenanigans_clarity PRIVATE src/NDA/Clarity)
+  target_include_directories(shenanigans_clarity_test PRIVATE src/NDA/Clarity)
 endif()
 
 # custom
@@ -230,14 +234,15 @@ file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.hpp src/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 target_sources(shenanigans_terminal PRIVATE ${SRC})
+target_sources(shenanigans_benchmark PRIVATE ${SRC})
 
 # shenanigans app sources
 file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST_APP CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp test/*.hpp test/*.cpp)
-target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST_APP})
+file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS test/shenanigans/*.cpp)
+target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST})
 gtest_discover_tests(shenanigans_test)
 
 # shenanigans_terminal app sources
@@ -253,5 +258,10 @@ file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
 
 # shenanigans_clarity app sources
-file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS apps/shenanigans_clarity/*.cpp)
+file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS apps/shenanigans_clarity/*.cpp src/NDA/Clarity/*.cpp)
 target_sources(shenanigans_clarity PRIVATE ${SRC_SHENANIGANS_CLARITY_APP})
+
+# shenanigans_clarity_test app sources
+file(GLOB SRC_SHENANIGANS_CLARITY_TEST CONFIGURE_DEPENDS test/shenanigans_clarity/*.cpp src/NDA/Clarity/*.cpp)
+target_sources(shenanigans_clarity_test PRIVATE ${SRC_SHENANIGANS_CLARITY_TEST})
+gtest_discover_tests(shenanigans_clarity_test)

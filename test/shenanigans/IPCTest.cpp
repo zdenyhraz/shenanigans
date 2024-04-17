@@ -3,7 +3,7 @@
 class IPCTest : public ::testing::Test
 {
 protected:
-  IPCTest() : mImg1(LoadUnitFloatImage<f64>(GetProjectDirectoryPath("test/data/baboon.png"))) {}
+  IPCTest() : mImg1(LoadUnitFloatImage<f64>(GetProjectDirectoryPath("test/shenanigans/data/baboon.png"))) {}
 
   using InterpolationType = IPC::InterpolationType;
   using BandpassType = IPC::BandpassType;

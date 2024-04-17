@@ -117,64 +117,64 @@ void RandomWindow::MicroserviceTestNodes() const
 
 void RandomWindow::NetworkingTestSubscriber() const
 {
-  LOG_FUNCTION;
-  zmq::context_t context(1);
-  zmq::socket_t subscriber(context, zmq::socket_type::sub);
-  subscriber.connect("tcp://localhost:5555");
-  subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
-  int hwm = 1;
-  subscriber.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-  FrameAverager<20> fps;
+  // LOG_FUNCTION;
+  // zmq::context_t context(1);
+  // zmq::socket_t subscriber(context, zmq::socket_type::sub);
+  // subscriber.connect("tcp://localhost:5555");
+  // subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+  // int hwm = 1;
+  // subscriber.setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
+  // FrameAverager<20> fps;
 
-  while (true)
-  {
-    const auto start = std::chrono::high_resolution_clock::now();
-    zmq::message_t message;
-    subscriber.recv(&message);
+  // while (true)
+  // {
+  //   const auto start = std::chrono::high_resolution_clock::now();
+  //   zmq::message_t message;
+  //   subscriber.recv(&message);
 
-    cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
-    std::this_thread::sleep_for(100ms);
+  //   cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+  //   std::this_thread::sleep_for(100ms);
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
-    fps.Register(1. / duration.count());
+  //   const auto end = std::chrono::high_resolution_clock::now();
+  //   const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
+  //   fps.Register(1. / duration.count());
 
-    cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
-    cv::imshow("Received Video", frame);
-    if (cv::waitKey(1) == 'q')
-      break;
-  }
-  cv::destroyAllWindows();
+  //   cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
+  //   cv::imshow("Received Video", frame);
+  //   if (cv::waitKey(1) == 'q')
+  //     break;
+  // }
+  // cv::destroyAllWindows();
 }
 
 void RandomWindow::NetworkingTestFeedback() const
 {
-  LOG_FUNCTION;
-  zmq::context_t context(1);
-  zmq::socket_t replier(context, zmq::socket_type::rep);
-  replier.connect("tcp://localhost:5555");
-  FrameAverager<20> fps;
+  // LOG_FUNCTION;
+  // zmq::context_t context(1);
+  // zmq::socket_t replier(context, zmq::socket_type::rep);
+  // replier.connect("tcp://localhost:5555");
+  // FrameAverager<20> fps;
 
-  while (true)
-  {
-    const auto start = std::chrono::high_resolution_clock::now();
-    zmq::message_t message;
-    replier.recv(&message);
+  // while (true)
+  // {
+  //   const auto start = std::chrono::high_resolution_clock::now();
+  //   zmq::message_t message;
+  //   replier.recv(&message);
 
-    cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
-    std::this_thread::sleep_for(100ms);
+  //   cv::Mat frame = cv::Mat(cv::Size(3840, 2160), CV_8UC3, message.data(), cv::Mat::AUTO_STEP);
+  //   std::this_thread::sleep_for(100ms);
 
-    // Send acknowledgment to C#
-    replier.send(zmq::str_buffer("Frame processed"), zmq::send_flags::dontwait);
+  //   // Send acknowledgment to C#
+  //   replier.send(zmq::str_buffer("Frame processed"), zmq::send_flags::dontwait);
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
-    fps.Register(1. / duration.count());
+  //   const auto end = std::chrono::high_resolution_clock::now();
+  //   const auto duration = std::chrono::duration_cast<std::chrono::duration<float>>(end - start);
+  //   fps.Register(1. / duration.count());
 
-    cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
-    cv::imshow("Received Video", frame);
-    if (cv::waitKey(1) == 'q')
-      break;
-  }
-  cv::destroyAllWindows();
+  //   cv::putText(frame, fmt::format("{:.0f}", fps.Get()), cv::Point(frame.cols * 0.97, frame.cols * 0.02), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 3);
+  //   cv::imshow("Received Video", frame);
+  //   if (cv::waitKey(1) == 'q')
+  //     break;
+  // }
+  // cv::destroyAllWindows();
 }

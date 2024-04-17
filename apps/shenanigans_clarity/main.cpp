@@ -3,14 +3,7 @@
 int main(int argc, char** argv)
 try
 {
-  ClarityApp app;
-  app.Run();
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  app.SimulateReceivingMessages();
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  app.SimulateIncomingMessages();
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  app.Shutdown();
+  ClarityApp::Main();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)

@@ -22,7 +22,8 @@
                   "value": "Something something"
               }
           ],
-          "console": "integratedTerminal",
+          //"console": "integratedTerminal",
+          "console": "internalConsole",
       }
   ]
 }
