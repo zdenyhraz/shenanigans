@@ -26,7 +26,7 @@ using MainLogger = ImGuiLogger;
 #define LOG_SCOPE(funName) LogFunction<MainLogger> logScope(funName)
 #define LOG_SCOPE_IF(show, funName) LogFunction<MainLogger, show> logScope(funName)
 
-#define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current(), std::stacktrace::current())
+#define EXCEPTION(...) ShenanigansException(EncodeMessage(__VA_ARGS__), std::source_location::current(), std::stacktrace::current())
 #define STDEXCEPTION(...)                                                                                                                                                          \
   std::runtime_error(                                                                                                                                                              \
-      fmt::format("{} error: {} {}\nException stack trace:\n{}", SOURCE_FUNCTION, CreateMessage(__VA_ARGS__), SOURCE_LOCATION, std::to_string(std::stacktrace::current())))
+      fmt::format("{} error: {} {}\nException stack trace:\n{}", SOURCE_FUNCTION, EncodeMessage(__VA_ARGS__), SOURCE_LOCATION, std::to_string(std::stacktrace::current())))

@@ -45,10 +45,10 @@ protected:
 // TEST_F(ZMQSendReceiveTest, SendReceiveString)
 // {
 //   const std::string str = "SendReceiveString";
-//   publisher.send(CreateMessage(str));
+//   publisher.send(EncodeMessage(str));
 //   zmq::message_t message;
 //   LOG_DEBUG("Receiving message");
 //   subscriber.recv(&message);
 //   ASSERT_FALSE(message.empty());
-//   ASSERT_EQ(ParseMessage<std::string_view>(message), str);
+//   ASSERT_EQ(DecodeMessage<std::string_view>(message), str);
 // }

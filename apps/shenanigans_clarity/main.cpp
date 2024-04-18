@@ -3,7 +3,8 @@
 int main(int argc, char** argv)
 try
 {
-  ClarityApp::Main();
+  // ClarityApp::Main();
+  ClarityApp::BenchmarkReceiveSendImages();
   return EXIT_SUCCESS;
 }
 catch (const std::exception& e)
