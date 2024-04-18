@@ -1,7 +1,7 @@
 #pragma once
 
 template <typename... Args>
-std::string EncodeMessage(std::string_view fmt, Args&&... args)
+std::string CreateMessage(std::string_view fmt, Args&&... args)
 {
   return fmt::vformat(fmt, fmt::make_format_args(args...));
 }
