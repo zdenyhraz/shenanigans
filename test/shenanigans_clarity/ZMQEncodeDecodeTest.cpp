@@ -67,10 +67,10 @@ TEST(ZMQEncodeDecodeTest, Span)
     auto operator<=>(const S&) const = default;
   };
 
-  std::vector<S> target = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+  const std::vector<S> target = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
   zmq::message_t message;
   {
-    const std::span<S> input = target;
+    const std::span<const S> input = target;
     message = EncodeMessage(input);
   }
   ASSERT_FALSE(message.empty());
