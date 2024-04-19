@@ -217,6 +217,13 @@ target_link_libraries(shenanigans PRIVATE cppzmq)
 target_link_libraries(shenanigans_clarity PRIVATE cppzmq)
 target_link_libraries(shenanigans_clarity_test PRIVATE cppzmq)
 
+# boost
+set(BOOST_INCLUDE_LIBRARIES interprocess)
+add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(shenanigans_clarity PRIVATE Boost::interprocess)
+target_link_libraries(shenanigans_clarity_test PRIVATE Boost::interprocess)
+
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
