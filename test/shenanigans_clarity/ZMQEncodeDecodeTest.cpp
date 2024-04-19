@@ -18,7 +18,7 @@ TEST(ZMQEncodeDecodeTest, Mat)
   const auto target = cv::imread(GetProjectDirectoryPath("test/shenanigans/data/baboon.png").string());
   zmq::message_t message;
   {
-    const auto input = target.clone();
+    const auto input = cv::imread(GetProjectDirectoryPath("test/shenanigans/data/baboon.png").string());
     message = EncodeMessage(input);
   }
   ASSERT_FALSE(message.empty());
