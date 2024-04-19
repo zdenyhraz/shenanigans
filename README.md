@@ -14,7 +14,6 @@
 <a href="https://www.codacy.com/gh/zdenyhraz/shenanigans/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdenyhraz/shenanigans&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 <br>
-<br>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/last-commit/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues/zdenyhraz/shenanigans"></a>
