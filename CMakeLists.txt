@@ -80,8 +80,8 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_clarity PRIVATE src/NDA/Clarity/Precompiled.hpp)
-  target_precompile_headers(shenanigans_clarity_test PRIVATE src/NDA/Clarity/Precompiled.hpp)
+  target_precompile_headers(shenanigans_clarity PRIVATE src/NDA/Clarity/src/Precompiled.hpp)
+  target_precompile_headers(shenanigans_clarity_test PRIVATE src/NDA/Clarity/src/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -229,8 +229,8 @@ get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
   include_directories(src/NDA)
-  target_include_directories(shenanigans_clarity PRIVATE src/NDA/Clarity)
-  target_include_directories(shenanigans_clarity_test PRIVATE src/NDA/Clarity)
+  target_include_directories(shenanigans_clarity PRIVATE src/NDA/Clarity/src)
+  target_include_directories(shenanigans_clarity_test PRIVATE src/NDA/Clarity/src)
 endif()
 
 # custom
@@ -265,10 +265,10 @@ file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
 
 # shenanigans_clarity app sources
-file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS apps/shenanigans_clarity/*.cpp src/NDA/Clarity/*.cpp)
+file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS src/NDA/Clarity/apps/clarity/*.cpp src/NDA/Clarity/src/*.cpp)
 target_sources(shenanigans_clarity PRIVATE ${SRC_SHENANIGANS_CLARITY_APP})
 
 # shenanigans_clarity_test app sources
-file(GLOB SRC_SHENANIGANS_CLARITY_TEST CONFIGURE_DEPENDS test/shenanigans_clarity/*.cpp src/NDA/Clarity/*.cpp)
+file(GLOB SRC_SHENANIGANS_CLARITY_TEST CONFIGURE_DEPENDS src/NDA/Clarity/test/clarity/*.cpp src/NDA/Clarity/src/*.cpp)
 target_sources(shenanigans_clarity_test PRIVATE ${SRC_SHENANIGANS_CLARITY_TEST})
 gtest_discover_tests(shenanigans_clarity_test)

@@ -1,5 +1,9 @@
 build/
+bin/
+obj/
+.vs/
 __pycache__/
+
 data/
 !data/apps
 !data/readme
@@ -9,3 +13,5 @@ libs/fftw
 
 *.zip
 *.dump
+*.dll
+*.exe
