@@ -1,5 +1,7 @@
 # Zdeny's shenanigans 🪐
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a18dc706ef8749f2a290e78dc7f3483f)](https://app.codacy.com/gh/zdenyhraz/shenanigans?utm_source=github.com&utm_medium=referral&utm_content=zdenyhraz/shenanigans&utm_campaign=Badge_Grade)
+
 <p align="center">
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml/badge.svg"/></a>
