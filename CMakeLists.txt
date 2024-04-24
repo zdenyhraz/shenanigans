@@ -69,8 +69,6 @@ add_executable(shenanigans_test)
 add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
-add_executable(shenanigans_clarity)
-add_executable(shenanigans_clarity_test)
 
 # precompiled headers
 if (ENABLE_PCH)
@@ -80,8 +78,6 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_clarity PRIVATE src/NDA/Clarity/src/Precompiled.hpp)
-  target_precompile_headers(shenanigans_clarity_test PRIVATE src/NDA/Clarity/src/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -100,8 +96,6 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
-target_link_libraries(shenanigans_clarity PRIVATE fmt::fmt)
-target_link_libraries(shenanigans_clarity_test PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
@@ -109,7 +103,6 @@ include_directories(libs/gtest/googletest/include)
 enable_testing()
 include(GoogleTest)
 target_link_libraries(shenanigans_test PRIVATE GTest::gtest GTest::gtest_main)
-target_link_libraries(shenanigans_clarity_test PRIVATE GTest::gtest GTest::gtest_main)
 
 # benchmark
 set(BENCHMARK_ENABLE_TESTING OFF)
@@ -149,8 +142,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
-target_link_libraries(shenanigans_clarity PRIVATE ${OpenCV_LIBS})
-target_link_libraries(shenanigans_clarity_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
 
 # torch
@@ -213,31 +204,41 @@ include_directories(${ZeroMQ_INCLUDE_DIR})
 #target_link_libraries(shenanigans PRIVATE ZeroMQ)
 find_package(cppzmq HINTS libs/zmq)
 include_directories(libs/zmq)
-target_link_libraries(shenanigans PRIVATE cppzmq)
-target_link_libraries(shenanigans_clarity PRIVATE cppzmq)
-target_link_libraries(shenanigans_clarity_test PRIVATE cppzmq)
 
 # boost
 set(BOOST_INCLUDE_LIBRARIES interprocess)
 add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
 include_directories(${Boost_INCLUDE_DIRS})
-target_link_libraries(shenanigans_clarity PRIVATE Boost::interprocess)
-target_link_libraries(shenanigans_clarity_test PRIVATE Boost::interprocess)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
   include_directories(src/NDA)
-  target_include_directories(shenanigans_clarity PRIVATE src/NDA/Clarity/src)
-  target_include_directories(shenanigans_clarity_test PRIVATE src/NDA/Clarity/src)
+  file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/Windows/*.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_NDA})
+  add_subdirectory(src/NDA/Clarity)
 endif()
 
 # custom
 include_directories(src)
 
 # sources
-file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.hpp src/*.cpp)
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
+ src/Astrophysics/*.cpp
+ src/Gui/*.cpp
+ src/ImageProcessing/*.cpp
+ src/ImageRegistration/*.cpp
+ src/Log/*.cpp
+ src/Math/*.cpp
+ src/Microservice/*.cpp
+ src/ML/*.cpp
+ src/Optimization/*.cpp
+ src/Plot/*.cpp
+ src/Python/*.cpp
+ src/Random/*.cpp
+ src/Utils/*.cpp
+ )
 target_sources(shenanigans PRIVATE ${SRC})
 target_sources(shenanigans_test PRIVATE ${SRC})
 target_sources(shenanigans_terminal PRIVATE ${SRC})
@@ -264,11 +265,3 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
 
-# shenanigans_clarity app sources
-file(GLOB SRC_SHENANIGANS_CLARITY_APP CONFIGURE_DEPENDS src/NDA/Clarity/apps/clarity/*.cpp src/NDA/Clarity/src/*.cpp)
-target_sources(shenanigans_clarity PRIVATE ${SRC_SHENANIGANS_CLARITY_APP})
-
-# shenanigans_clarity_test app sources
-file(GLOB SRC_SHENANIGANS_CLARITY_TEST CONFIGURE_DEPENDS src/NDA/Clarity/test/clarity/*.cpp src/NDA/Clarity/src/*.cpp)
-target_sources(shenanigans_clarity_test PRIVATE ${SRC_SHENANIGANS_CLARITY_TEST})
-gtest_discover_tests(shenanigans_clarity_test)

@@ -1,7 +1,5 @@
 #pragma once
 #include "Logger.hpp"
-#include "Utils/Singleton.hpp"
-#include "Utils/DateTime.hpp"
 
 class TerminalLogger : public Logger
 {
@@ -21,8 +19,8 @@ class TerminalLogger : public Logger
   static consteval std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
   {
     std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
-    names[static_cast<usize>(Logger::LogLevel::Trace)] = "\033[1;34m";
-    names[static_cast<usize>(Logger::LogLevel::Function)] = "\033[1;34m";
+    names[static_cast<usize>(Logger::LogLevel::Trace)] = "\033[0;35m";
+    names[static_cast<usize>(Logger::LogLevel::Function)] = "\033[2;35m";
     names[static_cast<usize>(Logger::LogLevel::Debug)] = "\033[1;34m";
     names[static_cast<usize>(Logger::LogLevel::Info)] = "\033[1;32m";
     names[static_cast<usize>(Logger::LogLevel::Success)] = "\033[0;32m";

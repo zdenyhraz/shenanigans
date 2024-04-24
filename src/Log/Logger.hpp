@@ -28,6 +28,17 @@ protected:
   inline static std::string mProgressName;
   inline static std::string mProgressBarOverlay;
 
+  template <typename T>
+  class Singleton
+  {
+  public:
+    static T& Get()
+    {
+      static T instance;
+      return instance;
+    }
+  };
+
   bool ShouldLog(LogLevel logLevel) const { return logLevel >= mLogLevel; }
 
 public:
@@ -52,4 +63,8 @@ public:
     mProgressName.clear();
     mProgressBarOverlay.clear();
   }
+
+  inline static std::string GetCurrentDate() { return fmt::format("{:%Y-%b-%d}", fmt::localtime(std::time(nullptr))); }
+
+  inline static std::string GetCurrentTime() { return fmt::format("{:%H:%M:%S}", fmt::localtime(std::time(nullptr))); }
 };

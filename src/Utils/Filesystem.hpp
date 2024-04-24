@@ -1,15 +1,15 @@
 #pragma once
 
-inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath = "")
+inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath = "", std::string_view identifier = "LICENSE.md")
 {
   auto path = std::filesystem::current_path();
   for (usize trial = 0; trial < 10; ++trial)
   {
-    if (std::filesystem::exists(path / "src"))
+    if (std::filesystem::exists(path / identifier))
       return relpath.empty() ? path : path / relpath;
     path = path.parent_path();
   }
-  return std::filesystem::current_path();
+  throw std::runtime_error(fmt::format("Could not determine project directory via identifier '{}'", identifier));
 }
 
 inline usize GetFileCount(const std::filesystem::path& dirpath)

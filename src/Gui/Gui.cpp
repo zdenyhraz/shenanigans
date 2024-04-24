@@ -56,9 +56,12 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-  io.Fonts->AddFontFromFileTTF((GetProjectDirectoryPath() / "data/apps/CascadiaCode.ttf").string().c_str(), scale * 10);
-  static const std::string iniFilename = (GetProjectDirectoryPath() / "data/apps/imgui.ini").string();
-  io.IniFilename = iniFilename.c_str();
+  const auto fontPath = GetProjectDirectoryPath("data/apps/CascadiaCode.ttf").string();
+  LOG_DEBUG("Using font {}", fontPath);
+  io.Fonts->AddFontFromFileTTF(fontPath.c_str(), scale * 10);
+  const auto iniPath = GetProjectDirectoryPath("data/apps/imgui.ini").string();
+  LOG_DEBUG("Using ini file {}", iniPath);
+  io.IniFilename = iniPath.c_str();
 
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetDefaultStyle();
