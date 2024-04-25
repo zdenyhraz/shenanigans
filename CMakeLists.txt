@@ -194,7 +194,7 @@ target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # zmq
 add_compile_definitions(ZMQ_STATIC)
-find_package(ZeroMQ HINTS libs/libzmq/install)
+find_package(ZeroMQ HINTS libs/libzmq/installer/CMake)
 include_directories(${ZeroMQ_INCLUDE_DIR})
 find_package(cppzmq HINTS libs/cppzmq)
 include_directories(libs/cppzmq)

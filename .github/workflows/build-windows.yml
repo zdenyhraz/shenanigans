@@ -3,7 +3,6 @@ name: build-windows
 on: [push,pull_request]
 env:
   CI: ON
-  build-jobs: 8
 
 jobs:
   build:
@@ -29,7 +28,7 @@ jobs:
 
     - name: OpenCV install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
-      run: cd libs/opencv && cmake install build
+      run: cd libs/opencv && cmake --install build --prefix install
 
     - name: OpenCV install from source
       if: steps.libs-cache.outputs.cache-hit != 'true'
@@ -40,13 +39,13 @@ jobs:
         git clone https://github.com/opencv/opencv_contrib.git --branch 4.x --single-branch --depth 1
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
-        cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
+        cmake --build build --config ${{ matrix.build-type }}
         cmake --install build --prefix install
         dir install
 
     - name: ZeroMQ install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
-      run: cd libs/libzmq && cmake install build
+      run: cd libs/libzmq && cmake --install build --prefix installer
 
     - name: ZeroMQ install from source
       if: steps.libs-cache.outputs.cache-hit != 'true'
@@ -56,15 +55,15 @@ jobs:
         cd libzmq
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
-        cmake --install build --prefix install
+        cmake --build build --config ${{ matrix.build-type }}
+        cmake --install build --prefix installer
         dir install
 
     - name: Build
       run: |
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
+        cmake --build build --config ${{ matrix.build-type }}
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v2
