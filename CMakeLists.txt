@@ -48,8 +48,8 @@ endif()
 
 # sanitizer
 if(ENABLE_SANITIZER)
-  add_compile_options(-fsanitize=address,undefined,thread,memory,leak -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=address,undefined,thread,memory,leak -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=address,undefined,thread,leak -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined,thread,leak -fno-omit-frame-pointer)
 endif()
 
 # status messages
