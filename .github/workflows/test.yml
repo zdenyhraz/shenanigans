@@ -1,55 +1,26 @@
 name: test
 
-on: [push,pull_request]
+on:
+  workflow_run:
+    workflows: ["build-linux"]
+    types:
+      - completed
 
 jobs:
   test:
-     runs-on: ubuntu-latest
-     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-          token: ${{ secrets.ACCESS_TOKEN }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-type: [Debug, Release]
 
-      - name: Setup linux
-        run: sudo chmod 755 script/linux/setup_linux.sh && ./script/linux/setup_linux.sh
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: build-${{ runner.os }}-${{ matrix.build-type }}
+        path: build
 
-      - name: OpenCV cache
-        id: opencv-cache
-        uses: actions/cache@v3
-        with:
-          path: ./opencv
-          key: ${{runner.os}}-opencv-cache-v4
-
-      - name: OpenCV install from cache
-        if: steps.opencv-cache.outputs.cache-hit == 'true'
-        run: cd opencv/build && sudo ninja install
-
-      - name: OpenCV install from source
-        if: steps.opencv-cache.outputs.cache-hit != 'true'
-        run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
-
-      - name: CMake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
-
-      - name: CMake build
-        run: cmake --build ./build --config Release --target shenanigans_test -j 6
-
-      - name: CMake test
-        working-directory: ./build
-        run: ctest --rerun-failed --output-on-failure
-
-      - name: Execute test
-        working-directory: ./build
-        run: ./shenanigans_test --gtest_output=xml:shenanigans_coverage.xml
-
-      - name: Show test report
-        working-directory: ./build
-        run: cat shenanigans_coverage.xml
-
-      - name: Codecov upload
-        uses: codecov/codecov-action@v2
-        with:
-          directory: ./build
-          verbose: true
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure

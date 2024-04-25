@@ -1,37 +1,64 @@
 name: build-linux
 
 on: [push,pull_request]
-
+env:
+  jobs: "8"
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-type: [Debug, Release]
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-          token: ${{ secrets.ACCESS_TOKEN }}
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+        token: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: Setup linux
-        run: sudo chmod 755 script/linux/setup_linux.sh && ./script/linux/setup_linux.sh
+    - name: Install CMake + Ninja
+      run: |
+        sudo apt-get install -y cmake
+        sudo apt install ninja-build
 
-      - name: OpenCV cache
-        id: opencv-cache
-        uses: actions/cache@v3
-        with:
-          path: ./opencv
-          key: ${{runner.os}}-opencv-cache-v4
+    - name: Install GCC 13
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 90 && sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 90
 
-      - name: OpenCV install from cache
-        if: steps.opencv-cache.outputs.cache-hit == 'true'
-        run: cd opencv/build && sudo ninja install
+    - name: OpenCV cache
+      id: opencv-cache
+      uses: actions/cache@v3
+      with:
+        path: ./opencv
+        key: ${{ runner.os }}-${{ matrix.build-type }}-opencv-cache-v1
 
-      - name: OpenCV install from source
-        if: steps.opencv-cache.outputs.cache-hit != 'true'
-        run: sudo chmod 755 script/linux/setup_opencv.sh && ./script/linux/setup_opencv.sh
+    - name: OpenCV install from cache
+      if: steps.opencv-cache.outputs.cache-hit == 'true'
+      run: |
+        cd opencv
+        cmake install ./build
 
-      - name: CMake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Release -B ./build -G Ninja
+    - name: OpenCV install from source
+      if: steps.opencv-cache.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/opencv/opencv.git --branch 4.x --single-branch --depth 1
+        git clone https://github.com/opencv/opencv_contrib.git --branch 4.x --single-branch --depth 1
+        cd opencv
+        mkdir build
+        cmake -B ./build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
+        cmake --build ./build --config ${{ matrix.build-type }} -j${jobs}
+        cmake install ./build
 
-      - name: CMake build
-        run: cmake --build ./build --config Release --target shenanigans -j 8
+    - name: Build
+      run: |
+        mkdir build
+        cmake -B ./build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
+        cmake --build ./build --config ${{ matrix.build-type }} -j${jobs}
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-${{ runner.os }}-${{ matrix.build-type }}
+        path: build
+

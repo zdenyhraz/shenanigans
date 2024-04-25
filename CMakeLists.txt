@@ -144,15 +144,6 @@ target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
 
-# torch
-find_package(Torch REQUIRED HINTS libs/libtorch)
-include_directories(libs/libtorch/include)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-target_link_libraries(shenanigans PRIVATE ${TORCH_LIBRARIES})
-target_link_libraries(shenanigans_test PRIVATE ${TORCH_LIBRARIES})
-target_link_libraries(shenanigans_terminal PRIVATE ${TORCH_LIBRARIES})
-target_link_libraries(shenanigans_benchmark PRIVATE ${TORCH_LIBRARIES})
-
 # implot
 include_directories(libs/implot)
 file(GLOB SRC_IMPLOT CONFIGURE_DEPENDS libs/implot/*.cpp)
@@ -226,20 +217,20 @@ include_directories(src)
 # sources
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
  src/Astrophysics/*.cpp
- src/Gui/*.cpp
  src/ImageProcessing/*.cpp
  src/ImageRegistration/*.cpp
  src/Log/*.cpp
  src/Math/*.cpp
  src/Microservice/*.cpp
- src/ML/*.cpp
  src/Optimization/*.cpp
  src/Plot/*.cpp
  src/Python/*.cpp
  src/Random/*.cpp
  src/Utils/*.cpp
  )
-target_sources(shenanigans PRIVATE ${SRC})
+file(GLOB_RECURSE SRC_GUI CONFIGURE_DEPENDS src/Gui/*.cpp)
+
+target_sources(shenanigans PRIVATE ${SRC} ${SRC_GUI})
 target_sources(shenanigans_test PRIVATE ${SRC})
 target_sources(shenanigans_terminal PRIVATE ${SRC})
 target_sources(shenanigans_benchmark PRIVATE ${SRC})

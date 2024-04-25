@@ -57,13 +57,9 @@
 #include <fmt/std.h>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
-#include <torch/torch.h>
-#include <torch/script.h>
 #include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
-// #include <opencv2/core/cuda.hpp>
-// #include <opencv2/cudaarithm.hpp>
 #include <opencv2/dnn.hpp>
 #include <opencv2/dnn/all_layers.hpp>
 
@@ -134,7 +130,6 @@ using namespace pybind11::literals;
 #include "Utils/Draw.hpp"
 #include "Utils/Load.hpp"
 #include "Utils/Vectmat.hpp"
-#include "Utils/DNNUtils.hpp"
 
 #include "Plot/Plot.hpp"
 #include "Plot/PyPlot.hpp"
