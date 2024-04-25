@@ -8,14 +8,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-        with:
-          submodules: true
-          token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Cppcheck install
         run: sudo apt install -y cppcheck
 
-      - name: Cppcheck run #--project=build/compile_commands.json
+      - name: Cppcheck run
         run: |
           cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=0 src/ apps/ 2> cppcheck-result.txt
           cat cppcheck-result.txt
