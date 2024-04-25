@@ -21,9 +21,7 @@ jobs:
       id: libs-cache
       uses: actions/cache@v3
       with:
-        path: |
-          libs/opencv-install
-          libs/libzmq-install
+        path: libs
         key: ${{ runner.os }}-libs-cache-v1
 
     - name: ZeroMQ install from cache
