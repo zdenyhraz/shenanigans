@@ -12,7 +12,7 @@ jobs:
       matrix:
         build-type: [Debug]
         #build-type: [Debug, Release]
-        compiler: [gcc]
+        compiler: [clang]
         #compiler: [gcc, clang]
     steps:
     - name: Checkout repository
