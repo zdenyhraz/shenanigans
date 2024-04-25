@@ -35,7 +35,7 @@ class TerminalLogger : public Logger
     if (not ShouldLog(logLevel))
       return;
 
-    static constinit auto logLevelColors = GenerateLogLevelColors();
+    static constinit std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> logLevelColors = GenerateLogLevelColors();
     fmt::print("{}[{}] {}\033[0m\n", logLevelColors[static_cast<usize>(logLevel)], GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(args...)));
   }
 
