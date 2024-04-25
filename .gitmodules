@@ -31,12 +31,12 @@
 [submodule "src/NDA"]
 	path = src/NDA
 	url = git@github.com:zdenyhraz/shenanigans_private.git
-[submodule "libs/zmq"]
-	path = libs/zmq
-	url = https://github.com/zeromq/cppzmq.git
 [submodule "libs/imgui-nodes"]
 	path = libs/imgui-nodes
 	url = https://github.com/thedmd/imgui-node-editor.git
 [submodule "libs/boost"]
 	path = libs/boost
 	url = https://github.com/boostorg/boost.git
+[submodule "libs/cppzmq"]
+	path = libs/cppzmq
+	url = https://github.com/zeromq/cppzmq.git
