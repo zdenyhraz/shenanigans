@@ -39,9 +39,10 @@ jobs:
         cd opencv
         git clone https://github.com/opencv/opencv_contrib.git --branch 4.x --single-branch --depth 1
         mkdir build
-        cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -D CMAKE_INSTALL_PREFIX=install -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
+        cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
         cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
-        cmake install build
+        cmake --install build --prefix install
+        dir install
 
     - name: ZeroMQ install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
@@ -54,9 +55,10 @@ jobs:
         git clone https://github.com/zeromq/libzmq.git --single-branch --depth 1
         cd libzmq
         mkdir build
-        cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -D CMAKE_INSTALL_PREFIX=install
+        cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
         cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
-        cmake install build
+        cmake --install build --prefix install
+        dir install
 
     - name: Build
       run: |
