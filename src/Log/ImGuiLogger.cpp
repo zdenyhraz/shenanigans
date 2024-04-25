@@ -44,7 +44,7 @@ void ImGuiLogger::RenderInternal()
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
   const char* bufStart = mTextBuffer.begin();
   const char* bufEnd = mTextBuffer.end();
-  static constexpr std::array<ImVec4, static_cast<i32>(LogLevel::LogLevelCount)> mLogLevelColors = GenerateLogLevelColors();
+  static constinit std::array<ImVec4, static_cast<i32>(LogLevel::LogLevelCount)> mLogLevelColors = GenerateLogLevelColors();
 
   ImGuiListClipper clipper;
   clipper.Begin(mLineOffsets.size());
