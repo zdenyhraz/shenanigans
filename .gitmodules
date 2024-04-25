@@ -43,3 +43,9 @@
 [submodule "libs/libzmq"]
 	path = libs/libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "libs/opencv"]
+	path = libs/opencv
+	url = https://github.com/opencv/opencv.git
+[submodule "libs/opencv_contrib"]
+	path = libs/opencv_contrib
+	url = https://github.com/opencv/opencv_contrib.git
