@@ -48,7 +48,7 @@ jobs:
         path: |
           libs/opencv
           libs/libzmq
-        key: ${{ runner.os }}-${{ matrix.build-type }}-libs-cache-v1
+        key: ${{ runner.os }}-libs-cache-v1
 
     - name: ZeroMQ install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
@@ -59,8 +59,8 @@ jobs:
       run: |
         cd libs/libzmq
         mkdir build
-        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        cmake --build build --config ${{ matrix.build-type }} -j4
+        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release
+        cmake --build build --config Release -j4
         cmake --install build --prefix ../libzmq-install
 
     - name: OpenCV install from cache
@@ -72,8 +72,8 @@ jobs:
       run: |
         cd libs/opencv
         mkdir build
-        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
-        cmake --build build --config ${{ matrix.build-type }} -j4
+        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
+        cmake --build build --config Release -j4
         cmake --install build --prefix ../opencv-install
 
     - name: Build
