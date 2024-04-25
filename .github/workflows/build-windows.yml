@@ -37,6 +37,7 @@ jobs:
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
         cmake --build build --config ${{ matrix.build-type }} -j4
+        dir build
         cmake --install build --prefix ../libzmq-install
 
     - name: OpenCV install from cache
