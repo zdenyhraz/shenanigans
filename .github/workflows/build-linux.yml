@@ -65,6 +65,7 @@ jobs:
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -D CMAKE_INSTALL_PREFIX=install -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
         cmake --build build --config ${{ matrix.build-type }}
         cmake install build
+        ls install
 
     - name: ZeroMQ install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
