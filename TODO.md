@@ -2,6 +2,8 @@
 
 
 ## :ballot_box_with_check:Tasks
+- [ ] CI build
+- [ ] CI test
 - [x] CI sanitizers
 - [x] CI clang
 - [ ] CI clang-tidy
