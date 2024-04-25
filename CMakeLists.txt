@@ -196,6 +196,7 @@ find_package(cppzmq HINTS libs/zmq)
 include_directories(libs/zmq)
 
 # boost
+set(BOOST_ENABLE_CMAKE ON)
 set(BOOST_INCLUDE_LIBRARIES interprocess)
 add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
 include_directories(${Boost_INCLUDE_DIRS})
