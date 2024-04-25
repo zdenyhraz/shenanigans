@@ -2,6 +2,7 @@ name: build-linux
 
 on: [push,pull_request]
 env:
+  CI: ON
   build-jobs: 8
 
 jobs:
