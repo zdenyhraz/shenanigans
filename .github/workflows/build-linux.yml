@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build-type: [Debug, Release]
+        build-type: [Debug]
+        #build-type: [Debug, Release]
+        compiler: [gcc]
+        #compiler: [gcc, clang]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -18,18 +21,28 @@ jobs:
         submodules: true
         token: ${{ secrets.ACCESS_TOKEN }}
 
-    - name: Install CMake + Ninja + OpenGL
+    - name: Install cmake/ninja/gui
       run: |
         sudo apt-get install -y cmake
         sudo apt install ninja-build
         sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
 
     - name: Install GCC 13
+      if: matrix.compiler == 'gcc'
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 90 && sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 90
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100
 
-    - name: OpenCV cache
+    - name: Install Clang 17
+      if: matrix.compiler == 'clang'
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo add-apt-repository "deb https://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-17 main"
+        sudo apt update
+        sudo apt install clang-17
+        sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
+
+    - name: Libs cache
       id: libs-cache
       uses: actions/cache@v3
       with:
