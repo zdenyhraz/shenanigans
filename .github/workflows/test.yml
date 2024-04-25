@@ -19,6 +19,11 @@ jobs:
         name: build-${{ runner.os }}-${{ matrix.build-type }}
         path: build
 
+    - name: Set environment variables
+      run: |
+        echo "##[add-path]${GITHUB_WORKSPACE}/libs/opencv-install/x64/vc17/bin"
+        echo "##[add-path]${GITHUB_WORKSPACE}/libs/libzmq-install/bin"
+
     - name: Run tests
       run: |
         cd build
