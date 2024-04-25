@@ -2,7 +2,8 @@ name: build-linux
 
 on: [push,pull_request]
 env:
-  jobs: "8"
+  build-jobs: 8
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,31 +31,32 @@ jobs:
       id: opencv-cache
       uses: actions/cache@v3
       with:
-        path: ./opencv
+        path: libs/opencv
         key: ${{ runner.os }}-${{ matrix.build-type }}-opencv-cache-v1
 
     - name: OpenCV install from cache
       if: steps.opencv-cache.outputs.cache-hit == 'true'
       run: |
-        cd opencv
-        cmake install ./build
+        cd libs/opencv
+        cmake install build
 
     - name: OpenCV install from source
       if: steps.opencv-cache.outputs.cache-hit != 'true'
       run: |
+        cd libs
         git clone https://github.com/opencv/opencv.git --branch 4.x --single-branch --depth 1
-        git clone https://github.com/opencv/opencv_contrib.git --branch 4.x --single-branch --depth 1
         cd opencv
+        git clone https://github.com/opencv/opencv_contrib.git --branch 4.x --single-branch --depth 1
         mkdir build
-        cmake -B ./build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
-        cmake --build ./build --config ${{ matrix.build-type }} -j${jobs}
-        cmake install ./build
+        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }} -D CMAKE_INSTALL_PREFIX=install -DOPENCV_ENABLE_NONFREE=ON -DOPENCV_EXTRA_MODULES_PATH="opencv_contrib/modules" -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
+        cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
+        cmake install build
 
     - name: Build
       run: |
         mkdir build
-        cmake -B ./build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        cmake --build ./build --config ${{ matrix.build-type }} -j${jobs}
+        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
+        cmake --build build --config ${{ matrix.build-type }} -j${{ env.build-jobs }}
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v2
