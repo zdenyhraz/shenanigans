@@ -36,7 +36,7 @@ jobs:
         cd libs/libzmq
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=Release
-        cmake --build build --config Release -j$((`nproc`+1))
+        cmake --build build --config Release
         cmake --install build --prefix ../libzmq-install
 
     - name: OpenCV install from cache
@@ -49,14 +49,14 @@ jobs:
         cd libs/opencv
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
-        cmake --build build --config Release -j$((`nproc`+1))
+        cmake --build build --config Release
         cmake --install build --prefix ../opencv-install
 
     - name: Build
       run: |
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        cmake --build build --config ${{ matrix.build-type }} -j$((`nproc`+1))
+        cmake --build build --config ${{ matrix.build-type }}
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v2
