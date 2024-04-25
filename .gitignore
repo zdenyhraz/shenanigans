@@ -3,6 +3,8 @@ bin/
 obj/
 .vs/
 __pycache__/
+*-install/
+
 
 data/
 !data/apps

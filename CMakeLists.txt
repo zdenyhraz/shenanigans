@@ -141,7 +141,7 @@ if(ENABLE_PROFILING)
 endif()
 
 # opencv
-find_package(OpenCV REQUIRED HINTS libs/opencv/install)
+find_package(OpenCV REQUIRED HINTS libs/opencv-install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
@@ -194,7 +194,7 @@ target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # zmq
 add_compile_definitions(ZMQ_STATIC)
-find_package(ZeroMQ HINTS libs/libzmq/installer/CMake)
+find_package(ZeroMQ HINTS libs/libzmq-install/CMake)
 include_directories(${ZeroMQ_INCLUDE_DIR})
 find_package(cppzmq HINTS libs/cppzmq)
 include_directories(libs/cppzmq)
