@@ -34,8 +34,9 @@
 #include <bit>
 #include <ranges>
 #include <future>
-#include <stacktrace>
-
+#ifdef __cpp_lib_stacktrace
+  #include <stacktrace>
+#endif
 #define ImDrawIdx unsigned int
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
