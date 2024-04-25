@@ -197,7 +197,6 @@ include_directories(libs/cppzmq)
 
 # boost
 set(BOOST_ENABLE_CMAKE ON)
-set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/boost")
 set(BOOST_INCLUDE_LIBRARIES interprocess)
 add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
 include_directories(${Boost_INCLUDE_DIRS})
