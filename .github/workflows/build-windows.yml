@@ -37,7 +37,7 @@ jobs:
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=Release
         cmake --build build --config Release -j$((`nproc`+1))
-        cmake --install build ../libzmq-install
+        cmake --install build --prefix ../libzmq-install
 
     - name: OpenCV install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
