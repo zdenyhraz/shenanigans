@@ -3,9 +3,9 @@
 
 class TerminalLogger : public Logger
 {
-  static consteval std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelNames()
+  static consteval std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelNames()
   {
-    std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
+    std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
     names[static_cast<usize>(Logger::LogLevel::Trace)] = "Trace";
     names[static_cast<usize>(Logger::LogLevel::Function)] = "Function";
     names[static_cast<usize>(Logger::LogLevel::Debug)] = "Debug";
@@ -16,9 +16,9 @@ class TerminalLogger : public Logger
     return names;
   }
 
-  static consteval std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
+  static consteval std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
   {
-    std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
+    std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
     names[static_cast<usize>(Logger::LogLevel::Trace)] = "\033[0;35m";
     names[static_cast<usize>(Logger::LogLevel::Function)] = "\033[2;35m";
     names[static_cast<usize>(Logger::LogLevel::Debug)] = "\033[1;34m";
@@ -35,7 +35,7 @@ class TerminalLogger : public Logger
     if (not ShouldLog(logLevel))
       return;
 
-    static constinit std::array<std::string, static_cast<i32>(Logger::LogLevel::LogLevelCount)> logLevelColors = GenerateLogLevelColors();
+    static constinit std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> logLevelColors = GenerateLogLevelColors();
     fmt::print("{}[{}] {}\033[0m\n", logLevelColors[static_cast<usize>(logLevel)], GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(args...)));
   }
 
