@@ -1,9 +1,9 @@
 build/
+install/
 bin/
 obj/
 .vs/
 __pycache__/
-*-install/
 
 
 data/
