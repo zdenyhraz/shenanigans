@@ -1,7 +1,0 @@
-  # clang-tidy:
-  #     - name: clang-tidy install
-  #       run: sudo apt install clang-tidy
-
-  #     - name: clang-tidy run
-  #       continue-on-error: true
-  #       run: find src/ -type f \( -iname \*.hpp -o -iname \*.h -o -iname \*.cpp \) | xargs clang-tidy --format-style=file -p build

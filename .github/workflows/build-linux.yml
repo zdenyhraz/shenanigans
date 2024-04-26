@@ -50,12 +50,13 @@ jobs:
 
     - name: OpenCV install from cache
       if: steps.opencv-cache.outputs.cache-hit == 'true'
-      run: cd libs/opencv && cmake --install build
+      working-directory: libs/opencv
+      run: cmake --install build
 
     - name: OpenCV install from source
       if: steps.opencv-cache.outputs.cache-hit != 'true'
+      working-directory: libs/opencv
       run: |
-        cd libs/opencv
         mkdir build
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
         cmake --build build --config Release -j$((`nproc`+1))
@@ -69,6 +70,6 @@ jobs:
         cmake --build build --config ${{ matrix.build-type }} -j$((`nproc`+1))
 
     - name: Test
+      working-directory: build
       run: |
-        cd build
-        ctest --output-on-failure
+        ctest --rerun-failed --output-on-failure
