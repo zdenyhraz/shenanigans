@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(ENABLE_PRIVATE ON)
 set(ENABLE_COVERAGE OFF)
+set(OPENCV_DIR libs/opencv-install/x64/vc17/staticlib)
 
 # ci variables
 if(CI OR DEFINED ENV{CI})
@@ -144,7 +145,7 @@ if(ENABLE_PROFILING)
 endif()
 
 # opencv
-find_package(OpenCV REQUIRED HINTS libs/opencv-install)
+find_package(OpenCV REQUIRED HINTS ${OPENCV_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
@@ -251,9 +252,7 @@ target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 # shenanigans_test app sources
 file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS test/shenanigans/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST})
-if(NOT WIN32)
-  gtest_discover_tests(shenanigans_test)
-endif()
+gtest_discover_tests(shenanigans_test)
 
 # shenanigans_terminal app sources
 file(GLOB SRC_SHENANIGANS_TERMINAL_APP CONFIGURE_DEPENDS apps/shenanigans_terminal/*.cpp)

@@ -9,3 +9,4 @@
 - [ ] CI clang-tidy
 - [ ] CI code coverage + badge
 - [ ] CI cache whole libs/
+- [ ] CI python build script
