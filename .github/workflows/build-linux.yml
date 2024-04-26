@@ -50,7 +50,7 @@ jobs:
 
     - name: OpenCV install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
-      run: cd libs/opencv && cmake --install build --prefix ../opencv-install
+      run: cd libs/opencv && cmake --install build --prefix ../../build
 
     - name: OpenCV install from source
       if: steps.libs-cache.outputs.cache-hit != 'true'
@@ -59,20 +59,18 @@ jobs:
         mkdir build
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
         cmake --build build --config Release -j$((`nproc`+1))
-        cmake --install build --prefix ../opencv-install
+        cmake --install build --prefix ../../build
 
     - name: Build
       run: |
         mkdir build
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        echo "${{ github.workspace }}/libs/opencv-install/lib" >> $GITHUB_PATH
+        echo "${{ github.workspace }}/build/lib" >> $GITHUB_PATH
         cmake --build build --config ${{ matrix.build-type }} -j$((`nproc`+1))
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: build-${{ runner.os }}-${{ matrix.build-type }}
-        path: |
-          build
-          libs/*-install
+        path: build
 

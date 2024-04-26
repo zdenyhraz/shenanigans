@@ -248,7 +248,9 @@ target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 # shenanigans_test app sources
 file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS test/shenanigans/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST})
-gtest_discover_tests(shenanigans_test)
+if(NOT WIN32)
+  gtest_discover_tests(shenanigans_test)
+endif()
 
 # shenanigans_terminal app sources
 file(GLOB SRC_SHENANIGANS_TERMINAL_APP CONFIGURE_DEPENDS apps/shenanigans_terminal/*.cpp)
@@ -261,9 +263,3 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
-
-#cmake --install build --prefix install --component shenanigans --config Debug
-install(TARGETS shenanigans DESTINATION bin)
-install(DIRECTORY libs/opencv-install DESTINATION bin FILES_MATCHING PATTERN "*.dll")
-
-

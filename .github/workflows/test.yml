@@ -21,7 +21,6 @@ jobs:
 
     - name: Run tests
       run: |
-        echo "${{ github.workspace }}/libs/opencv-install/lib" >> $GITHUB_PATH
-        echo "${{ github.workspace }}/libs/libzmq-install/lib" >> $GITHUB_PATH
+        echo "${{ github.workspace }}/build/lib" >> $GITHUB_PATH
         cd build
         ctest --output-on-failure
