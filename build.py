@@ -15,14 +15,17 @@ def run_command(command, cwd=None):
 def opencv_find_lib_dir(opencv_install_name):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
+    candidates = []
 
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
                 if file == 'OpenCVConfig.cmake':
-                    return root
+                    candidates.append(root)
 
-    raise RuntimeError("Unable to find installed OpenCV CMake directory")
+    if len(candidates) == 0:
+        raise RuntimeError("Unable to find installed OpenCV CMake directory")
+    return max(candidates, key=len)  # return the deepest if multiple found
 
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
