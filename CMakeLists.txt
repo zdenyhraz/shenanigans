@@ -87,11 +87,6 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
 endif()
 
-# codecov
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/codecov/cmake" ${CMAKE_MODULE_PATH})
-find_package(codecov)
-add_coverage(shenanigans_test)
-
 # pybind11
 add_subdirectory(libs/pybind11)
 include_directories(libs/pybind11/include)
@@ -271,5 +266,3 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
-
-coverage_evaluate() # last
