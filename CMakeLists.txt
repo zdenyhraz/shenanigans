@@ -10,9 +10,12 @@ set(ENABLE_SANITIZER OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(ENABLE_PRIVATE ON)
+set(ENABLE_COVERAGE OFF)
 
 # ci variables
 if(CI OR DEFINED ENV{CI})
+  message(STATUS "CI: ON")
+  set(ENABLE_COVERAGE ON)
   set(ENABLE_SANITIZER ON)
   set(ENABLE_PROFILING OFF)
   set(CMAKE_UNITY_BUILD OFF)
@@ -83,6 +86,11 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
 endif()
+
+# codecov
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/codecov/cmake" ${CMAKE_MODULE_PATH})
+find_package(codecov)
+add_coverage(shenanigans_test)
 
 # pybind11
 add_subdirectory(libs/pybind11)
@@ -263,3 +271,5 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
+
+coverage_evaluate() # last
