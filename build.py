@@ -4,10 +4,10 @@ import platform
 import multiprocessing
 
 
-def run_command(command):
+def run_command(command, cwd=None):
     print("Running command: ", command)
     try:
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Error running command {command}: {e}")
     return True
@@ -29,22 +29,21 @@ def opencv_find_lib_dir(os_name, opencv_install_name):
 
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
-    run_command('cd ./libs/opencv')
-    run_command('mkdir build')
-    run_command(f'cmake -B ./build -G {generator} {opencv_configure_args}')
-    run_command(f'cmake --build ./build --config Release -j {jobs}')
-    run_command(f'sudo cmake --install ./build --prefix {opencv_install_prefix}')
-    run_command('sudo cmake --install ./build')
+    cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
+    run_command('mkdir build', cwd)
+    run_command(f'cmake -B ./build -G {generator} {opencv_configure_args}', cwd)
+    run_command(f'cmake --build ./build --config Release -j {jobs}', cwd)
+    run_command(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
+    run_command('sudo cmake --install ./build', cwd)
     return opencv_find_lib_dir()
 
 
 def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix):
-    run_command('cd ./libs/opencv')
-    run_command('mkdir build')
-    run_command(f'cmake -B ./build {opencv_configure_args}')
-    run_command(f'cmake --build ./build --config Release -j {jobs}')
-    run_command(f'cmake --install ./build --prefix {opencv_install_prefix}')
-    run_command('cmake --install ./build')
+    cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
+    run_command('mkdir build', cwd)
+    run_command(f'cmake -B ./build {opencv_configure_args}', cwd)
+    run_command(f'cmake --build ./build --config Release -j {jobs}', cwd)
+    run_command(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
     return opencv_find_lib_dir()
 
 
