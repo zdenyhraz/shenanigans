@@ -109,7 +109,7 @@ include(GoogleTest)
 target_link_libraries(shenanigans_test PRIVATE GTest::gtest GTest::gtest_main)
 
 # benchmark
-set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(libs/benchmark)
 target_link_libraries(shenanigans PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_test PRIVATE benchmark::benchmark)
@@ -193,14 +193,16 @@ target_link_libraries(shenanigans_terminal PRIVATE glad)
 target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # zmq
-add_compile_definitions(ZMQ_STATIC)
-find_package(ZeroMQ HINTS libs/libzmq-install/CMake)
-include_directories(${ZeroMQ_INCLUDE_DIR})
-find_package(cppzmq HINTS libs/cppzmq)
-include_directories(libs/cppzmq)
+set(BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(libs/libzmq)
+
+# cppzmq
+set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(libs/cppzmq)
 
 # boost
-set(BOOST_ENABLE_CMAKE ON)
+set(BOOST_ENABLE_CMAKE ON CACHE BOOL "" FORCE)
 set(BOOST_INCLUDE_LIBRARIES interprocess)
 add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
 include_directories(${Boost_INCLUDE_DIRS})

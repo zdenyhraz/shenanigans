@@ -45,21 +45,8 @@ jobs:
       id: libs-cache
       uses: actions/cache@v3
       with:
-        path: libs
+        path: libs/opencv-install
         key: ${{ runner.os }}-libs-cache-v1
-
-    - name: ZeroMQ install from cache
-      if: steps.libs-cache.outputs.cache-hit == 'true'
-      run: cd libs/libzmq && cmake --install build --prefix ../libzmq-install
-
-    - name: ZeroMQ install from source
-      if: steps.libs-cache.outputs.cache-hit != 'true'
-      run: |
-        cd libs/libzmq
-        mkdir build
-        cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=Release
-        cmake --build build --config Release -j$((`nproc`+1))
-        cmake --install build --prefix ../libzmq-install
 
     - name: OpenCV install from cache
       if: steps.libs-cache.outputs.cache-hit == 'true'
@@ -79,7 +66,6 @@ jobs:
         mkdir build
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
         echo "${{ github.workspace }}/libs/opencv-install/lib" >> $GITHUB_PATH
-        echo "${{ github.workspace }}/libs/libzmq-install/lib" >> $GITHUB_PATH
         cmake --build build --config ${{ matrix.build-type }} -j$((`nproc`+1))
 
     - name: Archive build artifacts
