@@ -23,9 +23,7 @@ def opencv_find_lib_dir(opencv_install_name):
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
 
-    if len(candidates) == 0:
-        raise RuntimeError("Unable to find installed OpenCV CMake directory")
-    return max(candidates, key=len)  # return the deepest if multiple found
+    return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
@@ -140,9 +138,11 @@ if __name__ == '__main__':
         opengl_install()
         compiler_install(compiler)
 
-    opencv_install_cmake_dir = opencv_find_lib_dir(opencv_install_name)  # cached
+    opencv_install_cmake_dir = opencv_find_lib_dir(opencv_install_name)
     if not opencv_install_cmake_dir:
         opencv_install_cmake_dir = opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name)
+    if not opencv_install_cmake_dir:
+        raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
 
     build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir)
