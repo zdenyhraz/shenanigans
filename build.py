@@ -101,7 +101,7 @@ def opengl_install():
 def build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir):
     print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
     run('mkdir build')
-    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOPENCV_DIR={opencv_install_cmake_dir}")
+    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOpenCV_DIR={opencv_install_cmake_dir}")
     run(f'cmake --build {build_dir} --config {build_type} -j {jobs}')
 
 

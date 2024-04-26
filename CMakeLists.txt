@@ -11,7 +11,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(ENABLE_PRIVATE ON)
 set(ENABLE_COVERAGE OFF)
-set(OPENCV_DIR libs/opencv-install/x64/vc17/staticlib)
 
 # ci variables
 if(CI OR DEFINED ENV{CI})
@@ -70,7 +69,7 @@ message(STATUS "CMAKE_CXX_COMPILER_LAUNCHER: " ${CMAKE_CXX_COMPILER_LAUNCHER})
 message(STATUS "ENABLE_PROFILING: " ${ENABLE_PROFILING})
 message(STATUS "ENABLE_SANITIZER: " ${ENABLE_SANITIZER})
 message(STATUS "ENABLE_PRIVATE: " ${ENABLE_PRIVATE})
-message(STATUS "OPENCV_DIR: " ${OPENCV_DIR})
+message(STATUS "OPENCV_DIR: " ${OpenCV_DIR})
 
 # targets
 add_executable(shenanigans)
@@ -146,7 +145,7 @@ if(ENABLE_PROFILING)
 endif()
 
 # opencv
-find_package(OpenCV REQUIRED HINTS ${OPENCV_DIR})
+find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
