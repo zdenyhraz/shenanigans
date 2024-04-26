@@ -1,5 +1,6 @@
 #pragma once
 #include "Producer.hpp"
+#include "Entrypoint.hpp"
 
 class LoadImageMicroservice : public Entrypoint, public Producer<cv::Mat>
 {
