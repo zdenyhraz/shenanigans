@@ -12,19 +12,17 @@ def run_command(command, cwd=None):
         raise RuntimeError(f"Error running command {command}: {e}")
 
 
-def opencv_find_lib_dir(os_name, opencv_install_name):
-    filename = 'opencv_core'
-    extension = '.lib' if os_name == 'Windows' else '.a'
+def opencv_find_lib_dir(opencv_install_name):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
 
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
-                if file.startswith(filename) and file.endswith(extension):
+                if file == 'OpenCVConfig.cmake':
                     return root
 
-    return ''
+    raise RuntimeError("Unable to find installed OpenCV CMake directory")
 
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
@@ -53,7 +51,7 @@ def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_insta
     else:
         raise RuntimeError(f'Unsupported os: {os_name}')
 
-    return opencv_find_lib_dir(os_name, opencv_install_name)
+    return opencv_find_lib_dir(opencv_install_name)
 
 
 def gcc_install():
@@ -87,7 +85,9 @@ def ninja_install():
 
 
 def generator_install(generator):
-    if generator == 'Ninja':
+    if generator == None:
+        return
+    elif generator == 'Ninja':
         return ninja_install()
     else:
         raise RuntimeError(f'Unsupported generator {generator}')
@@ -97,10 +97,10 @@ def opengl_install():
     run_command('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
-def build(build_dir, generator, build_type, jobs, ci, opencv_install_lib_dir):
-    print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_lib_dir={opencv_install_lib_dir}')
+def build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir):
+    print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
     run_command('mkdir build')
-    run_command(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOPENCV_DIR={opencv_install_lib_dir}")
+    run_command(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOPENCV_DIR={opencv_install_cmake_dir}")
     run_command(f'cmake --build {build_dir} --config {build_type} -j {jobs}')
 
 
@@ -111,7 +111,7 @@ def test():
 if __name__ == '__main__':
     os_name = platform.system()
     generator = 'Ninja' if os_name == 'Linux' else None
-    compiler = 'gcc'
+    compiler = 'gcc' if os_name == 'Linux' else 'msvc'
     build_type = 'Release'
     build_dir = './build'
     jobs = multiprocessing.cpu_count() + 1
@@ -137,10 +137,10 @@ if __name__ == '__main__':
         opengl_install()
         compiler_install(compiler)
 
-    opencv_install_lib_dir = opencv_find_lib_dir(os_name, opencv_install_name)  # cached
-    if not opencv_install_lib_dir:
-        opencv_install_lib_dir = opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name)
-    print('opencv_install_lib_dir: ', opencv_install_lib_dir)
+    opencv_install_cmake_dir = opencv_find_lib_dir(opencv_install_name)  # cached
+    if not opencv_install_cmake_dir:
+        opencv_install_cmake_dir = opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name)
+    print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
 
-    build(build_dir, generator, build_type, jobs, ci, opencv_install_lib_dir)
+    build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir)
     test()
