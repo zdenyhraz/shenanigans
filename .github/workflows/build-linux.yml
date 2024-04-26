@@ -66,10 +66,9 @@ jobs:
       run: |
         mkdir build
         cmake -B build -G Ninja -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
-        echo "${{ github.workspace }}/build/lib" >> $GITHUB_PATH
         cmake --build build --config ${{ matrix.build-type }} -j$((`nproc`+1))
 
     - name: Test
       working-directory: build
-      run: |
-        ctest --rerun-failed --output-on-failure
+      run: ctest --rerun-failed --output-on-failure
+
