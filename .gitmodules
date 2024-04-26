@@ -49,6 +49,3 @@
 [submodule "libs/opencv_contrib"]
 	path = libs/opencv_contrib
 	url = https://github.com/opencv/opencv_contrib.git
-[submodule "libs/codecov"]
-	path = libs/codecov
-	url = https://github.com/RWTH-HPC/CMake-codecov.git
