@@ -7,9 +7,6 @@
 [submodule "libs/json"]
 	path = libs/json
 	url = https://github.com/nlohmann/json.git
-[submodule "libs/flamegraph"]
-	path = libs/flamegraph
-	url = https://github.com/brendangregg/FlameGraph.git
 [submodule "libs/tracy"]
 	path = libs/tracy
 	url = https://github.com/wolfpld/tracy.git
