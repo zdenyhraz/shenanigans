@@ -19,12 +19,9 @@ jobs:
         name: build-${{ runner.os }}-${{ matrix.build-type }}
         path: build
 
-    - name: Set environment variables
-      run: |
-        echo "##[add-path]${{ github.workspace }}/libs/opencv-install/x64/vc17/bin"
-        echo "##[add-path]${{ github.workspace }}/libs/libzmq-install/bin"
-
     - name: Run tests
       run: |
+        echo "${{ github.workspace }}/libs/opencv-install/lib" >> $GITHUB_PATH
+        echo "${{ github.workspace }}/libs/libzmq-install/lib" >> $GITHUB_PATH
         cd build
         ctest --output-on-failure
