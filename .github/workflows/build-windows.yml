@@ -43,10 +43,3 @@ jobs:
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
         echo "${{ github.workspace }}/build/x64/vc17/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         cmake --build build --config ${{ matrix.build-type }}
-
-    - name: Archive build artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-${{ runner.os }}-${{ matrix.build-type }}
-        path: build
-
