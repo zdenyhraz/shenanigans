@@ -4,7 +4,7 @@ import platform
 import multiprocessing
 
 
-def run_command(command, cwd=None):
+def run(command, cwd=None):
     print("Running command: ", command)
     try:
         subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
@@ -30,18 +30,18 @@ def opencv_find_lib_dir(opencv_install_name):
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
-    run_command('mkdir build', cwd)
-    run_command(f'cmake -B ./build -G {generator} {opencv_configure_args}', cwd)
-    run_command(f'cmake --build ./build --config Release -j {jobs}', cwd)
-    run_command(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
+    run('mkdir build', cwd)
+    run(f'cmake -B ./build -G {generator} {opencv_configure_args}', cwd)
+    run(f'cmake --build ./build --config Release -j {jobs}', cwd)
+    run(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
 
 
 def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
-    run_command('mkdir build', cwd)
-    run_command(f'cmake -B ./build {opencv_configure_args}', cwd)
-    run_command(f'cmake --build ./build --config Release -j {jobs}', cwd)
-    run_command(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
+    run('mkdir build', cwd)
+    run(f'cmake -B ./build {opencv_configure_args}', cwd)
+    run(f'cmake --build ./build --config Release -j {jobs}', cwd)
+    run(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
 
 
 def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name):
@@ -58,16 +58,16 @@ def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_insta
 
 
 def gcc_install():
-    run_command('sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13')
-    run_command('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
+    run('sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13')
+    run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
 
 
 def clang_install():
-    run_command('wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -')
-    run_command('sudo add-apt-repository "deb https://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-17 main"')
-    run_command('sudo apt update')
-    run_command('sudo apt install clang-17')
-    run_command('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
+    run('wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -')
+    run('sudo add-apt-repository "deb https://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-17 main"')
+    run('sudo apt update')
+    run('sudo apt install clang-17')
+    run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
 
 
 def compiler_install(compiler):
@@ -80,11 +80,11 @@ def compiler_install(compiler):
 
 
 def cmake_install():
-    run_command('sudo apt-get install -y cmake')
+    run('sudo apt-get install -y cmake')
 
 
 def ninja_install():
-    run_command('sudo apt install ninja-build')
+    run('sudo apt install ninja-build')
 
 
 def generator_install(generator):
@@ -97,14 +97,14 @@ def generator_install(generator):
 
 
 def opengl_install():
-    run_command('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
+    run('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
 def build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir):
     print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
-    run_command('mkdir build')
-    run_command(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOPENCV_DIR={opencv_install_cmake_dir}")
-    run_command(f'cmake --build {build_dir} --config {build_type} -j {jobs}')
+    run('mkdir build')
+    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOPENCV_DIR={opencv_install_cmake_dir}")
+    run(f'cmake --build {build_dir} --config {build_type} -j {jobs}')
 
 
 def test():
