@@ -54,6 +54,8 @@ jobs:
       run: |
         mkdir build
         cmake -B build -D CMAKE_BUILD_TYPE=${{ matrix.build-type }}
+        echo "##[add-path]${{ github.workspace }}/libs/opencv-install/x64/vc17/bin"
+        echo "##[add-path]${{ github.workspace }}/libs/libzmq-install/bin"
         cmake --build build --config ${{ matrix.build-type }}
 
     - name: Archive build artifacts

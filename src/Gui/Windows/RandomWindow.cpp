@@ -2,6 +2,7 @@
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 #include "Random/UnevenIllumination.hpp"
+#include "Microservice/MicroserviceRegistry.hpp"
 #include "Microservice/Workflow.hpp"
 #include "Utils/FrameAverager.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "Microservices/LoadImageMicroservice.hpp"
-#include "Microservices/BlurMicroservice.hpp"
-#include "Microservices/ShowImageMicroservice.hpp"
+#include "LoadImageMicroservice.hpp"
+#include "BlurMicroservice.hpp"
+#include "ShowImageMicroservice.hpp"
 
 class MicroserviceRegistry
 {

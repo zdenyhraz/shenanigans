@@ -21,8 +21,8 @@ jobs:
 
     - name: Set environment variables
       run: |
-        echo "##[add-path]${GITHUB_WORKSPACE}/libs/opencv-install/x64/vc17/bin"
-        echo "##[add-path]${GITHUB_WORKSPACE}/libs/libzmq-install/bin"
+        echo "##[add-path]${{ github.workspace }}/libs/opencv-install/x64/vc17/bin"
+        echo "##[add-path]${{ github.workspace }}/libs/libzmq-install/bin"
 
     - name: Run tests
       run: |
