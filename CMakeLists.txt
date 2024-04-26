@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.22)
 project(shenanigans LANGUAGES CXX)
 
 # variables
@@ -261,4 +261,9 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
+
+#cmake --install build --prefix install --component shenanigans --config Debug
+install(TARGETS shenanigans DESTINATION bin)
+install(DIRECTORY libs/opencv-install DESTINATION bin FILES_MATCHING PATTERN "*.dll")
+
 
