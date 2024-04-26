@@ -49,6 +49,7 @@ def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_instal
 
 
 def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix):
+    print(f'Installing OpenCV: {os_name}/{generator}/j{jobs}/prefix={opencv_install_prefix}/opencv_configure_args={opencv_configure_args}')
     if os_name == 'Linux':
         return opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix)
     elif os_name == 'Windows':
@@ -158,3 +159,4 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(e)
+        raise e
