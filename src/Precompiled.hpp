@@ -38,7 +38,6 @@
   #include <stacktrace>
 #endif
 
-#include <omp.h>
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
