@@ -1,4 +1,4 @@
-name: build-linux
+name: build
 
 on: [push,pull_request]
 env:
@@ -6,7 +6,24 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: gcc
+            generator: ninja
+            build_type: Release
+
+          # - os: ubuntu-latest
+          #   compiler: clang
+          #   generator: ninja
+          #   build_type: Release
+
+          # - os: windows-latest
+          #   compiler: msvc
+          #   build_type: Release
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
