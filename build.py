@@ -13,11 +13,8 @@ def run(command, cwd=None):
         raise RuntimeError(f"Error running command {command}: {e}")
 
 
-def opencv_find_lib_dir(opencv_install_name):
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
+def opencv_find_cmake_dir(opencv_install_dir):
     candidates = []
-
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
@@ -28,37 +25,46 @@ def opencv_find_lib_dir(opencv_install_name):
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
-def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
+def opencv_find_bin_dir(opencv_install_dir):
+    if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
+        for root, dirs, files in os.walk(opencv_install_dir):
+            for file in files:
+                if file.startswith('opencv_core') and (file.endswith('.dll') or file.endswith('.a')):
+                    print(f'OpenCV binary directory: {root}')
+                    return root
+
+    raise RuntimeError('Cannot find opencv binary directory')
+
+
+def opencv_install_linux(opencv_configure_args, jobs, opencv_install_name):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
     if not os.path.exists(os.path.join(cwd, 'build')):
         run('mkdir build', cwd)
     run(f'cmake -B ./build {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
-    run(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
-    run(f'sudo cmake --install ./build', cwd)
+    run(f'sudo cmake --install ./build --prefix ../{opencv_install_name}', cwd)
 
 
-def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix):
+def opencv_install_windows(opencv_configure_args, jobs, opencv_install_name):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
     if not os.path.exists(os.path.join(cwd, 'build')):
         run('mkdir build', cwd)
     run(f'cmake -B ./build {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
-    run(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
-    run(f'sudo cmake --install ./build', cwd)
+    run(f'cmake --install ./build --prefix ../{opencv_install_name}', cwd)
 
 
-def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name):
-    print(f'Installing OpenCV: {os_name}/{generator}/-j{jobs}/prefix={opencv_install_prefix}/opencv_configure_args={opencv_configure_args}')
+def opencv_install(os_name,  opencv_configure_args, jobs, opencv_install_name):
+    print(f'Installing OpenCV: {os_name}/-j{jobs}/opencv_configure_args={opencv_configure_args}')
 
     if os_name == 'linux':
-        opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix)
+        opencv_install_linux(opencv_configure_args, jobs, opencv_install_name)
     elif os_name == 'windows':
-        opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix)
+        opencv_install_windows(opencv_configure_args, jobs, opencv_install_name)
     else:
         raise RuntimeError(f'Unsupported os: {os_name}')
 
-    return opencv_find_lib_dir(opencv_install_name)
+    return opencv_find_cmake_dir(opencv_install_name)
 
 
 def gcc_install():
@@ -122,6 +128,41 @@ def check_args(args, os_name):
         raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
 
 
+def setup_opencv(os_name, opencv_configure_args, jobs, opencv_install_name, opencv_install_dir):
+    opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
+    if not opencv_install_cmake_dir:
+        opencv_install_cmake_dir = opencv_install(os_name, opencv_configure_args, jobs, opencv_install_name)
+    if not opencv_install_cmake_dir:
+        raise RuntimeError("Unable to find installed OpenCV CMake directory")
+    print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
+
+    opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
+    print('opencv_install_bin_dir: ', opencv_install_bin_dir)
+    env_current_path = os.environ.get('PATH', '')
+    os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
+
+    return opencv_install_cmake_dir
+
+
+def setup_linux(compiler, generator, opengl):
+    cmake_install()
+    generator_install(generator)
+    if opengl:
+        opengl_install()
+    compiler_install(compiler)
+
+
+def setup_windows():
+    pass
+
+
+def setup_os(os_name, compiler, generator, opengl):
+    if os_name == 'linux':
+        setup_linux(compiler, generator, opengl)
+    if os_name == 'windows':
+        setup_windows()
+
+
 def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir):
     print(f"Building: {f'{generator}/' if generator else ''}{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}/targets={targets}")
     if not os.path.exists('build'):
@@ -133,6 +174,7 @@ def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cm
 
 if __name__ == '__main__':
     os_name = platform.system().lower()
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser(description='Build script')
     parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if os_name == 'linux' else 'msvc')
     parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if os_name == 'linux' else None)
@@ -154,7 +196,7 @@ if __name__ == '__main__':
     opengl = 'shenanigans ' in targets
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
-    opencv_install_prefix = f'../{opencv_install_name}'
+    opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
 
     print('os_name: ', os_name)
     print('compiler: ', compiler)
@@ -167,20 +209,8 @@ if __name__ == '__main__':
     print('opengl: ', opengl)
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_name: ', opencv_install_name)
-    print('opencv_install_prefix: ', opencv_install_prefix)
 
-    if os_name == 'linux':
-        cmake_install()
-        generator_install(generator)
-        if opengl:
-            opengl_install()
-        compiler_install(compiler)
-
-    opencv_install_cmake_dir = opencv_find_lib_dir(opencv_install_name)
-    if not opencv_install_cmake_dir:
-        opencv_install_cmake_dir = opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name)
-    if not opencv_install_cmake_dir:
-        raise RuntimeError("Unable to find installed OpenCV CMake directory")
-    print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
+    setup_os(os_name, compiler, generator, opengl)
+    opencv_install_cmake_dir = setup_opencv(os_name, opencv_configure_args, jobs, opencv_install_name, opencv_install_dir)
 
     build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir)
