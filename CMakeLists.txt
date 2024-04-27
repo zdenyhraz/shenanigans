@@ -52,7 +52,7 @@ endif()
 # sanitizer
 if(ENABLE_SANITIZER)
   if(MSVC)
-    add_compile_options(/fsanitize=address /Oy-)
+    add_compile_options(/fsanitize=address /DEBUG /Oy-)
   else()
     add_compile_options(-fsanitize=address,undefined,leak -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address,undefined,leak -fno-omit-frame-pointer)
