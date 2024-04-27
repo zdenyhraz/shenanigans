@@ -93,6 +93,32 @@ def opencv_install(opencv_configure_args, jobs, opencv_install_name):
     return opencv_find_cmake_dir(opencv_install_name)
 
 
+def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir, build_type):
+    # get opencv cmake directory (install)
+    opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
+    if not opencv_install_cmake_dir:
+        opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
+    if not opencv_install_cmake_dir:
+        raise RuntimeError("Unable to find installed OpenCV CMake directory")
+    print('OpenCV cmake directory: ', opencv_install_cmake_dir)
+
+    # get opencv binary directory
+    opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
+    if not opencv_install_bin_dir:
+        raise RuntimeError('Cannot find opencv binary directory')
+    print('OpenCV binary directory: ', opencv_install_bin_dir)
+
+    # add opencv binary directory to PATH
+    env_current_path = os.environ.get('PATH', '')
+    os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
+    print(f'Added {opencv_install_bin_dir} to PATH')
+
+    # copy opencv binary files to runtime directory
+    opencv_binary_files = opencv_get_bin_files(opencv_install_bin_dir)
+    copy_files_to_directory(opencv_binary_files, get_runtime_directory(build_type))
+    return opencv_install_cmake_dir
+
+
 def gcc_install():
     run('sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13')
     run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
@@ -136,54 +162,6 @@ def opengl_install():
     run('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
-def check_args(args):
-    platforms = ['Linux', 'Windows']
-    if not platform.system() in platforms:
-        raise RuntimeError(f'Platform {platform.system()} not supported - supported platforms: {platforms}')
-
-    compilers_windows = ['msvc']
-    compilers_linux = ['gcc', 'clang']
-    compilers = compilers_windows if platform.system() == 'Windows' else compilers_linux
-    if args.compiler and args.compiler not in compilers:
-        raise RuntimeError(f'Compiler {args.compiler} on {platform.system()} not supported - supported compilers: {compilers}')
-
-    generators_windows = []
-    generators_linux = ['Ninja']
-    generators = generators_windows if platform.system() == 'Windows' else generators_linux
-    if args.generator and args.generator not in generators:
-        raise RuntimeError(f'Generator {args.generator} on {platform.system()} not supported - supported generators: {generators}')
-
-    build_types = ['Debug', 'Release']
-    if args.build_type not in build_types:
-        raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
-
-
-def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir, build_type):
-    # get opencv cmake directory (install)
-    opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
-    if not opencv_install_cmake_dir:
-        opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
-    if not opencv_install_cmake_dir:
-        raise RuntimeError("Unable to find installed OpenCV CMake directory")
-    print('OpenCV cmake directory: ', opencv_install_cmake_dir)
-
-    # get opencv binary directory
-    opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
-    if not opencv_install_bin_dir:
-        raise RuntimeError('Cannot find opencv binary directory')
-    print('OpenCV binary directory: ', opencv_install_bin_dir)
-
-    # add opencv binary directory to PATH
-    env_current_path = os.environ.get('PATH', '')
-    os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
-    print(f'Added {opencv_install_bin_dir} to PATH')
-
-    # copy opencv binary files to runtime directory
-    opencv_binary_files = opencv_get_bin_files(opencv_install_bin_dir)
-    copy_files_to_directory(opencv_binary_files, get_runtime_directory(build_type))
-    return opencv_install_cmake_dir
-
-
 def setup_linux(compiler, generator, opengl):
     cmake_install()
     generator_install(generator)
@@ -210,6 +188,28 @@ def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cm
     run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} {'-DCI=ON' if ci else ''} -DOpenCV_DIR={opencv_install_cmake_dir}")
     run(f'cmake --build {build_dir} --config {build_type} --target {targets} -j {jobs}')
     print(f'Targets {targets} built successfully')
+
+
+def check_args(args):
+    platforms = ['Linux', 'Windows']
+    if not platform.system() in platforms:
+        raise RuntimeError(f'Platform {platform.system()} not supported - supported platforms: {platforms}')
+
+    compilers_windows = ['msvc']
+    compilers_linux = ['gcc', 'clang']
+    compilers = compilers_windows if platform.system() == 'Windows' else compilers_linux
+    if args.compiler and args.compiler not in compilers:
+        raise RuntimeError(f'Compiler {args.compiler} on {platform.system()} not supported - supported compilers: {compilers}')
+
+    generators_windows = []
+    generators_linux = ['Ninja']
+    generators = generators_windows if platform.system() == 'Windows' else generators_linux
+    if args.generator and args.generator not in generators:
+        raise RuntimeError(f'Generator {args.generator} on {platform.system()} not supported - supported generators: {generators}')
+
+    build_types = ['Debug', 'Release']
+    if args.build_type not in build_types:
+        raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
 
 
 if __name__ == '__main__':
