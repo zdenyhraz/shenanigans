@@ -55,7 +55,7 @@ def opencv_find_bin_dir(opencv_install_dir):
     return ''
 
 
-def opencv_get_bin_files(opencv_install_bin_dir):
+def opencv_find_binaries(opencv_install_bin_dir):
     bin_files = []
     for root, dirs, files in os.walk(opencv_install_bin_dir):
         for file in files:
@@ -105,10 +105,12 @@ def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_instal
     # copy opencv binary files to runtime directory
     opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
     if not opencv_install_bin_dir:
-        raise RuntimeError('Cannot find opencv binary directory')
+        raise RuntimeError('Cannot find OpenCV binary directory')
     print('OpenCV binary directory: ', opencv_install_bin_dir)
-    opencv_binary_files = opencv_get_bin_files(opencv_install_bin_dir)
-    copy_files_to_directory(opencv_binary_files, get_runtime_directory(build_type))
+    opencv_binaries = opencv_find_binaries(opencv_install_bin_dir)
+    if not opencv_binaries:
+        print('Warning: Could not find any OpenCV binaries')
+    copy_files_to_directory(opencv_binaries, get_runtime_directory(build_type))
     return opencv_install_cmake_dir
 
 
