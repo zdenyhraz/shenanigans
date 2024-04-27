@@ -176,9 +176,9 @@ def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_instal
     # add opencv binary directory to PATH
     env_current_path = os.environ.get('PATH', '')
     os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
-    print(f'Added {opencv_install_bin_dir} to PATH')  # not enough sadly
+    print(f'Added {opencv_install_bin_dir} to PATH')
 
-    # get opencv binary files
+    # copy opencv binary files to runtime directory
     opencv_binary_files = opencv_get_bin_files(opencv_install_bin_dir)
     copy_files_to_directory(opencv_binary_files, get_runtime_directory(build_type))
     return opencv_install_cmake_dir
