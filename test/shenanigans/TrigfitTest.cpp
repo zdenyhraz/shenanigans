@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "Math/TrigonometricFit.hpp"
 
 TEST(TrigfitTest, Fit)

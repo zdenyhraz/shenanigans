@@ -101,11 +101,11 @@ def opengl_install():
     run('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
-def build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir):
+def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir):
     print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
     run('mkdir build')
     run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOpenCV_DIR={opencv_install_cmake_dir}")
-    run(f'cmake --build {build_dir} --config {build_type} -j {jobs}')
+    run(f'cmake --build {build_dir} --config {build_type} --target {targets} -j {jobs}')
 
 
 def test():
@@ -118,6 +118,7 @@ if __name__ == '__main__':
     compiler = 'gcc' if os_name == 'Linux' else 'msvc'
     build_type = 'Release'
     build_dir = './build'
+    targets = 'shenanigans shenanigans_test clarity clarity_test'
     jobs = multiprocessing.cpu_count()
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
@@ -148,5 +149,5 @@ if __name__ == '__main__':
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
 
-    build(build_dir, generator, build_type, jobs, ci, opencv_install_cmake_dir)
+    build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir)
     test()

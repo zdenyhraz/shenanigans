@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "ImageRegistration/IPC.hpp"
 
 class IPCTest : public ::testing::Test

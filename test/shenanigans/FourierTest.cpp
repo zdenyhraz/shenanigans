@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "Math/Fourier.hpp"
 #include "ImageRegistration/IPC.hpp"
 

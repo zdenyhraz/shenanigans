@@ -56,9 +56,7 @@
 #include <fmt/ostream.h>
 #include <fmt/chrono.h>
 #include <fmt/std.h>
-#include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
-#include <benchmark/benchmark.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
 #include <opencv2/dnn.hpp>

@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "Math/PolynomialFit.hpp"
 
 TEST(PolyfitTest, Fit)

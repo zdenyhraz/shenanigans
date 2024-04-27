@@ -107,17 +107,14 @@ target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
-include_directories(libs/gtest/googletest/include)
+target_include_directories(shenanigans_test PRIVATE libs/gtest/googletest/include)
 enable_testing()
 include(GoogleTest)
-target_link_libraries(shenanigans_test PRIVATE GTest::gtest GTest::gtest_main)
+target_link_libraries(shenanigans_test PRIVATE GTest::gtest)
 
 # benchmark
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(libs/benchmark)
-target_link_libraries(shenanigans PRIVATE benchmark::benchmark)
-target_link_libraries(shenanigans_test PRIVATE benchmark::benchmark)
-target_link_libraries(shenanigans_terminal PRIVATE benchmark::benchmark)
 target_link_libraries(shenanigans_benchmark PRIVATE benchmark::benchmark)
 
 # json
@@ -145,7 +142,7 @@ if(ENABLE_PROFILING)
 endif()
 
 # opencv
-find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR})
+find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR} libs/opencv-install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
@@ -250,7 +247,7 @@ file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS test/shenanigans/*.cpp)
+file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp test/shenanigans/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS_TEST})
 gtest_discover_tests(shenanigans_test)
 

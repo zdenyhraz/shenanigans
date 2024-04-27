@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "Math/Statistics.hpp"
 
 TEST(ColMathTest, ColMeansOdd)

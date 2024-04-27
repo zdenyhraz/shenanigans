@@ -1,3 +1,5 @@
+#include <benchmark/benchmark.h>
+
 std::vector<f32> GenerateRandomVector(usize size)
 {
   std::vector<f32> vec(size);

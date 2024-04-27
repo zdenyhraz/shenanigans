@@ -64,6 +64,8 @@ public:
     mProgressBarOverlay.clear();
   }
 
+  inline static void Mute() { mLogLevel = LogLevel::LogLevelCount; }
+
   inline static std::string GetCurrentDate() { return fmt::format("{:%Y-%b-%d}", fmt::localtime(std::time(nullptr))); }
 
   inline static std::string GetCurrentTime() { return fmt::format("{:%H:%M:%S}", fmt::localtime(std::time(nullptr))); }

@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "ImageProcessing/MedianBlur.hpp"
 
 TEST(MedianBlur, OpenCVEquality)
