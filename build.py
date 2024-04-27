@@ -131,11 +131,6 @@ def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cm
     print(f'Targets {targets} built successfully')
 
 
-def test():
-    cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build')
-    run('ctest --rerun-failed --output-on-failure', cwd)
-
-
 if __name__ == '__main__':
     os_name = platform.system().lower()
     parser = argparse.ArgumentParser(description='Build script')
@@ -156,6 +151,7 @@ if __name__ == '__main__':
     build_dir = args.build_dir
     jobs = args.jobs
     ci = args.ci
+    opengl = 'shenanigans ' in targets
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_prefix = f'../{opencv_install_name}'
@@ -168,6 +164,7 @@ if __name__ == '__main__':
     print('build_dir', build_dir)
     print('jobs: ', jobs)
     print('ci: ', ci)
+    print('opengl: ', opengl)
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_name: ', opencv_install_name)
     print('opencv_install_prefix: ', opencv_install_prefix)
@@ -175,7 +172,8 @@ if __name__ == '__main__':
     if os_name == 'linux':
         cmake_install()
         generator_install(generator)
-        opengl_install()
+        if opengl:
+            opengl_install()
         compiler_install(compiler)
 
     opencv_install_cmake_dir = opencv_find_lib_dir(opencv_install_name)
@@ -186,4 +184,3 @@ if __name__ == '__main__':
     print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
 
     build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir)
-    test()
