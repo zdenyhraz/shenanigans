@@ -33,6 +33,11 @@ def opencv_find_bin_dir(opencv_install_dir):
                     print(f'OpenCV binary directory: {root}')
                     return root
 
+    print('Cannot find OpenCV binary directory - opencv_install_dir:')
+    if platform.system() == 'Linux':
+        run(f'ls -R {opencv_install_dir}')
+    if platform.system() == 'Windows':
+        run(f'dir /s {opencv_install_dir}')
     raise RuntimeError('Cannot find opencv binary directory')
 
 
@@ -54,15 +59,12 @@ def opencv_install_windows(opencv_configure_args, jobs, opencv_install_name):
     run(f'cmake --install ./build --prefix ../{opencv_install_name}', cwd)
 
 
-def opencv_install(os_name,  opencv_configure_args, jobs, opencv_install_name):
-    print(f'Installing OpenCV: {os_name}/-j{jobs}/opencv_configure_args={opencv_configure_args}')
-
-    if os_name == 'linux':
+def opencv_install(opencv_configure_args, jobs, opencv_install_name):
+    print(f'Installing OpenCV: {platform.system()}/-j{jobs}/opencv_configure_args={opencv_configure_args}')
+    if platform.system() == 'Linux':
         opencv_install_linux(opencv_configure_args, jobs, opencv_install_name)
-    elif os_name == 'windows':
+    if platform.system() == 'Windows':
         opencv_install_windows(opencv_configure_args, jobs, opencv_install_name)
-    else:
-        raise RuntimeError(f'Unsupported os: {os_name}')
 
     return opencv_find_cmake_dir(opencv_install_name)
 
@@ -110,28 +112,32 @@ def opengl_install():
     run('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
-def check_args(args, os_name):
+def check_args(args):
+    platforms = ['Linux', 'Windows']
+    if not platform.system() in platforms:
+        raise RuntimeError(f'Platform {platform.system()} not supported - supported platforms: {platforms}')
+
     compilers_windows = ['msvc']
     compilers_linux = ['gcc', 'clang']
-    compilers = compilers_windows if os_name == 'windows' else compilers_linux
+    compilers = compilers_windows if platform.system() == 'Windows' else compilers_linux
     if args.compiler and args.compiler not in compilers:
-        raise RuntimeError(f'Compiler {args.compiler} on {os_name} not supported - supported compilers: {compilers}')
+        raise RuntimeError(f'Compiler {args.compiler} on {platform.system()} not supported - supported compilers: {compilers}')
 
     generators_windows = []
     generators_linux = ['Ninja']
-    generators = generators_windows if os_name == 'windows' else generators_linux
+    generators = generators_windows if platform.system() == 'Windows' else generators_linux
     if args.generator and args.generator not in generators:
-        raise RuntimeError(f'Generator {args.generator} on {os_name} not supported - supported generators: {generators}')
+        raise RuntimeError(f'Generator {args.generator} on {platform.system()} not supported - supported generators: {generators}')
 
     build_types = ['Debug', 'Release']
     if args.build_type not in build_types:
         raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
 
 
-def setup_opencv(os_name, opencv_configure_args, jobs, opencv_install_name, opencv_install_dir):
+def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir):
     opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
     if not opencv_install_cmake_dir:
-        opencv_install_cmake_dir = opencv_install(os_name, opencv_configure_args, jobs, opencv_install_name)
+        opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
     if not opencv_install_cmake_dir:
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
@@ -156,10 +162,10 @@ def setup_windows():
     pass
 
 
-def setup_os(os_name, compiler, generator, opengl):
-    if os_name == 'linux':
+def setup_os(compiler, generator, opengl):
+    if platform.system() == 'Linux':
         setup_linux(compiler, generator, opengl)
-    if os_name == 'windows':
+    if platform.system() == 'Windows':
         setup_windows()
 
 
@@ -173,18 +179,17 @@ def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cm
 
 
 if __name__ == '__main__':
-    os_name = platform.system().lower()
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser(description='Build script')
-    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if os_name == 'linux' else 'msvc')
-    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if os_name == 'linux' else None)
+    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if platform.system() == 'Linux' else 'msvc')
+    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if platform.system() == 'Linux' else None)
     parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
     parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test clarity clarity_test')
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
     parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     args = parser.parse_args()
-    check_args(args, os_name)
+    check_args(args)
 
     compiler = args.compiler
     generator = args.generator
@@ -198,7 +203,7 @@ if __name__ == '__main__':
     opencv_install_name = 'opencv-install'
     opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
 
-    print('os_name: ', os_name)
+    print('platform: ', platform.system())
     print('compiler: ', compiler)
     print('generator: ', generator)
     print('build_type: ', build_type)
@@ -210,7 +215,7 @@ if __name__ == '__main__':
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_name: ', opencv_install_name)
 
-    setup_os(os_name, compiler, generator, opengl)
-    opencv_install_cmake_dir = setup_opencv(os_name, opencv_configure_args, jobs, opencv_install_name, opencv_install_dir)
+    setup_os(compiler, generator, opengl)
+    opencv_install_cmake_dir = setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir)
 
     build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir)
