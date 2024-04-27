@@ -11,11 +11,11 @@ jobs:
       matrix:
         include:
           - compiler: gcc
-            generator: ninja
+            generator: Ninja
             build_type: Release
 
           - compiler: clang
-            generator: ninja
+            generator: Ninja
             build_type: Release
 
     steps:

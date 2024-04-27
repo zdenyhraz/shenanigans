@@ -32,7 +32,7 @@ def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
     if not os.path.exists(os.path.join(cwd, 'build')):
         run('mkdir build', cwd)
-    run(f'cmake -B ./build -G {generator} {opencv_configure_args}', cwd)
+    run(f'cmake -B ./build {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     run(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
     run(f'sudo cmake --install ./build', cwd)
@@ -112,12 +112,12 @@ def check_args(args, os_name):
         raise RuntimeError(f'Compiler {args.compiler} on {os_name} not supported - supported compilers: {compilers}')
 
     generators_windows = []
-    generators_linux = ['ninja']
+    generators_linux = ['Ninja']
     generators = generators_windows if os_name == 'windows' else generators_linux
     if args.generator and args.generator not in generators:
         raise RuntimeError(f'Generator {args.generator} on {os_name} not supported - supported generators: {generators}')
 
-    build_types = ['debug', 'release']
+    build_types = ['Debug', 'Release']
     if args.build_type not in build_types:
         raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
 
@@ -135,17 +135,12 @@ def test():
     pass
 
 
-class LowercaseAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values.lower())
-
-
 if __name__ == '__main__':
     os_name = platform.system().lower()
     parser = argparse.ArgumentParser(description='Build script')
-    parser.add_argument('--compiler', help='compiler', type=str, required=False, action=LowercaseAction, default='gcc' if os_name == 'linux' else 'msvc')
-    parser.add_argument('--generator', help='generator', type=str, required=False, action=LowercaseAction, default='ninja' if os_name == 'linux' else None)
-    parser.add_argument('--build_type', help='build_type', type=str, required=False, action=LowercaseAction, default='release')
+    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if os_name == 'linux' else 'msvc')
+    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if os_name == 'linux' else None)
+    parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
     parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test clarity clarity_test')
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
     parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
