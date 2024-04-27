@@ -3,6 +3,7 @@ import os
 import platform
 import multiprocessing
 import argparse
+import shutil
 
 
 def run(command, cwd=None):
@@ -13,6 +14,19 @@ def run(command, cwd=None):
         raise RuntimeError(f"Error running command {command}: {e}")
 
 
+def copy_files_to_directory(file_paths, destination_directory):
+    os.makedirs(destination_directory, exist_ok=True)
+    for file_path in file_paths:
+        file_name = os.path.basename(file_path)
+        destination_path = os.path.join(destination_directory, file_name)
+        shutil.copy2(file_path, destination_path)
+        print(f"File '{file_path}' copied to '{destination_directory}'")
+
+
+def get_runtime_directory(build_type):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build',  build_type)
+
+
 def opencv_find_cmake_dir(opencv_install_dir):
     candidates = []
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
@@ -20,6 +34,7 @@ def opencv_find_cmake_dir(opencv_install_dir):
             for file in files:
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
+
     if len(candidates) > 1:
         print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
@@ -37,7 +52,17 @@ def opencv_find_bin_dir(opencv_install_dir):
         run(f'ls -R {opencv_install_dir}')
     if platform.system() == 'Windows':
         run(f'dir /s {opencv_install_dir}')
-    raise RuntimeError('Cannot find opencv binary directory')
+    return ''
+
+
+def opencv_get_bin_files(opencv_install_bin_dir):
+    bin_files = []
+    for root, dirs, files in os.walk(opencv_install_bin_dir):
+        for file in files:
+            if file.endswith('.so') or file.endswith('.dll'):
+                bin_files.append(os.path.join(root, file))
+
+    return bin_files
 
 
 def opencv_install_linux(opencv_configure_args, jobs, opencv_install_name):
@@ -133,7 +158,8 @@ def check_args(args):
         raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
 
 
-def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir):
+def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir, build_type):
+    # get opencv cmake directory (install)
     opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
     if not opencv_install_cmake_dir:
         opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
@@ -141,12 +167,20 @@ def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_instal
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('OpenCV cmake directory: ', opencv_install_cmake_dir)
 
+    # get opencv binary directory
     opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
+    if not opencv_install_bin_dir:
+        raise RuntimeError('Cannot find opencv binary directory')
     print('OpenCV binary directory: ', opencv_install_bin_dir)
+
+    # add opencv binary directory to PATH
     env_current_path = os.environ.get('PATH', '')
     os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
-    print(f'Added {opencv_install_bin_dir} to PATH')
+    print(f'Added {opencv_install_bin_dir} to PATH')  # not enough sadly
 
+    # get opencv binary files
+    opencv_binary_files = opencv_get_bin_files(opencv_install_bin_dir)
+    copy_files_to_directory(opencv_binary_files, get_runtime_directory(build_type))
     return opencv_install_cmake_dir
 
 
@@ -208,6 +242,6 @@ if __name__ == '__main__':
     print('opencv_install_dir: ', opencv_install_dir)
 
     setup_os(args.compiler, args.generator, opengl)
-    opencv_install_cmake_dir = setup_opencv(opencv_configure_args, args.jobs, opencv_install_name, opencv_install_dir)
+    opencv_install_cmake_dir = setup_opencv(opencv_configure_args, args.jobs, opencv_install_name, opencv_install_dir, args.build_type)
 
     build(args.build_dir, args.generator, args.build_type, args.targets, args.jobs, args.ci, opencv_install_cmake_dir)
