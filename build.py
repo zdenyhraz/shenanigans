@@ -29,7 +29,7 @@ def opencv_find_bin_dir(opencv_install_dir):
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
-                if file.startswith('opencv_core') and (file.endswith('.dll') or file.endswith('.so')):
+                if 'opencv_core' in file and (file.endswith('.so') or file.endswith('.dll')):
                     print(f'OpenCV binary directory: {root}')
                     return root
 
@@ -146,6 +146,7 @@ def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_instal
     print('opencv_install_bin_dir: ', opencv_install_bin_dir)
     env_current_path = os.environ.get('PATH', '')
     os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
+    print(f'Added {opencv_install_bin_dir} to PATH')
 
     return opencv_install_cmake_dir
 
