@@ -6,13 +6,10 @@ obj/
 __pycache__/
 *-install/
 
+/data
 
-data/
 !data/apps
 !data/readme
-
-libs/libtorch
-libs/fftw
 
 *.zip
 *.dump
