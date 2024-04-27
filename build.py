@@ -29,7 +29,8 @@ def opencv_find_lib_dir(opencv_install_name):
 
 def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
-    run('mkdir build', cwd)
+    if not os.path.exists(os.path.join(cwd, 'build')):
+        run('mkdir build', cwd)
     run(f'cmake -B ./build -G {generator} {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     run(f'sudo cmake --install ./build --prefix {opencv_install_prefix}', cwd)
@@ -38,7 +39,8 @@ def opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_
 
 def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix):
     cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs/opencv')
-    run('mkdir build', cwd)
+    if not os.path.exists(os.path.join(cwd, 'build')):
+        run('mkdir build', cwd)
     run(f'cmake -B ./build {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     run(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
@@ -103,8 +105,9 @@ def opengl_install():
 
 def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir):
     print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
-    run('mkdir build')
-    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} -DCI={ci} -DOpenCV_DIR={opencv_install_cmake_dir}")
+    if not os.path.exists('build'):
+        run('mkdir build')
+    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} {'-DCI=ON' if ci else ''} -DOpenCV_DIR={opencv_install_cmake_dir}")
     run(f'cmake --build {build_dir} --config {build_type} --target {targets} -j {jobs}')
 
 
@@ -123,7 +126,7 @@ if __name__ == '__main__':
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_prefix = f'../{opencv_install_name}'
-    ci = 'ON'
+    ci = 'CI' in os.environ
 
     print('os_name: ', os_name)
     print('generator: ', generator)
