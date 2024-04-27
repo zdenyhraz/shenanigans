@@ -20,8 +20,8 @@ def opencv_find_cmake_dir(opencv_install_dir):
             for file in files:
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
-
-    print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
+    if len(candidates) > 1:
+        print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
@@ -30,7 +30,6 @@ def opencv_find_bin_dir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
                 if 'opencv_core' in file and (file.endswith('.so') or file.endswith('.dll')):
-                    print(f'OpenCV binary directory: {root}')
                     return root
 
     print('Cannot find OpenCV binary directory - opencv_install_dir:')
@@ -140,10 +139,10 @@ def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_instal
         opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
     if not opencv_install_cmake_dir:
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
-    print('opencv_install_cmake_dir: ', opencv_install_cmake_dir)
+    print('OpenCV cmake directory: ', opencv_install_cmake_dir)
 
     opencv_install_bin_dir = opencv_find_bin_dir(opencv_install_dir)
-    print('opencv_install_bin_dir: ', opencv_install_bin_dir)
+    print('OpenCV binary directory: ', opencv_install_bin_dir)
     env_current_path = os.environ.get('PATH', '')
     os.environ['PATH'] = f"{opencv_install_bin_dir}:{env_current_path}"
     print(f'Added {opencv_install_bin_dir} to PATH')
@@ -192,31 +191,23 @@ if __name__ == '__main__':
     args = parser.parse_args()
     check_args(args)
 
-    compiler = args.compiler
-    generator = args.generator
-    build_type = args.build_type
-    targets = args.targets
-    build_dir = args.build_dir
-    jobs = args.jobs
-    ci = args.ci
-    opengl = 'shenanigans ' in targets
+    opengl = 'shenanigans ' in args.targets
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
-
     print('platform: ', platform.system())
-    print('compiler: ', compiler)
-    print('generator: ', generator)
-    print('build_type: ', build_type)
-    print('targets: ', targets)
-    print('build_dir', build_dir)
-    print('jobs: ', jobs)
-    print('ci: ', ci)
+    print('compiler: ', args.compiler)
+    print('generator: ', args.generator)
+    print('build_type: ', args.build_type)
+    print('targets: ', args.targets)
+    print('build_dir', args.build_dir)
+    print('jobs: ', args.jobs)
+    print('ci: ', args.ci)
     print('opengl: ', opengl)
     print('opencv_configure_args: ', opencv_configure_args)
-    print('opencv_install_name: ', opencv_install_name)
+    print('opencv_install_dir: ', opencv_install_dir)
 
-    setup_os(compiler, generator, opengl)
-    opencv_install_cmake_dir = setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir)
+    setup_os(args.compiler, args.generator, opengl)
+    opencv_install_cmake_dir = setup_opencv(opencv_configure_args, args.jobs, opencv_install_name, opencv_install_dir)
 
-    build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir)
+    build(args.build_dir, args.generator, args.build_type, args.targets, args.jobs, args.ci, opencv_install_cmake_dir)
