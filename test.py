@@ -36,4 +36,4 @@ if __name__ == '__main__':
     check_build_dir(build_dir)
     check_test_data_dir(test_dir)
 
-    run('ctest --rerun-failed --output-on-failure', build_dir)
+    run('ctest --output-on-failure', build_dir)
