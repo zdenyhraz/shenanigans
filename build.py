@@ -67,11 +67,11 @@ def gcc_install():
 
 
 def clang_install():
-    run('wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -')
-    run('sudo add-apt-repository "deb https://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-17 main"')
-    run('sudo apt update')
-    run('sudo apt install clang-17')
-    run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
+    run('wget https://apt.llvm.org/llvm.sh')
+    run('sudo chmod u+x llvm.sh')
+    run('sudo ./llvm.sh 17')
+    run('clang-17 --version')
+    run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100')
 
 
 def compiler_install(compiler):
