@@ -6,23 +6,12 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            compiler: gcc
-            generator: ninja
+          - compiler: msvc
             build_type: Release
-
-          # - os: ubuntu-latest
-          #   compiler: clang
-          #   generator: ninja
-          #   build_type: Release
-
-          # - os: windows-latest
-          #   compiler: msvc
-          #   build_type: Release
 
     steps:
     - name: Checkout repository
@@ -44,7 +33,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python3 -u build.py
+      run: python3 -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
 
 

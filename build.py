@@ -2,6 +2,7 @@ import subprocess
 import os
 import platform
 import multiprocessing
+import argparse
 
 
 def run(command, cwd=None):
@@ -23,7 +24,7 @@ def opencv_find_lib_dir(opencv_install_name):
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
 
-    print(f'Found {len(candidates)} candidates: {candidates}')
+    print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
@@ -50,9 +51,9 @@ def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_instal
 def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name):
     print(f'Installing OpenCV: {os_name}/{generator}/-j{jobs}/prefix={opencv_install_prefix}/opencv_configure_args={opencv_configure_args}')
 
-    if os_name == 'Linux':
+    if os_name == 'linux':
         opencv_install_linux(generator, opencv_configure_args, jobs, opencv_install_prefix)
-    elif os_name == 'Windows':
+    elif os_name == 'windows':
         opencv_install_windows(generator, opencv_configure_args, jobs, opencv_install_prefix)
     else:
         raise RuntimeError(f'Unsupported os: {os_name}')
@@ -93,7 +94,7 @@ def ninja_install():
 def generator_install(generator):
     if generator == None:
         return
-    elif generator == 'Ninja':
+    elif generator == 'ninja':
         return ninja_install()
     else:
         raise RuntimeError(f'Unsupported generator {generator}')
@@ -103,43 +104,79 @@ def opengl_install():
     run('sudo apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev')
 
 
+def check_args(args, os_name):
+    compilers_windows = ['msvc']
+    compilers_linux = ['gcc', 'clang']
+    compilers = compilers_windows if os_name == 'windows' else compilers_linux
+    if args.compiler and args.compiler not in compilers:
+        raise RuntimeError(f'Compiler {args.compiler} on {os_name} not supported - supported compilers: {compilers}')
+
+    generators_windows = []
+    generators_linux = ['ninja']
+    generators = generators_windows if os_name == 'windows' else generators_linux
+    if args.generator and args.generator not in generators:
+        raise RuntimeError(f'Generator {args.generator} on {os_name} not supported - supported generators: {generators}')
+
+    build_types = ['debug', 'release']
+    if args.build_type not in build_types:
+        raise RuntimeError(f'Build type {args.build_type} not supported - supported build types: {build_types}')
+
+
 def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir):
-    print(f'Building: {generator}/{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}')
+    print(f"Building: {f'{generator}/' if generator else ''}{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}/targets={targets}")
     if not os.path.exists('build'):
         run('mkdir build')
     run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} {'-DCI=ON' if ci else ''} -DOpenCV_DIR={opencv_install_cmake_dir}")
     run(f'cmake --build {build_dir} --config {build_type} --target {targets} -j {jobs}')
+    print(f'Targets {targets} built successfully')
 
 
 def test():
     pass
 
 
+class LowercaseAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values.lower())
+
+
 if __name__ == '__main__':
-    os_name = platform.system()
-    generator = 'Ninja' if os_name == 'Linux' else None
-    compiler = 'gcc' if os_name == 'Linux' else 'msvc'
-    build_type = 'Release'
-    build_dir = './build'
-    targets = 'shenanigans shenanigans_test clarity clarity_test'
-    jobs = multiprocessing.cpu_count()
+    os_name = platform.system().lower()
+    parser = argparse.ArgumentParser(description='Build script')
+    parser.add_argument('--compiler', help='compiler', type=str, required=False, action=LowercaseAction, default='gcc' if os_name == 'linux' else 'msvc')
+    parser.add_argument('--generator', help='generator', type=str, required=False, action=LowercaseAction, default='ninja' if os_name == 'linux' else None)
+    parser.add_argument('--build_type', help='build_type', type=str, required=False, action=LowercaseAction, default='release')
+    parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test clarity clarity_test')
+    parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
+    parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
+    parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
+    args = parser.parse_args()
+    check_args(args, os_name)
+
+    compiler = args.compiler
+    generator = args.generator
+    build_type = args.build_type
+    targets = args.targets
+    build_dir = args.build_dir
+    jobs = args.jobs
+    ci = args.ci
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_prefix = f'../{opencv_install_name}'
-    ci = 'CI' in os.environ
 
     print('os_name: ', os_name)
-    print('generator: ', generator)
     print('compiler: ', compiler)
+    print('generator: ', generator)
     print('build_type: ', build_type)
+    print('targets: ', targets)
     print('build_dir', build_dir)
     print('jobs: ', jobs)
+    print('ci: ', ci)
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_name: ', opencv_install_name)
     print('opencv_install_prefix: ', opencv_install_prefix)
-    print('ci: ', ci)
 
-    if os_name == 'Linux':
+    if os_name == 'linux':
         cmake_install()
         generator_install(generator)
         opengl_install()
