@@ -29,7 +29,7 @@ def opencv_find_bin_dir(opencv_install_dir):
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, dirs, files in os.walk(opencv_install_dir):
             for file in files:
-                if file.startswith('opencv_core') and (file.endswith('.dll') or file.endswith('.a')):
+                if file.startswith('opencv_core') and (file.endswith('.dll') or file.endswith('.so')):
                     print(f'OpenCV binary directory: {root}')
                     return root
 
