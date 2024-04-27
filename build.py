@@ -132,7 +132,8 @@ def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cm
 
 
 def test():
-    pass
+    cwd = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build')
+    run('ctest --rerun-failed --output-on-failure', cwd)
 
 
 if __name__ == '__main__':

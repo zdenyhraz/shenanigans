@@ -14,9 +14,9 @@ jobs:
             generator: Ninja
             build_type: Release
 
-          - compiler: clang
-            generator: Ninja
-            build_type: Release
+          # - compiler: clang
+          #   generator: Ninja
+          #   build_type: Release
 
     steps:
     - name: Checkout repository
