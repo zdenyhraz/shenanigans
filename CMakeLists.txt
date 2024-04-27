@@ -171,7 +171,7 @@ target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
-#imgui-nodes
+# imgui-nodes
 include_directories(libs/imgui-nodes)
 file(GLOB SRC_IMGUI_NODES CONFIGURE_DEPENDS libs/imgui-nodes/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES})

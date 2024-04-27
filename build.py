@@ -5,7 +5,7 @@ import multiprocessing
 
 
 def run(command, cwd=None):
-    print("Running command: ", command)
+    print(f"Running command{f' in subdirectory {cwd}' if cwd else ''}: ", command)
     try:
         subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
     except subprocess.CalledProcessError as e:
@@ -23,6 +23,7 @@ def opencv_find_lib_dir(opencv_install_name):
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
 
+    print(f'Found {len(candidates)} candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
@@ -116,7 +117,7 @@ if __name__ == '__main__':
     build_type = 'Release'
     build_dir = './build'
     jobs = multiprocessing.cpu_count() + 1
-    opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
+    opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_prefix = f'../{opencv_install_name}'
     ci = 'ON'
