@@ -11,11 +11,9 @@ jobs:
       matrix:
         include:
           - compiler: gcc
-            generator: Ninja
             build_type: Release
 
           # - compiler: clang
-          #   generator: Ninja
           #   build_type: Release
 
     steps:
@@ -38,7 +36,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python3 -u build.py --ci --compiler ${{ matrix.compiler}} --generator ${{ matrix.generator}} --build_type ${{ matrix.build_type}}
+      run: python3 -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
     - name: Test
       run: python3 -u test.py
