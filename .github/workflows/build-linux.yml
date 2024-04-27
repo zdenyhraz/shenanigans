@@ -54,9 +54,10 @@ jobs:
       working-directory: ./libs/opencv
       run: |
         mkdir build
-        cmake -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
+        cmake -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF
         cmake --build ./build --config Release -j$((`nproc`+1))
         sudo cmake --install ./build --prefix ../opencv-install
+        sudo cmake --install ./build
 
     - name: Build
       run: |

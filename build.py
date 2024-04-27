@@ -117,7 +117,7 @@ if __name__ == '__main__':
     compiler = 'gcc' if os_name == 'Linux' else 'msvc'
     build_type = 'Release'
     build_dir = './build'
-    jobs = multiprocessing.cpu_count() + 1
+    jobs = multiprocessing.cpu_count()
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
     opencv_install_name = 'opencv-install'
     opencv_install_prefix = f'../{opencv_install_name}'
