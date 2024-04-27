@@ -13,9 +13,6 @@ jobs:
           - compiler: gcc
             build_type: Release
 
-          # - compiler: clang
-          #   build_type: Release
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
