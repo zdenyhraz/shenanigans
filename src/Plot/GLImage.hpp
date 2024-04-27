@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef GLAPI
 class GLImage
 {
 public:
@@ -43,3 +44,4 @@ public:
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, z.cols, z.rows, 0, GL_BGR, GetGLDataType(z), z.data);
   }
 };
+#endif

@@ -1,4 +1,6 @@
-#include "ImGuiPlot.hpp"
+#ifdef GLAPI
+
+  #include "ImGuiPlot.hpp"
 
 void ImGuiPlot::RenderInternal()
 {
@@ -117,3 +119,4 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
 
   return ImPlotColormap_Viridis;
 }
+#endif

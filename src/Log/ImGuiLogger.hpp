@@ -1,8 +1,10 @@
 #pragma once
-#include "Logger.hpp"
-#include "TerminalLogger.hpp"
-#include "Utils/Singleton.hpp"
-#include "Utils/DateTime.hpp"
+#ifdef GLAPI
+
+  #include "Logger.hpp"
+  #include "TerminalLogger.hpp"
+  #include "Utils/Singleton.hpp"
+  #include "Utils/DateTime.hpp"
 
 class ImGuiLogger : public Logger
 {
@@ -62,3 +64,4 @@ public:
     Singleton<ImGuiLogger>::Get().MessageInternal(logLevel, fmt, std::forward<Args>(args)...);
   }
 };
+#endif

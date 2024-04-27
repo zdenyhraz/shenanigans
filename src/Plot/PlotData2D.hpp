@@ -1,6 +1,7 @@
 #pragma once
-#include "GLImage.hpp"
-
+#ifdef GLAPI
+  #include "GLImage.hpp"
+#endif
 struct PlotData2D
 {
   static constexpr f64 Default = 0.12345;
@@ -21,5 +22,7 @@ struct PlotData2D
   bool surf = false;
   f64 aspectratio = 1;
   std::string savepath;
+#ifdef GLAPI
   GLImage image;
+#endif
 };

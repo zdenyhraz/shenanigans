@@ -37,16 +37,6 @@
 #ifdef __cpp_lib_stacktrace
   #include <stacktrace>
 #endif
-#define ImDrawIdx unsigned int
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include <imgui.h>
-#include <imgui_stdlib.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <implot.h>
-#include <implot_internal.h>
 
 #include <omp.h>
 #include <pybind11/embed.h>
@@ -62,33 +52,13 @@
 #include <opencv2/dnn.hpp>
 #include <opencv2/dnn/all_layers.hpp>
 
-#ifdef ENABLE_PROFILING
-  #include <Tracy.hpp>
-  // use FrameMark for frames (at the end of each frame)
-  // use ZoneScoped once per scope (automatic name)
-  // use ZoneScopedN once per scope (user-supplied name)
-  // use ZoneNamedN for scopes inside ZoneScoped scope (user-supplied name)
-  // bool parameter of ZoneNamed can turn it on/off
-  #define PROFILE_FRAME FrameMark
-  #define PROFILE_FUNCTION ZoneScoped
-  #define PROFILE_SCOPE(name) ZoneNamedN(name, #name, true)
-
-inline void* operator new(std::size_t count)
-{
-  auto ptr = malloc(count);
-  TracyAlloc(ptr, count);
-  return ptr;
-}
-
-inline void operator delete(void* ptr) noexcept
-{
-  TracyFree(ptr);
-  free(ptr);
-}
-
-#else
+#ifndef PROFILE_FRAME
   #define PROFILE_FRAME
+#endif
+#ifndef PROFILE_FUNCTION
   #define PROFILE_FUNCTION
+#endif
+#ifndef PROFILE_SCOPE
   #define PROFILE_SCOPE(name)
 #endif
 

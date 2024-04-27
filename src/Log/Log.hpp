@@ -1,8 +1,13 @@
 #pragma once
-#include "ImGuiLogger.hpp"
 #include "LogFunction.hpp"
 
+#ifdef GLAPI
+  #include "ImGuiLogger.hpp"
 using MainLogger = ImGuiLogger;
+#else
+  #include "TerminalLogger.hpp"
+using MainLogger = TerminalLogger;
+#endif
 
 #define SOURCE_FUNCTION std::source_location::current().function_name()
 #define SOURCE_FILE std::filesystem::relative(std::filesystem::path(std::source_location::current().file_name()), GetProjectDirectoryPath("src")).string()

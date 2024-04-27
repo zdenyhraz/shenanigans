@@ -1,4 +1,6 @@
-#include "ImGuiLogger.hpp"
+#ifdef GLAPI
+
+  #include "ImGuiLogger.hpp"
 
 static consteval ImVec4 GetColorFromU8(f32 R, f32 G, f32 B)
 {
@@ -78,3 +80,4 @@ void ImGuiLogger::ClearInternal()
   mLineOffsets.clear();
   mLineOffsets.emplace_back(0, LogLevel::Trace);
 }
+#endif

@@ -82,7 +82,8 @@ add_executable(shenanigans_icsw)
 if (ENABLE_PCH)
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
   set(SRC_PRECOMPILED src/Precompiled.hpp)
-  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED})
+  set(SRC_PRECOMPILED_GUI src/PrecompiledGui.hpp)
+  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED_GUI} ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
@@ -133,12 +134,7 @@ if(ENABLE_PROFILING)
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
   set(SRC_TRACY libs/tracy/Tracy.hpp libs/tracy/TracyClient.cpp)
   target_sources(shenanigans PRIVATE ${SRC_TRACY})
-  target_sources(shenanigans_test PRIVATE ${SRC_TRACY})
-  target_sources(shenanigans_terminal PRIVATE ${SRC_TRACY})
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
-  target_link_libraries(shenanigans_test PRIVATE ${CMAKE_DL_LIBS})
-  target_link_libraries(shenanigans_terminal PRIVATE ${CMAKE_DL_LIBS})
-  target_link_libraries(shenanigans_benchmark PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # opencv
@@ -153,9 +149,6 @@ target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
 include_directories(libs/implot)
 file(GLOB SRC_IMPLOT CONFIGURE_DEPENDS libs/implot/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMPLOT})
-target_sources(shenanigans_test PRIVATE ${SRC_IMPLOT})
-target_sources(shenanigans_terminal PRIVATE ${SRC_IMPLOT})
-target_sources(shenanigans_benchmark PRIVATE ${SRC_IMPLOT})
 
 # imgui
 include_directories(libs/imgui)
@@ -164,17 +157,11 @@ include_directories(libs/imgui/backends)
 file(GLOB SRC_IMGUI CONFIGURE_DEPENDS libs/imgui/*.cpp libs/imgui/misc/cpp/imgui_stdlib.cpp)
 set(SRC_IMGUI_BACKEND libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_opengl3.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-target_sources(shenanigans_test PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
-target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
 # imgui-nodes
 include_directories(libs/imgui-nodes)
 file(GLOB SRC_IMGUI_NODES CONFIGURE_DEPENDS libs/imgui-nodes/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES})
-target_sources(shenanigans_test PRIVATE ${SRC_IMGUI_NODES})
-target_sources(shenanigans_terminal PRIVATE ${SRC_IMGUI_NODES})
-target_sources(shenanigans_benchmark PRIVATE ${SRC_IMGUI_NODES})
 
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -182,16 +169,10 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(libs/glfw)
 target_link_libraries(shenanigans PRIVATE glfw)
-target_link_libraries(shenanigans_test PRIVATE glfw)
-target_link_libraries(shenanigans_terminal PRIVATE glfw)
-target_link_libraries(shenanigans_benchmark PRIVATE glfw)
 
 # glad
 add_subdirectory(libs/glad)
 target_link_libraries(shenanigans PRIVATE glad)
-target_link_libraries(shenanigans_test PRIVATE glad)
-target_link_libraries(shenanigans_terminal PRIVATE glad)
-target_link_libraries(shenanigans_benchmark PRIVATE glad)
 
 # zmq
 set(BUILD_SHARED OFF CACHE BOOL "" FORCE)
