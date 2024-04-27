@@ -42,6 +42,7 @@ def opencv_install_windows(generator, opencv_configure_args, jobs, opencv_instal
     run(f'cmake -B ./build {opencv_configure_args}', cwd)
     run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     run(f'cmake --install ./build --prefix {opencv_install_prefix}', cwd)
+    run(f'sudo cmake --install ./build', cwd)
 
 
 def opencv_install(os_name, generator, opencv_configure_args, jobs, opencv_install_prefix, opencv_install_name):
