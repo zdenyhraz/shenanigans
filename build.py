@@ -94,7 +94,7 @@ def ninja_install():
 def generator_install(generator):
     if generator == None:
         return
-    elif generator == 'ninja':
+    elif generator == 'Ninja':
         return ninja_install()
     else:
         raise RuntimeError(f'Unsupported generator {generator}')
