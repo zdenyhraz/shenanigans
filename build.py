@@ -56,7 +56,7 @@ def opencv_find_binaries(opencv_install_bin_dir):
     bin_files = []
     for root, dirs, files in os.walk(opencv_install_bin_dir):
         for file in files:
-            if file.endswith('.so') or file.endswith('.dll'):
+            if '.so' in file or '.dll' in file:
                 bin_files.append(os.path.join(root, file))
 
     return bin_files
