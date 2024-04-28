@@ -9,14 +9,16 @@ def run(command, cwd=None):
 
 
 def is_linux_executable(file):
-    return os.access(file, os.X_OK)
+    return os.path.splitext(file)[1] == '' and os.access(file, os.X_OK)
 
 
 def is_windows_executable(file):
-    return os.path.splitext(file)[1].lower() == ".exe"
+    return os.path.splitext(file)[1] == ".exe"
 
 
 def is_executable(file):
+    if not os.path.isfile(file):
+        return False
     if platform.system() == 'Linux':
         return is_linux_executable(file)
     if platform.system() == 'Windows':
@@ -48,10 +50,6 @@ def find_test_executables(build_dir):
             for file in files:
                 if '_test' in file:
                     executable = os.path.join(root, file)
-                    if not os.path.isfile(executable):
-                        continue
-                    if platform.system() == 'Linux':
-                        os.chmod(executable, 0o777)
                     if is_executable(executable):
                         test_executables.append(executable)
 
