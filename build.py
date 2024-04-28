@@ -162,15 +162,46 @@ def setup_linux(compiler, generator, opengl):
     compiler_install(compiler)
 
 
-def setup_windows():
-    pass
+def find_sanitizer_binaries_windows():
+    search_paths = [
+        'C:/Program Files (x86)/Microsoft Visual Studio',
+        'C:/Program Files/Microsoft Visual Studio',
+        'C:/Program Files (x86)/Windows Kits',
+        'C:/Program Files/Windows Kits',
+        'C:/Program Files (x86)/Microsoft Visual Studio/2019',
+        'C:/Program Files/Microsoft Visual Studio/2019',
+        'C:/Program Files (x86)/Microsoft Visual Studio/2017',
+        'C:/Program Files/Microsoft Visual Studio/2017',
+    ]
+
+    binaries = []
+    for path in search_paths:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                if 'asan' in file and file.endswith('.dll'):
+                    binaries.append(os.path.join(root, file))
+
+    return binaries
 
 
-def setup_os(compiler, generator, opengl):
+def setup_sanitizer_windows(build_type):
+    sanitizer_binaries = find_sanitizer_binaries_windows()
+    if not sanitizer_binaries:
+        print('Warning: Could not find sanitizer binaries')
+    print('Sanitizer binaries: ', sanitizer_binaries)
+    copy_files_to_directory(sanitizer_binaries, get_runtime_directory(build_type))
+
+
+def setup_windows(build_type, sanitizer):
+    if sanitizer:
+        setup_sanitizer_windows(build_type)
+
+
+def setup_os(compiler, generator, opengl, build_type, sanitizer):
     if platform.system() == 'Linux':
         setup_linux(compiler, generator, opengl)
     if platform.system() == 'Windows':
-        setup_windows()
+        setup_windows(build_type, sanitizer)
 
 
 def build(build_dir, generator, build_type, targets, jobs, ci, sanitizer, opencv_install_cmake_dir):
@@ -235,7 +266,7 @@ if __name__ == '__main__':
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_dir: ', opencv_install_dir)
 
-    setup_os(args.compiler, args.generator, opengl)
+    setup_os(args.compiler, args.generator, opengl, args.build_type, args.sanitizer)
     opencv_install_cmake_dir = setup_opencv(opencv_configure_args, args.jobs, opencv_install_name, opencv_install_dir, args.build_type)
 
     build(args.build_dir, args.generator, args.build_type, args.targets, args.jobs, args.ci, args.sanitizer, opencv_install_cmake_dir)
