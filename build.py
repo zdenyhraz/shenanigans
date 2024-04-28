@@ -164,14 +164,10 @@ def setup_linux(compiler, generator, opengl):
 
 def find_sanitizer_binaries_windows():
     search_paths = [
-        'C:/Program Files (x86)/Microsoft Visual Studio',
         'C:/Program Files/Microsoft Visual Studio',
-        'C:/Program Files (x86)/Windows Kits',
         'C:/Program Files/Windows Kits',
-        'C:/Program Files (x86)/Microsoft Visual Studio/2019',
-        'C:/Program Files/Microsoft Visual Studio/2019',
-        'C:/Program Files (x86)/Microsoft Visual Studio/2017',
-        'C:/Program Files/Microsoft Visual Studio/2017',
+        'C:/Program Files (x86)/Microsoft Visual Studio',
+        'C:/Program Files (x86)/Windows Kits',
     ]
 
     binaries = []
