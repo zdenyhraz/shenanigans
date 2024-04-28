@@ -47,7 +47,10 @@ def find_test_executables(build_dir):
         for root, dirs, files in os.walk(build_dir):
             for file in files:
                 if '_test' in file and is_executable(file):
-                    test_executables.append(os.path.join(root, file))
+                    executable = os.path.join(root, file)
+                    test_executables.append(executable)
+                    if platform.system() == 'Linux':
+                        os.chmod(executable, os.stat(executable).st_mode | 0o111)
 
     return test_executables
 
@@ -62,5 +65,6 @@ if __name__ == '__main__':
 
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
+    print('Test executables: ', test_executables)
     for test in test_executables:
         run(f'{test}')
