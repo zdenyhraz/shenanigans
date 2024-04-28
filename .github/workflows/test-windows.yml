@@ -1,4 +1,4 @@
-name: test-windows-sanitizers
+name: test-windows
 
 on: [push,pull_request]
 env:

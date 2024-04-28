@@ -56,6 +56,17 @@ def find_test_executables(build_dir):
     return test_executables
 
 
+def find_library_binaries(build_dir):
+    library_binaries = []
+    if os.path.exists(build_dir) and os.path.isdir(build_dir):
+        for root, dirs, files in os.walk(build_dir):
+            for file in files:
+                if '.so' in file or '.dll' in file:
+                    library_binaries.append(os.path.join(root, file))
+
+    return library_binaries
+
+
 if __name__ == '__main__':
     root_dir = os.path.dirname(os.path.abspath(__file__))
     build_dir = os.path.join(root_dir, 'build')
@@ -66,6 +77,7 @@ if __name__ == '__main__':
 
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
+    print('Library binaries: ', find_library_binaries(build_dir))
     print('Test executables: ', test_executables)
     for test in test_executables:
-        run(f'{test}')
+        run(test)

@@ -1,4 +1,4 @@
-name: test-linux-sanitizers
+name: test-linux
 
 on: [push,pull_request]
 env:
