@@ -21,7 +21,10 @@ def copy_files_to_directory(file_paths, destination_directory):
 
 
 def get_runtime_directory(build_type):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build',  build_type)
+    if platform.system() == 'Linux':
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build')
+    if platform.system() == 'Windows':
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build', build_type)
 
 
 def opencv_find_cmake_dir(opencv_install_dir):
