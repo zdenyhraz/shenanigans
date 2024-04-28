@@ -16,18 +16,13 @@ Semi-random ***funky stuff***, mainly for my [PhD experiments](https://www.vut.c
 
 Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https://github.com/ocornut/imgui) GUI and [ImPlot](https://github.com/epezent/implot) / [pybind11](https://github.com/pybind/pybind11)+[matplotlib](https://matplotlib.org/) plots. Uses [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [OpenGL](https://www.opengl.org/), [cuda](https://developer.nvidia.com/cuda-toolkit), [matplotlib](https://matplotlib.org/), [torch](https://pytorch.org/), [astropy](https://github.com/astropy/astropy), [spdlog](https://github.com/gabime/spdlog), [flamegraph](https://github.com/brendangregg/FlameGraph), [fmt](https://fmt.dev/latest/index.html), [googletest](https://github.com/google/googletest), [json](https://github.com/nlohmann/json), [optick](https://github.com/bombomby/optick), [pybind11](https://github.com/pybind/pybind11), [QCustomPlot](https://www.qcustomplot.com/), [tracy](https://github.com/wolfpld/tracy), [glad](https://glad.dav1d.de/), [GLFW](https://www.glfw.org/), [ImGui](https://github.com/ocornut/imgui). ***Examples below.***
 
-<p align="center">
+<p align="left">
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/last-commit/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/commits/master"><img src="https://img.shields.io/github/commit-activity/m/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/issues"><img src="https://img.shields.io/github/issues-closed/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/search?l=c%2B%2B"><img src="https://img.shields.io/github/languages/top/zdenyhraz/shenanigans"></a>
-<br>
-<a href="https://github.com/zdenyhraz/shenanigans/tags"><img src="https://img.shields.io/github/v/tag/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/releases"><img src="https://img.shields.io/github/v/release/zdenyhraz/shenanigans"></a>
 <a href="https://github.com/zdenyhraz/shenanigans/blob/master/LICENSE.md"><img src="https://img.shields.io/github/license/zdenyhraz/shenanigans.svg"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/repo-size/zdenyhraz/shenanigans"></a>
-<a href="https://github.com/zdenyhraz/shenanigans/"><img src="https://img.shields.io/github/languages/code-size/zdenyhraz/shenanigans"></a>
 </p>
 
 ## 📃Article links
