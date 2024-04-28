@@ -4,10 +4,7 @@ import os
 
 def run(command, cwd=None):
     print(f"Running command{f' in subdirectory {cwd}' if cwd else ''}: ", command)
-    try:
-        subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Error running command {command}: {e}")
+    subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
 
 
 def check_build_dir(build_dir):
