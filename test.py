@@ -63,5 +63,4 @@ if __name__ == '__main__':
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
     for test in test_executables:
-        cwd = os.path.dirname(test)
-        run(f'{os.path.splitext(os.path.basename(test))[0]}', cwd)
+        run(f'{test}')

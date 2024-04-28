@@ -3,6 +3,8 @@
 <p align="center">
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux-sanitizers.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux-sanitizers.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows-sanitizers.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows-sanitizers.yml/badge.svg"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>

@@ -173,11 +173,11 @@ def setup_os(compiler, generator, opengl):
         setup_windows()
 
 
-def build(build_dir, generator, build_type, targets, jobs, ci, opencv_install_cmake_dir):
+def build(build_dir, generator, build_type, targets, jobs, ci, sanitizer, opencv_install_cmake_dir):
     print(f"Building: {f'{generator}/' if generator else ''}{build_type}/-j{jobs}/ci={ci}/opencv_install_cmake_dir={opencv_install_cmake_dir}/targets={targets}")
     if not os.path.exists('build'):
         run('mkdir build')
-    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} {'-DCI=ON' if ci else ''} -DOpenCV_DIR={opencv_install_cmake_dir}")
+    run(f"cmake -B {build_dir} {f'-G {generator}' if generator else ''} -DCMAKE_BUILD_TYPE={build_type} {'-DCI=ON' if ci else ''} {'-DENABLE_SANITIZER=ON' if sanitizer else ''} -DOpenCV_DIR={opencv_install_cmake_dir}")
     run(f'cmake --build {build_dir} --config {build_type} --target {targets} -j {jobs}')
     print(f'Targets {targets} built successfully')
 
@@ -214,6 +214,7 @@ if __name__ == '__main__':
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
     parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
+    parser.add_argument('--sanitizer', help='sanitizer', required=False, action='store_true', default=False)
     args = parser.parse_args()
     check_args(args)
 
@@ -229,6 +230,7 @@ if __name__ == '__main__':
     print('build_dir', args.build_dir)
     print('jobs: ', args.jobs)
     print('ci: ', args.ci)
+    print('sanitizer: ', args.sanitizer)
     print('opengl: ', opengl)
     print('opencv_configure_args: ', opencv_configure_args)
     print('opencv_install_dir: ', opencv_install_dir)
@@ -236,4 +238,4 @@ if __name__ == '__main__':
     setup_os(args.compiler, args.generator, opengl)
     opencv_install_cmake_dir = setup_opencv(opencv_configure_args, args.jobs, opencv_install_name, opencv_install_dir, args.build_type)
 
-    build(args.build_dir, args.generator, args.build_type, args.targets, args.jobs, args.ci, opencv_install_cmake_dir)
+    build(args.build_dir, args.generator, args.build_type, args.targets, args.jobs, args.ci, args.sanitizer, opencv_install_cmake_dir)
