@@ -19,9 +19,7 @@ option(CI "" OFF)
 if(CI OR DEFINED ENV{CI})
   message(STATUS "CI: ON")
   set(ENABLE_COVERAGE ON)
-  set(ENABLE_SANITIZER ON)
   set(ENABLE_PROFILING OFF)
-  set(CMAKE_UNITY_BUILD OFF)
 endif()
 
 # compiler flags
