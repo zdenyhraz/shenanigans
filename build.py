@@ -83,21 +83,21 @@ def opencv_install_windows(opencv_configure_args, jobs, opencv_install_name):
     run(f'cmake --install ./build --prefix ../{opencv_install_name}', cwd)
 
 
-def opencv_install(opencv_configure_args, jobs, opencv_install_name):
+def opencv_install(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir):
     print(f'Installing OpenCV: {platform.system()}/-j{jobs}/opencv_configure_args={opencv_configure_args}')
     if platform.system() == 'Linux':
         opencv_install_linux(opencv_configure_args, jobs, opencv_install_name)
     if platform.system() == 'Windows':
         opencv_install_windows(opencv_configure_args, jobs, opencv_install_name)
 
-    return opencv_find_cmake_dir(opencv_install_name)
+    return opencv_find_cmake_dir(opencv_install_dir)
 
 
 def setup_opencv(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir, build_type):
     # install and get opencv cmake directory
     opencv_install_cmake_dir = opencv_find_cmake_dir(opencv_install_dir)
     if not opencv_install_cmake_dir:
-        opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name)
+        opencv_install_cmake_dir = opencv_install(opencv_configure_args, jobs, opencv_install_name, opencv_install_dir)
     if not opencv_install_cmake_dir:
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('OpenCV cmake directory: ', opencv_install_cmake_dir)
