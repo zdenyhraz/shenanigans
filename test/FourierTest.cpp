@@ -5,7 +5,7 @@
 
 TEST(FourierTest, ForwardInverseConsistency)
 {
-  auto img = LoadUnitFloatImage<f32>(GetProjectDirectoryPath("test/shenanigans/data/baboon.png"));
+  auto img = LoadUnitFloatImage<f32>(GetProjectDirectoryPath("test/data/baboon.png"));
   ASSERT_EQ(img.depth(), CV_32F);
   ASSERT_EQ(img.channels(), 1);
 
