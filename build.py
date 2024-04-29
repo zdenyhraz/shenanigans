@@ -241,7 +241,7 @@ if __name__ == '__main__':
     parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if platform.system() == 'Linux' else 'msvc')
     parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if platform.system() == 'Linux' else None)
     parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
-    parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test clarity clarity_test')
+    parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test')
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
     parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
     opengl = 'shenanigans ' in args.targets
     opencv_configure_args = '-DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib/modules" -DOPENCV_ENABLE_NONFREE=ON -DBUILD_TESTS=OFF -DBUILD_opencv_python=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_apps=OFF'
-    opencv_install_name = 'opencv-install'
+    opencv_install_name = 'opencv_install'
     opencv_install_dir = os.path.join(current_dir, 'libs', opencv_install_name)
     print('platform: ', platform.system())
     print('compiler: ', args.compiler)

@@ -4,7 +4,7 @@ bin/
 obj/
 .vs/
 __pycache__/
-*-install/
+*_install/
 
 /data
 
