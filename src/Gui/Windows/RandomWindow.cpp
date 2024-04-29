@@ -70,7 +70,7 @@ void RandomWindow::EvolutionOptimization(bool meta) const
   if (meta)
     Evo.MetaOptimize(OptimizationTestFunctions::Rosenbrock, Evolution::ObjectiveFunctionValue, runs, maxFunEvals, optimalFitness);
   else
-    Evo.Optimize(OptimizationTestFunctions::Rosenbrock, OptimizationTestFunctions::RosenbrockNoisy<noiseStddev>);
+    Evo.Optimize(OptimizationTestFunctions::Rosenbrock, [](const auto& vec) { return OptimizationTestFunctions::RosenbrockNoisy<noiseStddev>(vec); });
 }
 
 void RandomWindow::UnevenIlluminationCLAHE() const
