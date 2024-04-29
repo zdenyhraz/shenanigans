@@ -19,7 +19,7 @@ option(CI "" OFF)
 if(CI OR DEFINED ENV{CI})
   message(STATUS "CI: ON")
   set(ENABLE_COVERAGE ON)
-  #set(ENABLE_SANITIZER ON)
+  set(ENABLE_SANITIZER ON)
   set(ENABLE_PROFILING OFF)
   set(CMAKE_UNITY_BUILD OFF)
 endif()
@@ -178,21 +178,6 @@ target_link_libraries(shenanigans PRIVATE glfw)
 add_subdirectory(libs/glad)
 target_link_libraries(shenanigans PRIVATE glad)
 
-# zmq
-set(BUILD_SHARED OFF CACHE BOOL "" FORCE)
-set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(libs/libzmq)
-
-# cppzmq
-set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(libs/cppzmq)
-
-# boost
-set(BOOST_ENABLE_CMAKE ON CACHE BOOL "" FORCE)
-set(BOOST_INCLUDE_LIBRARIES interprocess)
-add_subdirectory(libs/boost EXCLUDE_FROM_ALL)
-include_directories(${Boost_INCLUDE_DIRS})
-
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
@@ -200,7 +185,6 @@ if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   include_directories(src/NDA)
   file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/Windows/*.cpp)
   target_sources(shenanigans PRIVATE ${SRC_NDA})
-  add_subdirectory(src/NDA/Clarity)
 endif()
 
 # custom
