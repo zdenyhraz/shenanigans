@@ -6,10 +6,9 @@ obj/
 __pycache__/
 *_install/
 
-/data
-
-!data/apps
-!data/readme
+data/*
+!data/apps/
+!data/readme/
 
 *.zip
 *.dump
