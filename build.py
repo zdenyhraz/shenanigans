@@ -120,6 +120,7 @@ def gcc_install():
 
 
 def clang_install():
+    run('sudo apt install libomp-dev')
     run('wget https://apt.llvm.org/llvm.sh')
     run('sudo chmod u+x llvm.sh')
     run('sudo ./llvm.sh 17')
