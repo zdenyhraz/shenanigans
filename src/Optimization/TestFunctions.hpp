@@ -49,14 +49,13 @@ inline f64 Rosenbrock(const std::vector<f64>& arg)
   return Sqr(a - x) + b * Sqr(y - Sqr(x));
 }
 
-template <f64 Stddev = 0.1>
-inline f64 RosenbrockNoisy(const std::vector<f64>& arg)
+inline f64 RosenbrockNoisy(const std::vector<f64>& arg, f64 noiseStddev)
 {
   f64 x = arg[0];
   f64 y = arg[1];
   static constexpr f64 a = 1;
   static constexpr f64 b = 100;
-  return Random::Rand(1., 1. + Stddev) * (Sqr(a - x) + b * Sqr(y - Sqr(x)));
+  return Random::Rand(1., 1. + noiseStddev) * (Sqr(a - x) + b * Sqr(y - Sqr(x)));
 }
 
 inline f64 Beale(const std::vector<f64>& arg)
@@ -70,7 +69,8 @@ inline f64 Goldstein(const std::vector<f64>& arg)
 {
   f64 x = arg[0];
   f64 y = arg[1];
-  return (1 + Sqr(x + y + 1) * (19 - 14 * x + 3 * x * x - 14 * y + 6 * x * y + 3 * y * y)) * (30 + Sqr(2 * x - 3 * y) * (18 - 32 * x + 12 * x * x + 48 * y - 36 * x * y + 27 * y * y));
+  return (1 + Sqr(x + y + 1) * (19 - 14 * x + 3 * x * x - 14 * y + 6 * x * y + 3 * y * y)) *
+         (30 + Sqr(2 * x - 3 * y) * (18 - 32 * x + 12 * x * x + 48 * y - 36 * x * y + 27 * y * y));
 }
 
 inline f64 Bukin(const std::vector<f64>& arg)
