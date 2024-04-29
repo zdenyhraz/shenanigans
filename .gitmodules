@@ -7,9 +7,6 @@
 [submodule "libs/json"]
 	path = libs/json
 	url = https://github.com/nlohmann/json.git
-[submodule "libs/tracy"]
-	path = libs/tracy
-	url = https://github.com/wolfpld/tracy.git
 [submodule "libs/pybind11"]
 	path = libs/pybind11
 	url = https://github.com/pybind/pybind11.git
@@ -37,3 +34,6 @@
 [submodule "libs/opencv_contrib"]
 	path = libs/opencv_contrib
 	url = https://github.com/opencv/opencv_contrib.git
+[submodule "libs/tracy"]
+	path = libs/tracy
+	url = https://github.com/wolfpld/tracy.git
