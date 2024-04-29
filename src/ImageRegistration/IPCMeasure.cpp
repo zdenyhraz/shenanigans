@@ -3,7 +3,7 @@
 #include "CrossCorrelation.hpp"
 #include "PhaseCorrelation.hpp"
 #include "PhaseCorrelationUpscale.hpp"
-#include "Math/Quantile.hpp"
+#include "Math/Statistics.hpp"
 
 void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::string& path)
 {
