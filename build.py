@@ -120,12 +120,12 @@ def gcc_install():
 
 
 def clang_install():
-    run('sudo apt install libomp-dev')
     run('wget https://apt.llvm.org/llvm.sh')
     run('sudo chmod u+x llvm.sh')
     run('sudo ./llvm.sh 17')
     run('clang-17 --version')
     run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100')
+    run('sudo apt install libomp-17-dev')
 
 
 def compiler_install(compiler):
