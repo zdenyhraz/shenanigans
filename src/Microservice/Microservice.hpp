@@ -42,6 +42,7 @@ class Microservice
 
   std::vector<MicroserviceConnection> inputParameterConnections;
   std::vector<MicroserviceConnection> outputParameterConnections;
+
   std::vector<std::shared_ptr<Microservice>> outputMicroservices;
 
 protected:
@@ -185,8 +186,8 @@ public:
 
   static void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice) // main execution flow: notify when done processing
   {
-    outputMicroservice->outputMicroservices.push_back(inputMicroservice);
     // TODO: make this resilient to being called multiple times
+    outputMicroservice->outputMicroservices.push_back(inputMicroservice);
   }
 
   bool HasInputConnection() const { return inputParameterConnections.size() > 0; }
@@ -196,7 +197,7 @@ public:
   {
     Process();          // do the processing
     PropagateOutputs(); // propagate outputs to connected inputs
-    Notify();           // notify connected microservices
+    Notify();           // notify connected microservices to start processing
   }
   catch (const std::exception& e)
   {
