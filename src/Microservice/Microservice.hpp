@@ -42,7 +42,7 @@ class Microservice
 
   std::vector<MicroserviceConnection> inputParameterConnections;
   std::vector<MicroserviceConnection> outputParameterConnections;
-  std::vector<std::shared_ptr<Microservice>> outputMicroservices; // main execution flow: notify when done processing
+  std::vector<std::shared_ptr<Microservice>> outputMicroservices;
 
 protected:
   virtual void DefineInputParameters() = 0;
@@ -115,11 +115,11 @@ protected:
     return param;
   }
 
-  void Propagate()
+  void PropagateOutputs()
   {
     for (const auto& connection : outputParameterConnections)
     {
-      LOG_DEBUG("Microservice '{}' setting microservice '{}' parameter '{}'", GetName(), connection.inputMicroservice->GetName(), connection.inputParameterName);
+      LOG_DEBUG("{}:{} -> {}:{}", GetName(), connection.outputParameterName, connection.inputMicroservice->GetName(), connection.inputParameterName);
       connection.inputMicroservice->SetInputParameter(connection.inputParameterName, GetOutputParameter(connection.outputParameterName));
     }
   }
@@ -128,9 +128,24 @@ protected:
   {
     for (auto& microservice : outputMicroservices)
     {
-      LOG_DEBUG("Microservice {} notifying microservice {}", GetName(), microservice->GetName());
+      LOG_DEBUG("{} -> {}", GetName(), microservice->GetName());
       microservice->Execute();
     }
+  }
+
+  void GenerateMicroserviceName()
+  {
+    std::string typeName = typeid(*this).name();
+    size_t posSpace = typeName.find(' ');
+    if (posSpace != std::string::npos)
+      typeName = typeName.substr(posSpace + 1);
+
+    size_t posMs = typeName.find("Microservice");
+    if (posMs != std::string::npos)
+      typeName.erase(posMs, std::string("Microservice").length());
+
+    static usize idx = 0;
+    microserviceName = fmt::format("{}{}", typeName, idx++);
   }
 
 public:
@@ -140,8 +155,7 @@ public:
 
   void Initialize()
   {
-    static usize idx = 0;
-    microserviceName = fmt::format("{}:{}", typeid(*this).name(), idx++);
+    GenerateMicroserviceName();
     DefineInputParameters();
     DefineOutputParameters();
   }
@@ -156,20 +170,20 @@ public:
   }
 
   static void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice, const std::string& outputParameterName,
-      const std::string& inputParameterName)
+      const std::string& inputParameterName) // connect output / input parameters
   {
     if (not outputMicroservice->outputParameters.contains(outputParameterName))
-      throw std::runtime_error(fmt::format("Cannot connect microservice <{}> parameter '{}' to microservice <{}> parameter '{}' - output parameter not found",
+      throw std::runtime_error(fmt::format("Cannot connect microservice '{}' parameter '{}' to microservice '{}' parameter '{}' - output parameter not found",
           outputMicroservice->GetName(), outputParameterName, inputMicroservice->GetName(), inputParameterName));
     if (not inputMicroservice->inputParameters.contains(inputParameterName))
-      throw std::runtime_error(fmt::format("Cannot connect microservice <{}> parameter '{}' to microservice <{}> parameter '{}' - input parameter not found",
+      throw std::runtime_error(fmt::format("Cannot connect microservice '{}' parameter '{}' to microservice '{}' parameter '{}' - input parameter not found",
           outputMicroservice->GetName(), outputParameterName, inputMicroservice->GetName(), inputParameterName));
 
     outputMicroservice->outputParameterConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
     inputMicroservice->inputParameterConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
   }
 
-  static void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice)
+  static void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice) // main execution flow: notify when done processing
   {
     outputMicroservice->outputMicroservices.push_back(inputMicroservice);
     // TODO: make this resilient to being called multiple times
@@ -180,12 +194,12 @@ public:
   void Execute()
   try
   {
-    Process();
-    Propagate();
-    Notify();
+    Process();          // do the processing
+    PropagateOutputs(); // propagate outputs to connected inputs
+    Notify();           // notify connected microservices
   }
   catch (const std::exception& e)
   {
-    LOG_ERROR("Microservice <{}> error: {}", microserviceName, e.what());
+    LOG_ERROR("Microservice '{}' error: {}", microserviceName, e.what());
   }
 };
