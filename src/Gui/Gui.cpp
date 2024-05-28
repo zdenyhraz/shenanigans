@@ -62,6 +62,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   const auto iniPath = GetProjectDirectoryPath("data/apps/imgui.ini").string();
   LOG_DEBUG("Using ini file {}", iniPath);
   io.IniFilename = iniPath.c_str();
+  ImGui::LoadIniSettingsFromDisk(iniPath.c_str());
 
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetDefaultStyle();

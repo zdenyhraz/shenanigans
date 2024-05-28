@@ -2,8 +2,6 @@
 #include "Optimization/Evolution.hpp"
 #include "Optimization/TestFunctions.hpp"
 #include "Random/UnevenIllumination.hpp"
-#include "Microservice/MicroserviceRegistry.hpp"
-#include "Microservice/Workflow.hpp"
 #include "Utils/FrameAverager.hpp"
 
 void RandomWindow::Render()
@@ -31,17 +29,6 @@ void RandomWindow::Render()
       if (ImGui::Button("Homomorphic"))
         LaunchAsync([&]() { UnevenIlluminationHomomorphic(); });
     }
-
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Microservice architecture"))
-    {
-      if (ImGui::Button("Test manual"))
-        LaunchAsync([&]() { MicroserviceTestManual(); });
-      ImGui::SameLine();
-      if (ImGui::Button("Test nodes"))
-        LaunchAsync([&]() { MicroserviceTestNodes(); });
-    }
-
     ImGui::EndTabItem();
   }
 }
@@ -88,21 +75,4 @@ void RandomWindow::UnevenIlluminationHomomorphic() const
   auto image = cv::imread("../data/UnevenIllumination/input.jpg");
   for (auto cutoff = 0.001; cutoff <= 0.02; cutoff += 0.001)
     CorrectUnevenIlluminationHomomorphic(image, cutoff);
-}
-
-void RandomWindow::MicroserviceTestManual() const
-{
-  LOG_FUNCTION;
-  MicroserviceRegistry::Initialize();
-  Workflow::TestManual();
-}
-
-void RandomWindow::MicroserviceTestNodes() const
-{
-  LOG_FUNCTION;
-  MicroserviceRegistry::Initialize();
-  std::vector<Node> nodes;
-  Workflow workflow("nodes");
-  workflow.Build(nodes);
-  workflow.Run();
 }

@@ -1,5 +1,6 @@
 #include "NodeEditorWindow.hpp"
 #include <imgui_node_editor.h>
+#include "Microservice/BlurImageMicroservice.hpp"
 
 namespace ed = ax::NodeEditor;
 ed::EditorContext* m_Context = nullptr;
@@ -16,6 +17,10 @@ void NodeEditorWindow::Render()
   PROFILE_FUNCTION;
   if (ImGui::BeginTabItem("NodeEditor"))
   {
+    ImGui::Separator();
+    if (ImGui::Button("Test"))
+      LaunchAsync([&]() { Test(); });
+
     ed::SetCurrentEditor(m_Context);
     ed::Begin("My Editor", ImVec2(0.0, 0.0f));
     int uniqueId = 1;
@@ -35,4 +40,11 @@ void NodeEditorWindow::Render()
 
     ImGui::EndTabItem();
   }
+}
+
+void NodeEditorWindow::Test()
+{
+  BlurImageMicroservice blur;
+  blur.Initialize();
+  blur.Execute();
 }

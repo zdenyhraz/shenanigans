@@ -1,5 +1,3 @@
-# MS ideas
-- [x] multiple outputs
-- [ ] multiple inputs - process() signature
-- [ ] multiple inputs of the same kind, like two cv::Mat
-- [ ] ms parameters
+- [x] use std::any, std::any_cast for input / output parameters / connections
+- [x] named inputs / outputs
+- [ ] dont duplicate data storage during ms output -> ms input
