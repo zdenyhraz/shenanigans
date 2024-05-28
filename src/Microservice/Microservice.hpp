@@ -1,17 +1,22 @@
 #pragma once
 
-template <typename Derived>
 class Microservice
 {
   struct MicroserviceParameter
   {
     std::type_index type = std::type_index(typeid(void));
     std::any value;
+
+    template <typename T>
+    bool CheckType()
+    {
+      return std::type_index(typeid(T)) == type;
+    }
   };
 
-  std::string name;
-  std::unordered_map<std::string, MicroserviceParameter> inputs;
-  std::unordered_map<std::string, MicroserviceParameter> outputs;
+  std::string microserviceName;
+  std::unordered_map<std::string, MicroserviceParameter> inputParameters;
+  std::unordered_map<std::string, MicroserviceParameter> outputParameters;
 
 protected:
   virtual void DefineInputParameters() = 0;
@@ -21,51 +26,53 @@ protected:
   template <typename T>
   void DefineInputParameter(const std::string& paramName)
   {
-    inputs[paramName] = MicroserviceParameter(typeid(T));
+    inputParameters[paramName] = MicroserviceParameter(typeid(T));
   }
 
   template <typename T>
   void DefineOutputParameter(const std::string& paramName)
   {
-    outputs[paramName] = MicroserviceParameter(typeid(T));
+    outputParameters[paramName] = MicroserviceParameter(typeid(T));
   }
-
-  virtual ~Microservice() {}
 
   template <typename T>
   T& GetInputParameter(const std::string& paramName)
   {
-    if (not inputs.contains(paramName))
+    if (not inputParameters.contains(paramName))
       throw std::runtime_error(fmt::format("Input parameter '{}' not found", paramName));
 
-    auto& value = inputs.at(paramName).value;
+    auto& param = inputParameters.at(paramName);
 
-    if (not value.has_value())
+    if (not param.value.has_value())
       throw std::runtime_error(fmt::format("Input parameter '{}' not set", paramName));
 
-    if (typeid(T) != value.type())
-      throw std::runtime_error(fmt::format("Input parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), inputs.at(paramName).value.type().name()));
+    if (not param.CheckType<T>())
+      throw std::runtime_error(fmt::format("Input parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.value.type().name()));
 
-    return std::any_cast<T&>(value);
+    return std::any_cast<T&>(param.value);
   }
 
   template <typename T>
   void SetOutputParameter(const std::string& paramName, const T& value)
   {
-    if (not inputs.contains(paramName))
+    if (not outputParameters.contains(paramName))
       throw std::runtime_error(fmt::format("Output parameter '{}' not found", paramName));
 
-    if (typeid(T) != outputs.at(paramName).value.type())
-      throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), inputs.at(paramName).value.type().name()));
+    auto& param = outputParameters.at(paramName);
 
-    outputs.at(paramName).value = value;
+    if (not param.CheckType<T>())
+      throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.value.type().name()));
+
+    param.value = value;
   }
 
 public:
+  virtual ~Microservice() {}
+
   void Initialize()
   {
     static usize idx = 0;
-    name = fmt::format("{}:{}", typeid(Derived).name(), idx++);
+    microserviceName = fmt::format("{}:{}", typeid(*this).name(), idx++);
     DefineInputParameters();
     DefineOutputParameters();
   }
@@ -77,6 +84,6 @@ public:
   }
   catch (const std::exception& e)
   {
-    LOG_ERROR("Microservice <{}> error: {}", name, e.what());
+    LOG_ERROR("Microservice <{}> error: {}", microserviceName, e.what());
   }
 };

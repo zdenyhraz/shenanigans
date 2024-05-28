@@ -1,7 +1,7 @@
 #pragma once
 #include "Microservice.hpp"
 
-class BlurImageMicroservice : public Microservice<BlurImageMicroservice>
+class BlurImageMicroservice : public Microservice
 {
   void DefineInputParameters() override { DefineInputParameter<cv::Mat>("image"); }
 
