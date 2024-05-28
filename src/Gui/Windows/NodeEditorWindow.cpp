@@ -1,6 +1,5 @@
 #include "NodeEditorWindow.hpp"
 #include <imgui_node_editor.h>
-#include "Microservice/BlurImageMicroservice.hpp"
 #include "Microservice/Workflow.hpp"
 
 namespace ed = ax::NodeEditor;
@@ -45,11 +44,6 @@ void NodeEditorWindow::Render()
 
 void NodeEditorWindow::Test()
 {
-  BlurImageMicroservice blur;
-  blur.Initialize();
-  blur.Execute();
-
   Workflow wrk;
-  wrk.Initialize();
-  wrk.Run();
+  wrk.Test();
 }
