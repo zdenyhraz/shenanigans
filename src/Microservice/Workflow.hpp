@@ -6,8 +6,15 @@ class Workflow
 {
   std::string name = "Default workflow";
   std::vector<std::shared_ptr<Microservice>> microservices;
+  std::vector<Microservice::MicroserviceConnection> microserviceConnections;
+  std::vector<Microservice::MicroserviceParameterConnection> parameterConnections;
 
 public:
+  const std::string& GetName() { return name; }
+  const std::vector<std::shared_ptr<Microservice>>& GetMicroservices() { return microservices; }
+  const std::vector<Microservice::MicroserviceConnection>& GetMicroserviceConnections() { return microserviceConnections; }
+  const std::vector<Microservice::MicroserviceParameterConnection>& GetParameterConnections() { return parameterConnections; }
+
   void Initialize()
   {
     LOG_FUNCTION;
@@ -34,7 +41,20 @@ public:
     LOG_ERROR("Workflow '{}' error: {}", name, e.what());
   }
 
-  void Test()
+  void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice, const std::string& outputParameterName,
+      const std::string& inputParameterName)
+  {
+    Microservice::Connect(outputMicroservice, inputMicroservice, outputParameterName, inputParameterName);
+    parameterConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
+  }
+
+  void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice)
+  {
+    Microservice::Connect(outputMicroservice, inputMicroservice);
+    microserviceConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get());
+  }
+
+  void TestInitialize()
   {
     LOG_FUNCTION;
 
@@ -54,21 +74,18 @@ public:
     auto image = cv::imread(GetProjectDirectoryPath("data/ml/object_detection/datasets/cats/cats2.jpg").string());
     blur1->SetInputParameter("image", Microservice::MicroserviceParameter::Get(std::move(image)));
 
-    Microservice::Connect(blur1, blur2);
-    Microservice::Connect(blur1, blur2, "blurred_image", "image");
+    Connect(blur1, blur2);
+    Connect(blur1, blur2, "blurred_image", "image");
 
-    Microservice::Connect(blur2, blur3);
-    Microservice::Connect(blur2, blur3, "blurred_image", "image");
+    Connect(blur2, blur3);
+    Connect(blur2, blur3, "blurred_image", "image");
 
     // from 3 to both 4 & 5 - split
 
-    Microservice::Connect(blur3, blur4);
-    Microservice::Connect(blur3, blur4, "blurred_image", "image");
+    Connect(blur3, blur4);
+    Connect(blur3, blur4, "blurred_image", "image");
 
-    Microservice::Connect(blur3, blur5);
-    Microservice::Connect(blur3, blur5, "blurred_image", "image");
-
-    Run();
-    LOG_SUCCESS("Workflow test completed");
+    Connect(blur3, blur5);
+    Connect(blur3, blur5, "blurred_image", "image");
   }
 };

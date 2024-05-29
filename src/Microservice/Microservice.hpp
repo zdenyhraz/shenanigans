@@ -9,6 +9,8 @@ class Microservice
     std::type_index type = std::type_index(typeid(void));
     std::any value;
 
+    auto operator<=>(const MicroserviceParameter&) const = default;
+
     void Reset()
     {
       type = std::type_index(typeid(void));
@@ -32,16 +34,27 @@ class Microservice
   {
     Microservice* outputMicroservice;
     Microservice* inputMicroservice;
+
+    auto operator<=>(const MicroserviceConnection&) const = default;
+  };
+
+  struct MicroserviceParameterConnection
+  {
+    Microservice* outputMicroservice;
+    Microservice* inputMicroservice;
     std::string outputParameterName;
     std::string inputParameterName;
+
+    auto operator<=>(const MicroserviceParameterConnection&) const = default;
   };
 
   std::string microserviceName;
+  usize microserviceId;
   std::unordered_map<std::string, MicroserviceParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceParameter> outputParameters;
 
-  std::vector<MicroserviceConnection> inputParameterConnections;
-  std::vector<MicroserviceConnection> outputParameterConnections;
+  std::vector<MicroserviceParameterConnection> inputParameterConnections;
+  std::vector<MicroserviceParameterConnection> outputParameterConnections;
 
   std::vector<std::shared_ptr<Microservice>> outputMicroservices;
 
@@ -146,13 +159,20 @@ protected:
       typeName.erase(posMs, std::string("Microservice").length());
 
     static usize idx = 0;
-    microserviceName = fmt::format("{}{}", typeName, idx++);
+    microserviceId = idx += 100; // for unique input/output pin ids
+    microserviceName = fmt::format("{}{}", typeName, microserviceId);
   }
 
 public:
   virtual ~Microservice() {}
 
   const std::string& GetName() { return microserviceName; }
+
+  usize GetId() { return microserviceId; }
+
+  const std::unordered_map<std::string, MicroserviceParameter>& GetInputParameters() { return inputParameters; }
+
+  const std::unordered_map<std::string, MicroserviceParameter>& GetOutputParameters() { return outputParameters; }
 
   void Initialize()
   {
@@ -180,14 +200,25 @@ public:
       throw std::runtime_error(fmt::format("Cannot connect microservice '{}' parameter '{}' to microservice '{}' parameter '{}' - input parameter not found",
           outputMicroservice->GetName(), outputParameterName, inputMicroservice->GetName(), inputParameterName));
 
-    outputMicroservice->outputParameterConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
-    inputMicroservice->inputParameterConnections.emplace_back(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
+    MicroserviceParameterConnection connection(outputMicroservice.get(), inputMicroservice.get(), outputParameterName, inputParameterName);
+    if (not std::ranges::any_of(outputMicroservice->outputParameterConnections, [&connection](const auto& conn) { return conn == connection; }))
+      outputMicroservice->outputParameterConnections.push_back(connection);
+    else
+      LOG_WARNING(
+          "Ignoring duplicate output parameter connection: {}:{} -> {}:{}", outputMicroservice->GetName(), outputParameterName, inputMicroservice->GetName(), inputParameterName);
+    if (not std::ranges::any_of(inputMicroservice->inputParameterConnections, [&connection](const auto& conn) { return conn == connection; }))
+      inputMicroservice->inputParameterConnections.push_back(connection);
+    else
+      LOG_WARNING(
+          "Ignoring duplicate input parameter connection: {}:{} -> {}:{}", outputMicroservice->GetName(), outputParameterName, inputMicroservice->GetName(), inputParameterName);
   }
 
   static void Connect(std::shared_ptr<Microservice> outputMicroservice, std::shared_ptr<Microservice> inputMicroservice) // main execution flow: notify when done processing
   {
-    // TODO: make this resilient to being called multiple times
-    outputMicroservice->outputMicroservices.push_back(inputMicroservice);
+    if (not std::ranges::any_of(outputMicroservice->outputMicroservices, [&inputMicroservice](const auto& ms) { return ms.get() == inputMicroservice.get(); }))
+      outputMicroservice->outputMicroservices.push_back(inputMicroservice);
+    else
+      LOG_WARNING("Ignoring duplicate microservice connection: {} -> {}", outputMicroservice->GetName(), inputMicroservice->GetName());
   }
 
   bool HasInputConnection() const { return inputParameterConnections.size() > 0; }

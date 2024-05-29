@@ -134,6 +134,15 @@ public:
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = GetProjectDirectoryPath(fmt::format("data/debug/{}.png", data.name)).string();
 
+    if constexpr (std::is_same_v<T, ImGuiPlot>)
+      if (data.z.rows > 8000)
+      {
+        int targetHeight = std::min(5000, data.z.rows);
+        int targetWidth = static_cast<float>(targetHeight) / data.z.rows * data.z.cols;
+        LOG_WARNING("Image '{}' is too big for ImGuiPlot ({}x{}), downsizing to {}x{}", data.name, data.z.cols, data.z.rows, targetWidth, targetHeight);
+        cv::resize(data.z, data.z, cv::Size(targetWidth, targetHeight));
+      }
+
     if (data.z.channels() == 3)
     {
       cv::normalize(data.z, data.z, 0, 255, cv::NORM_MINMAX);
