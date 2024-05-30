@@ -105,13 +105,7 @@ struct NodeEditor
         {
           // ed::AcceptNewItem() return true when user release mouse button.
           if (ed::AcceptNewItem())
-          {
-            // TODO:
-            // m_Workflow.Connect(outputPinId.Get(), inputPinId.Get());
-
-            // Draw new link.
-            // ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
-          }
+            m_Workflow.Connect(outputPinId.Get(), inputPinId.Get());
 
           // You may choose to reject connection between these nodes
           // by calling ed::RejectNewItem(). This will allow editor to give
@@ -130,18 +124,7 @@ struct NodeEditor
       {
         // If you agree that link can be deleted, accept deletion.
         if (ed::AcceptDeletedItem())
-        {
-          // TODO:
-          // // Then remove link from your data.
-          // for (auto& link : m_Links)
-          // {
-          //   if (link.Id == deletedLinkId)
-          //   {
-          //     m_Links.erase(&link);
-          //     break;
-          //   }
-          // }
-        }
+          m_Workflow.Disconnect(deletedLinkId.Get());
 
         // You may reject link deletion by calling:
         // ed::RejectDeletedItem();

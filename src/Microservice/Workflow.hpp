@@ -9,10 +9,10 @@ class Workflow
 
   struct MicroserviceConnection
   {
-    Microservice* outputMicroservice;
-    Microservice* inputMicroservice;
-    MicroserviceOutputParameter* outputParameter;
-    MicroserviceInputParameter* inputParameter;
+    Microservice* outputMicroservice = nullptr;
+    Microservice* inputMicroservice = nullptr;
+    MicroserviceOutputParameter* outputParameter = nullptr;
+    MicroserviceInputParameter* inputParameter = nullptr;
 
     auto operator<=>(const MicroserviceConnection&) const = default;
 
@@ -160,10 +160,10 @@ public:
     }
 
     if (not connection.outputMicroservice)
-      throw std::runtime_error(fmt::format("Failed to find output parameter for id {}", outputId));
+      return LOG_WARNING("Failed to find output parameter for id {}", outputId);
 
     if (not connection.inputMicroservice)
-      throw std::runtime_error(fmt::format("Failed to find input parameter for id {}", inputId));
+      return LOG_WARNING("Failed to find input parameter for id {}", inputId);
 
     if (connections.contains(connection.outputMicroservice))
       if (std::ranges::any_of(connections.at(connection.outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
@@ -172,6 +172,19 @@ public:
 
     connection.Connect();
     connections[connection.outputMicroservice].push_back(std::move(connection));
+  }
+
+  void Disconnect(uintptr_t connectionId)
+  {
+    for (auto& [ms, connectionvec] : connections)
+    {
+      const auto size = connectionvec.size();
+      auto conn = std::ranges::remove_if(connectionvec, [connectionId](const auto& conn) { return conn.GetId() == connectionId; });
+      connectionvec.erase(conn.begin(), connectionvec.end());
+      if (connectionvec.size() != size)
+        return LOG_DEBUG("Disconnected connection {}", connectionId);
+    }
+    LOG_WARNING("Ignoring disconnect of connection {}", connectionId);
   }
 
   void TestInitialize()
