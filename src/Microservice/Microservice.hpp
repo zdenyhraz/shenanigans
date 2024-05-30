@@ -101,7 +101,6 @@ protected:
     if (param.type != std::type_index(typeid(T)))
       throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
 
-    LOG_DEBUG("Microservice '{}' setting output parameter '{}'", GetName(), paramName);
     param.value = value;
   }
 

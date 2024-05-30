@@ -101,11 +101,11 @@ struct NodeEditor
         //   * input invalid, output valid - user started to drag new link from output pin
         //   * input valid, output valid   - user dragged link over other pin, can be validated
 
-        if (inputPinId && outputPinId) // both are valid, let's accept link
+        if (inputPinId and outputPinId) // both are valid, let's accept link
         {
           // ed::AcceptNewItem() return true when user release mouse button.
           if (ed::AcceptNewItem())
-            m_Workflow.Connect(outputPinId.Get(), inputPinId.Get());
+            m_Workflow.Connect(inputPinId.Get(), outputPinId.Get());
 
           // You may choose to reject connection between these nodes
           // by calling ed::RejectNewItem(). This will allow editor to give

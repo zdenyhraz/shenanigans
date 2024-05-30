@@ -171,6 +171,8 @@ public:
             connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
 
     connection.Connect();
+    LOG_DEBUG("Connected connection {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(), connection.inputMicroservice->GetName(),
+        connection.inputParameter->GetName());
     connections[connection.outputMicroservice].push_back(std::move(connection));
   }
 
@@ -226,14 +228,5 @@ public:
 
     Connect(blur3, blur5);
     Connect(blur3, blur5, "blurred image", "image");
-
-    LOG_DEBUG("Test connections:");
-    for (const auto& [ms, vecconnections] : connections)
-    {
-      LOG_DEBUG(" {}:", ms->GetName());
-      for (const auto& connection : vecconnections)
-        LOG_DEBUG("   {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(), connection.inputMicroservice->GetName(),
-            connection.inputParameter->GetName());
-    }
   }
 };
