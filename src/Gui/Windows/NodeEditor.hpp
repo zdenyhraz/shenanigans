@@ -5,20 +5,8 @@ namespace ed = ax::NodeEditor;
 
 struct NodeEditor
 {
-  // Struct to hold basic information about connection between
-  // pins. Note that connection (aka. link) has its own ID.
-  // This is useful later with dealing with selections, deletion
-  // or other operations.
-  struct LinkInfo
-  {
-    ed::LinkId Id;
-    ed::PinId InputId;
-    ed::PinId OutputId;
-  };
-
   ed::EditorContext* m_Context = nullptr; // Editor context, required to trace a editor state.
   bool m_FirstFrame = true;               // Flag set for first frame only, some action need to be executed once.
-  ImVector<LinkInfo> m_Links;             // List of live links. It is dynamic unless you want to create read-only view over nodes.
   int m_NextLinkId = 100;                 // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
   Workflow m_Workflow;
 
@@ -81,15 +69,11 @@ struct NodeEditor
     for (const auto& microservice : m_Workflow.GetMicroservices())
       DrawNode(*microservice);
 
-    // for (const auto& connection : m_Workflow.GetMicroserviceConnections())
-    //   ed::Link(connection.id, connection.idOutput, connection.idInput);
+    for (const auto& connection : m_Workflow.GetMicroserviceConnections())
+      ed::Link(connection.GetId(), connection.inputMicroservice->GetStartId(), connection.outputMicroservice->GetFinishId());
 
-    // for (const auto& connection : m_Workflow.GetParameterConnections())
-    //   ed::Link(connection.id, linkInfo.InputId, linkInfo.OutputId);
-
-    // Submit Links
-    for (auto& linkInfo : m_Links)
-      ed::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
+    for (const auto& connection : m_Workflow.GetParameterConnections())
+      ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
 
     //
     // 2) Handle interactions
@@ -119,13 +103,13 @@ struct NodeEditor
           if (ed::AcceptNewItem())
           {
             // Since we accepted new link, lets add one to our list of links.
-            m_Links.push_back({ed::LinkId(m_NextLinkId++), inputPinId, outputPinId});
+            // m_Links.push_back({ed::LinkId(m_NextLinkId++), inputPinId, outputPinId});
 
             // TODO: fix this
             // m_Workflow.Connect(*reinterpret_cast<MicroserviceOutputParameter*>(outputPinId), *reinterpret_cast<MicroserviceInputParameter*>(inputPinId));
 
             // Draw new link.
-            ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
+            // ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
           }
 
           // You may choose to reject connection between these nodes
@@ -146,15 +130,15 @@ struct NodeEditor
         // If you agree that link can be deleted, accept deletion.
         if (ed::AcceptDeletedItem())
         {
-          // Then remove link from your data.
-          for (auto& link : m_Links)
-          {
-            if (link.Id == deletedLinkId)
-            {
-              m_Links.erase(&link);
-              break;
-            }
-          }
+          // // Then remove link from your data.
+          // for (auto& link : m_Links)
+          // {
+          //   if (link.Id == deletedLinkId)
+          //   {
+          //     m_Links.erase(&link);
+          //     break;
+          //   }
+          // }
         }
 
         // You may reject link deletion by calling:

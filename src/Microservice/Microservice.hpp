@@ -29,6 +29,8 @@ class Microservice
   static constexpr std::string finishParameterName = "finish";
 
   std::string microserviceName;
+  bool start;
+  bool finish;
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 
@@ -124,7 +126,8 @@ protected:
     if (posMs != std::string::npos)
       typeName.erase(posMs, std::string("Microservice").length());
 
-    microserviceName = fmt::format("{}.{}", typeName, GetId());
+    static int nameid = 1;
+    microserviceName = fmt::format("{}.{}", typeName, nameid++);
   }
 
 public:
@@ -135,6 +138,10 @@ public:
   const std::string& GetName() { return microserviceName; }
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+
+  uintptr_t GetStartId() const { return reinterpret_cast<uintptr_t>(&start); }
+
+  uintptr_t GetFinishId() const { return reinterpret_cast<uintptr_t>(&finish); }
 
   const std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
 

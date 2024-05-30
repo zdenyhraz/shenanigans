@@ -62,7 +62,7 @@ public:
   const std::string& GetName() { return name; }
   const std::vector<std::unique_ptr<Microservice>>& GetMicroservices() { return microservices; }
   const std::vector<MicroserviceConnection>& GetMicroserviceConnections() { return microserviceConnections; }
-  const std::vector<MicroserviceParameterConnection>& GetMicroserviceParameterConnections() { return parameterConnections; }
+  const std::vector<MicroserviceParameterConnection>& GetParameterConnections() { return parameterConnections; }
 
   void Initialize()
   {
