@@ -30,9 +30,10 @@ void NodeEditorWindow::Render()
 
 void NodeEditorWindow::Test()
 {
-  Workflow wrk;
-  wrk.TestInitialize();
-  wrk.Run();
+  // Workflow wrk;
+  // wrk.TestInitialize();
+  // wrk.Run();
+  nex.m_Workflow.Run();
   LOG_SUCCESS("Workflow test completed");
 }
 

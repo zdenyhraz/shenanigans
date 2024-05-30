@@ -38,7 +38,7 @@ struct NodeEditor
 
     ImGuiEx_BeginColumn();
     ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
-    ImGui::Text("> start");
+    ImGui::Text("> ");
     ed::EndPin();
     for (const auto& [name, param] : microservice.GetInputParameters())
     {
@@ -48,12 +48,12 @@ struct NodeEditor
     }
 
     ImGuiEx_NextColumn();
-    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Input);
-    ImGui::Text("finish >");
+    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
+    ImGui::Text(" >");
     ed::EndPin();
     for (const auto& [name, param] : microservice.GetOutputParameters())
     {
-      ed::BeginPin(param.GetId(), ed::PinKind::Input);
+      ed::BeginPin(param.GetId(), ed::PinKind::Output);
       ImGui::Text(fmt::format("{} >", name).c_str());
       ed::EndPin();
     }
@@ -75,11 +75,9 @@ struct NodeEditor
     for (const auto& microservice : m_Workflow.GetMicroservices())
       DrawNode(*microservice);
 
-    for (const auto& connection : m_Workflow.GetMicroserviceConnections())
-      ed::Link(connection.GetId(), connection.inputMicroservice->GetStartId(), connection.outputMicroservice->GetFinishId());
-
-    for (const auto& connection : m_Workflow.GetParameterConnections())
-      ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
+    for (const auto& [microservice, connections] : m_Workflow.GetConnections())
+      for (const auto& connection : connections)
+        ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
 
     //
     // 2) Handle interactions
@@ -108,11 +106,8 @@ struct NodeEditor
           // ed::AcceptNewItem() return true when user release mouse button.
           if (ed::AcceptNewItem())
           {
-            // Since we accepted new link, lets add one to our list of links.
-            // m_Links.push_back({ed::LinkId(m_NextLinkId++), inputPinId, outputPinId});
-
-            // TODO: fix this
-            // m_Workflow.Connect(*reinterpret_cast<MicroserviceOutputParameter*>(outputPinId), *reinterpret_cast<MicroserviceInputParameter*>(inputPinId));
+            // TODO:
+            // m_Workflow.Connect(outputPinId.Get(), inputPinId.Get());
 
             // Draw new link.
             // ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
@@ -136,6 +131,7 @@ struct NodeEditor
         // If you agree that link can be deleted, accept deletion.
         if (ed::AcceptDeletedItem())
         {
+          // TODO:
           // // Then remove link from your data.
           // for (auto& link : m_Links)
           // {

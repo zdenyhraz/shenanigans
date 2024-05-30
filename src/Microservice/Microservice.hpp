@@ -1,10 +1,18 @@
 #pragma once
 
+struct MicroserviceStartParameter
+{
+};
+
+struct MicroserviceFinishParameter
+{
+};
+
 struct MicroserviceInputParameter
 {
   std::type_index type = std::type_index(typeid(void));
   std::string name;
-  std::any* value; // pointer ot avoid data duplication
+  std::any* value; // pointer to avoid data duplication
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
 
@@ -27,8 +35,8 @@ class Microservice
   friend class Workflow;
 
   std::string microserviceName;
-  bool start;
-  bool finish;
+  MicroserviceInputParameter start = MicroserviceInputParameter(std::type_index(typeid(MicroserviceStartParameter)));
+  MicroserviceOutputParameter finish = MicroserviceOutputParameter(std::type_index(typeid(MicroserviceFinishParameter)));
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 
@@ -93,6 +101,7 @@ protected:
     if (param.type != std::type_index(typeid(T)))
       throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
 
+    LOG_DEBUG("Microservice '{}' setting output parameter '{}'", GetName(), paramName);
     param.value = value;
   }
 
@@ -137,13 +146,13 @@ public:
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
 
-  uintptr_t GetStartId() const { return reinterpret_cast<uintptr_t>(&start); }
+  uintptr_t GetStartId() const { return start.GetId(); }
 
-  uintptr_t GetFinishId() const { return reinterpret_cast<uintptr_t>(&finish); }
+  uintptr_t GetFinishId() const { return finish.GetId(); }
 
-  const std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
+  std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
 
-  const std::unordered_map<std::string, MicroserviceOutputParameter>& GetOutputParameters() { return outputParameters; }
+  std::unordered_map<std::string, MicroserviceOutputParameter>& GetOutputParameters() { return outputParameters; }
 
   MicroserviceInputParameter& GetInputParameter(const std::string& paramName)
   {

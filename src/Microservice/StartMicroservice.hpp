@@ -4,6 +4,6 @@
 class StartMicroservice : public Microservice
 {
   void DefineInputParameters() override {}
-  void DefineOutputParameters() override { DefineOutputParameter<bool>("start"); }
-  void Process() override { SetOutputParameter("start", true); }
+  void DefineOutputParameters() override {}
+  void Process() override {}
 };
