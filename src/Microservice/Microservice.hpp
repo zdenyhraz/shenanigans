@@ -1,10 +1,6 @@
 #pragma once
 
-struct MicroserviceStartParameter
-{
-};
-
-struct MicroserviceFinishParameter
+struct MicroserviceStartFinish
 {
 };
 
@@ -32,11 +28,9 @@ struct MicroserviceOutputParameter
 
 class Microservice
 {
-  friend class Workflow;
-
   std::string microserviceName;
-  MicroserviceInputParameter start = MicroserviceInputParameter{.type = std::type_index(typeid(MicroserviceStartParameter)), .name = "start"};
-  MicroserviceOutputParameter finish = MicroserviceOutputParameter{.type = std::type_index(typeid(MicroserviceFinishParameter)), .name = "finish"};
+  MicroserviceInputParameter start = MicroserviceInputParameter{.type = std::type_index(typeid(MicroserviceStartFinish)), .name = "start"};
+  MicroserviceOutputParameter finish = MicroserviceOutputParameter{.type = std::type_index(typeid(MicroserviceStartFinish)), .name = "finish"};
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 
@@ -152,6 +146,10 @@ public:
   std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
 
   std::unordered_map<std::string, MicroserviceOutputParameter>& GetOutputParameters() { return outputParameters; }
+
+  MicroserviceInputParameter& GetStartParameter() { return start; }
+
+  MicroserviceOutputParameter& GetFinishParameter() { return finish; }
 
   MicroserviceInputParameter& GetInputParameter(const std::string& paramName)
   {
