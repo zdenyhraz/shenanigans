@@ -25,8 +25,6 @@ struct MicroserviceOutputParameter
 class Microservice
 {
   friend class Workflow;
-  static constexpr std::string startParameterName = "start";
-  static constexpr std::string finishParameterName = "finish";
 
   std::string microserviceName;
   bool start;
@@ -166,9 +164,6 @@ public:
   void Initialize()
   {
     GenerateMicroserviceName();
-    // TODO: add input / output flow connections
-    DefineInputParameter<void>(startParameterName);
-    DefineOutputParameter<void>(finishParameterName);
     DefineInputParameters();
     DefineOutputParameters();
   }

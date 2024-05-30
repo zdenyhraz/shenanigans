@@ -37,18 +37,24 @@ struct NodeEditor
     ImGui::Text(microservice.GetName().c_str());
 
     ImGuiEx_BeginColumn();
+    ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
+    ImGui::Text("> start");
+    ed::EndPin();
     for (const auto& [name, param] : microservice.GetInputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Input);
-      ImGui::Text(fmt::format("-> {}", name).c_str());
+      ImGui::Text(fmt::format("> {}", name).c_str());
       ed::EndPin();
     }
 
     ImGuiEx_NextColumn();
+    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Input);
+    ImGui::Text("finish >");
+    ed::EndPin();
     for (const auto& [name, param] : microservice.GetOutputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Input);
-      ImGui::Text(fmt::format("{} ->", name).c_str());
+      ImGui::Text(fmt::format("{} >", name).c_str());
       ed::EndPin();
     }
 
