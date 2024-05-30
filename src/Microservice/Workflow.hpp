@@ -17,6 +17,8 @@ class Workflow
     auto operator<=>(const MicroserviceConnection&) const = default;
 
     uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+
+    void Connect() { inputParameter->value = &outputParameter->value; }
   };
 
   std::string name = "Default workflow";
@@ -38,6 +40,7 @@ class Workflow
     LOG_DEBUG("Microservice '{}' has {} output connections:", microservice.GetName(), std::ranges::distance(relevantConnections));
     for (auto& connection : relevantConnections)
       LOG_DEBUG("'{}'", connection.inputMicroservice->GetName());
+
     for (auto& connection : relevantConnections)
       Execute(*connection.inputMicroservice);
   }
@@ -90,6 +93,7 @@ public:
       if (std::ranges::any_of(connections.at(&outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
         return LOG_WARNING("Ignoring duplicate connection {}:{} -> {}:{}", outputMicroservice.GetName(), outputParameterName, inputMicroservice.GetName(), inputParameterName);
 
+    connection.Connect();
     connections[&outputMicroservice].push_back(std::move(connection));
   }
 
@@ -98,8 +102,10 @@ public:
     MicroserviceConnection connection(&outputMicroservice, &inputMicroservice, &outputMicroservice.finish, &inputMicroservice.start);
     if (connections.contains(&outputMicroservice))
       if (std::ranges::any_of(connections.at(&outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
-        return LOG_WARNING("Ignoring duplicate connection {} -> {}", outputMicroservice.GetName(), inputMicroservice.GetName());
+        return LOG_WARNING("Ignoring duplicate connection {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(),
+            connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
 
+    connection.Connect();
     connections[&outputMicroservice].push_back(std::move(connection));
   }
 
@@ -161,9 +167,10 @@ public:
 
     if (connections.contains(connection.outputMicroservice))
       if (std::ranges::any_of(connections.at(connection.outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
-        return LOG_WARNING("Ignoring duplicate connection {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetId(),
-            connection.inputMicroservice->GetName(), connection.inputParameter->GetId());
+        return LOG_WARNING("Ignoring duplicate connection {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(),
+            connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
 
+    connection.Connect();
     connections[connection.outputMicroservice].push_back(std::move(connection));
   }
 
@@ -206,5 +213,14 @@ public:
 
     Connect(blur3, blur5);
     Connect(blur3, blur5, "blurred image", "image");
+
+    LOG_DEBUG("Test connections:");
+    for (const auto& [ms, vecconnections] : connections)
+    {
+      LOG_DEBUG(" {}:", ms->GetName());
+      for (const auto& connection : vecconnections)
+        LOG_DEBUG("   {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(), connection.inputMicroservice->GetName(),
+            connection.inputParameter->GetName());
+    }
   }
 };

@@ -11,22 +11,22 @@ struct MicroserviceFinishParameter
 struct MicroserviceInputParameter
 {
   std::type_index type = std::type_index(typeid(void));
-  std::string name;
   std::any* value; // pointer to avoid data duplication
+  std::string name;
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
-
+  const std::string& GetName() const { return name; }
   void Reset() { value = nullptr; }
 };
 
 struct MicroserviceOutputParameter
 {
   std::type_index type = std::type_index(typeid(void));
-  std::string name;
   std::any value;
+  std::string name;
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
-
+  const std::string& GetName() const { return name; }
   void Reset() { value.reset(); }
 };
 
@@ -35,8 +35,8 @@ class Microservice
   friend class Workflow;
 
   std::string microserviceName;
-  MicroserviceInputParameter start = MicroserviceInputParameter(std::type_index(typeid(MicroserviceStartParameter)));
-  MicroserviceOutputParameter finish = MicroserviceOutputParameter(std::type_index(typeid(MicroserviceFinishParameter)));
+  MicroserviceInputParameter start = MicroserviceInputParameter{.type = std::type_index(typeid(MicroserviceStartParameter)), .name = "start"};
+  MicroserviceOutputParameter finish = MicroserviceOutputParameter{.type = std::type_index(typeid(MicroserviceFinishParameter)), .name = "finish"};
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 
@@ -47,13 +47,13 @@ protected:
   template <typename T>
   void DefineInputParameter(const std::string& paramName)
   {
-    inputParameters[paramName] = MicroserviceInputParameter(std::type_index(typeid(T)));
+    inputParameters[paramName] = MicroserviceInputParameter{.type = std::type_index(typeid(T)), .name = paramName};
   }
 
   template <typename T>
   void DefineOutputParameter(const std::string& paramName)
   {
-    outputParameters[paramName] = MicroserviceOutputParameter(std::type_index(typeid(T)));
+    outputParameters[paramName] = MicroserviceOutputParameter{.type = std::type_index(typeid(T)), .name = paramName};
   }
 
   template <typename T>
