@@ -45,14 +45,13 @@ struct NodeEditor
 
   void DrawNode(Microservice& microservice)
   {
-    usize id = microservice.GetId();
-    ed::BeginNode(id);
+    ed::BeginNode(microservice.GetId());
     ImGui::Text(microservice.GetName().c_str());
 
     ImGuiEx_BeginColumn();
     for (const auto& [name, param] : microservice.GetInputParameters())
     {
-      ed::BeginPin(++id, ed::PinKind::Input);
+      ed::BeginPin(param.GetId(), ed::PinKind::Input);
       ImGui::Text(fmt::format("-> {}", name).c_str());
       ed::EndPin();
     }
@@ -60,7 +59,7 @@ struct NodeEditor
     ImGuiEx_NextColumn();
     for (const auto& [name, param] : microservice.GetOutputParameters())
     {
-      ed::BeginPin(++id, ed::PinKind::Input);
+      ed::BeginPin(param.GetId(), ed::PinKind::Input);
       ImGui::Text(fmt::format("{} ->", name).c_str());
       ed::EndPin();
     }
@@ -83,7 +82,10 @@ struct NodeEditor
       DrawNode(*microservice);
 
     // for (const auto& connection : m_Workflow.GetMicroserviceConnections())
-    //   ed::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
+    //   ed::Link(connection.id, connection.idOutput, connection.idInput);
+
+    // for (const auto& connection : m_Workflow.GetParameterConnections())
+    //   ed::Link(connection.id, linkInfo.InputId, linkInfo.OutputId);
 
     // Submit Links
     for (auto& linkInfo : m_Links)
@@ -118,6 +120,9 @@ struct NodeEditor
           {
             // Since we accepted new link, lets add one to our list of links.
             m_Links.push_back({ed::LinkId(m_NextLinkId++), inputPinId, outputPinId});
+
+            // TODO: fix this
+            // m_Workflow.Connect(*reinterpret_cast<MicroserviceOutputParameter*>(outputPinId), *reinterpret_cast<MicroserviceInputParameter*>(inputPinId));
 
             // Draw new link.
             ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
