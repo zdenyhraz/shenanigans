@@ -9,9 +9,8 @@ class BlurImageMicroservice : public Microservice
 
   void Process() override
   {
-    LOG_DEBUG("{} processing", GetName());
-    auto& image = GetInputParameter<cv::Mat>("image");
-    const auto blurSize = 7;
+    auto image = GetInputParameter<cv::Mat>("image").clone();
+    const auto blurSize = GetNearestOdd(image.rows * 0.05);
     cv::GaussianBlur(image, image, cv::Size(blurSize, blurSize), 0);
     SetOutputParameter("blurred image", image);
   }

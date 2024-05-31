@@ -137,6 +137,8 @@ public:
 
   const std::string& GetName() { return microserviceName; }
 
+  void SetName(const std::string& name) { microserviceName = name; }
+
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
 
   uintptr_t GetStartId() const { return start.GetId(); }

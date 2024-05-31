@@ -8,14 +8,14 @@ struct NodeEditor
   ed::EditorContext* m_Context = nullptr; // Editor context, required to trace a editor state.
   bool m_FirstFrame = true;               // Flag set for first frame only, some action need to be executed once.
   int m_NextLinkId = 100;                 // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
-  Workflow m_Workflow;
+  Workflow workflow;
 
   void OnStart()
   {
     ed::Config config;
     config.SettingsFile = "BasicInteraction.json";
     m_Context = ed::CreateEditor(&config);
-    m_Workflow.TestInitialize();
+    workflow.TestInitialize();
   }
 
   void OnStop() { ed::DestroyEditor(m_Context); }
@@ -31,15 +31,18 @@ struct NodeEditor
 
   void ImGuiEx_EndColumn() { ImGui::EndGroup(); }
 
-  void DrawNode(Microservice& microservice)
+  void DrawNode(Microservice& microservice, WorkflowType workflowType)
   {
     ed::BeginNode(microservice.GetId());
     ImGui::Text(microservice.GetName().c_str());
 
     ImGuiEx_BeginColumn();
-    ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
-    ImGui::Text("> ");
-    ed::EndPin();
+    if (workflowType != WorkflowType::Simple)
+    {
+      ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
+      ImGui::Text("> ");
+      ed::EndPin();
+    }
     for (const auto& [name, param] : microservice.GetInputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Input);
@@ -48,9 +51,12 @@ struct NodeEditor
     }
 
     ImGuiEx_NextColumn();
-    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
-    ImGui::Text(" >");
-    ed::EndPin();
+    if (workflowType != WorkflowType::Simple)
+    {
+      ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
+      ImGui::Text(" >");
+      ed::EndPin();
+    }
     for (const auto& [name, param] : microservice.GetOutputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Output);
@@ -72,10 +78,10 @@ struct NodeEditor
     // Start interaction with editor.
     ed::Begin("Microservice Editor", ImVec2(0.0, 0.0f));
 
-    for (const auto& microservice : m_Workflow.GetMicroservices())
-      DrawNode(*microservice);
+    for (const auto& microservice : workflow.GetMicroservices())
+      DrawNode(*microservice, workflow.GetType());
 
-    for (const auto& [microservice, connections] : m_Workflow.GetConnections())
+    for (const auto& [microservice, connections] : workflow.GetConnections())
       for (const auto& connection : connections)
         ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
 
@@ -105,7 +111,7 @@ struct NodeEditor
         {
           // ed::AcceptNewItem() return true when user release mouse button.
           if (ed::AcceptNewItem())
-            m_Workflow.Connect(inputPinId.Get(), outputPinId.Get());
+            workflow.Connect(inputPinId.Get(), outputPinId.Get());
 
           // You may choose to reject connection between these nodes
           // by calling ed::RejectNewItem(). This will allow editor to give
@@ -124,7 +130,7 @@ struct NodeEditor
       {
         // If you agree that link can be deleted, accept deletion.
         if (ed::AcceptDeletedItem())
-          m_Workflow.Disconnect(deletedLinkId.Get());
+          workflow.Disconnect(deletedLinkId.Get());
 
         // You may reject link deletion by calling:
         // ed::RejectDeletedItem();
