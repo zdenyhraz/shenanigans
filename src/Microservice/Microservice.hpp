@@ -54,12 +54,12 @@ protected:
   void SetInputParameter(const std::string& paramName, T& value)
   {
     if (not inputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Input parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
 
     auto& param = inputParameters.at(paramName);
 
     if (param.type != std::type_index(typeid(T)))
-      throw std::runtime_error(fmt::format("Input parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
 
     param.value = &value;
   }
@@ -68,18 +68,18 @@ protected:
   T& GetInputParameter(const std::string& paramName)
   {
     if (not inputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Input parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
 
     auto& param = inputParameters.at(paramName);
 
     if (not param.value)
-      throw std::runtime_error(fmt::format("Input parameter '{}' not set (parameter has no connections)", paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not set (parameter has no connections)", GetName(), paramName));
 
     if (not param.value->has_value())
-      throw std::runtime_error(fmt::format("Input parameter '{}' not set", paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not set", GetName(), paramName));
 
     if (param.type != std::type_index(typeid(T)))
-      throw std::runtime_error(fmt::format("Input parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
 
     return std::any_cast<T&>(*param.value);
   }
@@ -88,12 +88,12 @@ protected:
   void SetOutputParameter(const std::string& paramName, const T& value)
   {
     if (not outputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Output parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
 
     auto& param = outputParameters.at(paramName);
 
     if (param.type != std::type_index(typeid(T)))
-      throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
 
     param.value = value;
   }
@@ -102,15 +102,15 @@ protected:
   T& GetOutputParameter(const std::string& paramName)
   {
     if (not outputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Output parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
 
     auto& param = outputParameters.at(paramName);
 
     if (param.type != std::type_index(typeid(T)))
-      throw std::runtime_error(fmt::format("Output parameter '{}' type mismatch: {} != {}", paramName, typeid(T).name(), param.type.name()));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
 
     if (not param.value.has_value())
-      throw std::runtime_error(fmt::format("Output parameter '{}' not set", paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not set", GetName(), paramName));
 
     return std::any_cast<T&>(param.value);
   }
@@ -156,7 +156,7 @@ public:
   MicroserviceInputParameter& GetInputParameter(const std::string& paramName)
   {
     if (not inputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Input parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
 
     return inputParameters.at(paramName);
   }
@@ -164,7 +164,7 @@ public:
   MicroserviceOutputParameter& GetOutputParameter(const std::string& paramName)
   {
     if (not outputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("Output parameter '{}' not found", paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
 
     return outputParameters.at(paramName);
   }

@@ -1,7 +1,23 @@
 #pragma once
 #include <imgui_node_editor.h>
 #include "Microservice/Workflow.hpp"
+#include "libs/imgui-nodes/examples/blueprints-example/utilities/drawing.h"
+#include "libs/imgui-nodes/examples/blueprints-example/utilities/widgets.h"
+
 namespace ed = ax::NodeEditor;
+using ax::Widgets::IconType;
+
+enum class PinType
+{
+  Flow,
+  Bool,
+  Int,
+  Float,
+  String,
+  Object,
+  Function,
+  Delegate,
+};
 
 struct NodeEditor
 {
@@ -9,6 +25,7 @@ struct NodeEditor
   bool m_FirstFrame = true;               // Flag set for first frame only, some action need to be executed once.
   int m_NextLinkId = 100;                 // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
   Workflow workflow;
+  const int m_PinIconSize = 24;
 
   void OnStart()
   {
@@ -31,7 +48,69 @@ struct NodeEditor
 
   void ImGuiEx_EndColumn() { ImGui::EndGroup(); }
 
-  void DrawNode(Microservice& microservice, WorkflowType workflowType)
+  ImColor GetIconColor(PinType type)
+  {
+    switch (type)
+    {
+    default:
+    case PinType::Flow:
+      return ImColor(255, 255, 255);
+    case PinType::Bool:
+      return ImColor(220, 48, 48);
+    case PinType::Int:
+      return ImColor(68, 201, 156);
+    case PinType::Float:
+      return ImColor(147, 226, 74);
+    case PinType::String:
+      return ImColor(124, 21, 153);
+    case PinType::Object:
+      return ImColor(51, 150, 215);
+    case PinType::Function:
+      return ImColor(218, 0, 183);
+    case PinType::Delegate:
+      return ImColor(255, 48, 48);
+    }
+  };
+
+  void DrawPinIcon(PinType type, bool connected, int alpha)
+  {
+    IconType iconType;
+    ImColor color = GetIconColor(type);
+    color.Value.w = alpha / 255.0f;
+    switch (type)
+    {
+    case PinType::Flow:
+      iconType = IconType::Flow;
+      break;
+    case PinType::Bool:
+      iconType = IconType::Circle;
+      break;
+    case PinType::Int:
+      iconType = IconType::Circle;
+      break;
+    case PinType::Float:
+      iconType = IconType::Circle;
+      break;
+    case PinType::String:
+      iconType = IconType::Circle;
+      break;
+    case PinType::Object:
+      iconType = IconType::Circle;
+      break;
+    case PinType::Function:
+      iconType = IconType::Circle;
+      break;
+    case PinType::Delegate:
+      iconType = IconType::Square;
+      break;
+    default:
+      return;
+    }
+
+    ax::Widgets::Icon(ImVec2(static_cast<float>(m_PinIconSize), static_cast<float>(m_PinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
+  };
+
+  void RenderNode(Microservice& microservice, WorkflowType workflowType)
   {
     ed::BeginNode(microservice.GetId());
     ImGui::Text(microservice.GetName().c_str());
@@ -40,13 +119,17 @@ struct NodeEditor
     if (workflowType != WorkflowType::Simple)
     {
       ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
-      ImGui::Text("> ");
+      DrawPinIcon(PinType::Flow, false, 255);
       ed::EndPin();
     }
     for (const auto& [name, param] : microservice.GetInputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Input);
-      ImGui::Text(fmt::format("> {}", name).c_str());
+      ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
+      ed::PinPivotSize(ImVec2(0, 0));
+      DrawPinIcon(PinType::Object, false, 255);
+      ImGui::SameLine();
+      ImGui::TextUnformatted(name.c_str());
       ed::EndPin();
     }
 
@@ -54,13 +137,17 @@ struct NodeEditor
     if (workflowType != WorkflowType::Simple)
     {
       ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
-      ImGui::Text(" >");
+      DrawPinIcon(PinType::Flow, false, 255);
       ed::EndPin();
     }
     for (const auto& [name, param] : microservice.GetOutputParameters())
     {
       ed::BeginPin(param.GetId(), ed::PinKind::Output);
-      ImGui::Text(fmt::format("{} >", name).c_str());
+      ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
+      ed::PinPivotSize(ImVec2(0, 0));
+      ImGui::TextUnformatted(name.c_str());
+      ImGui::SameLine();
+      DrawPinIcon(PinType::Object, false, 255);
       ed::EndPin();
     }
 
@@ -79,7 +166,7 @@ struct NodeEditor
     ed::Begin("Microservice Editor", ImVec2(0.0, 0.0f));
 
     for (const auto& microservice : workflow.GetMicroservices())
-      DrawNode(*microservice, workflow.GetType());
+      RenderNode(*microservice, workflow.GetType());
 
     for (const auto& [microservice, connections] : workflow.GetConnections())
       for (const auto& connection : connections)

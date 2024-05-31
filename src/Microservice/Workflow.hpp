@@ -24,6 +24,11 @@ class Workflow
     auto operator<=>(const MicroserviceConnection&) const = default;
 
     uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+
+    std::string GetString() const
+    {
+      return fmt::format("{}:{} -> {}:{}", outputMicroservice->GetName(), outputParameter->GetName(), inputMicroservice->GetName(), inputParameter->GetName());
+    }
   };
 
   std::string name = "Default workflow";
@@ -51,8 +56,7 @@ class Workflow
 
     LOG_DEBUG("Microservice '{}' has {} output connections:", microservice.GetName(), std::ranges::distance(relevantConnections));
     for (auto& connection : relevantConnections)
-      LOG_DEBUG("   {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(), connection.inputMicroservice->GetName(),
-          connection.inputParameter->GetName());
+      LOG_DEBUG("   {}", connection.GetString());
 
     for (auto& connection : relevantConnections)
       ExecuteMicroservice(*connection.inputMicroservice);
@@ -93,20 +97,20 @@ class Workflow
   void Connect(MicroserviceConnection&& connection)
   {
     if (connection.outputParameter->type != connection.inputParameter->type)
-      return LOG_WARNING("Connection {}:{} -> {}:{} type mismatch: {} != {}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(),
-          connection.inputMicroservice->GetName(), connection.inputParameter->GetName(), connection.inputParameter->type.name(), connection.outputParameter->type.name());
+      return LOG_WARNING("Connection {} type mismatch: {} != {}", connection.GetString(), connection.inputParameter->type.name(), connection.outputParameter->type.name());
 
     if (connection.outputMicroservice == connection.inputMicroservice)
-      return LOG_WARNING("Connection {}:{} -> {}:{}: cannot connect microservice to itself ", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(),
-          connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
+      return LOG_WARNING("Connection {}: cannot connect microservice to itself ", connection.GetString());
 
     if (connections.contains(connection.outputMicroservice))
       if (std::ranges::any_of(connections.at(connection.outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
-        return LOG_WARNING("Ignoring duplicate connection {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(),
-            connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
+        return LOG_WARNING("Ignoring duplicate connection {}", connection.GetString());
 
-    LOG_DEBUG("Connected {}:{} -> {}:{}", connection.outputMicroservice->GetName(), connection.outputParameter->GetName(), connection.inputMicroservice->GetName(),
-        connection.inputParameter->GetName());
+    if (type == WorkflowType::Simple)
+      if (false)
+        return LOG_WARNING("Connection {}: cannot connect inputs from multiple sources in a simple workflow", connection.GetString());
+
+    LOG_DEBUG("Connected {}", connection.GetString());
 
     connection.inputParameter->value = &connection.outputParameter->value;
     connections[connection.outputMicroservice].push_back(std::move(connection));
@@ -142,7 +146,7 @@ class Workflow
   }
 
 public:
-  Workflow(WorkflowType _type = WorkflowType::Simple) : type(_type)
+  Workflow(WorkflowType _type = WorkflowType::Normal) : type(_type)
   {
     if (type != WorkflowType::Simple)
       microservices.push_back(std::make_unique<StartMicroservice>());
@@ -291,12 +295,12 @@ public:
       auto& plot3 = *microservices[8];
 
       Connect(load, blur1, "image", "image");
-      Connect(blur1, blur2, "blurred image", "image");
-      Connect(blur2, blur3, "blurred image", "image");
-      Connect(blur3, blur4, "blurred image", "image");
-      Connect(blur3, blur5, "blurred image", "image");
-      Connect(blur4, plot1, "blurred image", "image");
-      Connect(blur5, plot2, "blurred image", "image");
+      Connect(blur1, blur2, "blurred", "image");
+      Connect(blur2, blur3, "blurred", "image");
+      Connect(blur3, blur4, "blurred", "image");
+      Connect(blur3, blur5, "blurred", "image");
+      Connect(blur4, plot1, "blurred", "image");
+      Connect(blur5, plot2, "blurred", "image");
       Connect(load, plot3, "image", "image");
 
       plot1.SetName("Plot blur4");
@@ -315,6 +319,9 @@ public:
       auto& blur3 = *microservices[4];
       auto& blur4 = *microservices[5];
       auto& blur5 = *microservices[6];
+      auto& plot1 = *microservices[7];
+      auto& plot2 = *microservices[8];
+      auto& plot3 = *microservices[9];
 
       Connect(start, load);
 
@@ -322,16 +329,25 @@ public:
       Connect(load, blur1, "image", "image");
 
       Connect(blur1, blur2);
-      Connect(blur1, blur2, "blurred image", "image");
+      Connect(blur1, blur2, "blurred", "image");
 
       Connect(blur2, blur3);
-      Connect(blur2, blur3, "blurred image", "image");
+      Connect(blur2, blur3, "blurred", "image");
 
       Connect(blur3, blur4);
-      Connect(blur3, blur4, "blurred image", "image");
+      Connect(blur3, blur4, "blurred", "image");
 
       Connect(blur3, blur5);
-      Connect(blur3, blur5, "blurred image", "image");
+      Connect(blur3, blur5, "blurred", "image");
+
+      Connect(blur4, plot1);
+      Connect(blur4, plot1, "blurred", "image");
+
+      Connect(blur5, plot2);
+      Connect(blur5, plot2, "blurred", "image");
+
+      Connect(load, plot3);
+      Connect(load, plot3, "image", "image");
       break;
     }
     }

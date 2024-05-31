@@ -163,7 +163,8 @@ target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 # imgui-nodes
 include_directories(libs/imgui-nodes)
 file(GLOB SRC_IMGUI_NODES CONFIGURE_DEPENDS libs/imgui-nodes/*.cpp)
-target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES})
+file(GLOB SRC_IMGUI_NODES_EXTRA CONFIGURE_DEPENDS libs/imgui-nodes/examples/blueprints-example/utilities/drawing.cpp libs/imgui-nodes/examples/blueprints-example/utilities/widgets.cpp)
+target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES} ${SRC_IMGUI_NODES_EXTRA})
 
 # glfw
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)

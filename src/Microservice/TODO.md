@@ -6,6 +6,7 @@
 - [x] add parameter id for pins
 - [ ] workflow save to / load from file - json
 - [ ] fetch all inputs recursively when notified
+- [ ] add strongly-typed UserParameters (manual params) and a way to edit them
 
 # GUI
 - [ ] gui layout save? - json
