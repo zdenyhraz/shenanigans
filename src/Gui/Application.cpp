@@ -4,7 +4,7 @@
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
 #include "Windows/ObjdetectWindow.hpp"
-#include "Windows/NodeEditorWindow.hpp"
+#include "Windows/MicroserviceEditorWindow.hpp"
 
 void Application::Initialize()
 {
@@ -13,7 +13,7 @@ void Application::Initialize()
   mWindows.push_back(std::make_unique<AstroWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
-  mWindows.push_back(std::make_unique<NodeEditorWindow>());
+  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
 
   for (const auto& window : mWindows)
     window->Initialize();

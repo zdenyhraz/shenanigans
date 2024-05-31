@@ -1,6 +1,6 @@
 #pragma once
 #include <imgui_node_editor.h>
-#include "Microservice/Workflow.hpp"
+#include "Workflow.hpp"
 #include "libs/imgui-nodes/examples/blueprints-example/utilities/drawing.h"
 #include "libs/imgui-nodes/examples/blueprints-example/utilities/widgets.h"
 
@@ -19,7 +19,7 @@ enum class PinType
   Delegate,
 };
 
-struct NodeEditor
+struct MicroserviceEditor
 {
   ed::EditorContext* context = nullptr;
   bool firstFrame = true;
@@ -45,16 +45,16 @@ struct NodeEditor
 
   void OnStop() { ed::DestroyEditor(context); }
 
-  void ImGuiEx_BeginColumn() { ImGui::BeginGroup(); }
+  void BeginColumn() { ImGui::BeginGroup(); }
 
-  void ImGuiEx_NextColumn()
+  void NextColumn()
   {
     ImGui::EndGroup();
     ImGui::SameLine();
     ImGui::BeginGroup();
   }
 
-  void ImGuiEx_EndColumn() { ImGui::EndGroup(); }
+  void EndColumn() { ImGui::EndGroup(); }
 
   ImColor GetIconColor(PinType type)
   {
@@ -197,21 +197,21 @@ struct NodeEditor
     const auto nodeSize = inputColumnTextSize + outputColumnTextSize + pinIconSize * 2 + ImGui::GetStyle().FramePadding.x * 3;
     RenderNodeName(microservice.GetName(), nodeSize);
 
-    ImGuiEx_BeginColumn();
+    BeginColumn();
 
     if (workflowType != WorkflowType::Simple)
       RenderInputFlowPin(microservice);
     for (const auto& [name, param] : microservice.GetInputParameters())
       RenderInputPin(name, param);
 
-    ImGuiEx_NextColumn();
+    NextColumn();
 
     if (workflowType != WorkflowType::Simple)
       RenderOutputFlowPin(microservice, outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
       RenderOutputPin(name, param, outputColumnTextSize);
 
-    ImGuiEx_EndColumn();
+    EndColumn();
 
     ed::EndNode();
   }
