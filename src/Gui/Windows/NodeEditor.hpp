@@ -21,21 +21,29 @@ enum class PinType
 
 struct NodeEditor
 {
-  ed::EditorContext* m_Context = nullptr; // Editor context, required to trace a editor state.
-  bool m_FirstFrame = true;               // Flag set for first frame only, some action need to be executed once.
-  int m_NextLinkId = 100;                 // Counter to help generate link ids. In real application this will probably based on pointer to user data structure.
+  ed::EditorContext* context = nullptr;
+  bool firstFrame = true;
   Workflow workflow;
-  const int m_PinIconSize = 24;
+  const int pinIconSize = 24;
+  // const int nodeWidth = 200;
 
   void OnStart()
   {
     ed::Config config;
     config.SettingsFile = "BasicInteraction.json";
-    m_Context = ed::CreateEditor(&config);
+    context = ed::CreateEditor(&config);
+    ed::SetCurrentEditor(context);
+
     workflow.TestInitialize();
+
+    int ypos = 0;
+    int xpos = 0;
+    int step = 150;
+    for (const auto& microservice : workflow.GetMicroservices())
+      ed::SetNodePosition(microservice->GetId(), ImVec2(xpos += step, ypos += step));
   }
 
-  void OnStop() { ed::DestroyEditor(m_Context); }
+  void OnStop() { ed::DestroyEditor(context); }
 
   void ImGuiEx_BeginColumn() { ImGui::BeginGroup(); }
 
@@ -107,51 +115,104 @@ struct NodeEditor
       return;
     }
 
-    ax::Widgets::Icon(ImVec2(static_cast<float>(m_PinIconSize), static_cast<float>(m_PinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
+    ax::Widgets::Icon(ImVec2(static_cast<float>(pinIconSize), static_cast<float>(pinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
   };
+
+  float GetLongestOutputParameterNameLength(Microservice& microservice)
+  {
+    float maxSize = 0;
+    for (const auto& [name, param] : microservice.GetOutputParameters())
+      if (auto textSize = ImGui::CalcTextSize(name.c_str()).x; textSize > maxSize)
+        maxSize = textSize;
+
+    return maxSize;
+  }
+
+  float GetLongestInputParameterNameLength(Microservice& microservice)
+  {
+    float maxSize = 0;
+    for (const auto& [name, param] : microservice.GetInputParameters())
+      if (auto textSize = ImGui::CalcTextSize(name.c_str()).x; textSize > maxSize)
+        maxSize = textSize;
+
+    return maxSize;
+  }
+
+  void RenderInputPin(const std::string& name, const MicroserviceInputParameter& param)
+  {
+    ed::BeginPin(param.GetId(), ed::PinKind::Input);
+    ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
+    ed::PinPivotSize(ImVec2(0, 0));
+    DrawPinIcon(PinType::Object, false, 255);
+    ImGui::SameLine();
+    ImGui::TextUnformatted(name.c_str());
+    ed::EndPin();
+  }
+
+  void RenderOutputPin(const std::string& name, const MicroserviceOutputParameter& param, float outputColumnTextSize)
+  {
+    ed::BeginPin(param.GetId(), ed::PinKind::Output);
+    ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
+    ed::PinPivotSize(ImVec2(0, 0));
+    ImGui::Dummy(ImVec2(outputColumnTextSize - ImGui::CalcTextSize(name.c_str()).x, 0));
+    ImGui::SameLine();
+    ImGui::TextUnformatted(name.c_str());
+    ImGui::SameLine();
+    DrawPinIcon(PinType::Object, false, 255);
+    ed::EndPin();
+  }
+
+  void RenderInputFlowPin(Microservice& microservice)
+  {
+    ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
+    ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
+    ed::PinPivotSize(ImVec2(0, 0));
+    DrawPinIcon(PinType::Flow, false, 255); // TODO: check if connected
+    ed::EndPin();
+  }
+
+  void RenderOutputFlowPin(Microservice& microservice, float outputColumnTextSize)
+  {
+    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
+    ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
+    ed::PinPivotSize(ImVec2(0, 0));
+    ImGui::Dummy(ImVec2(outputColumnTextSize + ImGui::GetStyle().FramePadding.x * 2, 0));
+    ImGui::SameLine();
+    DrawPinIcon(PinType::Flow, false, 255); // TODO: check if connected
+    ed::EndPin();
+  }
+
+  void RenderNodeName(const std::string& name, float nodeSize)
+  {
+    ImGui::Dummy(ImVec2((nodeSize - ImGui::CalcTextSize(name.c_str()).x) * 0.5, 0));
+    ImGui::SameLine();
+    ImGui::Text(name.c_str());
+  }
 
   void RenderNode(Microservice& microservice, WorkflowType workflowType)
   {
     ed::BeginNode(microservice.GetId());
-    ImGui::Text(microservice.GetName().c_str());
+    const auto inputColumnTextSize = GetLongestInputParameterNameLength(microservice);
+    const auto outputColumnTextSize = GetLongestOutputParameterNameLength(microservice);
+    const auto nodeSize = inputColumnTextSize + outputColumnTextSize + pinIconSize * 2 + ImGui::GetStyle().FramePadding.x * 3;
+    RenderNodeName(microservice.GetName(), nodeSize);
 
     ImGuiEx_BeginColumn();
+
     if (workflowType != WorkflowType::Simple)
-    {
-      ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
-      DrawPinIcon(PinType::Flow, false, 255);
-      ed::EndPin();
-    }
+      RenderInputFlowPin(microservice);
     for (const auto& [name, param] : microservice.GetInputParameters())
-    {
-      ed::BeginPin(param.GetId(), ed::PinKind::Input);
-      ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
-      ed::PinPivotSize(ImVec2(0, 0));
-      DrawPinIcon(PinType::Object, false, 255);
-      ImGui::SameLine();
-      ImGui::TextUnformatted(name.c_str());
-      ed::EndPin();
-    }
+      RenderInputPin(name, param);
 
     ImGuiEx_NextColumn();
+
     if (workflowType != WorkflowType::Simple)
-    {
-      ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
-      DrawPinIcon(PinType::Flow, false, 255);
-      ed::EndPin();
-    }
+      RenderOutputFlowPin(microservice, outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
-    {
-      ed::BeginPin(param.GetId(), ed::PinKind::Output);
-      ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
-      ed::PinPivotSize(ImVec2(0, 0));
-      ImGui::TextUnformatted(name.c_str());
-      ImGui::SameLine();
-      DrawPinIcon(PinType::Object, false, 255);
-      ed::EndPin();
-    }
+      RenderOutputPin(name, param, outputColumnTextSize);
 
     ImGuiEx_EndColumn();
+
     ed::EndNode();
   }
 
@@ -160,7 +221,7 @@ struct NodeEditor
     auto& io = ImGui::GetIO();
     ImGui::Separator();
 
-    ed::SetCurrentEditor(m_Context);
+    ed::SetCurrentEditor(context);
 
     // Start interaction with editor.
     ed::Begin("Microservice Editor", ImVec2(0.0, 0.0f));
@@ -228,11 +289,11 @@ struct NodeEditor
     // End of interaction with editor.
     ed::End();
 
-    if (m_FirstFrame)
+    if (firstFrame)
       ed::NavigateToContent(0.0f);
 
     ed::SetCurrentEditor(nullptr);
 
-    m_FirstFrame = false;
+    firstFrame = false;
   }
 };

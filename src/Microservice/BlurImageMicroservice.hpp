@@ -5,7 +5,11 @@ class BlurImageMicroservice : public Microservice
 {
   void DefineInputParameters() override { DefineInputParameter<cv::Mat>("image"); }
 
-  void DefineOutputParameters() override { DefineOutputParameter<cv::Mat>("blurred"); }
+  void DefineOutputParameters() override
+  {
+    DefineOutputParameter<cv::Mat>("blurred");
+    DefineOutputParameter<bool>("aaaaaaaaaaa");
+  }
 
   void Process() override
   {
