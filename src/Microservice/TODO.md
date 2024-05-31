@@ -7,10 +7,12 @@
 - [ ] workflow save to / load from file - json
 - [ ] fetch all inputs recursively when notified
 - [ ] add strongly-typed UserParameters (manual params) and a way to edit them
+- [ ] derive more specific classes from Microservice for control flow - not all microservices have start / completed, e.g. plot / start
 
 # GUI
 - [ ] gui layout save? - json
 - [ ] connection curves fix
-- [ ] input / output parameter text alignment
+- [x] input / output parameter text alignment
 - [x] use *this* as node/link/pin ids
 - [ ] pin sprites depending on parameter type
+- [ ] show flow

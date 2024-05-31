@@ -7,18 +7,6 @@
 namespace ed = ax::NodeEditor;
 using ax::Widgets::IconType;
 
-enum class PinType
-{
-  Flow,
-  Bool,
-  Int,
-  Float,
-  String,
-  Object,
-  Function,
-  Delegate,
-};
-
 struct MicroserviceEditor
 {
   ed::EditorContext* context = nullptr;
@@ -55,6 +43,18 @@ struct MicroserviceEditor
   }
 
   void EndColumn() { ImGui::EndGroup(); }
+
+  enum class PinType
+  {
+    Flow,
+    Bool,
+    Int,
+    Float,
+    String,
+    Object,
+    Function,
+    Delegate,
+  };
 
   ImColor GetIconColor(PinType type)
   {
@@ -220,10 +220,7 @@ struct MicroserviceEditor
   {
     auto& io = ImGui::GetIO();
     ImGui::Separator();
-
     ed::SetCurrentEditor(context);
-
-    // Start interaction with editor.
     ed::Begin("Microservice Editor", ImVec2(0.0, 0.0f));
 
     for (const auto& microservice : workflow.GetMicroservices())
@@ -233,67 +230,36 @@ struct MicroserviceEditor
       for (const auto& connection : connections)
         ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
 
-    //
-    // 2) Handle interactions
-    //
-
-    // Handle creation action, returns true if editor want to create new object (node or link)
     if (ed::BeginCreate())
     {
       ed::PinId inputPinId, outputPinId;
       if (ed::QueryNewLink(&inputPinId, &outputPinId))
       {
-        // QueryNewLink returns true if editor want to create new link between pins.
-        //
-        // Link can be created only for two valid pins, it is up to you to
-        // validate if connection make sense. Editor is happy to make any.
-        //
-        // Link always goes from input to output. User may choose to drag
-        // link from output pin or input pin. This determine which pin ids
-        // are valid and which are not:
-        //   * input valid, output invalid - user started to drag new link from input pin
-        //   * input invalid, output valid - user started to drag new link from output pin
-        //   * input valid, output valid   - user dragged link over other pin, can be validated
-
-        if (inputPinId and outputPinId) // both are valid, let's accept link
+        if (inputPinId and outputPinId)
         {
-          // ed::AcceptNewItem() return true when user release mouse button.
           if (ed::AcceptNewItem())
             workflow.Connect(inputPinId.Get(), outputPinId.Get());
-
-          // You may choose to reject connection between these nodes
-          // by calling ed::RejectNewItem(). This will allow editor to give
-          // visual feedback by changing link thickness and color.
         }
       }
     }
-    ed::EndCreate(); // Wraps up object creation action handling.
+    ed::EndCreate();
 
-    // Handle deletion action
     if (ed::BeginDelete())
     {
-      // There may be many links marked for deletion, let's loop over them.
       ed::LinkId deletedLinkId;
       while (ed::QueryDeletedLink(&deletedLinkId))
       {
-        // If you agree that link can be deleted, accept deletion.
         if (ed::AcceptDeletedItem())
           workflow.Disconnect(deletedLinkId.Get());
-
-        // You may reject link deletion by calling:
-        // ed::RejectDeletedItem();
       }
     }
-    ed::EndDelete(); // Wrap up deletion action
+    ed::EndDelete();
 
-    // End of interaction with editor.
     ed::End();
 
     if (firstFrame)
       ed::NavigateToContent(0.0f);
-
     ed::SetCurrentEditor(nullptr);
-
     firstFrame = false;
   }
 };
