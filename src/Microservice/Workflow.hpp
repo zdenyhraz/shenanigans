@@ -22,13 +22,13 @@ class Workflow
   std::vector<std::unique_ptr<Microservice>> microservices;
   std::unordered_map<Microservice*, std::vector<MicroserviceConnection>> connections;
 
-  void Execute(Microservice& microservice)
+  void ExecuteMicroservice(Microservice& microservice)
   try
   {
-    // do the processing
+    // 1) do the processing
     microservice.Process();
 
-    // notify connected microservices to start processing
+    // 2) notify connected microservices to start processing
     if (not connections.contains(&microservice))
       return;
 
@@ -39,7 +39,7 @@ class Workflow
       LOG_DEBUG("'{}'", connection.inputMicroservice->GetName());
 
     for (auto& connection : relevantConnections)
-      Execute(*connection.inputMicroservice);
+      ExecuteMicroservice(*connection.inputMicroservice);
   }
   catch (const std::exception& e)
   {
@@ -49,7 +49,9 @@ class Workflow
 public:
   Workflow() { microservices.push_back(std::make_unique<StartMicroservice>()); }
 
-  Workflow(const std::filesystem::path& path) : Workflow()
+  Workflow(const std::filesystem::path& path) : Workflow() { Load(path); }
+
+  void Load(const std::filesystem::path& path)
   {
     // TODO: load microservices from file
     // TODO: load connections from file
@@ -80,9 +82,9 @@ public:
     LOG_DEBUG("Running workflow '{}'", GetName());
     auto startMicroservice = std::ranges::find_if(microservices, [](const auto& ms) { return dynamic_cast<StartMicroservice*>(ms.get()); });
     if (startMicroservice == microservices.end())
-      throw std::runtime_error("Missing start microservice");
+      throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
 
-    Execute(**startMicroservice);
+    ExecuteMicroservice(**startMicroservice);
   }
   catch (const std::exception& e)
   {
@@ -123,47 +125,32 @@ public:
     Connect(std::move(connection));
   }
 
-  void Connect(uintptr_t outputId, uintptr_t inputId)
+  void Connect(uintptr_t startId, uintptr_t endId)
   {
-    // TODO: remove this and use pin.aspointer
     MicroserviceConnection connection;
     for (const auto& microservice : microservices)
     {
-      if (microservice->GetFinishParameter().GetId() == outputId)
-      {
-        connection.outputMicroservice = microservice.get();
-        connection.outputParameter = &microservice->GetFinishParameter();
-      }
-      else
-      {
-        for (auto& [name, param] : microservice->GetOutputParameters())
-        {
-          if (param.GetId() == outputId)
-          {
-            connection.outputMicroservice = microservice.get();
-            connection.outputParameter = &param;
-            break;
-          }
-        }
-      }
-
-      if (microservice->GetStartParameter().GetId() == inputId)
+      if (auto param = microservice->FindInputParameter(startId))
       {
         connection.inputMicroservice = microservice.get();
-        connection.inputParameter = &microservice->GetStartParameter();
+        connection.inputParameter = param.value();
       }
-      else
+      if (auto param = microservice->FindInputParameter(endId))
       {
-        for (auto& [name, param] : microservice->GetInputParameters())
-        {
-          if (param.GetId() == inputId)
-          {
-            connection.inputMicroservice = microservice.get();
-            connection.inputParameter = &param;
-            break;
-          }
-        }
+        connection.inputMicroservice = microservice.get();
+        connection.inputParameter = param.value();
       }
+      if (auto param = microservice->FindOutputParameter(startId))
+      {
+        connection.outputMicroservice = microservice.get();
+        connection.outputParameter = param.value();
+      }
+      if (auto param = microservice->FindOutputParameter(endId))
+      {
+        connection.outputMicroservice = microservice.get();
+        connection.outputParameter = param.value();
+      }
+
       if (connection.outputMicroservice and connection.inputMicroservice)
         break;
     }

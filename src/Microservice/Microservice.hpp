@@ -182,4 +182,28 @@ public:
     for (auto& [name, param] : outputParameters)
       param.Reset();
   }
+
+  std::optional<MicroserviceInputParameter*> FindInputParameter(uintptr_t parameterId)
+  {
+    if (start.GetId() == parameterId)
+      return &start;
+
+    for (auto& [name, param] : inputParameters)
+      if (param.GetId() == parameterId)
+        return &param;
+
+    return std::nullopt;
+  }
+
+  std::optional<MicroserviceOutputParameter*> FindOutputParameter(uintptr_t parameterId)
+  {
+    if (finish.GetId() == parameterId)
+      return &finish;
+
+    for (auto& [name, param] : outputParameters)
+      if (param.GetId() == parameterId)
+        return &param;
+
+    return std::nullopt;
+  }
 };
