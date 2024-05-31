@@ -8,7 +8,7 @@
 enum class WorkflowType
 {
   Simple, // all microservice inputs come from a single source, no flow control
-  Normal, // TODO: flow control
+  Normal, // TODO: flow control - recursively fetch inputs
 };
 
 class Workflow
@@ -112,6 +112,35 @@ class Workflow
     connections[connection.outputMicroservice].push_back(std::move(connection));
   }
 
+  void RunSimple()
+  {
+    auto startMicroservices = std::views::filter(microservices,
+        [this](const auto& ms)
+        {
+          return std::ranges::none_of(
+              connections, [&ms](const auto& connvec) { return std::ranges::any_of(connvec.second, [&ms](const auto& conn) { return conn.inputMicroservice == ms.get(); }); });
+        });
+
+    if (startMicroservices.empty())
+      throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
+
+    LOG_DEBUG("Identified {} start microservices:", std::ranges::distance(startMicroservices));
+    for (const auto& startMicroservice : startMicroservices)
+      LOG_DEBUG("   {}", startMicroservice->GetName());
+
+    for (const auto& startMicroservice : startMicroservices)
+      ExecuteMicroservice(*startMicroservice);
+  }
+
+  void RunNormal()
+  {
+    auto startMicroservice = std::ranges::find_if(microservices, [](const auto& ms) { return dynamic_cast<StartMicroservice*>(ms.get()); });
+    if (startMicroservice == microservices.end())
+      throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
+
+    ExecuteMicroservice(**startMicroservice);
+  }
+
 public:
   Workflow(WorkflowType _type = WorkflowType::Simple) : type(_type)
   {
@@ -145,35 +174,6 @@ public:
   {
     for (const auto& microservice : microservices)
       microservice->Initialize();
-  }
-
-  void RunSimple()
-  {
-    auto startMicroservices = std::views::filter(microservices,
-        [this](const auto& ms)
-        {
-          return std::ranges::none_of(
-              connections, [&ms](const auto& connvec) { return std::ranges::any_of(connvec.second, [&ms](const auto& conn) { return conn.inputMicroservice == ms.get(); }); });
-        });
-
-    if (startMicroservices.empty())
-      throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
-
-    LOG_DEBUG("Identified {} start microservices:", std::ranges::distance(startMicroservices));
-    for (const auto& startMicroservice : startMicroservices)
-      LOG_DEBUG("   {}", startMicroservice->GetName());
-
-    for (const auto& startMicroservice : startMicroservices)
-      ExecuteMicroservice(*startMicroservice);
-  }
-
-  void RunNormal()
-  {
-    auto startMicroservice = std::ranges::find_if(microservices, [](const auto& ms) { return dynamic_cast<StartMicroservice*>(ms.get()); });
-    if (startMicroservice == microservices.end())
-      throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
-
-    ExecuteMicroservice(**startMicroservice);
   }
 
   void Run()
