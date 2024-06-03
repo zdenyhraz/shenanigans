@@ -12,7 +12,7 @@ class BlurImageMicroservice : public Microservice
   }
 
 public:
-  BlurImageMicroservice() : Microservice()
+  BlurImageMicroservice()
   {
     GenerateMicroserviceName();
     DefineInputParameter<cv::Mat>("image");

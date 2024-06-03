@@ -10,7 +10,7 @@ class PlotImageMicroservice : public Microservice
   }
 
 public:
-  PlotImageMicroservice() : Microservice()
+  PlotImageMicroservice()
   {
     GenerateMicroserviceName();
     DefineInputParameter<cv::Mat>("image");

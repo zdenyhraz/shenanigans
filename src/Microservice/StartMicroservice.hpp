@@ -6,5 +6,5 @@ class StartMicroservice : public Microservice
   void Process() override {}
 
 public:
-  StartMicroservice() : Microservice() { GenerateMicroserviceName(); }
+  StartMicroservice() { GenerateMicroserviceName(); }
 };

@@ -11,7 +11,7 @@ class LoadImageMicroservice : public Microservice
   }
 
 public:
-  LoadImageMicroservice() : Microservice()
+  LoadImageMicroservice()
   {
     GenerateMicroserviceName();
     DefineOutputParameter<cv::Mat>("image");

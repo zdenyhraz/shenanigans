@@ -155,8 +155,6 @@ protected:
 public:
   virtual ~Microservice() {}
 
-  Microservice() {}
-
   virtual void Process() = 0;
 
   const std::string& GetName() { return microserviceName; }
@@ -176,6 +174,24 @@ public:
   InputParameter& GetFlowInputParameter() { return flowInput; }
 
   OutputParameter& GetFlowOutputParameter() { return flowOutput; }
+
+  void AddInputConnection(const Connection& connection) { inputConnections.push_back(connection); }
+
+  void AddOutputConnection(const Connection& connection) { outputConnections.push_back(connection); }
+
+  void RemoveInputConnection(const Connection& connection) { inputConnections.erase(std::ranges::remove(inputConnections, connection).begin(), inputConnections.end()); }
+
+  void RemoveOutputConnection(const Connection& connection) { outputConnections.erase(std::ranges::remove(outputConnections, connection).begin(), outputConnections.end()); }
+
+  bool IsInputConnected(const InputParameter& param)
+  {
+    return std::ranges::any_of(inputConnections, [&param](const auto& conn) { return conn.inputParameter == &param; });
+  }
+
+  bool IsOutputConnected(const OutputParameter& param)
+  {
+    return std::ranges::any_of(outputConnections, [&param](const auto& conn) { return conn.outputParameter == &param; });
+  }
 
   InputParameter& GetInputParameter(const std::string& paramName)
   {
@@ -224,23 +240,5 @@ public:
         return &param;
 
     return std::nullopt;
-  }
-
-  void AddInputConnection(const Connection& connection) { inputConnections.push_back(connection); }
-
-  void AddOutputConnection(const Connection& connection) { outputConnections.push_back(connection); }
-
-  void RemoveInputConnection(const Connection& connection) { inputConnections.erase(std::ranges::remove(inputConnections, connection).begin(), inputConnections.end()); }
-
-  void RemoveOutputConnection(const Connection& connection) { outputConnections.erase(std::ranges::remove(outputConnections, connection).begin(), outputConnections.end()); }
-
-  bool IsInputConnected(const InputParameter& param)
-  {
-    return std::ranges::any_of(inputConnections, [&param](const auto& conn) { return conn.inputParameter == &param; });
-  }
-
-  bool IsOutputConnected(const OutputParameter& param)
-  {
-    return std::ranges::any_of(outputConnections, [&param](const auto& conn) { return conn.outputParameter == &param; });
   }
 };
