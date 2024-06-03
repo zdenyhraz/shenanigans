@@ -115,11 +115,13 @@ public:
   {
     LOG_DEBUG("Running workflow '{}'", GetName());
 
-    auto startMicroservice = std::ranges::find_if(microservices, [](const auto& ms) { return dynamic_cast<StartMicroservice*>(ms.get()); });
-    if (startMicroservice == microservices.end())
+    if (microservices.empty())
       throw std::runtime_error(fmt::format("Workflow '{}' is missing a start microservice", GetName()));
 
-    ExecuteMicroservice(**startMicroservice);
+    if (microservices.size() == 1)
+      return LOG_WARNING("Workflow '{}' does not contain any microservices", GetName());
+
+    ExecuteMicroservice(*microservices.front());
   }
   catch (const std::exception& e)
   {

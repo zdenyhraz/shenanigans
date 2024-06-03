@@ -11,8 +11,8 @@
 
 # GUI
 - [ ] gui layout save? - json
-- [ ] connection curves fix
+- [x] connection curves fix
 - [x] input / output parameter text alignment
 - [x] use *this* as node/link/pin ids
-- [ ] pin sprites depending on parameter type
+- [x] pin sprites depending on parameter type
 - [ ] show flow
