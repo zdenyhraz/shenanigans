@@ -197,7 +197,7 @@ public:
     connections.erase(std::ranges::remove(connections, connection).begin(), connections.end());
     connection.outputMicroservice->RemoveOutputConnection(connection);
     connection.inputMicroservice->RemoveInputConnection(connection);
-    return LOG_DEBUG("Disconnected connection {}", connectionId);
+    return LOG_DEBUG("Disconnected connection {}", connection.GetString());
   }
 
   void TestInitialize()
