@@ -189,7 +189,7 @@ struct MicroserviceEditor
     ImGui::Text(name.c_str());
   }
 
-  void RenderNode(Microservice& microservice, WorkflowType workflowType)
+  void RenderNode(Microservice& microservice)
   {
     ed::BeginNode(microservice.GetId());
     const auto inputColumnTextSize = GetLongestInputParameterNameLength(microservice);
@@ -199,15 +199,13 @@ struct MicroserviceEditor
 
     BeginColumn();
 
-    if (workflowType != WorkflowType::Simple)
-      RenderInputFlowPin(microservice);
+    RenderInputFlowPin(microservice);
     for (const auto& [name, param] : microservice.GetInputParameters())
       RenderInputPin(name, param);
 
     NextColumn();
 
-    if (workflowType != WorkflowType::Simple)
-      RenderOutputFlowPin(microservice, outputColumnTextSize);
+    RenderOutputFlowPin(microservice, outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
       RenderOutputPin(name, param, outputColumnTextSize);
 
@@ -224,7 +222,7 @@ struct MicroserviceEditor
     ed::Begin("Microservice Editor", ImVec2(0.0, 0.0f));
 
     for (const auto& microservice : workflow.GetMicroservices())
-      RenderNode(*microservice, workflow.GetType());
+      RenderNode(*microservice);
 
     for (const auto& [microservice, connections] : workflow.GetConnections())
       for (const auto& connection : connections)
