@@ -14,10 +14,10 @@ class Workflow
   void FetchInputs(Microservice& microservice)
   {
     auto relevantConnections = std::views::filter(microservice.GetInputConnections(),
-        [&microservice](const auto& conn) { return not conn.inputParameter->value and conn.inputParameter != &microservice.GetStartParameter(); });
+        [](const auto& conn) { return not conn.inputParameter->value and conn.inputParameter != &conn.inputMicroservice->GetStartParameter(); });
 
     LOG_DEBUG("Microservice '{}' has {} input parameter dependencies:", microservice.GetName(), std::ranges::distance(relevantConnections));
-    for (auto& connection : relevantConnections)
+    for (const auto& connection : relevantConnections)
       LOG_DEBUG("   {}", connection.GetString());
 
     for (auto& connection : relevantConnections)
@@ -33,10 +33,10 @@ class Workflow
   void Propagate(Microservice& microservice)
   {
     auto relevantConnections =
-        std::views::filter(microservice.GetOutputConnections(), [&microservice](const auto& conn) { return conn.outputParameter == &microservice.GetFinishParameter(); });
+        std::views::filter(microservice.GetOutputConnections(), [](const auto& conn) { return conn.outputParameter == &conn.outputMicroservice->GetFinishParameter(); });
 
     LOG_DEBUG("Microservice '{}' has {} output connections:", microservice.GetName(), std::ranges::distance(relevantConnections));
-    for (auto& connection : relevantConnections)
+    for (const auto& connection : relevantConnections)
       LOG_DEBUG("   {}", connection.GetString());
 
     for (auto& connection : relevantConnections)
