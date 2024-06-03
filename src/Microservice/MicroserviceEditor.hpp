@@ -140,6 +140,37 @@ struct MicroserviceEditor
     ed::EndNode();
   }
 
+  void RenderLink(const Microservice::Connection& connection) { ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId()); }
+
+  void HandleLinkCreate()
+  {
+    if (ed::BeginCreate())
+    {
+      ed::PinId inputPinId, outputPinId;
+      if (ed::QueryNewLink(&inputPinId, &outputPinId))
+      {
+        if (inputPinId and outputPinId)
+          if (ed::AcceptNewItem())
+            workflow.Connect(inputPinId.Get(), outputPinId.Get());
+      }
+    }
+    ed::EndCreate();
+  }
+
+  void HandleLinkDelete()
+  {
+    if (ed::BeginDelete())
+    {
+      ed::LinkId deletedLinkId;
+      while (ed::QueryDeletedLink(&deletedLinkId))
+      {
+        if (ed::AcceptDeletedItem())
+          workflow.Disconnect(deletedLinkId.Get());
+      }
+    }
+    ed::EndDelete();
+  }
+
   void OnFrame()
   {
     auto& io = ImGui::GetIO();
@@ -151,32 +182,10 @@ struct MicroserviceEditor
       RenderNode(*microservice);
 
     for (const auto& connection : workflow.GetConnections())
-      ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
+      RenderLink(connection);
 
-    if (ed::BeginCreate())
-    {
-      ed::PinId inputPinId, outputPinId;
-      if (ed::QueryNewLink(&inputPinId, &outputPinId))
-      {
-        if (inputPinId and outputPinId)
-        {
-          if (ed::AcceptNewItem())
-            workflow.Connect(inputPinId.Get(), outputPinId.Get());
-        }
-      }
-    }
-    ed::EndCreate();
-
-    if (ed::BeginDelete())
-    {
-      ed::LinkId deletedLinkId;
-      while (ed::QueryDeletedLink(&deletedLinkId))
-      {
-        if (ed::AcceptDeletedItem())
-          workflow.Disconnect(deletedLinkId.Get());
-      }
-    }
-    ed::EndDelete();
+    HandleLinkCreate();
+    HandleLinkDelete();
 
     ed::End();
 
