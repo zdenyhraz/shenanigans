@@ -208,8 +208,6 @@ public:
     microservices.push_back(std::make_unique<BlurImageMicroservice>());
     microservices.push_back(std::make_unique<BlurImageMicroservice>());
     microservices.push_back(std::make_unique<BlurImageMicroservice>());
-    microservices.push_back(std::make_unique<BlurImageMicroservice>());
-    microservices.push_back(std::make_unique<BlurImageMicroservice>());
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
@@ -218,24 +216,15 @@ public:
 
     auto& start = *microservices[0];
     auto& load = *microservices[1];
-    auto& blur1 = *microservices[2];
-    auto& blur2 = *microservices[3];
-    auto& blur3 = *microservices[4];
-    auto& blur4 = *microservices[5];
-    auto& blur5 = *microservices[6];
-    auto& plot1 = *microservices[7];
-    auto& plot2 = *microservices[8];
-    auto& plot3 = *microservices[9];
+    auto& blur3 = *microservices[2];
+    auto& blur4 = *microservices[3];
+    auto& blur5 = *microservices[4];
+    auto& plot1 = *microservices[5];
+    auto& plot2 = *microservices[6];
+    auto& plot3 = *microservices[7];
 
-    Connect(start, blur1);
-
-    Connect(load, blur1, "image", "image");
-
-    Connect(blur1, blur2);
-    Connect(blur1, blur2, "blurred", "image");
-
-    Connect(blur2, blur3);
-    Connect(blur2, blur3, "blurred", "image");
+    Connect(start, blur3);
+    Connect(load, blur3, "image", "image");
 
     Connect(blur3, blur4);
     Connect(blur3, blur4, "blurred", "image");
