@@ -9,7 +9,7 @@ class Workflow
 {
   std::string name = "Default workflow";
   std::vector<std::unique_ptr<Microservice>> microservices;
-  std::unordered_map<Microservice*, std::vector<Microservice::Connection>> connections;
+  std::vector<Microservice::Connection> connections;
 
   void FetchInputs(Microservice& microservice)
   {
@@ -60,27 +60,25 @@ class Workflow
     if (not connection.outputMicroservice or not connection.inputMicroservice or not connection.outputParameter or not connection.inputParameter)
       return LOG_WARNING("Ignoring invalid connection");
 
+    if (std::ranges::any_of(connections, [&connection](const auto& conn) { return conn == connection; }))
+      return LOG_WARNING("Ignoring duplicate connection {}", connection.GetString());
+
     if (connection.outputParameter->type != connection.inputParameter->type)
       return LOG_WARNING("Connection {} type mismatch: {} != {}", connection.GetString(), connection.inputParameter->type.name(), connection.outputParameter->type.name());
 
     if (connection.inputParameter->type != typeid(Microservice::FlowParameter))
-      if (std::ranges::any_of(connections, [&connection](const auto& connvec)
-              { return std::ranges::any_of(connvec.second, [&connection](const auto& conn) { return conn.inputParameter == connection.inputParameter; }); }))
+      if (std::ranges::any_of(connections, [&connection](const auto& conn) { return conn.inputParameter == connection.inputParameter; }))
         return LOG_WARNING("Connection to {}:{} already exists", connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
 
     if (connection.outputMicroservice == connection.inputMicroservice)
       return LOG_WARNING("Connection {}: cannot connect microservice to itself ", connection.GetString());
-
-    if (connections.contains(connection.outputMicroservice))
-      if (std::ranges::any_of(connections.at(connection.outputMicroservice), [&connection](auto& conn) { return conn == connection; }))
-        return LOG_WARNING("Ignoring duplicate connection {}", connection.GetString());
 
     LOG_DEBUG("Connected {}", connection.GetString());
 
     connection.inputParameter->value = &connection.outputParameter->value;
     connection.outputMicroservice->AddOutputConnection(connection);
     connection.inputMicroservice->AddInputConnection(connection);
-    connections[connection.outputMicroservice].push_back(std::move(connection));
+    connections.push_back(std::move(connection));
   }
 
 public:
@@ -105,7 +103,7 @@ public:
 
   const std::string& GetName() { return name; }
   const std::vector<std::unique_ptr<Microservice>>& GetMicroservices() { return microservices; }
-  const std::unordered_map<Microservice*, std::vector<Microservice::Connection>>& GetConnections() { return connections; }
+  const std::vector<Microservice::Connection>& GetConnections() { return connections; }
 
   void Initialize()
   {
@@ -185,14 +183,11 @@ public:
 
   void Disconnect(uintptr_t connectionId)
   {
-    for (auto& [ms, connectionvec] : connections)
-    {
-      const auto size = connectionvec.size();
-      auto conn = std::ranges::remove_if(connectionvec, [connectionId](const auto& conn) { return conn.GetId() == connectionId; });
-      connectionvec.erase(conn.begin(), connectionvec.end());
-      if (connectionvec.size() != size)
-        return LOG_DEBUG("Disconnected connection {}", connectionId);
-    }
+    const auto size = connections.size();
+    auto conn = std::ranges::remove_if(connections, [connectionId](const auto& conn) { return conn.GetId() == connectionId; });
+    connections.erase(conn.begin(), connections.end());
+    if (connections.size() != size)
+      return LOG_DEBUG("Disconnected connection {}", connectionId);
     LOG_WARNING("Ignoring disconnect of connection {}", connectionId);
   }
 

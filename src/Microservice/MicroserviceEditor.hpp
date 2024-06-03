@@ -150,9 +150,8 @@ struct MicroserviceEditor
     for (const auto& microservice : workflow.GetMicroservices())
       RenderNode(*microservice);
 
-    for (const auto& [microservice, connections] : workflow.GetConnections())
-      for (const auto& connection : connections)
-        ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
+    for (const auto& connection : workflow.GetConnections())
+      ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
 
     if (ed::BeginCreate())
     {
