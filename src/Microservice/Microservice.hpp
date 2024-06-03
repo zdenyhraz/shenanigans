@@ -1,42 +1,63 @@
 #pragma once
 
-struct MicroserviceFlowParameter
-{
-};
-
-struct MicroserviceInputParameter
-{
-  const std::type_info& type;
-  std::string name;
-  std::any* value; // pointer to avoid data duplication
-
-  MicroserviceInputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
-
-  uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
-  const std::string& GetName() const { return name; }
-  void Reset() { value = nullptr; }
-};
-
-struct MicroserviceOutputParameter
-{
-  const std::type_info& type;
-  std::string name;
-  std::any value;
-
-  MicroserviceOutputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
-
-  uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
-  const std::string& GetName() const { return name; }
-  void Reset() { value.reset(); }
-};
-
 class Microservice
 {
+public:
+  struct FlowParameter
+  {
+  };
+
+  struct InputParameter
+  {
+    const std::type_info& type;
+    std::string name;
+    std::any* value; // pointer to avoid data duplication
+
+    InputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
+
+    uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+    const std::string& GetName() const { return name; }
+    void Reset() { value = nullptr; }
+  };
+
+  struct OutputParameter
+  {
+    const std::type_info& type;
+    std::string name;
+    std::any value;
+
+    OutputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
+
+    uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+    const std::string& GetName() const { return name; }
+    void Reset() { value.reset(); }
+  };
+
+  struct Connection
+  {
+    Microservice* outputMicroservice = nullptr;
+    Microservice* inputMicroservice = nullptr;
+    OutputParameter* outputParameter = nullptr;
+    InputParameter* inputParameter = nullptr;
+
+    auto operator<=>(const Connection&) const = default;
+
+    uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
+
+    std::string GetString() const
+    {
+      return fmt::format("{}:{} -> {}:{}", outputMicroservice->GetName(), outputParameter->GetName(), inputMicroservice->GetName(), inputParameter->GetName());
+    }
+  };
+
+private:
   std::string microserviceName;
-  MicroserviceInputParameter start = MicroserviceInputParameter{typeid(MicroserviceFlowParameter), ""};
-  MicroserviceOutputParameter finish = MicroserviceOutputParameter{typeid(MicroserviceFlowParameter), ""};
-  std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
-  std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
+  InputParameter start = InputParameter{typeid(FlowParameter), ""};
+  OutputParameter finish = OutputParameter{typeid(FlowParameter), ""};
+  std::unordered_map<std::string, InputParameter> inputParameters;
+  std::unordered_map<std::string, OutputParameter> outputParameters;
+  std::vector<Connection> inputConnections;
+  std::vector<Connection> outputConnections;
 
 protected:
   virtual void DefineInputParameters() = 0;
@@ -45,13 +66,13 @@ protected:
   template <typename T>
   void DefineInputParameter(const std::string& paramName)
   {
-    inputParameters.emplace(paramName, MicroserviceInputParameter{typeid(T), paramName});
+    inputParameters.emplace(paramName, InputParameter{typeid(T), paramName});
   }
 
   template <typename T>
   void DefineOutputParameter(const std::string& paramName)
   {
-    outputParameters.emplace(paramName, MicroserviceOutputParameter{typeid(T), paramName});
+    outputParameters.emplace(paramName, OutputParameter{typeid(T), paramName});
   }
 
   template <typename T>
@@ -145,15 +166,19 @@ public:
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
 
-  std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
+  std::unordered_map<std::string, InputParameter>& GetInputParameters() { return inputParameters; }
 
-  std::unordered_map<std::string, MicroserviceOutputParameter>& GetOutputParameters() { return outputParameters; }
+  std::unordered_map<std::string, OutputParameter>& GetOutputParameters() { return outputParameters; }
 
-  MicroserviceInputParameter& GetStartParameter() { return start; }
+  const std::vector<Connection>& GetInputConnections() { return inputConnections; }
 
-  MicroserviceOutputParameter& GetFinishParameter() { return finish; }
+  const std::vector<Connection>& GetOutputConnections() { return outputConnections; }
 
-  MicroserviceInputParameter& GetInputParameter(const std::string& paramName)
+  InputParameter& GetStartParameter() { return start; }
+
+  OutputParameter& GetFinishParameter() { return finish; }
+
+  InputParameter& GetInputParameter(const std::string& paramName)
   {
     if (not inputParameters.contains(paramName))
       throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
@@ -161,7 +186,7 @@ public:
     return inputParameters.at(paramName);
   }
 
-  MicroserviceOutputParameter& GetOutputParameter(const std::string& paramName)
+  OutputParameter& GetOutputParameter(const std::string& paramName)
   {
     if (not outputParameters.contains(paramName))
       throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
@@ -185,7 +210,7 @@ public:
       param.Reset();
   }
 
-  std::optional<MicroserviceInputParameter*> FindInputParameter(uintptr_t parameterId)
+  std::optional<InputParameter*> FindInputParameter(uintptr_t parameterId)
   {
     if (start.GetId() == parameterId)
       return &start;
@@ -197,7 +222,7 @@ public:
     return std::nullopt;
   }
 
-  std::optional<MicroserviceOutputParameter*> FindOutputParameter(uintptr_t parameterId)
+  std::optional<OutputParameter*> FindOutputParameter(uintptr_t parameterId)
   {
     if (finish.GetId() == parameterId)
       return &finish;
@@ -208,4 +233,8 @@ public:
 
     return std::nullopt;
   }
+
+  void AddInputConnection(const Connection& connection) { inputConnections.push_back(connection); }
+
+  void AddOutputConnection(const Connection& connection) { outputConnections.push_back(connection); }
 };

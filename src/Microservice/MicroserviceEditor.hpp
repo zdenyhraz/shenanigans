@@ -46,7 +46,7 @@ struct MicroserviceEditor
 
   ImColor GetIconColor(const std::type_info& type)
   {
-    if (type == typeid(MicroserviceFlowParameter))
+    if (type == typeid(Microservice::FlowParameter))
       return ImColor(255, 255, 255);
 
     return ImColor(51, 150, 215);
@@ -58,7 +58,7 @@ struct MicroserviceEditor
     ImColor color = GetIconColor(type);
     color.Value.w = alpha / 255.0f;
 
-    if (type == typeid(MicroserviceFlowParameter))
+    if (type == typeid(Microservice::FlowParameter))
       iconType = IconType::Flow;
 
     ax::Widgets::Icon(ImVec2(static_cast<float>(pinIconSize), static_cast<float>(pinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
@@ -84,7 +84,7 @@ struct MicroserviceEditor
     return maxSize;
   }
 
-  void RenderInputPin(const MicroserviceInputParameter& param)
+  void RenderInputPin(const Microservice::InputParameter& param)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Input);
     ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
@@ -95,7 +95,7 @@ struct MicroserviceEditor
     ed::EndPin();
   }
 
-  void RenderOutputPin(const MicroserviceOutputParameter& param, float outputColumnTextSize)
+  void RenderOutputPin(const Microservice::OutputParameter& param, float outputColumnTextSize)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Output);
     ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
