@@ -61,7 +61,7 @@ struct MicroserviceEditor
     if (type == typeid(Microservice::FlowParameter))
       iconType = IconType::Flow;
 
-    ax::Widgets::Icon(ImVec2(static_cast<float>(pinIconSize), static_cast<float>(pinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
+    ax::Widgets::Icon(ImVec2(pinIconSize, pinIconSize), iconType, connected, color, ImColor(32, 32, 32, alpha));
   };
 
   float GetLongestOutputParameterNameLength(Microservice& microservice)
@@ -125,13 +125,13 @@ struct MicroserviceEditor
 
     BeginColumn();
 
-    RenderInputPin(microservice.GetStartParameter(), microservice.IsInputConnected(microservice.GetStartParameter()));
+    RenderInputPin(microservice.GetFlowInputParameter(), microservice.IsInputConnected(microservice.GetFlowInputParameter()));
     for (const auto& [name, param] : microservice.GetInputParameters())
       RenderInputPin(param, microservice.IsInputConnected(param));
 
     NextColumn();
 
-    RenderOutputPin(microservice.GetFinishParameter(), microservice.IsOutputConnected(microservice.GetFinishParameter()), outputColumnTextSize);
+    RenderOutputPin(microservice.GetFlowOutputParameter(), microservice.IsOutputConnected(microservice.GetFlowOutputParameter()), outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
       RenderOutputPin(param, microservice.IsOutputConnected(param), outputColumnTextSize);
 

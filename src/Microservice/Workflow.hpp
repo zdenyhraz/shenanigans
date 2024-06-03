@@ -14,7 +14,7 @@ class Workflow
   void FetchInputParameters(Microservice& microservice)
   {
     auto relevantConnections = std::views::filter(microservice.GetInputConnections(), [](const auto& conn)
-        { return conn.inputParameter->value and not conn.inputParameter->value->has_value() and conn.inputParameter != &conn.inputMicroservice->GetStartParameter(); });
+        { return conn.inputParameter->value and not conn.inputParameter->value->has_value() and conn.inputParameter != &conn.inputMicroservice->GetFlowInputParameter(); });
 
     if (std::ranges::distance(relevantConnections) == 0)
       return;
@@ -36,7 +36,7 @@ class Workflow
   void PropagateFlow(Microservice& microservice)
   {
     auto relevantConnections =
-        std::views::filter(microservice.GetOutputConnections(), [](const auto& conn) { return conn.outputParameter == &conn.outputMicroservice->GetFinishParameter(); });
+        std::views::filter(microservice.GetOutputConnections(), [](const auto& conn) { return conn.outputParameter == &conn.outputMicroservice->GetFlowOutputParameter(); });
 
     if (std::ranges::distance(relevantConnections) == 0)
       return;
@@ -139,7 +139,7 @@ public:
 
   void Connect(Microservice& outputMicroservice, Microservice& inputMicroservice)
   {
-    Microservice::Connection connection(&outputMicroservice, &inputMicroservice, &outputMicroservice.GetFinishParameter(), &inputMicroservice.GetStartParameter());
+    Microservice::Connection connection(&outputMicroservice, &inputMicroservice, &outputMicroservice.GetFlowOutputParameter(), &inputMicroservice.GetFlowInputParameter());
     Connect(std::move(connection));
   }
 

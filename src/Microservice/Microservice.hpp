@@ -52,8 +52,8 @@ public:
 
 private:
   std::string microserviceName;
-  InputParameter start = InputParameter{typeid(FlowParameter), ""};
-  OutputParameter finish = OutputParameter{typeid(FlowParameter), ""};
+  InputParameter flowInput = InputParameter{typeid(FlowParameter), ""};
+  OutputParameter flowOutput = OutputParameter{typeid(FlowParameter), ""};
   std::unordered_map<std::string, InputParameter> inputParameters;
   std::unordered_map<std::string, OutputParameter> outputParameters;
   std::vector<Connection> inputConnections;
@@ -173,9 +173,9 @@ public:
 
   const std::vector<Connection>& GetOutputConnections() { return outputConnections; }
 
-  InputParameter& GetStartParameter() { return start; }
+  InputParameter& GetFlowInputParameter() { return flowInput; }
 
-  OutputParameter& GetFinishParameter() { return finish; }
+  OutputParameter& GetFlowOutputParameter() { return flowOutput; }
 
   InputParameter& GetInputParameter(const std::string& paramName)
   {
@@ -204,8 +204,8 @@ public:
 
   std::optional<InputParameter*> FindInputParameter(uintptr_t parameterId)
   {
-    if (start.GetId() == parameterId)
-      return &start;
+    if (flowInput.GetId() == parameterId)
+      return &flowInput;
 
     for (auto& [name, param] : inputParameters)
       if (param.GetId() == parameterId)
@@ -216,8 +216,8 @@ public:
 
   std::optional<OutputParameter*> FindOutputParameter(uintptr_t parameterId)
   {
-    if (finish.GetId() == parameterId)
-      return &finish;
+    if (flowOutput.GetId() == parameterId)
+      return &flowOutput;
 
     for (auto& [name, param] : outputParameters)
       if (param.GetId() == parameterId)
