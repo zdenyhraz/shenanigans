@@ -237,4 +237,8 @@ public:
   void AddInputConnection(const Connection& connection) { inputConnections.push_back(connection); }
 
   void AddOutputConnection(const Connection& connection) { outputConnections.push_back(connection); }
+
+  void RemoveInputConnection(const Connection& connection) { inputConnections.erase(std::ranges::remove(inputConnections, connection).begin(), inputConnections.end()); }
+
+  void RemoveOutputConnection(const Connection& connection) { outputConnections.erase(std::ranges::remove(outputConnections, connection).begin(), outputConnections.end()); }
 };

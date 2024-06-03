@@ -189,12 +189,15 @@ public:
 
   void Disconnect(uintptr_t connectionId)
   {
-    const auto size = connections.size();
-    auto conn = std::ranges::remove_if(connections, [connectionId](const auto& conn) { return conn.GetId() == connectionId; });
-    connections.erase(conn.begin(), connections.end());
-    if (connections.size() != size)
-      return LOG_DEBUG("Disconnected connection {}", connectionId);
-    LOG_WARNING("Ignoring disconnect of connection {}", connectionId);
+    auto conn = std::ranges::find_if(connections, [connectionId](const auto& conn) { return conn.GetId() == connectionId; });
+    if (conn == connections.end())
+      return LOG_WARNING("Ignoring disconnect of connection {}: connection not found", connectionId);
+
+    const auto connection = *conn;
+    connections.erase(std::ranges::remove(connections, connection).begin(), connections.end());
+    connection.outputMicroservice->RemoveOutputConnection(connection);
+    connection.inputMicroservice->RemoveInputConnection(connection);
+    return LOG_DEBUG("Disconnected connection {}", connectionId);
   }
 
   void TestInitialize()
@@ -225,6 +228,7 @@ public:
     auto& plot3 = *microservices[9];
 
     Connect(start, blur1);
+
     Connect(load, blur1, "image", "image");
 
     Connect(blur1, blur2);
