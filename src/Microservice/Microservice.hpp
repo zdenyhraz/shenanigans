@@ -11,9 +11,9 @@ public:
   {
     const std::type_info& type;
     std::string name;
-    std::any* value; // pointer to avoid data duplication
+    std::any* value = nullptr; // pointer to avoid data duplication
 
-    InputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
+    InputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name), value(nullptr) {}
 
     uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
     const std::string& GetName() const { return name; }

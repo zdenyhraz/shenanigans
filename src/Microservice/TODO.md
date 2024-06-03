@@ -4,7 +4,7 @@
 - [x] dont duplicate data storage during ms output -> ms input
 - [x] add dedicated start node
 - [x] add parameter id for pins
-- [ ] fetch all inputs recursively when notified
+- [x] fetch all inputs recursively when notified
 - [ ] add strongly-typed UserParameters (manual params) and a way to edit them
 - [ ] workflow save to / load from file - json
 - [ ] derive more specific classes from Microservice for control flow - not all microservices have start / completed, e.g. plot / start

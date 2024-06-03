@@ -11,10 +11,10 @@ class Workflow
   std::vector<std::unique_ptr<Microservice>> microservices;
   std::vector<Microservice::Connection> connections;
 
-  void FetchInputs(Microservice& microservice)
+  void FetchInputParameters(Microservice& microservice)
   {
-    auto relevantConnections = std::views::filter(microservice.GetInputConnections(),
-        [](const auto& conn) { return not conn.inputParameter->value and conn.inputParameter != &conn.inputMicroservice->GetStartParameter(); });
+    auto relevantConnections = std::views::filter(microservice.GetInputConnections(), [](const auto& conn)
+        { return conn.inputParameter->value and not conn.inputParameter->value->has_value() and conn.inputParameter != &conn.inputMicroservice->GetStartParameter(); });
 
     if (std::ranges::distance(relevantConnections) == 0)
       return;
@@ -29,11 +29,11 @@ class Workflow
 
   void Process(Microservice& microservice)
   {
-    LOG_DEBUG("{} processing", microservice.GetName());
+    LOG_DEBUG(">>> {} processing", microservice.GetName());
     microservice.Process();
   }
 
-  void Propagate(Microservice& microservice)
+  void PropagateFlow(Microservice& microservice)
   {
     auto relevantConnections =
         std::views::filter(microservice.GetOutputConnections(), [](const auto& conn) { return conn.outputParameter == &conn.outputMicroservice->GetFinishParameter(); });
@@ -52,9 +52,9 @@ class Workflow
   void ExecuteMicroservice(Microservice& microservice)
   try
   {
-    FetchInputs(microservice); // recusively fetch all input parameters
-    Process(microservice);     // do the processing
-    Propagate(microservice);   // notify connected microservices to start processing
+    FetchInputParameters(microservice); // recusively fetch all input parameters
+    Process(microservice);              // do the processing
+    PropagateFlow(microservice);        // notify connected microservices to start processing
   }
   catch (const std::exception& e)
   {
@@ -224,9 +224,7 @@ public:
     auto& plot2 = *microservices[8];
     auto& plot3 = *microservices[9];
 
-    Connect(start, load);
-
-    Connect(load, blur1);
+    Connect(start, blur1);
     Connect(load, blur1, "image", "image");
 
     Connect(blur1, blur2);
