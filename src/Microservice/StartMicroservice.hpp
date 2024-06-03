@@ -3,7 +3,8 @@
 
 class StartMicroservice : public Microservice
 {
-  void DefineInputParameters() override {}
-  void DefineOutputParameters() override {}
   void Process() override {}
+
+public:
+  StartMicroservice() : Microservice() { GenerateMicroserviceName(); }
 };

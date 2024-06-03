@@ -111,12 +111,6 @@ public:
   const std::vector<std::unique_ptr<Microservice>>& GetMicroservices() { return microservices; }
   const std::vector<Microservice::Connection>& GetConnections() { return connections; }
 
-  void Initialize()
-  {
-    for (const auto& microservice : microservices)
-      microservice->Initialize();
-  }
-
   void Run()
   try
   {
@@ -195,6 +189,7 @@ public:
 
     const auto connection = *conn;
     connections.erase(std::ranges::remove(connections, connection).begin(), connections.end());
+    connection.inputParameter->value = nullptr;
     connection.outputMicroservice->RemoveOutputConnection(connection);
     connection.inputMicroservice->RemoveInputConnection(connection);
     return LOG_DEBUG("Disconnected connection {}", connection.GetString());
@@ -211,8 +206,6 @@ public:
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
     microservices.push_back(std::make_unique<PlotImageMicroservice>());
-
-    Initialize();
 
     auto& start = *microservices[0];
     auto& load = *microservices[1];

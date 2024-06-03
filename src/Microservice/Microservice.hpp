@@ -60,9 +60,6 @@ private:
   std::vector<Connection> outputConnections;
 
 protected:
-  virtual void DefineInputParameters() = 0;
-  virtual void DefineOutputParameters() = 0;
-
   template <typename T>
   void DefineInputParameter(const std::string& paramName)
   {
@@ -158,6 +155,8 @@ protected:
 public:
   virtual ~Microservice() {}
 
+  Microservice() {}
+
   virtual void Process() = 0;
 
   const std::string& GetName() { return microserviceName; }
@@ -192,13 +191,6 @@ public:
       throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
 
     return outputParameters.at(paramName);
-  }
-
-  void Initialize()
-  {
-    GenerateMicroserviceName();
-    DefineInputParameters();
-    DefineOutputParameters();
   }
 
   void Reset() // call this on repeated workflows
@@ -241,4 +233,14 @@ public:
   void RemoveInputConnection(const Connection& connection) { inputConnections.erase(std::ranges::remove(inputConnections, connection).begin(), inputConnections.end()); }
 
   void RemoveOutputConnection(const Connection& connection) { outputConnections.erase(std::ranges::remove(outputConnections, connection).begin(), outputConnections.end()); }
+
+  bool IsInputConnected(const InputParameter& param)
+  {
+    return std::ranges::any_of(inputConnections, [&param](const auto& conn) { return conn.inputParameter == &param; });
+  }
+
+  bool IsOutputConnected(const OutputParameter& param)
+  {
+    return std::ranges::any_of(outputConnections, [&param](const auto& conn) { return conn.outputParameter == &param; });
+  }
 };

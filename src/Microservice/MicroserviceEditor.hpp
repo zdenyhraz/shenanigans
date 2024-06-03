@@ -84,18 +84,18 @@ struct MicroserviceEditor
     return maxSize;
   }
 
-  void RenderInputPin(const Microservice::InputParameter& param)
+  void RenderInputPin(const Microservice::InputParameter& param, bool connected)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Input);
     ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
     ed::PinPivotSize(ImVec2(0, 0));
-    DrawPinIcon(param.type, false, 255);
+    DrawPinIcon(param.type, connected, 255);
     ImGui::SameLine();
     ImGui::TextUnformatted(param.name.c_str());
     ed::EndPin();
   }
 
-  void RenderOutputPin(const Microservice::OutputParameter& param, float outputColumnTextSize)
+  void RenderOutputPin(const Microservice::OutputParameter& param, bool connected, float outputColumnTextSize)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Output);
     ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
@@ -104,7 +104,7 @@ struct MicroserviceEditor
     ImGui::SameLine();
     ImGui::TextUnformatted(param.name.c_str());
     ImGui::SameLine();
-    DrawPinIcon(param.type, false, 255);
+    DrawPinIcon(param.type, connected, 255);
     ed::EndPin();
   }
 
@@ -125,15 +125,15 @@ struct MicroserviceEditor
 
     BeginColumn();
 
-    RenderInputPin(microservice.GetStartParameter());
+    RenderInputPin(microservice.GetStartParameter(), microservice.IsInputConnected(microservice.GetStartParameter()));
     for (const auto& [name, param] : microservice.GetInputParameters())
-      RenderInputPin(param);
+      RenderInputPin(param, microservice.IsInputConnected(param));
 
     NextColumn();
 
-    RenderOutputPin(microservice.GetFinishParameter(), outputColumnTextSize);
+    RenderOutputPin(microservice.GetFinishParameter(), microservice.IsOutputConnected(microservice.GetFinishParameter()), outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
-      RenderOutputPin(param, outputColumnTextSize);
+      RenderOutputPin(param, microservice.IsOutputConnected(param), outputColumnTextSize);
 
     EndColumn();
 
