@@ -56,6 +56,22 @@ class Workflow
   {
     Process(microservice);   // do the processing
     Propagate(microservice); // notify connected microservices to start processing
+
+    // TODO: recusively fetch all input parameters
+    for (const auto& [name, param] : microservice.GetInputParameters())
+    {
+      if (param.value) // input parameter already calculated
+        continue;
+
+      auto relevantMicroservices = std::views::filter(microservices,
+          [this, &param](const auto& ms)
+          {
+            if (not connections.contains(ms.get()))
+              return false;
+
+            return std::ranges::any_of(connections.at(ms.get()), [&param](const auto& conn) { return conn.inputParameter == &param; });
+          });
+    }
   }
   catch (const std::exception& e)
   {
@@ -66,6 +82,11 @@ class Workflow
   {
     if (connection.outputParameter->type != connection.inputParameter->type)
       return LOG_WARNING("Connection {} type mismatch: {} != {}", connection.GetString(), connection.inputParameter->type.name(), connection.outputParameter->type.name());
+
+    if (connection.inputParameter->type != typeid(MicroserviceFlowParameter))
+      if (std::ranges::any_of(connections, [&connection](const auto& connvec)
+              { return std::ranges::any_of(connvec.second, [&connection](const auto& conn) { return conn.inputParameter == connection.inputParameter; }); }))
+        return LOG_WARNING("Connection to {}:{} already exists", connection.inputMicroservice->GetName(), connection.inputParameter->GetName());
 
     if (connection.outputMicroservice == connection.inputMicroservice)
       return LOG_WARNING("Connection {}: cannot connect microservice to itself ", connection.GetString());

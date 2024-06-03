@@ -1,6 +1,6 @@
 #pragma once
 
-struct MicroserviceStartFinish
+struct MicroserviceFlowParameter
 {
 };
 
@@ -33,8 +33,8 @@ struct MicroserviceOutputParameter
 class Microservice
 {
   std::string microserviceName;
-  MicroserviceInputParameter start = MicroserviceInputParameter{typeid(MicroserviceStartFinish), ""};
-  MicroserviceOutputParameter finish = MicroserviceOutputParameter{typeid(MicroserviceStartFinish), ""};
+  MicroserviceInputParameter start = MicroserviceInputParameter{typeid(MicroserviceFlowParameter), ""};
+  MicroserviceOutputParameter finish = MicroserviceOutputParameter{typeid(MicroserviceFlowParameter), ""};
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 

@@ -18,7 +18,7 @@ struct MicroserviceEditor
   void OnStart()
   {
     ed::Config config;
-    config.SettingsFile = "BasicInteraction.json";
+    config.SettingsFile = "MicroserviceEditor.json";
     context = ed::CreateEditor(&config);
     ed::SetCurrentEditor(context);
 
@@ -46,7 +46,7 @@ struct MicroserviceEditor
 
   ImColor GetIconColor(const std::type_info& type)
   {
-    if (type == typeid(MicroserviceStartFinish))
+    if (type == typeid(MicroserviceFlowParameter))
       return ImColor(255, 255, 255);
 
     return ImColor(51, 150, 215);
@@ -58,7 +58,7 @@ struct MicroserviceEditor
     ImColor color = GetIconColor(type);
     color.Value.w = alpha / 255.0f;
 
-    if (type == typeid(MicroserviceStartFinish))
+    if (type == typeid(MicroserviceFlowParameter))
       iconType = IconType::Flow;
 
     ax::Widgets::Icon(ImVec2(static_cast<float>(pinIconSize), static_cast<float>(pinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
