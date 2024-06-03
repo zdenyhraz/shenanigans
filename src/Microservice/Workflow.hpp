@@ -16,6 +16,9 @@ class Workflow
     auto relevantConnections = std::views::filter(microservice.GetInputConnections(),
         [](const auto& conn) { return not conn.inputParameter->value and conn.inputParameter != &conn.inputMicroservice->GetStartParameter(); });
 
+    if (std::ranges::distance(relevantConnections) == 0)
+      return;
+
     LOG_DEBUG("Microservice '{}' has {} input parameter dependencies:", microservice.GetName(), std::ranges::distance(relevantConnections));
     for (const auto& connection : relevantConnections)
       LOG_DEBUG("   {}", connection.GetString());
@@ -34,6 +37,9 @@ class Workflow
   {
     auto relevantConnections =
         std::views::filter(microservice.GetOutputConnections(), [](const auto& conn) { return conn.outputParameter == &conn.outputMicroservice->GetFinishParameter(); });
+
+    if (std::ranges::distance(relevantConnections) == 0)
+      return;
 
     LOG_DEBUG("Microservice '{}' has {} output connections:", microservice.GetName(), std::ranges::distance(relevantConnections));
     for (const auto& connection : relevantConnections)
