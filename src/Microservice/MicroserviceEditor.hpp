@@ -44,76 +44,22 @@ struct MicroserviceEditor
 
   void EndColumn() { ImGui::EndGroup(); }
 
-  enum class PinType
+  ImColor GetIconColor(const std::type_info& type)
   {
-    Flow,
-    Bool,
-    Int,
-    Float,
-    String,
-    Object,
-    Function,
-    Delegate,
-  };
-
-  ImColor GetIconColor(PinType type)
-  {
-    switch (type)
-    {
-    default:
-    case PinType::Flow:
+    if (type == typeid(MicroserviceStartFinish))
       return ImColor(255, 255, 255);
-    case PinType::Bool:
-      return ImColor(220, 48, 48);
-    case PinType::Int:
-      return ImColor(68, 201, 156);
-    case PinType::Float:
-      return ImColor(147, 226, 74);
-    case PinType::String:
-      return ImColor(124, 21, 153);
-    case PinType::Object:
-      return ImColor(51, 150, 215);
-    case PinType::Function:
-      return ImColor(218, 0, 183);
-    case PinType::Delegate:
-      return ImColor(255, 48, 48);
-    }
+
+    return ImColor(51, 150, 215);
   };
 
-  void DrawPinIcon(PinType type, bool connected, int alpha)
+  void DrawPinIcon(const std::type_info& type, bool connected, int alpha)
   {
-    IconType iconType;
+    IconType iconType = IconType::Circle;
     ImColor color = GetIconColor(type);
     color.Value.w = alpha / 255.0f;
-    switch (type)
-    {
-    case PinType::Flow:
+
+    if (type == typeid(MicroserviceStartFinish))
       iconType = IconType::Flow;
-      break;
-    case PinType::Bool:
-      iconType = IconType::Circle;
-      break;
-    case PinType::Int:
-      iconType = IconType::Circle;
-      break;
-    case PinType::Float:
-      iconType = IconType::Circle;
-      break;
-    case PinType::String:
-      iconType = IconType::Circle;
-      break;
-    case PinType::Object:
-      iconType = IconType::Circle;
-      break;
-    case PinType::Function:
-      iconType = IconType::Circle;
-      break;
-    case PinType::Delegate:
-      iconType = IconType::Square;
-      break;
-    default:
-      return;
-    }
 
     ax::Widgets::Icon(ImVec2(static_cast<float>(pinIconSize), static_cast<float>(pinIconSize)), iconType, connected, color, ImColor(32, 32, 32, alpha));
   };
@@ -138,47 +84,27 @@ struct MicroserviceEditor
     return maxSize;
   }
 
-  void RenderInputPin(const std::string& name, const MicroserviceInputParameter& param)
+  void RenderInputPin(const MicroserviceInputParameter& param)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Input);
     ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
     ed::PinPivotSize(ImVec2(0, 0));
-    DrawPinIcon(PinType::Object, false, 255);
+    DrawPinIcon(param.type, false, 255);
     ImGui::SameLine();
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(param.name.c_str());
     ed::EndPin();
   }
 
-  void RenderOutputPin(const std::string& name, const MicroserviceOutputParameter& param, float outputColumnTextSize)
+  void RenderOutputPin(const MicroserviceOutputParameter& param, float outputColumnTextSize)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Output);
     ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
     ed::PinPivotSize(ImVec2(0, 0));
-    ImGui::Dummy(ImVec2(outputColumnTextSize - ImGui::CalcTextSize(name.c_str()).x, 0));
+    ImGui::Dummy(ImVec2(outputColumnTextSize - ImGui::CalcTextSize(param.name.c_str()).x, 0));
     ImGui::SameLine();
-    ImGui::TextUnformatted(name.c_str());
+    ImGui::TextUnformatted(param.name.c_str());
     ImGui::SameLine();
-    DrawPinIcon(PinType::Object, false, 255);
-    ed::EndPin();
-  }
-
-  void RenderInputFlowPin(Microservice& microservice)
-  {
-    ed::BeginPin(microservice.GetStartId(), ed::PinKind::Input);
-    ed::PinPivotAlignment(ImVec2(0.0f, 0.5f));
-    ed::PinPivotSize(ImVec2(0, 0));
-    DrawPinIcon(PinType::Flow, false, 255); // TODO: check if connected
-    ed::EndPin();
-  }
-
-  void RenderOutputFlowPin(Microservice& microservice, float outputColumnTextSize)
-  {
-    ed::BeginPin(microservice.GetFinishId(), ed::PinKind::Output);
-    ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
-    ed::PinPivotSize(ImVec2(0, 0));
-    ImGui::Dummy(ImVec2(outputColumnTextSize + ImGui::GetStyle().FramePadding.x * 2, 0));
-    ImGui::SameLine();
-    DrawPinIcon(PinType::Flow, false, 255); // TODO: check if connected
+    DrawPinIcon(param.type, false, 255);
     ed::EndPin();
   }
 
@@ -199,15 +125,15 @@ struct MicroserviceEditor
 
     BeginColumn();
 
-    RenderInputFlowPin(microservice);
+    RenderInputPin(microservice.GetStartParameter());
     for (const auto& [name, param] : microservice.GetInputParameters())
-      RenderInputPin(name, param);
+      RenderInputPin(param);
 
     NextColumn();
 
-    RenderOutputFlowPin(microservice, outputColumnTextSize);
+    RenderOutputPin(microservice.GetFinishParameter(), outputColumnTextSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
-      RenderOutputPin(name, param, outputColumnTextSize);
+      RenderOutputPin(param, outputColumnTextSize);
 
     EndColumn();
 

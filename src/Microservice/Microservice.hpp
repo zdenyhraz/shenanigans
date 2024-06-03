@@ -6,9 +6,11 @@ struct MicroserviceStartFinish
 
 struct MicroserviceInputParameter
 {
-  std::type_index type = std::type_index(typeid(void));
-  std::any* value; // pointer to avoid data duplication
+  const std::type_info& type;
   std::string name;
+  std::any* value; // pointer to avoid data duplication
+
+  MicroserviceInputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
   const std::string& GetName() const { return name; }
@@ -17,9 +19,11 @@ struct MicroserviceInputParameter
 
 struct MicroserviceOutputParameter
 {
-  std::type_index type = std::type_index(typeid(void));
-  std::any value;
+  const std::type_info& type;
   std::string name;
+  std::any value;
+
+  MicroserviceOutputParameter(const std::type_info& _type, const std::string& _name) : type(_type), name(_name) {}
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
   const std::string& GetName() const { return name; }
@@ -29,8 +33,8 @@ struct MicroserviceOutputParameter
 class Microservice
 {
   std::string microserviceName;
-  MicroserviceInputParameter start = MicroserviceInputParameter{.type = std::type_index(typeid(MicroserviceStartFinish)), .name = "start"};
-  MicroserviceOutputParameter finish = MicroserviceOutputParameter{.type = std::type_index(typeid(MicroserviceStartFinish)), .name = "finish"};
+  MicroserviceInputParameter start = MicroserviceInputParameter{typeid(MicroserviceStartFinish), ""};
+  MicroserviceOutputParameter finish = MicroserviceOutputParameter{typeid(MicroserviceStartFinish), ""};
   std::unordered_map<std::string, MicroserviceInputParameter> inputParameters;
   std::unordered_map<std::string, MicroserviceOutputParameter> outputParameters;
 
@@ -41,13 +45,13 @@ protected:
   template <typename T>
   void DefineInputParameter(const std::string& paramName)
   {
-    inputParameters[paramName] = MicroserviceInputParameter{.type = std::type_index(typeid(T)), .name = paramName};
+    inputParameters.emplace(paramName, MicroserviceInputParameter{typeid(T), paramName});
   }
 
   template <typename T>
   void DefineOutputParameter(const std::string& paramName)
   {
-    outputParameters[paramName] = MicroserviceOutputParameter{.type = std::type_index(typeid(T)), .name = paramName};
+    outputParameters.emplace(paramName, MicroserviceOutputParameter{typeid(T), paramName});
   }
 
   template <typename T>
@@ -140,10 +144,6 @@ public:
   void SetName(const std::string& name) { microserviceName = name; }
 
   uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
-
-  uintptr_t GetStartId() const { return start.GetId(); }
-
-  uintptr_t GetFinishId() const { return finish.GetId(); }
 
   std::unordered_map<std::string, MicroserviceInputParameter>& GetInputParameters() { return inputParameters; }
 
