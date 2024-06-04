@@ -5,7 +5,7 @@
 - [x] add dedicated start node
 - [x] add parameter id for pins
 - [x] fetch all inputs recursively when notified
-- [ ] add strongly-typed UserParameters (manual params) and a way to edit them
+- [x] add strongly-typed UserParameters (manual params) and a way to edit them
 - [ ] workflow save to / load from file - json
 - [ ] derive more specific classes from Microservice for control flow - not all microservices have start / completed, e.g. plot / start
 
@@ -15,4 +15,4 @@
 - [x] input / output parameter text alignment
 - [x] use *this* as node/link/pin ids
 - [x] pin sprites depending on parameter type
-- [ ] show flow
+- [x] show flow

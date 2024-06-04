@@ -13,7 +13,7 @@ struct MicroserviceEditor
   bool firstFrame = true;
   Workflow workflow;
   const int pinIconSize = 24;
-  // const int nodeWidth = 200;
+  const int paramSize = 200;
 
   void OnStart()
   {
@@ -22,7 +22,8 @@ struct MicroserviceEditor
     context = ed::CreateEditor(&config);
     ed::SetCurrentEditor(context);
 
-    workflow.TestInitialize();
+    auto& editorStyle = ed::GetStyle();
+    editorStyle.LinkStrength = 1000;
 
     int ypos = 0;
     int xpos = 0;
@@ -84,6 +85,16 @@ struct MicroserviceEditor
     return maxSize;
   }
 
+  float GetLongestParameterNameLength(Microservice& microservice)
+  {
+    float maxSize = 0;
+    for (const auto& [name, param] : microservice.GetParameters())
+      if (auto textSize = ImGui::CalcTextSize(name.c_str()).x; textSize > maxSize)
+        maxSize = textSize;
+
+    return maxSize;
+  }
+
   void RenderInputPin(const Microservice::InputParameter& param, bool connected)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Input);
@@ -95,13 +106,13 @@ struct MicroserviceEditor
     ed::EndPin();
   }
 
-  void RenderOutputPin(const Microservice::OutputParameter& param, bool connected, float outputColumnTextSize)
+  void RenderOutputPin(const Microservice::OutputParameter& param, bool connected, float outputSize)
   {
+    ImGui::Dummy(ImVec2(outputSize - ImGui::CalcTextSize(param.name.c_str()).x - pinIconSize, 0));
+    ImGui::SameLine();
     ed::BeginPin(param.GetId(), ed::PinKind::Output);
     ed::PinPivotAlignment(ImVec2(1.0f, 0.5f));
     ed::PinPivotSize(ImVec2(0, 0));
-    ImGui::Dummy(ImVec2(outputColumnTextSize - ImGui::CalcTextSize(param.name.c_str()).x, 0));
-    ImGui::SameLine();
     ImGui::TextUnformatted(param.name.c_str());
     ImGui::SameLine();
     DrawPinIcon(param.type, connected, 255);
@@ -115,13 +126,47 @@ struct MicroserviceEditor
     ImGui::Text(name.c_str());
   }
 
+  void RenderParameter(Microservice::Parameter& param, const std::string& microserviceName)
+  {
+    ImGui::PushItemWidth(paramSize);
+
+    if (param.type == typeid(float))
+      ImGui::InputFloat(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<float>(&param.value), 0.01f, 1.0f, "%.3f");
+    else if (param.type == typeid(std::string))
+      ImGui::InputText(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<std::string>(&param.value));
+
+    ImGui::PopItemWidth();
+  }
+
   void RenderNode(Microservice& microservice)
   {
     ed::BeginNode(microservice.GetId());
-    const auto inputColumnTextSize = GetLongestInputParameterNameLength(microservice);
-    const auto outputColumnTextSize = GetLongestOutputParameterNameLength(microservice);
-    const auto nodeSize = inputColumnTextSize + outputColumnTextSize + pinIconSize * 2 + ImGui::GetStyle().FramePadding.x * 3;
-    RenderNodeName(microservice.GetName(), nodeSize);
+    const auto inputMaxTextSize = GetLongestInputParameterNameLength(microservice);
+    const auto outputMaxTextSize = GetLongestOutputParameterNameLength(microservice);
+    const auto inputSize = inputMaxTextSize + pinIconSize;
+    const auto outputSizeMin = outputMaxTextSize + pinIconSize;
+    const auto ioSizeMin = inputSize + outputSizeMin;
+
+    const auto paramsMaxTextSize = GetLongestParameterNameLength(microservice);
+    const auto paramsSizeMin = microservice.GetParameters().size() ? paramsMaxTextSize + paramSize : 0.0f;
+
+    const auto nodeSize = std::max(paramsSizeMin, ioSizeMin);
+    const auto outputSize = nodeSize - inputSize;
+
+    const auto& microserviceName = microservice.GetName();
+
+    if (false and firstFrame)
+    {
+      LOG_DEBUG("Microservice '{}' gui parameters:", microserviceName);
+      LOG_DEBUG("   ioSizeMin: {}", ioSizeMin);
+      LOG_DEBUG("   paramsMaxTextSize: {}", paramsMaxTextSize);
+      LOG_DEBUG("   paramsSizeMin: {}", paramsSizeMin);
+      LOG_DEBUG("   nodeSize: {}", nodeSize);
+      LOG_DEBUG("   inputSize: {}", inputSize);
+      LOG_DEBUG("   outputSize: {}", outputSize);
+    }
+
+    RenderNodeName(microserviceName, nodeSize);
 
     BeginColumn();
 
@@ -131,16 +176,25 @@ struct MicroserviceEditor
 
     NextColumn();
 
-    RenderOutputPin(microservice.GetFlowOutputParameter(), microservice.IsOutputConnected(microservice.GetFlowOutputParameter()), outputColumnTextSize);
+    RenderOutputPin(microservice.GetFlowOutputParameter(), microservice.IsOutputConnected(microservice.GetFlowOutputParameter()), outputSize);
     for (const auto& [name, param] : microservice.GetOutputParameters())
-      RenderOutputPin(param, microservice.IsOutputConnected(param), outputColumnTextSize);
+      RenderOutputPin(param, microservice.IsOutputConnected(param), outputSize);
 
     EndColumn();
+
+    for (auto& [name, param] : microservice.GetParameters())
+      RenderParameter(param, microserviceName);
 
     ed::EndNode();
   }
 
-  void RenderLink(const Microservice::Connection& connection) { ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId()); }
+  void RenderLink(const Microservice::Connection& connection)
+  {
+    ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
+    if constexpr (false)
+      if (connection.outputParameter == &connection.outputMicroservice->GetFlowOutputParameter())
+        ed::Flow(connection.GetId(), ed::FlowDirection::Backward);
+  }
 
   void HandleLinkCreate()
   {

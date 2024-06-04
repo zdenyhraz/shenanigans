@@ -4,7 +4,8 @@
 
 class MicroserviceEditorWindow : public Window
 {
-  void Test();
+  void TestInitialize();
+  void Run();
 
   MicroserviceEditor editor;
 

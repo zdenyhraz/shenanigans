@@ -3,6 +3,27 @@
 class Microservice
 {
 public:
+  class Exception : public std::exception
+  {
+  public:
+    template <typename... Args>
+    Exception(const Microservice* microservice, std::string_view fmt, Args&&... args)
+    {
+      message = fmt::format("Microservice '{}' error: {}", microservice->GetName(), fmt::vformat(fmt, fmt::make_format_args(args...)));
+    }
+
+    virtual const char* what() const { return message.c_str(); }
+
+  private:
+    std::string message;
+  };
+
+  template <typename... Args>
+  Exception MicroserviceException(std::string_view fmt, Args&&... args)
+  {
+    return Exception(this, fmt, std::forward<Args>(args)...);
+  }
+
   struct FlowParameter
   {
   };
@@ -33,6 +54,18 @@ public:
     void Reset() { value.reset(); }
   };
 
+  struct Parameter
+  {
+    const std::type_info& type;
+    std::string name;
+    std::any value;
+
+    template <typename T>
+    Parameter(const std::type_info& _type, const std::string& _name, const T& _value) : type(_type), name(_name), value(_value)
+    {
+    }
+  };
+
   struct Connection
   {
     Microservice* outputMicroservice = nullptr;
@@ -56,6 +89,7 @@ private:
   OutputParameter flowOutput = OutputParameter{typeid(FlowParameter), ""};
   std::unordered_map<std::string, InputParameter> inputParameters;
   std::unordered_map<std::string, OutputParameter> outputParameters;
+  std::unordered_map<std::string, Parameter> parameters;
   std::vector<Connection> inputConnections;
   std::vector<Connection> outputConnections;
 
@@ -73,10 +107,16 @@ protected:
   }
 
   template <typename T>
+  void DefineParameter(const std::string& paramName, const T& defaultValue)
+  {
+    parameters.emplace(paramName, Parameter{typeid(T), paramName, defaultValue});
+  }
+
+  template <typename T>
   void SetInputParameter(const std::string& paramName, T& value)
   {
     if (not inputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not defined", GetName(), paramName));
 
     auto& param = inputParameters.at(paramName);
 
@@ -90,7 +130,7 @@ protected:
   T& GetInputParameter(const std::string& paramName)
   {
     if (not inputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not found", GetName(), paramName));
+      throw std::runtime_error(fmt::format("{}: Input parameter '{}' not defined", GetName(), paramName));
 
     auto& param = inputParameters.at(paramName);
 
@@ -110,7 +150,7 @@ protected:
   void SetOutputParameter(const std::string& paramName, const T& value)
   {
     if (not outputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not defined", GetName(), paramName));
 
     auto& param = outputParameters.at(paramName);
 
@@ -124,7 +164,7 @@ protected:
   T& GetOutputParameter(const std::string& paramName)
   {
     if (not outputParameters.contains(paramName))
-      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
+      throw std::runtime_error(fmt::format("{}: Output parameter '{}' not defined", GetName(), paramName));
 
     auto& param = outputParameters.at(paramName);
 
@@ -133,6 +173,37 @@ protected:
 
     if (not param.value.has_value())
       throw std::runtime_error(fmt::format("{}: Output parameter '{}' not set", GetName(), paramName));
+
+    return std::any_cast<T&>(param.value);
+  }
+
+  template <typename T>
+  void SetParameter(const std::string& paramName, const T& value)
+  {
+    if (not parameters.contains(paramName))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' not defined", GetName(), paramName));
+
+    auto& param = parameters.at(paramName);
+
+    if (param.type != std::type_index(typeid(T)))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
+
+    param.value = value;
+  }
+
+  template <typename T>
+  T& GetParameter(const std::string& paramName)
+  {
+    if (not parameters.contains(paramName))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' not defined", GetName(), paramName));
+
+    auto& param = parameters.at(paramName);
+
+    if (param.type != std::type_index(typeid(T)))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
+
+    if (not param.value.has_value())
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' not set", GetName(), paramName));
 
     return std::any_cast<T&>(param.value);
   }
@@ -157,7 +228,7 @@ public:
 
   virtual void Process() = 0;
 
-  const std::string& GetName() { return microserviceName; }
+  const std::string& GetName() const { return microserviceName; }
 
   void SetName(const std::string& name) { microserviceName = name; }
 
@@ -166,6 +237,8 @@ public:
   std::unordered_map<std::string, InputParameter>& GetInputParameters() { return inputParameters; }
 
   std::unordered_map<std::string, OutputParameter>& GetOutputParameters() { return outputParameters; }
+
+  std::unordered_map<std::string, Parameter>& GetParameters() { return parameters; }
 
   const std::vector<Connection>& GetInputConnections() { return inputConnections; }
 
