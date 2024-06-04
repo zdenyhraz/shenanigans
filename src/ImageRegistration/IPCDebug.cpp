@@ -212,7 +212,8 @@ void IPCDebug::DebugGradualShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
   LOG_FUNCTION;
   ipc.SetDebugDirectory("../debug/peakshift");
   const cv::Mat image1 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
-  const cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows) + GetNoise<IPC::Float>(crop1.size(), noiseStdev);
+  cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
+  crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
   cv::Mat image2 = image1.clone();
   cv::Mat crop2;
   const i32 iters = 51;

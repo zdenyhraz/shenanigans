@@ -29,7 +29,7 @@ if(MSVC)
 else()
   add_compile_options(-march=native -fopenmp -pthread -lstdc++_libbacktrace)
   add_compile_options(-Wall -Wfatal-errors -Wextra -Wpedantic -Wshadow)#-Werror
-  add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare)
+  add_compile_options(-Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare)
   add_compile_options("$<$<CONFIG:DEBUG>:-g;-O0>")
   add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
   add_compile_options("$<$<COMPILE_LANGUAGE:C>:-w>")
