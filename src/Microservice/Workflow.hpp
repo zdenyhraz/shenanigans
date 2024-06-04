@@ -60,7 +60,7 @@ public:
 
   void Load(const std::filesystem::path& path)
   {
-    // TODO: load microservices from file
+    // TODO: load microservices from file (with parameters!)
     // TODO: load connections from file
     // TODO: connect the parameters
     // TODO: set workflow name according to file name
@@ -69,7 +69,7 @@ public:
 
   void Save(const std::filesystem::path& path) const
   {
-    // TODO: serialize microservices to json
+    // TODO: serialize microservices to json (with parameters!)
     // TODO: serialize connections to json
   }
 

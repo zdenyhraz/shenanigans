@@ -14,5 +14,6 @@ public:
   {
     GenerateMicroserviceName();
     DefineInputParameter<cv::Mat>("image");
+    DefineParameter<bool>("grayscale", false);
   }
 };

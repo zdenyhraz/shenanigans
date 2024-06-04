@@ -157,6 +157,8 @@ struct MicroserviceEditor
       ImGui::InputFloat(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<float>(&param.value), 0.01f, 1.0f, "%.3f");
     else if (param.type == typeid(std::string))
       ImGui::InputText(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<std::string>(&param.value));
+    else if (param.type == typeid(bool))
+      ImGui::Checkbox(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<bool>(&param.value));
 
     ImGui::PopItemWidth();
   }
@@ -265,6 +267,8 @@ struct MicroserviceEditor
       ed::PinId inputPinId, outputPinId;
       if (ed::QueryNewLink(&inputPinId, &outputPinId))
       {
+        ImColor failColor(170, 0, 0);
+        ImColor successColor(147, 226, 74);
         if (inputPinId and outputPinId)
         {
           auto connection = GetConnection(inputPinId.Get(), outputPinId.Get());
@@ -274,27 +278,27 @@ struct MicroserviceEditor
           }
           else if (connection.outputMicroservice == connection.inputMicroservice)
           {
-            ShowLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
+            ShowLabel("x Cannot connect to self", failColor);
             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
           }
           else if (not connection.inputMicroservice)
           {
-            ShowLabel("x Cannot connect output to output", ImColor(45, 32, 32, 180));
+            ShowLabel("x Cannot connect output to output", failColor);
             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
           }
           else if (not connection.outputMicroservice)
           {
-            ShowLabel("x Cannot connect input to input", ImColor(45, 32, 32, 180));
+            ShowLabel("x Cannot connect input to input", failColor);
             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
           }
           else if (connection.outputParameter->type != connection.inputParameter->type)
           {
-            ShowLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+            ShowLabel("x Incompatible Pin Type", failColor);
             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
           }
           else
           {
-            ShowLabel("+ Create Link", ImColor(32, 45, 32, 180));
+            ShowLabel("+ Create Link", successColor);
             if (ed::AcceptNewItem())
               workflow.Connect(std::move(connection));
           }
