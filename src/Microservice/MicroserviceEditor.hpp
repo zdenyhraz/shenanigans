@@ -14,6 +14,9 @@ struct MicroserviceEditor
   Workflow workflow;
   const int pinIconSize = 24;
   const int paramSize = 200;
+  const ImVec2 spacing = ImVec2(6, 6);
+  const ImVec2 minNodeSize = ImVec2(100, 50);
+  const float connectionThickness = 2.0f;
 
   void OnStart()
   {
@@ -49,6 +52,8 @@ struct MicroserviceEditor
   {
     if (type == typeid(Microservice::FlowParameter))
       return ImColor(255, 255, 255);
+    if (type == typeid(cv::Mat))
+      return ImColor(147, 226, 74);
 
     return ImColor(51, 150, 215);
   };
@@ -93,6 +98,24 @@ struct MicroserviceEditor
         maxSize = textSize;
 
     return maxSize;
+  }
+
+  void ShowLabel(const char* label, ImColor color)
+  {
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+    auto size = ImGui::CalcTextSize(label);
+
+    auto padding = ImGui::GetStyle().FramePadding;
+    auto spacing = ImGui::GetStyle().ItemSpacing;
+
+    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+    auto rectMin = ImGui::GetCursorScreenPos() - padding;
+    auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
+
+    auto drawList = ImGui::GetWindowDrawList();
+    drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
+    ImGui::TextUnformatted(label);
   }
 
   void RenderInputPin(const Microservice::InputParameter& param, bool connected)
@@ -141,19 +164,21 @@ struct MicroserviceEditor
   void RenderNode(Microservice& microservice)
   {
     ed::BeginNode(microservice.GetId());
+    auto& style = ImGui::GetStyle();
+    auto spacingOrig = style.ItemSpacing;
+    style.ItemSpacing = spacing;
+
+    const auto& microserviceName = microservice.GetName();
     const auto inputMaxTextSize = GetLongestInputParameterNameLength(microservice);
     const auto outputMaxTextSize = GetLongestOutputParameterNameLength(microservice);
     const auto inputSize = inputMaxTextSize + pinIconSize;
     const auto outputSizeMin = outputMaxTextSize + pinIconSize;
     const auto ioSizeMin = inputSize + outputSizeMin;
-
     const auto paramsMaxTextSize = GetLongestParameterNameLength(microservice);
     const auto paramsSizeMin = microservice.GetParameters().size() ? paramsMaxTextSize + paramSize : 0.0f;
-
-    const auto nodeSize = std::max(paramsSizeMin, ioSizeMin);
+    const auto nameSizeMin = ImGui::CalcTextSize(microserviceName.c_str()).x;
+    const auto nodeSize = std::max({paramsSizeMin, ioSizeMin, nameSizeMin, minNodeSize.x});
     const auto outputSize = nodeSize - inputSize;
-
-    const auto& microserviceName = microservice.GetName();
 
     if (false and firstFrame)
     {
@@ -185,15 +210,52 @@ struct MicroserviceEditor
     for (auto& [name, param] : microservice.GetParameters())
       RenderParameter(param, microserviceName);
 
+    style.ItemSpacing = spacingOrig;
     ed::EndNode();
   }
 
   void RenderLink(const Microservice::Connection& connection)
   {
-    ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId());
+    const auto thicknessMultiplier = connection.outputParameter == &connection.outputMicroservice->GetFlowOutputParameter() ? 2 : 1;
+    ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId(), GetIconColor(connection.outputParameter->type),
+        thicknessMultiplier * connectionThickness);
+
     if constexpr (false)
       if (connection.outputParameter == &connection.outputMicroservice->GetFlowOutputParameter())
         ed::Flow(connection.GetId(), ed::FlowDirection::Backward);
+  }
+
+  Microservice::Connection GetConnection(uintptr_t startId, uintptr_t endId)
+  {
+    Microservice::Connection connection;
+    for (const auto& microservice : workflow.GetMicroservices())
+    {
+      if (auto param = microservice->FindInputParameter(startId))
+      {
+        connection.inputMicroservice = microservice.get();
+        connection.inputParameter = param.value();
+      }
+      if (auto param = microservice->FindInputParameter(endId))
+      {
+        connection.inputMicroservice = microservice.get();
+        connection.inputParameter = param.value();
+      }
+      if (auto param = microservice->FindOutputParameter(startId))
+      {
+        connection.outputMicroservice = microservice.get();
+        connection.outputParameter = param.value();
+      }
+      if (auto param = microservice->FindOutputParameter(endId))
+      {
+        connection.outputMicroservice = microservice.get();
+        connection.outputParameter = param.value();
+      }
+
+      if (connection.outputMicroservice and connection.inputMicroservice)
+        break;
+    }
+
+    return connection;
   }
 
   void HandleLinkCreate()
@@ -204,8 +266,39 @@ struct MicroserviceEditor
       if (ed::QueryNewLink(&inputPinId, &outputPinId))
       {
         if (inputPinId and outputPinId)
-          if (ed::AcceptNewItem())
-            workflow.Connect(inputPinId.Get(), outputPinId.Get());
+        {
+          auto connection = GetConnection(inputPinId.Get(), outputPinId.Get());
+          if (inputPinId == outputPinId)
+          {
+            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+          }
+          else if (connection.outputMicroservice == connection.inputMicroservice)
+          {
+            ShowLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
+            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+          }
+          else if (not connection.inputMicroservice)
+          {
+            ShowLabel("x Cannot connect output to output", ImColor(45, 32, 32, 180));
+            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+          }
+          else if (not connection.outputMicroservice)
+          {
+            ShowLabel("x Cannot connect input to input", ImColor(45, 32, 32, 180));
+            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+          }
+          else if (connection.outputParameter->type != connection.inputParameter->type)
+          {
+            ShowLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+            ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+          }
+          else
+          {
+            ShowLabel("+ Create Link", ImColor(32, 45, 32, 180));
+            if (ed::AcceptNewItem())
+              workflow.Connect(std::move(connection));
+          }
+        }
       }
     }
     ed::EndCreate();

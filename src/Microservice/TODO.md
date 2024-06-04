@@ -16,3 +16,6 @@
 - [x] use *this* as node/link/pin ids
 - [x] pin sprites depending on parameter type
 - [x] show flow
+- [x] link color based on type
+- [x] link hints
+- [ ] node header
