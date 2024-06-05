@@ -95,10 +95,17 @@ public:
       return LOG_WARNING("Workflow '{}' does not contain any microservices", GetName());
 
     ExecuteMicroservice(*microservices.front());
+    Reset();
   }
   catch (const std::exception& e)
   {
     LOG_ERROR("Workflow '{}' error: {}", GetName(), e.what());
+  }
+
+  void Reset()
+  {
+    for (auto& microservice : microservices)
+      microservice->Reset();
   }
 
   void Connect(Microservice::Connection&& connection)

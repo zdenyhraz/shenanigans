@@ -21,6 +21,9 @@ void MicroserviceEditorWindow::Render()
     if (ImGui::Button("Run"))
       LaunchAsync([&]() { Run(); });
     ImGui::SameLine();
+    if (ImGui::Button("Run repeat"))
+      LaunchAsync([&]() { RunRepeat(); });
+    ImGui::SameLine();
     if (ImGui::Button("Show flow"))
       editor.ShowFlow();
 
@@ -33,6 +36,16 @@ void MicroserviceEditorWindow::Render()
 void MicroserviceEditorWindow::Run()
 {
   editor.workflow.Run();
+  LOG_SUCCESS("Workflow run completed");
+}
+
+void MicroserviceEditorWindow::RunRepeat()
+{
+  for (int i = 0; i < 5; ++i)
+  {
+    Plot::Clear();
+    editor.workflow.Run();
+  }
   LOG_SUCCESS("Workflow run completed");
 }
 

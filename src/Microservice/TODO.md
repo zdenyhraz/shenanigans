@@ -8,7 +8,9 @@
 - [x] add strongly-typed UserParameters (manual params) and a way to edit them
 - [ ] workflow save to / load from file - json
 - [ ] derive more specific classes from Microservice for control flow - not all microservices have start / completed, e.g. plot / start
-- [ ] repeated workflows - reset? / remove .has_value condition
+- [ ] repeated workflows - reset / remove .has_value condition
+- [ ] tracy profile
+- [ ] simple workflow type - just follow output connections
 
 # GUI
 - [ ] gui layout save? - json

@@ -38,7 +38,6 @@ public:
 
     uintptr_t GetId() const { return reinterpret_cast<uintptr_t>(this); }
     const std::string& GetName() const { return name; }
-    void Reset() { value = nullptr; }
   };
 
   struct OutputParameter
@@ -282,11 +281,9 @@ public:
     param.value = value;
   }
 
-  void Reset() // call this on repeated workflows
+  void Reset()
   {
-    for (auto& [name, param] : inputParameters)
-      param.Reset();
-
+    // call this on repeated workflows to recompute output parameters
     for (auto& [name, param] : outputParameters)
       param.Reset();
   }
