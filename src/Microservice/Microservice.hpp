@@ -178,20 +178,6 @@ protected:
   }
 
   template <typename T>
-  void SetParameter(const std::string& paramName, const T& value)
-  {
-    if (not parameters.contains(paramName))
-      throw std::runtime_error(fmt::format("{}: Parameter '{}' not defined", GetName(), paramName));
-
-    auto& param = parameters.at(paramName);
-
-    if (param.type != std::type_index(typeid(T)))
-      throw std::runtime_error(fmt::format("{}: Parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
-
-    param.value = value;
-  }
-
-  template <typename T>
   T& GetParameter(const std::string& paramName)
   {
     if (not parameters.contains(paramName))
@@ -280,6 +266,20 @@ public:
       throw std::runtime_error(fmt::format("{}: Output parameter '{}' not found", GetName(), paramName));
 
     return outputParameters.at(paramName);
+  }
+
+  template <typename T>
+  void SetParameter(const std::string& paramName, const T& value)
+  {
+    if (not parameters.contains(paramName))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' not defined", GetName(), paramName));
+
+    auto& param = parameters.at(paramName);
+
+    if (param.type != std::type_index(typeid(T)))
+      throw std::runtime_error(fmt::format("{}: Parameter '{}' type mismatch: {} != {}", GetName(), paramName, typeid(T).name(), param.type.name()));
+
+    param.value = value;
   }
 
   void Reset() // call this on repeated workflows

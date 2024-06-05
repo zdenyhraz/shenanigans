@@ -1,5 +1,5 @@
 #pragma once
-#include "Microservice.hpp"
+#include "../Microservice.hpp"
 
 class PlotImageMicroservice : public Microservice
 {
@@ -14,6 +14,7 @@ public:
   {
     GenerateMicroserviceName();
     DefineInputParameter<cv::Mat>("image");
+    DefineInputParameter<bool>("normalize");
     DefineParameter<bool>("grayscale", false);
   }
 };

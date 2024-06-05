@@ -16,7 +16,10 @@ struct MicroserviceEditor
   const int paramSize = 200;
   const ImVec2 spacing = ImVec2(6, 6);
   const ImVec2 minNodeSize = ImVec2(100, 50);
-  const float connectionThickness = 2.0f;
+  const float connectionThickness = 4.0f;
+  const float parametersVerticalOffset = 10.0f;
+  bool showFlow = false;
+  bool showFlowOnce = false;
 
   void OnStart()
   {
@@ -27,6 +30,11 @@ struct MicroserviceEditor
 
     auto& editorStyle = ed::GetStyle();
     editorStyle.LinkStrength = 1000;
+    editorStyle.FlowMarkerDistance = 30.0f;
+    editorStyle.FlowSpeed = 150.0f;
+    editorStyle.FlowDuration = 3.0f;
+    editorStyle.Colors[ed::StyleColor_Flow] = GetColor(typeid(Microservice::FlowParameter));
+    editorStyle.Colors[ed::StyleColor_FlowMarker] = GetColor(typeid(Microservice::FlowParameter));
 
     int ypos = 0;
     int xpos = 0;
@@ -48,12 +56,14 @@ struct MicroserviceEditor
 
   void EndColumn() { ImGui::EndGroup(); }
 
-  ImColor GetIconColor(const std::type_info& type)
+  ImColor GetColor(const std::type_info& type)
   {
     if (type == typeid(Microservice::FlowParameter))
       return ImColor(255, 255, 255);
     if (type == typeid(cv::Mat))
       return ImColor(147, 226, 74);
+    if (type == typeid(bool))
+      return ImColor(225, 0, 0);
 
     return ImColor(51, 150, 215);
   };
@@ -61,7 +71,7 @@ struct MicroserviceEditor
   void DrawPinIcon(const std::type_info& type, bool connected, int alpha)
   {
     IconType iconType = IconType::Circle;
-    ImColor color = GetIconColor(type);
+    ImColor color = GetColor(type);
     color.Value.w = alpha / 255.0f;
 
     if (type == typeid(Microservice::FlowParameter))
@@ -118,6 +128,8 @@ struct MicroserviceEditor
     ImGui::TextUnformatted(label);
   }
 
+  void ShowFlow() { showFlowOnce = true; }
+
   void RenderInputPin(const Microservice::InputParameter& param, bool connected)
   {
     ed::BeginPin(param.GetId(), ed::PinKind::Input);
@@ -159,6 +171,7 @@ struct MicroserviceEditor
       ImGui::InputText(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<std::string>(&param.value));
     else if (param.type == typeid(bool))
       ImGui::Checkbox(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<bool>(&param.value));
+    // else if (std::ranges::contains(param.type.name(), "enum"))
 
     ImGui::PopItemWidth();
   }
@@ -209,6 +222,7 @@ struct MicroserviceEditor
 
     EndColumn();
 
+    ImGui::Dummy(ImVec2(0, parametersVerticalOffset));
     for (auto& [name, param] : microservice.GetParameters())
       RenderParameter(param, microserviceName);
 
@@ -218,11 +232,9 @@ struct MicroserviceEditor
 
   void RenderLink(const Microservice::Connection& connection)
   {
-    const auto thicknessMultiplier = connection.outputParameter == &connection.outputMicroservice->GetFlowOutputParameter() ? 2 : 1;
-    ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId(), GetIconColor(connection.outputParameter->type),
-        thicknessMultiplier * connectionThickness);
+    ed::Link(connection.GetId(), connection.inputParameter->GetId(), connection.outputParameter->GetId(), GetColor(connection.outputParameter->type), connectionThickness);
 
-    if constexpr (false)
+    if (showFlowOnce or showFlow)
       if (connection.outputParameter == &connection.outputMicroservice->GetFlowOutputParameter())
         ed::Flow(connection.GetId(), ed::FlowDirection::Backward);
   }
@@ -267,8 +279,8 @@ struct MicroserviceEditor
       ed::PinId inputPinId, outputPinId;
       if (ed::QueryNewLink(&inputPinId, &outputPinId))
       {
-        ImColor failColor(170, 0, 0);
-        ImColor successColor(147, 226, 74);
+        ImColor failColor(170, 20, 20);
+        ImColor successColor(40, 140, 10);
         if (inputPinId and outputPinId)
         {
           auto connection = GetConnection(inputPinId.Get(), outputPinId.Get());
@@ -293,12 +305,12 @@ struct MicroserviceEditor
           }
           else if (connection.outputParameter->type != connection.inputParameter->type)
           {
-            ShowLabel("x Incompatible Pin Type", failColor);
+            ShowLabel("x Incompatible type", failColor);
             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
           }
           else
           {
-            ShowLabel("+ Create Link", successColor);
+            ShowLabel("+ Create link", successColor);
             if (ed::AcceptNewItem())
               workflow.Connect(std::move(connection));
           }
@@ -334,6 +346,7 @@ struct MicroserviceEditor
 
     for (const auto& connection : workflow.GetConnections())
       RenderLink(connection);
+    showFlowOnce = false;
 
     HandleLinkCreate();
     HandleLinkDelete();

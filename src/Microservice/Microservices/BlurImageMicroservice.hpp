@@ -1,5 +1,5 @@
 #pragma once
-#include "Microservice.hpp"
+#include "../Microservice.hpp"
 
 class BlurImageMicroservice : public Microservice
 {
@@ -23,5 +23,6 @@ public:
     DefineOutputParameter<cv::Mat>("blurred");
     DefineParameter<float>("relative blur x", 0.05);
     DefineParameter<float>("relative blur y", 0.15);
+    DefineParameter<bool>("median", false);
   }
 };
