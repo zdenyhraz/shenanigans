@@ -14,6 +14,7 @@ void MicroserviceEditorWindow::Initialize()
 void MicroserviceEditorWindow::Render()
 {
   PROFILE_FUNCTION;
+
   if (ImGui::BeginTabItem("MicroserviceEditor"))
   {
     ImGui::Separator();
@@ -67,7 +68,7 @@ void MicroserviceEditorWindow::TestInitialize()
   loadSAS.SetParameter("grayscale", true);
 
   editor.workflow.Connect(start, blur3);
-  editor.workflow.Connect(start, sas);
+  editor.workflow.Connect(start, plotSAS);
 
   editor.workflow.Connect(load1, blur3, "image", "image");
 
@@ -80,13 +81,11 @@ void MicroserviceEditorWindow::TestInitialize()
   editor.workflow.Connect(blur4, plot1);
   editor.workflow.Connect(blur4, plot1, "blurred", "image");
 
-  editor.workflow.Connect(blur5, plot2);
   editor.workflow.Connect(blur5, plot2, "blurred", "image");
 
   editor.workflow.Connect(load1, plot3);
   editor.workflow.Connect(load1, plot3, "image", "image");
 
-  editor.workflow.Connect(sas, plotSAS);
   editor.workflow.Connect(sas, plotSAS, "objects", "objects");
 
   editor.workflow.Connect(loadSAS, sas, "image", "image");

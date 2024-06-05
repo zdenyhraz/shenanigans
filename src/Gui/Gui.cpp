@@ -61,8 +61,8 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.Fonts->AddFontFromFileTTF(fontPath.c_str(), scale * 10);
   const auto iniPath = GetProjectDirectoryPath("data/apps/imgui.ini").string();
   LOG_DEBUG("Using ini file {}", iniPath);
-  io.IniFilename = iniPath.c_str();
   ImGui::LoadIniSettingsFromDisk(iniPath.c_str());
+  io.IniFilename = iniPath.c_str();
 
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetDefaultStyle();

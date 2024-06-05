@@ -9,11 +9,11 @@
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
+  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectWindow>());
   mWindows.push_back(std::make_unique<IPCWindow>());
   mWindows.push_back(std::make_unique<AstroWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
-  mWindows.push_back(std::make_unique<ObjdetectWindow>());
-  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
 
   for (const auto& window : mWindows)
     window->Initialize();
@@ -67,6 +67,7 @@ try
       RenderPlotMenu();
       RenderDemoMenu();
       RenderThemeMenu();
+      RenderStyleMenu();
       ImGui::EndMenuBar();
     }
 
@@ -151,6 +152,21 @@ void Application::RenderThemeMenu()
       ImGuiSetLightTheme();
     if (ImGui::MenuItem("Hazel"))
       ImGuiSetHazelTheme();
+
+    ImGui::EndMenu();
+  }
+}
+
+void Application::RenderStyleMenu()
+{
+  if (ImGui::BeginMenu("Style"))
+  {
+    if (ImGui::MenuItem("Save style to disk"))
+    {
+      const auto path = GetProjectDirectoryPath("data/apps/imgui.ini").string();
+      LOG_DEBUG("Saving ImGui style to {}", path);
+      ImGui::SaveIniSettingsToDisk(path.c_str());
+    }
 
     ImGui::EndMenu();
   }
