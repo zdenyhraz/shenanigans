@@ -8,6 +8,7 @@
 - [x] add strongly-typed UserParameters (manual params) and a way to edit them
 - [ ] workflow save to / load from file - json
 - [ ] derive more specific classes from Microservice for control flow - not all microservices have start / completed, e.g. plot / start
+- [ ] repeated workflows - reset? / remove .has_value condition
 
 # GUI
 - [ ] gui layout save? - json
