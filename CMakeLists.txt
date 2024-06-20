@@ -36,6 +36,8 @@ else()
   add_link_options(-fopenmp -pthread)
 endif()
 
+add_compile_definitions(PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}")
+
 # ignore warnings from external sources
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
 if(MSVC)
