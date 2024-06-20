@@ -159,6 +159,7 @@ def opengl_install():
 
 
 def setup_linux(compiler, generator, opengl):
+    run('sudo apt-get update')
     cmake_install()
     generator_install(generator)
     if opengl:
