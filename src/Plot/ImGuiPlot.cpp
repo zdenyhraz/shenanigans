@@ -87,7 +87,7 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
       if (data.z.channels() == 1)
       {
         ImPlot::PlotHeatmap(
-            data.name.c_str(), std::bit_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+            data.name.c_str(), reinterpret_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
       }
 
       if (data.z.channels() == 3)
@@ -95,7 +95,7 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
         if (data.image.texid == 0)
           data.image.Load(data.z); // has to run in main thread
         ImPlot::PlotImage(
-            data.name.c_str(), std::bit_cast<ImTextureID>(static_cast<intptr_t>(data.image.texid)), ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+            data.name.c_str(), reinterpret_cast<ImTextureID>(static_cast<intptr_t>(data.image.texid)), ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
       }
 
       ImPlot::EndPlot();

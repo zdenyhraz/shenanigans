@@ -115,6 +115,8 @@ public:
     if (data.z.empty())
       throw std::invalid_argument("Unable to plot empty data");
     if (not data.z.isContinuous())
+      data.z = data.z.clone();
+    if (not data.z.isContinuous())
       throw std::invalid_argument("Unable to plot non-continuous data");
     if (data.z.channels() != 1 and data.z.channels() != 3)
       throw std::invalid_argument(fmt::format("Unable to plot {}-channel data", data.z.channels()));
@@ -134,14 +136,21 @@ public:
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = GetProjectDirectoryPath(fmt::format("data/debug/{}.png", data.name)).string();
 
-    if constexpr (std::is_same_v<T, ImGuiPlot>)
-      if (data.z.rows > 8000)
+    if constexpr (std::is_same_v<T, ImGuiPlot> and true)
+    {
+      if (data.z.rows > 8000 or data.z.cols > 8000)
       {
-        int targetHeight = std::min(5000, data.z.rows);
-        int targetWidth = static_cast<float>(targetHeight) / data.z.rows * data.z.cols;
+        static constexpr int maxSize = 5000;
+        const float aspect = static_cast<float>(data.z.cols) / data.z.rows;
+        int targetHeight = std::min(maxSize, data.z.rows);
+        int targetWidth = targetHeight * aspect;
+        targetWidth = std::min(maxSize, data.z.cols);
+        targetHeight = targetWidth / aspect;
+
         LOG_WARNING("Image '{}' is too big for ImGuiPlot ({}x{}), downsizing to {}x{}", data.name, data.z.cols, data.z.rows, targetWidth, targetHeight);
         cv::resize(data.z, data.z, cv::Size(targetWidth, targetHeight));
       }
+    }
 
     if (data.z.channels() == 3)
     {
