@@ -9,8 +9,8 @@
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
-  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
   mWindows.push_back(std::make_unique<ObjdetectWindow>());
+  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
   mWindows.push_back(std::make_unique<IPCWindow>());
   mWindows.push_back(std::make_unique<AstroWindow>());
   mWindows.push_back(std::make_unique<RandomWindow>());
