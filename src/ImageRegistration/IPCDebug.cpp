@@ -43,9 +43,9 @@ void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
 {
   Plot::Plot({.name = fmt::format("{} L2U", ipc.mDebugName),
+      .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : "",
       .z = L2U,
-      .cmap = "jet",
-      .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L2U_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+      .cmap = "jet"});
 
   if (false)
   {
@@ -70,9 +70,9 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
     DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift));
   cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   Plot::Plot({.name = fmt::format("{} L1B", ipc.mDebugName),
+      .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : "",
       .z = mat,
-      .cmap = "jet",
-      .savepath = not ipc.mDebugDirectory.empty() ? fmt::format("{}/L1B_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+      .cmap = "jet"});
 }
 
 void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, f64 UC, bool last)
@@ -85,13 +85,13 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
     DrawCross(mat, cv::Point2d(mat.cols / 2, mat.rows / 2) + UC * (ipc.mDebugTrueShift - L3shift) - L2Ushift);
   // cv::resize(mat, mat, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
   Plot::Plot({.name = fmt::format("{} L1A", ipc.mDebugName),
+      .savepath = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : "",
       .z = mat,
       .xmin = 0,
       .xmax = static_cast<f32>(L1.cols - 1),
       .ymin = 0,
       .ymax = static_cast<f32>(L1.rows - 1),
-      .cmap = "jet",
-      .savepath = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : ""});
+      .cmap = "jet"});
 }
 
 void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)

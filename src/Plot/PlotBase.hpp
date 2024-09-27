@@ -1,6 +1,5 @@
 #pragma once
-#include "PlotData1D.hpp"
-#include "PlotData2D.hpp"
+#include "PlotData.hpp"
 #include "Utils/Singleton.hpp"
 #include "Utils/Colormap.hpp"
 
@@ -23,15 +22,15 @@ class PlotBase
     mPlots2D.clear();
   }
 
-  template <class PlotData>
-  void SchedulePlot(PlotData&& data, std::vector<PlotData>& vec)
+  template <class PlotDataND>
+  void SchedulePlot(PlotDataND&& data, std::vector<PlotDataND>& vec)
   {
     PROFILE_FUNCTION;
     std::scoped_lock lock(mPlotsMutex);
     if (auto it = std::ranges::find_if(vec, [&data](const auto& entry) { return entry.name == data.name; }); it != vec.end())
-      *it = std::forward<PlotData>(data);
+      *it = std::forward<PlotDataND>(data);
     else
-      vec.emplace_back(std::forward<PlotData>(data));
+      vec.emplace_back(std::forward<PlotDataND>(data));
   }
 
 protected:
@@ -42,6 +41,12 @@ protected:
   bool mShouldPlot = true;
 
 public:
+  enum PlotLocation : usize
+  {
+    Left,
+    Right
+  };
+
   static bool ShouldPlot() { return Singleton<T>::Get().mShouldPlot; }
 
   static void Initialize()
@@ -180,10 +185,24 @@ public:
     Singleton<T>::Get().SchedulePlot(std::move(data), Singleton<T>::Get().mPlots2D);
   }
 
-  static void Plot(const std::string& name, const cv::Mat& z)
+  static void Plot(const std::string& name, const cv::Mat& z, PlotLocation loc = Left)
   {
     if (not ShouldPlot())
       return;
-    Plot({.name = name, .z = z});
+    Plot({.name = name, .location = loc, .z = z});
+  }
+
+  static void PlotLeft(const std::string& name, const cv::Mat& z)
+  {
+    if (not ShouldPlot())
+      return;
+    Plot({.name = name, .location = Left, .z = z});
+  }
+
+  static void PlotRight(const std::string& name, const cv::Mat& z)
+  {
+    if (not ShouldPlot())
+      return;
+    Plot({.name = name, .location = Right, .z = z});
   }
 };

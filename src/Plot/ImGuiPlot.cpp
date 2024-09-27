@@ -5,19 +5,22 @@
 void ImGuiPlot::RenderInternal()
 {
   PROFILE_FUNCTION;
-  if (ImGui::Begin("Plot"))
+  for (usize plotLocation = 0; plotLocation < 2; ++plotLocation)
   {
-    if (ImGui::BeginTabBar("Plots", ImGuiTabBarFlags_AutoSelectNewTabs))
+    if (ImGui::Begin(fmt::format("Plot{}", static_cast<char>('A' + plotLocation)).c_str()))
     {
-      std::scoped_lock lock(mPlotsMutex);
-      for (const auto& data : mPlots1D)
-        RenderInternal(data);
-      for (const auto& data : mPlots2D)
-        RenderInternal(data);
+      if (ImGui::BeginTabBar("Plots", ImGuiTabBarFlags_AutoSelectNewTabs))
+      {
+        std::scoped_lock lock(mPlotsMutex);
+        for (const auto& data : mPlots1D | std::ranges::views::filter([plotLocation](const auto& data) { return data.location == plotLocation; }))
+          RenderInternal(data);
+        for (const auto& data : mPlots2D | std::ranges::views::filter([plotLocation](const auto& data) { return data.location == plotLocation; }))
+          RenderInternal(data);
 
-      ImGui::EndTabBar();
+        ImGui::EndTabBar();
+      }
+      ImGui::End();
     }
-    ImGui::End();
   }
 }
 
