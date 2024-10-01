@@ -47,12 +47,12 @@ constexpr std::vector<T> Linspace(f64 start, f64 end, usize n)
 
 inline i32 GetNearestOdd(i32 value)
 {
-  return value % 2 == 0 ? value + 1 : value;
+  return value % 2 ? value : value + 1;
 }
 
 inline i32 GetNearestEven(i32 value)
 {
-  return value % 2 != 0 ? value + 1 : value;
+  return value % 2 ? value + 1 : value;
 }
 
 template <typename T>
