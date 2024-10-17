@@ -1,5 +1,4 @@
 import os
-import platform
 import multiprocessing
 import argparse
 import tools.build as build
