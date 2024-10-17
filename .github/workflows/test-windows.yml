@@ -33,7 +33,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python3 -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer
+      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer
 
     - name: Test
-      run: python3 -u test.py
+      run: python -u test.py
