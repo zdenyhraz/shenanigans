@@ -32,6 +32,9 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
     - name: Build
       run: python3 -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
