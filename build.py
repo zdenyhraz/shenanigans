@@ -1,13 +1,16 @@
 import os
 import multiprocessing
 import argparse
-import tools.build as build
+from tools.build import utils
+from tools.build import configuration
+from tools.build import buildtools
+from tools.build import opencv
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Build script')
-    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if build.utils.linux() else 'msvc')
-    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if build.utils.linux() else None)
+    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if utils.linux() else 'msvc')
+    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if utils.linux() else None)
     parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
     parser.add_argument('--targets', help='targets', type=str, required=False, default='shenanigans shenanigans_test')
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
@@ -20,9 +23,9 @@ if __name__ == '__main__':
     for arg, val in vars(args).items():
         print(f'{arg}: {val}')
 
-    build.configuration.check(args)
-    build.buildtools.setup(args.compiler, args.generator, args.opengl, args.build_type, args.sanitizer)
-    opencv_dir = build.opencv.setup(args.jobs, args.build_type)
+    configuration.check(args)
+    buildtools.setup(args.compiler, args.generator, args.opengl, args.build_type, args.sanitizer)
+    opencv_dir = opencv.setup(args.jobs, args.build_type)
 
     configure_args = {
         'CMAKE_BUILD_TYPE': args.build_type,
@@ -33,6 +36,6 @@ if __name__ == '__main__':
 
     print(f"Building {args.targets}")
     os.makedirs("build", exist_ok=True)
-    build.utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {build.utils.generate_configure_args(configure_args)}")
-    build.utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
+    utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)}")
+    utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
     print(f'{args.targets} built successfully')

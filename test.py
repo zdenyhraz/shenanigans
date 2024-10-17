@@ -1,5 +1,5 @@
 import os
-import tools.build as build
+from tools.build import utils
 
 
 def check_data_dir(test_dir):
@@ -20,7 +20,7 @@ def find_test_executables(build_dir):
         for file in files:
             if '_test' in file:
                 executable = os.path.join(root, file)
-                if build.utils.is_executable(executable):
+                if utils.is_executable(executable):
                     test_executables.append(executable)
     if not test_executables:
         raise RuntimeError(f'Cannot find any test executables in {build_dir}')
@@ -28,7 +28,7 @@ def find_test_executables(build_dir):
 
 
 if __name__ == '__main__':
-    root_dir = build.utils.get_root_directory()
+    root_dir = utils.get_root_directory()
     build_dir = os.path.join(root_dir, 'build')
     test_dir = os.path.join(root_dir, 'test')
 
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     test_executables = find_test_executables(build_dir)
     print('Test executables: ', test_executables)
     for test in test_executables:
-        build.utils.run(test)
+        utils.run(test)
