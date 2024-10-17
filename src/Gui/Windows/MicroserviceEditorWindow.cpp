@@ -76,7 +76,7 @@ void MicroserviceEditorWindow::TestInitialize()
   auto& loadSAS = *microservices[9];
   auto& plotSAS = *microservices[10];
 
-  loadSAS.SetParameter("file name", std::string("data/sas/SMK Test 0/sasi-S-upper-20221102-143803-l38.tif"));
+  loadSAS.SetParameter("file name", std::string("data/cx/sas/kd/SMK Test 0/sasi-S-upper-20221102-143803-l38.tif"));
   loadSAS.SetParameter("float", true);
   loadSAS.SetParameter("grayscale", true);
 
