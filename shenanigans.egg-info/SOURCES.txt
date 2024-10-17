@@ -1,0 +1,15 @@
+LICENSE.md
+README.md
+setup.py
+shenanigans.egg-info/PKG-INFO
+shenanigans.egg-info/SOURCES.txt
+shenanigans.egg-info/dependency_links.txt
+shenanigans.egg-info/top_level.txt
+tools/__init__.py
+tools/build/__init__.py
+tools/build/buildtools.py
+tools/build/configuration.py
+tools/build/linux.py
+tools/build/opencv.py
+tools/build/utils.py
+tools/build/windows.py
