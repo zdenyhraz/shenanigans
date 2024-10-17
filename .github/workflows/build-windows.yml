@@ -35,6 +35,7 @@ jobs:
     - name: Build
       run: |
         pwd
+        ls
         python3 -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
     - name: Test
