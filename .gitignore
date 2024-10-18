@@ -9,6 +9,7 @@ __pycache__/
 data/*
 !data/apps/
 !data/readme/
+!tools/build/
 
 *.zip
 *.dump
