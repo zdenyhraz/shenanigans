@@ -24,7 +24,7 @@ def opencv_find_root(opencv_install_dir):
                     candidates.append(root)
     if len(candidates) > 1:
         print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
-    return '' if len(candidates) == 0 else min(candidates, key=len)  # return the shallowest if multiple found
+    return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
 def opencv_find_binaries(opencv_install_dir):
