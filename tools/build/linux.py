@@ -24,7 +24,8 @@ def opengl_install():
 
 def gcc_install():
     utils.run('sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get install -y gcc-13 g++-13')
-    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
+    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100')
+    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
 
 
 def clang_install():
@@ -32,8 +33,9 @@ def clang_install():
     utils.run('sudo chmod u+x llvm.sh')
     utils.run('sudo ./llvm.sh 17')
     utils.run('clang-17 --version')
-    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100 && sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100')
-    utils.run('sudo apt install libomp-17-dev')
+    utils.run('sudo apt install libc++-dev libc++abi-dev libomp-17-dev')
+    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100')
+    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100')
 
 
 def compiler_install(compiler):

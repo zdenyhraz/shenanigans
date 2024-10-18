@@ -35,7 +35,7 @@ if __name__ == '__main__':
     }
 
     print(f"Building {args.targets}")
-    os.makedirs("build", exist_ok=True)
+    os.makedirs(args.build_dir, exist_ok=True)
     utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)}")
     utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
     print(f'{args.targets} built successfully')
