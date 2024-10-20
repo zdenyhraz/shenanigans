@@ -97,8 +97,7 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
       {
         if (data.image.texid == 0)
           data.image.Load(data.z); // has to run in main thread
-        ImPlot::PlotImage(
-            data.name.c_str(), reinterpret_cast<ImTextureID>(static_cast<intptr_t>(data.image.texid)), ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+        ImPlot::PlotImage(data.name.c_str(), static_cast<ImTextureID>(data.image.texid), ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
       }
 
       ImPlot::EndPlot();
