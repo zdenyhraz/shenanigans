@@ -1,8 +1,9 @@
 # Zdeny's shenanigans 🪐
 
 <p align="center">
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml/badge.svg"/></a>
 <br>

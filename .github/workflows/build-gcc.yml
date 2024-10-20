@@ -1,0 +1,40 @@
+name: build-gcc
+
+on: [push,pull_request]
+env:
+  CI: ON
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - compiler: gcc
+            build_type: Release
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        token: ${{ secrets.ACCESS_TOKEN }}
+
+    - name: OpenCV cache
+      id: opencv-cache
+      uses: actions/cache@v3
+      with:
+        path: ./libs/opencv_install
+        key: ${{ runner.os }}-opencv-cache-v1
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Build
+      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
+
+    - name: Test
+      run: python -u test.py
+      continue-on-error: true
