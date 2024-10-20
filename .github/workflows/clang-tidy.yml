@@ -7,11 +7,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - compiler: gcc
-            build_type: Release
 
     steps:
     - name: Checkout repository
@@ -33,7 +28,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
+      run: python -u build.py --ci --compiler gcc --build_type Debug --configure_only
       continue-on-error: true
 
     - name: Install dependencies

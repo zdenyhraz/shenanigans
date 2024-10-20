@@ -18,6 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, action='store_true', default=False)
     parser.add_argument('--opengl', help='opengl', required=False, action='store_true', default=True)
+    parser.add_argument('--configure_only', help='configure_only', required=False, action='store_true', default=False)
 
     args = parser.parse_args()
     for arg, val in vars(args).items():
@@ -37,5 +38,8 @@ if __name__ == '__main__':
     print(f"Building {args.targets}")
     os.makedirs(args.build_dir, exist_ok=True)
     utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)}")
+    if args.configure_only:
+        print(f'Repository configured successfully')
+        exit()
     utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
     print(f'{args.targets} built successfully')
