@@ -24,7 +24,6 @@ def opengl_install():
 
 def gcc_install():
     utils.run('sudo add-apt-repository ppa:ubuntu-toolchain-r/test && sudo apt update && sudo apt install g++-13')
-    utils.run('sudo apt install libstdc++-dev')
     utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100')
     utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
 

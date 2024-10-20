@@ -1,4 +1,4 @@
-name: test-linux
+name: test-gcc
 
 on: [push,pull_request]
 env:
@@ -11,9 +11,6 @@ jobs:
       matrix:
         include:
           - compiler: gcc
-            build_type: Debug
-
-          - compiler: clang
             build_type: Debug
 
     steps:

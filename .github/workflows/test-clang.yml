@@ -1,4 +1,4 @@
-name: test-msvc
+name: test-clang
 
 on: [push,pull_request]
 env:
@@ -6,11 +6,11 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - compiler: msvc
+          - compiler: clang
             build_type: Debug
 
     steps:

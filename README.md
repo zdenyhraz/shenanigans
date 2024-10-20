@@ -4,8 +4,10 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml/badge.svg"/></a>
+<br>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml/badge.svg"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
