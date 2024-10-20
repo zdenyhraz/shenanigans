@@ -32,12 +32,13 @@ if __name__ == '__main__':
         'CMAKE_BUILD_TYPE': args.build_type,
         'CI': 'ON' if args.ci else 'OFF',
         'ENABLE_SANITIZER': 'ON' if args.sanitizer else 'OFF',
-        'OPENCV_DIR': opencv_dir
+        'OPENCV_DIR': opencv_dir,
+        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON' if args.configure_only else 'OFF'
     }
 
     print(f"Building {args.targets}")
     os.makedirs(args.build_dir, exist_ok=True)
-    utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)}")
+    utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)} ")
     if args.configure_only:
         print(f'Repository configured successfully')
         exit()
