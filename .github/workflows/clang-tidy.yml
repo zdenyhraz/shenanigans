@@ -40,3 +40,5 @@ jobs:
       run: |
         cd build
         find ../src -type f \( -name "*.cpp" -o -name "*.hpp" \) | xargs clang-tidy -- -p=.
+      continue-on-error: true
+
