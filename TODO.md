@@ -6,6 +6,6 @@
 - [x] CI test
 - [x] CI sanitizers
 - [x] CI clang
-- [ ] CI clang-tidy
+- [x] CI clang-tidy
 - [ ] CI code coverage + badge
 - [x] CI python build script
