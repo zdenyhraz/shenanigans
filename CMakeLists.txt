@@ -182,6 +182,9 @@ target_link_libraries(shenanigans PRIVATE glad)
 # range-v3
 add_subdirectory(libs/range-v3)
 target_link_libraries(shenanigans PRIVATE range-v3)
+target_link_libraries(shenanigans_test PRIVATE range-v3)
+target_link_libraries(shenanigans_terminal PRIVATE range-v3)
+target_link_libraries(shenanigans_benchmark PRIVATE range-v3)
 
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
