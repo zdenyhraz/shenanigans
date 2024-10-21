@@ -179,6 +179,10 @@ target_link_libraries(shenanigans PRIVATE glfw)
 add_subdirectory(libs/glad)
 target_link_libraries(shenanigans PRIVATE glad)
 
+# range-v3
+add_subdirectory(libs/range-v3)
+target_link_libraries(shenanigans PRIVATE range-v3)
+
 # shenanigans_private
 get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")

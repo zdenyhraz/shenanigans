@@ -37,3 +37,6 @@
 [submodule "libs/tracy"]
 	path = libs/tracy
 	url = https://github.com/wolfpld/tracy.git
+[submodule "libs/range-v3"]
+	path = libs/range-v3
+	url = https://github.com/ericniebler/range-v3.git
