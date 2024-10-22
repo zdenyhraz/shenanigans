@@ -110,13 +110,22 @@ inline bool Equal(const cv::Mat& mat1, const cv::Mat& mat2, f64 tolerance = 0.)
 }
 
 template <typename T>
-inline f64 GetQuantile(const std::vector<T>& vec, f64 quan)
+inline T GetQuantile(const std::vector<T>& vec, f64 quan)
 {
   if (vec.empty())
     return 0;
   std::vector<T> out = vec;
   std::sort(out.begin(), out.end());
   return out[(usize)(quan * (out.size() - 1))];
+}
+
+template <typename T>
+inline T GetQuantile(const cv::Mat& mat, f64 quan)
+{
+  std::vector<T> data;
+  data.assign((T*)mat.datastart, (T*)mat.dataend);
+  std::ranges::sort(data);
+  return data[static_cast<usize>(std::clamp(quan, 0., 1.) * (data.size() - 1))];
 }
 
 template <typename T>
