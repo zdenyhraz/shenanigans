@@ -191,7 +191,7 @@ get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
 if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
   add_compile_definitions(ENABLE_PRIVATE)
   include_directories(src/NDA)
-  file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/Windows/*.cpp)
+  file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/*.cpp)
   target_sources(shenanigans PRIVATE ${SRC_NDA})
 endif()
 
