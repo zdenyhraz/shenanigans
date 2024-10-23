@@ -18,8 +18,8 @@ void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, i32 tileGridSize, i32 
   cv::cvtColor(imageLAB, imageCLAHE, cv::COLOR_Lab2BGR);
   cv::rectangle(imageCLAHE, cv::Rect(0, 0, tileGridSize, tileGridSize), cv::Scalar(0, 0, 255), imageCLAHE.rows * 0.005);
 
-  Plot::Plot("../data/UnevenIllumination/CLAHE/input.png", image);
-  Plot::Plot("../data/UnevenIllumination/CLAHE/output.png", imageCLAHE);
+  Plot::Plot("input", image);
+  Plot::Plot("clahe output", imageCLAHE);
 }
 
 void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.001)
@@ -33,11 +33,11 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
   lightness.convertTo(lightness, GetMatType<f64>());
 
   cv::log(lightness, lightness);
-  cv::Mat FFT = FFT(lightness);
+  cv::Mat fft = FFT(lightness);
   cv::Mat filter = 1. - Butterworth<f64>(lightness.size(), cutoff, 1);
   IFFTShift(filter);
-  cv::multiply(FFT, DuplicateChannelsCopy(filter), FFT);
-  lightness = IFFT(FFT);
+  cv::multiply(fft, DuplicateChannelsCopy(filter), fft);
+  lightness = IFFT(fft);
   cv::exp(lightness, lightness);
 
   cv::normalize(lightness, lightness, 0, 255, cv::NORM_MINMAX);
@@ -48,5 +48,5 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
   cv::Mat result;
   cv::cvtColor(imageLAB, result, cv::COLOR_Lab2BGR);
 
-  Plot::Plot(fmt::format("../data/UnevenIllumination/Homomorphic/output_{:.3f}.png", cutoff), result);
+  Plot::Plot("homo output", result);
 }

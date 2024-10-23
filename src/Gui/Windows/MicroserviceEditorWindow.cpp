@@ -2,7 +2,7 @@
 #include "Microservice/Microservices/LoadImageMicroservice.hpp"
 #include "Microservice/Microservices/BlurImageMicroservice.hpp"
 #include "Microservice/Microservices/PlotImageMicroservice.hpp"
-#include "NDA/SAS/ObjdetectSASMicroservice.hpp"
+#include "NDA/Microservice/ObjdetectSASMicroservice.hpp"
 #include "Microservice/Microservices/PlotObjectsMicroservice.hpp"
 
 void MicroserviceEditorWindow::Initialize()
