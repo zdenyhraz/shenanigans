@@ -136,13 +136,13 @@ if(ENABLE_PROFILING)
   add_compile_definitions(TRACY_ENABLE) # for tracy macros
   add_compile_definitions(ENABLE_PROFILING) # for custom macros
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
-  set(SRC_TRACY libs/tracy/Tracy.hpp libs/tracy/TracyClient.cpp)
+  set(SRC_TRACY libs/tracy/public/TracyClient.cpp)
   target_sources(shenanigans PRIVATE ${SRC_TRACY})
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
 # opencv
-find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR} libs/opencv_install)
+find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
