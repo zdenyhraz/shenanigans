@@ -11,7 +11,7 @@
 #include <implot_internal.h>
 
 #ifdef ENABLE_PROFILING
-  #include <Tracy.hpp>
+  #include <tracy/Tracy.hpp>
   // use FrameMark for frames (at the end of each frame)
   // use ZoneScoped once per scope (automatic name)
   // use ZoneScopedN once per scope (user-supplied name)
@@ -21,6 +21,7 @@
   #define PROFILE_FUNCTION ZoneScoped
   #define PROFILE_SCOPE(name) ZoneNamedN(name, #name, true)
 
+  #ifdef ENABLE_PROFILING_MEMORY
 inline void* operator new(std::size_t count)
 {
   auto ptr = malloc(count);
@@ -33,6 +34,7 @@ inline void operator delete(void* ptr) noexcept
   TracyFree(ptr);
   free(ptr);
 }
+  #endif
 #endif
 
 namespace ImGui

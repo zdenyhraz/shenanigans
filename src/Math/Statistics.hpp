@@ -120,10 +120,10 @@ inline T GetQuantile(const std::vector<T>& vec, f64 quan)
 }
 
 template <typename T>
-inline T GetQuantile(const cv::Mat& mat, f64 quan)
+inline T GetQuantile(cv::Mat&& mat, f64 quan)
 {
-  std::vector<T> data;
-  data.assign(reinterpret_cast<const T*>(mat.datastart), reinterpret_cast<const T*>(mat.dataend));
+  PROFILE_FUNCTION;
+  std::span<T> data(reinterpret_cast<T*>(mat.data), mat.total());
   std::ranges::sort(data);
   return data[static_cast<usize>(std::clamp(quan, 0., 1.) * (data.size() - 1))];
 }

@@ -9,7 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-option(ENABLE_PROFILING "" OFF)
+option(ENABLE_PROFILING "" ON)
+option(ENABLE_PROFILING_MEMORY "" OFF)
 option(ENABLE_SANITIZER "" OFF)
 option(ENABLE_PRIVATE "" ON)
 option(ENABLE_COVERAGE "" OFF)
@@ -132,10 +133,13 @@ target_link_libraries(shenanigans_benchmark PRIVATE nlohmann_json::nlohmann_json
 
 # tracy
 if(ENABLE_PROFILING)
-  include_directories(libs/tracy)
+  include_directories(libs/tracy/public)
   add_compile_definitions(TRACY_ENABLE) # for tracy macros
   add_compile_definitions(ENABLE_PROFILING) # for custom macros
   add_compile_definitions(TRACY_NO_FRAME_IMAGE) # not using frame images
+  if(ENABLE_PROFILING_MEMORY)
+    add_compile_definitions(ENABLE_PROFILING_MEMORY)
+  endif()
   set(SRC_TRACY libs/tracy/public/TracyClient.cpp)
   target_sources(shenanigans PRIVATE ${SRC_TRACY})
   target_link_libraries(shenanigans PRIVATE ${CMAKE_DL_LIBS})
