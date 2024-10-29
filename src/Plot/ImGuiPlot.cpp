@@ -118,6 +118,10 @@ ImPlotColormap ImGuiPlot::GetColormap(const std::string& cmap)
     return ImPlotColormap_Jet;
   if (cmap == "viridis")
     return ImPlotColormap_Viridis;
+  if (cmap == "hot")
+    return ImPlotColormap_Hot;
+  if (cmap == "cool")
+    return ImPlotColormap_Cool;
 
   return ImPlotColormap_Viridis;
 }
