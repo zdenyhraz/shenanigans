@@ -27,13 +27,14 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang make git cmake opam
+          sudo apt-get install -y clang make git cmake
 
-      - name: Install Infer
+      - name: Download Infer
         run: |
-          git clone https://github.com/facebook/infer.git
-          cd infer
-          ./build-infer.sh
+          wget https://github.com/facebook/infer/releases/download/v1.2.0/infer-linux-x86_64-v1.2.0.tar.xz
+          tar -xf infer-linux-x86_64-v1.2.0.tar.xz
+          sudo mv infer-* /usr/local/bin/infer  # Move to /usr/local/bin for easier access
+          sudo chmod +x /usr/local/bin/infer/infer  # Ensure the infer binary is executable
 
       - name: Build
         run: python -u build.py --ci --compiler clang --build_type Release
@@ -41,9 +42,9 @@ jobs:
       - name: Run Infer
         run: |
           cd build
-          infer run --make-command="make" --output=../infer_out
+          /usr/local/bin/infer/infer run --make-command="make" --output=../infer_out
 
       - name: Generate Infer Report
         run: |
-          cd ../infer  # Go back to the infer directory
+          cd /usr/local/bin/infer  # Navigate to the infer directory
           infer report --no-filter --results-dir=../infer_out
