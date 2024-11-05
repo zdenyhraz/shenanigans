@@ -46,9 +46,4 @@ jobs:
       - name: Run Infer
         run: |
           cd build  # Change to the build directory
-          infer run --make-command="make" --output=../infer_out
-
-      - name: Generate Infer Report
-        run: |
-          cd /usr/local/bin/infer  # Navigate to the infer directory
-          infer report --no-filter --results-dir=../infer_out
+          infer run --make
