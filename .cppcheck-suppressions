@@ -4,6 +4,5 @@ knownConditionTrueFalse
 duplicateBranch
 funcArgNamesDifferent
 internalAstError
-unusedFunction
 missingInclude
 useStlAlgorithm
