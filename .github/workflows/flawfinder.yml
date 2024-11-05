@@ -1,0 +1,18 @@
+name: flawfinder
+
+on: [push,pull_request]
+
+jobs:
+  flawfinder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Flawfinder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flawfinder
+
+      - name: Run Flawfinder
+        run: flawfinder --minlevel=1 --columns --dataonly src/
