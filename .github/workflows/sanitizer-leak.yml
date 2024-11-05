@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - compiler: gcc
+          - compiler: clang
             build_type: Release
 
     steps:
