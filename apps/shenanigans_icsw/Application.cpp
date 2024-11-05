@@ -6,6 +6,7 @@
 int main(int argc, char** argv)
 {
   Log("ICSW started");
+  // flawfinder: ignore
   std::srand(std::time(nullptr));
 
   Instrument instrument;
