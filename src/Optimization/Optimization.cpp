@@ -17,7 +17,6 @@ OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname)
   }
 }
 
-// cppcheck-suppress unusedFunction
 void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax,
     f64 ymin, f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
@@ -187,4 +186,27 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       .xlabel = xName,
       .ylabel = yName,
       .zlabel = fmt::format("log({:.1e}+obj)", logConstant)});
+}
+
+const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
+{
+  switch (reason)
+  {
+  case NotTerminated:
+    return "Not yet terminated";
+  case OptimalFitnessReached:
+    return "Optimal fitness reached";
+  case MaximumGenerationsReached:
+    return "Maximum generations reached";
+  case MaximumFunctionEvaluationsReached:
+    return "Maximum function evaluations reached";
+  case NoImprovementReachedRel:
+    return "No relative improvement reached";
+  case NoImprovementReachedAbs:
+    return "No absolute improvement reached";
+  case UnexpectedErrorOccured:
+    return "Unexpected error occured";
+  default:
+    return "Unknown reason";
+  }
 }

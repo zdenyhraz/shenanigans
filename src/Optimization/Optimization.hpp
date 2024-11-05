@@ -45,6 +45,8 @@ protected:
     return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
   }
 
+  static const char* GetTerminationReasonString(const TerminationReason& reason);
+
   usize GetParameterIndex(const std::string& parameterName)
   {
     const auto idx = std::ranges::find(mParameterNames, parameterName);

@@ -1,2 +1,2 @@
-Checks: '*,-clang-diagnostic-error,-llvm-include-order,-llvm-header-guard,-modernize-use-trailing-return-type'
+Checks: '*,-clang-diagnostic-error,-llvm-include-order,-llvm-header-guard,-modernize-use-trailing-return-type,-google-readability-braces-around-statements,-hicpp-braces-around-statements,-readability-braces-around-statements'
 FormatStyle: 'file'
