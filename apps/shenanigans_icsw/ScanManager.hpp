@@ -18,5 +18,5 @@ public:
 private:
   ThreadLoop mThread{"Scan loop"};
 
-  void ScanLoop() { Log("Scanning"); }
+  static void ScanLoop() { Log("Scanning"); }
 };

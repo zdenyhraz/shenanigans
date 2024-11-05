@@ -3,7 +3,7 @@
 
 class PyPlot : public PlotBase<PyPlot>
 {
-  py::dict GetDefaultPlotData(const std::string& name);
+  static py::dict GetDefaultPlotData(const std::string& name);
   py::dict GetPythonPlotData(const PlotData1D& data);
   py::dict GetPythonPlotData(const PlotData2D& data);
   void ScheduleCustomPlot(const std::string& type, py::dict&& data);
@@ -15,7 +15,7 @@ public:
   void RenderInternal() override;
   void RenderInternal(const PlotData1D& data) override;
   void RenderInternal(const PlotData2D& data) override;
-  void RenderInternal(const std::string& type, py::dict&& data);
+  static void RenderInternal(const std::string& type, py::dict&& data);
 
   static void PlotCustom(const std::string& type, py::dict&& data) { Singleton<PyPlot>::Get().ScheduleCustomPlot(type, std::move(data)); }
 };

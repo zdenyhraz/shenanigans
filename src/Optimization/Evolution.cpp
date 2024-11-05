@@ -240,7 +240,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
 }
 
-void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj)
+void Evolution::CheckObjectiveFunctionNormality(ObjectiveFunction obj) const
 try
 {
   PROFILE_FUNCTION;
@@ -287,7 +287,7 @@ void Evolution::CheckBounds()
     throw std::runtime_error(fmt::format("Invalid upper parameter bound size: {} != {}", mUpperBounds.size(), N));
 }
 
-void Evolution::CheckParameters()
+void Evolution::CheckParameters() const
 {
   PROFILE_FUNCTION;
 
@@ -364,7 +364,7 @@ catch (const std::exception& e)
     LOG_EXCEPTION(e);
 }
 
-Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, usize generation)
+Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, usize generation) const
 {
   if (population.bestEntity.fitness <= mOptimalFitness) // populationFitness goal reached
     return OptimalFitnessReached;
@@ -428,7 +428,7 @@ const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
   }
 }
 
-usize Evolution::GetNumberOfParents()
+usize Evolution::GetNumberOfParents() const
 {
   switch (mMutStrat)
   {

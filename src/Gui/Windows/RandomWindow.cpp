@@ -33,7 +33,7 @@ void RandomWindow::Render()
   }
 }
 
-void RandomWindow::EvolutionOptimization(bool meta) const
+void RandomWindow::EvolutionOptimization(bool meta)
 {
   LOG_FUNCTION;
   static constexpr i32 N = 2;
@@ -60,7 +60,7 @@ void RandomWindow::EvolutionOptimization(bool meta) const
     Evo.Optimize(OptimizationTestFunctions::Rosenbrock, [](const auto& vec) { return OptimizationTestFunctions::RosenbrockNoisy(vec, noiseStddev); });
 }
 
-void RandomWindow::UnevenIlluminationCLAHE() const
+void RandomWindow::UnevenIlluminationCLAHE()
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/UnevenIllumination/input.jpg");
@@ -69,7 +69,7 @@ void RandomWindow::UnevenIlluminationCLAHE() const
   CorrectUnevenIlluminationCLAHE(image, tileGridSize, clipLimit);
 }
 
-void RandomWindow::UnevenIlluminationHomomorphic() const
+void RandomWindow::UnevenIlluminationHomomorphic()
 {
   LOG_FUNCTION;
   auto image = cv::imread("../data/UnevenIllumination/input.jpg");

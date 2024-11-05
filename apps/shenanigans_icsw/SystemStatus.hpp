@@ -26,5 +26,5 @@ private:
   double mCIDGasPressure = 0;
   double mTotalIonCurrent = 0;
 
-  void MonitoringLoop() { Log("Monitoring"); }
+  static void MonitoringLoop() { Log("Monitoring"); }
 };

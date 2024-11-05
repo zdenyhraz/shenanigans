@@ -147,10 +147,8 @@ public:
       {
         static constexpr int maxSize = 5000;
         const float aspect = static_cast<float>(data.z.cols) / data.z.rows;
-        int targetHeight = std::min(maxSize, data.z.rows);
-        int targetWidth = targetHeight * aspect;
-        targetWidth = std::min(maxSize, data.z.cols);
-        targetHeight = targetWidth / aspect;
+        int targetWidth = std::min(maxSize, data.z.cols);
+        int targetHeight = targetWidth / aspect;
 
         LOG_WARNING("Image '{}' is too big for ImGuiPlot ({}x{}), downsizing to {}x{}", data.name, data.z.cols, data.z.rows, targetWidth, targetHeight);
         cv::resize(data.z, data.z, cv::Size(targetWidth, targetHeight));

@@ -39,7 +39,7 @@ protected:
     }
   };
 
-  bool ShouldLog(LogLevel logLevel) const { return logLevel >= mLogLevel; }
+  static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 
 public:
   static void SetLogLevel(LogLevel logLevel) { mLogLevel = logLevel; }
@@ -50,6 +50,7 @@ public:
     fmt::format_to(mProgressBarOverlay.begin(), "{}% {}", std::clamp(static_cast<i32>(mProgress * 100), 0, 100), mProgressName);
   }
 
+  // cppcheck-suppress passedByValue
   static void SetProgressName(std::string_view progressName)
   {
     mProgressName = progressName;

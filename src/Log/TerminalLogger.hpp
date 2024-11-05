@@ -3,19 +3,6 @@
 
 class TerminalLogger : public Logger
 {
-  static consteval std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelNames()
-  {
-    std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;
-    names[static_cast<usize>(Logger::LogLevel::Trace)] = "Trace";
-    names[static_cast<usize>(Logger::LogLevel::Function)] = "Function";
-    names[static_cast<usize>(Logger::LogLevel::Debug)] = "Debug";
-    names[static_cast<usize>(Logger::LogLevel::Info)] = "Info";
-    names[static_cast<usize>(Logger::LogLevel::Success)] = "Success";
-    names[static_cast<usize>(Logger::LogLevel::Warning)] = "Warning";
-    names[static_cast<usize>(Logger::LogLevel::Error)] = "Error";
-    return names;
-  }
-
   static consteval std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
   {
     std::array<std::string_view, static_cast<i32>(Logger::LogLevel::LogLevelCount)> names;

@@ -94,13 +94,13 @@ private:
     bool mConsoleOutput = true;
   };
 
-  void CheckObjectiveFunctionNormality(ObjectiveFunction obj);
+  void CheckObjectiveFunctionNormality(ObjectiveFunction obj) const;
   void CheckBounds();
-  void CheckParameters();
-  usize GetNumberOfParents();
+  void CheckParameters() const;
+  usize GetNumberOfParents() const;
   void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
   void UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid);
-  TerminationReason CheckTerminationCriterions(const Population& population, usize generation);
+  TerminationReason CheckTerminationCriterions(const Population& population, usize generation) const;
   std::string GetOutputString(usize generation, const Population& population);
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);

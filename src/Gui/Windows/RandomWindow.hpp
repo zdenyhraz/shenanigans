@@ -3,9 +3,9 @@
 
 class RandomWindow : public Window
 {
-  void EvolutionOptimization(bool meta) const;
-  void UnevenIlluminationCLAHE() const;
-  void UnevenIlluminationHomomorphic() const;
+  static void EvolutionOptimization(bool meta);
+  static void UnevenIlluminationCLAHE();
+  static void UnevenIlluminationHomomorphic();
 
 public:
   void Render() override;

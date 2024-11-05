@@ -7,8 +7,8 @@ class Application
   void Render();
   void RenderPlotMenu();
   void RenderDemoMenu();
-  void RenderThemeMenu();
-  void RenderStyleMenu();
+  static void RenderThemeMenu();
+  static void RenderStyleMenu();
   static void SetWindowIcon(GLFWwindow* window);
   static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
