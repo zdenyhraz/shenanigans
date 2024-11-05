@@ -1,0 +1,8 @@
+noExplicitConstructor
+constParameterCallback
+knownConditionTrueFalse
+duplicateBranch
+funcArgNamesDifferent
+internalAstError
+unusedFunction
+missingInclude

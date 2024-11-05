@@ -13,6 +13,4 @@ jobs:
         run: sudo apt install -y cppcheck
 
       - name: Cppcheck run
-        run: |
-          cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=0 src/ apps/ 2> cppcheck-result.txt
-          cat cppcheck-result.txt
+        run: cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inconclusive --error-exitcode=1 src/ apps/
