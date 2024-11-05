@@ -34,7 +34,8 @@ if(MSVC)
   #add_compile_options(/Wall /WX)
 else()
   add_compile_options(-march=native -fopenmp -pthread -lstdc++_libbacktrace)
-  add_compile_options(-Wall -Wfatal-errors -Wextra -Wpedantic -Wshadow)#-Werror
+  add_compile_options(-Wall -Wfatal-errors -Wextra -Wpedantic -Wshadow)
+  #add_compile_options(-Werror)
   add_compile_options(-Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare)
   add_compile_options("$<$<CONFIG:DEBUG>:-g;-O0>")
   add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
@@ -73,7 +74,7 @@ if(ENABLE_SANITIZER_ADDRESS AND NOT MSVC)
 endif()
 
 if(ENABLE_SANITIZER_UNDEFINED AND NOT MSVC)
-  add_compile_options(-fsanitize=undefined -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer)
 endif()
 
 if(ENABLE_SANITIZER_THREAD AND NOT MSVC)

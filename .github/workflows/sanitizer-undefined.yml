@@ -11,7 +11,7 @@ jobs:
       matrix:
         include:
           - compiler: gcc
-            build_type: Debug
+            build_type: Release
 
     steps:
     - name: Checkout repository
