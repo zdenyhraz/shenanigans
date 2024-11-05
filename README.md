@@ -12,6 +12,7 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-leak.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-leak.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-memory.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-memory.yml/badge.svg"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
