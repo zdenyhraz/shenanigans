@@ -34,7 +34,6 @@ jobs:
 
     - name: Configure
       run: python -u build.py --ci --compiler gcc --build_type Debug --configure_only
-      continue-on-error: true
 
     - name: Run clang-tidy
       run: |
