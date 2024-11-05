@@ -26,6 +26,7 @@ void Application::Run()
   static constexpr f32 scale = 2.0;
   static constexpr f64 targetFPS = 60;
   static constexpr f64 targetFrametime = 1. / targetFPS;
+  // flawfinder: ignore
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
   GLFWInitialize();

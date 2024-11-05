@@ -698,6 +698,7 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
     for (usize pid = 0; pid < params.size(); ++pid)
     {
       f64 random = Random::Rand();
+      // flawfinder: ignore
       if (random < CR or pid == definite)
         crossoverParameters[pid] = true;
     }
