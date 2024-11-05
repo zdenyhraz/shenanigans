@@ -2,9 +2,18 @@ name: infer
 
 on: [push, pull_request]
 
+env:
+  CI: ON
+
 jobs:
   infer:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - compiler: clang
+            build_type: Release
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,25 +33,20 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang make git cmake
+      - name: Build
+        run: python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }}
 
       - name: Download Infer
         run: |
-          wget https://github.com/facebook/infer/releases/download/v1.2.0/infer-linux-x86_64-v1.2.0.tar.xz
-          tar -xf infer-linux-x86_64-v1.2.0.tar.xz
-          sudo mv infer-* /usr/local/bin/infer  # Move to /usr/local/bin for easier access
-          sudo chmod +x /usr/local/bin/infer/infer  # Ensure the infer binary is executable
-
-      - name: Build
-        run: python -u build.py --ci --compiler clang --build_type Release
+          VERSION=1.2.0  # Set the desired version of Infer
+          curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux-x86_64-v$VERSION.tar.xz" \
+          | tar -C /opt -xJ && \
+          sudo ln -s "/opt/infer-linux-x86_64-v$VERSION/bin/infer" /usr/local/bin/infer
 
       - name: Run Infer
         run: |
-          cd build
-          /usr/local/bin/infer/infer run --make-command="make" --output=../infer_out
+          cd build  # Change to the build directory
+          infer run --make-command="make" --output=../infer_out
 
       - name: Generate Infer Report
         run: |
