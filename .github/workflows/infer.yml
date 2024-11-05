@@ -46,4 +46,4 @@ jobs:
       - name: Run Infer
         run: |
           cd build  # Change to the build directory
-          infer run --make
+          infer run -- make
