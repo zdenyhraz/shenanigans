@@ -1,6 +1,13 @@
 # Zdeny's shenanigans 🪐
 
 <p align="center">
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml/badge.svg"/></a>
+<a href="https://app.codacy.com/gh/zdenyhraz/shenanigans/dashboard"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
+<a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
+<br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml/badge.svg"/></a>
@@ -8,14 +15,6 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml/badge.svg"/></a>
-<br>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml/badge.svg"/></a>
-<br>
-<a href="https://app.codacy.com/gh/zdenyhraz/shenanigans/dashboard"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
-<a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 </p>
 
 Semi-random ***funky stuff***, mainly for my [PhD experiments](https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=250739) and [articles](#article-links). Contains calculations and algorithm implementations for various applied mathematics and astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, sub-pixel [image registration](https://en.wikipedia.org/wiki/Image_registration), non-convex [optimization](https://en.wikipedia.org/wiki/Mathematical_optimization).
