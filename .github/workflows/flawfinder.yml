@@ -15,4 +15,4 @@ jobs:
           sudo apt-get install -y flawfinder
 
       - name: Run Flawfinder
-        run: flawfinder --minlevel=1 --error-level=1 --columns --context src/ apps/
+        run: flawfinder --minlevel=0 --error-level=0 --columns --context src/ apps/
