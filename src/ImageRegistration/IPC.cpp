@@ -58,6 +58,7 @@ std::string IPC::InterpolationType2String(InterpolationType type)
   }
 }
 
+// cppcheck-suppress unusedFunction
 std::string IPC::Serialize() const
 {
   return fmt::format("Rows: {}, Cols: {}, BPL: {}, BPH: {}, L2size: {}, L1ratio: {}, L2Usize: {}, CPeps: {}, BPT: {}, WinT: {}, IntT: {}", GetRows(), GetCols(), GetBandpassL(),

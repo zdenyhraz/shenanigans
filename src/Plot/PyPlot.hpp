@@ -4,7 +4,7 @@
 class PyPlot : public PlotBase<PyPlot>
 {
   static py::dict GetDefaultPlotData(const std::string& name);
-  py::dict GetPythonPlotData(const PlotData1D& data);
+  static py::dict GetPythonPlotData(const PlotData1D& data);
   py::dict GetPythonPlotData(const PlotData2D& data);
   void ScheduleCustomPlot(const std::string& type, py::dict&& data);
 

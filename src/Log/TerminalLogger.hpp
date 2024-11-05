@@ -17,7 +17,7 @@ class TerminalLogger : public Logger
   }
 
   template <typename... Args>
-  void MessageInternal(LogLevel logLevel, std::string_view fmt, Args&&... args) const
+  static void MessageInternal(LogLevel logLevel, std::string_view fmt, Args&&... args)
   {
     if (not ShouldLog(logLevel))
       return;

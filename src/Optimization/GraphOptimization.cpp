@@ -23,6 +23,7 @@ u32 getTupleIndexWithIndex(std::vector<std::tuple<u32, f64, u32>> vec, u32 index
   return -1;
 }
 
+// cppcheck-suppress unusedFunction
 void findOptimalGraphPathDebug()
 {
   Graph graph(9);
