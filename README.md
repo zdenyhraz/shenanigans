@@ -8,6 +8,11 @@
 <a href="https://app.codacy.com/gh/zdenyhraz/shenanigans/dashboard"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 <br>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-leak.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-leak.yml/badge.svg"/></a>
+<br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml/badge.svg"/></a>
