@@ -1,4 +1,4 @@
-name: sanitizer-thread
+name: thrsan
 
 on: [push,pull_request]
 env:

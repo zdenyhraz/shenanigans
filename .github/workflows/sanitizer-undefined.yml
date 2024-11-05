@@ -1,4 +1,4 @@
-name: sanitizer-undefind
+name: ubsan
 
 on: [push,pull_request]
 env:

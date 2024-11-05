@@ -1,4 +1,4 @@
-name: sanitizer-leak
+name: leaksan
 
 on: [push,pull_request]
 env:

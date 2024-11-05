@@ -1,4 +1,4 @@
-name: sanitizer-memory
+name: memsan
 
 on: [push,pull_request]
 env:

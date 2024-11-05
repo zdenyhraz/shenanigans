@@ -1,4 +1,4 @@
-name: sanitizer-address
+name: asan
 
 on: [push,pull_request]
 env:
