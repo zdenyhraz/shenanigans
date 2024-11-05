@@ -1,0 +1,49 @@
+name: infer
+
+on: [push, pull_request]
+
+jobs:
+  infer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: OpenCV cache
+        id: opencv-cache
+        uses: actions/cache@v4
+        with:
+          path: ./libs/opencv_install
+          key: ${{ runner.os }}-opencv-cache-v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang make git cmake
+
+      - name: Install Infer
+        run: |
+          git clone https://github.com/facebook/infer.git
+          cd infer
+          ./build-infer.sh
+
+      - name: Build
+        run: python -u build.py --ci --compiler clang --build_type Release
+
+      - name: Run Infer
+        run: |
+          cd build
+          infer run --make-command="make" --output=../infer_out
+
+      - name: Generate Infer Report
+        run: |
+          cd ../infer  # Go back to the infer directory
+          infer report --no-filter --results-dir=../infer_out
