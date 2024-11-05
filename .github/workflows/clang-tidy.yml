@@ -27,18 +27,18 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Configure
-      run: python -u build.py --ci --compiler gcc --build_type Debug --configure_only
-      continue-on-error: true
-
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install clang-tidy cmake build-essential
 
+    - name: Configure
+      run: python -u build.py --ci --compiler gcc --build_type Debug --configure_only
+      continue-on-error: true
+
     - name: Run clang-tidy
       run: |
         cd build
-        find ../src -type f \( -name "*.cpp" -o -name "*.hpp" \) | xargs clang-tidy -- -p=.
+        find ../src -type f \( -name "*.cpp" -o -name "*.hpp" \) | xargs clang-tidy -p=.
       continue-on-error: true
 

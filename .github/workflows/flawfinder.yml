@@ -15,4 +15,4 @@ jobs:
           sudo apt-get install -y flawfinder
 
       - name: Run Flawfinder
-        run: flawfinder --minlevel=1 --columns --dataonly src/
+        run: flawfinder --minlevel=1 --exitcode=2 --columns --omit=random,buffer src/

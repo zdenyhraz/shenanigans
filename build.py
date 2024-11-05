@@ -33,7 +33,7 @@ if __name__ == '__main__':
         'CI': 'ON' if args.ci else 'OFF',
         'ENABLE_SANITIZER': 'ON' if args.sanitizer else 'OFF',
         'OPENCV_DIR': opencv_dir,
-        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON' if args.configure_only else 'OFF'
+        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON' if args.configure_only or args.ci else 'OFF'
     }
 
     print(f"Building {args.targets}")
