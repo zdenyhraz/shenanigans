@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
     parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
-    parser.add_argument('--sanitizer', help='sanitizer', required=False, action='store_true', default=False)
+    parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
     parser.add_argument('--opengl', help='opengl', required=False, action='store_true', default=True)
     parser.add_argument('--configure_only', help='configure_only', required=False, action='store_true', default=False)
 
@@ -31,10 +31,11 @@ if __name__ == '__main__':
     configure_args = {
         'CMAKE_BUILD_TYPE': args.build_type,
         'CI': 'ON' if args.ci else 'OFF',
-        'ENABLE_SANITIZER': 'ON' if args.sanitizer else 'OFF',
         'OPENCV_DIR': opencv_dir,
         'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON' if args.configure_only or args.ci else 'OFF'
     }
+    if args.sanitizer:
+        configure_args[f'ENABLE_SANITIZER_{args.sanitizer.upper()}'] = 'ON'
 
     print(f"Building {args.targets}")
     os.makedirs(args.build_dir, exist_ok=True)

@@ -12,6 +12,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 option(ENABLE_PROFILING "" OFF)
 option(ENABLE_PROFILING_MEMORY "" OFF)
 option(ENABLE_SANITIZER "" OFF)
+option(ENABLE_SANITIZER_ADDRESS "" OFF)
+option(ENABLE_SANITIZER_UNDEFINED "" OFF)
+option(ENABLE_SANITIZER_THREAD "" OFF)
+option(ENABLE_SANITIZER_LEAK "" OFF)
 option(ENABLE_PRIVATE "" ON)
 option(ENABLE_COVERAGE "" OFF)
 option(CI "" OFF)
@@ -61,6 +65,22 @@ if(ENABLE_SANITIZER)
     add_compile_options(-fsanitize=address,undefined,leak -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address,undefined,leak -fno-omit-frame-pointer)
   endif()
+endif()
+
+if(ENABLE_SANITIZER_ADDRESS AND NOT MSVC)
+  add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+endif()
+
+if(ENABLE_SANITIZER_UNDEFINED AND NOT MSVC)
+  add_compile_options(-fsanitize=undefined -fno-omit-frame-pointer)
+endif()
+
+if(ENABLE_SANITIZER_THREAD AND NOT MSVC)
+  add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
+endif()
+
+if(ENABLE_SANITIZER_LEAK AND NOT MSVC)
+  add_compile_options(-fsanitize=leak -fno-omit-frame-pointer)
 endif()
 
 # status messages
