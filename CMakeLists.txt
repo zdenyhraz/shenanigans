@@ -71,22 +71,27 @@ endif()
 
 if(ENABLE_SANITIZER_ADDRESS AND NOT MSVC)
   add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address -fno-omit-frame-pointer)
 endif()
 
 if(ENABLE_SANITIZER_UNDEFINED AND NOT MSVC)
   add_compile_options(-fsanitize=undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=undefined -fno-omit-frame-pointer)
 endif()
 
 if(ENABLE_SANITIZER_THREAD AND NOT MSVC)
   add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=thread -fno-omit-frame-pointer)
 endif()
 
 if(ENABLE_SANITIZER_LEAK AND NOT MSVC)
   add_compile_options(-fsanitize=leak -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=leak -fno-omit-frame-pointer)
 endif()
 
 if(ENABLE_SANITIZER_MEMORY AND NOT MSVC)
-    add_compile_options(-fsanitize=memory -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=memory -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=memory -fno-omit-frame-pointer)
 endif()
 
 # status messages
