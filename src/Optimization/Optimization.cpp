@@ -189,6 +189,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
       .zlabel = fmt::format("log({:.1e}+obj)", logConstant)});
 }
 
+// cppcheck-suppress unusedFunction
 const char* OptimizationAlgorithm::GetTerminationReasonString(const TerminationReason& reason)
 {
   switch (reason)
