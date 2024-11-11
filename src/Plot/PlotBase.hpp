@@ -150,7 +150,7 @@ public:
         int targetWidth = std::min(maxSize, data.z.cols);
         int targetHeight = targetWidth / aspect;
 
-        LOG_WARNING("Image '{}' is too big for ImGuiPlot ({}x{}), downsizing to {}x{}", data.name, data.z.cols, data.z.rows, targetWidth, targetHeight);
+        // LOG_WARNING("Image '{}' is too big for ImGuiPlot ({}x{}), downsizing to {}x{}", data.name, data.z.cols, data.z.rows, targetWidth, targetHeight);
         cv::resize(data.z, data.z, cv::Size(targetWidth, targetHeight));
       }
     }
