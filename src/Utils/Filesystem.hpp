@@ -10,6 +10,14 @@ inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath)
   return std::filesystem::path(PROJECT_DIRECTORY) / relpath;
 }
 
+inline std::filesystem::path GetExistingPath(std::string_view relpath)
+{
+  const auto projectDirectoryPath = GetProjectDirectoryPath(relpath);
+  if (std::filesystem::exists(projectDirectoryPath))
+    return projectDirectoryPath;
+  return relpath;
+}
+
 inline usize GetFileCount(const std::filesystem::path& dirpath)
 {
   if (not std::filesystem::is_directory(dirpath))
@@ -30,9 +38,20 @@ class FilePathGenerator
   std::filesystem::directory_iterator mIterator;
 
 public:
-  FilePathGenerator(const std::string dirPath) : mDirPath(dirPath), mIterator(dirPath) {}
+  FilePathGenerator() = default;
+
+  FilePathGenerator(const std::string& dirPath) : mDirPath(dirPath), mIterator(dirPath) {}
 
   void Reset() { mIterator = std::filesystem::directory_iterator(mDirPath); }
+
+  void SetDirectory(const std::string& dirPath)
+  {
+    if (dirPath != mDirPath)
+    {
+      mDirPath = dirPath;
+      Reset();
+    }
+  }
 
   std::filesystem::path GetNextFilePath()
   {

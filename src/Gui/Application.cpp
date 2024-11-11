@@ -164,9 +164,9 @@ void Application::RenderStyleMenu()
   {
     if (ImGui::MenuItem("Save style to disk"))
     {
-      const auto path = GetProjectDirectoryPath("data/apps/imgui.ini").string();
+      const auto path = GetExistingPath("data/apps") / "imgui.ini";
       LOG_DEBUG("Saving ImGui style to {}", path);
-      ImGui::SaveIniSettingsToDisk(path.c_str());
+      ImGui::SaveIniSettingsToDisk(path.string().c_str());
     }
 
     ImGui::EndMenu();

@@ -39,7 +39,7 @@ inline void operator delete(void* ptr) noexcept
 
 namespace ImGui
 {
-inline bool SliderPercentage(const char* label, float* v, float v_min, float v_max, const char* format = "%.2f%%", ImGuiSliderFlags flags = 0)
+inline bool SliderPercentage(const char* label, float* v, float v_min, float v_max, const char* format = "%.1f%%", ImGuiSliderFlags flags = 0)
 {
   float valuePercent = *v * 100;
   ImGui::SliderFloat(label, &valuePercent, v_min * 100, v_max * 100, format, flags);
