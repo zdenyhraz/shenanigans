@@ -10,8 +10,8 @@ def valid(sources, targets):
     return True
 
 
-sources = ["Tomas", "Mia", "Sasa", "Zdenek", "Babi", "Eva", "Maros",  "Diana"]
-targets = ["Tomas", "Mia", "Sasa", "Zdenek", "Babi", "Eva", "Maros",  "Diana"]
+sources = ["Tomas", "Mia", "Sasa", "Zdenek", "Babi", "Eva", "Maros", "Diana"]
+targets = ["Tomas", "Mia", "Sasa", "Zdenek", "Babi", "Eva", "Maros", "Diana"]
 file = True
 random.seed(9)
 
