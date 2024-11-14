@@ -57,15 +57,13 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 
-  static constexpr auto fontPathRelative = "data/apps/CascadiaCode.ttf";
-  if (const auto fontPath = GetExistingPath(fontPathRelative); std::filesystem::exists(fontPath))
+  if (const auto fontPath = GetExistingPath("data/apps/CascadiaCode.ttf"); std::filesystem::exists(fontPath))
   {
     LOG_DEBUG("Using font {}", fontPath);
     io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
   }
 
-  static constexpr auto iniPathRelative = "data/apps/imgui.ini";
-  if (const auto iniPath = GetExistingPath(iniPathRelative); std::filesystem::exists(iniPath))
+  if (const auto iniPath = GetExistingPath("data/apps/imgui.ini"); std::filesystem::exists(iniPath))
   {
     LOG_DEBUG("Using ini file {}", iniPath);
     ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
