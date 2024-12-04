@@ -3,13 +3,15 @@
 #include "Windows/IPCWindow.hpp"
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
-#include "Windows/ObjdetectWindow.hpp"
+#include "Windows/ObjdetectObjectnessWindow.hpp"
+#include "Windows/ObjdetectColorWindow.hpp"
 #include "Windows/MicroserviceEditorWindow.hpp"
 
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
-  mWindows.push_back(std::make_unique<ObjdetectWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectObjectnessWindow>());
+  mWindows.push_back(std::make_unique<ObjdetectColorWindow>());
   mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
   mWindows.push_back(std::make_unique<IPCWindow>());
   mWindows.push_back(std::make_unique<AstroWindow>());
