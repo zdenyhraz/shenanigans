@@ -13,8 +13,7 @@ AccessModifierOffset: -2
 AllowShortFunctionsOnASingleLine: InlineOnly
 FixNamespaceComments: false
 SortIncludes: false
-AlwaysBreakTemplateDeclarations: true
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: AfterHash
 AlwaysBreakTemplateDeclarations: Yes
 AlignAfterOpenBracket: DontAlign
 IncludeBlocks: Preserve
