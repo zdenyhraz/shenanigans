@@ -10,7 +10,7 @@ struct fmt::formatter<std::vector<T>>
   }
 
   template <typename FormatContext>
-  constexpr auto format(const std::vector<T>& vec, FormatContext& ctx)
+  constexpr auto format(const std::vector<T>& vec, FormatContext& ctx) const
   {
     if (vec.empty())
       return fmt::format_to(ctx.out(), "[]");
@@ -85,9 +85,9 @@ struct fmt::formatter<cv::Point_<T>>
   }
 
   template <typename FormatContext>
-  constexpr auto format(const cv::Point_<T>& point, FormatContext& ctx)
+  constexpr auto format(const cv::Point_<T>& point, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(), "[{:.3f}, {:.3f}]", point.x, point.y);
+    return fmt::format_to(ctx.out(), "[{}, {}]", point.x, point.y);
   }
 };
 
@@ -101,25 +101,9 @@ struct fmt::formatter<cv::Size>
   }
 
   template <typename FormatContext>
-  constexpr auto format(const cv::Size& size, FormatContext& ctx)
+  constexpr auto format(const cv::Size& size, FormatContext& ctx) const
   {
     return fmt::format_to(ctx.out(), "[{}, {}]", size.width, size.height);
-  }
-};
-
-template <>
-struct fmt::formatter<cv::MatSize>
-{
-  template <typename ParseContext>
-  constexpr auto parse(ParseContext& ctx)
-  {
-    return ctx.begin();
-  }
-
-  template <typename FormatContext>
-  constexpr auto format(const cv::MatSize& size, FormatContext& ctx)
-  {
-    return fmt::format_to(ctx.out(), "{}", size());
   }
 };
 
@@ -133,7 +117,7 @@ struct fmt::formatter<cv::Mat>
   }
 
   template <typename FormatContext>
-  constexpr auto format(const cv::Mat& mat, FormatContext& ctx)
+  constexpr auto format(const cv::Mat& mat, FormatContext& ctx) const
   {
     if (mat.rows == 0)
       return fmt::format_to(ctx.out(), "[]");
