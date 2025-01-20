@@ -5,5 +5,7 @@ duplicateBranch
 funcArgNamesDifferent
 internalAstError
 missingInclude
+missingIncludeSystem
 useStlAlgorithm
 syntaxError
+unusedFunction
