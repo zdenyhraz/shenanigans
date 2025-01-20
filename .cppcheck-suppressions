@@ -3,7 +3,6 @@ constParameterCallback
 knownConditionTrueFalse
 duplicateBranch
 funcArgNamesDifferent
-internalAstError
 missingInclude
 missingIncludeSystem
 useStlAlgorithm
