@@ -53,56 +53,33 @@ void MicroserviceEditorWindow::TestInitialize()
 {
   editor.workflow.AddMicroservice<LoadImageMicroservice>();
   editor.workflow.AddMicroservice<BlurImageMicroservice>();
-  editor.workflow.AddMicroservice<BlurImageMicroservice>();
-  editor.workflow.AddMicroservice<BlurImageMicroservice>();
-  editor.workflow.AddMicroservice<PlotImageMicroservice>();
-  editor.workflow.AddMicroservice<PlotImageMicroservice>();
   editor.workflow.AddMicroservice<PlotImageMicroservice>();
   editor.workflow.AddMicroservice<ObjdetectSASMicroservice>();
-  editor.workflow.AddMicroservice<LoadImageMicroservice>();
   editor.workflow.AddMicroservice<PlotObjectsMicroservice>();
 
   const auto& microservices = editor.workflow.GetMicroservices();
-
   auto& start = *microservices[0];
-  auto& load1 = *microservices[1];
-  auto& blur3 = *microservices[2];
-  auto& blur4 = *microservices[3];
-  auto& blur5 = *microservices[4];
-  auto& plot1 = *microservices[5];
-  auto& plot2 = *microservices[6];
-  auto& plot3 = *microservices[7];
-  auto& sas = *microservices[8];
-  auto& loadSAS = *microservices[9];
-  auto& plotSAS = *microservices[10];
+  auto& load = *microservices[1];
+  auto& blur = *microservices[2];
+  auto& plotBlur2 = *microservices[3];
+  auto& sas = *microservices[4];
+  auto& plotSAS = *microservices[5];
 
-  loadSAS.SetParameter("file name", std::string("data/cx/sas/kd/SMK Test 0/sasi-S-upper-20221102-143803-l38.tif"));
-  loadSAS.SetParameter("float", true);
-  loadSAS.SetParameter("grayscale", true);
+  load.SetParameter("file name", std::string("rox.tif"));
+  load.SetParameter("float", true);
+  load.SetParameter("grayscale", true);
+  blur.SetParameter("relative blur x", 0.0f);
+  blur.SetParameter("relative blur y", 0.0f);
 
-  editor.workflow.Connect(start, blur3);
-  editor.workflow.Connect(start, plotSAS);
-
-  editor.workflow.Connect(load1, blur3, "image", "image");
-
-  editor.workflow.Connect(blur3, blur4);
-  editor.workflow.Connect(blur3, blur4, "blurred", "image");
-
-  editor.workflow.Connect(blur3, blur5);
-  editor.workflow.Connect(blur3, blur5, "blurred", "image");
-
-  editor.workflow.Connect(blur4, plot1);
-  editor.workflow.Connect(blur4, plot1, "blurred", "image");
-
-  editor.workflow.Connect(blur5, plot2, "blurred", "image");
-
-  editor.workflow.Connect(load1, plot3);
-  editor.workflow.Connect(load1, plot3, "image", "image");
-
+  editor.workflow.Connect(start, blur);
+  editor.workflow.Connect(load, blur, "image", "image");
+  editor.workflow.Connect(blur, plotBlur2);
+  editor.workflow.Connect(blur, plotBlur2, "blurred", "image");
+  editor.workflow.Connect(blur, sas, "blurred", "image");
+  editor.workflow.Connect(blur, sas);
+  editor.workflow.Connect(sas, plotSAS);
   editor.workflow.Connect(sas, plotSAS, "objects", "objects");
-
-  editor.workflow.Connect(loadSAS, sas, "image", "image");
-  editor.workflow.Connect(loadSAS, plotSAS, "image", "image");
+  editor.workflow.Connect(load, plotSAS, "image", "image");
 }
 
 void MicroserviceEditorWindow::ShowFlow()

@@ -13,7 +13,7 @@ class LoadImageMicroservice : public Microservice
     if (not loadGrayscale)
       mode |= cv::IMREAD_COLOR;
 
-    auto image = cv::imread(GetProjectDirectoryPath(filename).string(), mode);
+    auto image = cv::imread(filename, mode);
     if (image.empty())
       throw MicroserviceException("Failed to load image '{}'", filename);
 
