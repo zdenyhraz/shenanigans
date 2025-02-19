@@ -39,6 +39,7 @@ protected:
   std::mutex mPlotsMutex;
   bool mSave = false;
   bool mShouldPlot = true;
+  usize mWindowCount = 1;
 
 public:
   enum PlotLocation : usize
@@ -48,6 +49,8 @@ public:
   };
 
   static bool ShouldPlot() { return Singleton<T>::Get().mShouldPlot; }
+
+  static void SetWindowCount(usize windowCount) { Singleton<T>::Get().mWindowCount = windowCount; }
 
   static void Initialize()
   {
@@ -141,7 +144,7 @@ public:
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
       data.savepath = GetProjectDirectoryPath(fmt::format("data/debug/{}.png", data.name)).string();
 
-    if constexpr (std::is_same_v<T, ImGuiPlot> and true)
+    if constexpr (std::is_same_v<T, ImGuiPlot>)
     {
       if (data.z.rows > 8000 or data.z.cols > 8000)
       {

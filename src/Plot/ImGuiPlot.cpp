@@ -1,13 +1,13 @@
 #ifdef GLAPI
 
-  #include "ImGuiPlot.hpp"
+#  include "ImGuiPlot.hpp"
 
 void ImGuiPlot::RenderInternal()
 {
   PROFILE_FUNCTION;
-  for (usize plotLocation = 0; plotLocation < 2; ++plotLocation)
+  for (usize plotLocation = 0; plotLocation < mWindowCount; ++plotLocation)
   {
-    if (ImGui::Begin(fmt::format("Plot{}", static_cast<char>('A' + plotLocation)).c_str()))
+    if (ImGui::Begin(mWindowCount > 1 ? fmt::format("Plot{}", static_cast<char>('A' + plotLocation)).c_str() : "Plot"))
     {
       if (ImGui::BeginTabBar("Plots", ImGuiTabBarFlags_AutoSelectNewTabs))
       {

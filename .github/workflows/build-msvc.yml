@@ -33,5 +33,5 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
+      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --targets shenanigans
 

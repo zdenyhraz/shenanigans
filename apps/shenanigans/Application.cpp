@@ -30,6 +30,7 @@ void Application::Run()
   // flawfinder: ignore
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
+  ImGuiPlot::SetWindowCount(2);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, hiddenWindow);
   GLFWInitializeGL(window);
