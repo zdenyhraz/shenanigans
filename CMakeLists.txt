@@ -124,13 +124,13 @@ add_executable(umbellula)
 # precompiled headers
 if (ENABLE_PCH)
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-  set(SRC_PRECOMPILED apps/shenanigans/Precompiled.hpp)
+  set(SRC_PRECOMPILED_SHENANIGANS apps/shenanigans/Precompiled.hpp)
   set(SRC_PRECOMPILED_GUI src/PrecompiledGui.hpp)
-  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED_GUI} ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
-  target_precompile_headers(umbellula PRIVATE ${SRC_PRECOMPILED_GUI} apps/umbellula/Precompiled.hpp)
+  target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED_GUI} ${SRC_PRECOMPILED_SHENANIGANS})
+  target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED_SHENANIGANS})
+  target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED_SHENANIGANS})
+  target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED_SHENANIGANS})
+  target_precompile_headers(umbellula PRIVATE ${SRC_PRECOMPILED_GUI} src/NDA/apps/umbellula/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -255,7 +255,10 @@ file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
 
 # shenanigans_private sources
 include_directories(src/NDA)
-file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/*.cpp)
+file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS
+src/NDA/Windows/*.cpp
+src/NDA/SAS/*.cpp
+)
 
 # gui soruces
 file(GLOB_RECURSE SRC_GUI CONFIGURE_DEPENDS src/Gui/*.cpp)
@@ -293,5 +296,5 @@ file(GLOB_RECURSE SRC_UMBELLULA CONFIGURE_DEPENDS
  src/Plot/ImGuiPlot.cpp
  src/Log/ImGuiLogger.cpp
  )
-file(GLOB SRC_UMBELLULA_APP CONFIGURE_DEPENDS apps/umbellula/*.cpp)
+file(GLOB SRC_UMBELLULA_APP CONFIGURE_DEPENDS src/NDA/apps/umbellula/*.cpp)
 target_sources(umbellula PRIVATE ${SRC_UMBELLULA_APP} ${SRC_UMBELLULA} ${SRC_GUI})
