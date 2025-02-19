@@ -269,7 +269,7 @@ target_sources(shenanigans_terminal PRIVATE ${SRC_SHENANIGANS})
 target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS})
 
 # shenanigans app sources
-file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp)
+file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shenanigans/Windows/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
