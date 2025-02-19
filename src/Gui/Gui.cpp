@@ -44,7 +44,7 @@ void ImGuiSetDefaultStyle()
   ImGuiSetHazelTheme();
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& iniPath)
 {
   PROFILE_FUNCTION;
   IMGUI_CHECKVERSION();
@@ -63,12 +63,13 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale)
     io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
   }
 
-  if (const auto iniPath = GetExistingPath("data/apps/imgui.ini"); std::filesystem::exists(iniPath))
-  {
-    LOG_DEBUG("Using ini file {}", iniPath);
-    ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
-    io.IniFilename = iniPath.string().c_str();
-  }
+  if (not iniPath.empty())
+    if (const auto iniPathEx = GetExistingPath(iniPath); std::filesystem::exists(iniPathEx))
+    {
+      LOG_DEBUG("Using ini file {}", iniPathEx);
+      ImGui::LoadIniSettingsFromDisk(iniPathEx.string().c_str());
+      io.IniFilename = iniPathEx.string().c_str();
+    }
 
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetDefaultStyle();
