@@ -119,16 +119,18 @@ add_executable(shenanigans_test)
 add_executable(shenanigans_terminal)
 add_executable(shenanigans_benchmark)
 add_executable(shenanigans_icsw)
+add_executable(umbellula)
 
 # precompiled headers
 if (ENABLE_PCH)
   set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
-  set(SRC_PRECOMPILED src/Precompiled.hpp)
+  set(SRC_PRECOMPILED apps/shenanigans/Precompiled.hpp)
   set(SRC_PRECOMPILED_GUI src/PrecompiledGui.hpp)
   target_precompile_headers(shenanigans PRIVATE ${SRC_PRECOMPILED_GUI} ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_terminal PRIVATE ${SRC_PRECOMPILED})
   target_precompile_headers(shenanigans_benchmark PRIVATE ${SRC_PRECOMPILED})
+  target_precompile_headers(umbellula PRIVATE ${SRC_PRECOMPILED_GUI} apps/umbellula/Precompiled.hpp)
 endif()
 
 # pybind11
@@ -147,6 +149,7 @@ target_link_libraries(shenanigans_test PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_terminal PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_benchmark PRIVATE fmt::fmt)
 target_link_libraries(shenanigans_icsw PRIVATE fmt::fmt)
+target_link_libraries(umbellula PRIVATE fmt::fmt)
 
 # gtest
 add_subdirectory(libs/gtest)
@@ -189,11 +192,13 @@ target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_terminal PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_benchmark PRIVATE ${OpenCV_LIBS})
+target_link_libraries(umbellula PRIVATE ${OpenCV_LIBS})
 
 # implot
 include_directories(libs/implot)
 file(GLOB SRC_IMPLOT CONFIGURE_DEPENDS libs/implot/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMPLOT})
+target_sources(umbellula PRIVATE ${SRC_IMPLOT})
 
 # imgui
 include_directories(libs/imgui)
@@ -202,6 +207,7 @@ include_directories(libs/imgui/backends)
 file(GLOB SRC_IMGUI CONFIGURE_DEPENDS libs/imgui/*.cpp libs/imgui/misc/cpp/imgui_stdlib.cpp)
 set(SRC_IMGUI_BACKEND libs/imgui/backends/imgui_impl_glfw.cpp libs/imgui/backends/imgui_impl_opengl3.cpp)
 target_sources(shenanigans PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
+target_sources(umbellula PRIVATE ${SRC_IMGUI} ${SRC_IMGUI_BACKEND})
 
 # imgui-nodes
 include_directories(libs/imgui-nodes)
@@ -215,10 +221,12 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(libs/glfw)
 target_link_libraries(shenanigans PRIVATE glfw)
+target_link_libraries(umbellula PRIVATE glfw)
 
 # glad
 add_subdirectory(libs/glad)
 target_link_libraries(shenanigans PRIVATE glad)
+target_link_libraries(umbellula PRIVATE glad)
 
 # range-v3
 add_subdirectory(libs/range-v3)
@@ -227,20 +235,11 @@ target_link_libraries(shenanigans_test PRIVATE range-v3)
 target_link_libraries(shenanigans_terminal PRIVATE range-v3)
 target_link_libraries(shenanigans_benchmark PRIVATE range-v3)
 
-# shenanigans_private
-get_filename_component(PATH_PRIVATE "${src/NDA}" REALPATH)
-if (ENABLE_PRIVATE AND EXISTS "${PATH_PRIVATE}/LICENSE.md")
-  add_compile_definitions(ENABLE_PRIVATE)
-  include_directories(src/NDA)
-  file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/*.cpp)
-  target_sources(shenanigans PRIVATE ${SRC_NDA})
-endif()
-
 # custom
 include_directories(src)
 
-# sources
-file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
+# shenanigans sources
+file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
  src/Astrophysics/*.cpp
  src/ImageProcessing/*.cpp
  src/ImageRegistration/*.cpp
@@ -253,12 +252,18 @@ file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
  src/Random/*.cpp
  src/Utils/*.cpp
  )
+
+# shenanigans_private sources
+include_directories(src/NDA)
+file(GLOB_RECURSE SRC_NDA CONFIGURE_DEPENDS src/NDA/*.cpp)
+
+# gui soruces
 file(GLOB_RECURSE SRC_GUI CONFIGURE_DEPENDS src/Gui/*.cpp)
 
-target_sources(shenanigans PRIVATE ${SRC} ${SRC_GUI})
-target_sources(shenanigans_test PRIVATE ${SRC})
-target_sources(shenanigans_terminal PRIVATE ${SRC})
-target_sources(shenanigans_benchmark PRIVATE ${SRC})
+target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS} ${SRC_NDA} ${SRC_GUI})
+target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS})
+target_sources(shenanigans_terminal PRIVATE ${SRC_SHENANIGANS})
+target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS})
 
 # shenanigans app sources
 file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp)
@@ -280,3 +285,13 @@ target_sources(shenanigans_benchmark PRIVATE ${SRC_SHENANIGANS_BENCHMARK_APP})
 # shenanigans_icsw app sources
 file(GLOB SRC_SHENANIGANS_ICSW_APP CONFIGURE_DEPENDS apps/shenanigans_icsw/*.cpp)
 target_sources(shenanigans_icsw PRIVATE ${SRC_SHENANIGANS_ICSW_APP})
+
+# umbellula app sources
+file(GLOB_RECURSE SRC_UMBELLULA CONFIGURE_DEPENDS
+ src/Log/*.cpp
+ src/Utils/*.cpp
+ src/Plot/ImGuiPlot.cpp
+ src/Log/ImGuiLogger.cpp
+ )
+file(GLOB SRC_UMBELLULA_APP CONFIGURE_DEPENDS apps/umbellula/*.cpp)
+target_sources(umbellula PRIVATE ${SRC_UMBELLULA_APP} ${SRC_UMBELLULA} ${SRC_GUI})

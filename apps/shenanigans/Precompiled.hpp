@@ -35,7 +35,7 @@
 #include <ranges>
 #include <future>
 #ifdef __cpp_lib_stacktrace
-  #include <stacktrace>
+#  include <stacktrace>
 #endif
 
 #include <pybind11/embed.h>
@@ -53,13 +53,13 @@
 #include <range/v3/all.hpp>
 
 #ifndef PROFILE_FRAME
-  #define PROFILE_FRAME
+#  define PROFILE_FRAME
 #endif
 #ifndef PROFILE_FUNCTION
-  #define PROFILE_FUNCTION
+#  define PROFILE_FUNCTION
 #endif
 #ifndef PROFILE_SCOPE
-  #define PROFILE_SCOPE(name)
+#  define PROFILE_SCOPE(name)
 #endif
 
 using i8 = int8_t;
@@ -81,13 +81,12 @@ using namespace std::complex_literals;
 using namespace std::chrono_literals;
 using namespace pybind11::literals;
 
+#include "Gui/Gui.hpp"
 #include "Log/Log.hpp"
-
 #include "Math/Functions.hpp"
 #include "Math/Transform.hpp"
 #include "Math/RNG.hpp"
 #include "Math/Statistics.hpp"
-
 #include "Utils/Filesystem.hpp"
 #include "Utils/Exception.hpp"
 #include "Utils/DateTime.hpp"
@@ -99,6 +98,5 @@ using namespace pybind11::literals;
 #include "Utils/Draw.hpp"
 #include "Utils/Load.hpp"
 #include "Utils/Vectmat.hpp"
-
 #include "Plot/Plot.hpp"
 #include "Plot/PyPlot.hpp"

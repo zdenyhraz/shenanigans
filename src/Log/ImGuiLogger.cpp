@@ -1,6 +1,6 @@
 #ifdef GLAPI
 
-  #include "ImGuiLogger.hpp"
+#  include "ImGuiLogger.hpp"
 
 static consteval ImVec4 GetColorFromU8(f32 R, f32 G, f32 B)
 {
@@ -27,7 +27,7 @@ void ImGuiLogger::RenderInternal()
   if (ImGui::Button("Clear"))
     Clear();
   ImGui::SameLine();
-  if (ImGui::Button("Debug"))
+  if (false and ImGui::Button("Debug Log"))
   {
     Message(LogLevel::Trace, "Trace message");
     Message(LogLevel::Function, "Function message");
