@@ -54,6 +54,8 @@ public:
     }
   }
 
+  bool Valid() { return mIterator != std::filesystem::end(mIterator); }
+
   std::string GetDirectory() { return mDirPath; }
 
   void AddExtensionFilter(const std::string& extension) { allowedExtensions.push_back(extension); }
@@ -62,7 +64,7 @@ public:
 
   std::filesystem::path GetNextFilePath()
   {
-    while (mIterator != std::filesystem::end(mIterator))
+    while (Valid())
     {
       if (mIterator->is_regular_file())
       {
