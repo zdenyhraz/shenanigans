@@ -133,6 +133,7 @@ add_subdirectory(libs/pybind11)
 include_directories(libs/pybind11/include)
 target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
+target_link_libraries(umbellula PRIVATE pybind11::embed)
 
 # fmt
 add_subdirectory(libs/fmt)
@@ -215,6 +216,7 @@ target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
 
 # custom
+include_directories(libs)
 include_directories(src)
 include_directories(src/NDA)
 

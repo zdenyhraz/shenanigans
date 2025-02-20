@@ -6,6 +6,8 @@ obj/
 __pycache__/
 *_install/
 
+libs/onnxruntime
+libs/libtorch
 data/*
 !data/apps/
 !data/readme/

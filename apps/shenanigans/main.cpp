@@ -10,6 +10,7 @@ try
 catch (const ShenanigansException& e)
 {
   e.Log();
+  return EXIT_FAILURE;
 }
 catch (const std::exception& e)
 {

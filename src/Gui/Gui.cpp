@@ -166,11 +166,11 @@ void GLFWCloseWindow(GLFWwindow* window)
 
 void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data)
 {
-  GLFWimage image;
-  image.width = width;
-  image.height = height;
-  image.pixels = data;
-  glfwSetWindowIcon(window, 1, &image);
+  GLFWimage icon;
+  icon.width = width;
+  icon.height = height;
+  icon.pixels = data;
+  glfwSetWindowIcon(window, 1, &icon);
 }
 
 void ImGuiSetDarkTheme()
