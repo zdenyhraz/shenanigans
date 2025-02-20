@@ -1,9 +1,9 @@
 #pragma once
-#include "CvPlot.hpp"
-#include "PyPlot.hpp"
+// #include "CvPlot.hpp"
+// #include "PyPlot.hpp"
 
 #ifdef GLAPI
-  #include "ImGuiPlot.hpp"
+#  include "ImGuiPlot.hpp"
 using Plot = ImGuiPlot;
 #else
 using Plot = CvPlot;
