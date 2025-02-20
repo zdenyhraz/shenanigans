@@ -90,13 +90,8 @@ try
     ImPlot::ShowDemoWindow();
 
   ImGuiPlot::SetSave(mPlotSave);
-  PyPlot::SetSave(mPlotSave);
-  CvPlot::SetSave(mPlotSave);
-
   ImGuiLogger::Render();
   ImGuiPlot::Render();
-  PyPlot::Render();
-  CvPlot::Render();
 }
 catch (const ShenanigansException& e)
 {
@@ -121,10 +116,6 @@ void Application::RenderPlotMenu()
       LaunchAsync([]() { Plot::Clear(); });
     if (ImGui::MenuItem("Debug ImGuiPlots"))
       LaunchAsync([]() { ImGuiPlot::Debug(); });
-    if (ImGui::MenuItem("Debug PyPlots"))
-      LaunchAsync([]() { PyPlot::Debug(); });
-    if (ImGui::MenuItem("Debug CvPlots"))
-      LaunchAsync([]() { CvPlot::Debug(); });
 
     ImGui::EndMenu();
   }

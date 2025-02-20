@@ -35,14 +35,15 @@ inline usize GetDirectoryCount(const std::filesystem::path& dirpath)
 class FilePathGenerator
 {
   std::string mDirPath;
-  std::filesystem::directory_iterator mIterator;
+  std::filesystem::recursive_directory_iterator mIterator;
+  std::vector<std::string> allowedExtensions;
 
 public:
   FilePathGenerator() = default;
 
   FilePathGenerator(const std::string& dirPath) : mDirPath(dirPath), mIterator(dirPath) {}
 
-  void Reset() { mIterator = std::filesystem::directory_iterator(mDirPath); }
+  void Reset() { mIterator = std::filesystem::recursive_directory_iterator(mDirPath); }
 
   void SetDirectory(const std::string& dirPath)
   {
@@ -53,6 +54,12 @@ public:
     }
   }
 
+  std::string GetDirectory() { return mDirPath; }
+
+  void AddExtensionFilter(const std::string& extension) { allowedExtensions.push_back(extension); }
+
+  void ResetExtensionFilter() { allowedExtensions.clear(); }
+
   std::filesystem::path GetNextFilePath()
   {
     while (mIterator != std::filesystem::end(mIterator))
@@ -60,8 +67,11 @@ public:
       if (mIterator->is_regular_file())
       {
         const auto path = mIterator->path();
-        ++mIterator;
-        return path;
+        if (allowedExtensions.empty() or std::ranges::find(allowedExtensions, path.extension().string()) != allowedExtensions.end())
+        {
+          ++mIterator;
+          return path;
+        }
       }
       ++mIterator;
     }

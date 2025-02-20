@@ -3,7 +3,7 @@
 inline cv::Mat LoadImage(const std::filesystem::path& path)
 {
   PROFILE_FUNCTION;
-  if (not std::filesystem::exists(path))
+  if (not std::filesystem::is_regular_file(path))
     throw std::invalid_argument(fmt::format("File {} does not exist", path.string()));
   return cv::imread(path.string());
 }
