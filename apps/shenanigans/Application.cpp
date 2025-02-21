@@ -37,7 +37,7 @@ void Application::Run()
   GLFWSetWindowCallback(window, KeyCallback);
   if constexpr (not hiddenWindow)
     SetWindowIcon(window);
-  ImGuiIO& io = ImGuiInitialize(window, scale, "data/apps/imgui.ini");
+  ImGuiIO& io = ImGuiInitialize(window, scale, GetExistingPath("data/shenanigans/app/imgui.ini"), GetExistingPath("data/shenanigans/app/CascadiaCode.ttf"));
   Initialize();
   LOG_SUCCESS("Ready");
   f64 lastUpdateTime = 0, elapsedTime = 0;

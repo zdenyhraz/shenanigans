@@ -9,7 +9,7 @@ __pycache__/
 libs/onnxruntime
 libs/libtorch
 data/*
-!data/apps/
+!data/shenanigans/
 !data/readme/
 !tools/build/
 

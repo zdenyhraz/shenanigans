@@ -44,7 +44,7 @@ void ImGuiSetDefaultStyle()
   ImGuiSetHazelTheme();
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& iniPath, const std::string& fontPath)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem::path& iniPath, const std::filesystem::path& fontPath)
 {
   PROFILE_FUNCTION;
   IMGUI_CHECKVERSION();
@@ -57,18 +57,18 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& ini
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 
-  if (const auto fontPathEx = GetExistingPath(fontPath); std::filesystem::exists(fontPathEx))
+  if (std::filesystem::exists(fontPath))
   {
-    LOG_DEBUG("Using font {}", fontPathEx);
-    io.Fonts->AddFontFromFileTTF(fontPathEx.string().c_str(), scale * 10);
+    LOG_DEBUG("Using font {}", fontPath);
+    io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
   }
 
   if (not iniPath.empty())
-    if (const auto iniPathEx = GetExistingPath(iniPath); std::filesystem::exists(iniPathEx))
+    if (std::filesystem::exists(iniPath))
     {
-      LOG_DEBUG("Using ini {}", iniPathEx);
-      ImGui::LoadIniSettingsFromDisk(iniPathEx.string().c_str());
-      io.IniFilename = iniPathEx.string().c_str();
+      LOG_DEBUG("Using ini {}", iniPath);
+      ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
+      io.IniFilename = iniPath.string().c_str();
     }
 
   ImGuiStyle& style = ImGui::GetStyle();

@@ -4,7 +4,7 @@ void GLFWInitialize();
 GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden = false);
 void GLFWInitializeGL(GLFWwindow* window);
 void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback);
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& iniPath = "", const std::string& fontPath = "");
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem::path& iniPath = "", const std::filesystem::path& fontPath = "");
 void ImGuiSetDefaultStyle();
 void ImGuiNewFrame();
 void ImGuiRender(GLFWwindow* window, ImGuiIO& io);
