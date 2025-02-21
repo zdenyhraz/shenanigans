@@ -44,7 +44,7 @@ void ImGuiSetDefaultStyle()
   ImGuiSetHazelTheme();
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& iniPath)
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& iniPath, const std::string& fontPath)
 {
   PROFILE_FUNCTION;
   IMGUI_CHECKVERSION();
@@ -57,16 +57,16 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::string& ini
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 
-  if (const auto fontPath = GetExistingPath("data/apps/CascadiaCode.ttf"); std::filesystem::exists(fontPath))
+  if (const auto fontPathEx = GetExistingPath(fontPath); std::filesystem::exists(fontPathEx))
   {
-    LOG_DEBUG("Using font {}", fontPath);
-    io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
+    LOG_DEBUG("Using font {}", fontPathEx);
+    io.Fonts->AddFontFromFileTTF(fontPathEx.string().c_str(), scale * 10);
   }
 
   if (not iniPath.empty())
     if (const auto iniPathEx = GetExistingPath(iniPath); std::filesystem::exists(iniPathEx))
     {
-      LOG_DEBUG("Using ini file {}", iniPathEx);
+      LOG_DEBUG("Using ini {}", iniPathEx);
       ImGui::LoadIniSettingsFromDisk(iniPathEx.string().c_str());
       io.IniFilename = iniPathEx.string().c_str();
     }
