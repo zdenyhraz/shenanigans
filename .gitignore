@@ -8,6 +8,7 @@ __pycache__/
 
 libs/onnxruntime
 libs/libtorch
+
 data/*
 !data/shenanigans/
 !data/readme/
