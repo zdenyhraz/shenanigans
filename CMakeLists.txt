@@ -238,7 +238,6 @@ file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
  src/Python/*.cpp
  src/Random/*.cpp
  src/Utils/*.cpp
- src/NDA/Windows/*.cpp
  src/NDA/SAS/*.cpp
 )
 
@@ -246,7 +245,7 @@ file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
 file(GLOB_RECURSE SRC_GUI CONFIGURE_DEPENDS src/Gui/*.cpp)
 
 # shenanigans app sources
-file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shenanigans/Windows/*.cpp)
+file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shenanigans/Windows/*.cpp src/NDA/Windows/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS} ${SRC_GUI} ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
@@ -258,8 +257,8 @@ gtest_discover_tests(shenanigans_test)
 file(GLOB_RECURSE SRC_UMBELLULA CONFIGURE_DEPENDS
  src/Log/*.cpp
  src/Utils/*.cpp
- src/Plot/ImGuiPlot.cpp
- src/Log/ImGuiLogger.cpp
+ src/Plot/*.cpp
+ src/Log/*.cpp
  )
 file(GLOB SRC_UMBELLULA_APP CONFIGURE_DEPENDS src/NDA/apps/umbellula/*.cpp)
 target_sources(umbellula PRIVATE ${SRC_UMBELLULA} ${SRC_GUI} ${SRC_UMBELLULA_APP})

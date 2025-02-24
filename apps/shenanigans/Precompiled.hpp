@@ -81,7 +81,6 @@ using namespace std::complex_literals;
 using namespace std::chrono_literals;
 using namespace pybind11::literals;
 
-#include "Gui/Gui.hpp"
 #include "Log/Log.hpp"
 #include "Math/Functions.hpp"
 #include "Math/Transform.hpp"
@@ -99,4 +98,3 @@ using namespace pybind11::literals;
 #include "Utils/Load.hpp"
 #include "Utils/Vectmat.hpp"
 #include "Plot/Plot.hpp"
-#include "Plot/PyPlot.hpp"

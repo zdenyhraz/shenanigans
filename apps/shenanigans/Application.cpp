@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "Gui/Gui.hpp"
 #include "Windows/IPCWindow.hpp"
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
