@@ -1,5 +1,3 @@
-noExplicitConstructor
-constParameterCallback
 knownConditionTrueFalse
 duplicateBranch
 funcArgNamesDifferent
