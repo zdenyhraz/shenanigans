@@ -51,6 +51,7 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem:
   ImGui::CreateContext();
   ImPlot::CreateContext();
   LOG_DEBUG("ImGui version: {}", IMGUI_VERSION);
+  LOG_DEBUG("ImPlot version: {}", IMPLOT_VERSION);
 
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
