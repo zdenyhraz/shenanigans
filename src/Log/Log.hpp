@@ -30,13 +30,12 @@ using MainLogger = TerminalLogger;
 #define LOG_FUNCTION_IF(show) LogFunction<MainLogger, show> logFunction(fmt::format("{} {}", SOURCE_FUNCTION, SOURCE_LOCATION))
 #define LOG_SCOPE(funName) LogFunction<MainLogger> logScope(funName)
 #define LOG_SCOPE_IF(show, funName) LogFunction<MainLogger, show> logScope(funName)
-
-#ifdef __cpp_lib_stacktrace
-#  define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current(), std::stacktrace::current())
-#  define STDEXCEPTION(...)                                                                                                                                                        \
-    std::runtime_error(                                                                                                                                                            \
-        fmt::format("{} error: {} {}\nException stack trace:\n{}", SOURCE_FUNCTION, CreateMessage(__VA_ARGS__), SOURCE_LOCATION, std::to_string(std::stacktrace::current())))
+#ifdef PUBLIC
+#  define EXCEPTION(...) ShenanigansExceptionPublic(CreateMessage(__VA_ARGS__))
 #else
-#  define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current())
-#  define STDEXCEPTION(...) std::runtime_error(fmt::format("{} error: {} {}", SOURCE_FUNCTION, CreateMessage(__VA_ARGS__), SOURCE_LOCATION))
+#  ifdef __cpp_lib_stacktrace
+#    define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current(), std::stacktrace::current())
+#  else
+#    define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current())
+#  endif
 #endif

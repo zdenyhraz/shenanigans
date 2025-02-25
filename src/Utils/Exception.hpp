@@ -38,3 +38,15 @@ public:
   void Log() const { LOG_ERROR(mMessage); }
 };
 #endif
+
+class ShenanigansExceptionPublic : public std::exception
+{
+  std::string mMessage;
+
+public:
+  ShenanigansExceptionPublic(const std::string& message) : mMessage(message) {}
+
+  const char* what() const noexcept override { return mMessage.c_str(); }
+
+  void Log() const { LOG_ERROR(mMessage); }
+};

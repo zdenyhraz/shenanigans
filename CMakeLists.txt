@@ -266,7 +266,7 @@ gtest_discover_tests(shenanigans_test)
 file(GLOB_RECURSE SRC_UMBELLULA CONFIGURE_DEPENDS
  src/Log/*.cpp
  src/Utils/*.cpp
- src/Plot/*.cpp
+ src/Plot/ImGuiPlot.cpp
  src/Log/*.cpp
  )
 file(GLOB SRC_UMBELLULA_APP CONFIGURE_DEPENDS src/NDA/apps/umbellula/*.cpp)
