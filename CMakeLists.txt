@@ -119,9 +119,9 @@ add_executable(shenanigans_test)
 add_executable(umbellula)
 
 # hide console window
-if (MSVC)
-    set_target_properties(umbellula PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-endif()
+# if (MSVC)
+#     set_target_properties(umbellula PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+# endif()
 
 # precompiled headers
 if (ENABLE_PCH)
@@ -138,7 +138,6 @@ add_subdirectory(libs/pybind11)
 include_directories(libs/pybind11/include)
 target_link_libraries(shenanigans PRIVATE pybind11::embed)
 target_link_libraries(shenanigans_test PRIVATE pybind11::embed)
-target_link_libraries(umbellula PRIVATE pybind11::embed)
 
 # fmt
 add_subdirectory(libs/fmt)
@@ -219,6 +218,16 @@ target_link_libraries(umbellula PRIVATE glad)
 add_subdirectory(libs/range-v3)
 target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
+
+# onnxruntime
+set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime")
+target_include_directories(umbellula PRIVATE ${ONNXRUNTIME_DIR}/include)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(ONNXRUNTIME_LIB ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib)
+else()
+    set(ONNXRUNTIME_LIB ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so)
+endif()
+target_link_libraries(umbellula PRIVATE ${ONNXRUNTIME_LIB})
 
 # custom
 include_directories(libs)

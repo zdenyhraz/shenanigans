@@ -6,8 +6,8 @@ obj/
 __pycache__/
 *_install/
 
-libs/onnxruntime
 libs/libtorch
+libs/onnxruntime
 
 data/*
 !data/shenanigans/
