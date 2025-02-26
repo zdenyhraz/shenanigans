@@ -118,10 +118,10 @@ add_executable(shenanigans)
 add_executable(shenanigans_test)
 add_executable(umbellula)
 
-# hide console window
-# if (MSVC)
-#     set_target_properties(umbellula PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-# endif()
+#hide console window
+if (MSVC)
+    set_target_properties(umbellula PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
 
 # precompiled headers
 if (ENABLE_PCH)
