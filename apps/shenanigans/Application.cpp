@@ -3,9 +3,9 @@
 #include "Windows/IPCWindow.hpp"
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
-#include "Windows/ObjdetectObjectnessWindow.hpp"
-#include "Windows/ObjdetectColorWindow.hpp"
 #include "Windows/MicroserviceEditorWindow.hpp"
+#include "NDA/Windows/ObjdetectColorWindow.hpp"
+#include "NDA/Windows/ObjdetectObjectnessWindow.hpp"
 
 void Application::Initialize()
 {
