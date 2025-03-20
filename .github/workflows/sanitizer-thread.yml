@@ -28,7 +28,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./libs/opencv_install
-        key: ${{ runner.os }}-opencv-cache-v1
+        key: ${{ matrix.compiler}}-opencv-cache-thrsan-v1
 
     - name: ONNX cache
       id: onnxruntime-cache
