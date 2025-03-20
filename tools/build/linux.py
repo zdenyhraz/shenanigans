@@ -23,11 +23,13 @@ def opengl_install():
 
 
 def gcc_install():
+    utils.run('sudo apt update')
     utils.run('sudo add-apt-repository ppa:ubuntu-toolchain-r/test')
     utils.run('sudo apt update')
-    utils.run('sudo apt install gcc-13 g++-13')
-    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 100')
-    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 100')
+    utils.run('sudo apt install gcc-14 g++-14')
+    utils.run('gcc-14 --version')
+    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 100')
+    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 100')
 
 
 def clang_install():

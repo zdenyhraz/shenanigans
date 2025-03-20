@@ -27,6 +27,13 @@ jobs:
         path: ./libs/opencv_install
         key: ${{ runner.os }}-opencv-cache-v1
 
+    - name: ONNX cache
+      id: onnxruntime-cache
+      uses: actions/cache@v4
+      with:
+        path: ./libs/onnxruntime
+        key: ${{ runner.os }}-onnxruntime-cache-v1
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
