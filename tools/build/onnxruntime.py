@@ -3,6 +3,7 @@ import tarfile
 import os
 import platform
 import urllib.request
+import shutil
 from . import utils
 
 onnxruntime_install_name = "onnxruntime"
@@ -21,19 +22,30 @@ def onnxruntime_download():
     url = onnxruntime_get_url()
     filename, extension = os.path.splitext(url.split('/')[-1])
     archive_file = f"onnxruntime{extension}"
+    temp_extract_dir = "temp_onnxruntime_extract"
 
     os.makedirs(onnxruntime_install_dir, exist_ok=True)
     print(f"Downloading onnxruntime from {url}")
     urllib.request.urlretrieve(url, archive_file)
 
-    print(f"Extracting onnxruntime to {onnxruntime_install_dir}")
+    print(f"Extracting onnxruntime to temporary directory {temp_extract_dir}")
+    os.makedirs(temp_extract_dir, exist_ok=True)
     if extension == ".tgz":
         with tarfile.open(archive_file, 'r:gz') as tar_ref:
-            tar_ref.extractall(onnxruntime_install_dir)
+            tar_ref.extractall(temp_extract_dir)
     elif extension == ".zip":
         with zipfile.ZipFile(archive_file, 'r') as zip_ref:
-            zip_ref.extractall(onnxruntime_install_dir)
+            zip_ref.extractall(temp_extract_dir)
 
+    extracted_dir = os.path.join(temp_extract_dir, os.listdir(temp_extract_dir)[0])
+    for item in os.listdir(extracted_dir):
+        src = os.path.join(extracted_dir, item)
+        dst = os.path.join(onnxruntime_install_dir, item)
+        print(f"Moving {src} to {dst}")
+        shutil.move(src, dst)
+
+    print(f"Cleaning up temporary directory {temp_extract_dir}")
+    shutil.rmtree(temp_extract_dir)
     print(f"Cleaning up onnxruntime archive {archive_file}")
     os.remove(archive_file)
 
