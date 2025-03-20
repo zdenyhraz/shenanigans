@@ -1,7 +1,6 @@
 name: memsan
 
-on:
-  workflow_dispatch:
+on: [push,pull_request]
 env:
   CI: ON
 
