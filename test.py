@@ -2,16 +2,6 @@ import os
 from tools.build import utils
 
 
-def check_data_dir(test_dir):
-    if os.path.exists(test_dir) and os.path.isdir(test_dir):
-        for root, _, files in os.walk(test_dir):
-            for file in files:
-                if file == 'baboon.png':
-                    print(f'Test data directory: {root}')
-                    return
-    raise RuntimeError('Cannot find test data directory')
-
-
 def find_test_executables(build_dir):
     if not os.path.exists(build_dir) or not os.path.isdir(build_dir):
         raise RuntimeError(f'Cannot find test build directory {build_dir}')
@@ -31,8 +21,6 @@ if __name__ == '__main__':
     root_dir = utils.get_root_directory()
     build_dir = os.path.join(root_dir, 'build')
     test_dir = os.path.join(root_dir, 'test')
-
-    check_data_dir(test_dir)
 
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)

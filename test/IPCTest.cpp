@@ -1,11 +1,14 @@
 #include <gtest/gtest.h>
-
 #include "ImageRegistration/IPC.hpp"
 
 class IPCTest : public ::testing::Test
 {
 protected:
-  IPCTest() : mImg1(LoadUnitFloatImage<f64>(GetProjectDirectoryPath("test/data/baboon.png"))) {}
+  IPCTest()
+  {
+    mImg1 = cv::Mat(1000, 1000, CV_32F);
+    cv::randu(mImg1, cv::Scalar(0), cv::Scalar(1));
+  }
 
   using InterpolationType = IPC::InterpolationType;
   using BandpassType = IPC::BandpassType;

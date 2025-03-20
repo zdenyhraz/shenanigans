@@ -1,13 +1,11 @@
 #include <gtest/gtest.h>
-
 #include "Math/Fourier.hpp"
 #include "ImageRegistration/IPC.hpp"
 
 TEST(FourierTest, ForwardInverseConsistency)
 {
-  auto img = LoadUnitFloatImage<f32>(GetProjectDirectoryPath("test/data/baboon.png"));
-  ASSERT_EQ(img.depth(), CV_32F);
-  ASSERT_EQ(img.channels(), 1);
+  cv::Mat img(1000, 1000, CV_32F);
+  cv::randu(img, cv::Scalar(0), cv::Scalar(1));
 
   auto fft = FFT(img);
   ASSERT_EQ(fft.size(), img.size());
