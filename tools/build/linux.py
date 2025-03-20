@@ -33,13 +33,14 @@ def gcc_install():
 
 
 def clang_install():
-    utils.run('wget https://apt.llvm.org/llvm.sh')
-    utils.run('sudo chmod u+x llvm.sh')
-    utils.run('sudo ./llvm.sh 17')
-    utils.run('clang-17 --version')
-    utils.run('sudo apt install libc++-dev libc++abi-dev libomp-17-dev')
-    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-17 100')
-    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-17 100')
+    utils.run('sudo apt update')
+    utils.run('sudo apt install -y wget gnupg software-properties-common')
+    utils.run('wget -O - https://apt.llvm.org/llvm.sh | sudo bash')
+    utils.run('sudo apt install -y clang')
+    utils.run('clang --version')
+    utils.run('sudo apt install libc++-dev libc++abi-dev libomp-dev')
+    utils.run('sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100')
+    utils.run('sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
 
 
 def compiler_install(compiler):
