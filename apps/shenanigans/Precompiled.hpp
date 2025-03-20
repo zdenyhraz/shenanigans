@@ -34,9 +34,6 @@
 #include <bit>
 #include <ranges>
 #include <future>
-#ifdef __cpp_lib_stacktrace
-#  include <stacktrace>
-#endif
 
 #include <pybind11/embed.h>
 #include <pybind11/stl.h>
