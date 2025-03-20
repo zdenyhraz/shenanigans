@@ -41,7 +41,7 @@ def find_binaries(dir):
     target_extension = '.so' if linux() else '.dll' if windows() else None
     for root, _, files in os.walk(dir):
         for file in files:
-            _, extension = os.path.splitext(file)
+            filename, extension = os.path.splitext(file)
             if extension == target_extension:
                 binaries.append(os.path.join(root, file))
     return binaries
