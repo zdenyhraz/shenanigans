@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(__cpp_lib_stacktrace) && __cpp_lib_stacktrace >= 202011L
+#ifdef _MSC_VER
 #  include <stacktrace>
 #  define HAS_STACKTRACE 1
 #else
