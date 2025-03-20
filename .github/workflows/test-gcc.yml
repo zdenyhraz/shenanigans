@@ -1,19 +1,17 @@
-name: memsan
+name: test-gcc
 
-on:
-  workflow_dispatch:
-
+on: [push,pull_request]
 env:
   CI: ON
 
 jobs:
-  sanitizer-memory:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - compiler: clang
-            build_type: Release
+          - compiler: gcc
+            build_type: Debug
 
     steps:
     - name: Checkout repository
@@ -29,13 +27,20 @@ jobs:
         path: ./libs/opencv_install
         key: ${{ runner.os }}-opencv-cache-v1
 
+    - name: ONNX cache
+      id: onnxruntime-cache
+      uses: actions/cache@v4
+      with:
+        path: ./libs/onnxruntime
+        key: ${{ runner.os }}-onnxruntime-cache-v1
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
     - name: Build
-      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer memory
+      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
     - name: Test
       run: python -u test.py
