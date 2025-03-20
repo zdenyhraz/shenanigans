@@ -34,7 +34,7 @@ def opencv_install(jobs):
     utils.run(f'cmake -B ./build {utils.generate_configure_args(opencv_cmake_args)}', cwd)
     utils.run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     utils.run(f'{"sudo " if utils.linux() else ""}cmake --install ./build --prefix ../{opencv_install_name}', cwd)
-    return opencv_find_root(opencv_install_dir)
+    return opencv_find_root()
 
 
 def setup(jobs, build_type):

@@ -29,8 +29,8 @@ if __name__ == '__main__':
     buildtools.setup(args.compiler, args.generator, args.opengl, args.build_type, args.sanitizer)
 
     print("Setting up libraries")
-    opencv_dir = opencv.setup(args.jobs, args.build_type)
     onnxruntime_dir = onnxruntime.setup(args.build_type)
+    opencv_dir = opencv.setup(args.jobs, args.build_type)
 
     configure_args = {
         'CMAKE_BUILD_TYPE': args.build_type,
