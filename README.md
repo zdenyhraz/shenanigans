@@ -10,7 +10,6 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml/badge.svg"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-memory.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-memory.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml/badge.svg"/></a>
 <br>

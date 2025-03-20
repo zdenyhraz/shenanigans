@@ -6,14 +6,20 @@ env:
 
 jobs:
   sanitizer-address:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          - compiler: clang
+          - os: ubuntu-latest
+            compiler: clang
             build_type: Release
 
-          - compiler: gcc
+          - os: ubuntu-latest
+            compiler: gcc
+            build_type: Release
+
+          - os: windows-latest
+            compiler: msvc
             build_type: Release
 
     steps:
@@ -28,7 +34,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./libs/opencv_install
-        key: ${{ matrix.compiler}}-opencv-cache-asan-v1
+        key: ${{ runner.os }}-opencv-cache-v1
 
     - name: ONNX cache
       id: onnxruntime-cache

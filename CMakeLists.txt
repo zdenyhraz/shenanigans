@@ -58,34 +58,30 @@ if(CCACHE_FOUND)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
 endif()
 
-# sanitizer
-if(ENABLE_SANITIZER)
+# sanitizers
+if(ENABLE_SANITIZER_ADDRESS)
   if(MSVC)
-    add_compile_options(/fsanitize=address /Oy-)
+    add_compile_options(/fsanitize=address /Zi /EHsc /Oy-)
+    add_link_options(/debug)
   else()
-    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+    add_compile_options(-fsanitize=address -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=address)
   endif()
 endif()
 
-if(ENABLE_SANITIZER_ADDRESS AND NOT MSVC)
-  add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=address -fno-omit-frame-pointer)
-endif()
-
 if(ENABLE_SANITIZER_UNDEFINED AND NOT MSVC)
-  add_compile_options(-fsanitize=undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=undefined -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -g)
+  add_link_options(-fsanitize=undefined)
 endif()
 
 if(ENABLE_SANITIZER_THREAD AND NOT MSVC)
-  add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=thread -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=thread -fno-omit-frame-pointer -g)
+  add_link_options(-fsanitize=thread)
 endif()
 
 if(ENABLE_SANITIZER_MEMORY AND NOT MSVC)
-  add_compile_options(-fsanitize=memory -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=memory -fno-omit-frame-pointer)
+  add_compile_options(-fsanitize=memory -fno-omit-frame-pointer -g)
+  add_link_options(-fsanitize=thread)
 endif()
 
 # status messages
