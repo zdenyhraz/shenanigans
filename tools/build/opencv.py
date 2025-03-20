@@ -15,7 +15,7 @@ opencv_args = {
 }
 
 
-def opencv_find_root(opencv_install_dir):
+def opencv_find_root(install_dir):
     candidates = []
     if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
         for root, _, files in os.walk(opencv_install_dir):
@@ -25,24 +25,6 @@ def opencv_find_root(opencv_install_dir):
     if len(candidates) > 1:
         print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
-
-
-def opencv_find_binaries(opencv_install_dir):
-    opencv_install_bin_dir = ''
-    if os.path.exists(opencv_install_dir) and os.path.isdir(opencv_install_dir):
-        for root, _, files in os.walk(opencv_install_dir):
-            for file in files:
-                if 'opencv_core' in file and (file.endswith('.so') or file.endswith('.dll')):
-                    opencv_install_bin_dir = root
-    if not opencv_install_bin_dir:
-        raise RuntimeError('Cannot find OpenCV binary directory')
-    print('OpenCV binary directory: ', opencv_install_bin_dir)
-    bin_files = []
-    for root, _, files in os.walk(opencv_install_bin_dir):
-        for file in files:
-            if '.so' in file or '.dll' in file:
-                bin_files.append(os.path.join(root, file))
-    return bin_files
 
 
 def opencv_install(jobs, opencv_install_name, opencv_install_dir):
@@ -63,9 +45,6 @@ def setup(jobs, build_type):
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('OpenCV cmake directory: ', opencv_dir)
 
-    opencv_binaries = opencv_find_binaries(opencv_install_dir)
-    if opencv_binaries:
-        utils.copy_files_to_directory(opencv_binaries, utils.get_runtime_directory(build_type))
-    else:
-        print('Warning: Could not find any OpenCV binaries')
+    binaries = utils.find_binaries(opencv_install_dir)
+    utils.copy_files_to_directory(binaries, utils.get_runtime_directory(build_type))
     return opencv_dir

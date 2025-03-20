@@ -36,6 +36,17 @@ def copy_files_to_directory(file_paths, destination_directory):
         print(f"File '{file_path}' copied to '{destination_directory}'")
 
 
+def find_binaries(dir):
+    binaries = []
+    target_extension = '.so' if linux() else '.dll' if windows() else None
+    for root, _, files in os.walk(dir):
+        for file in files:
+            _, extension = os.path.splitext(file)
+            if extension == target_extension:
+                binaries.append(os.path.join(root, file))
+    return binaries
+
+
 def get_root_directory(start_dir=os.getcwd()):
     if 'build.py' in os.listdir(start_dir):
         return start_dir
