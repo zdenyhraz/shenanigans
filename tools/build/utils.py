@@ -7,11 +7,9 @@ import platform
 def run(command, cwd=None):
     print(f"Running command '{command}'{f' in subdirectory {cwd}' if cwd else ''}")
     try:
-        result = subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        print(result.stdout)
+        subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
     except subprocess.CalledProcessError as e:
         print(f"Command '{command}' failed with exit code {e.returncode}")
-        print(f"Error output: {e.stderr}")
         raise
 
 
