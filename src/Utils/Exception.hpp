@@ -34,7 +34,10 @@ public:
   {
     LOG_ERROR(mMessage);
 #if HAS_STACKTRACE
-    LOG_WARNING("Exception stack trace:\n{}", std::to_string(mStacktrace));
+    LOG_WARNING("Exception stack trace:");
+    size_t index = 0;
+    for (const auto& entry : mStacktrace)
+      LOG_WARNING("[{}] {} at {}:{}", index++, entry.description(), entry.source_file(), entry.source_line());
 #endif
   }
 };

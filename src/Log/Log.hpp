@@ -33,9 +33,5 @@ using MainLogger = TerminalLogger;
 #ifdef PUBLIC
 #  define EXCEPTION(...) ShenanigansExceptionPublic(CreateMessage(__VA_ARGS__))
 #else
-#  ifdef __cpp_lib_stacktrace
-#    define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current(), std::stacktrace::current())
-#  else
-#    define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current())
-#  endif
+#  define EXCEPTION(...) ShenanigansException(CreateMessage(__VA_ARGS__), std::source_location::current())
 #endif
