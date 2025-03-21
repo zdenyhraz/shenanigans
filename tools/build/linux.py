@@ -27,7 +27,7 @@ def gcc_install():
     utils.run('apt install -y software-properties-common')
     utils.run('add-apt-repository ppa:ubuntu-toolchain-r/test')
     utils.run('apt update')
-    utils.run('apt install gcc-14 g++-14')
+    utils.run('apt install -y gcc-14 g++-14')
     utils.run('gcc-14 --version')
     utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 100')
     utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 100')
@@ -39,7 +39,7 @@ def clang_install():
     utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash')
     utils.run('apt install -y clang')
     utils.run('clang --version')
-    utils.run('apt install libc++-dev libc++abi-dev libomp-dev')
+    utils.run('apt install -y libc++-dev libc++abi-dev libomp-dev')
     utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100')
     utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
 
