@@ -40,7 +40,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --targets shenanigans_test
+      run: sudo python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --targets shenanigans_test
 
     - name: Test
-      run: python -u test.py
+      run: sudo python -u test.py
