@@ -24,6 +24,7 @@ def opengl_install():
 
 def gcc_install():
     utils.run('apt update')
+    utils.run('apt install -y software-properties-common')
     utils.run('add-apt-repository ppa:ubuntu-toolchain-r/test')
     utils.run('apt update')
     utils.run('apt install gcc-14 g++-14')
