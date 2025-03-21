@@ -35,7 +35,7 @@ jobs:
         sudo apt-get install clang-tidy cmake build-essential
 
     - name: Configure
-      run: sudo python -u build.py --ci --compiler gcc --build_type Debug --configure_only
+      run: ${{ matrix.os == 'ubuntu-latest' && 'sudo' || '' }} python -u build.py --ci --compiler gcc --build_type Debug --configure_only
 
     - name: Run clang-tidy
       run: |

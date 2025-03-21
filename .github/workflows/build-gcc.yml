@@ -40,5 +40,5 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: sudo python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
+      run: ${{ matrix.os == 'ubuntu-latest' && 'sudo' || '' }} python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 

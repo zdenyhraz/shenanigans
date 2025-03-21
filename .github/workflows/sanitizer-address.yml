@@ -49,7 +49,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: sudo python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer address
+      run: ${{ matrix.os == 'ubuntu-latest' && 'sudo' || '' }} python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer address
 
     - name: Test
-      run: sudo python -u test.py
+      run:  python -u test.py
