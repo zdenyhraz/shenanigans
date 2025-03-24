@@ -3,22 +3,27 @@
 class OnnxModel
 {
   Ort::Env env{nullptr};
-  Ort::Session model{nullptr};
-  Ort::MemoryInfo memoryInfo{nullptr};
   Ort::SessionOptions options{nullptr};
-  const std::vector<const char*> inputNames = {"input"};
-  const std::vector<const char*> outputNames = {"boxes", "labels", "scores"};
+  Ort::Session session{nullptr};
+  Ort::MemoryInfo memoryInfo{nullptr};
+  std::vector<const char*> inputNames = {"input"};
+  std::vector<const char*> outputNames = {"boxes", "labels", "scores"};
+  const char* name = "model";
+  bool usesGPU = false;
   bool loaded = false;
 
-  static void LoadProviders(Ort::SessionOptions& options);
+  void LoadProviders();
   static cv::Mat Preprocess(const cv::Mat& image);
 
 public:
-  OnnxModel() = default;
-  OnnxModel(const std::filesystem::path& modelPath);
+  OnnxModel(
+      const char* name = "model", const std::filesystem::path& modelPath = "", const std::vector<const char*>& inputNames = {}, const std::vector<const char*>& outputNames = {});
   operator bool() const { return loaded; }
 
   std::vector<Ort::Value> Run(const cv::Mat image);
   void Load(const std::filesystem::path& modelPath);
   void Unload();
+  void SetName(const char* _name) { name = _name; }
+  void SetInputNames(const std::vector<const char*>& names) { inputNames = names; }
+  void SetOutputNames(const std::vector<const char*>& names) { outputNames = names; }
 };
