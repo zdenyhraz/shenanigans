@@ -1,12 +1,10 @@
 #include "OnnxModel.hpp"
 
-OnnxModel::OnnxModel(const char* name, const std::filesystem::path& modelPath, const std::vector<const char*>& _inputNames, const std::vector<const char*>& _outputNames)
+OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, const std::vector<const char*>& _inputNames, const std::vector<const char*>& _outputNames) :
+  name(_name), inputNames(_inputNames), outputNames(_outputNames)
 {
-  SetName(name);
   if (not modelPath.empty())
     Load(modelPath);
-  SetInputNames(_inputNames);
-  SetOutputNames(_outputNames);
 }
 
 void OnnxModel::Load(const std::filesystem::path& modelPath)
@@ -23,7 +21,7 @@ try
   session = Ort::Session(env, modelPathEx.c_str(), options);
   memoryInfo = Ort::MemoryInfo(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, usesGPU ? OrtMemTypeCPUInput : OrtMemTypeDefault));
   loaded = true;
-  LOG_DEBUG("Loaded model {} | GPU: {}", modelPathEx.string(), usesGPU);
+  LOG_DEBUG("Loaded model {} | GPU: {}", modelPathEx.filename(), usesGPU);
 }
 catch (const std::exception& e)
 {
@@ -49,27 +47,12 @@ catch (const std::exception& e)
 void OnnxModel::LoadProviders()
 {
   const auto providers = Ort::GetAvailableProviders();
-  LOG_DEBUG("Available providers: {}", providers);
+  LOG_DEBUG("ONNX available providers: {}", providers);
 
-  static constexpr int deviceId = 0;
-  if (false and std::ranges::contains(providers, "TensorrtExecutionProvider"))
-    try
-    {
-      OrtTensorRTProviderOptions tensorrtOptions;
-      tensorrtOptions.device_id = deviceId;
-      options.AppendExecutionProvider_TensorRT(tensorrtOptions);
-      usesGPU = true;
-      LOG_DEBUG("ONNX TensorRT provider loaded");
-    }
-    catch (const std::exception& e)
-    {
-      LOG_WARNING("ONNX TensorRT provider failed to load: {}", e.what());
-    }
-  if (std::ranges::contains(providers, "CUDAExecutionProvider"))
+  if (useCUDA and std::ranges::contains(providers, "CUDAExecutionProvider"))
     try
     {
       OrtCUDAProviderOptions cudaOptions;
-      cudaOptions.device_id = deviceId;
       options.AppendExecutionProvider_CUDA(cudaOptions);
       usesGPU = true;
       LOG_DEBUG("ONNX CUDA provider loaded");
@@ -77,6 +60,18 @@ void OnnxModel::LoadProviders()
     catch (const std::exception& e)
     {
       LOG_WARNING("ONNX CUDA provider failed to load: {}", e.what());
+    }
+  if (useTensorRT and std::ranges::contains(providers, "TensorrtExecutionProvider"))
+    try
+    {
+      OrtTensorRTProviderOptions tensorrtOptions;
+      options.AppendExecutionProvider_TensorRT(tensorrtOptions);
+      usesGPU = true;
+      LOG_DEBUG("ONNX TensorRT provider loaded");
+    }
+    catch (const std::exception& e)
+    {
+      LOG_WARNING("ONNX TensorRT provider failed to load: {}", e.what());
     }
   if (std::ranges::contains(providers, "CPUExecutionProvider"))
   {

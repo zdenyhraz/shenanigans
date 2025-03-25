@@ -8,6 +8,8 @@ class OnnxModel
   Ort::MemoryInfo memoryInfo{nullptr};
   std::vector<const char*> inputNames = {"input"};
   std::vector<const char*> outputNames = {"boxes", "labels", "scores"};
+  static constexpr bool useCUDA = true;
+  static constexpr bool useTensorRT = false;
   const char* name = "model";
   bool usesGPU = false;
   bool loaded = false;
@@ -17,7 +19,7 @@ class OnnxModel
 
 public:
   OnnxModel(
-      const char* name = "model", const std::filesystem::path& modelPath = "", const std::vector<const char*>& inputNames = {}, const std::vector<const char*>& outputNames = {});
+      const std::filesystem::path& modelPath = "", const char* name = "model", const std::vector<const char*>& inputNames = {}, const std::vector<const char*>& outputNames = {});
   operator bool() const { return loaded; }
 
   std::vector<Ort::Value> Run(const cv::Mat image);
