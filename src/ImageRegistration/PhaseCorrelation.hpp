@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Fourier.hpp"
+#include "Math/Functions.hpp"
 
 class PhaseCorrelation
 {

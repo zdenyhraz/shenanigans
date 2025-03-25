@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Functions.hpp"
 
 inline cv::Mat RoiCropRef(const cv::Mat& mat, int x, int y, int w, int h)
 {

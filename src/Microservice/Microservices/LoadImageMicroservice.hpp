@@ -1,5 +1,6 @@
 #pragma once
 #include "Microservice/Microservice.hpp"
+#include "Math/Functions.hpp"
 
 class LoadImageMicroservice : public Microservice
 {

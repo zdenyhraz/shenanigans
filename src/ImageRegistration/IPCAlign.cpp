@@ -1,6 +1,7 @@
 #include "IPCAlign.hpp"
 #include "IPC.hpp"
 #include "Math/Transform.hpp"
+#include "Math/Functions.hpp"
 #include "Utils/Draw.hpp"
 #include "Plot/Plot.hpp"
 

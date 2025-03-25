@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Fourier.hpp"
+#include "Math/Functions.hpp"
 #include "Plot/Plot.hpp"
 
 void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, int tileGridSize, int clipLimit)

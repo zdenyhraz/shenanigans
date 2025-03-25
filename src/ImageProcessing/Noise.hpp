@@ -1,3 +1,6 @@
+#pragma once
+#include "Math/Functions.hpp"
+
 template <typename T>
 cv::Mat GetNoise(cv::Size size, double stddev)
 {

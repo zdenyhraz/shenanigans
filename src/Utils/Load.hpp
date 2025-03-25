@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Functions.hpp"
 
 inline cv::Mat LoadImage(const std::filesystem::path& path)
 {

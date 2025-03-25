@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Crop.hpp"
+#include "Math/Functions.hpp"
 
 template <typename T>
 inline double Mean(const std::vector<T>& vec)
