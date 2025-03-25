@@ -271,7 +271,6 @@ public:
       IPCDebug::DebugL2U(*this, L2, L2U);
 
     // initialize L1 centroid neighborhood parameters
-    int L1size;
     cv::Mat L1, L1Win;
     cv::Point2d L2Upeak, L1mid, L1peak;
 
@@ -283,7 +282,7 @@ public:
         LOG_DEBUG("Iterative refinement L1ratio: {:.2f}", L1ratio);
 
       L2Upeak = L2Umid;                                                      // reset the accumulated L2U peak position
-      L1size = GetL1size(L2U.cols, L1ratio);                                 // calculate the current L1 size
+      int L1size = GetL1size(L2U.cols, L1ratio);                             // calculate the current L1 size
       L1mid = cv::Point2d(L1size / 2, L1size / 2);                           // update the L1 mid position
       L1Win = mL1Win.cols == L1size ? mL1Win : GetL1Window(mL1WinT, L1size); // update the L1 window if necessary
 

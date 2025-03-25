@@ -7,3 +7,4 @@ useStlAlgorithm
 syntaxError
 unusedFunction
 noExplicitConstructor
+unreadVariable
