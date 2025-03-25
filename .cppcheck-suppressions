@@ -6,3 +6,4 @@ missingIncludeSystem
 useStlAlgorithm
 syntaxError
 unusedFunction
+noExplicitConstructor
