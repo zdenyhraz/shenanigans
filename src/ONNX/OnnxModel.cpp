@@ -48,10 +48,8 @@ catch (const std::exception& e)
 
 void OnnxModel::LoadProviders()
 {
-  auto providers = Ort::GetAvailableProviders();
-  LOG_DEBUG("Available providers:");
-  for (const auto& provider : providers)
-    LOG_DEBUG("  - {}", provider);
+  const auto providers = Ort::GetAvailableProviders();
+  LOG_DEBUG("Available providers: {}", providers);
 
   static constexpr int deviceId = 0;
   if (false and std::ranges::contains(providers, "TensorrtExecutionProvider"))

@@ -42,6 +42,8 @@
 #include <fmt/ostream.h>
 #include <fmt/chrono.h>
 #include <fmt/std.h>
+#include <fmt/ranges.h>
+#include <fmt/color.h>
 #include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>

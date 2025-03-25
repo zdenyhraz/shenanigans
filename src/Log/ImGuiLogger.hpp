@@ -1,14 +1,33 @@
 #pragma once
 #ifdef GLAPI
 
-  #include "Logger.hpp"
-  #include "TerminalLogger.hpp"
-  #include "Utils/Singleton.hpp"
-  #include "Utils/DateTime.hpp"
+#  include "Logger.hpp"
+#  include "TerminalLogger.hpp"
+#  include "Utils/Singleton.hpp"
+#  include "Utils/DateTime.hpp"
 
 class ImGuiLogger : public Logger
 {
   using FallbackLogger = TerminalLogger;
+
+  static const ImVec4 GetImColor(const fmt::rgb& color)
+  {
+    return ImVec4(static_cast<float>(color.r) / 255, static_cast<float>(color.g) / 255, static_cast<float>(color.b / 255), 1.0f);
+  }
+
+  static const std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
+  {
+    static constinit auto colors = GetLogLevelColors();
+    std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> imcolors{};
+    imcolors[static_cast<usize>(Logger::LogLevel::Trace)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Trace)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Function)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Function)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Debug)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Debug)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Info)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Info)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Success)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Success)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Warning)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Warning)]);
+    imcolors[static_cast<usize>(Logger::LogLevel::Error)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Error)]);
+    return imcolors;
+  }
 
   ImGuiTextBuffer mTextBuffer;
   std::vector<std::pair<int, LogLevel>> mLineOffsets{{0, LogLevel::Trace}};

@@ -41,6 +41,19 @@ protected:
 
   static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 
+  static consteval std::array<fmt::rgb, static_cast<i32>(LogLevel::LogLevelCount)> GetLogLevelColors()
+  {
+    std::array<fmt::rgb, static_cast<i32>(LogLevel::LogLevelCount)> colors{};
+    colors[static_cast<usize>(LogLevel::Trace)] = fmt::rgb(125, 125, 125);
+    colors[static_cast<usize>(LogLevel::Function)] = fmt::rgb(125, 125, 125);
+    colors[static_cast<usize>(LogLevel::Debug)] = fmt::rgb(0, 185, 255);
+    colors[static_cast<usize>(LogLevel::Info)] = fmt::rgb(235, 235, 235);
+    colors[static_cast<usize>(LogLevel::Success)] = fmt::rgb(0, 200, 15);
+    colors[static_cast<usize>(LogLevel::Warning)] = fmt::rgb(255, 90, 0);
+    colors[static_cast<usize>(LogLevel::Error)] = fmt::rgb(255, 0, 0);
+    return colors;
+  }
+
 public:
   static void SetLogLevel(LogLevel logLevel) { mLogLevel = logLevel; }
 

@@ -2,24 +2,6 @@
 
 #  include "ImGuiLogger.hpp"
 
-static consteval ImVec4 GetColorFromU8(f32 R, f32 G, f32 B)
-{
-  return ImVec4(R / 255, G / 255, B / 255, 1.0f);
-}
-
-static consteval std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
-{
-  std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> colors;
-  colors[static_cast<usize>(Logger::LogLevel::Trace)] = GetColorFromU8(125, 125, 125);
-  colors[static_cast<usize>(Logger::LogLevel::Function)] = GetColorFromU8(125, 125, 125);
-  colors[static_cast<usize>(Logger::LogLevel::Debug)] = GetColorFromU8(0, 185, 255);
-  colors[static_cast<usize>(Logger::LogLevel::Info)] = GetColorFromU8(235, 235, 235);
-  colors[static_cast<usize>(Logger::LogLevel::Success)] = GetColorFromU8(0, 200, 15);
-  colors[static_cast<usize>(Logger::LogLevel::Warning)] = GetColorFromU8(255, 90, 0);
-  colors[static_cast<usize>(Logger::LogLevel::Error)] = GetColorFromU8(255, 0, 0);
-  return colors;
-}
-
 void ImGuiLogger::RenderInternal()
 {
   ImGui::Begin("Log");
@@ -46,7 +28,6 @@ void ImGuiLogger::RenderInternal()
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
   const char* bufStart = mTextBuffer.begin();
   const char* bufEnd = mTextBuffer.end();
-  static constinit std::array<ImVec4, static_cast<i32>(LogLevel::LogLevelCount)> mLogLevelColors = GenerateLogLevelColors();
 
   ImGuiListClipper clipper;
   clipper.Begin(mLineOffsets.size());
@@ -56,6 +37,7 @@ void ImGuiLogger::RenderInternal()
     {
       const char* lineStart = bufStart + mLineOffsets[lineNumber].first;
       const char* lineEnd = (lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? (bufStart + mLineOffsets[lineNumber + 1].first - 1) : bufEnd;
+      static const auto mLogLevelColors = GenerateLogLevelColors();
       ImGui::PushStyleColor(ImGuiCol_Text, mLogLevelColors[(lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? static_cast<i32>(mLineOffsets[lineNumber + 1].second)
                                                                                                                     : static_cast<i32>(Logger::LogLevel::Debug)]);
       ImGui::TextUnformatted(lineStart, lineEnd);
