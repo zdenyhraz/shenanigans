@@ -31,15 +31,17 @@ public:
 
   const char* what() const noexcept override { return mMessage.c_str(); }
 
-  void Log() const
+  std::string Log() const
   {
-    LOG_ERROR(mMessage);
+    std::string ret;
+    ret.append(mMessage);
 #if HAS_STACKTRACE
-    LOG_WARNING("Exception stack trace:");
+    ret.append("Exception stack trace:");
     size_t index = 0;
     for (const auto& entry : mStacktrace)
-      LOG_WARNING("[{}] {} at {}:{}", index++, entry.description(), entry.source_file(), entry.source_line());
+      ret.append(fmt::format("[{}] {} at {}:{}", index++, entry.description(), entry.source_file(), entry.source_line()));
 #endif
+    return ret;
   }
 };
 
@@ -52,5 +54,5 @@ public:
 
   const char* what() const noexcept override { return mMessage.c_str(); }
 
-  void Log() const { LOG_ERROR(mMessage); }
+  std::string Log() const { return mMessage; }
 };

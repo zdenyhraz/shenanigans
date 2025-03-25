@@ -1,4 +1,5 @@
 #pragma once
+#include "Math/Functions.hpp"
 
 inline cv::Mat FFT(cv::Mat&& img)
 {

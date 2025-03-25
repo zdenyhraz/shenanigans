@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Formatters.hpp"
+#include "Utils/Exception.hpp"
 #include "LogFunction.hpp"
 #include "TerminalLogger.hpp"
 
