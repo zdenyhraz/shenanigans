@@ -42,8 +42,6 @@ else()
   add_link_options(-fopenmp -pthread)
 endif()
 
-add_compile_definitions(PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}")
-
 # ignore warnings from external sources
 file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
 if(MSVC)
@@ -105,6 +103,10 @@ message(STATUS "CMAKE_EXPORT_COMPILE_COMMANDS: " ${CMAKE_EXPORT_COMPILE_COMMANDS
 # targets
 add_executable(shenanigans)
 add_executable(shenanigans_test)
+
+# definitions
+target_compile_definitions(shenanigans PRIVATE PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}" DEVELOP=1)
+target_compile_definitions(shenanigans_test PRIVATE PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}" DEVELOP=1)
 
 # precompiled headers
 if (ENABLE_PCH)
