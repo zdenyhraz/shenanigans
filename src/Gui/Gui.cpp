@@ -10,7 +10,7 @@ void GLFWInitialize()
   LOG_DEBUG("GLFW version: {}", glfwGetVersionString());
 }
 
-GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden)
+GLFWwindow* GLFWCreateWindow(int width, int height, bool hidden)
 {
   PROFILE_FUNCTION;
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -165,7 +165,7 @@ void GLFWCloseWindow(GLFWwindow* window)
   glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data)
+void GLFWSetWindowIcon(GLFWwindow* window, int width, int height, uchar* data)
 {
   GLFWimage icon;
   icon.width = width;

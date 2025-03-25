@@ -9,5 +9,5 @@ public:
   static cv::Mat Align(const IPC& ipc, cv::Mat&& image1, cv::Mat&& image2);
 
 private:
-  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2, f64 gamma1 = 1, f64 gamma2 = 1);
+  static cv::Mat ColorComposition(const cv::Mat& img1, const cv::Mat& img2, double gamma1 = 1, double gamma2 = 1);
 };

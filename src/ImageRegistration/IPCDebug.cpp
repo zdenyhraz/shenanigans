@@ -1,6 +1,10 @@
 #include "IPCDebug.hpp"
 #include "IPC.hpp"
 #include "ImageProcessing/Noise.hpp"
+#include "Utils/Draw.hpp"
+#include "Utils/Load.hpp"
+#include "Math/Transform.hpp"
+#include "Plot/Plot.hpp"
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
@@ -36,8 +40,13 @@ void IPCDebug::DebugL2(const IPC& ipc, const cv::Mat& L2)
 {
   auto plot = L2.clone();
   cv::resize(plot, plot, {ipc.mL2Usize, ipc.mL2Usize}, 0, 0, cv::INTER_NEAREST);
-  Plot::Plot(
-      {.name = fmt::format("{} L2", ipc.mDebugName), .z = plot, .xmin = 0, .xmax = static_cast<f32>(L2.cols - 1), .ymin = 0, .ymax = static_cast<f32>(L2.rows - 1), .cmap = "jet"});
+  Plot::Plot({.name = fmt::format("{} L2", ipc.mDebugName),
+      .z = plot,
+      .xmin = 0,
+      .xmax = static_cast<float>(L2.cols - 1),
+      .ymin = 0,
+      .ymax = static_cast<float>(L2.rows - 1),
+      .cmap = "jet"});
 }
 
 void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
@@ -60,7 +69,7 @@ void IPCDebug::DebugL2U(const IPC& ipc, const cv::Mat& L2, const cv::Mat& L2U)
   }
 }
 
-void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv::Point2d& L3shift, f64 UC)
+void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, int L1size, const cv::Point2d& L3shift, double UC)
 {
   cv::Mat mat = IPC::CalculateL1(L2U, cv::Point(L2U.cols / 2, L2U.rows / 2), L1size).clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
@@ -75,7 +84,7 @@ void IPCDebug::DebugL1B(const IPC& ipc, const cv::Mat& L2U, i32 L1size, const cv
       .cmap = "jet"});
 }
 
-void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, f64 UC, bool last)
+void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3shift, const cv::Point2d& L2Ushift, double UC, bool last)
 {
   cv::Mat mat = L1.clone();
   cv::normalize(mat, mat, 0, 1, cv::NORM_MINMAX); // for black crosshairs + cross
@@ -88,24 +97,24 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
       .savepath = not ipc.mDebugDirectory.empty() and last ? fmt::format("{}/L1A_{}.png", ipc.mDebugDirectory, ipc.mDebugIndex) : "",
       .z = mat,
       .xmin = 0,
-      .xmax = static_cast<f32>(L1.cols - 1),
+      .xmax = static_cast<float>(L1.cols - 1),
       .ymin = 0,
-      .ymax = static_cast<f32>(L1.rows - 1),
+      .ymax = static_cast<float>(L1.rows - 1),
       .cmap = "jet"});
 }
 
-void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
+void IPCDebug::DebugShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
   const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/star.png"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
   // cv::Point2d shift(maxShift, -maxShift);
 
-  cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
-      std::clamp(Random::Rand() * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
-  // cv::Point2i point(std::clamp(0.45 * image.cols, static_cast<f64>(ipc.mCols), static_cast<f64>(image.cols - ipc.mCols)),
-  //     std::clamp(0.5 * image.rows, static_cast<f64>(ipc.mRows), static_cast<f64>(image.rows - ipc.mRows)));
+  cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<double>(ipc.mCols), static_cast<double>(image.cols - ipc.mCols)),
+      std::clamp(Random::Rand() * image.rows, static_cast<double>(ipc.mRows), static_cast<double>(image.rows - ipc.mRows)));
+  // cv::Point2i point(std::clamp(0.45 * image.cols, static_cast<double>(ipc.mCols), static_cast<double>(image.cols - ipc.mCols)),
+  //     std::clamp(0.5 * image.rows, static_cast<double>(ipc.mRows), static_cast<double>(image.rows - ipc.mRows)));
 
-  cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+  cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
   cv::Mat imageShifted;
   cv::warpAffine(image, imageShifted, Tmat, image.size());
   cv::Mat image1 = RoiCrop(image, point.x, point.y, ipc.mCols, ipc.mRows);
@@ -122,7 +131,7 @@ void IPCDebug::DebugShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
   LOG_INFO("Error = [{:.4f}, {:.4f}]", error.x, error.y);
 }
 
-void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
+void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, double noiseStdev)
 {
   LOG_FUNCTION;
   auto image1 = LoadUnitFloatImage<IPC::Float>(image1Path);
@@ -135,7 +144,7 @@ void IPCDebug::DebugShift2(const IPC& ipc, const std::string& image1Path, const 
   LOG_INFO("Estimated shift = [{:.4f}, {:.4f}]", ipcshift.x, ipcshift.y);
 }
 
-void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, f64 noiseStdev)
+void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, double noiseStdev)
 {
   LOG_FUNCTION;
   static constexpr bool save = false;
@@ -207,7 +216,7 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   IPCAlign::Align(ipc, image1, image2);
 }
 
-void IPCDebug::DebugGradualShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
+void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
   LOG_FUNCTION;
   ipc.SetDebugDirectory("../debug/peakshift");
@@ -216,14 +225,14 @@ void IPCDebug::DebugGradualShift(const IPC& ipc, f64 maxShift, f64 noiseStdev)
   crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
   cv::Mat image2 = image1.clone();
   cv::Mat crop2;
-  const i32 iters = 51;
+  const int iters = 51;
   cv::Mat noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
 
-  for (i32 i = 0; i < iters; ++i)
+  for (int i = 0; i < iters; ++i)
   {
     ipc.SetDebugIndex(i);
     const cv::Point2d shift(maxShift * i / (iters - 1), maxShift * i / (iters - 1));
-    const cv::Mat Tmat = (cv::Mat_<f64>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+    const cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
     cv::warpAffine(image1, image2, Tmat, image2.size());
     crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
     ipc.SetDebugTrueShift(shift);

@@ -4,7 +4,7 @@
 class Evolution : public OptimizationAlgorithm
 {
 public:
-  enum MutationStrategy : u8
+  enum MutationStrategy : uint8_t
   {
     RAND1,
     RAND2,
@@ -13,28 +13,28 @@ public:
     MutationStrategyCount
   };
 
-  enum CrossoverStrategy : u8
+  enum CrossoverStrategy : uint8_t
   {
     BIN,
     EXP,
     CrossoverStrategyCount
   };
 
-  enum MetaObjectiveFunctionType : u8
+  enum MetaObjectiveFunctionType : uint8_t
   {
     ObjectiveFunctionValue
   };
 
-  explicit Evolution(usize N_, const std::string& optname = "default");
+  explicit Evolution(size_t N_, const std::string& optname = "default");
 
   OptimizationResult Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid = std::nullopt) override;
 
-  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, usize runsPerObj = 3, usize maxFunEvals = 10000,
-      f64 optimalFitness = -std::numeric_limits<f64>::max());
+  void MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType = ObjectiveFunctionValue, size_t runsPerObj = 3, size_t maxFunEvals = 10000,
+      double optimalFitness = -std::numeric_limits<double>::max());
 
-  usize mNP = 4;
-  f64 mF = 0.65;
-  f64 mCR = 0.90;
+  size_t mNP = 4;
+  double mF = 0.65;
+  double mCR = 0.90;
   MutationStrategy mMutStrat = RAND1;
   CrossoverStrategy mCrossStrat = BIN;
 
@@ -42,54 +42,54 @@ private:
   struct Entity
   {
     Entity() = default;
-    explicit Entity(usize N);
+    explicit Entity(size_t N);
 
-    std::vector<f64> params;
-    f64 fitness;
+    std::vector<double> params;
+    double fitness;
   };
 
   struct Offspring
   {
     Offspring() = default;
-    Offspring(usize N, usize nParents);
-    void UpdateDistinctParents(usize eid, usize NP);
-    void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, f64 CR);
+    Offspring(size_t N, size_t nParents);
+    void UpdateDistinctParents(size_t eid, size_t NP);
+    void UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR);
 
-    std::vector<f64> params;
-    f64 fitness;
-    std::vector<usize> parentIndices;
+    std::vector<double> params;
+    double fitness;
+    std::vector<size_t> parentIndices;
     std::vector<bool> crossoverParameters;
   };
 
   struct Population
   {
-    Population(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents, bool consoleOutput, bool saveProgress);
-    void UpdateDistinctParents(usize eid);
-    void UpdateCrossoverParameters(usize eid, CrossoverStrategy crossoverStrategy, f64 CR);
-    void UpdateOffspring(usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB);
+    Population(size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, size_t nParents, bool consoleOutput, bool saveProgress);
+    void UpdateDistinctParents(size_t eid);
+    void UpdateCrossoverParameters(size_t eid, CrossoverStrategy crossoverStrategy, double CR);
+    void UpdateOffspring(size_t eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB);
     void PerformSelection();
     void UpdateBestEntity();
-    void UpdateTerminationCriterions(f64 relativeDifferenceThreshold);
+    void UpdateTerminationCriterions(double relativeDifferenceThreshold);
     void UpdateProgress();
 
     std::vector<Entity> entities;
     std::vector<Offspring> offspring;
     Entity bestEntity;
-    usize functionEvaluations;
-    f64 averageFitness;
-    f64 previousFitness;
-    f64 absoluteDifference;
-    f64 relativeDifference;
-    usize relativeDifferenceGenerationsOverThreshold;
+    size_t functionEvaluations;
+    double averageFitness;
+    double previousFitness;
+    double absoluteDifference;
+    double relativeDifference;
+    size_t relativeDifferenceGenerationsOverThreshold;
     bool mSaveProgress;
-    std::vector<f64> bestFitnessProgress;
-    std::vector<std::vector<f64>> bestParametersProgress;
-    std::vector<std::vector<f64>> evaluatedParameters;
+    std::vector<double> bestFitnessProgress;
+    std::vector<std::vector<double>> bestParametersProgress;
+    std::vector<std::vector<double>> evaluatedParameters;
 
   private:
-    void InitializePopulation(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB);
+    void InitializePopulation(size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB);
     void InitializeBestEntity();
-    void InitializeOffspring(usize nParents);
+    void InitializeOffspring(size_t nParents);
 
     bool mConsoleOutput = true;
   };
@@ -97,16 +97,16 @@ private:
   void CheckObjectiveFunctionNormality(ObjectiveFunction obj) const;
   void CheckBounds();
   void CheckParameters() const;
-  usize GetNumberOfParents() const;
-  void UninitializeOutputs(const Population& population, TerminationReason reason, usize generation);
-  void UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid);
-  TerminationReason CheckTerminationCriterions(const Population& population, usize generation) const;
-  std::string GetOutputString(usize generation, const Population& population);
+  size_t GetNumberOfParents() const;
+  void UninitializeOutputs(const Population& population, TerminationReason reason, size_t generation);
+  void UpdateOutputs(size_t generation, const Population& population, const std::optional<ObjectiveFunction>& valid);
+  TerminationReason CheckTerminationCriterions(const Population& population, size_t generation) const;
+  std::string GetOutputString(size_t generation, const Population& population);
   static const char* GetMutationStrategyString(MutationStrategy strategy);
   static const char* GetCrossoverStrategyString(CrossoverStrategy strategy);
-  static f64 averageVectorDistance(const std::vector<f64>& vec1, const std::vector<f64>& vec2, const std::vector<f64>& boundsRange);
+  static double averageVectorDistance(const std::vector<double>& vec1, const std::vector<double>& vec2, const std::vector<double>& boundsRange);
 
-  f64 mAbsoluteDifferenceThreshold = 1e-10;
-  f64 mRelativeDifferenceThreshold = 0.9;
-  usize mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
+  double mAbsoluteDifferenceThreshold = 1e-10;
+  double mRelativeDifferenceThreshold = 0.9;
+  size_t mRelativeDifferenceGenerationsOverThresholdThreshold = 10;
 };

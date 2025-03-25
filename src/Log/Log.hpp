@@ -1,11 +1,12 @@
 #pragma once
+#include "Utils/Formatters.hpp"
 #include "LogFunction.hpp"
+#include "TerminalLogger.hpp"
 
 #ifdef GLAPI
 #  include "ImGuiLogger.hpp"
 using MainLogger = ImGuiLogger;
 #else
-#  include "TerminalLogger.hpp"
 using MainLogger = TerminalLogger;
 #endif
 

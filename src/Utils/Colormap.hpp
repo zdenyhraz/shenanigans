@@ -1,12 +1,12 @@
 #pragma once
 
-inline cv::Scalar ColormapJet(f32 x, f32 valMin = 0, f32 valMax = 1, f32 val = 255)
+inline cv::Scalar ColormapJet(float x, float valMin = 0, float valMax = 1, float val = 255)
 {
-  f32 B, G, R;
-  f32 sh = 0.125 * (valMax - valMin);
-  f32 start = valMin;
-  f32 mid = valMin + 0.5 * (valMax - valMin);
-  f32 end = valMax;
+  float B, G, R;
+  float sh = 0.125 * (valMax - valMin);
+  float start = valMin;
+  float mid = valMin + 0.5 * (valMax - valMin);
+  float end = valMax;
 
   B = (x > (start + sh)) ? std::clamp(-val / 2 / sh * x + val / 2 / sh * (mid + sh), 0.f, val)
                          : (x < start ? val / 2 : std::clamp(val / 2 / sh * x + val / 2 - val / 2 / sh * start, 0.f, val));

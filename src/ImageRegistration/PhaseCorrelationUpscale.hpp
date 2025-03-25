@@ -4,8 +4,8 @@
 class PhaseCorrelationUpscale
 {
 public:
-  using Float = f64;
-  inline static f64 mUC = 5;
+  using Float = double;
+  inline static double mUC = 5;
 
   static cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2)
   {

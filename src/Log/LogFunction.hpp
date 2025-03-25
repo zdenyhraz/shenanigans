@@ -35,12 +35,12 @@ private:
     using namespace std::chrono;
 
     if (dur < 1s)
-      return fmt::format("{:.2f} ms", duration<f32, std::milli>(dur).count());
+      return fmt::format("{:.2f} ms", duration<float, std::milli>(dur).count());
     else if (dur < 1min)
-      return fmt::format("{:.2f} s", duration<f32>(dur).count());
+      return fmt::format("{:.2f} s", duration<float>(dur).count());
     else if (dur < 1h)
-      return fmt::format("{:.2f} min", duration<f32, std::ratio<60>>(dur).count());
+      return fmt::format("{:.2f} min", duration<float, std::ratio<60>>(dur).count());
     else
-      return fmt::format("{:.2f} h", duration<f32, std::ratio<3600>>(dur).count());
+      return fmt::format("{:.2f} h", duration<float, std::ratio<3600>>(dur).count());
   }
 };

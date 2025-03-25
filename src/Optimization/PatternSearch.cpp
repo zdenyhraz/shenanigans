@@ -1,53 +1,57 @@
 #include "PatternSearch.hpp"
+#include "Utils/Operators.hpp"
+#include "Math/Functions.hpp"
+#include "Math/Random.hpp"
+#include "Plot/Plot.hpp"
 
 OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid)
 {
   LOG_INFO(" Optimization started (pattern search)");
-  std::vector<f64> boundsRange = mUpperBounds - mLowerBounds;
-  f64 initialStep = *std::max_element(boundsRange.begin(), boundsRange.end()) / 4;
+  std::vector<double> boundsRange = mUpperBounds - mLowerBounds;
+  double initialStep = *std::max_element(boundsRange.begin(), boundsRange.end()) / 4;
   multistartCnt = 0;
   // multistart algorithm - initialize global results
-  std::vector<f64> topPoint = Zerovect(N, 0.);
-  f64 topPointFitness = std::numeric_limits<f64>::max();
+  std::vector<double> topPoint = Zerovect(N, 0.);
+  double topPointFitness = std::numeric_limits<double>::max();
   // generate all starting points
-  std::vector<std::vector<f64>> mainPointsInitial(multistartMaxCnt, Zerovect(N, 0.));
-  for (i32 run = 0; run < multistartMaxCnt; run++)
-    for (usize indexParam = 0; indexParam < N; indexParam++)
+  std::vector<std::vector<double>> mainPointsInitial(multistartMaxCnt, Zerovect(N, 0.));
+  for (int run = 0; run < multistartMaxCnt; run++)
+    for (size_t indexParam = 0; indexParam < N; indexParam++)
       mainPointsInitial[run][indexParam] = Random::Rand(mLowerBounds[indexParam], mUpperBounds[indexParam]); // idk dude
 
   // multistart pattern search
   volatile bool flag = false;
-  usize funEvals = 0;
+  size_t funEvals = 0;
 #pragma omp parallel for shared(flag)
-  for (i32 run = 0; run < multistartMaxCnt; run++)
+  for (int run = 0; run < multistartMaxCnt; run++)
   {
     if (flag)
       continue;
 
-    usize funEvalsThisRun = 0;
+    size_t funEvalsThisRun = 0;
     // initialize vectors
-    f64 step = initialStep;
-    std::vector<f64> mainPoint = mainPointsInitial[run];
-    f64 mainPointFitness = obj(mainPoint);
-    std::vector<std::vector<std::vector<f64>>> pattern;                                            // N-2-N (N pairs of N-dimensional points)
-    std::vector<std::vector<f64>> patternFitness(N, Zerovect(2, std::numeric_limits<f64>::max())); // N-2 (N pairs of fitness)
+    double step = initialStep;
+    std::vector<double> mainPoint = mainPointsInitial[run];
+    double mainPointFitness = obj(mainPoint);
+    std::vector<std::vector<std::vector<double>>> pattern;                                               // N-2-N (N pairs of N-dimensional points)
+    std::vector<std::vector<double>> patternFitness(N, Zerovect(2, std::numeric_limits<double>::max())); // N-2 (N pairs of fitness)
     pattern.resize(N);
 
-    for (usize dim = 0; dim < N; dim++)
+    for (size_t dim = 0; dim < N; dim++)
     {
       pattern[dim].resize(2);
-      for (i32 pm = 0; pm < 2; pm++)
+      for (int pm = 0; pm < 2; pm++)
         pattern[dim][pm].resize(N);
     }
 
     // main search cycle
-    for (usize generation = 1; generation < 1e8; generation++)
+    for (size_t generation = 1; generation < 1e8; generation++)
     {
       bool smallerStep = true;
       // asign values to pattern vertices - exploration
-      for (usize dim = 0; dim < N; dim++)
+      for (size_t dim = 0; dim < N; dim++)
       {
-        for (i32 pm = 0; pm < 2; pm++)
+        for (int pm = 0; pm < 2; pm++)
         {
           pattern[dim][pm] = mainPoint;
           pattern[dim][pm][dim] += pm == 0 ? step : -step;
@@ -66,10 +70,10 @@ OptimizationAlgorithm::OptimizationResult PatternSearch::Optimize(const Objectiv
             // LOG_DEBUG  "> run "  run  " current best entity fitness: "  patternFitness[dim][pm]  ;
             if (maxExploitCnt > 0)
             {
-              f64 testPointFitness = mainPointFitness;
-              for (i32 exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
+              double testPointFitness = mainPointFitness;
+              for (int exploitCnt = 0; exploitCnt < maxExploitCnt; exploitCnt++)
               {
-                std::vector<f64> testPoint = mainPoint;
+                std::vector<double> testPoint = mainPoint;
                 testPoint[dim] += pm == 0 ? step : -step;
                 testPoint[dim] = ClampSmooth(testPoint[dim], mainPoint[dim], mLowerBounds[dim], mUpperBounds[dim]);
                 testPointFitness = obj(testPoint);

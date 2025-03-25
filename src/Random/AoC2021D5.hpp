@@ -1,6 +1,6 @@
 #pragma once
 
-u64 AoC2021D5()
+uint64_t AoC2021D5()
 {
   std::stringstream inputStream(R"(629,581,123,75
 921,643,452,643
@@ -26,16 +26,16 @@ u64 AoC2021D5()
 
     LOG_DEBUG("Processing coords [{},{}]->[{},{}]", x1, y1, x2, y2);
 
-    i32 stepx = x1 == x2 ? 0 : x2 - x1 > 0 ? 1 : -1;
-    i32 stepy = y1 == y2 ? 0 : y2 - y1 > 0 ? 1 : -1;
-    for (i32 step = 0; step <= std::max(std::abs(x2 - x1), std::abs(y2 - y1)); ++step)
-      mat.at<u16>(x1 + step * stepx, y1 + step * stepy)++;
+    int stepx = x1 == x2 ? 0 : x2 - x1 > 0 ? 1 : -1;
+    int stepy = y1 == y2 ? 0 : y2 - y1 > 0 ? 1 : -1;
+    for (int step = 0; step <= std::max(std::abs(x2 - x1), std::abs(y2 - y1)); ++step)
+      mat.at<uint16_t>(x1 + step * stepx, y1 + step * stepy)++;
   }
 
-  i32 result = 0;
-  for (i32 r = 0; r < mat.rows; r++)
-    for (i32 c = 0; c < mat.cols; c++)
-      if (mat.at<u16>(r, c) >= 2)
+  int result = 0;
+  for (int r = 0; r < mat.rows; r++)
+    for (int c = 0; c < mat.cols; c++)
+      if (mat.at<uint16_t>(r, c) >= 2)
         result++;
 
   return result;

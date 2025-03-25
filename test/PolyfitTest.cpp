@@ -3,31 +3,31 @@
 
 TEST(PolyfitTest, Fit)
 {
-  const i32 n = 101;
-  const f64 c0 = 3.23, c1 = -2.56, c2 = 1.65;
-  std::vector<f64> x(n), y(n);
+  const int n = 101;
+  const double c0 = 3.23, c1 = -2.56, c2 = 1.65;
+  std::vector<double> x(n), y(n);
 
-  for (i32 i = 0; i < n; ++i)
+  for (int i = 0; i < n; ++i)
   {
-    x[i] = static_cast<f64>(i) / (n - 1);
+    x[i] = static_cast<double>(i) / (n - 1);
     y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
   }
 
   const auto fy = PolynomialFit(x, y, 2);
   ASSERT_EQ(fy.size(), n);
-  for (i32 i = 0; i < n; ++i)
+  for (int i = 0; i < n; ++i)
     ASSERT_NEAR(fy[i], y[i], 1e-5);
 }
 
 TEST(PolyfitTest, Coeffs)
 {
-  const i32 n = 101;
-  const f64 c0 = 3.23, c1 = -2.56, c2 = 1.65;
-  std::vector<f64> x(n), y(n);
+  const int n = 101;
+  const double c0 = 3.23, c1 = -2.56, c2 = 1.65;
+  std::vector<double> x(n), y(n);
 
-  for (i32 i = 0; i < n; ++i)
+  for (int i = 0; i < n; ++i)
   {
-    x[i] = static_cast<f64>(i) / (n - 1);
+    x[i] = static_cast<double>(i) / (n - 1);
     y[i] = c0 + c1 * x[i] + c2 * std::pow(x[i], 2);
   }
 

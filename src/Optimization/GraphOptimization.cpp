@@ -5,15 +5,15 @@
 
 #include "GraphOptimization.hpp"
 
-std::ostream& operator<<(std::ostream& out, std::tuple<u32, f64, u32> tuple)
+std::ostream& operator<<(std::ostream& out, std::tuple<uint32_t, double, uint32_t> tuple)
 {
   out << "<" << std::get<0>(tuple) << "," << std::get<1>(tuple) << "," << std::get<2>(tuple) << ">";
   return out;
 }
 
-u32 getTupleIndexWithIndex(std::vector<std::tuple<u32, f64, u32>> vec, u32 index)
+uint32_t getTupleIndexWithIndex(std::vector<std::tuple<uint32_t, double, uint32_t>> vec, uint32_t index)
 {
-  for (u32 i = 0; i < vec.size(); i++)
+  for (uint32_t i = 0; i < vec.size(); i++)
   {
     if (std::get<0>(vec[i]) == index)
     {

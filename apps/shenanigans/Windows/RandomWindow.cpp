@@ -3,6 +3,7 @@
 #include "Optimization/TestFunctions.hpp"
 #include "Random/UnevenIllumination.hpp"
 #include "Utils/FrameAverager.hpp"
+#include "Utils/Async.hpp"
 
 void RandomWindow::Render()
 {
@@ -36,11 +37,11 @@ void RandomWindow::Render()
 void RandomWindow::EvolutionOptimization(bool meta)
 {
   LOG_FUNCTION;
-  static constexpr i32 N = 2;
-  static constexpr i32 runs = 20;
-  static constexpr i32 maxFunEvals = 1000;
-  static constexpr f64 optimalFitness = -std::numeric_limits<f64>::max();
-  static constexpr f64 noiseStddev = 0.3;
+  static constexpr int N = 2;
+  static constexpr int runs = 20;
+  static constexpr int maxFunEvals = 1000;
+  static constexpr double optimalFitness = -std::numeric_limits<double>::max();
+  static constexpr double noiseStddev = 0.3;
   Evolution Evo(N);
   Evo.mNP = 5 * N;
   Evo.mMutStrat = Evolution::RAND1;

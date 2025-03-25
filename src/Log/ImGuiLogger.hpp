@@ -3,8 +3,6 @@
 
 #  include "Logger.hpp"
 #  include "TerminalLogger.hpp"
-#  include "Utils/Singleton.hpp"
-#  include "Utils/DateTime.hpp"
 
 class ImGuiLogger : public Logger
 {
@@ -15,17 +13,17 @@ class ImGuiLogger : public Logger
     return ImVec4(static_cast<float>(color.r) / 255, static_cast<float>(color.g) / 255, static_cast<float>(color.b / 255), 1.0f);
   }
 
-  static const std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
+  static const std::array<ImVec4, static_cast<int>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
   {
     static constinit auto colors = GetLogLevelColors();
-    std::array<ImVec4, static_cast<i32>(Logger::LogLevel::LogLevelCount)> imcolors{};
-    imcolors[static_cast<usize>(Logger::LogLevel::Trace)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Trace)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Function)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Function)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Debug)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Debug)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Info)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Info)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Success)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Success)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Warning)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Warning)]);
-    imcolors[static_cast<usize>(Logger::LogLevel::Error)] = GetImColor(colors[static_cast<usize>(Logger::LogLevel::Error)]);
+    std::array<ImVec4, static_cast<int>(Logger::LogLevel::LogLevelCount)> imcolors{};
+    imcolors[static_cast<size_t>(Logger::LogLevel::Trace)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Trace)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Function)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Function)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Debug)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Debug)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Info)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Info)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Success)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Success)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Warning)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Warning)]);
+    imcolors[static_cast<size_t>(Logger::LogLevel::Error)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Error)]);
     return imcolors;
   }
 
@@ -33,7 +31,7 @@ class ImGuiLogger : public Logger
   std::vector<std::pair<int, LogLevel>> mLineOffsets{{0, LogLevel::Trace}};
   bool mActive = false;
   bool mFallback = false;
-  static constexpr usize mMaxMessages = 10000;
+  static constexpr size_t mMaxMessages = 10000;
 
   void RenderInternal();
   void ClearInternal();
@@ -57,9 +55,9 @@ class ImGuiLogger : public Logger
     }
 
     std::string message = fmt::format("[{}] {}\n", GetCurrentTime(), fmt::vformat(fmt, fmt::make_format_args(args...)));
-    i32 oldSize = mTextBuffer.size();
+    int oldSize = mTextBuffer.size();
     mTextBuffer.append(message.c_str(), message.c_str() + message.size());
-    for (i32 newSize = mTextBuffer.size(); oldSize < newSize; ++oldSize)
+    for (int newSize = mTextBuffer.size(); oldSize < newSize; ++oldSize)
       if (mTextBuffer[oldSize] == '\n')
         mLineOffsets.emplace_back(oldSize + 1, logLevel);
   }

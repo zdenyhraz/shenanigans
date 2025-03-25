@@ -2,6 +2,9 @@
 #include "PlotData.hpp"
 #include "Utils/Singleton.hpp"
 #include "Utils/Colormap.hpp"
+#include "Math/Random.hpp"
+#include "Math/Functions.hpp"
+#include "Utils/Filesystem.hpp"
 
 class ImGuiPlot;
 class PyPlot;
@@ -39,10 +42,10 @@ protected:
   std::mutex mPlotsMutex;
   bool mSave = false;
   bool mShouldPlot = true;
-  usize mWindowCount = 1;
+  size_t mWindowCount = 1;
 
 public:
-  enum PlotLocation : usize
+  enum PlotLocation : size_t
   {
     Left,
     Right
@@ -50,7 +53,7 @@ public:
 
   static bool ShouldPlot() { return Singleton<T>::Get().mShouldPlot; }
 
-  static void SetWindowCount(usize windowCount) { Singleton<T>::Get().mWindowCount = windowCount; }
+  static void SetWindowCount(size_t windowCount) { Singleton<T>::Get().mWindowCount = windowCount; }
 
   static void Initialize()
   {
@@ -72,17 +75,17 @@ public:
 
   static void Debug()
   {
-    static constexpr usize n = 501;
-    const f64 y1A = Random::Rand<f64>(0.5, 1);
-    const f64 y2A = Random::Rand<f64>(0.5, 1);
-    const f64 y1F = Random::Rand<f64>(2, 5);
-    const f64 y2F = Random::Rand<f64>(2, 5);
-    std::vector<f64> x(n);
-    std::vector<f64> y1(n);
-    std::vector<f64> y2(n);
-    for (usize i = 0; i < n; ++i)
+    static constexpr size_t n = 501;
+    const double y1A = Random::Rand<double>(0.5, 1);
+    const double y2A = Random::Rand<double>(0.5, 1);
+    const double y1F = Random::Rand<double>(2, 5);
+    const double y2F = Random::Rand<double>(2, 5);
+    std::vector<double> x(n);
+    std::vector<double> y1(n);
+    std::vector<double> y2(n);
+    for (size_t i = 0; i < n; ++i)
     {
-      x[i] = static_cast<f64>(3 * i) / (n - 1);
+      x[i] = static_cast<double>(3 * i) / (n - 1);
       y1[i] = y1A * std::sin(y1F * std::numbers::pi * x[i]);
       y2[i] = y2A * std::cos(y2F * std::numbers::pi * x[i]);
     }
@@ -90,7 +93,7 @@ public:
     Plot({.name = fmt::format("debug1d({})", Singleton<T>::Get().mPlots1D.size()), .x = x, .ys = {y1, y2}, .ylabels = {"Asin(fx)", "Acos(fx)"}});
 
     Plot({.name = fmt::format("debug2d({})", Singleton<T>::Get().mPlots2D.size()),
-        .z = Random::Rand<f32>(0, 1) * Gaussian<f32>(n, Random::Rand<f32>(0, 0.5) * n),
+        .z = Random::Rand<float>(0, 1) * Gaussian<float>(n, Random::Rand<float>(0, 0.5) * n),
         .xmin = -3,
         .xmax = 3,
         .ymin = -5,
@@ -130,7 +133,7 @@ public:
       throw std::invalid_argument(fmt::format("Unable to plot {}-channel data", data.z.channels()));
 
     data.z = data.z.clone();
-    data.aspectratio = static_cast<f64>(data.z.cols) / data.z.rows;
+    data.aspectratio = static_cast<double>(data.z.cols) / data.z.rows;
     if (data.xmin == PlotData2D::Default or data.xmax == PlotData2D::Default)
     {
       data.xmin = 0;

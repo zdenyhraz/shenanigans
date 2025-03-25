@@ -1,4 +1,5 @@
 #include "IPC.hpp"
+#include "Plot/Plot.hpp"
 
 std::string IPC::BandpassType2String(BandpassType type)
 {

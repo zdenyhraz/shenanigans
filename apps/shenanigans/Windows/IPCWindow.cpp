@@ -1,5 +1,7 @@
 #include "IPCWindow.hpp"
 #include "ImageRegistration/ImageRegistrationDataset.hpp"
+#include "Utils/Load.hpp"
+#include "Utils/Async.hpp"
 
 void IPCWindow::Initialize()
 {
@@ -33,11 +35,11 @@ void IPCWindow::Render()
       ImGui::SliderInt("L2Usize", &mIPCParameters.L2Usize, 31, 501);
       ImGui::SliderInt("MaxIter", &mIPCParameters.MaxIter, 1, 21);
       ImGui::SliderFloat("CPeps", &mIPCParameters.CPeps, 0, 10, nullptr, ImGuiSliderFlags_Logarithmic);
-      ImGui::SliderInt("WindowType", &mIPCParameters.WinT, 0, static_cast<i32>(IPC::WindowType::WindowTypeCount) - 1, IPCParameters::WindowTypes[mIPCParameters.WinT]);
-      ImGui::SliderInt("BandpassType", &mIPCParameters.BPT, 0, static_cast<i32>(IPC::BandpassType::BandpassTypeCount) - 1, IPCParameters::BandpassTypes[mIPCParameters.BPT]);
-      ImGui::SliderInt("InterpolationType", &mIPCParameters.IntT, 0, static_cast<i32>(IPC::InterpolationType::InterpolationTypeCount) - 1,
+      ImGui::SliderInt("WindowType", &mIPCParameters.WinT, 0, static_cast<int>(IPC::WindowType::WindowTypeCount) - 1, IPCParameters::WindowTypes[mIPCParameters.WinT]);
+      ImGui::SliderInt("BandpassType", &mIPCParameters.BPT, 0, static_cast<int>(IPC::BandpassType::BandpassTypeCount) - 1, IPCParameters::BandpassTypes[mIPCParameters.BPT]);
+      ImGui::SliderInt("InterpolationType", &mIPCParameters.IntT, 0, static_cast<int>(IPC::InterpolationType::InterpolationTypeCount) - 1,
           IPCParameters::InterpolationTypes[mIPCParameters.IntT]);
-      ImGui::SliderInt("L1WindowType", &mIPCParameters.L1WinT, 0, static_cast<i32>(IPC::L1WindowType::L1WindowTypeCount) - 1, IPCParameters::L1WindowTypes[mIPCParameters.L1WinT]);
+      ImGui::SliderInt("L1WindowType", &mIPCParameters.L1WinT, 0, static_cast<int>(IPC::L1WindowType::L1WindowTypeCount) - 1, IPCParameters::L1WindowTypes[mIPCParameters.L1WinT]);
     }
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);

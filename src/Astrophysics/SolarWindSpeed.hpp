@@ -1,14 +1,15 @@
 #pragma once
+#include "Plot/Plot.hpp"
 
-static constexpr i32 piccnt = 9;             // number of pics
-static constexpr f64 kmpp = 696010. / 378.3; // kilometers per pixel
-static constexpr f64 dt = 11.8;              // dt seconds temporally adjacent pics
-static constexpr f64 arrow_scale = 12;
-static constexpr f64 arrow_thickness = 0.0015;
-static constexpr f64 text_scale = 0.001;
-static constexpr f64 text_thickness = arrow_thickness * 1.0;
-static constexpr f64 text_xoffset = 0.0075;
-static constexpr f64 text_yoffset = 2 * text_xoffset;
+static constexpr int piccnt = 9;                // number of pics
+static constexpr double kmpp = 696010. / 378.3; // kilometers per pixel
+static constexpr double dt = 11.8;              // dt seconds temporally adjacent pics
+static constexpr double arrow_scale = 12;
+static constexpr double arrow_thickness = 0.0015;
+static constexpr double text_scale = 0.001;
+static constexpr double text_thickness = arrow_thickness * 1.0;
+static constexpr double text_xoffset = 0.0075;
+static constexpr double text_yoffset = 2 * text_xoffset;
 
 enum FeatureType
 {
@@ -19,21 +20,21 @@ enum FeatureType
 struct SolarWindSpeedParameters
 {
   FeatureType ftype = SURF; // SURF
-  f32 thresh = 100;         // 100/200
-  i32 matchcnt = 1000;      // 1000
-  f32 minSpeed = 450;       // 450
-  f32 maxSpeed = 841;       // 841
+  float thresh = 100;       // 100/200
+  int matchcnt = 1000;      // 1000
+  float minSpeed = 450;     // 450
+  float maxSpeed = 841;     // 841
   std::string path = "../data/articles/swind/source/1/cropped/crop";
   std::string path1;
   std::string path2;
-  f32 overlapdistance = 40;        // 40
+  float overlapdistance = 40;      // 40
   bool drawOverlapCircles = false; // false
-  f32 ratioThreshold = 0.5;        // 0.4/0.5
-  f32 upscale = 1;                 // 1
+  float ratioThreshold = 0.5;      // 0.4/0.5
+  float upscale = 1;               // 1
   bool surfExtended = false;       // false
   bool surfUpright = true;         // true
-  i32 nOctaves = 4;                // 4
-  i32 nOctaveLayers = 3;           // 3
+  int nOctaves = 4;                // 4
+  int nOctaveLayers = 3;           // 3
   bool mask = true;                // true
 };
 
@@ -60,19 +61,19 @@ inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const SolarWindSpeedParameters&
   throw std::runtime_error("Unknown feature type");
 }
 
-inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::Point2f>& points, const std::vector<f64>& speeds, const std::vector<f64>& directions)
+inline void ExportFeaturesToCsv(const std::string& path, const std::vector<cv::Point2f>& points, const std::vector<double>& speeds, const std::vector<double>& directions)
 {
   std::string pth = path + "features.csv";
   std::ofstream csv(pth, std::ios::out | std::ios::trunc);
   csv << "X,Y,SPD,DIR" << std::endl;
-  for (usize i = 0; i < points.size(); i++)
+  for (size_t i = 0; i < points.size(); i++)
   {
     csv << points[i].x << "," << points[i].y << "," << speeds[i] << "," << directions[i] << std::endl;
   }
   LOG_INFO("Feature data exported to {}", std::filesystem::weakly_canonical(pth).string());
 }
 
-inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<usize, usize, cv::DMatch, bool>>& matches_all,
+inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std::tuple<size_t, size_t, cv::DMatch, bool>>& matches_all,
     const std::vector<std::vector<cv::KeyPoint>>& kp1_all, const std::vector<std::vector<cv::KeyPoint>>& kp2_all, const SolarWindSpeedParameters& data, bool drawSpeed)
 {
   PROFILE_FUNCTION;
@@ -83,15 +84,15 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
   if (data.upscale != 1)
     cv::resize(out, out, cv::Size(data.upscale * out.cols, data.upscale * out.rows), 0, 0, cv::INTER_LINEAR);
 
-  f64 minspd = std::numeric_limits<f64>::max();
-  f64 maxspd = std::numeric_limits<f64>::min();
+  double minspd = std::numeric_limits<double>::max();
+  double maxspd = std::numeric_limits<double>::min();
   std::vector<bool> shouldDraw(matches_all.size(), false);
-  std::vector<f64> removeSpeeds = {}; // 639, 652
+  std::vector<double> removeSpeeds = {}; // 639, 652
 
   if (false)
-    for (i32 r = 0; r < out.rows; ++r)
-      for (i32 c = 0; c < out.cols; ++c)
-        if (((f32)c / img.cols + (f32)r / img.rows) / 2 < 0.5)
+    for (int r = 0; r < out.rows; ++r)
+      for (int c = 0; c < out.cols; ++c)
+        if (((float)c / img.cols + (float)r / img.rows) / 2 < 0.5)
           out.at<cv::Vec3b>(r, c) = (out.at<cv::Vec3b>(r, c) + cv::Vec3b(0, 0, 255)) / 2;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
@@ -103,7 +104,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
 
     const auto& point = kp1_all[pic][match.queryIdx].pt;
 
-    if (data.mask and (((f32)point.x / img.cols + (f32)point.y / img.rows) / 2 < 0.5))
+    if (data.mask and (((float)point.x / img.cols + (float)point.y / img.rows) / 2 < 0.5))
     {
       LOG_TRACE("Skipping match {}: masked out", idx);
       continue;
@@ -116,8 +117,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     }
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const f64 spd = Magnitude(shift) * kmpp / dt;
-    const f64 dir = ToDegrees(atan2(-shift.y, shift.x));
+    const double spd = Magnitude(shift) * kmpp / dt;
+    const double dir = ToDegrees(atan2(-shift.y, shift.x));
 
     if (std::any_of(removeSpeeds.begin(), removeSpeeds.end(), [&](const auto& remspd) { return std::abs(spd - remspd) < 1; }))
       continue;
@@ -134,8 +135,8 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
       continue;
     }
 
-    static constexpr f64 kMinDir = -170;
-    static constexpr f64 kMaxDir = -120;
+    static constexpr double kMinDir = -170;
+    static constexpr double kMaxDir = -120;
     if (dir < kMinDir or dir > kMaxDir)
     {
       LOG_TRACE("Skipping match {}: direction {:.2f} deg off limits", idx, dir);
@@ -148,7 +149,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
     shouldDraw[idx] = true;
   }
 
-  usize drawcounter = 1;
+  size_t drawcounter = 1;
 
   for (auto it = matches_all.rbegin(); it != matches_all.rend(); ++it)
   {
@@ -158,7 +159,7 @@ inline cv::Mat DrawFeatureMatchArrows(const cv::Mat& img, const std::vector<std:
       continue;
 
     const auto shift = GetFeatureMatchShift(match, kp1_all[pic], kp2_all[pic]);
-    const f64 spd = Magnitude(shift) * kmpp / dt;
+    const double spd = Magnitude(shift) * kmpp / dt;
 
     auto pts = GetFeatureMatchPoints(match, kp1_all[pic], kp2_all[pic]);
     cv::Point2f arrStart = data.upscale * pts.first;
@@ -218,8 +219,8 @@ inline cv::Mat DrawFeatureMatchArrows(
       continue;
 
     const auto pts = GetFeatureMatchPoints(match, kp1, kp2);
-    const f64 spd = Magnitude(GetFeatureMatchShift(match, kp1, kp2));
-    const f64 diagonal = sqrt(Sqr(img.rows) + Sqr(img.cols));
+    const double spd = Magnitude(GetFeatureMatchShift(match, kp1, kp2));
+    const double diagonal = sqrt(Sqr(img.rows) + Sqr(img.cols));
 
     cv::Scalar color = ColormapJet(spd, 0, 0.3 * diagonal);
     arrowedLine(out, pts.first, pts.second, color, 0.002 * out.cols, cv::LINE_AA, 0, 0.1);
@@ -241,7 +242,7 @@ try
   std::vector<std::vector<cv::KeyPoint>> keypoints2_all(piccnt - 1);
 
 #pragma omp parallel for
-  for (i32 pic = 1; pic < piccnt - 1; ++pic)
+  for (int pic = 1; pic < piccnt - 1; ++pic)
   {
     const std::string path1 = data.path + std::to_string(pic) + ".PNG";
     const std::string path2 = data.path + std::to_string(pic + 1) + ".PNG";
@@ -267,7 +268,7 @@ try
     // filter matches using the Lowe's ratio test
     std::vector<cv::DMatch> matches;
     {
-      for (usize i = 0; i < knn_matches.size(); i++)
+      for (size_t i = 0; i < knn_matches.size(); i++)
         if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
           matches.push_back(knn_matches[i][0]);
     }
@@ -275,7 +276,7 @@ try
     // get first best fits
     {
       std::sort(matches.begin(), matches.end(), [&](const cv::DMatch& a, const cv::DMatch& b) { return a.distance < b.distance; });
-      matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (i32)matches.size()));
+      matches = std::vector<cv::DMatch>(matches.begin(), matches.begin() + std::min(data.matchcnt, (int)matches.size()));
       matches_all[pic] = matches;
     }
 
@@ -287,11 +288,11 @@ try
     }
   }
 
-  std::vector<std::tuple<usize, usize, cv::DMatch, bool>> matches_all_serialized;
+  std::vector<std::tuple<size_t, size_t, cv::DMatch, bool>> matches_all_serialized;
   {
     LOG_SCOPE("Sorting matches based on speed");
-    usize i = 0;
-    for (usize pic = 0; pic < piccnt - 1; pic++)
+    size_t i = 0;
+    for (size_t pic = 0; pic < piccnt - 1; pic++)
       for (const auto& match : matches_all[pic])
         matches_all_serialized.push_back({i++, pic, match, false});
 
@@ -307,7 +308,7 @@ try
           return spd1 > spd2;
         });
 
-    usize newidx = 0;
+    size_t newidx = 0;
     for (auto& [idx, pic, match, overlap] : matches_all_serialized)
       idx = newidx++;
   }
@@ -332,7 +333,7 @@ try
           continue;
 
         const auto shift = keypoints1_all[pic][match.queryIdx].pt - keypoints1_all[otherpic][othermatch.queryIdx].pt;
-        const f64 distance = Magnitude(shift);
+        const double distance = Magnitude(shift);
         otheroverlap = distance < data.overlapdistance;
       }
     }
@@ -372,7 +373,7 @@ try
   // filter matches using the Lowe's ratio test
   std::vector<cv::DMatch> matches;
   {
-    for (usize i = 0; i < knn_matches.size(); i++)
+    for (size_t i = 0; i < knn_matches.size(); i++)
       if (knn_matches[i][0].distance < data.ratioThreshold * knn_matches[i][1].distance)
         matches.push_back(knn_matches[i][0]);
   }

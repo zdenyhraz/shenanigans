@@ -35,13 +35,13 @@ public:
     mData.clear();
   }
 
-  void SetCapacity(usize capacity)
+  void SetCapacity(size_t capacity)
   {
     std::scoped_lock lock(mMutex);
     mCapacity = capacity;
   }
 
-  void Reserve(usize capacity)
+  void Reserve(size_t capacity)
   {
     PROFILE_FUNCTION;
     std::scoped_lock lock(mMutex);
@@ -52,6 +52,6 @@ public:
 private:
   GetDataFunction mGetDataFunction;
   std::unordered_map<Key, Value> mData;
-  usize mCapacity = 100;
+  size_t mCapacity = 100;
   std::mutex mMutex;
 };

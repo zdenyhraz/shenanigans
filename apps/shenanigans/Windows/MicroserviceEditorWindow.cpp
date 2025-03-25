@@ -4,6 +4,7 @@
 #include "Microservice/Microservices/PlotImageMicroservice.hpp"
 #include "NDA/Microservice/ObjdetectSASMicroservice.hpp"
 #include "Microservice/Microservices/PlotObjectsMicroservice.hpp"
+#include "Utils/Async.hpp"
 
 void MicroserviceEditorWindow::Initialize()
 {

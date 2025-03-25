@@ -61,8 +61,8 @@ inline cv::Mat GPUIFFT(cv::Mat& FFT)
 inline void FFTShift(cv::Mat& mat)
 {
   PROFILE_FUNCTION;
-  i32 cx = mat.cols / 2;
-  i32 cy = mat.rows / 2;
+  int cx = mat.cols / 2;
+  int cy = mat.rows / 2;
   cv::Mat q0(mat, cv::Rect(0, 0, cx, cy));
   cv::Mat q1(mat, cv::Rect(cx, 0, cx, cy));
   cv::Mat q2(mat, cv::Rect(0, cy, cx, cy));
@@ -86,8 +86,8 @@ inline cv::Mat FFTShift(cv::Mat&& mat)
 inline void IFFTShift(cv::Mat& mat)
 {
   PROFILE_FUNCTION;
-  i32 cx = mat.cols / 2;
-  i32 cy = mat.rows / 2;
+  int cx = mat.cols / 2;
+  int cy = mat.rows / 2;
   cv::Mat q0(mat, cv::Rect(0, 0, cx, cy));
   cv::Mat q1(mat, cv::Rect(cx, 0, cx, cy));
   cv::Mat q2(mat, cv::Rect(0, cy, cx, cy));
@@ -118,7 +118,7 @@ inline cv::Mat DuplicateChannelsZero(const cv::Mat& img)
   return out;
 }
 
-inline cv::Mat LogMagnitude(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat LogMagnitude(const cv::Mat& img, int logs = 1)
 {
   PROFILE_FUNCTION;
   cv::Mat mag;
@@ -132,7 +132,7 @@ inline cv::Mat LogMagnitude(const cv::Mat& img, i32 logs = 1)
   {
     mag = img.clone();
   }
-  for (i32 logit = 0; logit < logs; ++logit)
+  for (int logit = 0; logit < logs; ++logit)
   {
     mag += cv::Scalar::all(1);
     log(mag, mag);
@@ -167,7 +167,7 @@ inline cv::Mat Phase(const cv::Mat& img)
   return phs;
 }
 
-inline cv::Mat FFTLogMagnitude(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat FFTLogMagnitude(const cv::Mat& img, int logs = 1)
 {
   PROFILE_FUNCTION;
   cv::Mat out = FFT(img.clone());
@@ -175,7 +175,7 @@ inline cv::Mat FFTLogMagnitude(const cv::Mat& img, i32 logs = 1)
   return LogMagnitude(out, logs);
 }
 
-inline cv::Mat IFFTLogMagnitude(const cv::Mat& img, i32 logs = 1)
+inline cv::Mat IFFTLogMagnitude(const cv::Mat& img, int logs = 1)
 {
   PROFILE_FUNCTION;
   cv::Mat out = IFFT(DuplicateChannelsZero(img));

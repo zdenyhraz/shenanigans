@@ -28,8 +28,8 @@ void CvPlot::RenderInternal(const PlotData2D& data)
 {
   PROFILE_FUNCTION;
   cv::Mat image = data.z.clone();
-  i32 height = 600;
-  i32 width = data.aspectratio * height;
+  int height = 600;
+  int width = data.aspectratio * height;
   cv::namedWindow(data.name, cv::WINDOW_NORMAL);
   cv::resizeWindow(data.name, width, height);
 

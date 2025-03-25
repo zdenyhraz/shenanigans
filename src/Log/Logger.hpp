@@ -24,7 +24,7 @@ public:
 protected:
   inline static std::recursive_mutex mMutex;
   inline static LogLevel mLogLevel = LogLevel::Trace;
-  inline static f32 mProgress = 0;
+  inline static float mProgress = 0;
   inline static std::string mProgressName;
   inline static std::string mProgressBarOverlay;
 
@@ -39,28 +39,28 @@ protected:
     }
   };
 
-  static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
+  inline static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 
-  static consteval std::array<fmt::rgb, static_cast<i32>(LogLevel::LogLevelCount)> GetLogLevelColors()
+  static consteval std::array<fmt::rgb, static_cast<int>(LogLevel::LogLevelCount)> GetLogLevelColors()
   {
-    std::array<fmt::rgb, static_cast<i32>(LogLevel::LogLevelCount)> colors{};
-    colors[static_cast<usize>(LogLevel::Trace)] = fmt::rgb(125, 125, 125);
-    colors[static_cast<usize>(LogLevel::Function)] = fmt::rgb(125, 125, 125);
-    colors[static_cast<usize>(LogLevel::Debug)] = fmt::rgb(0, 185, 255);
-    colors[static_cast<usize>(LogLevel::Info)] = fmt::rgb(235, 235, 235);
-    colors[static_cast<usize>(LogLevel::Success)] = fmt::rgb(0, 200, 15);
-    colors[static_cast<usize>(LogLevel::Warning)] = fmt::rgb(255, 90, 0);
-    colors[static_cast<usize>(LogLevel::Error)] = fmt::rgb(255, 0, 0);
+    std::array<fmt::rgb, static_cast<int>(LogLevel::LogLevelCount)> colors{};
+    colors[static_cast<size_t>(LogLevel::Trace)] = fmt::rgb(125, 125, 125);
+    colors[static_cast<size_t>(LogLevel::Function)] = fmt::rgb(125, 125, 125);
+    colors[static_cast<size_t>(LogLevel::Debug)] = fmt::rgb(0, 185, 255);
+    colors[static_cast<size_t>(LogLevel::Info)] = fmt::rgb(235, 235, 235);
+    colors[static_cast<size_t>(LogLevel::Success)] = fmt::rgb(0, 200, 15);
+    colors[static_cast<size_t>(LogLevel::Warning)] = fmt::rgb(255, 90, 0);
+    colors[static_cast<size_t>(LogLevel::Error)] = fmt::rgb(255, 0, 0);
     return colors;
   }
 
 public:
   static void SetLogLevel(LogLevel logLevel) { mLogLevel = logLevel; }
 
-  static void SetProgress(f32 progress)
+  static void SetProgress(float progress)
   {
     mProgress = progress;
-    fmt::format_to(mProgressBarOverlay.begin(), "{}% {}", std::clamp(static_cast<i32>(mProgress * 100), 0, 100), mProgressName);
+    fmt::format_to(mProgressBarOverlay.begin(), "{}% {}", std::clamp(static_cast<int>(mProgress * 100), 0, 100), mProgressName);
   }
 
   // cppcheck-suppress passedByValue
@@ -68,7 +68,7 @@ public:
   {
     mProgressName = progressName;
     mProgressBarOverlay.resize(mProgressName.size() + sizeof("100%"));
-    fmt::format_to(mProgressBarOverlay.begin(), "{}% {}", std::clamp(static_cast<i32>(mProgress * 100), 0, 100), mProgressName);
+    fmt::format_to(mProgressBarOverlay.begin(), "{}% {}", std::clamp(static_cast<int>(mProgress * 100), 0, 100), mProgressName);
   }
 
   static void ResetProgress()

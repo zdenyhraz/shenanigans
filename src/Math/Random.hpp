@@ -3,8 +3,8 @@
 class Random
 {
 public:
-  template <typename T = f64>
-  static T Rand(f64 min = 0., f64 max = 1.)
+  template <typename T = double>
+  static T Rand(double min = 0., double max = 1.)
   {
     static_assert(std::is_floating_point_v<T> or std::is_integral_v<T>);
 
@@ -14,8 +14,8 @@ public:
       return std::uniform_int_distribution<T>(min, max)(Get().mGenerator);
   }
 
-  template <typename T = f64>
-  static T Randn(f64 mean = 0., f64 stddev = 1.)
+  template <typename T = double>
+  static T Randn(double mean = 0., double stddev = 1.)
   {
     static_assert(std::is_floating_point_v<T>);
     return std::normal_distribution<T>(mean, stddev)(Get().mGenerator);

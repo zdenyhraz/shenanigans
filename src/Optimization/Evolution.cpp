@@ -1,7 +1,9 @@
 
 #include "Evolution.hpp"
+#include "Utils/Operators.hpp"
+#include "Plot/Plot.hpp"
 
-Evolution::Evolution(usize N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N)
+Evolution::Evolution(size_t N_, const std::string& optname) : OptimizationAlgorithm(N_, optname), mNP(7 * N)
 {
   PROFILE_FUNCTION;
 }
@@ -17,7 +19,7 @@ try
   CheckBounds();
   CheckObjectiveFunctionNormality(obj);
 
-  usize gen = 0;
+  size_t gen = 0;
   Population population(mNP, N, obj, mLowerBounds, mUpperBounds, GetNumberOfParents(), mConsoleOutput, mSaveProgress);
   population.UpdateTerminationCriterions(mRelativeDifferenceThreshold);
   TerminationReason termReason = NotTerminated;
@@ -30,7 +32,7 @@ try
       PROFILE_SCOPE(EvolutionGeneration);
       gen++;
 #pragma omp parallel for
-      for (i32 eid = 0; eid < mNP; ++eid)
+      for (int eid = 0; eid < mNP; ++eid)
       {
         population.UpdateDistinctParents(eid);
         population.UpdateCrossoverParameters(eid, mCrossStrat, mCR);
@@ -83,12 +85,12 @@ catch (...)
   return OptimizationResult();
 }
 
-void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, usize runsPerObj, usize maxFunEvals, f64 optimalFitness)
+void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType metaObjType, size_t runsPerObj, size_t maxFunEvals, double optimalFitness)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
 
-  enum MetaParameter : u8
+  enum MetaParameter : uint8_t
   {
     MetaNP,
     MetaCR,
@@ -117,11 +119,11 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
     }
   };
 
-  const auto metaObj = [&](const std::vector<f64>& metaparams)
+  const auto metaObj = [&](const std::vector<double>& metaparams)
   {
-    f64 retval = 0;
+    double retval = 0;
 
-    for (usize run = 0; run < runsPerObj; run++)
+    for (size_t run = 0; run < runsPerObj; run++)
     {
       Evolution evo(N);
       evo.mNP = metaparams[MetaNP];
@@ -131,8 +133,8 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
       evo.mUpperBounds = mUpperBounds;
       evo.mMaxFunEvals = maxFunEvals;
       evo.mOptimalFitness = optimalFitness;
-      evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<usize>(metaparams[MetaMutationStrategy]));
-      evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<usize>(metaparams[MetaCrossoverStrategy]));
+      evo.mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(metaparams[MetaMutationStrategy]));
+      evo.mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(metaparams[MetaCrossoverStrategy]));
       evo.Mute();
 
       const auto result = evo.Optimize(obj);
@@ -156,7 +158,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   evo.mCrossStrat = BIN;
   evo.mMaxFunEvals = 5000;
   evo.mLowerBounds = {7, 0.1, 0.2, 0, 0};
-  evo.mUpperBounds = {30. * N, 1, 1.5, -1e-6 + static_cast<f64>(MutationStrategyCount), -1e-6 + static_cast<f64>(CrossoverStrategyCount)};
+  evo.mUpperBounds = {30. * N, 1, 1.5, -1e-6 + static_cast<double>(MutationStrategyCount), -1e-6 + static_cast<double>(CrossoverStrategyCount)};
   evo.SetConsoleOutput(true);
   evo.SetPlotOutput(true);
   evo.SetSaveProgress(true);
@@ -178,25 +180,25 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
   LOG_INFO("Evolution parameters before metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat),
       GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsB4;
-  for (usize run = 0; run < runsPerObj; run++)
+  for (size_t run = 0; run < runsPerObj; run++)
     resultsB4.push_back(Optimize(obj));
 
   // apply metaopt parameters
   mNP = optimalMetaParams[MetaNP];
   mCR = optimalMetaParams[MetaCR];
   mF = optimalMetaParams[MetaF];
-  mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<usize>(optimalMetaParams[MetaMutationStrategy]));
-  mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<usize>(optimalMetaParams[MetaCrossoverStrategy]));
+  mMutStrat = static_cast<Evolution::MutationStrategy>(static_cast<size_t>(optimalMetaParams[MetaMutationStrategy]));
+  mCrossStrat = static_cast<Evolution::CrossoverStrategy>(static_cast<size_t>(optimalMetaParams[MetaCrossoverStrategy]));
 
   // statistics A4 metaopt
   LOG_INFO("Evolution parameters after metaoptimization: NP: {}, CR: {:.2f}, F: {:.2f}, M: {}, C: {}", mNP, mCR, mF, GetMutationStrategyString(mMutStrat),
       GetCrossoverStrategyString(mCrossStrat));
   std::vector<Evolution::OptimizationResult> resultsA4;
-  for (usize run = 0; run < runsPerObj; run++)
+  for (size_t run = 0; run < runsPerObj; run++)
     resultsA4.push_back(Optimize(obj));
 
   // plot unoptimized vs optimized
-  std::vector<f64> xs(resultsB4[0].bestFitnessProgress.size());
+  std::vector<double> xs(resultsB4[0].bestFitnessProgress.size());
   std::iota(xs.begin(), xs.end(), 0);
   // Plot1D::Set(fmt::format("{} metaopt comparison", mName));
   // Plot1D::SetXlabel("generation");
@@ -213,13 +215,13 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
 
   struct OptimizationPerformanceStatistics
   {
-    f64 averageFitness = 0;
-    f64 averageFunctionEvaluations = 0;
+    double averageFitness = 0;
+    double averageFunctionEvaluations = 0;
   };
 
   OptimizationPerformanceStatistics statsB4, statsA4;
 
-  for (usize run = 0; run < runsPerObj; run++)
+  for (size_t run = 0; run < runsPerObj; run++)
   {
     statsB4.averageFitness += (1.0 / runsPerObj) * obj(resultsB4[run].optimum);
     statsA4.averageFitness += (1.0 / runsPerObj) * obj(resultsA4[run].optimum);
@@ -298,7 +300,7 @@ void Evolution::CheckParameters() const
     throw std::runtime_error("Invalid crossover strategy");
 }
 
-void Evolution::UpdateOutputs(usize generation, const Population& population, const std::optional<ObjectiveFunction>& valid)
+void Evolution::UpdateOutputs(size_t generation, const Population& population, const std::optional<ObjectiveFunction>& valid)
 {
   PROFILE_FUNCTION;
 
@@ -307,10 +309,10 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, co
 
   if (mPlotOutput)
   {
-    static std::vector<f64> gens;
-    static std::vector<f64> objvals;
-    static std::vector<f64> validvals;
-    static std::vector<f64> sims;
+    static std::vector<double> gens;
+    static std::vector<double> objvals;
+    static std::vector<double> validvals;
+    static std::vector<double> sims;
 
     if (generation == 0)
     {
@@ -347,7 +349,7 @@ void Evolution::UpdateOutputs(usize generation, const Population& population, co
   }
 }
 
-void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason, usize generation)
+void Evolution::UninitializeOutputs(const Population& population, TerminationReason reason, size_t generation)
 try
 {
   PROFILE_FUNCTION;
@@ -364,7 +366,7 @@ catch (const std::exception& e)
     LOG_EXCEPTION(e);
 }
 
-Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, usize generation) const
+Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Population& population, size_t generation) const
 {
   if (population.bestEntity.fitness <= mOptimalFitness) // populationFitness goal reached
     return OptimalFitnessReached;
@@ -388,11 +390,11 @@ Evolution::TerminationReason Evolution::CheckTerminationCriterions(const Populat
   return NotTerminated;
 }
 
-std::string Evolution::GetOutputString(usize generation, const Population& population)
+std::string Evolution::GetOutputString(size_t generation, const Population& population)
 {
   PROFILE_FUNCTION;
   std::string value = fmt::format("Gen {} ({}) [", generation, population.bestEntity.fitness);
-  for (usize param = 0; param < population.bestEntity.params.size(); ++param)
+  for (size_t param = 0; param < population.bestEntity.params.size(); ++param)
     value += fmt::format("{}: {} ", mParameterNames[param], mParameterValueToNameFunctions[param](population.bestEntity.params[param]));
   value += fmt::format("] diff: {:.1f}% ({:.2e})", population.relativeDifference * 100, population.absoluteDifference);
   return value;
@@ -428,7 +430,7 @@ const char* Evolution::GetCrossoverStrategyString(CrossoverStrategy strategy)
   }
 }
 
-usize Evolution::GetNumberOfParents() const
+size_t Evolution::GetNumberOfParents() const
 {
   switch (mMutStrat)
   {
@@ -446,7 +448,7 @@ usize Evolution::GetNumberOfParents() const
 }
 
 Evolution::Population::Population(
-    usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB, usize nParents, bool consoleOutput, bool saveProgress)
+    size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB, size_t nParents, bool consoleOutput, bool saveProgress)
 try
 {
   PROFILE_FUNCTION;
@@ -471,24 +473,25 @@ catch (const std::exception& e)
   throw std::runtime_error(fmt::format("Could not initialize population: {}", e.what()));
 }
 
-void Evolution::Population::UpdateDistinctParents(usize eid)
+void Evolution::Population::UpdateDistinctParents(size_t eid)
 {
   PROFILE_FUNCTION;
   offspring[eid].UpdateDistinctParents(eid, entities.size());
 }
 
-void Evolution::Population::UpdateCrossoverParameters(usize eid, CrossoverStrategy crossoverStrategy, f64 CR)
+void Evolution::Population::UpdateCrossoverParameters(size_t eid, CrossoverStrategy crossoverStrategy, double CR)
 {
   PROFILE_FUNCTION;
   offspring[eid].UpdateCrossoverParameters(crossoverStrategy, CR);
 }
 
-void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, f64 F, const std::vector<f64>& LB, const std::vector<f64>& UB)
+void Evolution::Population::UpdateOffspring(
+    size_t eid, MutationStrategy mutationStrategy, ObjectiveFunction obj, double F, const std::vector<double>& LB, const std::vector<double>& UB)
 {
   PROFILE_FUNCTION;
   auto& newoffspring = offspring[eid];
   newoffspring.params = entities[eid].params;
-  for (usize pid = 0; pid < newoffspring.params.size(); pid++)
+  for (size_t pid = 0; pid < newoffspring.params.size(); pid++)
   {
     if (newoffspring.crossoverParameters[pid])
     {
@@ -530,20 +533,20 @@ void Evolution::Population::UpdateOffspring(usize eid, MutationStrategy mutation
   {
     if (mConsoleOutput)
       LOG_WARNING("Could not evaluate new offspring with params {}: {}", newoffspring.params, e.what());
-    newoffspring.fitness = std::numeric_limits<f64>::max();
+    newoffspring.fitness = std::numeric_limits<double>::max();
   }
   catch (...)
   {
     if (mConsoleOutput)
       LOG_WARNING("Could not evaluate new offspring with params {}", newoffspring.params);
-    newoffspring.fitness = std::numeric_limits<f64>::max();
+    newoffspring.fitness = std::numeric_limits<double>::max();
   }
 }
 
 void Evolution::Population::PerformSelection()
 {
   PROFILE_FUNCTION;
-  for (usize eid = 0; eid < entities.size(); ++eid)
+  for (size_t eid = 0; eid < entities.size(); ++eid)
   {
     if (offspring[eid].fitness <= entities[eid].fitness)
     {
@@ -558,7 +561,7 @@ void Evolution::Population::UpdateBestEntity()
   PROFILE_FUNCTION;
   averageFitness = 0;
   previousFitness = bestEntity.fitness;
-  for (usize eid = 0; eid < entities.size(); ++eid)
+  for (size_t eid = 0; eid < entities.size(); ++eid)
   {
     averageFitness += entities[eid].fitness;
     if (entities[eid].fitness <= bestEntity.fitness)
@@ -567,7 +570,7 @@ void Evolution::Population::UpdateBestEntity()
   averageFitness /= entities.size();
 }
 
-void Evolution::Population::UpdateTerminationCriterions(f64 relativeDifferenceThreshold)
+void Evolution::Population::UpdateTerminationCriterions(double relativeDifferenceThreshold)
 {
   PROFILE_FUNCTION;
   absoluteDifference = averageFitness - bestEntity.fitness;
@@ -589,30 +592,30 @@ void Evolution::Population::UpdateProgress()
   bestParametersProgress.push_back(bestEntity.params);
 }
 
-void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFunction obj, const std::vector<f64>& LB, const std::vector<f64>& UB)
+void Evolution::Population::InitializePopulation(size_t NP, size_t N, ObjectiveFunction obj, const std::vector<double>& LB, const std::vector<double>& UB)
 {
   PROFILE_FUNCTION;
   entities = Zerovect(NP, Entity(N));
-  std::vector<f64> RB = UB - LB;
-  const f64 initialMinAvgDist = 0.5;
-  const usize distincEntityMaxTrials = 10;
-  f64 minAvgDist = initialMinAvgDist;
+  std::vector<double> RB = UB - LB;
+  const double initialMinAvgDist = 0.5;
+  const size_t distincEntityMaxTrials = 10;
+  double minAvgDist = initialMinAvgDist;
 
-  for (usize eid = 0; eid < NP; eid++)
+  for (size_t eid = 0; eid < NP; eid++)
   {
-    usize distinctEntityTrials = 0;
+    size_t distinctEntityTrials = 0;
     bool distinctEntity = false; // entities may not be too close together
     while (!distinctEntity)      // loop until they are distinct enough
     {
       distinctEntity = true; // assume entity is distinct
 
-      for (usize pid = 0; pid < N; pid++) // generate initial entity
+      for (size_t pid = 0; pid < N; pid++) // generate initial entity
         entities[eid].params[pid] = Random::Rand(LB[pid], UB[pid]);
 
-      for (usize eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
+      for (size_t eidx2 = 0; eidx2 < eid; eidx2++) // check distance to all other entities
       {
-        f64 avgDist = averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
-        if (avgDist < minAvgDist)                                                              // check if entity is distinct
+        double avgDist = averageVectorDistance(entities[eid].params, entities[eidx2].params, RB); // calculate how distinct the entity is to another entity
+        if (avgDist < minAvgDist)                                                                 // check if entity is distinct
         {
           distinctEntity = false;
           break; // needs to be distinct from all entities
@@ -630,7 +633,7 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
   }
 
 #pragma omp parallel for
-  for (i32 eid = 0; eid < NP; ++eid)
+  for (int eid = 0; eid < NP; ++eid)
   {
     entities[eid].fitness = obj(entities[eid].params);
 
@@ -641,11 +644,11 @@ void Evolution::Population::InitializePopulation(usize NP, usize N, ObjectiveFun
   functionEvaluations += NP;
 }
 
-void Evolution::Population::InitializeOffspring(usize nParents)
+void Evolution::Population::InitializeOffspring(size_t nParents)
 {
   PROFILE_FUNCTION;
   offspring = Zerovect(entities.size(), Offspring(entities[0].params.size(), nParents));
-  for (usize eid = 0; eid < entities.size(); ++eid)
+  for (size_t eid = 0; eid < entities.size(); ++eid)
   {
     offspring[eid].params = entities[eid].params;
     offspring[eid].fitness = entities[eid].fitness;
@@ -659,33 +662,33 @@ void Evolution::Population::InitializeBestEntity()
   UpdateBestEntity();
 }
 
-Evolution::Entity::Entity(usize N)
+Evolution::Entity::Entity(size_t N)
 {
   params.resize(N);
-  fitness = std::numeric_limits<f64>::max();
+  fitness = std::numeric_limits<double>::max();
 }
 
-Evolution::Offspring::Offspring(usize N, usize nParents)
+Evolution::Offspring::Offspring(size_t N, size_t nParents)
 {
   params.resize(N);
   parentIndices.resize(nParents);
   crossoverParameters.resize(N);
-  fitness = std::numeric_limits<f64>::max();
+  fitness = std::numeric_limits<double>::max();
 }
 
-void Evolution::Offspring::UpdateDistinctParents(usize eid, usize NP)
+void Evolution::Offspring::UpdateDistinctParents(size_t eid, size_t NP)
 {
   PROFILE_FUNCTION;
   for (auto& idx : parentIndices)
   {
-    usize idxTst = Random::Rand<i32>(0, 1e6) % NP;
+    size_t idxTst = Random::Rand<int>(0, 1e6) % NP;
     while (std::any_of(parentIndices.begin(), parentIndices.end(), [&](const auto pidx) { return idxTst == pidx; }) or idxTst == eid)
-      idxTst = Random::Rand<i32>(0, 1e6) % NP;
+      idxTst = Random::Rand<int>(0, 1e6) % NP;
     idx = idxTst;
   }
 }
 
-void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, f64 CR)
+void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossoverStrategy, double CR)
 {
   PROFILE_FUNCTION;
   crossoverParameters = Zerovect(params.size(), false);
@@ -694,10 +697,10 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   {
   case CrossoverStrategy::BIN:
   {
-    usize definite = Random::Rand<i32>(0, 1e6) % params.size(); // at least one param undergoes crossover
-    for (usize pid = 0; pid < params.size(); ++pid)
+    size_t definite = Random::Rand<int>(0, 1e6) % params.size(); // at least one param undergoes crossover
+    for (size_t pid = 0; pid < params.size(); ++pid)
     {
-      f64 random = Random::Rand();
+      double random = Random::Rand();
       // flawfinder: ignore
       if (random < CR or pid == definite)
         crossoverParameters[pid] = true;
@@ -706,12 +709,12 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   }
   case CrossoverStrategy::EXP:
   {
-    usize L = 1; // at least one param undergoes crossover
+    size_t L = 1; // at least one param undergoes crossover
     while ((Random::Rand() < CR) and (L < params.size()))
       L++;
 
-    usize pid = Random::Rand<i32>(0, 1e6) % params.size();
-    for (usize i = 0; i < L; i++)
+    size_t pid = Random::Rand<int>(0, 1e6) % params.size();
+    for (size_t i = 0; i < L; i++)
     {
       crossoverParameters[pid] = true;
       pid++;
@@ -724,10 +727,10 @@ void Evolution::Offspring::UpdateCrossoverParameters(CrossoverStrategy crossover
   }
 }
 
-f64 Evolution::averageVectorDistance(const std::vector<f64>& vec1, const std::vector<f64>& vec2, const std::vector<f64>& boundsRange)
+double Evolution::averageVectorDistance(const std::vector<double>& vec1, const std::vector<double>& vec2, const std::vector<double>& boundsRange)
 {
-  f64 result = 0;
-  for (usize i = 0; i < vec1.size(); i++)
+  double result = 0;
+  for (size_t i = 0; i < vec1.size(); i++)
     result += abs(vec1[i] - vec2[i]) / boundsRange[i]; // cv::normalize -> 0 to 1
 
   result /= vec1.size(); // coordinate average

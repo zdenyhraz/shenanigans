@@ -1,25 +1,27 @@
 
 #include "Optimization.hpp"
+#include "Math/Functions.hpp"
+#include "Plot/Plot.hpp"
 
-OptimizationAlgorithm::OptimizationAlgorithm(i32 N_, const std::string& optname) : N(N_), mName(optname)
+OptimizationAlgorithm::OptimizationAlgorithm(int N_, const std::string& optname) : N(N_), mName(optname)
 {
   PROFILE_FUNCTION;
   mLowerBounds = Zerovect(N, -1.);
   mUpperBounds = Zerovect(N, 1.);
   mParameterNames = std::vector<std::string>(N, "");
-  mParameterValueToNameFunctions = std::vector<std::function<std::string(f64)>>(N, nullptr);
+  mParameterValueToNameFunctions = std::vector<std::function<std::string(double)>>(N, nullptr);
 
   // default, can be overridden by the user
-  for (usize i = 0; i < N; ++i)
+  for (size_t i = 0; i < N; ++i)
   {
     mParameterNames[i] = fmt::format("param{}", i);
-    mParameterValueToNameFunctions[i] = [](f64 val) { return fmt::format("{:.1e}", val); };
+    mParameterValueToNameFunctions[i] = [](double val) { return fmt::format("{:.1e}", val); };
   }
 }
 
 // cppcheck-suppress unusedFunction
-void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax,
-    f64 ymin, f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
+void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double>& baseParams, int iters, int xParamIndex, int yParamIndex, double xmin,
+    double xmax, double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -27,43 +29,43 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   if (xParamIndex < 0 or yParamIndex < 0 or xParamIndex == yParamIndex)
     throw std::runtime_error("Bad x/y parameter indices");
 
-  if (baseParams.size() <= static_cast<usize>(std::max(xParamIndex, yParamIndex)))
+  if (baseParams.size() <= static_cast<size_t>(std::max(xParamIndex, yParamIndex)))
     throw std::runtime_error(fmt::format("Base parameters size ({}) is too small for x/y indices {}/{}", baseParams.size(), xParamIndex, yParamIndex));
 
-  i32 rows = iters;
-  i32 cols = iters;
+  int rows = iters;
+  int cols = iters;
   cv::Mat landscape = cv::Mat(rows, cols, CV_32F);
   cv::Mat landscapeLog = cv::Mat(rows, cols, CV_32F);
-  std::atomic<i32> progress = 0;
-  static constexpr f64 logConstant = std::numeric_limits<f32>::epsilon();
+  std::atomic<int> progress = 0;
+  static constexpr double logConstant = std::numeric_limits<float>::epsilon();
 
 #pragma omp parallel for
-  for (i32 r = 0; r < rows; ++r)
+  for (int r = 0; r < rows; ++r)
   {
     progress++;
     if ((r % std::max(rows / 20, 1) == 0) or r == (rows - 1))
-      LOG_INFO("Drawing objective function landscape ({:.1f}%)", (f32)progress / rows * 100);
+      LOG_INFO("Drawing objective function landscape ({:.1f}%)", (float)progress / rows * 100);
 
-    for (i32 c = 0; c < cols; ++c)
+    for (int c = 0; c < cols; ++c)
     {
       auto parameters = baseParams;
-      parameters[xParamIndex] = xmin + (f64)c / (cols - 1) * (xmax - xmin);
-      parameters[yParamIndex] = ymax - (f64)r / (rows - 1) * (ymax - ymin);
+      parameters[xParamIndex] = xmin + (double)c / (cols - 1) * (xmax - xmin);
+      parameters[yParamIndex] = ymax - (double)r / (rows - 1) * (ymax - ymin);
       const auto funval = f(parameters);
-      landscape.at<f32>(r, c) = funval;
-      landscapeLog.at<f32>(r, c) = std::log(std::max(logConstant + funval, logConstant));
+      landscape.at<float>(r, c) = funval;
+      landscapeLog.at<float>(r, c) = std::log(std::max(logConstant + funval, logConstant));
     }
   }
 
-  f64 minVal, maxVal, minValLog, maxValLog;
+  double minVal, maxVal, minValLog, maxValLog;
   cv::Point minLoc;
   cv::minMaxLoc(landscape, &minVal, &maxVal, &minLoc);
   cv::minMaxLoc(landscapeLog, &minValLog, &maxValLog);
 
   if (true)
   {
-    static constexpr i32 landscapeSize = 1000;
-    f64 lanscapeSizeMultiplier = (f64)landscapeSize / cols;
+    static constexpr int landscapeSize = 1000;
+    double lanscapeSizeMultiplier = (double)landscapeSize / cols;
     cv::resize(landscape, landscape, cv::Size(landscapeSize, lanscapeSizeMultiplier * rows), 0, 0, cv::INTER_LINEAR);
     cv::resize(landscapeLog, landscapeLog, cv::Size(landscapeSize, landscapeSize * rows / cols), 0, 0, cv::INTER_LINEAR);
     rows = landscape.rows;
@@ -77,19 +79,19 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   Plot::Plot({.name = fmt::format("Objective function landscape: {} raw surf", funName), .z = landscape, .surf = true});
   Plot::Plot({.name = fmt::format("Objective function landscape: {} log surf", funName), .z = landscapeLog, .surf = true});
 
-  static constexpr f64 pointSizeMultiplierMin = 0.01;
-  static constexpr f64 pointSizeMultiplierBest = 0.008;
-  static constexpr f64 pointSizeMultiplierEvaluated = 0.004;
-  static constexpr f64 pointThicknessMultiplier = 0.005;
-  static constexpr f64 lineThicknessMultiplier = 0.003;
-  static constexpr f64 pointColorRangeMultiplierMin = 0.5;
-  static constexpr f64 pointColorRangeMultiplierBest = 0.85;
-  static constexpr f64 pointColorRangeMultiplierEvaluated = 0.65;
-  const i32 pointSizeMin = pointSizeMultiplierMin * cols;
-  const i32 pointSizeBest = pointSizeMultiplierBest * cols;
-  const i32 pointSizeEvaluated = pointSizeMultiplierEvaluated * cols;
-  const i32 pointThickness = std::max(pointThicknessMultiplier * cols, 1.);
-  const i32 lineThickness = std::max(lineThicknessMultiplier * cols, 1.);
+  static constexpr double pointSizeMultiplierMin = 0.01;
+  static constexpr double pointSizeMultiplierBest = 0.008;
+  static constexpr double pointSizeMultiplierEvaluated = 0.004;
+  static constexpr double pointThicknessMultiplier = 0.005;
+  static constexpr double lineThicknessMultiplier = 0.003;
+  static constexpr double pointColorRangeMultiplierMin = 0.5;
+  static constexpr double pointColorRangeMultiplierBest = 0.85;
+  static constexpr double pointColorRangeMultiplierEvaluated = 0.65;
+  const int pointSizeMin = pointSizeMultiplierMin * cols;
+  const int pointSizeBest = pointSizeMultiplierBest * cols;
+  const int pointSizeEvaluated = pointSizeMultiplierEvaluated * cols;
+  const int pointThickness = std::max(pointThicknessMultiplier * cols, 1.);
+  const int lineThickness = std::max(lineThicknessMultiplier * cols, 1.);
   const cv::Point pointOffset1Min(pointSizeMin, pointSizeMin);
   const cv::Point pointOffset2Min(pointSizeMin, -pointSizeMin);
   const cv::Scalar pointColorBest(minVal + pointColorRangeMultiplierBest * (maxVal - minVal));
@@ -99,7 +101,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
   const cv::Scalar pointColorMin(minVal + pointColorRangeMultiplierMin * (maxVal - minVal));
   const cv::Scalar pointColorMinLog(minValLog + pointColorRangeMultiplierMin * (maxValLog - minValLog));
 
-  const auto GetPoint = [&](const std::vector<f64>& parameters)
+  const auto GetPoint = [&](const std::vector<double>& parameters)
   {
     cv::Point point;
     point.x = (parameters[xParamIndex] - xmin) / (xmax - xmin) * cols;
@@ -107,7 +109,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     return point;
   };
 
-  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
+  const auto DrawPoint = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, int size, int thickness)
   {
     const cv::Point pointOffset1(size, size);
     const cv::Point pointOffset2(size, -size);
@@ -116,16 +118,16 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     cv::line(mat, point - pointOffset2, point + pointOffset2, color, thickness, cv::LINE_AA);
   };
 
-  const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
+  const auto DrawCircle = [](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, int size, int thickness)
   { cv::circle(mat, point, size, color, thickness, cv::LINE_AA); };
 
-  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, i32 thickness)
+  const auto DrawLine = [](cv::Mat& mat, const cv::Point& point1, const cv::Point& point2, const cv::Scalar& color, int thickness)
   {
     cv::line(mat, point1, point2, color, thickness, cv::LINE_AA);
     // arrowedLine(mat, point1, point2, color, thickness, cv::LINE_AA);
   };
 
-  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, i32 size, i32 thickness)
+  const auto DrawCircledPoint = [&](cv::Mat& mat, const cv::Point& point, const cv::Scalar& color, int size, int thickness)
   {
     DrawPoint(mat, point, color, size, thickness);
     DrawCircle(mat, point, color, 1.9 * size, thickness);
@@ -144,7 +146,7 @@ void OptimizationAlgorithm::PlotObjectiveFunctionLandscape(ObjectiveFunction f, 
     }
 
     cv::Point pointprev;
-    for (usize i = 0; i < optResult->bestParametersProgress.size(); i++)
+    for (size_t i = 0; i < optResult->bestParametersProgress.size(); i++)
     {
       // best entity points
       const cv::Point point = GetPoint(optResult->bestParametersProgress[i]);

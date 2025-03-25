@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "ImageRegistration/IPC.hpp"
+#include "Math/Transform.hpp"
 
 class IPCTest : public ::testing::Test
 {
@@ -25,7 +26,7 @@ protected:
   IPC GetIPC() const { return IPC(mImg1.size()); }
 
   cv::Point2d mShift = cv::Point2d(38.638, -67.425);
-  static constexpr f64 kTolerance = 1e-7;
+  static constexpr double kTolerance = 1e-7;
   cv::Mat mImg1;
   cv::Mat mImg2;
 };

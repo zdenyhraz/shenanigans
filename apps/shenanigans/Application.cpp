@@ -1,5 +1,8 @@
 #include "Application.hpp"
 #include "Gui/Gui.hpp"
+#include "Utils/Async.hpp"
+#include "Log/ImGuiLogger.hpp"
+#include "Plot/ImGuiPlot.hpp"
 #include "Windows/IPCWindow.hpp"
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
@@ -25,9 +28,9 @@ void Application::Run()
 {
   static constexpr bool hiddenWindow = true;
   static constexpr bool limitFPS = true;
-  static constexpr f32 scale = 2.0;
-  static constexpr f64 targetFPS = 60;
-  static constexpr f64 targetFrametime = 1. / targetFPS;
+  static constexpr float scale = 2.0;
+  static constexpr double targetFPS = 60;
+  static constexpr double targetFrametime = 1. / targetFPS;
   // flawfinder: ignore
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
@@ -41,13 +44,13 @@ void Application::Run()
   ImGuiIO& io = ImGuiInitialize(window, scale, GetExistingPath("data/shenanigans/app/imgui.ini"), GetExistingPath("data/shenanigans/app/CascadiaCode.ttf"));
   Initialize();
   LOG_SUCCESS("Ready");
-  f64 lastUpdateTime = 0, elapsedTime = 0;
+  double lastUpdateTime = 0, elapsedTime = 0;
   while (!glfwWindowShouldClose(window))
   {
     if constexpr (limitFPS)
     {
       if (elapsedTime = glfwGetTime() - lastUpdateTime; elapsedTime < targetFrametime)
-        std::this_thread::sleep_for(std::chrono::duration<f64>(targetFrametime - elapsedTime));
+        std::this_thread::sleep_for(std::chrono::duration<double>(targetFrametime - elapsedTime));
       lastUpdateTime += targetFrametime;
     }
 

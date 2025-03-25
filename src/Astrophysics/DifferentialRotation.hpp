@@ -3,27 +3,30 @@
 #include "Math/PolynomialFit.hpp"
 #include "Math/TrigonometricFit.hpp"
 #include "Utils/DataCache.hpp"
+#include "Utils/Load.hpp"
+#include "Utils/Operators.hpp"
 #include "ImageProcessing/MedianBlur.hpp"
+#include "Plot/Plot.hpp"
 
 class DifferentialRotation
 {
-  static constexpr f64 SecondsInDay = 24. * 60. * 60.;
-  static constexpr f64 RadPerSecToDegPerDay = ToDegrees(1) * SecondsInDay;
+  static constexpr double SecondsInDay = 24. * 60. * 60.;
+  static constexpr double RadPerSecToDegPerDay = ToDegrees(1) * SecondsInDay;
 
 public:
   struct ImageHeader
   {
-    f64 xcenter; // [px]
-    f64 ycenter; // [px]
-    f64 theta0;  // [rad]
-    f64 R;       // [px]
+    double xcenter; // [px]
+    double ycenter; // [px]
+    double theta0;  // [rad]
+    double R;       // [px]
   };
 
   struct DifferentialRotationData
   {
     DifferentialRotationData() {}
 
-    DifferentialRotationData(i32 xsize_, i32 ysize_, i32 idstep_, i32 idstride_, f64 thetamax_, i32 cadence_, i32 idstart_) :
+    DifferentialRotationData(int xsize_, int ysize_, int idstep_, int idstride_, double thetamax_, int cadence_, int idstart_) :
       xsize(xsize_),
       ysize(ysize_),
       idstep(idstep_),
@@ -36,10 +39,10 @@ public:
       omegax(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
       omegay(cv::Mat::zeros(ysize_, xsize_, CV_32F)),
       theta(GenerateTheta(ysize_, thetamax_)),
-      fshiftx(std::vector<f64>(xsize_, 0.)),
-      fshifty(std::vector<f64>(xsize_, 0.)),
-      theta0(std::vector<f64>(xsize_, 0.)),
-      R(std::vector<f64>(xsize_, 0.))
+      fshiftx(std::vector<double>(xsize_, 0.)),
+      fshifty(std::vector<double>(xsize_, 0.)),
+      theta0(std::vector<double>(xsize_, 0.)),
+      R(std::vector<double>(xsize_, 0.))
     {
     }
 
@@ -90,20 +93,20 @@ public:
       file << "R" << R;
     }
 
-    static std::vector<f64> GenerateTheta(i32 ysize, f64 thetamax)
+    static std::vector<double> GenerateTheta(int ysize, double thetamax)
     {
-      std::vector<f64> theta(ysize);
+      std::vector<double> theta(ysize);
       const auto thetastep = thetamax * 2 / (ysize - 1);
-      for (usize i = 0; i < theta.size(); ++i)
+      for (size_t i = 0; i < theta.size(); ++i)
         theta[i] = thetamax - i * thetastep;
       return theta;
     }
 
-    std::vector<std::pair<i32, i32>> GenerateIds() const
+    std::vector<std::pair<int, int>> GenerateIds() const
     {
-      std::vector<std::pair<i32, i32>> ids(xsize);
-      i32 id = idstart;
-      for (i32 x = 0; x < xsize; ++x)
+      std::vector<std::pair<int, int>> ids(xsize);
+      int id = idstart;
+      for (int x = 0; x < xsize; ++x)
       {
         ids[x] = {id, id + idstep};
         id += idstride != 0 ? idstride : idstep;
@@ -114,12 +117,12 @@ public:
     void PostProcess()
     {
       PROFILE_FUNCTION;
-      const i32 medsizeX = std::min(3, shiftx.cols); // time
-      const i32 medsizeY = std::min(3, shiftx.rows); // meridian
-      shiftx = MedianBlur<f32>(shiftx, medsizeX, medsizeY);
-      shifty = MedianBlur<f32>(shifty, medsizeX, medsizeY);
-      omegax = MedianBlur<f32>(omegax, medsizeX, medsizeY);
-      omegay = MedianBlur<f32>(omegay, medsizeX, medsizeY);
+      const int medsizeX = std::min(3, shiftx.cols); // time
+      const int medsizeY = std::min(3, shiftx.rows); // meridian
+      shiftx = MedianBlur<float>(shiftx, medsizeX, medsizeY);
+      shifty = MedianBlur<float>(shifty, medsizeX, medsizeY);
+      omegax = MedianBlur<float>(omegax, medsizeX, medsizeY);
+      omegay = MedianBlur<float>(omegay, medsizeX, medsizeY);
     }
 
     template <bool Managed>
@@ -127,9 +130,9 @@ public:
     {
       PROFILE_FUNCTION;
       // fix missing data by interpolation
-      for (i32 x = 0; x < omegax.cols; ++x)
+      for (int x = 0; x < omegax.cols; ++x)
       {
-        if (omegax.at<f32>(0, x) != 0.0f) // no need to fix, data not missing
+        if (omegax.at<float>(0, x) != 0.0f) // no need to fix, data not missing
           continue;
 
         // find first non-missing previous data
@@ -137,44 +140,44 @@ public:
 
         // find first non-missing next data
         auto xindex2 = std::min(x + 1, omegax.cols - 1);
-        while (omegax.at<f32>(0, xindex2) == 0.0f and xindex2 < omegax.cols - 1)
+        while (omegax.at<float>(0, xindex2) == 0.0f and xindex2 < omegax.cols - 1)
           ++xindex2;
 
-        const f64 t = (static_cast<f64>(x) - xindex1) / (xindex2 - xindex1);
+        const double t = (static_cast<double>(x) - xindex1) / (xindex2 - xindex1);
 
         if constexpr (not Managed)
           LOG_DEBUG("Fixing missing data: {} < x({}) < {}, t: {:.2f}", xindex1, x, xindex2, t);
 
-        for (i32 y = 0; y < omegax.rows; ++y)
+        for (int y = 0; y < omegax.rows; ++y)
         {
           fshiftx[x] = std::lerp(fshiftx[xindex1], fshiftx[xindex2], t);
           fshifty[x] = std::lerp(fshifty[xindex1], fshifty[xindex2], t);
           theta0[x] = std::lerp(theta0[xindex1], theta0[xindex2], t);
           R[x] = std::lerp(R[xindex1], R[xindex2], t);
-          shiftx.at<f32>(y, x) = std::lerp(shiftx.at<f32>(y, xindex1), shiftx.at<f32>(y, xindex2), static_cast<f32>(t));
-          shifty.at<f32>(y, x) = std::lerp(shifty.at<f32>(y, xindex1), shifty.at<f32>(y, xindex2), static_cast<f32>(t));
-          omegax.at<f32>(y, x) = std::lerp(omegax.at<f32>(y, xindex1), omegax.at<f32>(y, xindex2), static_cast<f32>(t));
-          omegay.at<f32>(y, x) = std::lerp(omegay.at<f32>(y, xindex1), omegay.at<f32>(y, xindex2), static_cast<f32>(t));
+          shiftx.at<float>(y, x) = std::lerp(shiftx.at<float>(y, xindex1), shiftx.at<float>(y, xindex2), static_cast<float>(t));
+          shifty.at<float>(y, x) = std::lerp(shifty.at<float>(y, xindex1), shifty.at<float>(y, xindex2), static_cast<float>(t));
+          omegax.at<float>(y, x) = std::lerp(omegax.at<float>(y, xindex1), omegax.at<float>(y, xindex2), static_cast<float>(t));
+          omegay.at<float>(y, x) = std::lerp(omegay.at<float>(y, xindex1), omegay.at<float>(y, xindex2), static_cast<float>(t));
         }
       }
     }
 
-    i32 xsize = 2500;
-    i32 ysize = 101;
-    i32 idstep = 1;
-    i32 idstride = 25;
-    f64 thetamax = ToRadians(50);
-    i32 cadence = 45;
-    i32 idstart = 123456;
+    int xsize = 2500;
+    int ysize = 101;
+    int idstep = 1;
+    int idstride = 25;
+    double thetamax = ToRadians(50);
+    int cadence = 45;
+    int idstart = 123456;
 
     cv::Mat shiftx, shifty, omegax, omegay;
-    std::vector<f64> theta, fshiftx, fshifty, theta0, R;
+    std::vector<double> theta, fshiftx, fshifty, theta0, R;
   };
 
   template <bool Managed = false> // executed automatically by some logic (e.g.
                                   // optimization algorithm) instead of manually
   static DifferentialRotationData Calculate(
-      const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, f32* progress = nullptr)
+      const IPC& ipc, const std::string& dataPath, int xsize, int ysize, int idstep, int idstride, double thetamax, int cadence, int idstart, float* progress = nullptr)
   {
     PROFILE_FUNCTION;
     if constexpr (not Managed)
@@ -192,15 +195,15 @@ public:
 
   template <bool Managed = false> // executed automatically by some logic (e.g.
                                   // optimization algorithm) instead of manually
-  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart,
-      f32* progress, DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
+  static DifferentialRotationData Calculate(const IPC& ipc, const std::string& dataPath, int xsize, int ysize, int idstep, int idstride, double thetamax, int cadence, int idstart,
+      float* progress, DataCache<std::string, cv::Mat>& imageCache, DataCache<std::string, ImageHeader>& headerCache)
   {
     PROFILE_FUNCTION;
     if constexpr (not Managed)
       LOG_FUNCTION;
 
     DifferentialRotationData data(xsize, ysize, idstep, idstride, thetamax, cadence, idstart);
-    std::atomic<i32> progressi = 0;
+    std::atomic<int> progressi = 0;
     const auto tstep = idstep * cadence;
     const auto wxsize = ipc.GetCols();
     const auto wysize = ipc.GetRows();
@@ -212,11 +215,11 @@ public:
     const auto omegaxpred = GetPredictedOmegas(data.theta, 14.296, -1.847, -2.615);
 
 #pragma omp parallel for if (not Managed)
-    for (i32 x = 0; x < xsize; ++x)
+    for (int x = 0; x < xsize; ++x)
       try
       {
         PROFILE_SCOPE(CalculateMeridianShifts);
-        const f64 logprogress = ++progressi;
+        const double logprogress = ++progressi;
         if (progress)
           *progress = logprogress / xsize;
         const auto [id1, id2] = ids[x];
@@ -253,7 +256,7 @@ public:
         if (std::abs(data.fshiftx[xindex]) > fshiftmax or std::abs(data.fshifty[xindex]) > fshiftmax) [[unlikely]]
           continue;
 
-        for (i32 y = 0; y < ysize; ++y)
+        for (int y = 0; y < ysize; ++y)
         {
           PROFILE_SCOPE(CalculateMeridianShift);
           const auto theta = data.theta[y];
@@ -266,10 +269,10 @@ public:
           const auto omegax = std::clamp(std::asin(shiftx / (R * std::cos(theta))) / tstep * RadPerSecToDegPerDay, 0.7 * omegaxpred[y], 1.3 * omegaxpred[y]);
           const auto omegay = (std::asin((R * std::sin(theta) + shifty) / R) - theta) / tstep * RadPerSecToDegPerDay;
 
-          data.shiftx.at<f32>(y, xindex) = shiftx;
-          data.shifty.at<f32>(y, xindex) = shifty;
-          data.omegax.at<f32>(y, xindex) = omegax;
-          data.omegay.at<f32>(y, xindex) = omegay;
+          data.shiftx.at<float>(y, xindex) = shiftx;
+          data.shifty.at<float>(y, xindex) = shifty;
+          data.omegax.at<float>(y, xindex) = omegax;
+          data.omegay.at<float>(y, xindex) = omegay;
         }
       }
       catch (const std::exception& e)
@@ -293,17 +296,17 @@ public:
   }
 
   static void Optimize(
-      IPC& ipc, const std::string& dataPath, i32 xsize, i32 ysize, i32 idstep, i32 idstride, f64 thetamax, i32 cadence, i32 idstart, i32 xsizeopt, i32 ysizeopt, i32 popsize)
+      IPC& ipc, const std::string& dataPath, int xsize, int ysize, int idstep, int idstride, double thetamax, int cadence, int idstart, int xsizeopt, int ysizeopt, int popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;
-    i32 idstrideopt = idstride * std::floor(static_cast<f64>(xsize) / xsizeopt); // automatically stretch opt samples
-                                                                                 // over the entire time span
+    int idstrideopt = idstride * std::floor(static_cast<double>(xsize) / xsizeopt); // automatically stretch opt samples
+                                                                                    // over the entire time span
     LOG_INFO("Optimization xsize: {}", xsizeopt);
     LOG_INFO("Optimization ysize: {}", ysizeopt);
     LOG_INFO("Optimization popsize: {}", popsize);
     LOG_INFO("Optimization idstride: {}", idstrideopt);
-    const usize ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
+    const size_t ids = idstride > 0 ? xsizeopt * 2 : xsizeopt + 1;
     DataCache<std::string, cv::Mat> imageCache{[](const std::string& path)
         {
           PROFILE_SCOPE(Imread);
@@ -320,12 +323,12 @@ public:
     {
       const auto dataopt = Calculate<true>(ipc, dataPath, xsizeopt, ysizeopt, idstep, idstride, thetamax, cadence, idstart, nullptr, imageCache, headerCache);
       if (dataopt.omegax.empty())
-        return std::numeric_limits<f64>::infinity();
+        return std::numeric_limits<double>::infinity();
       const auto omegax = GetRowAverage(dataopt.omegax);
       const auto omegaxfit = PolynomialFit(dataopt.theta, omegax, 2);
 
-      f64 ret = 0;
-      for (usize i = 0; i < omegaxfit.size(); ++i)
+      double ret = 0;
+      for (size_t i = 0; i < omegaxfit.size(); ++i)
       {
         ret += 0.7 * std::pow(omegaxfit[i] - predfit[i], 2); // minimize pred fit diff
         ret += 0.3 * std::pow(omegax[i] - omegaxfit[i], 2);  // minimize variance
@@ -350,7 +353,7 @@ public:
     });
   }
 
-  static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, f64 timestep)
+  static void PlotMeridianCurve(const DifferentialRotationData& data, const std::string& dataPath, double timestep)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;
@@ -362,18 +365,18 @@ public:
     std::vector<cv::Point2d> mcptspred(data.theta.size());                     // [px,px]
     std::vector<cv::Point2d> mcptsz(data.theta.size());                        // [px,px]
 
-    for (usize y = 0; y < data.theta.size(); ++y)
+    for (size_t y = 0; y < data.theta.size(); ++y)
     {
-      const f64 mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / ToDegrees(1));
-      const f64 mcy = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
+      const double mcx = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(omegax[y] * timestep / ToDegrees(1));
+      const double mcy = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcpts[y] = cv::Point2d(mcx, mcy);
 
-      const f64 mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / ToDegrees(1));
-      const f64 mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
+      const double mcxpred = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * timestep / ToDegrees(1));
+      const double mcypred = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptspred[y] = cv::Point2d(mcxpred, mcypred);
 
-      const f64 mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / ToDegrees(1));
-      const f64 mcyz = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
+      const double mcxz = header.xcenter + header.R * std::cos(data.theta[y]) * std::sin(predx[y] * 0 / ToDegrees(1));
+      const double mcyz = header.ycenter - header.R * std::sin(data.theta[y] - header.theta0);
       mcptsz[y] = cv::Point2d(mcxz, mcyz);
     }
 
@@ -383,7 +386,7 @@ public:
     const auto thickness = 13;
     const auto color = 65535. / 255 * cv::Scalar(50., 205., 50.);
     const auto colorpred = 65535. / 255 * cv::Scalar(255., 0, 255.);
-    for (usize y = 0; y < mcpts.size() - 1; ++y)
+    for (size_t y = 0; y < mcpts.size() - 1; ++y)
     {
       if (data.omegax.cols > 10)
       {
@@ -404,14 +407,14 @@ public:
     Plot::Plot("meridian curve", imageclr);
   }
 
-  static void PlotGradualIdStep(const IPC& ipc, i32 maxstep)
+  static void PlotGradualIdStep(const IPC& ipc, int maxstep)
   {
     LOG_FUNCTION;
     const std::string dataPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_day_2500";
-    const i32 idstart = 18933122;
+    const int idstart = 18933122;
     const auto image1 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
 
-    for (i32 idstep = 1; idstep <= maxstep; ++idstep)
+    for (int idstep = 1; idstep <= maxstep; ++idstep)
     {
       const auto image2 = RoiCrop(LoadUnitFloatImage<IPC::Float>(fmt::format("{}/{}.png", dataPath, idstart + idstep)), 4096 / 2, 4096 / 2, ipc.GetCols(), ipc.GetRows());
       ipc.SetDebugName(fmt::format("{}s", idstep * 45));
@@ -428,18 +431,18 @@ private:
     file >> j;
 
     ImageHeader header;
-    header.xcenter = (j["NAXIS1"].get<f64>()) - (j["CRPIX1"].get<f64>()); // [py] (x is flipped, 4095 - fits index from 1)
-    header.ycenter = j["CRPIX2"].get<f64>() - 1;                          // [px] (fits index from 1)
-    header.theta0 = ToRadians(j["CRLT_OBS"].get<f64>());                  // [rad] (convert from deg to rad)
-    header.R = j["RSUN_OBS"].get<f64>() / j["CDELT1"].get<f64>();         // [px] (arcsec / arcsec per pixel)
+    header.xcenter = (j["NAXIS1"].get<double>()) - (j["CRPIX1"].get<double>()); // [py] (x is flipped, 4095 - fits index from 1)
+    header.ycenter = j["CRPIX2"].get<double>() - 1;                             // [px] (fits index from 1)
+    header.theta0 = ToRadians(j["CRLT_OBS"].get<double>());                     // [rad] (convert from deg to rad)
+    header.R = j["RSUN_OBS"].get<double>() / j["CDELT1"].get<double>();         // [px] (arcsec / arcsec per pixel)
     return header;
   }
 
-  static std::vector<f64> GetTimesInDays(i32 tstep, i32 tstride, i32 xsize)
+  static std::vector<double> GetTimesInDays(int tstep, int tstride, int xsize)
   {
-    std::vector<f64> times(xsize);
-    f64 time = 0;
-    for (i32 i = 0; i < xsize; ++i)
+    std::vector<double> times(xsize);
+    double time = 0;
+    for (int i = 0; i < xsize; ++i)
     {
       times[i] = time / 60 / 60 / 24;
       time += tstride != 0 ? tstride : tstep;
@@ -447,41 +450,41 @@ private:
     return times;
   }
 
-  static std::vector<f64> GetRowAverage(const cv::Mat& vals)
+  static std::vector<double> GetRowAverage(const cv::Mat& vals)
   {
     PROFILE_FUNCTION;
-    std::vector<f64> avgs(vals.rows, 0.);
+    std::vector<double> avgs(vals.rows, 0.);
 
-    for (i32 y = 0; y < vals.rows; ++y)
-      for (i32 x = 0; x < vals.cols; ++x)
-        avgs[y] += vals.at<f32>(y, x);
+    for (int y = 0; y < vals.rows; ++y)
+      for (int x = 0; x < vals.cols; ++x)
+        avgs[y] += vals.at<float>(y, x);
 
-    for (i32 y = 0; y < vals.rows; ++y)
+    for (int y = 0; y < vals.rows; ++y)
       avgs[y] /= vals.cols;
 
     return avgs;
   }
 
-  static std::vector<f64> GetVectorAverage(const std::vector<std::vector<f64>>& vecs)
+  static std::vector<double> GetVectorAverage(const std::vector<std::vector<double>>& vecs)
   {
     PROFILE_FUNCTION;
-    std::vector<f64> avg(vecs[0].size());
+    std::vector<double> avg(vecs[0].size());
 
-    for (usize v = 0; v < vecs.size(); ++v)
-      for (usize i = 0; i < vecs[v].size(); ++i)
+    for (size_t v = 0; v < vecs.size(); ++v)
+      for (size_t i = 0; i < vecs[v].size(); ++i)
         avg[i] += vecs[v][i];
 
-    for (usize i = 0; i < avg.size(); ++i)
+    for (size_t i = 0; i < avg.size(); ++i)
       avg[i] /= vecs.size();
 
     return avg;
   }
 
-  static std::vector<f64> GetPredictedOmegas(const std::vector<f64>& theta, f64 A, f64 B, f64 C)
+  static std::vector<double> GetPredictedOmegas(const std::vector<double>& theta, double A, double B, double C)
   {
     PROFILE_FUNCTION;
-    std::vector<f64> omegas(theta.size());
-    for (usize i = 0; i < theta.size(); ++i)
+    std::vector<double> omegas(theta.size());
+    for (size_t i = 0; i < theta.size(); ++i)
       omegas[i] = A + B * std::pow(std::sin(theta[i]), 2) + C * std::pow(std::sin(theta[i]), 4);
     return omegas;
   }
@@ -533,11 +536,11 @@ private:
         .ylabel = "average omega x [deg/day]",
     });
 
-    const f64 xmin = times.front(), xmax = times.back();
-    const f64 ymin = ToDegrees(data.theta.back()), ymax = ToDegrees(data.theta.front());
+    const double xmin = times.front(), xmax = times.back();
+    const double ymin = ToDegrees(data.theta.back()), ymax = ToDegrees(data.theta.front());
     const std::string xlabel = "time [days]";
     const std::string ylabel = "latitude [deg]";
-    const f64 aspectratio = 2;
+    const double aspectratio = 2;
     Plot::Plot({.name = "shift x",
         .z = data.shiftx,
         .xmin = xmin,
@@ -580,7 +583,7 @@ private:
         .aspectratio = aspectratio});
   }
 
-  static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, i32 xsizeopt, i32 ysizeopt, i32 popsize)
+  static void SaveOptimizedParameters(const IPC& ipc, const std::string& dataPath, int xsizeopt, int ysizeopt, int popsize)
   {
     PROFILE_FUNCTION;
     LOG_FUNCTION;

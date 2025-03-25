@@ -4,7 +4,7 @@
 class CrossCorrelation
 {
 public:
-  using Float = f64;
+  using Float = double;
 
   static cv::Point2d Calculate(const cv::Mat& image1, const cv::Mat& image2)
   {
@@ -57,11 +57,11 @@ private:
   static cv::Mat CalculateCrossPowerSpectrum(cv::Mat&& dft1, cv::Mat&& dft2)
   {
     PROFILE_FUNCTION;
-    for (i32 row = 0; row < dft1.rows; ++row)
+    for (int row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec<Float, 2>>(row); // reuse dft1 memory
       const auto dft2p = dft2.ptr<cv::Vec<Float, 2>>(row);
-      for (i32 col = 0; col < dft1.cols; ++col)
+      for (int col = 0; col < dft1.cols; ++col)
       {
         const Float re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
         const Float im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];

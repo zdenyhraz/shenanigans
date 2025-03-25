@@ -1,9 +1,11 @@
 #include "ImageRegistrationDataset.hpp"
 #include "IPC.hpp"
 #include "ImageProcessing/Noise.hpp"
+#include "Math/Transform.hpp"
+#include "Utils/Load.hpp"
 
 std::vector<ImagePair> CreateImagePairs(
-    const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift, cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, i32 iters, f64 noiseStddev, f32* progress)
+    const IPC& ipc, const std::vector<cv::Mat>& images, cv::Point2d maxShift, cv::Point2d shiftOffset1, cv::Point2d shiftOffset2, int iters, double noiseStddev, float* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -21,8 +23,8 @@ std::vector<ImagePair> CreateImagePairs(
 
   std::vector<ImagePair> imagePairs;
   imagePairs.reserve(images.size() * iters * iters);
-  std::atomic<i32> progressidx = 0;
-  i32 imageidx = 0;
+  std::atomic<int> progressidx = 0;
+  int imageidx = 0;
   for (const auto& image : images)
   {
     LOG_DEBUG("Creating {} image pairs from image {}/{}", iters * iters, ++imageidx, images.size());
@@ -31,12 +33,12 @@ std::vector<ImagePair> CreateImagePairs(
     AddNoise<IPC::Float>(image1, noiseStddev);
 
 #pragma omp parallel for
-    for (i32 row = 0; row < iters; ++row)
+    for (int row = 0; row < iters; ++row)
     {
-      for (i32 col = 0; col < iters; ++col)
+      for (int col = 0; col < iters; ++col)
       {
         if (progress)
-          *progress = static_cast<f32>(++progressidx) / (images.size() * iters * iters);
+          *progress = static_cast<float>(++progressidx) / (images.size() * iters * iters);
 
         const auto shift = cv::Point2d(maxShift.x * (-1.0 + 2.0 * col / (iters - 1)), maxShift.y * (-1.0 + 2.0 * (iters - 1 - row) / (iters - 1))) + shiftOffset2;
         cv::Mat image2 = RoiCropMid(Shifted(image, shiftOffset1 + shift), ipc.GetCols(), ipc.GetRows());
@@ -81,13 +83,13 @@ ImageRegistrationDataset LoadImageRegistrationDataset(const std::string& path)
   dataset.maxShift = j["maxShift"];
   dataset.noiseStddev = j["noiseStddev"];
 
-  for (i32 idx = 0; idx < dataset.imageCount * dataset.iters * dataset.iters; ++idx)
+  for (int idx = 0; idx < dataset.imageCount * dataset.iters * dataset.iters; ++idx)
   {
     const std::string path1 = j["image1Paths"][idx];
     const std::string path2 = j["image2Paths"][idx];
-    const std::pair<f64, f64> shift = j["shifts"][idx];
-    const i32 row = j["coords"][idx][0];
-    const i32 col = j["coords"][idx][1];
+    const std::pair<double, double> shift = j["shifts"][idx];
+    const int row = j["coords"][idx][0];
+    const int col = j["coords"][idx][1];
 
     dataset.imagePairs.emplace_back(LoadUnitFloatImage<IPC::Float>(path1), LoadUnitFloatImage<IPC::Float>(path2), cv::Point2d(shift.first, shift.second), row, col);
   }
@@ -95,7 +97,7 @@ ImageRegistrationDataset LoadImageRegistrationDataset(const std::string& path)
   return dataset;
 }
 
-void GenerateImageRegistrationDataset(const IPC& ipc, const std::string& path, const std::string& saveDir, i32 iters, f64 maxShiftAbs, f64 noiseStddev, f32* progress)
+void GenerateImageRegistrationDataset(const IPC& ipc, const std::string& path, const std::string& saveDir, int iters, double maxShiftAbs, double noiseStddev, float* progress)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -114,9 +116,9 @@ void GenerateImageRegistrationDataset(const IPC& ipc, const std::string& path, c
     std::filesystem::create_directory(datasetDir);
 
   std::vector<std::string> image1Paths, image2Paths;
-  std::vector<std::pair<f64, f64>> shifts;
-  std::vector<std::pair<i32, i32>> coords;
-  i32 idx = 0;
+  std::vector<std::pair<double, double>> shifts;
+  std::vector<std::pair<int, int>> coords;
+  int idx = 0;
   for (auto& imagePair : imagePairs)
   {
     auto& image1 = imagePair.image1;
@@ -138,7 +140,7 @@ void GenerateImageRegistrationDataset(const IPC& ipc, const std::string& path, c
     coords.emplace_back(imagePair.row, imagePair.col);
 
     if (progress)
-      *progress = static_cast<f32>(++idx) / imagePairs.size();
+      *progress = static_cast<float>(++idx) / imagePairs.size();
   }
 
   LOG_DEBUG("Generating dataset json file");

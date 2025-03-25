@@ -48,10 +48,10 @@ struct fmt::formatter<cv::Mat>
       return fmt::format_to(ctx.out(), "[]");
 
     fmt::format_to(ctx.out(), "[");
-    for (i32 r = 0; r < mat.rows; ++r)
+    for (int r = 0; r < mat.rows; ++r)
     {
-      for (i32 c = 0; c < mat.cols; ++c)
-        fmt::format_to(ctx.out(), "{}, ", mat.at<f32>(r, c));
+      for (int c = 0; c < mat.cols; ++c)
+        fmt::format_to(ctx.out(), "{}, ", mat.at<float>(r, c));
       fmt::format_to(ctx.out(), "\n");
     }
 

@@ -61,19 +61,6 @@
 #  define PROFILE_SCOPE(name)
 #endif
 
-using i8 = int8_t;
-using u8 = uint8_t;
-using i16 = int16_t;
-using u16 = uint16_t;
-using i32 = int32_t;
-using u32 = uint32_t;
-using i64 = int64_t;
-using u64 = uint64_t;
-using usize = size_t;
-using f32 = float;
-using f64 = double;
-using f128 = long double;
-
 namespace py = pybind11;
 namespace json = nlohmann;
 using namespace std::complex_literals;
@@ -81,19 +68,4 @@ using namespace std::chrono_literals;
 using namespace pybind11::literals;
 
 #include "Log/Log.hpp"
-#include "Math/Functions.hpp"
-#include "Math/Transform.hpp"
-#include "Math/RNG.hpp"
-#include "Math/Statistics.hpp"
-#include "Utils/Filesystem.hpp"
 #include "Utils/Exception.hpp"
-#include "Utils/DateTime.hpp"
-#include "Utils/Operators.hpp"
-#include "Utils/Timer.hpp"
-#include "Utils/Formatters.hpp"
-#include "Utils/ThreadUtils.hpp"
-#include "Utils/Crop.hpp"
-#include "Utils/Draw.hpp"
-#include "Utils/Load.hpp"
-#include "Utils/Vectmat.hpp"
-#include "Plot/Plot.hpp"

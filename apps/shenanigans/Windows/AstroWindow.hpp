@@ -7,16 +7,16 @@ class AstroWindow : public Window
 {
   struct DiffrotParameters
   {
-    i32 xsize = 2500;
-    i32 ysize = 101;
-    i32 idstep = 1;
-    i32 idstride = 25;
-    f32 thetamax = 50;
-    i32 cadence = 45;
-    i32 idstart = 18933122;
-    i32 xsizeopt = 1;
-    i32 ysizeopt = 101;
-    i32 popsize = 6;
+    int xsize = 2500;
+    int ysize = 101;
+    int idstep = 1;
+    int idstride = 25;
+    float thetamax = 50;
+    int cadence = 45;
+    int idstart = 18933122;
+    int xsizeopt = 1;
+    int ysizeopt = 101;
+    int popsize = 6;
     std::string dataPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_month_5000";
     std::string loadPath = "/media/zdenyhraz/Zdeny_exSSD/diffrot_month_5000/xd.json";
   };
@@ -24,7 +24,7 @@ class AstroWindow : public Window
   DiffrotParameters mDiffrotParameters;
   DifferentialRotation::DifferentialRotationData mDiffrotData{mDiffrotParameters.xsize, mDiffrotParameters.ysize, mDiffrotParameters.idstep, mDiffrotParameters.idstride,
       mDiffrotParameters.thetamax, mDiffrotParameters.cadence, mDiffrotParameters.idstart};
-  f32 mProgress = 0;
+  float mProgress = 0;
   SolarWindSpeedParameters mSwindParameters;
 
 public:

@@ -3,12 +3,12 @@
 template <int N>
 class FrameAverager
 {
-  usize index = 0;
-  f32 sum = 0;
-  std::array<f32, N> data{};
+  size_t index = 0;
+  float sum = 0;
+  std::array<float, N> data{};
 
 public:
-  void Register(f32 value)
+  void Register(float value)
   {
     const auto i = index % N;
     sum -= data[i];
@@ -17,5 +17,5 @@ public:
     ++index;
   }
 
-  f32 Get() const { return sum / N; }
+  float Get() const { return sum / N; }
 };

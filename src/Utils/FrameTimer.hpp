@@ -16,5 +16,5 @@ public:
     averager.Register(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
   }
 
-  f32 GetDurationMilliseconds() { averager.Get(); }
+  float GetDurationMilliseconds() { averager.Get(); }
 };

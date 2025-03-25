@@ -5,7 +5,7 @@
 #include "PhaseCorrelation.hpp"
 #include "ImageRegistrationDataset.hpp"
 
-void IPCOptimization::Optimize(IPC& ipc, const std::string& path, i32 popSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::string& path, int popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -16,9 +16,9 @@ try
   const auto obj = [&dataset](const IPC& ipc_)
   {
     if (std::floor(ipc_.GetL2Usize() * ipc_.GetL1ratio()) < 3)
-      return std::numeric_limits<f64>::max();
+      return std::numeric_limits<double>::max();
 
-    f64 avgerror = 0;
+    double avgerror = 0;
     for (const auto& imagePair : dataset.imagePairs)
     {
       avgerror += Magnitude(ipc_.Calculate(imagePair.image1, imagePair.image2) - imagePair.shift);
@@ -33,7 +33,7 @@ catch (const std::exception& e)
   LOG_EXCEPTION(e);
 }
 
-void IPCOptimization::Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize)
+void IPCOptimization::Optimize(IPC& ipc, const std::function<double(const IPC&)>& obj, int popSize)
 try
 {
   PROFILE_FUNCTION;
@@ -51,12 +51,12 @@ try
 
   if (objAfter >= objBefore)
   {
-    LOG_WARNING("Objective function value not improved ({}%), parameters unchanged", static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+    LOG_WARNING("Objective function value not improved ({}%), parameters unchanged", static_cast<int>((objBefore - objAfter) / objBefore * 100));
     return;
   }
 
   ipc = ipcAfter;
-  LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<i32>((objBefore - objAfter) / objBefore * 100));
+  LOG_SUCCESS("Average improvement: {:.2e} -> {:.2e} ({}%)", objBefore, objAfter, static_cast<int>((objBefore - objAfter) / objBefore * 100));
   LOG_SUCCESS("Iterative Phase Correlation parameter optimization successful");
 }
 catch (const std::exception& e)
@@ -64,37 +64,37 @@ catch (const std::exception& e)
   LOG_EXCEPTION(e);
 }
 
-IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<f64>& params)
+IPC IPCOptimization::CreateIPCFromParams(const IPC& ipc_, const std::vector<double>& params)
 {
   PROFILE_FUNCTION;
   IPC ipc(ipc_.mRows, ipc_.mCols);
-  ipc.SetBandpassType(static_cast<IPC::BandpassType>((i32)params[BandpassTypeParameter]));
+  ipc.SetBandpassType(static_cast<IPC::BandpassType>((int)params[BandpassTypeParameter]));
   ipc.SetBandpassParameters(params[BandpassLParameter], params[BandpassHParameter]);
-  ipc.SetInterpolationType(static_cast<IPC::InterpolationType>((i32)params[InterpolationTypeParameter]));
-  ipc.SetWindowType(static_cast<IPC::WindowType>((i32)params[WindowTypeParameter]));
-  ipc.SetL1WindowType(static_cast<IPC::L1WindowType>((i32)params[L1WindowTypeParameter]));
+  ipc.SetInterpolationType(static_cast<IPC::InterpolationType>((int)params[InterpolationTypeParameter]));
+  ipc.SetWindowType(static_cast<IPC::WindowType>((int)params[WindowTypeParameter]));
+  ipc.SetL1WindowType(static_cast<IPC::L1WindowType>((int)params[L1WindowTypeParameter]));
   ipc.SetL2Usize(params[L2UsizeParameter]);
   ipc.SetL1ratio(params[L1ratioParameter]);
   ipc.SetCrossPowerEpsilon(params[CPepsParameter]);
   return ipc;
 }
 
-std::function<f64(const std::vector<f64>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::function<f64(const IPC&)>& obj)
+std::function<double(const std::vector<double>&)> IPCOptimization::CreateObjectiveFunction(const IPC& ipc_, const std::function<double(const IPC&)>& obj)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
-  return [&](const std::vector<f64>& params)
+  return [&](const std::vector<double>& params)
   {
     const auto ipc = CreateIPCFromParams(ipc_, params);
     if (std::floor(ipc.GetL2Usize() * ipc.GetL1ratio()) < 3)
-      return std::numeric_limits<f64>::max();
+      return std::numeric_limits<double>::max();
 
     return obj(ipc);
   };
 }
 
-std::vector<f64> IPCOptimization::CalculateOptimalParameters(
-    const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize)
+std::vector<double> IPCOptimization::CalculateOptimalParameters(
+    const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int popSize)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;
@@ -108,23 +108,23 @@ std::vector<f64> IPCOptimization::CalculateOptimalParameters(
   evo.SetName("IPC");
   evo.SetParameterNames({"BP", "BPL", "BPH", "INT", "WIN", "L2U", "L1R", "CPeps", "L1WIN"});
   evo.SetLowerBounds({0, -0.5, 0, 0, 0, 21, 0.1, -1e-4, 0});
-  evo.SetUpperBounds({static_cast<f64>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<f64>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
-      static_cast<f64>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<f64>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8});
+  evo.SetUpperBounds({static_cast<double>(IPC::BandpassType::BandpassTypeCount) - 1e-8, 0.5, 2., static_cast<double>(IPC::InterpolationType::InterpolationTypeCount) - 1e-8,
+      static_cast<double>(IPC::WindowType::WindowTypeCount) - 1e-8, 501, 0.8, 1e-4, static_cast<double>(IPC::L1WindowType::L1WindowTypeCount) - 1e-8});
   evo.SetPlotOutput(true);
   evo.SetConsoleOutput(true);
-  evo.SetParameterValueToNameFunction("BP", [](f64 val) { return IPC::BandpassType2String(static_cast<IPC::BandpassType>((i32)val)); });
-  evo.SetParameterValueToNameFunction("BPL", [](f64 val) { return fmt::format("{:.2f}", val); });
-  evo.SetParameterValueToNameFunction("BPH", [](f64 val) { return fmt::format("{:.2f}", val); });
-  evo.SetParameterValueToNameFunction("INT", [](f64 val) { return IPC::InterpolationType2String(static_cast<IPC::InterpolationType>((i32)val)); });
-  evo.SetParameterValueToNameFunction("WIN", [](f64 val) { return IPC::WindowType2String(static_cast<IPC::WindowType>((i32)val)); });
-  evo.SetParameterValueToNameFunction("L2U", [](f64 val) { return fmt::format("{}", static_cast<i32>(val)); });
-  evo.SetParameterValueToNameFunction("L1R", [](f64 val) { return fmt::format("{:.2f}", val); });
-  evo.SetParameterValueToNameFunction("CPeps", [](f64 val) { return fmt::format("{:.2e}", val); });
-  evo.SetParameterValueToNameFunction("L1WIN", [](f64 val) { return IPC::L1WindowType2String(static_cast<IPC::L1WindowType>((i32)val)); });
+  evo.SetParameterValueToNameFunction("BP", [](double val) { return IPC::BandpassType2String(static_cast<IPC::BandpassType>((int)val)); });
+  evo.SetParameterValueToNameFunction("BPL", [](double val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("BPH", [](double val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("INT", [](double val) { return IPC::InterpolationType2String(static_cast<IPC::InterpolationType>((int)val)); });
+  evo.SetParameterValueToNameFunction("WIN", [](double val) { return IPC::WindowType2String(static_cast<IPC::WindowType>((int)val)); });
+  evo.SetParameterValueToNameFunction("L2U", [](double val) { return fmt::format("{}", static_cast<int>(val)); });
+  evo.SetParameterValueToNameFunction("L1R", [](double val) { return fmt::format("{:.2f}", val); });
+  evo.SetParameterValueToNameFunction("CPeps", [](double val) { return fmt::format("{:.2e}", val); });
+  evo.SetParameterValueToNameFunction("L1WIN", [](double val) { return IPC::L1WindowType2String(static_cast<IPC::L1WindowType>((int)val)); });
   return evo.Optimize(obj, valid).optimum;
 }
 
-void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters)
+void IPCOptimization::ApplyOptimalParameters(IPC& ipc, const std::vector<double>& optimalParameters)
 {
   PROFILE_FUNCTION;
   LOG_FUNCTION;

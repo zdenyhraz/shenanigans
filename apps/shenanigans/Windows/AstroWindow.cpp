@@ -1,4 +1,5 @@
 #include "AstroWindow.hpp"
+#include "Utils/Async.hpp"
 
 void AstroWindow::Render()
 {

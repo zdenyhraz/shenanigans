@@ -3,7 +3,7 @@
 class OptimizationAlgorithm
 {
 public:
-  enum TerminationReason : u8
+  enum TerminationReason : uint8_t
   {
     NotTerminated = 0,
     OptimalFitnessReached,
@@ -16,38 +16,38 @@ public:
 
   struct OptimizationResult
   {
-    std::vector<f64> optimum;
+    std::vector<double> optimum;
     TerminationReason terminationReason = NotTerminated;
-    i32 functionEvaluations = -1;
-    std::vector<f64> bestFitnessProgress;
-    std::vector<std::vector<f64>> bestParametersProgress;
-    std::vector<std::vector<f64>> evaluatedParameters;
+    int functionEvaluations = -1;
+    std::vector<double> bestFitnessProgress;
+    std::vector<std::vector<double>> bestParametersProgress;
+    std::vector<std::vector<double>> evaluatedParameters;
   };
 
-  using ObjectiveFunction = std::function<f64(const std::vector<f64>&)>;
+  using ObjectiveFunction = std::function<double(const std::vector<double>&)>;
 
 protected:
-  usize N = 1;                                            // the problem dimension
-  std::vector<f64> mLowerBounds;                          // lower search space bounds
-  std::vector<f64> mUpperBounds;                          // upper search space bounds
-  f64 mOptimalFitness = -std::numeric_limits<f64>::max(); // satisfactory function value
-  usize mMaxFunEvals = std::numeric_limits<i32>::max();   // maximum # of function evaluations
-  usize maxGen = 1000;                                    // maximum # of algorithm iterations
+  size_t N = 1;                                                 // the problem dimension
+  std::vector<double> mLowerBounds;                             // lower search space bounds
+  std::vector<double> mUpperBounds;                             // upper search space bounds
+  double mOptimalFitness = -std::numeric_limits<double>::max(); // satisfactory function value
+  size_t mMaxFunEvals = std::numeric_limits<int>::max();        // maximum # of function evaluations
+  size_t maxGen = 1000;                                         // maximum # of algorithm iterations
   bool mConsoleOutput = true;
   bool mPlotOutput = true;
   bool mSaveProgress = false;
   std::string mName;
   std::vector<std::string> mParameterNames;
-  std::vector<std::function<std::string(f64)>> mParameterValueToNameFunctions;
+  std::vector<std::function<std::string(double)>> mParameterValueToNameFunctions;
 
-  static f64 ClampSmooth(f64 x_new, f64 x_prev, f64 clampMin, f64 clampMax)
+  static double ClampSmooth(double x_new, double x_prev, double clampMin, double clampMax)
   {
     return x_new < clampMin ? (x_prev + clampMin) / 2 : x_new > clampMax ? (x_prev + clampMax) / 2 : x_new;
   }
 
   static const char* GetTerminationReasonString(const TerminationReason& reason);
 
-  usize GetParameterIndex(const std::string& parameterName)
+  size_t GetParameterIndex(const std::string& parameterName)
   {
     const auto idx = std::ranges::find(mParameterNames, parameterName);
     if (idx == mParameterNames.end())
@@ -56,22 +56,22 @@ protected:
   }
 
 public:
-  explicit OptimizationAlgorithm(i32 N, const std::string& optname = "default");
+  explicit OptimizationAlgorithm(int N, const std::string& optname = "default");
   virtual ~OptimizationAlgorithm() = default;
 
   virtual OptimizationResult Optimize(const ObjectiveFunction& obj, const std::optional<ObjectiveFunction>& valid = std::nullopt) = 0;
 
-  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<f64>& baseParams, i32 iters, i32 xParamIndex, i32 yParamIndex, f64 xmin, f64 xmax, f64 ymin,
-      f64 ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
+  static void PlotObjectiveFunctionLandscape(ObjectiveFunction f, const std::vector<double>& baseParams, int iters, int xParamIndex, int yParamIndex, double xmin, double xmax,
+      double ymin, double ymax, const std::string& xName, const std::string& yName, const std::string& funName, const OptimizationResult* optResult = nullptr);
 
-  void SetMaxFunEvals(usize maxFunEvals) { mMaxFunEvals = maxFunEvals; }
-  void SetOptimalFitness(f64 optimalFitness) { mOptimalFitness = optimalFitness; }
+  void SetMaxFunEvals(size_t maxFunEvals) { mMaxFunEvals = maxFunEvals; }
+  void SetOptimalFitness(double optimalFitness) { mOptimalFitness = optimalFitness; }
   void SetConsoleOutput(bool ConsoleOutput) { mConsoleOutput = ConsoleOutput; }
   void SetPlotOutput(bool PlotOutput) { mPlotOutput = PlotOutput; }
   void SetSaveProgress(bool SaveProgress) { mSaveProgress = SaveProgress; }
   void SetName(const std::string& optname) { mName = optname; }
-  void SetLowerBounds(const std::vector<f64>& lowerBounds) { mLowerBounds = lowerBounds; }
-  void SetUpperBounds(const std::vector<f64>& upperBounds) { mUpperBounds = upperBounds; }
+  void SetLowerBounds(const std::vector<double>& lowerBounds) { mLowerBounds = lowerBounds; }
+  void SetUpperBounds(const std::vector<double>& upperBounds) { mUpperBounds = upperBounds; }
 
   void SetParameterNames(const std::vector<std::string>& ParameterNames)
   {
@@ -80,22 +80,22 @@ public:
     mParameterNames = ParameterNames;
   }
 
-  void SetParameterValueToNameFunction(usize ParameterIndex, const std::function<std::string(f64)>& fun)
+  void SetParameterValueToNameFunction(size_t ParameterIndex, const std::function<std::string(double)>& fun)
   {
     if (ParameterIndex < N)
       mParameterValueToNameFunctions[ParameterIndex] = fun;
   }
 
-  void SetParameterValueToNameFunction(const std::string& ParameterName, const std::function<std::string(f64)>& fun)
+  void SetParameterValueToNameFunction(const std::string& ParameterName, const std::function<std::string(double)>& fun)
   {
-    for (usize i = 0; i < N; ++i)
+    for (size_t i = 0; i < N; ++i)
       if (mParameterNames[i] == ParameterName)
         return SetParameterValueToNameFunction(i, fun);
 
     LOG_WARNING("Parameter name {} not defined, ignoring value -> name function", ParameterName);
   }
 
-  void SetBounds(const std::string& parameterName, f64 lower, f64 upper)
+  void SetBounds(const std::string& parameterName, double lower, double upper)
   {
     const auto index = GetParameterIndex(parameterName);
     mLowerBounds[index] = lower;

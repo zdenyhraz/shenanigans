@@ -6,19 +6,19 @@ class IPCWindow : public Window
 {
   struct IPCParameters
   {
-    i32 Rows = 512;
-    i32 Cols = 512;
-    f32 BPL = 0;
-    f32 BPH = 1;
-    i32 L2size = 7;
-    f32 L1ratio = 0.45;
-    i32 L2Usize = 357;
-    i32 MaxIter = 10;
-    f32 CPeps = 0;
-    i32 WinT = static_cast<i32>(IPC::WindowType::Hann);
-    i32 BPT = static_cast<i32>(IPC::BandpassType::Gaussian);
-    i32 IntT = static_cast<i32>(IPC::InterpolationType::Linear);
-    i32 L1WinT = static_cast<i32>(IPC::L1WindowType::Circular);
+    int Rows = 512;
+    int Cols = 512;
+    float BPL = 0;
+    float BPH = 1;
+    int L2size = 7;
+    float L1ratio = 0.45;
+    int L2Usize = 357;
+    int MaxIter = 10;
+    float CPeps = 0;
+    int WinT = static_cast<int>(IPC::WindowType::Hann);
+    int BPT = static_cast<int>(IPC::BandpassType::Gaussian);
+    int IntT = static_cast<int>(IPC::InterpolationType::Linear);
+    int L1WinT = static_cast<int>(IPC::L1WindowType::Circular);
     static constexpr const char* WindowTypes[] = {"None", "Hann"};
     static constexpr const char* BandpassTypes[] = {"None", "Rectangular", "Gaussian"};
     static constexpr const char* InterpolationTypes[] = {"NearestNeighbor", "Linear", "Cubic"};
@@ -31,11 +31,11 @@ class IPCWindow : public Window
     std::string generateDirectory = "../debug/ipcopt";
     std::string debugImage1Path = "data/debug/artificial1.png";
     std::string debugImage2Path = "data/debug/artificial2.png";
-    f32 maxShift = 2.5;
-    f32 noiseStddev = 0.0;
-    i32 iters = 51;
-    f32 testRatio = 0.2;
-    i32 popSize = 18;
+    float maxShift = 2.5;
+    float noiseStddev = 0.0;
+    int iters = 51;
+    float testRatio = 0.2;
+    int popSize = 18;
   };
 
   void UpdateIPCParameters(IPC& ipc);

@@ -17,7 +17,7 @@ TEST(FourierTest, ForwardInverseConsistency)
   ASSERT_EQ(ifft.depth(), img.depth());
   ASSERT_EQ(ifft.channels(), img.channels());
 
-  for (i32 r = 0; r < img.rows; ++r)
-    for (i32 c = 0; c < img.cols; ++c)
-      ASSERT_NEAR(ifft.at<f32>(r, c), img.at<f32>(r, c), 1e-6);
+  for (int r = 0; r < img.rows; ++r)
+    for (int c = 0; c < img.cols; ++c)
+      ASSERT_NEAR(ifft.at<float>(r, c), img.at<float>(r, c), 1e-6);
 }

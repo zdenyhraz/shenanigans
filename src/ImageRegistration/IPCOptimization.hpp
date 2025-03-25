@@ -6,7 +6,7 @@ class IPC;
 class IPCOptimization
 {
 public:
-  enum OptimizedParameters : u8
+  enum OptimizedParameters : uint8_t
   {
     BandpassTypeParameter,
     BandpassLParameter,
@@ -20,12 +20,13 @@ public:
     OptimizedParameterCount, // last
   };
 
-  static void Optimize(IPC& ipc, const std::string& path, i32 popSize = 42);
-  static void Optimize(IPC& ipc, const std::function<f64(const IPC&)>& obj, i32 popSize = 42);
+  static void Optimize(IPC& ipc, const std::string& path, int popSize = 42);
+  static void Optimize(IPC& ipc, const std::function<double(const IPC&)>& obj, int popSize = 42);
 
 private:
-  static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<f64>& params);
-  static std::function<f64(const std::vector<f64>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<f64(const IPC&)>& obj);
-  static std::vector<f64> CalculateOptimalParameters(const std::function<f64(const std::vector<f64>&)>& obj, const std::function<f64(const std::vector<f64>&)>& valid, i32 popSize);
-  static void ApplyOptimalParameters(IPC& ipc, const std::vector<f64>& optimalParameters);
+  static IPC CreateIPCFromParams(const IPC& ipc, const std::vector<double>& params);
+  static std::function<double(const std::vector<double>&)> CreateObjectiveFunction(const IPC& ipc, const std::function<double(const IPC&)>& obj);
+  static std::vector<double> CalculateOptimalParameters(
+      const std::function<double(const std::vector<double>&)>& obj, const std::function<double(const std::vector<double>&)>& valid, int popSize);
+  static void ApplyOptimalParameters(IPC& ipc, const std::vector<double>& optimalParameters);
 };

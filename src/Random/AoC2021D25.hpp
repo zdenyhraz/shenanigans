@@ -7,7 +7,7 @@ struct Seafloor
 {
   explicit Seafloor(const std::string& str) { Parse(str); };
 
-  enum Entity : u8
+  enum Entity : uint8_t
   {
     None,
     Right,
@@ -17,14 +17,14 @@ struct Seafloor
   std::vector<std::vector<Entity>> currentmap;
   std::vector<std::vector<Entity>> nextmap;
   cv::Mat pic;
-  i32 width = 0;
-  i32 height = 0;
-  i32 steps = 0;
+  int width = 0;
+  int height = 0;
+  int steps = 0;
 
   void Parse(const std::string& str)
   {
-    i32 x = 0;
-    i32 y = 0;
+    int x = 0;
+    int y = 0;
     std::vector<std::tuple<cv::Point, Entity>> cucumbers;
     for (const auto character : str)
     {
@@ -50,8 +50,8 @@ struct Seafloor
     for (auto& row : currentmap)
       row.resize(width);
 
-    for (i32 r = 0; r < height; r++)
-      for (i32 c = 0; c < width; c++)
+    for (int r = 0; r < height; r++)
+      for (int c = 0; c < width; c++)
         currentmap[r][c] = None;
     nextmap = currentmap;
 
@@ -89,9 +89,9 @@ struct Seafloor
 
   bool EntityStep(Entity ent)
   {
-    for (i32 r = 0; r < height; r++)
+    for (int r = 0; r < height; r++)
     {
-      for (i32 c = 0; c < width; c++)
+      for (int c = 0; c < width; c++)
       {
         if (currentmap[r][c] == None)
           continue;
@@ -103,8 +103,8 @@ struct Seafloor
         }
 
         const auto shift = GetShift(ent);
-        const i32 nr = (r + shift.y) % height;
-        const i32 nc = (c + shift.x) % width;
+        const int nr = (r + shift.y) % height;
+        const int nc = (c + shift.x) % width;
 
         if (currentmap[nr][nc] == None)
           nextmap[nr][nc] = ent; // move
@@ -119,8 +119,8 @@ struct Seafloor
   {
     bool moved = currentmap != nextmap;
     currentmap = nextmap;
-    for (i32 r = 0; r < height; r++)
-      for (i32 c = 0; c < width; c++)
+    for (int r = 0; r < height; r++)
+      for (int c = 0; c < width; c++)
         nextmap[r][c] = None;
     return moved;
   }
@@ -134,7 +134,7 @@ struct Seafloor
     return (movedRight or movedDown) and steps < 1e5;
   }
 
-  i32 GetStabilitySteps()
+  int GetStabilitySteps()
   {
     while (Step())
     {
@@ -145,9 +145,9 @@ struct Seafloor
   void Debug()
   {
     pic = cv::Mat::zeros(height, width, CV_32F);
-    for (i32 r = 0; r < height; r++)
-      for (i32 c = 0; c < width; c++)
-        pic.at<f32>(r, c) = currentmap[r][c];
+    for (int r = 0; r < height; r++)
+      for (int c = 0; c < width; c++)
+        pic.at<float>(r, c) = currentmap[r][c];
 
     if (width < 50 or height < 50)
       cv::resize(pic, pic, cv::Size(width * 10, height * 10), cv::INTER_NEAREST);
@@ -160,17 +160,17 @@ struct Seafloor
       return; // too long for text output
 
     LOG_DEBUG("Step {}:", steps);
-    for (i32 r = 0; r < height; r++)
+    for (int r = 0; r < height; r++)
     {
       std::string line;
-      for (i32 c = 0; c < width; c++)
+      for (int c = 0; c < width; c++)
         line += GetString(currentmap[r][c]);
       LOG_DEBUG("{}", line);
     }
   }
 };
 
-u64 AoC2021D25()
+uint64_t AoC2021D25()
 {
   std::string input = R"(..........
 .>v....v..

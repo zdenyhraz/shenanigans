@@ -1,7 +1,7 @@
 #pragma once
 
 void GLFWInitialize();
-GLFWwindow* GLFWCreateWindow(i32 width, i32 height, bool hidden = false);
+GLFWwindow* GLFWCreateWindow(int width, int height, bool hidden = false);
 void GLFWInitializeGL(GLFWwindow* window);
 void GLFWSetWindowCallback(GLFWwindow* window, GLFWkeyfun callback);
 ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem::path& iniPath = "", const std::filesystem::path& fontPath = "");
@@ -14,7 +14,7 @@ void SwapBuffers(GLFWwindow* window);
 void ImGuiShutdown();
 void GLFWShutdown(GLFWwindow* window);
 void GLFWCloseWindow(GLFWwindow* window);
-void GLFWSetWindowIcon(GLFWwindow* window, i32 width, i32 height, uchar* data);
+void GLFWSetWindowIcon(GLFWwindow* window, int width, int height, uchar* data);
 void ImGuiSetDarkTheme();
 void ImGuiSetClassicTheme();
 void ImGuiSetLightTheme();

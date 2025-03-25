@@ -1,4 +1,5 @@
 #pragma once
+#include "Utils/Filesystem.hpp"
 
 #ifdef _MSC_VER
 #  include <stacktrace>

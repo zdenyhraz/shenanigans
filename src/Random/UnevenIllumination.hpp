@@ -1,7 +1,8 @@
 #pragma once
 #include "Math/Fourier.hpp"
+#include "Plot/Plot.hpp"
 
-void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, i32 tileGridSize, i32 clipLimit)
+void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, int tileGridSize, int clipLimit)
 {
   cv::Mat imageLAB;
   cv::cvtColor(image, imageLAB, cv::COLOR_BGR2Lab);
@@ -22,7 +23,7 @@ void CorrectUnevenIlluminationCLAHE(const cv::Mat& image, i32 tileGridSize, i32 
   Plot::Plot("clahe output", imageCLAHE);
 }
 
-void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.001)
+void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, double cutoff = 0.001)
 {
   cv::Mat imageLAB;
   cv::cvtColor(image, imageLAB, cv::COLOR_BGR2Lab);
@@ -30,11 +31,11 @@ void CorrectUnevenIlluminationHomomorphic(const cv::Mat& image, f64 cutoff = 0.0
   cv::split(imageLAB, LABplanes);
 
   cv::Mat lightness = LABplanes[0].clone();
-  lightness.convertTo(lightness, GetMatType<f64>());
+  lightness.convertTo(lightness, GetMatType<double>());
 
   cv::log(lightness, lightness);
   cv::Mat fft = FFT(lightness);
-  cv::Mat filter = 1. - Butterworth<f64>(lightness.size(), cutoff, 1);
+  cv::Mat filter = 1. - Butterworth<double>(lightness.size(), cutoff, 1);
   IFFTShift(filter);
   cv::multiply(fft, DuplicateChannelsCopy(filter), fft);
   lightness = IFFT(fft);

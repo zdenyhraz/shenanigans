@@ -33,13 +33,13 @@ void ImGuiLogger::RenderInternal()
   clipper.Begin(mLineOffsets.size());
   while (clipper.Step())
   {
-    for (i32 lineNumber = clipper.DisplayStart; lineNumber < clipper.DisplayEnd; lineNumber++)
+    for (int lineNumber = clipper.DisplayStart; lineNumber < clipper.DisplayEnd; lineNumber++)
     {
       const char* lineStart = bufStart + mLineOffsets[lineNumber].first;
-      const char* lineEnd = (lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? (bufStart + mLineOffsets[lineNumber + 1].first - 1) : bufEnd;
+      const char* lineEnd = (lineNumber + 1 < static_cast<int>(mLineOffsets.size())) ? (bufStart + mLineOffsets[lineNumber + 1].first - 1) : bufEnd;
       static const auto mLogLevelColors = GenerateLogLevelColors();
-      ImGui::PushStyleColor(ImGuiCol_Text, mLogLevelColors[(lineNumber + 1 < static_cast<i32>(mLineOffsets.size())) ? static_cast<i32>(mLineOffsets[lineNumber + 1].second)
-                                                                                                                    : static_cast<i32>(Logger::LogLevel::Debug)]);
+      ImGui::PushStyleColor(ImGuiCol_Text, mLogLevelColors[(lineNumber + 1 < static_cast<int>(mLineOffsets.size())) ? static_cast<int>(mLineOffsets[lineNumber + 1].second)
+                                                                                                                    : static_cast<int>(Logger::LogLevel::Debug)]);
       ImGui::TextUnformatted(lineStart, lineEnd);
       ImGui::PopStyleColor();
     }

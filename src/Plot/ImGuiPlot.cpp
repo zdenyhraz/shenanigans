@@ -5,7 +5,7 @@
 void ImGuiPlot::RenderInternal()
 {
   PROFILE_FUNCTION;
-  for (usize plotLocation = 0; plotLocation < mWindowCount; ++plotLocation)
+  for (size_t plotLocation = 0; plotLocation < mWindowCount; ++plotLocation)
   {
     if (ImGui::Begin(mWindowCount > 1 ? fmt::format("Plot{}", static_cast<char>('A' + plotLocation)).c_str() : "Plot"))
     {
@@ -42,7 +42,7 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
         ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
 
       const auto x = data.x.data();
-      for (usize i = 0; i < data.ys.size(); ++i)
+      for (size_t i = 0; i < data.ys.size(); ++i)
       {
         const auto n = data.ys[i].size();
         if (n == 0)
@@ -52,7 +52,7 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
         ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
         ImPlot::PlotLine(data.ylabels.size() > i ? data.ylabels[i].c_str() : fmt::format("y{}", i).c_str(), x, y, n);
       }
-      for (usize i = 0; i < data.y2s.size(); ++i)
+      for (size_t i = 0; i < data.y2s.size(); ++i)
       {
         const auto n = data.y2s[i].size();
         if (n == 0)
@@ -73,10 +73,10 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
   PROFILE_FUNCTION;
   if (ImGui::BeginTabItem(data.name.c_str()))
   {
-    const f32 height = ImGui::GetContentRegionAvail().y;
-    const f32 width = height * data.aspectratio;
-    const f32 heightcb = height;
-    const f32 widthcb = heightcb * 0.15;
+    const float height = ImGui::GetContentRegionAvail().y;
+    const float width = height * data.aspectratio;
+    const float heightcb = height;
+    const float widthcb = heightcb * 0.15;
     static const ImPlotFlags plotFlags = ImPlotFlags_NoLegend; // | ImPlotFlags_Crosshairs;
     static const ImPlotAxisFlags axesFlagsX = ImPlotAxisFlags_None;
     const ImPlotAxisFlags axesFlagsY = data.ymin > data.ymax ? ImPlotAxisFlags_Invert : ImPlotAxisFlags_None;
@@ -89,8 +89,8 @@ void ImGuiPlot::RenderInternal(const PlotData2D& data)
 
       if (data.z.channels() == 1)
       {
-        ImPlot::PlotHeatmap(
-            data.name.c_str(), reinterpret_cast<f32*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin), ImPlotPoint(data.xmax, data.ymax));
+        ImPlot::PlotHeatmap(data.name.c_str(), reinterpret_cast<float*>(data.z.data), data.z.rows, data.z.cols, 0, 0, nullptr, ImPlotPoint(data.xmin, data.ymin),
+            ImPlotPoint(data.xmax, data.ymax));
       }
 
       if (data.z.channels() == 3)

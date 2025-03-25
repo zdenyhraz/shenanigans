@@ -1,11 +1,11 @@
 #pragma once
 
-inline i32 FindNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
+inline int FindNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Point2f pt)
 {
-  i32 idx = 0;
-  f64 mindist = std::numeric_limits<f64>::max();
-  f64 dist;
-  for (usize i = 0; i < pts.size(); i++)
+  int idx = 0;
+  double mindist = std::numeric_limits<double>::max();
+  double dist;
+  for (size_t i = 0; i < pts.size(); i++)
   {
     dist = Magnitude(pts[i] - pt);
     if (dist < mindist)
@@ -17,27 +17,27 @@ inline i32 FindNearestNeighborIndex(const std::vector<cv::Point2f>& pts, cv::Poi
   return idx;
 }
 
-inline cv::Mat NearestNeighborFit(const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt)
+inline cv::Mat NearestNeighborFit(const std::vector<cv::Point2f>& pts, const std::vector<double>& zdata, double xmin, double xmax, double ymin, double ymax, int xcnt, int ycnt)
 {
   cv::Mat out = cv::Mat::zeros(ycnt, xcnt, CV_32F);
-  for (i32 r = 0; r < out.rows; r++)
+  for (int r = 0; r < out.rows; r++)
   {
-    for (i32 c = 0; c < out.cols; c++)
+    for (int c = 0; c < out.cols; c++)
     {
-      f64 x = xmin + ((f32)c / (out.cols - 1)) * (xmax - xmin);
-      f64 y = ymin + ((f32)r / (out.rows - 1)) * (ymax - ymin);
+      double x = xmin + ((float)c / (out.cols - 1)) * (xmax - xmin);
+      double y = ymin + ((float)r / (out.rows - 1)) * (ymax - ymin);
       cv::Point2f pt(x, y);
-      out.at<f32>(r, c) = zdata[FindNearestNeighborIndex(pts, pt)];
+      out.at<float>(r, c) = zdata[FindNearestNeighborIndex(pts, pt)];
     }
   }
   return out;
 }
 
-inline void UpdateHighest(std::vector<std::pair<i32, f64>>& proxidxs, i32 idx, f64 val)
+inline void UpdateHighest(std::vector<std::pair<int, double>>& proxidxs, int idx, double val)
 {
-  i32 maxidx = 0;
-  f64 maxval = 0;
-  for (usize i = 0; i < proxidxs.size(); i++)
+  int maxidx = 0;
+  double maxval = 0;
+  for (size_t i = 0; i < proxidxs.size(); i++)
   {
     if (proxidxs[i].second > maxval)
     {
@@ -52,46 +52,46 @@ inline void UpdateHighest(std::vector<std::pair<i32, f64>>& proxidxs, i32 idx, f
   }
 }
 
-inline cv::Mat WeightedNearestNeighborFit(
-    const std::vector<cv::Point2f>& pts, const std::vector<f64>& zdata, f64 xmin, f64 xmax, f64 ymin, f64 ymax, i32 xcnt, i32 ycnt, i32 proxpts = 10, f64 proxcoeff = 7)
+inline cv::Mat WeightedNearestNeighborFit(const std::vector<cv::Point2f>& pts, const std::vector<double>& zdata, double xmin, double xmax, double ymin, double ymax, int xcnt,
+    int ycnt, int proxpts = 10, double proxcoeff = 7)
 {
   cv::Mat out = cv::Mat::zeros(ycnt, xcnt, CV_32F);
-  proxpts = std::min(proxpts, (i32)pts.size());
-  for (i32 r = 0; r < out.rows; r++)
+  proxpts = std::min(proxpts, (int)pts.size());
+  for (int r = 0; r < out.rows; r++)
   {
-    for (i32 c = 0; c < out.cols; c++)
+    for (int c = 0; c < out.cols; c++)
     {
       // get correspoinding point values
-      f64 x = xmin + ((f32)c / (out.cols - 1)) * (xmax - xmin);
-      f64 y = ymin + ((f32)r / (out.rows - 1)) * (ymax - ymin);
+      double x = xmin + ((float)c / (out.cols - 1)) * (xmax - xmin);
+      double y = ymin + ((float)r / (out.rows - 1)) * (ymax - ymin);
       cv::Point2f pt(x, y);
 
       // get first proxpts point indices, maxdistance
-      f64 distance = 0;
-      f64 maxdistance = 0;
-      std::vector<std::pair<i32, f64>> proxidxs(proxpts);
-      for (usize i = 0; i < pts.size(); i++)
+      double distance = 0;
+      double maxdistance = 0;
+      std::vector<std::pair<int, double>> proxidxs(proxpts);
+      for (size_t i = 0; i < pts.size(); i++)
       {
         distance = Magnitude(pts[i] - pt);
         if (distance > maxdistance)
           maxdistance = distance;
 
-        if (i < static_cast<usize>(proxpts))
+        if (i < static_cast<size_t>(proxpts))
           proxidxs.push_back(std::make_pair(i, distance));
         else
           UpdateHighest(proxidxs, i, distance);
       }
 
       // weighted average
-      f64 weight = 0;
-      f64 weightsum = 0;
+      double weight = 0;
+      double weightsum = 0;
       for (auto i : proxidxs)
       {
         weight = std::max(1. - Magnitude(pts[i.first] - pt) / (maxdistance / proxcoeff), 0.);
         weightsum += weight;
-        out.at<f32>(r, c) += weight * zdata[i.first];
+        out.at<float>(r, c) += weight * zdata[i.first];
       }
-      out.at<f32>(r, c) /= weightsum;
+      out.at<float>(r, c) /= weightsum;
     }
   }
   return out;

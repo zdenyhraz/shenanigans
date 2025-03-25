@@ -1,5 +1,6 @@
 #pragma once
-#include "../Microservice.hpp"
+#include "Microservice/Microservice.hpp"
+#include "Plot/Plot.hpp"
 
 class PlotImageMicroservice : public Microservice
 {

@@ -1,5 +1,7 @@
 #pragma once
 #include "Math/Fourier.hpp"
+#include "Math/Functions.hpp"
+#include "Utils/Crop.hpp"
 #include "IPCAlign.hpp"
 #include "IPCDebug.hpp"
 #include "IPCFlow.hpp"
@@ -10,10 +12,10 @@ class IPC
 {
 public:
   // algorithm floating point precision, use 64-bit for most accurate results, 32-bit for performance
-  using Float = f64;
+  using Float = double;
 
   // input image DFT window type
-  enum class WindowType : u8
+  enum class WindowType : uint8_t
   {
     None,           // no DFT window applied
     Hann,           // Hann window
@@ -21,7 +23,7 @@ public:
   };
 
   // cross-power spectrum bandpass filter type
-  enum class BandpassType : u8
+  enum class BandpassType : uint8_t
   {
     None,             // no filtering applied
     Rectangular,      // bandpass filter with sharp edges
@@ -30,7 +32,7 @@ public:
   };
 
   // correlation interpolation type
-  enum class InterpolationType : u8
+  enum class InterpolationType : uint8_t
   {
     NearestNeighbor,       // nearest neighbor interpolation
     Linear,                // bilinear interpolation
@@ -39,7 +41,7 @@ public:
   };
 
   // L1 window (mask) type (used to compute correlation centroids)
-  enum class L1WindowType : u8
+  enum class L1WindowType : uint8_t
   {
     None,             // no window applied
     Circular,         // circular mask with sharp edges
@@ -48,7 +50,7 @@ public:
   };
 
   // IPC execution mode
-  enum class Mode : u8
+  enum class Mode : uint8_t
   {
     Normal, // normal mode
     Debug   // special mode used for debugging and plotting
@@ -58,16 +60,16 @@ public:
   inline static const cv::Point2d mDefaultDebugTrueShift{123.456, 123.456};
 
 private:
-  i32 mRows = 0;                                       // the height of registered images
-  i32 mCols = 0;                                       // the width of registered images
-  f64 mBPL = 0.01;                                     // low frequency bandpass cutoff
-  f64 mBPH = 1.0;                                      // high frequency bandpass cutoff
-  i32 mL2size = 7;                                     // size of the maximum correlation neighborhood L2
-  i32 mL2Usize = 357;                                  // size of the upsampled maximum correlation neighborhood L2U
-  f64 mL1ratio = 0.45;                                 // size ratio of the L1 centroid neighborhood in relation to L2U
-  f64 mL1ratioStep = 0.025;                            // L1 size ratio step used when reducing L1 size due to centroid divergence
-  i32 mMaxIter = 10;                                   // maximum number of iterative refinement iterations
-  f64 mCPeps = 0;                                      // cross-power normalization epsilon used to avoid division by values close to zero
+  int mRows = 0;                                       // the height of registered images
+  int mCols = 0;                                       // the width of registered images
+  double mBPL = 0.01;                                  // low frequency bandpass cutoff
+  double mBPH = 1.0;                                   // high frequency bandpass cutoff
+  int mL2size = 7;                                     // size of the maximum correlation neighborhood L2
+  int mL2Usize = 357;                                  // size of the upsampled maximum correlation neighborhood L2U
+  double mL1ratio = 0.45;                              // size ratio of the L1 centroid neighborhood in relation to L2U
+  double mL1ratioStep = 0.025;                         // L1 size ratio step used when reducing L1 size due to centroid divergence
+  int mMaxIter = 10;                                   // maximum number of iterative refinement iterations
+  double mCPeps = 0;                                   // cross-power normalization epsilon used to avoid division by values close to zero
   BandpassType mBPT = BandpassType::Gaussian;          // cross-power spectrum bandpass filter type
   InterpolationType mIntT = InterpolationType::Linear; // correlation interpolation type
   WindowType mWinT = WindowType::Hann;                 // input image DFT window type
@@ -79,7 +81,7 @@ private:
   // debugging and plotting helpers
   mutable std::string mDebugName = "IPC";
   mutable std::string mDebugDirectory;
-  mutable i32 mDebugIndex = 0;
+  mutable int mDebugIndex = 0;
   mutable cv::Point2d mDebugTrueShift = mDefaultDebugTrueShift;
 
   friend class IPCAlign;
@@ -90,11 +92,11 @@ private:
 
 public:
   IPC() { Initialize(0, 0, 0, 1); }
-  explicit IPC(i32 rows, i32 cols = -1, f64 bpL = 0, f64 bpH = 1) { Initialize(rows, cols, bpL, bpH); }
-  explicit IPC(const cv::Size& size, f64 bpL = 0, f64 bpH = 1) { Initialize(size.height, size.width, bpL, bpH); }
-  explicit IPC(const cv::Mat& img, f64 bpL = 0, f64 bpH = 1) { Initialize(img.rows, img.cols, bpL, bpH); }
+  explicit IPC(int rows, int cols = -1, double bpL = 0, double bpH = 1) { Initialize(rows, cols, bpL, bpH); }
+  explicit IPC(const cv::Size& size, double bpL = 0, double bpH = 1) { Initialize(size.height, size.width, bpL, bpH); }
+  explicit IPC(const cv::Mat& img, double bpL = 0, double bpH = 1) { Initialize(img.rows, img.cols, bpL, bpH); }
 
-  void Initialize(i32 rows, i32 cols, f64 bpL, f64 bpH)
+  void Initialize(int rows, int cols, double bpL, double bpH)
   {
     PROFILE_FUNCTION;
     SetSize(rows, cols);
@@ -102,7 +104,7 @@ public:
     UpdateL1Window();
   }
 
-  void SetSize(i32 rows, i32 cols = -1)
+  void SetSize(int rows, int cols = -1)
   {
     PROFILE_FUNCTION;
     mRows = rows;
@@ -117,10 +119,10 @@ public:
 
   void SetSize(const cv::Size& size) { SetSize(size.height, size.width); }
 
-  void SetBandpassParameters(f64 bpL, f64 bpH)
+  void SetBandpassParameters(double bpL, double bpH)
   {
-    mBPL = std::clamp(bpL, 0., std::numeric_limits<f64>::max());
-    mBPH = std::clamp(bpH, 0., std::numeric_limits<f64>::max());
+    mBPL = std::clamp(bpL, 0., std::numeric_limits<double>::max());
+    mBPH = std::clamp(bpH, 0., std::numeric_limits<double>::max());
     UpdateBandpass();
   }
 
@@ -130,19 +132,19 @@ public:
     UpdateBandpass();
   }
 
-  void SetL2size(i32 L2size)
+  void SetL2size(int L2size)
   {
     mL2size = (L2size % 2) ? L2size : L2size + 1;
     UpdateL1Window();
   }
 
-  void SetL1ratio(f64 L1ratio)
+  void SetL1ratio(double L1ratio)
   {
     mL1ratio = L1ratio;
     UpdateL1Window();
   }
 
-  void SetL2Usize(i32 L2Usize)
+  void SetL2Usize(int L2Usize)
   {
     mL2Usize = std::max(L2Usize, mL2size);
     UpdateL1Window();
@@ -160,11 +162,11 @@ public:
     UpdateL1Window();
   }
 
-  void SetCrossPowerEpsilon(f64 CPeps) { mCPeps = std::max(CPeps, 0.); }
-  void SetMaxIterations(i32 maxIterations) { mMaxIter = maxIterations; }
+  void SetCrossPowerEpsilon(double CPeps) { mCPeps = std::max(CPeps, 0.); }
+  void SetMaxIterations(int maxIterations) { mMaxIter = maxIterations; }
   void SetInterpolationType(InterpolationType interpolationType) { mIntT = interpolationType; }
   void SetDebugName(const std::string& name) const { mDebugName = name; }
-  void SetDebugIndex(i32 index) const { mDebugIndex = index; }
+  void SetDebugIndex(int index) const { mDebugIndex = index; }
   void SetDebugTrueShift(const cv::Point2d& shift) const { mDebugTrueShift = shift; }
   void SetDebugDirectory(const std::string& dir) const
   {
@@ -173,23 +175,23 @@ public:
       std::filesystem::create_directory(dir);
   }
 
-  i32 GetRows() const { return mRows; }
-  i32 GetCols() const { return mCols; }
-  i32 GetSize() const { return mRows; }
-  f64 GetBandpassL() const { return mBPL; }
-  f64 GetBandpassH() const { return mBPH; }
-  i32 GetL2size() const { return mL2size; }
-  f64 GetL1ratio() const { return mL1ratio; }
-  i32 GetL2Usize() const { return mL2Usize; }
-  f64 GetCrossPowerEpsilon() const { return mCPeps; }
+  int GetRows() const { return mRows; }
+  int GetCols() const { return mCols; }
+  int GetSize() const { return mRows; }
+  double GetBandpassL() const { return mBPL; }
+  double GetBandpassH() const { return mBPH; }
+  int GetL2size() const { return mL2size; }
+  double GetL1ratio() const { return mL1ratio; }
+  int GetL2Usize() const { return mL2Usize; }
+  double GetCrossPowerEpsilon() const { return mCPeps; }
   cv::Mat GetWindow() const { return mWin; }
   cv::Mat GetBandpass() const { return mBP; }
   BandpassType GetBandpassType() const { return mBPT; }
   WindowType GetWindowType() const { return mWinT; }
   L1WindowType GetL1WindowType() const { return mL1WinT; }
   InterpolationType GetInterpolationType() const { return mIntT; }
-  f64 GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
-  f64 GetUpsampleCoeff(i32 L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
+  double GetUpsampleCoeff() const { return static_cast<Float>(mL2Usize) / mL2size; };
+  double GetUpsampleCoeff(int L2size) const { return static_cast<Float>(mL2Usize) / L2size; };
 
   // calculate the subpixel image shift between image1 and image2
   template <Mode ModeT = Mode::Normal>
@@ -251,7 +253,7 @@ public:
       IPCDebug::DebugL3(*this, L3);
 
     // reduce the L2size as long as the L2 is out of bounds of L3, return pixel level estimation accuracy if it cannot be reduced anymore
-    i32 L2size = mL2size;
+    int L2size = mL2size;
     while (IsOutOfBounds(L3peak, L3, L2size))
       if (!ReduceL2size<ModeT>(L2size))
         return L3peak - L3mid;
@@ -269,12 +271,12 @@ public:
       IPCDebug::DebugL2U(*this, L2, L2U);
 
     // initialize L1 centroid neighborhood parameters
-    i32 L1size;
+    int L1size;
     cv::Mat L1, L1Win;
     cv::Point2d L2Upeak, L1mid, L1peak;
 
     // run the iterative refinement algorithm using the specified L1 ratio, gradually decrease L1 ratio if convergence is not achieved
-    for (f64 L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
+    for (double L1ratio = mL1ratio; GetL1size(L2U.cols, L1ratio) > 0; L1ratio -= mL1ratioStep)
     {
       PROFILE_SCOPE(IterativeRefinement);
       if constexpr (ModeT == Mode::Debug)
@@ -289,7 +291,7 @@ public:
         IPCDebug::DebugL1B(*this, L2U, L1size, L3peak - L3mid, GetUpsampleCoeff(L2size));
 
       // perform the iterative refinement algorithm
-      for (i32 iter = 0; iter < mMaxIter; ++iter)
+      for (int iter = 0; iter < mMaxIter; ++iter)
       {
         PROFILE_SCOPE(IterativeRefinementIteration);
         if constexpr (ModeT == Mode::Debug)
@@ -351,7 +353,7 @@ private:
     }
   }
 
-  static cv::Mat GetL1Window(L1WindowType type, i32 size)
+  static cv::Mat GetL1Window(L1WindowType type, int size)
   {
     PROFILE_FUNCTION;
     switch (type)
@@ -386,38 +388,38 @@ private:
     case BandpassType::Gaussian:
       if (mBPL == 0 and mBPH != 0)
       {
-        for (i32 r = 0; r < mRows; ++r)
+        for (int r = 0; r < mRows; ++r)
         {
           auto bpp = mBP.ptr<Float>(r);
-          for (i32 c = 0; c < mCols; ++c)
+          for (int c = 0; c < mCols; ++c)
             bpp[c] = LowpassEquation(r, c);
         }
       }
       else if (mBPL != 0 and mBPH == 0)
       {
-        for (i32 r = 0; r < mRows; ++r)
+        for (int r = 0; r < mRows; ++r)
         {
           auto bpp = mBP.ptr<Float>(r);
-          for (i32 c = 0; c < mCols; ++c)
+          for (int c = 0; c < mCols; ++c)
             bpp[c] = HighpassEquation(r, c);
         }
       }
       else
       {
-        for (i32 r = 0; r < mRows; ++r)
+        for (int r = 0; r < mRows; ++r)
         {
           auto bpp = mBP.ptr<Float>(r);
-          for (i32 c = 0; c < mCols; ++c)
+          for (int c = 0; c < mCols; ++c)
             bpp[c] = BandpassGEquation(r, c);
         }
         cv::normalize(mBP, mBP, 0.0, 1.0, cv::NORM_MINMAX);
       }
       break;
     case BandpassType::Rectangular:
-      for (i32 r = 0; r < mRows; ++r)
+      for (int r = 0; r < mRows; ++r)
       {
         auto bpp = mBP.ptr<Float>(r);
-        for (i32 c = 0; c < mCols; ++c)
+        for (int c = 0; c < mCols; ++c)
           bpp[c] = BandpassREquation(r, c);
       }
       break;
@@ -428,21 +430,21 @@ private:
     IFFTShift(mBP);
   }
 
-  f64 LowpassEquation(i32 row, i32 col) const
+  double LowpassEquation(int row, int col) const
   {
     return std::exp(-1.0 / (2. * std::pow(mBPH, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
 
-  f64 HighpassEquation(i32 row, i32 col) const
+  double HighpassEquation(int row, int col) const
   {
     return 1.0 - std::exp(-1.0 / (2. * std::pow(mBPL, 2)) * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
   }
 
-  f64 BandpassGEquation(i32 row, i32 col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
+  double BandpassGEquation(int row, int col) const { return LowpassEquation(row, col) * HighpassEquation(row, col); }
 
-  f64 BandpassREquation(i32 row, i32 col) const
+  double BandpassREquation(int row, int col) const
   {
-    f64 r = std::sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
+    double r = std::sqrt(0.5 * (std::pow(col - mCols / 2, 2) / std::pow(mCols / 2, 2) + std::pow(row - mRows / 2, 2) / std::pow(mRows / 2, 2)));
     return (mBPL <= r and r <= mBPH) ? 1 : 0;
   }
 
@@ -470,12 +472,12 @@ private:
   {
     PROFILE_FUNCTION;
     const Float eps = mCPeps * dft1.rows * dft1.cols;
-    for (i32 row = 0; row < dft1.rows; ++row)
+    for (int row = 0; row < dft1.rows; ++row)
     {
       auto dft1p = dft1.ptr<cv::Vec<Float, 2>>(row); // reuse dft1 memory
       const auto dft2p = dft2.ptr<cv::Vec<Float, 2>>(row);
       const auto bandp = mBP.ptr<Float>(row);
-      for (i32 col = 0; col < dft1.cols; ++col)
+      for (int col = 0; col < dft1.cols; ++col)
       {
         const Float re = dft1p[col][0] * dft2p[col][0] + dft1p[col][1] * dft2p[col][1];
         const Float im = dft1p[col][0] * dft2p[col][1] - dft1p[col][1] * dft2p[col][0];
@@ -521,7 +523,7 @@ private:
     }
   }
 
-  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, i32 L2size)
+  static cv::Mat CalculateL2(const cv::Mat& L3, const cv::Point2d& L3peak, int L2size)
   {
     PROFILE_FUNCTION;
     return RoiCrop(L3, L3peak.x, L3peak.y, L2size, L2size);
@@ -550,15 +552,15 @@ private:
     return L2U;
   }
 
-  static i32 GetL1size(i32 L2Usize, f64 L1ratio)
+  static int GetL1size(int L2Usize, double L1ratio)
   {
-    i32 L1size = std::floor(L1ratio * L2Usize);
+    int L1size = std::floor(L1ratio * L2Usize);
     return (L1size % 2) ? L1size : L1size + 1;
   }
 
-  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, i32 L1size) { return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
+  static cv::Mat CalculateL1(const cv::Mat& L2U, const cv::Point2d& L2Upeak, int L1size) { return RoiCropRef(L2U, L2Upeak.x, L2Upeak.y, L1size, L1size); }
 
-  static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, i32 size) { return IsOutOfBounds(peak, mat, {size, size}); }
+  static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, int size) { return IsOutOfBounds(peak, mat, {size, size}); }
 
   static bool IsOutOfBounds(const cv::Point2i& peak, const cv::Mat& mat, cv::Size size)
   {
@@ -568,7 +570,7 @@ private:
   static bool AccuracyReached(const cv::Point2d& L1peak, const cv::Point2d& L1mid) { return std::abs(L1peak.x - L1mid.x) < 0.5 and std::abs(L1peak.y - L1mid.y) < 0.5; }
 
   template <Mode ModeT = Mode::Normal>
-  static bool ReduceL2size(i32& L2size)
+  static bool ReduceL2size(int& L2size)
   {
     L2size -= 2;
     if constexpr (ModeT == Mode::Debug)
@@ -577,7 +579,7 @@ private:
   }
 
   template <Mode ModeT = Mode::Normal>
-  cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, i32 L2size) const
+  cv::Point2d GetSubpixelShift(const cv::Mat& L3, const cv::Point2d& L3peak, const cv::Point2d& L3mid, int L2size) const
   {
     PROFILE_FUNCTION;
     while (IsOutOfBounds(L3peak, L3, L2size))
