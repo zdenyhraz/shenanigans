@@ -63,10 +63,10 @@ void IPCMeasure::MeasureAccuracy(const IPC& ipc, const IPC& ipcopt, const std::s
     accuracyIPCO = QuantileFilter<double>(accuracyIPCO / dataset.imageCount, 0, mQuanT);
   }
 
-  LOG_SUCCESS("PC average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyPC), Stddev<double>(accuracyPC));
-  LOG_SUCCESS("PCS average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyPCS), Stddev<double>(accuracyPCS));
-  LOG_SUCCESS("IPC average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyIPC), Stddev<double>(accuracyIPC));
-  LOG_SUCCESS("IPCO average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyIPCO), Stddev<double>(accuracyIPCO));
+  LOG_INFO("PC average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyPC), Stddev<double>(accuracyPC));
+  LOG_INFO("PCS average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyPCS), Stddev<double>(accuracyPCS));
+  LOG_INFO("IPC average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyIPC), Stddev<double>(accuracyIPC));
+  LOG_INFO("IPCO average accuracy: {:.3f} ± {:.3f}", Mean<double>(accuracyIPCO), Stddev<double>(accuracyIPCO));
 
   // PyPlot::PlotCustom(
   //     "imreg_accuracy", py::dict{"name"_a = "shift error", "x"_a = ColMeans<double>(refShiftsX), "pc_error"_a = ColMeans<double>(accuracyPC), "pc_stddev"_a =

@@ -43,7 +43,7 @@ void Application::Run()
     SetWindowIcon(window);
   ImGuiIO& io = ImGuiInitialize(window, scale, GetExistingPath("data/shenanigans/app/imgui.ini"), GetExistingPath("data/shenanigans/app/CascadiaCode.ttf"));
   Initialize();
-  LOG_SUCCESS("Ready");
+  LOG_INFO("Ready");
   double lastUpdateTime = 0, elapsedTime = 0;
   while (!glfwWindowShouldClose(window))
   {

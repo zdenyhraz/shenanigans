@@ -3,17 +3,15 @@
 
 class TerminalLogger : public Logger
 {
-  static const std::array<fmt::text_style, static_cast<int>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
+  static const std::array<fmt::text_style, LogLevelCount> GenerateLogLevelColors()
   {
     static constinit auto colors = GetLogLevelColors();
-    std::array<fmt::text_style, static_cast<int>(Logger::LogLevel::LogLevelCount)> styles{};
-    styles[static_cast<size_t>(Logger::LogLevel::Trace)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Trace)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Function)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Function)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Debug)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Debug)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Info)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Info)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Success)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Success)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Warning)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Warning)]);
-    styles[static_cast<size_t>(Logger::LogLevel::Error)] = fg(colors[static_cast<size_t>(Logger::LogLevel::Error)]);
+    std::array<fmt::text_style, LogLevelCount> styles{};
+    styles[Trace] = fg(colors[Trace]);
+    styles[Debug] = fg(colors[Debug]);
+    styles[Info] = fg(colors[Info]);
+    styles[Warning] = fg(colors[Warning]);
+    styles[Error] = fg(colors[Error]);
     return styles;
   }
 

@@ -1,6 +1,5 @@
 #pragma once
 #ifdef GLAPI
-
 #  include "Logger.hpp"
 #  include "TerminalLogger.hpp"
 
@@ -10,20 +9,18 @@ class ImGuiLogger : public Logger
 
   static const ImVec4 GetImColor(const fmt::rgb& color)
   {
-    return ImVec4(static_cast<float>(color.r) / 255, static_cast<float>(color.g) / 255, static_cast<float>(color.b / 255), 1.0f);
+    return ImVec4(static_cast<float>(color.r) / 255, static_cast<float>(color.g) / 255, static_cast<float>(color.b) / 255, 1.0f);
   }
 
-  static const std::array<ImVec4, static_cast<int>(Logger::LogLevel::LogLevelCount)> GenerateLogLevelColors()
+  static const std::array<ImVec4, LogLevelCount> GenerateLogLevelColors()
   {
     static constinit auto colors = GetLogLevelColors();
-    std::array<ImVec4, static_cast<int>(Logger::LogLevel::LogLevelCount)> imcolors{};
-    imcolors[static_cast<size_t>(Logger::LogLevel::Trace)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Trace)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Function)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Function)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Debug)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Debug)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Info)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Info)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Success)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Success)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Warning)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Warning)]);
-    imcolors[static_cast<size_t>(Logger::LogLevel::Error)] = GetImColor(colors[static_cast<size_t>(Logger::LogLevel::Error)]);
+    std::array<ImVec4, LogLevelCount> imcolors{};
+    imcolors[Trace] = GetImColor(colors[Trace]);
+    imcolors[Debug] = GetImColor(colors[Debug]);
+    imcolors[Info] = GetImColor(colors[Info]);
+    imcolors[Warning] = GetImColor(colors[Warning]);
+    imcolors[Error] = GetImColor(colors[Error]);
     return imcolors;
   }
 

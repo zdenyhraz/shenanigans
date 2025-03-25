@@ -16,7 +16,6 @@ using MainLogger = TerminalLogger;
 #define LOG_TRACE(...) MainLogger::Message(Logger::LogLevel::Trace, __VA_ARGS__)
 #define LOG_DEBUG(...) MainLogger::Message(Logger::LogLevel::Debug, __VA_ARGS__)
 #define LOG_INFO(...) MainLogger::Message(Logger::LogLevel::Info, __VA_ARGS__)
-#define LOG_SUCCESS(...) MainLogger::Message(Logger::LogLevel::Success, __VA_ARGS__)
 #define LOG_WARNING(...) MainLogger::Message(Logger::LogLevel::Warning, __VA_ARGS__)
 #define LOG_ERROR(...) MainLogger::Message(Logger::LogLevel::Error, __VA_ARGS__)
 

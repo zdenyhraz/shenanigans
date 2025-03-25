@@ -9,13 +9,11 @@ std::string CreateMessage(std::string_view fmt, Args&&... args)
 class Logger
 {
 public:
-  enum class LogLevel
+  enum LogLevel
   {
     Trace,
-    Function,
     Debug,
     Info,
-    Success,
     Warning,
     Error,
     LogLevelCount
@@ -23,7 +21,7 @@ public:
 
 protected:
   inline static std::recursive_mutex mMutex;
-  inline static LogLevel mLogLevel = LogLevel::Trace;
+  inline static LogLevel mLogLevel = Trace;
   inline static float mProgress = 0;
   inline static std::string mProgressName;
   inline static std::string mProgressBarOverlay;
@@ -41,16 +39,14 @@ protected:
 
   inline static bool ShouldLog(LogLevel logLevel) { return logLevel >= mLogLevel; }
 
-  static consteval std::array<fmt::rgb, static_cast<int>(LogLevel::LogLevelCount)> GetLogLevelColors()
+  static consteval std::array<fmt::rgb, LogLevelCount> GetLogLevelColors()
   {
-    std::array<fmt::rgb, static_cast<int>(LogLevel::LogLevelCount)> colors{};
-    colors[static_cast<size_t>(LogLevel::Trace)] = fmt::rgb(125, 125, 125);
-    colors[static_cast<size_t>(LogLevel::Function)] = fmt::rgb(125, 125, 125);
-    colors[static_cast<size_t>(LogLevel::Debug)] = fmt::rgb(0, 185, 255);
-    colors[static_cast<size_t>(LogLevel::Info)] = fmt::rgb(235, 235, 235);
-    colors[static_cast<size_t>(LogLevel::Success)] = fmt::rgb(0, 200, 15);
-    colors[static_cast<size_t>(LogLevel::Warning)] = fmt::rgb(255, 90, 0);
-    colors[static_cast<size_t>(LogLevel::Error)] = fmt::rgb(255, 0, 0);
+    std::array<fmt::rgb, LogLevelCount> colors{};
+    colors[Trace] = fmt::rgb(172, 136, 255);
+    colors[Debug] = fmt::rgb(30, 144, 255);
+    colors[Info] = fmt::rgb(87, 226, 143);
+    colors[Warning] = fmt::rgb(255, 150, 45);
+    colors[Error] = fmt::rgb(255, 55, 55);
     return colors;
   }
 

@@ -37,7 +37,7 @@ void MicroserviceEditorWindow::Render()
 void MicroserviceEditorWindow::Run()
 {
   editor.workflow.Run();
-  LOG_SUCCESS("Workflow run completed");
+  LOG_INFO("Workflow run completed");
 }
 
 void MicroserviceEditorWindow::RunRepeat()
@@ -47,7 +47,7 @@ void MicroserviceEditorWindow::RunRepeat()
     Plot::Clear();
     editor.workflow.Run();
   }
-  LOG_SUCCESS("Workflow run completed");
+  LOG_INFO("Workflow run completed");
 }
 
 void MicroserviceEditorWindow::TestInitialize()

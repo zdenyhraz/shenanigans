@@ -12,10 +12,8 @@ void ImGuiLogger::RenderInternal()
   if (false and ImGui::Button("Debug Log"))
   {
     Message(LogLevel::Trace, "Trace message");
-    Message(LogLevel::Function, "Function message");
     Message(LogLevel::Debug, "Debug message");
     Message(LogLevel::Info, "Info message");
-    Message(LogLevel::Success, "Success message");
     Message(LogLevel::Warning, "Warning message");
     Message(LogLevel::Error, "Error message");
   }

@@ -236,7 +236,7 @@ void Evolution::MetaOptimize(ObjectiveFunction obj, MetaObjectiveFunctionType me
       statsA4.averageFunctionEvaluations, statsA4.averageFunctionEvaluations / maxFunEvals * 100, runsPerObj);
 
   if (statsA4.averageFitness < statsB4.averageFitness)
-    LOG_SUCCESS("Metaopt with {} function evaluations budget improved average resulting fitness from {:.2e} to {:.2e} ({} runs)", maxFunEvals, statsB4.averageFitness,
+    LOG_INFO("Metaopt with {} function evaluations budget improved average resulting fitness from {:.2e} to {:.2e} ({} runs)", maxFunEvals, statsB4.averageFitness,
         statsA4.averageFitness, runsPerObj);
   else
     LOG_WARNING("Metaopt with {} function evaluations budget did not improve average resulting fitness ({} runs)", maxFunEvals, runsPerObj);
@@ -357,7 +357,7 @@ try
   if (mConsoleOutput)
   {
     LOG_INFO("Evolution terminated: {}", GetTerminationReasonString(reason));
-    LOG_SUCCESS("Evolution result: {}", GetOutputString(generation, population));
+    LOG_INFO("Evolution result: {}", GetOutputString(generation, population));
   }
 }
 catch (const std::exception& e)
