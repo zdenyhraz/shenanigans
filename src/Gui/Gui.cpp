@@ -64,13 +64,12 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem:
     io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
   }
 
-  if (not iniPath.empty())
-    if (std::filesystem::exists(iniPath))
-    {
-      LOG_DEBUG("Using ini {}", iniPath.filename());
-      ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
-      io.IniFilename = iniPath.string().c_str();
-    }
+  if (std::filesystem::exists(iniPath))
+  {
+    LOG_DEBUG("Using ini {}", iniPath.filename());
+    ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
+    io.IniFilename = iniPath.string().c_str();
+  }
 
   ImGuiStyle& style = ImGui::GetStyle();
   ImGuiSetDefaultStyle();

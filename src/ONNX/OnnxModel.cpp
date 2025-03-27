@@ -10,18 +10,17 @@ OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, 
 void OnnxModel::Load(const std::filesystem::path& modelPath)
 try
 {
-  const auto modelPathEx = GetProjectPath(modelPath.string());
-  if (not std::filesystem::is_regular_file(modelPathEx))
-    throw EXCEPTION("Could not find model '{}'", modelPathEx.string());
+  if (not std::filesystem::is_regular_file(modelPath))
+    throw EXCEPTION("Could not find model '{}'", modelPath);
 
   env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, name);
   options = Ort::SessionOptions();
   options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
   LoadProviders();
-  session = Ort::Session(env, modelPathEx.c_str(), options);
+  session = Ort::Session(env, modelPath.c_str(), options);
   memoryInfo = Ort::MemoryInfo(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, usesGPU ? OrtMemTypeCPUInput : OrtMemTypeDefault));
   loaded = true;
-  LOG_DEBUG("Loaded model {} | GPU: {}", modelPathEx.filename(), usesGPU);
+  LOG_DEBUG("Loaded model {} | GPU: {}", modelPath.filename(), usesGPU);
 }
 catch (const std::exception& e)
 {
