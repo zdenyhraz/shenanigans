@@ -162,6 +162,18 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
 
+# glad
+add_subdirectory(libs/glad)
+target_link_libraries(shenanigans PRIVATE glad)
+add_compile_definitions(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+
+# glfw
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(libs/glfw)
+target_link_libraries(shenanigans PRIVATE glfw)
+
 # imgui
 include_directories(libs/imgui)
 include_directories(libs/imgui/misc/cpp)
@@ -184,16 +196,6 @@ file(GLOB SRC_IMGUI_NODES_EXTRA CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/libs/imgui
 set(SRC_IMGUI_NODES_EXTRA ${SRC_IMGUI_NODES_EXTRA} CACHE INTERNAL "ImGui Nodes extra source files")
 target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES} ${SRC_IMGUI_NODES_EXTRA})
 
-# glfw
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(libs/glfw)
-target_link_libraries(shenanigans PRIVATE glfw)
-
-# glad
-add_subdirectory(libs/glad)
-target_link_libraries(shenanigans PRIVATE glad)
 
 # range-v3
 add_subdirectory(libs/range-v3)
