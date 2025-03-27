@@ -53,16 +53,16 @@ void IPCWindow::Render()
         LaunchAsync(
             [&]()
             {
-              IPCDebug::DebugShift2(mIPCOptimized, GetProjectDirectoryPath(mOptimizeParameters.debugImage1Path).string(),
-                  GetProjectDirectoryPath(mOptimizeParameters.debugImage2Path).string(), mOptimizeParameters.noiseStddev);
+              IPCDebug::DebugShift2(mIPCOptimized, GetProjectPath(mOptimizeParameters.debugImage1Path).string(), GetProjectPath(mOptimizeParameters.debugImage2Path).string(),
+                  mOptimizeParameters.noiseStddev);
             });
       ImGui::SameLine();
       if (ImGui::Button("DebugAlign"))
         LaunchAsync(
             [&]()
             {
-              IPCDebug::DebugAlign(mIPCOptimized, GetProjectDirectoryPath(mOptimizeParameters.debugImage1Path).string(),
-                  GetProjectDirectoryPath(mOptimizeParameters.debugImage2Path).string(), mOptimizeParameters.noiseStddev);
+              IPCDebug::DebugAlign(mIPCOptimized, GetProjectPath(mOptimizeParameters.debugImage1Path).string(), GetProjectPath(mOptimizeParameters.debugImage2Path).string(),
+                  mOptimizeParameters.noiseStddev);
             });
       ImGui::SameLine();
       if (ImGui::Button("DebugGradual"))

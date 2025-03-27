@@ -1,21 +1,8 @@
 #pragma once
 
-inline std::filesystem::path GetProjectDirectoryPath()
-{
-  return std::filesystem::path(PROJECT_DIRECTORY);
-}
-
-inline std::filesystem::path GetProjectDirectoryPath(std::string_view relpath)
+inline std::filesystem::path GetProjectPath(std::string_view relpath = "")
 {
   return std::filesystem::path(PROJECT_DIRECTORY) / relpath;
-}
-
-inline std::filesystem::path GetExistingPath(std::string_view relpath)
-{
-  const auto projectDirectoryPath = GetProjectDirectoryPath(relpath);
-  if (std::filesystem::exists(projectDirectoryPath))
-    return projectDirectoryPath;
-  return relpath;
 }
 
 inline size_t GetFileCount(const std::filesystem::path& dirpath)

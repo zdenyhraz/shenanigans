@@ -31,7 +31,7 @@ using MainLogger = TerminalLogger;
 
 // source location
 #define SOURCE_FUNCTION std::source_location::current().function_name()
-#define SOURCE_FILE std::filesystem::relative(std::filesystem::path(std::source_location::current().file_name()), GetProjectDirectoryPath("src")).string()
+#define SOURCE_FILE std::filesystem::relative(std::filesystem::path(std::source_location::current().file_name()), GetProjectPath("src")).string()
 #define SOURCE_LINE std::source_location::current().line()
 #define SOURCE_LOCATION fmt::format("[{}:{}]", SOURCE_FILE, SOURCE_LINE)
 

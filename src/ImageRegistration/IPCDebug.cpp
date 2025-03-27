@@ -105,7 +105,7 @@ void IPCDebug::DebugL1A(const IPC& ipc, const cv::Mat& L1, const cv::Point2d& L3
 
 void IPCDebug::DebugShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
-  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/star.png"));
+  const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/debug/star.png"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
   // cv::Point2d shift(maxShift, -maxShift);
 
@@ -150,12 +150,12 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
   static constexpr bool save = false;
   static constexpr bool artificial = false;
   static constexpr bool create = false;
-  ipc.SetDebugDirectory(GetProjectDirectoryPath("data/debug").string());
+  ipc.SetDebugDirectory(GetProjectPath("data/debug").string());
 
   if constexpr (create) // create test images
   {
-    auto image = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/304A.png"));
-    auto imagee = LoadUnitFloatImage<IPC::Float>(GetProjectDirectoryPath("data/debug/171A.png"));
+    auto image = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/debug/304A.png"));
+    auto imagee = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/debug/171A.png"));
 
     image.convertTo(image, CV_8U, 255);
     imagee.convertTo(imagee, CV_8U, 255);
@@ -172,8 +172,8 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
     Plot::Plot("image1", image1);
     Plot::Plot("image2", image2);
 
-    cv::imwrite(GetProjectDirectoryPath("data/debug/artificialx1.png").string(), image1);
-    cv::imwrite(GetProjectDirectoryPath("data/debug/artificialx2.png").string(), image2);
+    cv::imwrite(GetProjectPath("data/debug/artificialx1.png").string(), image1);
+    cv::imwrite(GetProjectPath("data/debug/artificialx2.png").string(), image2);
     return;
   }
 

@@ -145,7 +145,7 @@ public:
       data.ymax = 0;
     }
     if (data.savepath.empty() and Singleton<T>::Get().mSave)
-      data.savepath = GetProjectDirectoryPath(fmt::format("data/debug/{}.png", data.name)).string();
+      data.savepath = GetProjectPath(fmt::format("data/debug/{}.png", data.name)).string();
 
     if constexpr (std::is_same_v<T, ImGuiPlot>)
     {

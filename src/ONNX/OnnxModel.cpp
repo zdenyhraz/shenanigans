@@ -10,7 +10,7 @@ OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, 
 void OnnxModel::Load(const std::filesystem::path& modelPath)
 try
 {
-  const auto modelPathEx = GetExistingPath(modelPath.string());
+  const auto modelPathEx = GetProjectPath(modelPath.string());
   if (not std::filesystem::is_regular_file(modelPathEx))
     throw EXCEPTION("Could not find model '{}'", modelPathEx.string());
 

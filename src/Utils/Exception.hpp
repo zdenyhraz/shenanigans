@@ -17,13 +17,13 @@ public:
 #ifdef DEVELOP
 #  ifdef HAS_STACKTRACE
   ShenanigansException(const std::string& message, const std::source_location& source, std::stacktrace&& stacktrace = std::stacktrace::current()) :
-    mMessage(fmt::format("{} [{}:{}]", message, std::filesystem::relative(std::filesystem::path(source.file_name()), GetProjectDirectoryPath("src")).string(), source.line())),
+    mMessage(fmt::format("{} [{}:{}]", message, std::filesystem::relative(std::filesystem::path(source.file_name()), GetProjectPath("src")).string(), source.line())),
     mStacktrace(std::move(stacktrace))
   {
   }
 #  else
   ShenanigansException(const std::string& message, const std::source_location& source) :
-    mMessage(fmt::format("{} [{}:{}]", message, std::filesystem::relative(std::filesystem::path(source.file_name()), GetProjectDirectoryPath("src")).string(), source.line()))
+    mMessage(fmt::format("{} [{}:{}]", message, std::filesystem::relative(std::filesystem::path(source.file_name()), GetProjectPath("src")).string(), source.line()))
   {
   }
 #  endif

@@ -41,7 +41,7 @@ void Application::Run()
   GLFWSetWindowCallback(window, KeyCallback);
   if constexpr (not hiddenWindow)
     SetWindowIcon(window);
-  ImGuiIO& io = ImGuiInitialize(window, scale, GetExistingPath("data/shenanigans/app/imgui.ini"), GetExistingPath("data/shenanigans/app/CascadiaCode.ttf"));
+  ImGuiIO& io = ImGuiInitialize(window, scale, GetProjectPath("data/shenanigans/app/imgui.ini"), GetProjectPath("data/shenanigans/app/CascadiaCode.ttf"));
   Initialize();
   LOG_INFO("Ready");
   double lastUpdateTime = 0, elapsedTime = 0;
@@ -161,7 +161,7 @@ void Application::RenderStyleMenu()
   {
     if (ImGui::MenuItem("Save style to disk"))
     {
-      const auto path = GetExistingPath("data/apps") / "imgui.ini";
+      const auto path = GetProjectPath("data/apps") / "imgui.ini";
       LOG_DEBUG("Saving ImGui style to {}", path);
       ImGui::SaveIniSettingsToDisk(path.string().c_str());
     }
@@ -172,7 +172,7 @@ void Application::RenderStyleMenu()
 
 void Application::SetWindowIcon(GLFWwindow* window)
 {
-  cv::Mat icon = cv::imread((GetProjectDirectoryPath() / "data/apps/logo.png").string(), cv::IMREAD_COLOR);
+  cv::Mat icon = cv::imread((GetProjectPath() / "data/apps/logo.png").string(), cv::IMREAD_COLOR);
   cv::resize(icon, icon, cv::Size(32, 32));
   cv::cvtColor(icon, icon, cv::COLOR_BGR2RGBA);
   cv::normalize(icon, icon, 0, 255, cv::NORM_MINMAX);
