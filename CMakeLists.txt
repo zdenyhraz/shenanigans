@@ -8,6 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 option(ENABLE_PROFILING "Enable performance profiling" OFF)
 option(ENABLE_PROFILING_MEMORY "Enable memory profiling" OFF)
@@ -29,26 +30,26 @@ endif()
 
 # compiler flags
 if(MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-  add_compile_options(/favor:AMD64 /arch:AVX2 /openmp:static)
-  #add_compile_options(/Wall /WX)
+  add_compile_options(/W1 /favor:AMD64 /arch:AVX2 /openmp:static)
 else()
-  add_compile_options(-march=native -fopenmp -pthread)
-  add_compile_options(-Wall -Wfatal-errors -Wextra -Wpedantic -Wshadow)
-  #add_compile_options(-Werror)
-  add_compile_options(-Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers -Wno-unused-function -Wno-sign-compare)
-  add_compile_options("$<$<CONFIG:DEBUG>:-g;-O0>")
-  add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
-  add_compile_options("$<$<COMPILE_LANGUAGE:C>:-w>")
-  add_link_options(-fopenmp -pthread)
+  add_compile_options(/W -march=native -fopenmp)
+  add_link_options(-fopenmp)
+endif()
+
+# definitions
+if (DEVELOP)
+  add_compile_definitions(PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}" DEVELOP)
+else()
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+  add_compile_definitions(PROJECT_DIRECTORY="")
 endif()
 
 # ignore warnings from external sources
-file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.h libs/*.hpp libs/*.c libs/*.cpp)
+file(GLOB_RECURSE SRC_LIBS CONFIGURE_DEPENDS libs/*.c libs/*.cpp)
 if(MSVC)
-  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS /w)
+  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_OPTIONS /w)
 else()
-  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_FLAGS -w)
+  set_source_files_properties(${SRC_LIBS} PROPERTIES COMPILE_OPTIONS -w)
 endif()
 
 # ccache
@@ -106,15 +107,6 @@ message(STATUS "DEVELOP: " ${DEVELOP})
 # targets
 add_executable(shenanigans)
 add_executable(shenanigans_test)
-
-# definitions
-if (DEVELOP)
-  target_compile_definitions(shenanigans PRIVATE PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}" DEVELOP)
-  target_compile_definitions(shenanigans_test PRIVATE PROJECT_DIRECTORY="${CMAKE_SOURCE_DIR}" DEVELOP)
-else()
-  target_compile_definitions(shenanigans PRIVATE PROJECT_DIRECTORY="")
-  target_compile_definitions(shenanigans_test PRIVATE PROJECT_DIRECTORY="")
-endif()
 
 # precompiled headers
 if (ENABLE_PCH)
