@@ -52,7 +52,4 @@ def setup(jobs, build_type):
     if not opencv_dir:
         raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('OpenCV cmake directory: ', opencv_dir)
-
-    binaries = utils.find_binaries(opencv_install_dir)
-    utils.copy_files_to_directory(binaries, utils.get_runtime_directory(build_type))
     return opencv_dir
