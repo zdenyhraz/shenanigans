@@ -8,7 +8,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ENABLE_PCH ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 option(ENABLE_PROFILING "Enable performance profiling" OFF)
 option(ENABLE_PROFILING_MEMORY "Enable memory profiling" OFF)
@@ -30,9 +29,9 @@ endif()
 
 # compiler flags
 if(MSVC)
-  add_compile_options(/W1 /favor:AMD64 /arch:AVX2 /openmp:static)
+  add_compile_options(/W1 /favor:AMD64 /arch:AVX2 /openmp /MT)
 else()
-  add_compile_options(/W -march=native -fopenmp)
+  add_compile_options(/Wall -march=native -fopenmp)
   add_link_options(-fopenmp)
 endif()
 
