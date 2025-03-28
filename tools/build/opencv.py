@@ -46,11 +46,14 @@ def opencv_install(jobs):
     return opencv_find_root()
 
 
+def opencv_installed():
+    return os.path.isdir(opencv_install_dir) and any(os.scandir(opencv_install_dir))
+
+
 def setup(jobs, build_type):
+    if not opencv_installed():
+        opencv_install()
+
     opencv_dir = opencv_find_root()
-    if not opencv_dir:
-        opencv_dir = opencv_install(jobs)
-    if not opencv_dir:
-        raise RuntimeError("Unable to find installed OpenCV CMake directory")
     print('OpenCV cmake directory: ', opencv_dir)
     return opencv_dir
