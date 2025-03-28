@@ -11,6 +11,7 @@ opencv_cmake_args = {
     'OPENCV_ENABLE_NONFREE': 'ON',
     'BUILD_TESTS': 'OFF',
     'BUILD_PERF_TESTS': 'OFF',
+    'BUILD_opencv_wechat_qrcode': 'OFF',
     'BUILD_opencv_java': 'OFF',
     'BUILD_opencv_apps': 'OFF',
     'BUILD_opencv_python': 'OFF',
