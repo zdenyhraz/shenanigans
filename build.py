@@ -26,7 +26,7 @@ def configure(args):
 
 def build(args):
     print(f"Building {args.targets}")
-    utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
+    utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} --parallel')
     print(f'{args.targets} built successfully')
 
 
@@ -37,7 +37,6 @@ if __name__ == '__main__':
     parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
     parser.add_argument('--targets', help='targets', type=str, required=False, default='all' if utils.linux() else 'ALL_BUILD')
     parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
-    parser.add_argument('--jobs', help='jobs', type=int, required=False, default=multiprocessing.cpu_count())
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
     parser.add_argument('--opengl', help='opengl', required=False, action='store_true', default=True)
@@ -54,7 +53,7 @@ if __name__ == '__main__':
 
     print("Setting up libraries")
     args.onnxruntime_dir = args.onnxruntime_dir if args.onnxruntime_dir else onnxruntime.setup(args.build_type)
-    args.opencv_dir = args.opencv_dir if args.opencv_dir else opencv.setup(args.jobs, args.build_type)
+    args.opencv_dir = args.opencv_dir if args.opencv_dir else opencv.setup(args.build_type)
 
     configure(args)
     build(args)
