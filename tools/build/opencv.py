@@ -6,12 +6,20 @@ opencv_install_name = 'opencv_install'
 opencv_install_dir = os.path.join(utils.get_root_directory(), 'libs', opencv_install_name)
 opencv_cmake_args = {
     'CMAKE_BUILD_TYPE': 'Release',
+    'BUILD_SHARED_LIBS': 'OFF',
     'OPENCV_EXTRA_MODULES_PATH': '../opencv_contrib/modules',
     'OPENCV_ENABLE_NONFREE': 'ON',
     'BUILD_TESTS': 'OFF',
-    'BUILD_opencv_python': 'OFF',
+    'BUILD_PERF_TESTS': 'OFF',
     'BUILD_opencv_java': 'OFF',
-    'BUILD_opencv_apps': 'OFF'
+    'BUILD_opencv_apps': 'OFF',
+    'BUILD_opencv_python': 'OFF',
+    'BUILD_opencv_python': 'OFF',
+    'BUILD_opencv_python2': 'OFF',
+    'BUILD_opencv_python3': 'OFF',
+    'OPENCV_PYTHON_SKIP': 'ON',
+    'PYTHON_EXECUTABLE': '',
+    'PYTHON_LIBRARY': ''
 }
 
 
