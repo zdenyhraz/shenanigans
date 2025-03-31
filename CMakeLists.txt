@@ -196,19 +196,10 @@ file(GLOB SRC_IMGUI_NODES_EXTRA CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/libs/imgui
 set(SRC_IMGUI_NODES_EXTRA ${SRC_IMGUI_NODES_EXTRA} CACHE INTERNAL "ImGui Nodes extra source files")
 target_sources(shenanigans PRIVATE ${SRC_IMGUI_NODES} ${SRC_IMGUI_NODES_EXTRA})
 
-
 # range-v3
 add_subdirectory(libs/range-v3)
 target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
-
-# onnxruntime
-set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime" CACHE INTERNAL "ONNX runtime dir")
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(ONNXRUNTIME_LIB ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib CACHE INTERNAL "ONNX runtime lib")
-else()
-    set(ONNXRUNTIME_LIB ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so CACHE INTERNAL "ONNX runtime lib")
-endif()
 
 # custom
 include_directories(libs)

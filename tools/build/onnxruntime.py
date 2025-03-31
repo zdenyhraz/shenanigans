@@ -6,7 +6,7 @@ import urllib.request
 import shutil
 from . import utils
 
-onnxruntime_install_name = "onnxruntime"
+onnxruntime_install_name = "onnxruntime_install"
 onnxruntime_install_dir = os.path.join(utils.get_root_directory(), 'libs', onnxruntime_install_name)
 
 
@@ -50,14 +50,19 @@ def onnxruntime_download():
     os.remove(archive_file)
 
 
+def onnxruntime_install():
+    print(f'Installing onnxruntime')
+    cwd = os.path.join(utils.get_root_directory(), 'libs/onnxruntime')
+    os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
+    utils.run(f'python tools\ci_build\build.py --build_dir {onnxruntime_install_dir} --parallel --config Release --enable_msvc_static_runtime', cwd)
+
+
 def onnxruntime_installed():
     return os.path.isdir(onnxruntime_install_dir) and any(os.scandir(onnxruntime_install_dir))
 
 
 def setup(build_type):
     if not onnxruntime_installed():
-        onnxruntime_download()
+        onnxruntime_install()  # onnxruntime_download()
 
-    binaries = utils.find_binaries(onnxruntime_install_dir)
-    utils.copy_files_to_directory(binaries, utils.get_runtime_directory(build_type))
     return onnxruntime_install_dir

@@ -40,3 +40,6 @@
 [submodule "libs/range-v3"]
 	path = libs/range-v3
 	url = https://github.com/ericniebler/range-v3.git
+[submodule "libs/onnxruntime"]
+	path = libs/onnxruntime
+	url = https://github.com/microsoft/onnxruntime.git
