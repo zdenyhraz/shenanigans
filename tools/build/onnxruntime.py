@@ -6,7 +6,7 @@ import urllib.request
 import shutil
 from . import utils
 
-onnxruntime_install_name = "onnxruntime_install"
+onnxruntime_install_name = "onnxruntime"
 onnxruntime_install_dir = os.path.join(utils.get_root_directory(), 'libs', onnxruntime_install_name)
 
 
@@ -52,7 +52,7 @@ def onnxruntime_download():
 
 def onnxruntime_install():
     cwd = os.path.join(utils.get_root_directory(), 'libs/onnxruntime')
-    cmake_args = "onnxruntime_BUILD_SHARED_LIB=OFF"
+    cmake_args = ""
     cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
     os_args = '--enable_msvc_static_runtime' * utils.windows() + '--allow_running_as_root' * utils.linux()
     print(f"Installing onnxruntime to {onnxruntime_install_dir}")
@@ -68,6 +68,7 @@ def onnxruntime_installed():
 
 def setup(build_type):
     if not onnxruntime_installed():
-        onnxruntime_install()
+        onnxruntime_download()
 
+    utils.copy_files_to_directory(utils.find_binaries(onnxruntime_install_dir), utils.get_runtime_directory(build_type))
     return onnxruntime_install_dir
