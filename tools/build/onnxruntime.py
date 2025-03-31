@@ -51,7 +51,7 @@ def onnxruntime_download():
 
 
 def onnxruntime_install():
-    print(f'Installing onnxruntime')
+    print(f'Installing onnxruntime to {onnxruntime_install_dir}')
     cwd = os.path.join(utils.get_root_directory(), 'libs/onnxruntime')
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
     cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
@@ -68,4 +68,5 @@ def setup(build_type):
     if not onnxruntime_installed():
         onnxruntime_install()  # onnxruntime_download()
 
+    utils.print_directory_tree(onnxruntime_install_dir)
     return onnxruntime_install_dir

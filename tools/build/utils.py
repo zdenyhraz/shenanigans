@@ -84,3 +84,16 @@ def cuda_available():
         return True
     except FileNotFoundError:
         return False
+
+
+def print_directory_tree(directory, prefix=""):
+    print(f"Directory tree for {directory}:")
+    entries = sorted(os.listdir(directory))
+    for index, entry in enumerate(entries):
+        path = os.path.join(directory, entry)
+        is_last = index == len(entries) - 1
+        connector = "└── " if is_last else "├── "
+        print(prefix + connector + entry)
+        if os.path.isdir(path):
+            new_prefix = prefix + ("    " if is_last else "│   ")
+            print_directory_tree(path, new_prefix)
