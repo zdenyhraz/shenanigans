@@ -16,6 +16,7 @@ try
   env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, name);
   options = Ort::SessionOptions();
   options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+  options.DisableMemPattern();
   LoadProviders();
   session = Ort::Session(env, modelPath.c_str(), options);
   memoryInfo = Ort::MemoryInfo(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, usesGPU ? OrtMemTypeCPUInput : OrtMemTypeDefault));

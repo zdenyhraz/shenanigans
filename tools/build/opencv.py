@@ -32,12 +32,12 @@ def opencv_find_root():
                 if file == 'OpenCVConfig.cmake':
                     candidates.append(root)
     if len(candidates) > 1:
-        print(f'Found {len(candidates)} OpenCV candidates: {candidates}')
+        print(f'Found {len(candidates)} opencv candidates: {candidates}')
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
 def opencv_install():
-    print(f'Installing OpenCV: {platform.system()}/opencv_configure_args={utils.generate_configure_args(opencv_cmake_args)}')
+    print(f"Installing opencv to {opencv_install_dir}")
     cwd = os.path.join(utils.get_root_directory(), 'libs/opencv')
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
     utils.run(f'cmake -B ./build {utils.generate_configure_args(opencv_cmake_args)}', cwd)
@@ -55,5 +55,5 @@ def setup(build_type):
         opencv_install()
 
     opencv_dir = opencv_find_root()
-    print('OpenCV cmake directory: ', opencv_dir)
+    print('opencv cmake directory: ', opencv_dir)
     return opencv_dir

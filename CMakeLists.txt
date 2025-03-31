@@ -157,7 +157,7 @@ endif()
 
 # opencv
 set(OpenCV_STATIC ON)
-find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR} libs/opencv_install)
+find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR} ${CMAKE_SOURCE_DIR}/libs/opencv_install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})

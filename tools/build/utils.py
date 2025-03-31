@@ -87,7 +87,6 @@ def cuda_available():
 
 
 def print_directory_tree(directory, prefix=""):
-    print(f"Directory tree for {directory}:")
     entries = sorted(os.listdir(directory))
     for index, entry in enumerate(entries):
         path = os.path.join(directory, entry)
