@@ -54,7 +54,7 @@ def onnxruntime_install():
     print(f'Installing onnxruntime')
     cwd = os.path.join(utils.get_root_directory(), 'libs/onnxruntime')
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
-    utils.run(f'python tools/ci_build/build.py --build_dir {onnxruntime_install_dir} --parallel --config Release --enable_msvc_static_runtime', cwd)
+    utils.run(f'python tools/ci_build/build.py --build_dir {onnxruntime_install_dir} --parallel --config Release --enable_msvc_static_runtime --allow_running_as_root', cwd)
 
 
 def onnxruntime_installed():
