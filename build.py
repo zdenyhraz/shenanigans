@@ -19,7 +19,7 @@ def configure(args):
         **({f'ENABLE_SANITIZER_{args.sanitizer.upper()}': 'ON'} if args.sanitizer else {})
     }
     os.makedirs(args.build_dir, exist_ok=True)
-    utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)} ")
+    utils.run(f"cmake -B {args.build_dir} {f'-G {args.generator}' if args.generator else ''} {utils.generate_configure_args(configure_args)}")
     print('Repository configured successfully')
     args.configure_only and exit()
 

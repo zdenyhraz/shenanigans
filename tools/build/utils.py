@@ -76,3 +76,11 @@ def is_executable(file):
         return is_linux_executable(file)
     if windows():
         return is_windows_executable(file)
+
+
+def cuda_available():
+    try:
+        result = subprocess.run(["nvcc", "--version"], capture_output=True, text=True, check=True)
+        return True
+    except FileNotFoundError:
+        return False
