@@ -56,8 +56,10 @@ def onnxruntime_install():
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
     cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
     os_args = '--enable_msvc_static_runtime' * utils.windows() + '--allow_running_as_root' * utils.linux()
+    cmake_args = "onnxruntime_BUILD_SHARED_LIB=OFF"
     utils.run(
-        f"python tools/ci_build/build.py --parallel --config Release --build_dir {onnxruntime_install_dir} {cuda_args} {os_args}", cwd)
+        f"python tools/ci_build/build.py --config Release --parallel --update --build --skip_tests --build_dir {onnxruntime_install_dir} --cmake_extra_defines {cmake_args} {cuda_args} {os_args}", cwd)
+    utils.print_directory_tree(onnxruntime_install_dir)
 
 
 def onnxruntime_installed():
@@ -66,7 +68,6 @@ def onnxruntime_installed():
 
 def setup(build_type):
     if not onnxruntime_installed():
-        onnxruntime_install()  # onnxruntime_download()
+        onnxruntime_install()
 
-    utils.print_directory_tree(onnxruntime_install_dir)
     return onnxruntime_install_dir
