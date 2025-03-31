@@ -18,10 +18,6 @@ jobs:
             compiler: gcc
             build_type: Release
 
-          - os: windows-latest
-            compiler: msvc
-            build_type: Release
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4

@@ -5,9 +5,6 @@ from . import utils
 def find_sanitizer_binaries_windows():
     search_paths = [
         'C:/Program Files/Microsoft Visual Studio',
-        'C:/Program Files/Windows Kits',
-        'C:/Program Files (x86)/Microsoft Visual Studio',
-        'C:/Program Files (x86)/Windows Kits',
     ]
 
     binaries = []
