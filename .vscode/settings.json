@@ -1,6 +1,0 @@
-{
-  "cmake.environment": {
-    "CMAKE_PREFIX_PATH": "${workspaceFolder}/libs/opencv_install/x64/vc17/lib",
-    "OpenCV_DIR": "${workspaceFolder}/libs/opencv_install/x64/vc17/lib"
-  }
-}

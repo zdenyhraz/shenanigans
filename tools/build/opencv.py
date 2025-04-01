@@ -1,5 +1,4 @@
 import os
-import platform
 from . import utils
 
 opencv_install_name = 'opencv_install'
@@ -43,7 +42,6 @@ def opencv_install():
     utils.run(f'cmake -B ./build {utils.generate_configure_args(opencv_cmake_args)}', cwd)
     utils.run(f'cmake --build ./build --config Release --parallel', cwd)
     utils.run(f'cmake --install ./build --prefix ../{opencv_install_name}', cwd)
-    return opencv_find_root()
 
 
 def opencv_installed():
