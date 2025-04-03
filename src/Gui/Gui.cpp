@@ -3,7 +3,7 @@
 void GLFWInitialize()
 {
   PROFILE_FUNCTION;
-  auto GLFWErrorCallback = [](int error, const char* description) { LOG_ERROR("GLFWError {}: {}", error, description); };
+  static auto GLFWErrorCallback = [](int error, const char* description) { LOG_ERROR("GLFWError {}: {}", error, description); };
   glfwSetErrorCallback(GLFWErrorCallback);
   if (not glfwInit())
     throw std::runtime_error("GLFW initialization failed");
@@ -44,15 +44,46 @@ void ImGuiSetDefaultStyle()
   ImGuiSetHazelTheme();
 }
 
-ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem::path& iniPath, const std::filesystem::path& fontPath)
+void LogGPUInfo()
+{
+  int vramTotal, vramAvailable;
+  glGetIntegerv(0x9048, &vramTotal);
+  glGetIntegerv(0x9049, &vramAvailable);
+  LOG_DEBUG("GPU: {}, VRAM available: {:.1f}GB / {:.1f}GB ({:.0f}%)", reinterpret_cast<const char*>(glGetString(GL_RENDERER)), static_cast<float>(vramAvailable) / 1024 / 1024,
+      static_cast<float>(vramTotal) / 1024 / 1024, static_cast<float>(vramAvailable) / vramTotal * 100);
+}
+
+void LogMonitorInfo()
+{
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+  const char* monitorName = glfwGetMonitorName(monitor);
+  const float resolutionScale = static_cast<float>(mode->width) / 1920;
+  LOG_DEBUG("Monitor: {}, {}x{}, {}Hz, resolution scale: {}", monitorName, mode->width, mode->height, mode->refreshRate, resolutionScale);
+}
+
+void LogImGuiInfo()
+{
+  LOG_DEBUG("ImGui version: {}", IMGUI_VERSION);
+  LOG_DEBUG("ImPlot version: {}", IMPLOT_VERSION);
+}
+
+float GetResolutionScale()
+{
+  return static_cast<float>(glfwGetVideoMode(glfwGetPrimaryMonitor())->width) / 1920;
+}
+
+ImGuiIO& ImGuiInitialize(GLFWwindow* window, float baseScale, const std::filesystem::path& iniPath, const std::filesystem::path& fontPath)
 {
   PROFILE_FUNCTION;
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImPlot::CreateContext();
-  LOG_DEBUG("ImGui version: {}", IMGUI_VERSION);
-  LOG_DEBUG("ImPlot version: {}", IMPLOT_VERSION);
+  LogImGuiInfo();
+  LogGPUInfo();
+  LogMonitorInfo();
 
+  const float scale = baseScale * GetResolutionScale();
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
@@ -60,15 +91,25 @@ ImGuiIO& ImGuiInitialize(GLFWwindow* window, float scale, const std::filesystem:
 
   if (std::filesystem::exists(fontPath))
   {
-    LOG_DEBUG("Using font {}", fontPath.filename());
-    io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), scale * 10);
+    LOG_DEBUG("Using font '{}'", fontPath);
+    static constexpr float fontSize = 10;
+    io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), fontSize * scale);
+  }
+  else
+  {
+    LOG_WARNING("Font file '{}' not found", fontPath);
+    io.FontGlobalScale = scale;
   }
 
   if (std::filesystem::exists(iniPath))
   {
-    LOG_DEBUG("Using ini {}", iniPath.filename());
-    ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
-    io.IniFilename = iniPath.string().c_str();
+    LOG_DEBUG("Using ini file '{}'", iniPath);
+    static std::string iniPathStr = iniPath.string();
+    io.IniFilename = iniPathStr.c_str();
+  }
+  else
+  {
+    LOG_WARNING("Ini file '{}' not found", iniPath);
   }
 
   ImGuiStyle& style = ImGui::GetStyle();
@@ -231,32 +272,9 @@ void ImGuiSetHazelTheme()
 void ImPlotUpdatePlotTheme()
 {
   ImPlot::StyleColorsAuto();
-  // auto& style = ImGui::GetStyle();
-  // auto& colors = style.Colors;
   auto& plotStyle = ImPlot::GetStyle();
-  auto& plotColors = plotStyle.Colors;
-
   plotStyle.MinorAlpha = 0.25f;
-  plotColors[ImPlotCol_Line] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_Fill] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_MarkerOutline] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_MarkerFill] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_ErrorBar] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_FrameBg] = ImVec4(0, 0, 0, 0);
-  plotColors[ImPlotCol_PlotBg] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_PlotBorder] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_LegendBg] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_LegendBorder] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_LegendText] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_TitleText] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_InlayText] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_PlotBorder] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_AxisText] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_AxisGrid] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_AxisTick] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_AxisBg] = ImVec4(0, 0, 0, 0);
-  plotColors[ImPlotCol_AxisBgHovered] = ImVec4(0, 0, 0, 0);
-  plotColors[ImPlotCol_AxisBgActive] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_Selection] = IMPLOT_AUTO_COL;
-  plotColors[ImPlotCol_Crosshairs] = IMPLOT_AUTO_COL;
+  plotStyle.Colors[ImPlotCol_FrameBg] = ImVec4(0, 0, 0, 0);
+  plotStyle.Colors[ImPlotCol_AxisBg] = ImVec4(0, 0, 0, 0);
+  plotStyle.Colors[ImPlotCol_AxisBgHovered] = ImVec4(0, 0, 0, 0);
 }

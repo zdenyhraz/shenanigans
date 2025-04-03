@@ -20,3 +20,7 @@ void ImGuiSetClassicTheme();
 void ImGuiSetLightTheme();
 void ImGuiSetHazelTheme();
 void ImPlotUpdatePlotTheme();
+void LogGPUInfo();
+void LogMonitorInfo();
+void LogImGuiInfo();
+float GetResolutionScale();

@@ -35,7 +35,11 @@ class FilePathGenerator
 public:
   FilePathGenerator() = default;
 
-  FilePathGenerator(const std::string& dirPath) : mDirPath(dirPath), mIterator(dirPath) {}
+  FilePathGenerator(const std::string& dirPath) : mDirPath(dirPath), mIterator(dirPath)
+  {
+    if (not std::filesystem::is_directory(mDirPath))
+      throw std::invalid_argument(fmt::format("{} is not a valid directory", mDirPath));
+  }
 
   void Reset() { mIterator = std::filesystem::recursive_directory_iterator(mDirPath); }
 
@@ -43,6 +47,9 @@ public:
   {
     if (dirPath != mDirPath)
     {
+      if (not std::filesystem::is_directory(dirPath))
+        throw std::invalid_argument(fmt::format("{} is not a valid directory", dirPath));
+
       mDirPath = dirPath;
       Reset();
     }

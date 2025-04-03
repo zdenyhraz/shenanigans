@@ -28,7 +28,7 @@ void Application::Run()
 {
   static constexpr bool hiddenWindow = true;
   static constexpr bool limitFPS = true;
-  static constexpr float scale = 2.0;
+  static constexpr float scale = 1;
   static constexpr double targetFPS = 60;
   static constexpr double targetFrametime = 1. / targetFPS;
   // flawfinder: ignore
