@@ -82,9 +82,12 @@ try
   {
     if (ImGui::BeginMenuBar())
     {
-      RenderPlotMenu();
-      RenderDemoMenu();
-      RenderThemeMenu();
+      if constexpr (showThemeMenu)
+        RenderThemeMenu();
+      if constexpr (showPlotMenu)
+        RenderPlotMenu();
+      if constexpr (showImGuiDemoMenu)
+        RenderDemoMenu();
       ImGui::EndMenuBar();
     }
 
@@ -92,15 +95,14 @@ try
     {
       for (const auto& window : mWindows)
         window->Render();
-
       ImGui::EndTabBar();
     }
     ImGui::End();
   }
 
-  if (mShowImGuiDemoWindow)
+  if (showImGuiDemoWindow)
     ImGui::ShowDemoWindow();
-  if (mShowImPlotDemoWindow)
+  if (showImPlotDemoWindow)
     ImPlot::ShowDemoWindow();
 
   ImGuiLogger::Render();
@@ -132,10 +134,10 @@ void Application::RenderDemoMenu()
 {
   if (ImGui::BeginMenu("Demos"))
   {
-    if (ImGui::MenuItem("ImGui demo", nullptr, mShowImGuiDemoWindow))
-      mShowImGuiDemoWindow = !mShowImGuiDemoWindow;
-    if (ImGui::MenuItem("ImPlot demo", nullptr, mShowImPlotDemoWindow))
-      mShowImPlotDemoWindow = !mShowImPlotDemoWindow;
+    if (ImGui::MenuItem("ImGui demo", nullptr, showImGuiDemoWindow))
+      showImGuiDemoWindow = !showImGuiDemoWindow;
+    if (ImGui::MenuItem("ImPlot demo", nullptr, showImPlotDemoWindow))
+      showImPlotDemoWindow = !showImPlotDemoWindow;
 
     ImGui::EndMenu();
   }

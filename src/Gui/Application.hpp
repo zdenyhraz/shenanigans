@@ -12,11 +12,14 @@ class Application
   static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
   std::vector<std::unique_ptr<Window>> mWindows;
-  bool mShowImGuiDemoWindow = false;
-  bool mShowImPlotDemoWindow = false;
   std::string appName;
   std::filesystem::path iniPath = "imgui.ini";
   std::filesystem::path fontPath = "CascadiaCode.ttf";
+  bool showImGuiDemoWindow = false;
+  bool showImPlotDemoWindow = false;
+  static constexpr bool showPlotMenu = false;
+  static constexpr bool showImGuiDemoMenu = false;
+  static constexpr bool showThemeMenu = true;
 
 public:
   Application(const std::string& appName_);
