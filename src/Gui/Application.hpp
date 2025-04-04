@@ -5,7 +5,7 @@ class Application
 {
   void Initialize();
   void Render();
-  void RenderPlotMenu();
+  static void RenderPlotMenu();
   void RenderDemoMenu();
   static void RenderThemeMenu();
   static void SetWindowIcon(GLFWwindow* window);
@@ -25,7 +25,7 @@ public:
   Application(const std::string& appName_);
   void SetIniPath(const std::filesystem::path& iniPath_);
   void SetFontPath(const std::filesystem::path& fontPath_);
-  void SetPlotWindowCount(size_t count);
+  static void SetPlotWindowCount(size_t count);
   void Run();
 
   template <typename T>

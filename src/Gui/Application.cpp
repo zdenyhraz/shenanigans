@@ -32,7 +32,7 @@ void Application::SetPlotWindowCount(size_t count)
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
-  for (const auto& window : mWindows)
+  for (auto& window : mWindows)
     window->Initialize();
 }
 
