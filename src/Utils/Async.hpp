@@ -18,10 +18,6 @@ inline void LaunchAsync(T&& fun)
         {
           LOG_EXCEPTION(e);
         }
-        catch (...)
-        {
-          LOG_UNKNOWN_EXCEPTION;
-        }
       })
       .detach();
 }

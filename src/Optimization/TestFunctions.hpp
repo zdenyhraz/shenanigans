@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Random.hpp"
+#include "Math/Functions.hpp"
 
 namespace OptimizationTestFunctions
 {

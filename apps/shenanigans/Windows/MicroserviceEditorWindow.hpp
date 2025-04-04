@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.hpp"
+#include "Gui/Window.hpp"
 #include "Microservice/MicroserviceEditor.hpp"
 
 class MicroserviceEditorWindow : public Window

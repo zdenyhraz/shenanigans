@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.hpp"
+#include "Gui/Window.hpp"
 
 class RandomWindow : public Window
 {

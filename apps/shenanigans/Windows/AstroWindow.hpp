@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.hpp"
+#include "Gui/Window.hpp"
 #include "Astrophysics/DifferentialRotation.hpp"
 #include "Astrophysics/SolarWindSpeed.hpp"
 
@@ -26,6 +26,7 @@ class AstroWindow : public Window
       mDiffrotParameters.thetamax, mDiffrotParameters.cadence, mDiffrotParameters.idstart};
   float mProgress = 0;
   SolarWindSpeedParameters mSwindParameters;
+  IPC mIPC;
 
 public:
   void Render() override;

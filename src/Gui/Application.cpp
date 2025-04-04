@@ -3,23 +3,35 @@
 #include "Utils/Async.hpp"
 #include "Log/ImGuiLogger.hpp"
 #include "Plot/ImGuiPlot.hpp"
-#include "Windows/IPCWindow.hpp"
-#include "Windows/AstroWindow.hpp"
-#include "Windows/RandomWindow.hpp"
-#include "Windows/MicroserviceEditorWindow.hpp"
-#include "NDA/Windows/ObjdetectColorWindow.hpp"
-#include "NDA/Windows/ObjdetectObjectnessWindow.hpp"
+
+Application::Application(const std::string& appName_) : appName(appName_)
+{
+}
+
+void Application::SetIniPath(const std::filesystem::path& iniPath_)
+{
+  const auto path = GetProjectPath(iniPath_.string());
+  if (not std::filesystem::is_regular_file(path))
+    return LOG_WARNING(fmt::format("File '{}' does not exist", path));
+  iniPath = path;
+}
+
+void Application::SetFontPath(const std::filesystem::path& fontPath_)
+{
+  const auto path = GetProjectPath(fontPath_.string());
+  if (not std::filesystem::is_regular_file(path))
+    return LOG_WARNING(fmt::format("File '{}' does not exist", path));
+  fontPath = path;
+}
+
+void Application::SetPlotWindowCount(size_t count)
+{
+  ImGuiPlot::SetWindowCount(count);
+}
 
 void Application::Initialize()
 {
   PROFILE_FUNCTION;
-  mWindows.push_back(std::make_unique<ObjdetectObjectnessWindow>());
-  mWindows.push_back(std::make_unique<ObjdetectColorWindow>());
-  mWindows.push_back(std::make_unique<MicroserviceEditorWindow>());
-  mWindows.push_back(std::make_unique<IPCWindow>());
-  mWindows.push_back(std::make_unique<AstroWindow>());
-  mWindows.push_back(std::make_unique<RandomWindow>());
-
   for (const auto& window : mWindows)
     window->Initialize();
 }
@@ -34,14 +46,13 @@ void Application::Run()
   // flawfinder: ignore
   std::srand(std::time(nullptr));
   ImGuiLogger::SetFallback(false);
-  ImGuiPlot::SetWindowCount(2);
   GLFWInitialize();
   auto window = GLFWCreateWindow(1920, 1080, hiddenWindow);
   GLFWInitializeGL(window);
   GLFWSetWindowCallback(window, KeyCallback);
   if constexpr (not hiddenWindow)
     SetWindowIcon(window);
-  ImGuiIO& io = ImGuiInitialize(window, scale, GetProjectPath("data/shenanigans/app/imgui.ini"), GetProjectPath("data/shenanigans/app/CascadiaCode.ttf"));
+  ImGuiIO& io = ImGuiInitialize(window, scale, iniPath, fontPath);
   Initialize();
   LOG_INFO("Ready");
   double lastUpdateTime = 0, elapsedTime = 0;
@@ -67,14 +78,13 @@ void Application::Render()
 try
 {
   PROFILE_FUNCTION;
-  if (ImGui::Begin("Shenanigans", nullptr, ImGuiWindowFlags_MenuBar))
+  if (ImGui::Begin(appName.c_str(), nullptr, ImGuiWindowFlags_MenuBar))
   {
     if (ImGui::BeginMenuBar())
     {
       RenderPlotMenu();
       RenderDemoMenu();
       RenderThemeMenu();
-      RenderStyleMenu();
       ImGui::EndMenuBar();
     }
 
@@ -93,7 +103,6 @@ try
   if (mShowImPlotDemoWindow)
     ImPlot::ShowDemoWindow();
 
-  ImGuiPlot::SetSave(mPlotSave);
   ImGuiLogger::Render();
   ImGuiPlot::Render();
 }
@@ -105,19 +114,13 @@ catch (const std::exception& e)
 {
   LOG_EXCEPTION(e);
 }
-catch (...)
-{
-  LOG_UNKNOWN_EXCEPTION;
-}
 
 void Application::RenderPlotMenu()
 {
   if (ImGui::BeginMenu("Plot"))
   {
-    if (ImGui::MenuItem("Save plots", nullptr, mPlotSave))
-      mPlotSave = !mPlotSave;
     if (ImGui::MenuItem("Clear plots"))
-      LaunchAsync([]() { Plot::Clear(); });
+      LaunchAsync([]() { ImGuiPlot::Clear(); });
     if (ImGui::MenuItem("Debug ImGuiPlots"))
       LaunchAsync([]() { ImGuiPlot::Debug(); });
 
@@ -150,21 +153,6 @@ void Application::RenderThemeMenu()
       ImGuiSetLightTheme();
     if (ImGui::MenuItem("Hazel"))
       ImGuiSetHazelTheme();
-
-    ImGui::EndMenu();
-  }
-}
-
-void Application::RenderStyleMenu()
-{
-  if (ImGui::BeginMenu("Style"))
-  {
-    if (ImGui::MenuItem("Save style to disk"))
-    {
-      const auto path = GetProjectPath("data/apps") / "imgui.ini";
-      LOG_DEBUG("Saving ImGui style to {}", path);
-      ImGui::SaveIniSettingsToDisk(path.string().c_str());
-    }
 
     ImGui::EndMenu();
   }

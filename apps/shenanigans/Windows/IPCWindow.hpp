@@ -1,6 +1,6 @@
 #pragma once
 #include "ImageRegistration/IPC.hpp"
-#include "Window.hpp"
+#include "Gui/Window.hpp"
 
 class IPCWindow : public Window
 {
@@ -40,10 +40,12 @@ class IPCWindow : public Window
 
   void UpdateIPCParameters(IPC& ipc);
   std::string GetCurrentDatasetPath() const;
-  void FalseCorrelationsRemoval() const;
+  void FalseCorrelationsRemoval();
 
   IPCParameters mIPCParameters;
   IPCOptimizeParameters mOptimizeParameters;
+  IPC mIPC;
+  IPC mIPCOptimized;
 
 public:
   void Initialize() override;
