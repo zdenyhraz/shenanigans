@@ -98,7 +98,7 @@ cv::Mat OnnxModel::Preprocess(const cv::Mat& image)
   return chw;
 }
 
-std::vector<Ort::Value> OnnxModel::Run(const cv::Mat image)
+std::vector<Ort::Value> OnnxModel::Run(const cv::Mat& image)
 {
   std::vector<int64_t> inputShape = {1, 3, image.rows, image.cols};
   cv::Mat imageTensor = Preprocess(image);

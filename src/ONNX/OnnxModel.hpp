@@ -22,7 +22,7 @@ public:
       const std::filesystem::path& modelPath = "", const char* name = "model", const std::vector<const char*>& inputNames = {}, const std::vector<const char*>& outputNames = {});
   operator bool() const { return loaded; }
 
-  std::vector<Ort::Value> Run(const cv::Mat image);
+  std::vector<Ort::Value> Run(const cv::Mat& image);
   void Load(const std::filesystem::path& modelPath);
   void Unload();
   void SetName(const char* _name) { name = _name; }
