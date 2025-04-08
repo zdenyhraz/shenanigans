@@ -1,5 +1,5 @@
 import os
-from script.build import utils
+from script.setup import utils
 from script.log import log
 
 

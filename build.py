@@ -9,7 +9,7 @@ from script.setup import onnxruntime
 
 
 def configure(args):
-    log.info(f"Configuring {args.targets}")
+    log.info(f"Configuring target {args.targets}")
     configure_args = {
         'CMAKE_BUILD_TYPE': args.build_type,
         'OPENCV_DIR': args.opencv_dir,
@@ -23,14 +23,14 @@ def configure(args):
     generator_args = f'-G {args.generator}' if args.generator else ''
     cmake_args = utils.generate_configure_args(configure_args)
     utils.run(f"cmake {builddir_args} {generator_args} {cmake_args}")
-    log.info('Repository configured successfully')
+    log.info(f'Target {args.targets} configured successfully')
     args.configure_only and exit()
 
 
 def build(args):
-    log.info(f"Building {args.targets}")
+    log.info(f"Building target {args.targets}")
     utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} --parallel')
-    log.info(f'{args.targets} built successfully')
+    log.info(f'Target {args.targets} built successfully')
 
 
 if __name__ == '__main__':
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('--onnxruntime_dir', help='onnxruntime_dir', type=str, required=False, default=None)
 
     args = parser.parse_args()
-    log.info(f"Setting up {args.targets}")
+    log.info(f"Setting up target {args.targets}")
     for arg, val in vars(args).items():
         log.debug(f'{arg}: {val}')
 
