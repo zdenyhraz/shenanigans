@@ -10,7 +10,7 @@ def run(command, cwd=None):
     try:
         subprocess.run(command, shell=True, check=True, cwd=cwd if cwd else None)
     except subprocess.CalledProcessError as e:
-        log.debug(f"Command '{command}' failed with exit code {e.returncode}")
+        log.error(f"Command '{command}' failed with exit code {e.returncode}")
         raise
 
 

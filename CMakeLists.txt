@@ -231,7 +231,7 @@ file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shen
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS} ${SRC_GUI} ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp test/*.cpp)
+file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp src/Test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS} ${SRC_SHENANIGANS_TEST})
 gtest_discover_tests(shenanigans_test)
 

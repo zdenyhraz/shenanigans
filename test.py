@@ -19,12 +19,14 @@ def find_test_executables(build_dir):
 
 
 if __name__ == '__main__':
+    log.info('Running tests')
     root_dir = utils.get_root_directory()
     build_dir = os.path.join(root_dir, 'build')
-    test_dir = os.path.join(root_dir, 'test')
+    log.debug(f'Root directory: {root_dir}')
+    log.debug(f'Build directory: {build_dir}')
 
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
-    log.debug('Test executables: ', test_executables)
+    log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
         utils.run(test)
