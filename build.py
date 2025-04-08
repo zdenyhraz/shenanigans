@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if utils.linux() else None)
     parser.add_argument('--build_type', help='build_type', type=str, required=False, default='Release')
     parser.add_argument('--targets', help='targets', type=str, required=False, default='all' if utils.linux() else 'ALL_BUILD')
-    parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='./build')
+    parser.add_argument('--build_dir', help='build_dir', type=str, required=False, default='build')
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
     parser.add_argument('--opengl', help='opengl', required=False, action='store_true', default=True)
