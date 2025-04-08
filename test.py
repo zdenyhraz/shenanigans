@@ -33,6 +33,7 @@ def run_cpp_tests():
 
 def run_python_tests():
     log.info('Running Python tests')
+    utils.run(f'pip install -r requirements.txt')
     test_dir = 'script/test'
     log.debug(f'Test directory: {test_dir}')
     utils.run(f'pytest -p no:warnings {test_dir}')
