@@ -1,5 +1,6 @@
 import os
-from tools.build import utils
+from script.build import utils
+from script.log import log
 
 
 def find_test_executables(build_dir):
@@ -24,6 +25,6 @@ if __name__ == '__main__':
 
     # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
-    print('Test executables: ', test_executables)
+    log.debug('Test executables: ', test_executables)
     for test in test_executables:
         utils.run(test)

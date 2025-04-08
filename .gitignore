@@ -11,7 +11,7 @@ libs/onnxruntime
 data/*
 !data/shenanigans/
 !data/readme/
-!tools/build/
+!script/build/
 
 *.zip
 *.dump

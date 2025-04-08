@@ -2,7 +2,7 @@ import pyxtf
 import numpy as np
 import os
 from PIL import Image
-
+from script.log import log
 
 directory = r'M:\Work\shenanigans\data\debug\ObjectDetection\xtf'
 for filename in os.listdir(directory):
@@ -12,7 +12,7 @@ for filename in os.listdir(directory):
     if not file.endswith('.xtf'):
         continue
 
-    print(f"Processing {savepath}")
+    log.debug(f"Processing {savepath}")
     (header, packets) = pyxtf.xtf_read(file)
 
     # The function concatenate_channels concatenates all the individual pings for a channel, and returns it as a dense numpy array

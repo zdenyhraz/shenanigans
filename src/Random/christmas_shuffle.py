@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
 import os
+from script.log import log
 
 
 def valid(sources, targets):
@@ -21,9 +22,9 @@ while not valid(sources, targets):
     targets[2:] = sublist
 
 if not file:
-    print("Results:")
+    log.debug("Results:")
     for source, target in zip(sources, targets):
-        print(f"{source} -> {target}")
+        log.debug(f"{source} -> {target}")
 else:
     for source, target in zip(sources, targets):
         with open(f'{os.path.dirname(os.path.abspath(__file__))}/{source}.txt', 'w') as file:
