@@ -1,11 +1,11 @@
 import os
 import argparse
 from script.log import log
-from script.build import utils
-from script.build import configuration
-from script.build import buildtools
-from script.build import opencv
-from script.build import onnxruntime
+from script.setup import utils
+from script.setup import configuration
+from script.setup import buildtools
+from script.setup import opencv
+from script.setup import onnxruntime
 
 
 def configure(args):
