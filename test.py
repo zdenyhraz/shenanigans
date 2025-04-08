@@ -9,7 +9,7 @@ def find_test_executables(build_dir):
     test_executables = []
     for root, _, files in os.walk(build_dir):
         for file in files:
-            if '_test' in file:
+            if 'test' in file:
                 executable = os.path.join(root, file)
                 if utils.is_executable(executable):
                     test_executables.append(executable)
@@ -18,11 +18,9 @@ def find_test_executables(build_dir):
     return test_executables
 
 
-if __name__ == '__main__':
-    log.info('Running tests')
-    root_dir = utils.get_root_directory()
-    build_dir = os.path.join(root_dir, 'build')
-    log.debug(f'Root directory: {root_dir}')
+def run_cpp_tests():
+    log.info('Running C++ tests')
+    build_dir = 'build'
     log.debug(f'Build directory: {build_dir}')
 
     # run('ctest --output-on-failure', build_dir)
@@ -30,3 +28,17 @@ if __name__ == '__main__':
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
         utils.run(test)
+
+
+def run_python_tests():
+    log.info('Running Python tests')
+    test_dir = 'script/test'
+    log.debug(f'Test directory: {test_dir}')
+    utils.run(f'pytest -p no:warnings {test_dir}')
+
+
+if __name__ == '__main__':
+    log.info('Running tests')
+    run_cpp_tests()
+    run_python_tests()
+    log.info('All tests passed')
