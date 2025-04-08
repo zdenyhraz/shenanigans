@@ -5,11 +5,7 @@
 class IPCTest : public ::testing::Test
 {
 protected:
-  IPCTest()
-  {
-    mImg1 = cv::Mat(1000, 1000, CV_32F);
-    cv::randu(mImg1, cv::Scalar(0), cv::Scalar(1));
-  }
+  IPCTest() : mImg1(1000, 1000, CV_32F) { cv::randu(mImg1, cv::Scalar(0), cv::Scalar(1)); }
 
   using InterpolationType = IPC::InterpolationType;
   using BandpassType = IPC::BandpassType;
@@ -26,6 +22,7 @@ protected:
   IPC GetIPC() const { return IPC(mImg1.size()); }
 
   cv::Point2d mShift = cv::Point2d(38.638, -67.425);
+  // cppcheck-suppress unusedStructMember
   static constexpr double kTolerance = 1e-7;
   cv::Mat mImg1;
   cv::Mat mImg2;
