@@ -16,6 +16,7 @@ class OnnxModel
 
   void LoadProviders();
   static cv::Mat Preprocess(const cv::Mat& image);
+  static void OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message);
 
 public:
   OnnxModel(

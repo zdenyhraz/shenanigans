@@ -10,10 +10,11 @@ OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, 
 void OnnxModel::Load(const std::filesystem::path& modelPath)
 try
 {
+  LOG_DEBUG("Loading model {}", modelPath);
   if (not std::filesystem::is_regular_file(modelPath))
-    throw EXCEPTION("Could not find model '{}'", modelPath);
+    throw EXCEPTION("Could not find model '{}'", modelPath.string());
 
-  env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, name);
+  env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, name, OnnxLogFunction, nullptr);
   options = Ort::SessionOptions();
   options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
   options.DisableMemPattern();
@@ -21,7 +22,7 @@ try
   session = Ort::Session(env, modelPath.c_str(), options);
   memoryInfo = Ort::MemoryInfo(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, usesGPU ? OrtMemTypeCPUInput : OrtMemTypeDefault));
   loaded = true;
-  LOG_DEBUG("Loaded model {} | GPU: {}", modelPath.filename(), usesGPU);
+  LOG_DEBUG("Loaded model {} | GPU: {}", modelPath, usesGPU);
 }
 catch (const std::exception& e)
 {
@@ -78,6 +79,23 @@ void OnnxModel::LoadProviders()
     LOG_DEBUG("ONNX CPU provider loaded");
   }
 }
+
+void OnnxModel::OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message)
+{
+  switch (severity)
+  {
+  case ORT_LOGGING_LEVEL_VERBOSE:
+    return LOG_DEBUG("ONNX {}", message);
+  case ORT_LOGGING_LEVEL_INFO:
+    return LOG_INFO("ONNX {}", message);
+  case ORT_LOGGING_LEVEL_WARNING:
+    return LOG_WARNING("ONNX {}", message);
+  case ORT_LOGGING_LEVEL_ERROR:
+    return LOG_ERROR("ONNX {}", message);
+  case ORT_LOGGING_LEVEL_FATAL:
+    return LOG_ERROR("ONNX {}", message);
+  }
+};
 
 cv::Mat OnnxModel::Preprocess(const cv::Mat& image)
 {
