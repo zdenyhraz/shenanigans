@@ -40,8 +40,8 @@ def run_python_tests():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
-    parser.add_argument('--cpp', help='configure_only', required=False, action='store_true', default=True)
-    parser.add_argument('--python', help='configure_only', required=False, action='store_true', default=True)
+    parser.add_argument('--cpp', help='Run C++ tests', required=False, action='store_true', default=True)
+    parser.add_argument('--python', help='Run Python tests', required=False, action='store_true', default=True)
     args = parser.parse_args()
 
     log.info('Running tests')

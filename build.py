@@ -43,9 +43,9 @@ if __name__ == '__main__':
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
     parser.add_argument('--opengl', help='opengl', required=False, action='store_true', default=True)
-    parser.add_argument('--configure_only', help='configure_only', required=False, action='store_true', default=False)
-    parser.add_argument('--opencv_dir', help='opencv_dir', type=str, required=False, default=None)
-    parser.add_argument('--onnxruntime_dir', help='onnxruntime_dir', type=str, required=False, default=None)
+    parser.add_argument('--configure_only', help='configure only', required=False, action='store_true', default=False)
+    parser.add_argument('--opencv_dir', help='opencv dir', type=str, required=False, default=None)
+    parser.add_argument('--onnxruntime_dir', help='onnxruntime dir', type=str, required=False, default=None)
     args = parser.parse_args()
 
     log.info(f"Setting up target {args.targets}")
