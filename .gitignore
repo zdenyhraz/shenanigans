@@ -17,4 +17,6 @@ data/*
 *.dump
 *.dll
 *.exe
-*.pyc
+*.py[cod]
+*.pt
+*.onnx
