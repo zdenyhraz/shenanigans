@@ -1,4 +1,5 @@
 numpy
 matplotlib
+pytest
 torch
 torchvision

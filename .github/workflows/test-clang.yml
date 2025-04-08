@@ -39,11 +39,6 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Pytest install
-      uses: BSFishy/pip-action@v1
-      with:
-        packages: pytest
-
     - name: Build
       run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
 
