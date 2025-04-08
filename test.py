@@ -1,4 +1,5 @@
 import os
+import argparse
 from script.setup import utils
 from script.log import log
 
@@ -38,7 +39,16 @@ def run_python_tests():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Test script')
+    parser.add_argument('--cpp', help='configure_only', required=False, action='store_true', default=True)
+    parser.add_argument('--python', help='configure_only', required=False, action='store_true', default=True)
+    args = parser.parse_args()
+
     log.info('Running tests')
-    run_cpp_tests()
-    run_python_tests()
+    for arg, val in vars(args).items():
+        log.debug(f'{arg}: {val}')
+
+    args.cpp and run_cpp_tests()
+    args.python and run_python_tests()
+
     log.info('All tests passed')

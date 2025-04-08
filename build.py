@@ -46,8 +46,8 @@ if __name__ == '__main__':
     parser.add_argument('--configure_only', help='configure_only', required=False, action='store_true', default=False)
     parser.add_argument('--opencv_dir', help='opencv_dir', type=str, required=False, default=None)
     parser.add_argument('--onnxruntime_dir', help='onnxruntime_dir', type=str, required=False, default=None)
-
     args = parser.parse_args()
+
     log.info(f"Setting up target {args.targets}")
     for arg, val in vars(args).items():
         log.debug(f'{arg}: {val}')
