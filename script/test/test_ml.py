@@ -2,9 +2,9 @@ import matplotlib
 matplotlib.use('Agg')
 
 
-def test_sas_segm():
-    import script.ml.detection.sas.sas_segm as sas_segm
-    sas_segm.main()
+def test_sas():
+    import script.ml.detection.sas.sas as sas
+    sas.main()
 
 
 def test_umbellula():
