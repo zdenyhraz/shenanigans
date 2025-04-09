@@ -1,6 +1,7 @@
 numpy
 matplotlib
 pytest
+tqdm
 torch
 torchvision
 pandas
