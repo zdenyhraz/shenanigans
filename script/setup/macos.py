@@ -32,7 +32,7 @@ def gcc_install(version='14'):
     os.environ['CXX'] = f'g++-{version}'
 
 
-def clang_install(version='19'):
+def clang_install(version='18'):
     utils.run('brew search clang')
     utils.run(f'brew install llvm@{version}')
     utils.run(f'brew unlink llvm@{version}')
