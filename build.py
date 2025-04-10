@@ -35,10 +35,10 @@ def build(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Build script')
-    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='gcc' if utils.linux() else 'msvc')
-    parser.add_argument('--generator', help='generator', type=str, required=False, default='Ninja' if utils.linux() else None)
+    parser.add_argument('--compiler', help='compiler', type=str, required=False, default='msvc' if utils.windows() else 'gcc')
+    parser.add_argument('--generator', help='generator', type=str, required=False, default=None if utils.windows() else 'Ninja')
+    parser.add_argument('--targets', help='targets to build', type=str, required=False, default='ALL_BUILD' if utils.windows() else 'all')
     parser.add_argument('--build_type', help='build type', type=str, required=False, default='Release')
-    parser.add_argument('--targets', help='targets to build', type=str, required=False, default='all' if utils.linux() else 'ALL_BUILD')
     parser.add_argument('--build_dir', help='build directory', type=str, required=False, default='build')
     parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
