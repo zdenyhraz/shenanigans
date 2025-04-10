@@ -17,8 +17,6 @@ opencv_cmake_args = {
     'BUILD_OPENCV_APPS': 'OFF',
     'BUILD_OPENCV_PYTHON': 'OFF',
     'OPENCV_PYTHON_SKIP': 'ON',
-    'PYTHON_EXECUTABLE': '',
-    'PYTHON_LIBRARY': '',
     'BUILD_OPENCV_DNN': 'OFF',
     'BUILD_OPENCV_ML': 'OFF',
     'BUILD_OPENCV_OBJDETECT': 'OFF',
