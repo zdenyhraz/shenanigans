@@ -23,21 +23,23 @@ def opengl_install():
 
 
 def gcc_install(version='14'):
+    utils.run('brew search gcc')
     utils.run(f'brew install gcc@{version}')
+    utils.run(f'brew unlink gcc@{version}')
     utils.run(f'brew link --overwrite --force gcc@{version}')
-    utils.run('brew install libomp')
-    utils.run(f'gcc --version')
-    os.environ['CC'] = 'gcc'
-    os.environ['CXX'] = 'g++'
+    utils.run(f'gcc-{version} --version')
+    os.environ['CC'] = f'gcc-{version}'
+    os.environ['CXX'] = f'g++-{version}'
 
 
-def clang_install(version='20'):
+def clang_install(version='19'):
+    utils.run('brew search clang')
     utils.run(f'brew install llvm@{version}')
+    utils.run(f'brew unlink llvm@{version}')
     utils.run(f'brew link --overwrite --force llvm@{version}')
-    utils.run('brew install libomp')
-    utils.run(f'clang --version')
-    os.environ['CC'] = 'clang'
-    os.environ['CXX'] = 'clang++'
+    utils.run(f'clang-{version} --version')
+    os.environ['CC'] = f'clang-{version}'
+    os.environ['CXX'] = f'clang++-{version}'
 
 
 def compiler_install(compiler):
