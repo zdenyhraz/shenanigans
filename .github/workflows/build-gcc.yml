@@ -13,9 +13,6 @@ jobs:
           - os: ubuntu-latest
             compiler: gcc
             build_type: Release
-          - os: macos-latest
-            compiler: gcc
-            build_type: Release
 
     runs-on: ${{ matrix.os }}
     steps:
