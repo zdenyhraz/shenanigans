@@ -17,6 +17,8 @@ def onnxruntime_get_url():
         return "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-linux-x64-gpu-1.20.1.tgz"
     elif utils.windows():
         return "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-win-x64-gpu-1.20.1.zip"
+    elif utils.macos():
+        return "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-osx-universal2-1.20.1.tgz"
     raise RuntimeError(f"Unsupported onnxruntime platform: {platform.system()}")
 
 

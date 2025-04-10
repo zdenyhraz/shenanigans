@@ -19,7 +19,8 @@ def generator_install(generator):
 
 
 def opengl_install():
-    utils.run('apt install libglu1-mesa-dev mesa-common-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev')
+    utils.run('apt install mesa-common-dev libglu1-mesa-dev')
+    # utils.run('apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev')
 
 
 def gcc_install():
