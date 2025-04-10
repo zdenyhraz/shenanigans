@@ -22,6 +22,10 @@ def windows():
     return platform.system() == 'Windows'
 
 
+def macos():
+    return platform.system() == 'Darwin'
+
+
 def generate_configure_args(configure_args):
     return ' '.join([f"-D{key}={value}" for key, value in configure_args.items()])
 

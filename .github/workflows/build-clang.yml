@@ -44,10 +44,5 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies (macOS only)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install cmake ninja
-
       - name: Build
         run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }}

@@ -2,19 +2,19 @@ import platform
 
 
 def check_platform():
-    platforms = ['Linux', 'Windows']
+    platforms = ['Linux', 'Windows', 'Darwin']
     if not platform.system() in platforms:
         raise RuntimeError(f'Platform {platform.system()} not supported - supported platforms: {platforms}')
 
 
 def check_compiler(compiler):
-    compilers = {'Windows': ['msvc'], 'Linux': ['gcc', 'clang']}
+    compilers = {'Windows': ['msvc'], 'Linux': ['gcc', 'clang'], 'Darwin': ['gcc', 'clang']}
     if compiler and compiler not in compilers[platform.system()]:
         raise RuntimeError(f'Compiler {compiler} on {platform.system()} not supported - supported compilers: {compilers[platform.system()]}')
 
 
 def check_generator(generator):
-    generators = {'Windows': [], 'Linux': ['Ninja']}
+    generators = {'Windows': [], 'Linux': ['Ninja'], 'Darwin': ['Ninja']}
     if generator and generator not in generators[platform.system()]:
         raise RuntimeError(f'Generator {generator} on {platform.system()} not supported - supported generators: {generators[platform.system()]}')
 

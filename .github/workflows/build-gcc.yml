@@ -1,18 +1,23 @@
 name: build-gcc
 
 on: [push,pull_request]
+
 env:
   CI: ON
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - compiler: gcc
+          - os: ubuntu-latest
+            compiler: gcc
+            build_type: Release
+          - os: macos-latest
+            compiler: gcc
             build_type: Release
 
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
