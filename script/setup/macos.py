@@ -33,7 +33,7 @@ def gcc_install(version='14'):
 
 
 def clang_install(version='18'):
-    utils.run('brew search clang')
+    utils.run('brew search llvm')
     utils.run(f'brew install llvm@{version}')
     utils.run('brew unlink llvm')
     utils.run(f'brew link --overwrite --force llvm@{version}')
