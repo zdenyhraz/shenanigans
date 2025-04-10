@@ -1,3 +1,4 @@
+import os
 from . import utils
 
 
@@ -10,37 +11,41 @@ def ninja_install():
 
 
 def generator_install(generator):
-    if generator is None:
+    if not generator:
         return
-    elif generator == 'Ninja':
+    if generator == 'Ninja':
         return ninja_install()
-    else:
-        raise RuntimeError(f'Unsupported generator {generator}')
+    raise RuntimeError(f'Unsupported generator {generator}')
 
 
 def opengl_install():
     utils.run('brew install mesa')
 
 
-def gcc_install():
-    utils.run('brew install gcc')
-    utils.run('gcc-14 --version')
-    utils.run('brew link --overwrite gcc')
-
-
-def clang_install():
-    utils.run('brew install llvm')
-    utils.run('clang --version')
+def gcc_install(version='14'):
+    utils.run(f'brew install gcc@{version}')
+    utils.run(f'brew link --overwrite --force gcc@{version}')
     utils.run('brew install libomp')
+    utils.run(f'gcc --version')
+    os.environ['CC'] = 'gcc'
+    os.environ['CXX'] = 'g++'
+
+
+def clang_install(version='20'):
+    utils.run(f'brew install llvm@{version}')
+    utils.run(f'brew link --overwrite --force llvm@{version}')
+    utils.run('brew install libomp')
+    utils.run(f'clang --version')
+    os.environ['CC'] = 'clang'
+    os.environ['CXX'] = 'clang++'
 
 
 def compiler_install(compiler):
     if compiler == 'gcc':
         return gcc_install()
-    elif compiler == 'clang':
+    if compiler == 'clang':
         return clang_install()
-    else:
-        raise RuntimeError(f'Unsupported compiler {compiler}')
+    raise RuntimeError(f'Unsupported compiler {compiler}')
 
 
 def setup_buildtools(compiler, generator, opengl):

@@ -23,26 +23,26 @@ def opengl_install():
     utils.run('apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev')
 
 
-def gcc_install():
+def gcc_install(version='14'):
     utils.run('apt update')
     utils.run('apt install -y software-properties-common')
     utils.run('add-apt-repository ppa:ubuntu-toolchain-r/test')
     utils.run('apt update')
-    utils.run('apt install -y gcc-14 g++-14')
-    utils.run('gcc-14 --version')
-    utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 100')
-    utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 100')
+    utils.run('apt install -y gcc-{version} g++-{version}')
+    utils.run('gcc-{version} --version')
+    utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-{version} 100')
+    utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-{version} 100')
 
 
-def clang_install():
+def clang_install(version='20'):
     utils.run('apt update')
     utils.run('apt install -y wget gnupg software-properties-common')
     utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash')
-    utils.run('apt install -y clang')
-    utils.run('clang --version')
+    utils.run('apt install -y clang-{version}')
+    utils.run('clang-{version} --version')
     utils.run('apt install -y libc++-dev libc++abi-dev libomp-dev')
-    utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100')
-    utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100')
+    utils.run('update-alternatives --install /usr/bin/cc cc /usr/bin/clang-{version} 100')
+    utils.run('update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-{version} 100')
 
 
 def compiler_install(compiler):
