@@ -1,43 +1,53 @@
 name: build-clang
 
-on: [push,pull_request]
+on: [push, pull_request]
+
 env:
   CI: ON
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - compiler: clang
+          - os: ubuntu-latest
+            compiler: clang
+            build_type: Release
+          - os: macos-latest
+            compiler: clang
             build_type: Release
 
+    runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
 
-    - name: OpenCV cache
-      id: opencv-cache
-      uses: actions/cache@v4
-      with:
-        path: ./libs/opencv_install
-        key: ${{ runner.os }}-opencv-cache-v2
+      - name: OpenCV cache
+        id: opencv-cache
+        uses: actions/cache@v4
+        with:
+          path: ./libs/opencv_install
+          key: ${{ runner.os }}-opencv-cache-v2
 
-    - name: ONNX cache
-      id: onnxruntime-cache
-      uses: actions/cache@v4
-      with:
-        path: ./libs/onnxruntime
-        key: ${{ runner.os }}-onnxruntime-cache-v1
+      - name: ONNX cache
+        id: onnxruntime-cache
+        uses: actions/cache@v4
+        with:
+          path: ./libs/onnxruntime
+          key: ${{ runner.os }}-onnxruntime-cache-v1
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-    - name: Build
-      run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}}
+      - name: Install dependencies (macOS only)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install cmake ninja
+
+      - name: Build
+        run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }}
