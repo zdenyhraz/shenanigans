@@ -62,10 +62,7 @@ def get_root_directory(start_dir=os.getcwd()):
 
 
 def get_runtime_directory(build_type):
-    if windows():
-        return os.path.join(get_root_directory(), 'build', build_type)
-    else:
-        return os.path.join(get_root_directory(), 'build')
+    return os.path.join(get_root_directory(), 'build', build_type) if windows() else os.path.join(get_root_directory(), 'build')
 
 
 def is_linux_executable(file):
@@ -79,15 +76,12 @@ def is_windows_executable(file):
 def is_executable(file):
     if not os.path.isfile(file):
         return False
-    if windows():
-        return is_windows_executable(file)
-    else:
-        return is_linux_executable(file)
+    return is_windows_executable(file) if windows() else is_linux_executable(file)
 
 
 def cuda_available():
     try:
-        result = subprocess.run(["nvcc", "--version"], capture_output=True, text=True, check=True)
+        subprocess.run(["nvcc", "--version"], capture_output=True, text=True, check=True)
         return True
     except FileNotFoundError:
         return False
