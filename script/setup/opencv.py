@@ -10,30 +10,61 @@ opencv_cmake_args = {
     'OPENCV_EXTRA_MODULES_PATH': '../opencv_contrib/modules',
     'OPENCV_ENABLE_NONFREE': 'ON',
     'OPENCV_PYTHON_SKIP': 'ON',
+
+    # essentials
     'BUILD_SHARED_LIBS': 'OFF',
-    'BUILD_TESTS': 'OFF',
-    'BUILD_PERF_TESTS': 'OFF',
-    'BUILD_OPENCV_WECHAT_QRCODE': 'OFF',
+    'BUILD_OPENCV_CORE': 'ON',
+    'BUILD_OPENCV_IMGPROC': 'ON',
+    'BUILD_OPENCV_IMGCODECS': 'ON',
+    'BUILD_OPENCV_HIGHGUI': 'ON',
+    'BUILD_OPENCV_VIDEOIO': 'ON',
+
+    # bindings and extras
+    'BUILD_OPENCV_PYTHON': 'OFF',
     'BUILD_OPENCV_JAVA': 'OFF',
     'BUILD_OPENCV_APPS': 'OFF',
-    'BUILD_OPENCV_PYTHON': 'OFF',
+    'BUILD_EXAMPLES': 'OFF',
+    'BUILD_TESTS': 'OFF',
+    'BUILD_PERF_TESTS': 'OFF',
+    'BUILD_DOCS': 'OFF',
+    'BUILD_PACKAGE': 'OFF',
+
+    # unwanted modules
     'BUILD_OPENCV_DNN': 'OFF',
     'BUILD_OPENCV_ML': 'OFF',
     'BUILD_OPENCV_OBJDETECT': 'OFF',
     'BUILD_OPENCV_PHOTO': 'OFF',
     'BUILD_OPENCV_VIDEO': 'OFF',
-    'BUILD_OPENCV_VIDEOIO': 'ON',
     'BUILD_OPENCV_STITCHING': 'OFF',
     'BUILD_OPENCV_CALIB3D': 'OFF',
     'BUILD_OPENCV_SHAPE': 'OFF',
     'BUILD_OPENCV_SUPERRES': 'OFF',
     'BUILD_OPENCV_FLANN': 'OFF',
-    'BUILD_OPENCV_HIGHGUI': 'ON',
-    'BUILD_OPENCV_IMGCODECS': 'ON',
-    'BUILD_OPENCV_IMGPROC': 'ON',
-    'BUILD_OPENCV_CORE': 'ON',
-    'BUILD_OPENCV_CONTRIB': 'OFF',
     'BUILD_OPENCV_TS': 'OFF',
+    'BUILD_OPENCV_CONTRIB': 'OFF',
+    'BUILD_OPENCV_WECHAT_QRCODE': 'OFF',
+
+    # hardware acceleration
+    'WITH_CUDA': 'OFF',
+    'WITH_OPENCL': 'OFF',
+    'WITH_OPENGL': 'OFF',
+    'WITH_V4L': 'OFF',
+    'WITH_FFMPEG': 'OFF',
+    'WITH_GSTREAMER': 'OFF',
+    'WITH_TBB': 'OFF',
+    'WITH_PTHREADS_PF': 'OFF',
+    'WITH_EIGEN': 'OFF',
+    'WITH_IPP': 'OFF',
+    'WITH_1394': 'OFF',
+    'WITH_QT': 'OFF',
+    'WITH_JASPER': 'OFF',
+    'WITH_OPENEXR': 'OFF',
+
+    # image formats
+    'WITH_PNG': 'ON',
+    'WITH_JPEG': 'ON',
+    'WITH_TIFF': 'ON',
+    'WITH_WEBP': 'OFF',
 }
 
 
