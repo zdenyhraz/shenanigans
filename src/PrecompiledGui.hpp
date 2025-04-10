@@ -1,4 +1,6 @@
 #pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #define ImDrawIdx unsigned int
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -6,8 +8,6 @@
 #include <imgui_impl_glfw.h>
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui_impl_opengl3.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <implot.h>
 #include <implot_internal.h>
 
