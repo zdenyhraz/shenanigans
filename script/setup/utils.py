@@ -62,10 +62,10 @@ def get_root_directory(start_dir=os.getcwd()):
 
 
 def get_runtime_directory(build_type):
-    if linux():
-        return os.path.join(get_root_directory(), 'build')
     if windows():
         return os.path.join(get_root_directory(), 'build', build_type)
+    else:
+        return os.path.join(get_root_directory(), 'build')
 
 
 def is_linux_executable(file):
@@ -79,10 +79,10 @@ def is_windows_executable(file):
 def is_executable(file):
     if not os.path.isfile(file):
         return False
-    if linux():
-        return is_linux_executable(file)
     if windows():
         return is_windows_executable(file)
+    else:
+        return is_linux_executable(file)
 
 
 def cuda_available():
