@@ -39,7 +39,7 @@ def clang_install(version='18'):
     utils.run(f'brew link --overwrite --force llvm@{version}')
     utils.run(f'clang-{version} --version')
     os.environ['CC'] = f'clang-{version}'
-    os.environ['CXX'] = f'clang-{version}'
+    os.environ['CXX'] = f'clang++-{version}'
 
 
 def compiler_install(compiler):
