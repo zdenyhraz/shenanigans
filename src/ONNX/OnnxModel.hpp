@@ -10,7 +10,7 @@ class OnnxModel
   std::vector<const char*> inputNames = {"input"};
   std::vector<const char*> outputNames = {"boxes", "labels", "scores"};
   static constexpr bool useCUDA = true;
-  static constexpr bool useTensorRT = false;
+  static constexpr bool useTensorRT = true;
   bool usesGPU = false;
   bool loaded = false;
 

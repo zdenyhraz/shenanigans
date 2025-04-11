@@ -58,4 +58,4 @@ def setup_buildtools(compiler, generator, opengl):
     generator_install(generator)
     if opengl:
         opengl_install()
-    compiler_install(compiler)
+    # compiler_install(compiler)
