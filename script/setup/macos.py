@@ -28,6 +28,7 @@ def gcc_install(version='14'):
     utils.run('brew unlink gcc')
     utils.run(f'brew link --overwrite --force gcc@{version}')
     utils.run('gcc --version')
+    utils.run('g++ --version')
     os.environ['CC'] = 'gcc'
     os.environ['CXX'] = 'g++'
 
@@ -38,6 +39,7 @@ def clang_install(version='18'):
     utils.run('brew unlink llvm')
     utils.run(f'brew link --overwrite --force llvm@{version}')
     utils.run('clang --version')
+    utils.run('clang++ --version')
     os.environ['CC'] = 'clang'
     os.environ['CXX'] = 'clang++'
 
