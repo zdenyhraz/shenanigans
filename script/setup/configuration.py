@@ -8,7 +8,7 @@ def check_platform():
 
 
 def check_compiler(compiler):
-    compilers = {'Windows': ['msvc'], 'Linux': ['gcc', 'clang'], 'Darwin': ['gcc', 'clang']}
+    compilers = {'Windows': ['msvc'], 'Linux': ['gcc', 'clang'], 'Darwin': ['clang']}
     if compiler and compiler not in compilers[platform.system()]:
         raise RuntimeError(f'Compiler {compiler} on {platform.system()} not supported - supported compilers: {compilers[platform.system()]}')
 

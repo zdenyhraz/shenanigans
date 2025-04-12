@@ -40,8 +40,8 @@ def clang_install(version='18'):
     utils.run(f'brew link --overwrite --force llvm@{version}')
     utils.run('clang --version')
     utils.run('clang++ --version')
-    os.environ['CC'] = 'clang'
-    os.environ['CXX'] = 'clang++'
+    os.environ['CC'] = '/opt/homebrew/opt/llvm/bin/clang'
+    os.environ['CXX'] = '/opt/homebrew/opt/llvm/bin/clang++'
 
 
 def compiler_install(compiler):
@@ -58,4 +58,4 @@ def setup_buildtools(compiler, generator, opengl):
     generator_install(generator)
     if opengl:
         opengl_install()
-    # compiler_install(compiler)
+    compiler_install(compiler)
