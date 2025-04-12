@@ -42,6 +42,7 @@ opencv_cmake_args = {
 
     # optional dependencies
     'WITH_CUDA': 'OFF',
+    'WITH_JAVA': 'OFF',
 }
 
 
