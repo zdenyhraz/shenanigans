@@ -11,7 +11,7 @@ opencv_cmake_args = {
     'BUILD_SHARED_LIBS': 'OFF',
 
     # extra modules
-    'OPENCV_EXTRA_MODULES_PATH': '../opencv_contrib/modules',
+    'OPENCV_EXTRA_MODULES_PATH': '',  # '../opencv_contrib/modules',
     'OPENCV_ENABLE_NONFREE': 'ON',
 
     # tests and docs
@@ -36,7 +36,7 @@ opencv_cmake_args = {
     'BUILD_OPENCV_VIDEO': 'OFF',
     'BUILD_OPENCV_VIDEOSTAB': 'OFF',
     'BUILD_OPENCV_WORLD': 'OFF',
-    'BUILD_OPENCV_XFEATURES2D': 'ON',
+    'BUILD_OPENCV_XFEATURES2D': 'OFF',
     'BUILD_OPENCV_LINE_DESCRIPTOR': 'OFF',
     'BUILD_OPENCV_SALIENCY': 'OFF',
 

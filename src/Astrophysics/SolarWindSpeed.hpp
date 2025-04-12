@@ -1,4 +1,7 @@
 #pragma once
+#ifdef HAVE_OPENCV_XFEATURES2D
+#  include <opencv2/xfeatures2d.hpp>
+#endif
 #include "Plot/Plot.hpp"
 
 static constexpr int piccnt = 9;                // number of pics
@@ -52,10 +55,12 @@ inline cv::Ptr<cv::Feature2D> GetFeatureDetector(const SolarWindSpeedParameters&
 {
   switch (data.ftype)
   {
+#ifdef HAVE_OPENCV_XFEATURES2D
   case FeatureType::SURF:
     return cv::xfeatures2d::SURF::create(std::min(data.thresh, 500.f), std::max(data.nOctaves, 1), std::max(data.nOctaveLayers, 1), data.surfExtended, data.surfUpright);
   case FeatureType::SIFT:
     return cv::SIFT::create(0, std::max(data.nOctaveLayers, 1), 0, 1e5);
+#endif
   }
 
   throw std::runtime_error("Unknown feature type");

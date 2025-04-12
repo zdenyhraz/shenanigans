@@ -45,6 +45,7 @@ catch (const std::exception& e)
 }
 
 void OnnxModel::LoadProviders()
+try
 {
   const auto providers = Ort::GetAvailableProviders();
   LOG_DEBUG("ONNX available providers: {}", providers);
@@ -77,6 +78,10 @@ void OnnxModel::LoadProviders()
   {
     LOG_DEBUG("ONNX CPU provider loaded");
   }
+}
+catch (...)
+{
+  LOG_ERROR("ONNX providers failed to load");
 }
 
 void OnnxModel::OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message)

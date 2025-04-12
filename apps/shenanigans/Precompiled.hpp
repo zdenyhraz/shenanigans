@@ -46,9 +46,6 @@
 #include <fmt/color.h>
 #include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
-#include <opencv2/xfeatures2d.hpp>
-#include <opencv2/dnn.hpp>
-#include <opencv2/dnn/all_layers.hpp>
 #include <range/v3/all.hpp>
 
 #ifndef PROFILE_FRAME
