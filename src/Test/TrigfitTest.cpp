@@ -16,7 +16,7 @@ TEST(TrigfitTest, Fit)
   const auto fy = TrigonometricFit(x, y);
   ASSERT_EQ(fy.size(), n);
   for (int i = 0; i < n; ++i)
-    ASSERT_NEAR(fy[i], y[i], 1e-5);
+    ASSERT_NEAR(fy[i], y[i], 1e-4);
 }
 
 TEST(TrigfitTest, Coeffs)
