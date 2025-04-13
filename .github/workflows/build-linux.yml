@@ -1,4 +1,4 @@
-name: build-clang
+name: build-linux
 
 on: [push, pull_request]
 
@@ -7,17 +7,15 @@ env:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            compiler: clang
+          - compiler: gcc
             build_type: Release
-          - os: macos-latest
-            compiler: clang
+          - compiler: clang
             build_type: Release
 
-    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,4 +43,5 @@ jobs:
           python-version: '3.x'
 
       - name: Build
-        run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }}
+        run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }}
+

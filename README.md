@@ -1,13 +1,13 @@
 # Zdeny's shenanigans 🪐
 
 <p align="center">
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-msvc.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-gcc.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-clang.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-windows.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-linux.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-macos.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/build-macos.yml/badge.svg"/></a>
 <br>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-msvc.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-gcc.yml/badge.svg"/></a>
-<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-clang.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-windows.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-linux.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-macos.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/test-macos.yml/badge.svg"/></a>
 <br>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-address.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml/badge.svg"/></a>
