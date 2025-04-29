@@ -56,8 +56,8 @@ if __name__ == '__main__':
     buildtools.setup(args.compiler, args.generator, args.opengl, args.build_type, args.sanitizer)
 
     log.info("Setting up libraries")
-    args.onnxruntime_dir = args.onnxruntime_dir if args.onnxruntime_dir else onnxruntime.setup(args.build_type)
-    args.opencv_dir = args.opencv_dir if args.opencv_dir else opencv.setup(args.build_type)
+    args.onnxruntime_dir = args.onnxruntime_dir or onnxruntime.setup(args.build_type)
+    args.opencv_dir = args.opencv_dir or opencv.setup(args.build_type)
     log.info("Libraries set up successfully")
 
     configure(args)

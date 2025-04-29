@@ -22,7 +22,7 @@ def opengl_install():
     utils.run('brew install mesa')
 
 
-def gcc_install(version='14'):
+def gcc_install(version=14):
     utils.run('brew search gcc')
     utils.run(f'brew install gcc@{version}')
     utils.run('brew unlink gcc')
@@ -33,7 +33,7 @@ def gcc_install(version='14'):
     os.environ['CXX'] = 'g++'
 
 
-def clang_install(version='18'):
+def clang_install(version=18):
     utils.run('brew search llvm')
     utils.run(f'brew install llvm@{version}')
     utils.run('brew unlink llvm')
@@ -56,6 +56,6 @@ def setup_buildtools(compiler, generator, opengl):
     utils.run('brew update')
     cmake_install()
     generator_install(generator)
+    compiler_install(compiler)
     if opengl:
         opengl_install()
-    compiler_install(compiler)

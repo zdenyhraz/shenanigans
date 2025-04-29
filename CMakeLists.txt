@@ -25,6 +25,7 @@ if(CI OR DEFINED ENV{CI})
   message(STATUS "CI: ON")
   set(ENABLE_COVERAGE ON)
   set(ENABLE_PROFILING OFF)
+  set(DEVELOP ON)
 endif()
 
 # compiler flags
