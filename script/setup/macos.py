@@ -25,7 +25,6 @@ def opengl_install():
 def gcc_install(version='14'):
     utils.run('brew search gcc')
     utils.run(f'brew install gcc@{version}')
-    utils.run('brew unlink gcc')
     utils.run(f'brew link --overwrite --force gcc@{version}')
     utils.run('gcc --version')
     utils.run('g++ --version')
@@ -36,7 +35,6 @@ def gcc_install(version='14'):
 def clang_install(version='18'):
     utils.run('brew search llvm')
     utils.run(f'brew install llvm@{version}')
-    utils.run('brew unlink llvm')
     utils.run(f'brew link --overwrite --force llvm@{version}')
     utils.run('clang --version')
     utils.run('clang++ --version')
