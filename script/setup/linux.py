@@ -23,7 +23,7 @@ def opengl_install():
     utils.run('apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev')
 
 
-def gcc_install(version='14'):
+def gcc_install(version=14):
     utils.run('apt update')
     utils.run('apt install -y software-properties-common')
     utils.run('add-apt-repository ppa:ubuntu-toolchain-r/test')
@@ -35,7 +35,7 @@ def gcc_install(version='14'):
     utils.run(f'update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-{version} 100')
 
 
-def clang_install(version='18'):
+def clang_install(version=18):
     utils.run('apt update')
     utils.run('apt install -y wget gnupg software-properties-common')
     utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash')

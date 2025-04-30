@@ -22,7 +22,7 @@ def opengl_install():
     utils.run('brew install mesa')
 
 
-def gcc_install(version='14'):
+def gcc_install(version=14):
     utils.run('brew search gcc')
     utils.run(f'brew install gcc@{version}')
     utils.run(f'brew link --overwrite --force gcc@{version}')
@@ -32,7 +32,7 @@ def gcc_install(version='14'):
     os.environ['CXX'] = 'g++'
 
 
-def clang_install(version='18'):
+def clang_install(version=18):
     utils.run('brew search llvm')
     utils.run(f'brew install llvm@{version}')
     utils.run(f'brew link --overwrite --force llvm@{version}')
