@@ -46,6 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('--configure_only', help='configure only', required=False, action='store_true', default=False)
     parser.add_argument('--opencv_dir', help='opencv dir', type=str, required=False, default=None)
     parser.add_argument('--onnxruntime_dir', help='onnxruntime dir', type=str, required=False, default=None)
+    parser.add_argument('--jobs', help='build jobs', type=int, required=False, default=os.cpu_count())
     args = parser.parse_args()
 
     log.info(f"Setting up target {args.targets}")
@@ -57,7 +58,7 @@ if __name__ == '__main__':
 
     log.info("Setting up libraries")
     args.onnxruntime_dir = args.onnxruntime_dir or onnxruntime.setup(args.build_type)
-    args.opencv_dir = args.opencv_dir or opencv.setup(args.build_type)
+    args.opencv_dir = args.opencv_dir or opencv.setup(args.build_type, args.jobs)
     log.info("Libraries set up successfully")
 
     configure(args)

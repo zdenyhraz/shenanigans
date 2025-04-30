@@ -58,12 +58,12 @@ def opencv_find_root():
     return '' if len(candidates) == 0 else max(candidates, key=len)  # return the deepest if multiple found
 
 
-def opencv_install():
+def opencv_install(jobs):
     log.debug(f"Installing opencv to {opencv_install_dir}")
     cwd = os.path.join(utils.get_root_directory(), 'libs/opencv')
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
     utils.run(f'cmake -B ./build {utils.generate_configure_args(opencv_cmake_args)}', cwd)
-    utils.run(f'cmake --build ./build --config Release --parallel', cwd)
+    utils.run(f'cmake --build ./build --config Release -j {jobs}', cwd)
     utils.run(f'cmake --install ./build --prefix ../{opencv_install_name}', cwd)
 
 
@@ -71,9 +71,9 @@ def opencv_installed():
     return os.path.isdir(opencv_install_dir) and any(os.scandir(opencv_install_dir))
 
 
-def setup(build_type):
+def setup(build_type, jobs):
     if not opencv_installed():
-        opencv_install()
+        opencv_install(jobs)
 
     opencv_dir = opencv_find_root()
     log.debug(f'opencv directory: {opencv_dir}')
