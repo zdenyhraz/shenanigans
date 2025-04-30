@@ -7,8 +7,8 @@ class OnnxModel
   Ort::Session session{nullptr};
   Ort::MemoryInfo memoryInfo{nullptr};
   const char* name = "model";
-  std::vector<const char*> inputNames = {"input"};
-  std::vector<const char*> outputNames = {"boxes", "labels", "scores"};
+  std::vector<const char*> inputNames;
+  std::vector<const char*> outputNames;
   static constexpr bool useCUDA = true;
   static constexpr bool useTensorRT = false;
   bool usesGPU = false;
