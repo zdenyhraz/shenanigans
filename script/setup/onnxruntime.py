@@ -10,6 +10,7 @@ from script.log import log
 
 onnxruntime_install_name = "onnxruntime"
 onnxruntime_install_dir = os.path.join(utils.get_root_directory(), 'libs', onnxruntime_install_name)
+onnxruntime_static = False
 
 
 def onnxruntime_get_url():
@@ -74,6 +75,7 @@ def setup(build_type):
     if not onnxruntime_installed():
         onnxruntime_download()
 
-    utils.copy_files_to_directory(utils.find_binaries(onnxruntime_install_dir), utils.get_runtime_directory(build_type))
+    if not onnxruntime_static:
+        utils.copy_files_to_directory(utils.find_binaries(onnxruntime_install_dir), utils.get_runtime_directory(build_type))
     log.debug(f'onnxruntime directory: {onnxruntime_install_dir}')
     return onnxruntime_install_dir

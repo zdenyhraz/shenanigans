@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('--targets', help='targets to build', type=str, required=False, default='ALL_BUILD' if utils.windows() else 'all')
     parser.add_argument('--build_type', help='build type', type=str, required=False, default='Release')
     parser.add_argument('--build_dir', help='build directory', type=str, required=False, default='build')
-    parser.add_argument('--ci', help='ci', required=False, action='store_true', default='CI' in os.environ)
+    parser.add_argument('--ci', help='ci mode', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
     parser.add_argument('--opengl', help='install opengl', required=False, action='store_true', default=True)
     parser.add_argument('--configure_only', help='configure only', required=False, action='store_true', default=False)

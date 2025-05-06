@@ -5,10 +5,11 @@ from script.log import log
 
 opencv_install_name = 'opencv_install'
 opencv_install_dir = os.path.join(utils.get_root_directory(), 'libs', opencv_install_name)
+opencv_static = True
 opencv_cmake_args = {
     # build configuration
     'CMAKE_BUILD_TYPE': 'RELEASE',
-    'BUILD_SHARED_LIBS': 'OFF',
+    'BUILD_SHARED_LIBS': 'OFF' if opencv_static else 'ON',
 
     # extra modules
     'OPENCV_EXTRA_MODULES_PATH': '',  # '../opencv_contrib/modules',
@@ -76,5 +77,7 @@ def setup(build_type, jobs):
         opencv_install(jobs)
 
     opencv_dir = opencv_find_root()
+    if not opencv_static:
+        utils.copy_files_to_directory(utils.find_binaries(opencv_install_dir), utils.get_runtime_directory(build_type))
     log.debug(f'opencv directory: {opencv_dir}')
     return opencv_dir
