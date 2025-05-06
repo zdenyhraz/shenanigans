@@ -29,7 +29,7 @@ def configure(args):
 
 def build(args):
     log.info(f"Building target {args.targets}")
-    utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} --parallel')
+    utils.run(f'cmake --build {args.build_dir} --config {args.build_type} --target {args.targets} -j {args.jobs}')
     log.info(f'Target {args.targets} built successfully')
 
 
