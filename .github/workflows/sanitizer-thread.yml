@@ -43,7 +43,7 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: ${{ runner.os == 'Linux' && 'sudo ' || '' }}python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer thread
+      run: sudo python -u build.py --ci --compiler ${{ matrix.compiler}} --build_type ${{ matrix.build_type}} --sanitizer thread --jobs 4
 
     - name: Test
       run:  python -u test.py
