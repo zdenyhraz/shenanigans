@@ -114,5 +114,5 @@ std::vector<Ort::Value> OnnxModel::Run(const cv::Mat& image)
   cv::Mat imageTensor = Preprocess(image);
   Ort::Value inputTensor =
       Ort::Value::CreateTensor<float>(memoryInfo, imageTensor.ptr<float>(0), imageTensor.total() * imageTensor.channels(), inputShape.data(), inputShape.size());
-  return session.Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, 1, outputNames.data(), 3);
+  return session.Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, 1, outputNames.data(), outputNames.size());
 }

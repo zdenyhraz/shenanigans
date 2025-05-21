@@ -5,6 +5,7 @@
 #include "Windows/MicroserviceEditorWindow.hpp"
 #include "NDA/Windows/ObjdetectColorWindow.hpp"
 #include "NDA/Windows/ObjdetectObjectnessWindow.hpp"
+#include "NDA/Windows/PipeTrackerWindow.hpp"
 
 int main(int argc, char** argv)
 try
@@ -14,6 +15,7 @@ try
   app.SetFontPath("data/shenanigans/CascadiaCode.ttf");
   app.SetPlotWindowCount(2);
   app.AddWindow<ObjdetectObjectnessWindow>();
+  app.AddWindow<PipeTrackerWindow>();
   app.AddWindow<ObjdetectColorWindow>();
   app.AddWindow<MicroserviceEditorWindow>();
   app.AddWindow<IPCWindow>();

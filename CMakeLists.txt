@@ -202,6 +202,22 @@ add_subdirectory(libs/range-v3)
 target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
 
+# onnxruntime
+if(NOT DEFINED ONNXRUNTIME_DIR)
+  set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime" CACHE INTERNAL "ONNX runtime dir")
+endif()
+if(WIN32)
+    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib CACHE INTERNAL "ONNX runtime lib")
+elseif(APPLE)
+    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/libonnxruntime.dylib CACHE INTERNAL "ONNX runtime lib")
+else()
+    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so CACHE INTERNAL "ONNX runtime lib")
+endif()
+target_include_directories(shenanigans PRIVATE ${ONNXRUNTIME_DIR}/include)
+target_include_directories(shenanigans_test PRIVATE ${ONNXRUNTIME_DIR}/include)
+target_link_libraries(shenanigans PRIVATE ${ONNXRUNTIME_LIBS})
+target_link_libraries(shenanigans_test PRIVATE ${ONNXRUNTIME_LIBS})
+
 # custom
 include_directories(libs)
 include_directories(src)
@@ -214,6 +230,7 @@ file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
  src/Log/*.cpp
  src/Math/*.cpp
  src/Microservice/*.cpp
+ src/ONNX/*.cpp
  src/Optimization/*.cpp
  src/Plot/*.cpp
  src/Python/*.cpp

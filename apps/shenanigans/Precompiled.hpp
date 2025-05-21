@@ -45,8 +45,9 @@
 #include <fmt/ranges.h>
 #include <fmt/color.h>
 #include <nlohmann/json.hpp>
-#include <opencv2/opencv.hpp>
 #include <range/v3/all.hpp>
+#include <onnxruntime/include/onnxruntime_cxx_api.h>
+#include <opencv2/opencv.hpp>
 
 #ifndef PROFILE_FRAME
 #  define PROFILE_FRAME
