@@ -8,7 +8,6 @@
 
 void MicroserviceEditorWindow::Initialize()
 {
-  TestInitialize();
   editor.OnStart();
 }
 
@@ -36,12 +35,14 @@ void MicroserviceEditorWindow::Render()
 
 void MicroserviceEditorWindow::Run()
 {
+  TestInitialize();
   editor.workflow.Run();
   LOG_INFO("Workflow run completed");
 }
 
 void MicroserviceEditorWindow::RunRepeat()
 {
+  TestInitialize();
   for (int i = 0; i < 5; ++i)
   {
     Plot::Clear();
@@ -52,6 +53,10 @@ void MicroserviceEditorWindow::RunRepeat()
 
 void MicroserviceEditorWindow::TestInitialize()
 {
+  static bool initialized = false;
+  if (initialized)
+    return;
+  initialized = true;
   editor.workflow.AddMicroservice<LoadImageMicroservice>();
   editor.workflow.AddMicroservice<BlurImageMicroservice>();
   editor.workflow.AddMicroservice<PlotImageMicroservice>();

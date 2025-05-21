@@ -126,7 +126,7 @@ public:
     if (connection.outputMicroservice == connection.inputMicroservice)
       return LOG_WARNING("Connection {}: cannot connect microservice to itself ", connection.GetString());
 
-    LOG_DEBUG("Connected {}", connection.GetString());
+    LOG_TRACE("Connected {}", connection.GetString());
 
     connection.inputParameter->value = &connection.outputParameter->value;
     connection.outputMicroservice->AddOutputConnection(connection);
@@ -159,6 +159,6 @@ public:
     connection.inputParameter->value = nullptr;
     connection.outputMicroservice->RemoveOutputConnection(connection);
     connection.inputMicroservice->RemoveInputConnection(connection);
-    return LOG_DEBUG("Disconnected connection {}", connection.GetString());
+    return LOG_TRACE("Disconnected connection {}", connection.GetString());
   }
 };
