@@ -103,20 +103,8 @@ void OnnxModel::OnnxLogFunction(void* param, OrtLoggingLevel severity, const cha
 
 cv::Mat OnnxModel::Preprocess(const cv::Mat& image)
 {
-  // HWC BGR 8U -> CHW RGB 32F
-  int height = image.rows;
-  int width = image.cols;
-  cv::Mat chw(3 * height * width, 1, CV_8UC1);
-  uchar* chwData = chw.ptr<uchar>(0);
-  cv::Mat chwChannels[3] = {
-      cv::Mat(height, width, CV_8UC1, chwData),                     // R
-      cv::Mat(height, width, CV_8UC1, chwData + height * width),    // G
-      cv::Mat(height, width, CV_8UC1, chwData + 2 * height * width) // B
-  };
-
-  int channelMap[] = {2, 0, 1, 1, 0, 2};
-  cv::mixChannels(&image, 1, chwChannels, 3, channelMap, 3);
-  chw.convertTo(chw, CV_32FC1, 1.0 / 255.0);
+  cv::Mat chw;
+  cv::dnn::blobFromImage(image, chw, 1.0 / 255.0);
   return chw;
 }
 
