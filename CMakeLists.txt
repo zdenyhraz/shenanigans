@@ -31,6 +31,8 @@ endif()
 # compiler flags
 if(MSVC)
   add_compile_options(/W1 /favor:AMD64 /arch:AVX2 /openmp /MT)
+elseif(APPLE)
+  add_compile_options(-Wall)
 else()
   add_compile_options(-Wall -march=native -fopenmp)
   add_link_options(-fopenmp)
