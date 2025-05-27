@@ -28,9 +28,9 @@ def run_cpp_tests(coverage):
     test_executables = find_test_executables(build_dir)
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
-        utils.run(test)
+        utils.run(test, cwd=os.path.dirname(test))
     if coverage:
-        generate_cpp_coverage_report()
+        generate_cpp_coverage_report(os.path.dirname(test_executables[0]))
 
 
 def run_python_tests(coverage):
@@ -42,10 +42,10 @@ def run_python_tests(coverage):
     utils.run(f'pytest -p no:warnings {coverage_arg} {test_dir}')
 
 
-def generate_cpp_coverage_report():
+def generate_cpp_coverage_report(cwd):
     log.info('Generating C++ coverage report')
-    utils.run("gcovr -r . --txt --verbose")
-    utils.run("gcovr -r . --xml -o coverage_cpp.xml")
+    utils.run("gcovr -r . --txt --verbose", cwd=cwd)
+    utils.run("gcovr -r . --xml -o coverage_cpp.xml", cwd=cwd)
 
 
 if __name__ == '__main__':

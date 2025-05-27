@@ -1,4 +1,4 @@
-name: test-linux
+name: coverage
 
 on: [push, pull_request]
 
@@ -8,14 +8,6 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - compiler: gcc
-            build_type: Debug
-          - compiler: clang
-            build_type: Debug
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -43,7 +35,25 @@ jobs:
         python-version: '3.x'
 
     - name: Build
-      run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --jobs 4
+      run: sudo python -u build.py --ci --compiler gcc --build_type Debug --jobs 4 --coverage
 
     - name: Test
-      run: python -u test.py
+      run: sudo python -u test.py --coverage
+
+    - name: Upload C++ coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        files: ./coverage_cpp.xml
+        flags: cpp
+        verbose: true
+
+    - name: Upload Python coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        files: ./coverage_py.xml
+        flags: python
+        verbose: true
+
+
