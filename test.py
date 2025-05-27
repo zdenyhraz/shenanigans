@@ -38,7 +38,7 @@ def run_python_tests(coverage):
     test_dir = 'script/test'
     log.debug(f'Test directory: {test_dir}')
     coverage_arg = f'--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
-    utils.run(f'pytest -p no:warnings {coverage_arg} {test_dir}')
+    utils.run(f'pytest {coverage_arg} -p no:warnings {test_dir}')
 
 
 def generate_cpp_coverage_report(cwd):
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     args.python and utils.run('pip install pytest pytest-cov')
     log.info('Running tests')
     args.cpp and run_cpp_tests(args.coverage)
-    args.python and run_python_tests()  # TODO: add python test coverage
+    args.python and run_python_tests(args.coverage)  # TODO: add python test coverage
 
     log.info('All tests passed')
