@@ -43,7 +43,7 @@ def run_python_tests(coverage):
 
 def generate_cpp_coverage_report(cwd):
     log.info('Generating C++ coverage report')
-    utils.run("gcovr -r . --txt --verbose", cwd=cwd)
+    utils.run("gcovr -r . --txt", cwd=cwd)
     utils.run("gcovr -r . --xml -o coverage_cpp.xml", cwd=cwd)
 
 
