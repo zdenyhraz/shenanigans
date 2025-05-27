@@ -1,0 +1,8 @@
+[MASTER]
+max-line-length=180
+
+[MESSAGES CONTROL]
+disable=missing-docstring
+
+[REPORTS]
+output-format=colorized
