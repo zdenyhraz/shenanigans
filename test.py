@@ -33,19 +33,19 @@ def run_cpp_tests(coverage):
         generate_cpp_coverage_report()
 
 
-def run_python_tests():
+def run_python_tests(coverage):
     log.info('Running Python tests')
     utils.run(f'pip install -r requirements.txt')
     test_dir = 'script/test'
     log.debug(f'Test directory: {test_dir}')
-    utils.run(f'pytest -p no:warnings {test_dir}')
+    coverage_arg = f'--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
+    utils.run(f'pytest -p no:warnings {coverage_arg} {test_dir}')
 
 
 def generate_cpp_coverage_report():
     log.info('Generating C++ coverage report')
-    utils.run("gcovr -r . --html --html-details -o coverage.html")
-    utils.run("gcovr -r . --xml -o coverage.xml")
-    utils.run("gcovr -r . --txt")
+    utils.run("gcovr -r . --txt --verbose")
+    utils.run("gcovr -r . --xml -o coverage_cpp.xml")
 
 
 if __name__ == '__main__':
@@ -55,12 +55,12 @@ if __name__ == '__main__':
     parser.add_argument('--coverage', help='test coverage', required=False, action='store_true', default=False)
     args = parser.parse_args()
 
-    log.info('Running tests')
     for arg, val in vars(args).items():
         log.debug(f'{arg}: {val}')
 
     args.coverage and utils.run('pip install gcovr')
-    args.python and utils.run('pip install pytest')
+    args.python and utils.run('pip install pytest pytest-cov')
+    log.info('Running tests')
     args.cpp and run_cpp_tests(args.coverage)
     args.python and run_python_tests()  # TODO: add python test coverage
 

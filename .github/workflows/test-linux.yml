@@ -46,4 +46,22 @@ jobs:
       run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --jobs 4 --coverage
 
     - name: Test
-      run:  python -u test.py --coverage
+      run: sudo python -u test.py --coverage
+
+    - name: Upload C++ coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        files: ./coverage_cpp.xml
+        flags: cpp
+        verbose: true
+
+    - name: Upload Python coverage
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        files: ./coverage_py.xml
+        flags: python
+        verbose: true
+
+
