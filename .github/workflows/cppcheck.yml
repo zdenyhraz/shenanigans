@@ -9,8 +9,5 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Cppcheck install
-        run: sudo apt install -y cppcheck
-
       - name: Cppcheck run
-        run: cppcheck --enable=all --suppressions-list=.cppcheck-suppressions --inline-suppr --inconclusive --error-exitcode=1 src/ apps/
+        run: python -m script.ci.cppcheck

@@ -1,13 +1,13 @@
-name: cpplint
+name: flake8
 
 on: [push,pull_request]
 
 jobs:
-  cpplint:
+  flake8:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Cpplint run
-        run: python -m script.ci.cpplint
+      - name: Flake8 run
+        run: python -m script.ci.flake8

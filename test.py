@@ -24,11 +24,10 @@ def run_cpp_tests(coverage):
     build_dir = 'build'
     log.debug(f'Build directory: {build_dir}')
 
-    # run('ctest --output-on-failure', build_dir)
     test_executables = find_test_executables(build_dir)
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
-        utils.run(test, cwd=os.path.dirname(test))
+        utils.run(test)
     if coverage:
         generate_cpp_coverage_report(os.path.dirname(test_executables[0]))
 
