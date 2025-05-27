@@ -32,7 +32,7 @@ jobs:
         id: onnxruntime-cache
         uses: actions/cache@v4
         with:
-          path: ./libs/onnxruntime
+          path: ./libs/onnxruntime_install
           key: ${{ runner.os }}-onnxruntime-cache-v2
 
       - name: Set up Python
