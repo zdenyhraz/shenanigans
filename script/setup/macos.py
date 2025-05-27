@@ -46,7 +46,7 @@ def compiler_install(compiler):
     if compiler == 'gcc':
         return gcc_install()
     if compiler == 'clang':
-        return clang_install()
+        return  # use native apple clang
     raise RuntimeError(f'Unsupported compiler {compiler}')
 
 
