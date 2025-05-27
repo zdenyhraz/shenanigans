@@ -58,11 +58,10 @@ def onnxruntime_download():
 def onnxruntime_install(jobs):
     log.debug(f"Installing onnxruntime to {onnxruntime_install_dir}")
     cwd = os.path.join(utils.get_root_directory(), 'libs', 'onnxruntime')
-    cmake_args = '--cmake_extra_defines CMAKE_CXX_STANDARD=20 CMAKE_CXX_STANDARD_REQUIRED=ON'
-    cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
     os_args = '--enable_msvc_static_runtime' * utils.windows() + '--allow_running_as_root' * utils.linux()
+    cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
     utils.run(
-        f"python tools/ci_build/build.py --config Release --parallel {jobs} --update --build --skip_tests --compile_no_warning_as_error --build_shared_lib --build_dir build {os_args} {cmake_args} {cuda_args}", cwd)
+        f"python tools/ci_build/build.py --config Release --build_shared_lib --build_dir build --parallel {jobs} --update --build --skip_tests --compile_no_warning_as_error {os_args} {cuda_args}", cwd)
     utils.run(f'cmake --install ./build/Release --prefix ../{onnxruntime_install_name}', cwd)
 
 
