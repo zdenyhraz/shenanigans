@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./libs/onnxruntime
-        key: ${{ matrix.os }}-onnxruntime-cache-v1
+        key: ${{ matrix.os }}-onnxruntime-cache-v2
 
     - name: Set up Python
       uses: actions/setup-python@v5
