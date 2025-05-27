@@ -10,4 +10,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cppcheck run
-        run: python -m script.ci.cppcheck
+        run: sudo python -m script.ci.cppcheck

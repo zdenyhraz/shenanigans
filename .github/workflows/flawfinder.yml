@@ -10,4 +10,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Flawfinder
-        run: python -m script.ci.flawfinder
+        run: sudo python -m script.ci.flawfinder
