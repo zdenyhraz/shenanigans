@@ -3,7 +3,7 @@ import platform
 
 def check_platform():
     platforms = ['Linux', 'Windows', 'Darwin']
-    if not platform.system() in platforms:
+    if platform.system() not in platforms:
         raise RuntimeError(f'Platform {platform.system()} not supported - supported platforms: {platforms}')
 
 

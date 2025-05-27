@@ -10,7 +10,7 @@ def ninja_install():
 
 
 def generator_install(generator):
-    if generator == None:
+    if not generator:
         return
     elif generator == 'Ninja':
         return ninja_install()
