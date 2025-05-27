@@ -1,5 +1,5 @@
-from script.setup import utils
 import os
+from script.setup import utils
 
 if __name__ == '__main__':
     try:

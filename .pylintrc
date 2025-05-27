@@ -2,7 +2,7 @@
 max-line-length=180
 
 [MESSAGES CONTROL]
-disable=missing-docstring
+disable=missing-docstring,invalid-name,try-except-raise
 
 [REPORTS]
 output-format=colorized
