@@ -38,8 +38,9 @@ endif()
 
 if(ENABLE_COVERAGE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(--coverage -O0 -g -fprofile-arcs -ftest-coverage)
-    add_link_options(--coverage)
+    set(COVERAGE_FLAGS "-O0" "-g" "--coverage" "-fprofile-arcs" "-ftest-coverage")
+    add_compile_options(${COVERAGE_FLAGS})
+    add_link_options("--coverage")
   endif()
 endif()
 
