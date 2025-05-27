@@ -158,7 +158,7 @@ endif()
 
 # opencv
 set(OpenCV_STATIC ON)
-find_package(OpenCV REQUIRED HINTS ${OpenCV_DIR} ${CMAKE_SOURCE_DIR}/libs/opencv_install)
+find_package(OpenCV REQUIRED HINTS ${OPENCV_DIR} ${CMAKE_SOURCE_DIR}/libs/opencv_install)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(shenanigans PRIVATE ${OpenCV_LIBS})
 target_link_libraries(shenanigans_test PRIVATE ${OpenCV_LIBS})
@@ -203,20 +203,10 @@ target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
 
 # onnxruntime
-if(NOT DEFINED ONNXRUNTIME_DIR)
-  set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime" CACHE INTERNAL "ONNX runtime dir")
-endif()
-if(WIN32)
-    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib CACHE INTERNAL "ONNX runtime lib")
-elseif(APPLE)
-    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/libonnxruntime.dylib CACHE INTERNAL "ONNX runtime lib")
-else()
-    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so CACHE INTERNAL "ONNX runtime lib")
-endif()
-target_include_directories(shenanigans PRIVATE ${ONNXRUNTIME_DIR}/include)
-target_include_directories(shenanigans_test PRIVATE ${ONNXRUNTIME_DIR}/include)
-target_link_libraries(shenanigans PRIVATE ${ONNXRUNTIME_LIBS})
-target_link_libraries(shenanigans_test PRIVATE ${ONNXRUNTIME_LIBS})
+find_package(onnxruntime REQUIRED HINTS ${ONNXRUNTIME_DIR} ${CMAKE_SOURCE_DIR}/libs/onnxruntime_install)
+include_directories(${CMAKE_SOURCE_DIR}/libs/onnxruntime_install/include)
+target_link_libraries(shenanigans PRIVATE onnxruntime::onnxruntime)
+target_link_libraries(shenanigans_test PRIVATE onnxruntime::onnxruntime)
 
 # custom
 include_directories(libs)

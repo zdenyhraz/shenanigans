@@ -61,7 +61,7 @@ def opencv_find_root():
 
 def opencv_install(jobs):
     log.debug(f"Installing opencv to {opencv_install_dir}")
-    cwd = os.path.join(utils.get_root_directory(), 'libs/opencv')
+    cwd = os.path.join(utils.get_root_directory(), 'libs', 'opencv')
     os.makedirs(os.path.join(cwd, 'build'), exist_ok=True)
     utils.run(f'cmake -B ./build {utils.generate_configure_args(opencv_cmake_args)}', cwd)
     utils.run(f'cmake --build ./build --config Release -j {jobs}', cwd)

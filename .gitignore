@@ -6,8 +6,6 @@ obj/
 __pycache__/
 *_install/
 
-libs/onnxruntime
-
 data/*
 !data/shenanigans/
 !data/readme/

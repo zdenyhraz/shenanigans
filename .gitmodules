@@ -43,3 +43,6 @@
 [submodule "script/ml"]
 	path = script/ml
 	url = git@github.com:zdenyhraz/ml.git
+[submodule "libs/onnxruntime"]
+	path = libs/onnxruntime
+	url = https://github.com/microsoft/onnxruntime.git

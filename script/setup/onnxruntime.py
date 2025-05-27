@@ -8,9 +8,9 @@ from . import utils
 from script.log import log
 
 
-onnxruntime_install_name = "onnxruntime"
+onnxruntime_install_name = "onnxruntime_install"
 onnxruntime_install_dir = os.path.join(utils.get_root_directory(), 'libs', onnxruntime_install_name)
-onnxruntime_static = False
+onnxruntime_build = True
 
 
 def onnxruntime_get_url():
@@ -20,7 +20,7 @@ def onnxruntime_get_url():
         return "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-win-x64-gpu-1.20.1.zip"
     elif utils.macos():
         return "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-osx-universal2-1.20.1.tgz"
-    raise RuntimeError(f"Unsupported onnxruntime platform: {platform.system()}")
+    raise RuntimeError(f"Unsupported onnxruntime system/machine: {platform.system()}/{platform.machine()}")
 
 
 def onnxruntime_download():
@@ -55,27 +55,25 @@ def onnxruntime_download():
     os.remove(archive_file)
 
 
-def onnxruntime_install():
-    cwd = os.path.join(utils.get_root_directory(), 'libs/onnxruntime')
-    cmake_args = ""
+def onnxruntime_install(jobs):
+    log.debug(f"Installing onnxruntime to {onnxruntime_install_dir}")
+    cwd = os.path.join(utils.get_root_directory(), 'libs', 'onnxruntime')
+    cmake_args = '--cmake_extra_defines CMAKE_CXX_STANDARD=20 CMAKE_CXX_STANDARD_REQUIRED=ON'
     cuda_args = f'--use_cuda --cuda_home "{os.getenv("CUDA_PATH")}"' * utils.cuda_available()
     os_args = '--enable_msvc_static_runtime' * utils.windows() + '--allow_running_as_root' * utils.linux()
-    log.debug(f"Installing onnxruntime to {onnxruntime_install_dir}")
     utils.run(
-        f"python tools/ci_build/build.py --config Release --parallel --update --build --skip_tests --build_dir {onnxruntime_install_dir} --cmake_extra_defines {cmake_args} {cuda_args} {os_args}", cwd)
-    log.debug(f"Directory tree for {onnxruntime_install_dir}:")
-    utils.print_directory_tree(onnxruntime_install_dir)
+        f"python tools/ci_build/build.py --config Release --parallel {jobs} --update --build --skip_tests --compile_no_warning_as_error --build_shared_lib --build_dir build {os_args} {cmake_args} {cuda_args}", cwd)
+    utils.run(f'cmake --install ./build/Release --prefix ../{onnxruntime_install_name}', cwd)
 
 
 def onnxruntime_installed():
     return os.path.isdir(onnxruntime_install_dir) and any(os.scandir(onnxruntime_install_dir))
 
 
-def setup(build_type):
+def setup(build_type, jobs):
     if not onnxruntime_installed():
-        onnxruntime_download()
+        onnxruntime_install(jobs) if onnxruntime_build else onnxruntime_download()
 
-    if not onnxruntime_static:
-        utils.copy_files_to_directory(utils.find_binaries(onnxruntime_install_dir), utils.get_runtime_directory(build_type))
+    utils.copy_files_to_directory(utils.find_binaries(onnxruntime_install_dir), utils.get_runtime_directory(build_type))
     log.debug(f'onnxruntime directory: {onnxruntime_install_dir}')
     return onnxruntime_install_dir
