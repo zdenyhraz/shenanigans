@@ -19,7 +19,7 @@ def find_test_executables(build_dir):
     return test_executables
 
 
-def run_cpp_tests():
+def run_cpp_tests(coverage):
     log.info('Running C++ tests')
     build_dir = 'build'
     log.debug(f'Build directory: {build_dir}')
@@ -29,6 +29,8 @@ def run_cpp_tests():
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
         utils.run(test)
+    if coverage:
+        generate_cpp_coverage_report()
 
 
 def run_python_tests():
@@ -39,17 +41,27 @@ def run_python_tests():
     utils.run(f'pytest -p no:warnings {test_dir}')
 
 
+def generate_cpp_coverage_report():
+    log.info('Generating C++ coverage report')
+    utils.run("gcovr -r . --html --html-details -o coverage.html")
+    utils.run("gcovr -r . --xml -o coverage.xml")
+    utils.run("gcovr -r . --txt")
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
     parser.add_argument('--cpp', help='run C++ tests', required=False, action='store_true', default=True)
     parser.add_argument('--python', help='run Python tests', required=False, action='store_true', default=True)
+    parser.add_argument('--coverage', help='test coverage', required=False, action='store_true', default=False)
     args = parser.parse_args()
 
     log.info('Running tests')
     for arg, val in vars(args).items():
         log.debug(f'{arg}: {val}')
 
-    args.cpp and run_cpp_tests()
-    args.python and run_python_tests()
+    args.coverage and utils.run('pip install gcovr')
+    args.python and utils.run('pip install pytest')
+    args.cpp and run_cpp_tests(args.coverage)
+    args.python and run_python_tests()  # TODO: add python test coverage
 
     log.info('All tests passed')

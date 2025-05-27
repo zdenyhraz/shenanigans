@@ -22,8 +22,6 @@ option(DEVELOP "Development build" ON)
 
 # ci variables
 if(CI OR DEFINED ENV{CI})
-  message(STATUS "CI: ON")
-  set(ENABLE_COVERAGE ON)
   set(ENABLE_PROFILING OFF)
   set(DEVELOP ON)
 endif()
@@ -36,6 +34,13 @@ elseif(APPLE)
 else()
   add_compile_options(-Wall -march=native -fopenmp)
   add_link_options(-fopenmp)
+endif()
+
+if(ENABLE_COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+  endif()
 endif()
 
 # definitions
