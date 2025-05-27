@@ -23,22 +23,17 @@ jobs:
         path: ./libs/opencv_install
         key: ${{ runner.os }}-opencv-cache-v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: ONNX cache
+      id: onnxruntime-cache
+      uses: actions/cache@v4
       with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install clang-tidy cmake build-essential
+        path: ./libs/onnxruntime_install
+        key: ${{ runner.os }}-onnxruntime-cache-v2
 
     - name: Configure
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --configure_only
 
     - name: Run clang-tidy
-      run: |
-        cd build
-        find ../src -type f \( -name "*.cpp" -o -name "*.hpp" \) | xargs clang-tidy -p=.
+      run: sudo python -m script.ci.clang_tidy
       continue-on-error: true
 

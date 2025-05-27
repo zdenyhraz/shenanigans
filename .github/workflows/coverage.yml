@@ -29,11 +29,6 @@ jobs:
         path: ./libs/onnxruntime_install
         key: ${{ runner.os }}-onnxruntime-cache-v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
     - name: Build
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --jobs 4 --coverage
 
