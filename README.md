@@ -13,13 +13,17 @@
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-thread.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/sanitizer-undefined.yml/badge.svg"/></a>
 <br>
-<a href="https://app.codacy.com/gh/zdenyhraz/shenanigans/dashboard"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
-<a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cppcheck.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/clang-tidy.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/cpplint.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/flawfinder.yml/badge.svg"/></a>
+<br>
+<a href="https://app.codacy.com/gh/zdenyhraz/shenanigans/dashboard"><img src="https://app.codacy.com/project/badge/Grade/ea68f108539b4e4eb13b0e92a905ef50"/></a>
+<a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/pylint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/pylint.yml/badge.svg"/></a>
+<a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/ruff.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/ruff.yml/badge.svg"/></a>
 </p>
+
 
 Semi-random ***funky stuff***, mainly for my [PhD experiments](https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=250739) and [articles](#article-links). Contains calculations and algorithm implementations for various applied mathematics and astrophysics articles I worked on - [Solar Dynamics Observatory](https://www.nasa.gov/mission_pages/sdo/main/index.html) image processing, sub-pixel [image registration](https://en.wikipedia.org/wiki/Image_registration), non-convex [optimization](https://en.wikipedia.org/wiki/Mathematical_optimization).
 Written in [C++20](https://en.cppreference.com/w/cpp/20), with C++ [ImGui](https://github.com/ocornut/imgui) GUI and [ImPlot](https://github.com/epezent/implot) / [pybind11](https://github.com/pybind/pybind11)+[matplotlib](https://matplotlib.org/) plots. Uses [OpenCV](https://opencv.org/), [OpenMP](https://www.openmp.org/), [OpenGL](https://www.opengl.org/), [cuda](https://developer.nvidia.com/cuda-toolkit), [matplotlib](https://matplotlib.org/), [torch](https://pytorch.org/), [astropy](https://github.com/astropy/astropy), [spdlog](https://github.com/gabime/spdlog), [flamegraph](https://github.com/brendangregg/FlameGraph), [fmt](https://fmt.dev/latest/index.html), [googletest](https://github.com/google/googletest), [json](https://github.com/nlohmann/json), [optick](https://github.com/bombomby/optick), [pybind11](https://github.com/pybind/pybind11), [QCustomPlot](https://www.qcustomplot.com/), [tracy](https://github.com/wolfpld/tracy), [glad](https://glad.dav1d.de/), [GLFW](https://www.glfw.org/), [ImGui](https://github.com/ocornut/imgui), and others. ***Examples below.***
