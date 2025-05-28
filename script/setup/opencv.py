@@ -77,7 +77,7 @@ def setup(build_type, jobs):
         opencv_install(jobs)
 
     opencv_dir = opencv_find_root()
+    log.debug(f'opencv directory: {opencv_dir}')
     if not opencv_static:
         utils.copy_files_to_directory(utils.find_binaries(opencv_install_dir), utils.get_runtime_directory(build_type))
-    log.debug(f'opencv directory: {opencv_dir}')
     return opencv_dir
