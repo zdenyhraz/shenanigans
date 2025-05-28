@@ -23,7 +23,6 @@ def run_cpp_tests(coverage):
     log.info('Running C++ tests')
     build_dir = 'build'
     log.debug(f'Build directory: {build_dir}')
-
     test_executables = find_test_executables(build_dir)
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
@@ -34,7 +33,6 @@ def run_cpp_tests(coverage):
 
 def run_python_tests(coverage):
     log.info('Running Python tests')
-    utils.run(f'pip install -r requirements.txt')
     test_dir = 'script/test'
     log.debug(f'Test directory: {test_dir}')
     coverage_arg = f'--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
@@ -57,8 +55,6 @@ if __name__ == '__main__':
     for arg, val in vars(args).items():
         log.debug(f'{arg}: {val}')
 
-    args.coverage and utils.run('pip install gcovr')
-    args.python and utils.run('pip install pytest pytest-cov')
     log.info('Running tests')
     args.cpp and run_cpp_tests(args.coverage)
     args.python and run_python_tests(args.coverage)  # TODO: add python test coverage

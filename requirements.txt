@@ -6,3 +6,6 @@ torchvision
 pandas
 pycocotools
 opencv-python
+pytest
+pytest-cov
+gcovr
