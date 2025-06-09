@@ -14,8 +14,8 @@ try
   app.SetIniPath("data/shenanigans/imgui.ini");
   app.SetFontPath("data/shenanigans/CascadiaCode.ttf");
   app.SetPlotWindowCount(2);
-  app.AddWindow<ObjdetectObjectnessWindow>();
   app.AddWindow<PipeTrackerWindow>();
+  app.AddWindow<ObjdetectObjectnessWindow>();
   app.AddWindow<ObjdetectColorWindow>();
   app.AddWindow<MicroserviceEditorWindow>();
   app.AddWindow<IPCWindow>();
