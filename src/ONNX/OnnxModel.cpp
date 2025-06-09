@@ -7,6 +7,27 @@ OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, 
     Load(modelPath);
 }
 
+void OnnxModel::VerifyInputsOutputs()
+{
+  size_t inputCount = session.GetInputCount();
+  if (inputNames.size() != inputCount)
+    throw EXCEPTION("ONNX model input count mismatch: Expected {} inputs, but model has {}", inputNames.size(), inputCount);
+
+  size_t outputCount = session.GetOutputCount();
+  if (outputNames.size() != outputCount)
+    throw EXCEPTION("ONNX model output count mismatch: Expected {} outputs, but model has {}", outputNames.size(), outputCount);
+
+  Ort::AllocatorWithDefaultOptions allocator;
+
+  for (size_t i = 0; i < inputCount; ++i)
+    if (const auto modelInputName = session.GetInputNameAllocated(i, allocator); std::strcmp(inputNames[i], modelInputName.get()) != 0)
+      throw EXCEPTION("ONNX model input name mismatch at index {}: Expected '{}', but got '{}'", i, inputNames[i], modelInputName.get());
+
+  for (size_t i = 0; i < outputCount; ++i)
+    if (const auto modelOutputName = session.GetOutputNameAllocated(i, allocator); std::strcmp(outputNames[i], modelOutputName.get()) != 0)
+      throw EXCEPTION("ONNX model output name mismatch at index {}: Expected '{}', but got '{}'", i, outputNames[i], modelOutputName.get());
+}
+
 void OnnxModel::Load(const std::filesystem::path& modelPath)
 try
 {
@@ -114,5 +135,5 @@ std::vector<Ort::Value> OnnxModel::Run(const cv::Mat& image)
   cv::Mat imageTensor = Preprocess(image);
   Ort::Value inputTensor =
       Ort::Value::CreateTensor<float>(memoryInfo, imageTensor.ptr<float>(0), imageTensor.total() * imageTensor.channels(), inputShape.data(), inputShape.size());
-  return session.Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, 1, outputNames.data(), outputNames.size());
+  return session.Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, inputNames.size(), outputNames.data(), outputNames.size());
 }

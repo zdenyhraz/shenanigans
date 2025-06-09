@@ -19,8 +19,7 @@ class OnnxModel
   static void OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message);
 
 public:
-  OnnxModel(
-      const std::filesystem::path& modelPath = "", const char* name = "model", const std::vector<const char*>& inputNames = {}, const std::vector<const char*>& outputNames = {});
+  OnnxModel(const std::filesystem::path& modelPath, const char* name, const std::vector<const char*>& inputNames, const std::vector<const char*>& outputNames);
   operator bool() const { return loaded; }
 
   std::vector<Ort::Value> Run(const cv::Mat& image);
@@ -29,4 +28,5 @@ public:
   void SetName(const char* _name) { name = _name; }
   void SetInputNames(const std::vector<const char*>& names) { inputNames = names; }
   void SetOutputNames(const std::vector<const char*>& names) { outputNames = names; }
+  void VerifyInputsOutputs();
 };
