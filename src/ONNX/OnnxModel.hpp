@@ -14,8 +14,11 @@ class OnnxModel
   bool usesGPU = false;
   bool loaded = false;
 
+  cv::Mat imageTensor;
+  Ort::Value inputTensor{nullptr};
+
   void LoadProviders();
-  static cv::Mat Preprocess(const cv::Mat& image);
+  void Preprocess(const cv::Mat& image);
   static void OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message);
 
 public:
