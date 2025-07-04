@@ -216,6 +216,17 @@ include_directories(${CMAKE_SOURCE_DIR}/libs/onnxruntime_install/include)
 target_link_libraries(shenanigans PRIVATE onnxruntime::onnxruntime)
 target_link_libraries(shenanigans_test PRIVATE onnxruntime::onnxruntime)
 
+# onnxruntime
+set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime_install" CACHE INTERNAL "ONNX runtime dir")
+if (MSVC)
+    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib CACHE INTERNAL "ONNX runtime lib")
+else()
+    set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so CACHE INTERNAL "ONNX runtime lib")
+endif()
+include_directories(${ONNXRUNTIME_DIR}/include)
+target_link_libraries(shenanigans PRIVATE ${ONNXRUNTIME_LIBS})
+target_link_libraries(shenanigans_test PRIVATE ${ONNXRUNTIME_LIBS})
+
 # custom
 include_directories(libs)
 include_directories(src)
