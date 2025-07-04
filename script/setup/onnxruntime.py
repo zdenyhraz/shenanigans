@@ -10,7 +10,7 @@ from script.log import log
 
 onnxruntime_install_name = "onnxruntime_install"
 onnxruntime_install_dir = os.path.join(utils.get_root_directory(), 'libs', onnxruntime_install_name)
-onnxruntime_build = True
+onnxruntime_build = False
 
 
 def onnxruntime_get_url():
