@@ -37,6 +37,10 @@ jobs:
           path: ./libs/onnxruntime_install
           key: ${{ runner.os }}-onnxruntime-cache-v2
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Build
         run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --jobs 4
 
