@@ -211,12 +211,6 @@ target_link_libraries(shenanigans PRIVATE range-v3)
 target_link_libraries(shenanigans_test PRIVATE range-v3)
 
 # onnxruntime
-find_package(onnxruntime REQUIRED HINTS ${ONNXRUNTIME_DIR} ${CMAKE_SOURCE_DIR}/libs/onnxruntime_install)
-include_directories(${CMAKE_SOURCE_DIR}/libs/onnxruntime_install/include)
-target_link_libraries(shenanigans PRIVATE onnxruntime::onnxruntime)
-target_link_libraries(shenanigans_test PRIVATE onnxruntime::onnxruntime)
-
-# onnxruntime
 set(ONNXRUNTIME_DIR "${CMAKE_SOURCE_DIR}/libs/onnxruntime_install" CACHE INTERNAL "ONNX runtime dir")
 if (MSVC)
     set(ONNXRUNTIME_LIBS ${ONNXRUNTIME_DIR}/lib/onnxruntime.lib CACHE INTERNAL "ONNX runtime lib")
