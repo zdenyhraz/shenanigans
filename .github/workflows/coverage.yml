@@ -42,7 +42,7 @@ jobs:
     - name: Upload C++ coverage
       uses: codecov/codecov-action@v4
       with:
-        token: ${{ secrets.ACCESS_TOKEN }}
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage_cpp.xml
         flags: cpp
         verbose: true
@@ -50,7 +50,7 @@ jobs:
     - name: Upload Python coverage
       uses: codecov/codecov-action@v4
       with:
-        token: ${{ secrets.ACCESS_TOKEN }}
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage_py.xml
         flags: python
         verbose: true
