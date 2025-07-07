@@ -20,6 +20,7 @@
 <a href="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/overview/master"><img src="https://www.codefactor.io/repository/github/zdenyhraz/shenanigans/badge/master"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/pylint.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/pylint.yml/badge.svg"/></a>
 <a href="https://github.com/zdenyhraz/shenanigans/actions/workflows/ruff.yml"><img src="https://github.com/zdenyhraz/shenanigans/actions/workflows/ruff.yml/badge.svg"/></a>
+<a href="https://codecov.io/gh/zdenyhraz/shenanigans"><img src="https://codecov.io/gh/zdenyhraz/shenanigans/graph/badge.svg?token=2CD71S18CG"/></a>
 </p>
 
 
