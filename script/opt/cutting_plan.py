@@ -147,16 +147,17 @@ if __name__ == '__main__':
             "stock_cost": 484,
             "saw_kerf": 1,
             "required_cuts": {
-                85.5: 2,
-                68.5: 2,
-                51.5: 2,
-                25: 10,
-                35: 4,
-                15: 4
+                101.5: 2,
+                84.5: 2,
+                67.5: 2,
+                25: 6,
+                32: 4,
+                22: 4,
+                12: 4
             }
         },
         {
-            "name": "Hranol 1.8x8.2",
+            "name": "Hranol 18x82",
             "stock_length": 300,
             "stock_cost": 91,
             "saw_kerf": 1,
