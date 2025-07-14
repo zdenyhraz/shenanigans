@@ -1,4 +1,3 @@
-import collections
 import sys
 
 sys.setrecursionlimit(2000)
@@ -157,14 +156,24 @@ if __name__ == '__main__':
             }
         },
         {
-            "name": "Hranol 18x82",
-            "stock_length": 300,
-            "stock_cost": 91,
+            "name": "Prkno 18x82",
+            "stock_length": 150,
+            "stock_cost": 121,
             "saw_kerf": 1,
             "required_cuts": {
-                25: 24
+                25: 16,  # 24
             }
-        }
+        },
+        {
+            "name": "Hranol 40x80",
+            "stock_length": 200,
+            "stock_cost": 248,
+            "saw_kerf": 1,
+            "required_cuts": {
+                95: 6,
+                40: 12,
+            }
+        },
     ]
 
     final_plan = find_optimal_cutting_plan(user_data)
