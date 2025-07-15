@@ -34,6 +34,6 @@ jobs:
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --configure_only
 
     - name: Run clang-tidy
-      run: sudo python -m script.ci.clang_tidy
+      run: sudo python -m script.ci.clang-tidy
       continue-on-error: true
 
