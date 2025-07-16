@@ -1,0 +1,14 @@
+CompileFlags:
+  Add: [
+    -std=c++23,
+    -target=x86_64-pc-windows-msvc,
+    -fms-compatibility,
+    -fms-extensions,
+    -fdelayed-template-parsing,
+    ]
+
+Index:
+  Background: Build
+
+Completion:
+  AllScopes: true
