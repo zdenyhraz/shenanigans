@@ -16,19 +16,11 @@ class Workflow
     if (std::ranges::distance(relevantConnections) == 0)
       return;
 
-    LOG_DEBUG("Microservice '{}' has {} input parameter dependencies:", microservice.GetName(), std::ranges::distance(relevantConnections));
-    for (const auto& connection : relevantConnections)
-      LOG_DEBUG("   {}", connection.GetString());
-
     for (auto& connection : relevantConnections)
       ExecuteMicroservice(*connection.outputMicroservice);
   }
 
-  void Process(Microservice& microservice)
-  {
-    LOG_DEBUG(">>> {} processing", microservice.GetName());
-    microservice.Process();
-  }
+  void Process(Microservice& microservice) { microservice.Process(); }
 
   void PropagateFlow(Microservice& microservice)
   {
@@ -37,10 +29,6 @@ class Workflow
 
     if (std::ranges::distance(relevantConnections) == 0)
       return;
-
-    LOG_DEBUG("Microservice '{}' has {} output connections:", microservice.GetName(), std::ranges::distance(relevantConnections));
-    for (const auto& connection : relevantConnections)
-      LOG_DEBUG("   {}", connection.GetString());
 
     for (auto& connection : relevantConnections)
       ExecuteMicroservice(*connection.inputMicroservice);
@@ -75,17 +63,20 @@ public:
 
   const std::string& GetName() { return name; }
   const std::vector<std::unique_ptr<Microservice>>& GetMicroservices() { return microservices; }
+  Microservice& GetStart() { return *microservices.front(); }
   const std::vector<Microservice::Connection>& GetConnections() { return connections; }
 
   template <typename T>
-  void AddMicroservice()
+  Microservice& AddMicroservice()
   {
     microservices.push_back(std::make_unique<T>());
+    return *microservices.back();
   }
 
   void Run()
   try
   {
+    LOG_FUNCTION;
     LOG_DEBUG("Running workflow '{}'", GetName());
 
     if (microservices.empty())
@@ -138,6 +129,14 @@ public:
   {
     auto& outputParameter = outputMicroservice.GetOutputParameter(outputParameterName);
     auto& inputParameter = inputMicroservice.GetInputParameter(inputParameterName);
+    Microservice::Connection connection(&outputMicroservice, &inputMicroservice, &outputParameter, &inputParameter);
+    Connect(std::move(connection));
+  }
+
+  void Connect(Microservice& outputMicroservice, Microservice& inputMicroservice, const std::string& parameterName)
+  {
+    auto& outputParameter = outputMicroservice.GetOutputParameter(parameterName);
+    auto& inputParameter = inputMicroservice.GetInputParameter(parameterName);
     Microservice::Connection connection(&outputMicroservice, &inputMicroservice, &outputParameter, &inputParameter);
     Connect(std::move(connection));
   }

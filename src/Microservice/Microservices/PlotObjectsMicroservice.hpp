@@ -5,6 +5,7 @@ class PlotObjectsMicroservice : public Microservice
 {
   void Process() override
   {
+    LOG_FUNCTION;
     auto image = GetInputParameter<cv::Mat>("image").clone();
 
     cv::normalize(image, image, 0, 255, cv::NORM_MINMAX);

@@ -9,6 +9,7 @@
 void MicroserviceEditorWindow::Initialize()
 {
   editor.OnStart();
+  TestInitializeCX();
 }
 
 void MicroserviceEditorWindow::Render()
@@ -35,28 +36,20 @@ void MicroserviceEditorWindow::Render()
 
 void MicroserviceEditorWindow::Run()
 {
-  TestInitialize();
   editor.workflow.Run();
-  LOG_INFO("Workflow run completed");
 }
 
 void MicroserviceEditorWindow::RunRepeat()
 {
-  TestInitialize();
   for (int i = 0; i < 5; ++i)
   {
     Plot::Clear();
     editor.workflow.Run();
   }
-  LOG_INFO("Workflow run completed");
 }
 
 void MicroserviceEditorWindow::TestInitialize()
 {
-  static bool initialized = false;
-  if (initialized)
-    return;
-  initialized = true;
   editor.workflow.AddMicroservice<LoadImageMicroservice>();
   editor.workflow.AddMicroservice<BlurImageMicroservice>();
   editor.workflow.AddMicroservice<PlotImageMicroservice>();
@@ -71,21 +64,41 @@ void MicroserviceEditorWindow::TestInitialize()
   auto& sas = *microservices[4];
   auto& plotSAS = *microservices[5];
 
-  load.SetParameter("file name", std::string("rox.tif"));
+  load.SetParameter("file name", std::string("data/sas/kd/samples/rox.tif"));
   load.SetParameter("float", true);
   load.SetParameter("grayscale", true);
   blur.SetParameter("relative blur x", 0.0f);
   blur.SetParameter("relative blur y", 0.0f);
 
   editor.workflow.Connect(start, blur);
-  editor.workflow.Connect(load, blur, "image", "image");
+  editor.workflow.Connect(load, blur, "image");
   editor.workflow.Connect(blur, plotBlur2);
-  editor.workflow.Connect(blur, plotBlur2, "blurred", "image");
-  editor.workflow.Connect(blur, sas, "blurred", "image");
+  editor.workflow.Connect(blur, plotBlur2, "image");
+  editor.workflow.Connect(blur, sas, "image");
   editor.workflow.Connect(blur, sas);
   editor.workflow.Connect(sas, plotSAS);
-  editor.workflow.Connect(sas, plotSAS, "objects", "objects");
-  editor.workflow.Connect(load, plotSAS, "image", "image");
+  editor.workflow.Connect(sas, plotSAS, "objects");
+  editor.workflow.Connect(load, plotSAS, "image");
+}
+
+void MicroserviceEditorWindow::TestInitializeCX()
+{
+  auto& load = editor.workflow.AddMicroservice<LoadImageMicroservice>();
+  auto& sas = editor.workflow.AddMicroservice<ObjdetectSASMicroservice>();
+  auto& plot = editor.workflow.AddMicroservice<PlotObjectsMicroservice>();
+
+  load.SetParameter("file name", std::string("data/sas/kd/samples/rox.tif"));
+  load.SetParameter("float", true);
+  load.SetParameter("grayscale", true);
+
+  sas.SetParameter("useAutoThreshold", false);
+  sas.SetParameter("removeShadow", false);
+
+  editor.workflow.Connect(editor.workflow.GetStart(), sas);
+  editor.workflow.Connect(load, sas, "image");
+  editor.workflow.Connect(sas, plot);
+  editor.workflow.Connect(sas, plot, "objects");
+  editor.workflow.Connect(load, plot, "image");
 }
 
 void MicroserviceEditorWindow::ShowFlow()

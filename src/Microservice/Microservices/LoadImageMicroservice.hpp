@@ -6,6 +6,7 @@ class LoadImageMicroservice : public Microservice
 {
   void Process() override
   {
+    LOG_FUNCTION;
     const auto& filename = GetParameter<std::string>("file name");
     const bool loadFloat = GetParameter<bool>("float");
     const bool loadGrayscale = GetParameter<bool>("grayscale");
@@ -14,7 +15,7 @@ class LoadImageMicroservice : public Microservice
     if (not loadGrayscale)
       mode |= cv::IMREAD_COLOR;
 
-    auto image = cv::imread(filename, mode);
+    auto image = cv::imread(GetProjectPath(filename).string(), mode);
     if (image.empty())
       throw MicroserviceException("Failed to load image '{}'", filename);
 
