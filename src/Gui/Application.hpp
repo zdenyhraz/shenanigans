@@ -17,8 +17,8 @@ class Application
   std::filesystem::path fontPath = "CascadiaCode.ttf";
   bool showImGuiDemoWindow = false;
   bool showImPlotDemoWindow = false;
-  static constexpr bool showPlotMenu = false;
-  static constexpr bool showImGuiDemoMenu = false;
+  static constexpr bool showPlotMenu = true;
+  static constexpr bool showImGuiDemoMenu = true;
   static constexpr bool showThemeMenu = true;
 
 public:
