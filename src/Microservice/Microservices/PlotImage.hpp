@@ -2,7 +2,7 @@
 #include "Microservice/Microservice.hpp"
 #include "Plot/Plot.hpp"
 
-class PlotImageMicroservice : public Microservice
+class PlotImage : public Microservice
 {
   void Process() override
   {
@@ -11,7 +11,7 @@ class PlotImageMicroservice : public Microservice
   }
 
 public:
-  PlotImageMicroservice()
+  PlotImage()
   {
     GenerateMicroserviceName();
     DefineInputParameter<cv::Mat>("image");

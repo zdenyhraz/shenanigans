@@ -200,18 +200,17 @@ protected:
     if (posSpace != std::string::npos)
       typeName = typeName.substr(posSpace + 1);
 
-    size_t posMs = typeName.find("Microservice");
-    if (posMs != std::string::npos)
-      typeName.erase(posMs, std::string("Microservice").length());
-
-    static int nameid = 1;
-    microserviceName = fmt::format("{}.{}", typeName, nameid++);
+    microserviceName = typeName;
   }
 
 public:
   virtual ~Microservice() {}
 
   virtual void Process() = 0;
+
+  virtual void Load(){};
+
+  virtual void Unload(){};
 
   const std::string& GetName() const { return microserviceName; }
 

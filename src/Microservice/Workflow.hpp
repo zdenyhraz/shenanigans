@@ -1,6 +1,6 @@
 #pragma once
 #include "Microservice.hpp"
-#include "Microservices/StartMicroservice.hpp"
+#include "Microservices/Start.hpp"
 
 class Workflow
 {
@@ -42,7 +42,7 @@ class Workflow
   }
 
 public:
-  Workflow() { microservices.push_back(std::make_unique<StartMicroservice>()); }
+  Workflow() { microservices.push_back(std::make_unique<Start>()); }
 
   Workflow(const std::filesystem::path& path) { Load(path); }
 
@@ -76,7 +76,7 @@ public:
   void Run()
   try
   {
-    LOG_FUNCTION;
+    LOG_SCOPE("Workflow");
     LOG_DEBUG("Running workflow '{}'", GetName());
 
     if (microservices.empty())
@@ -91,6 +91,20 @@ public:
   catch (const std::exception& e)
   {
     LOG_ERROR("Workflow '{}' error: {}", GetName(), e.what());
+  }
+
+  void Load()
+  {
+    LOG_DEBUG("Loading workflow '{}'", GetName());
+    for (auto& microservice : microservices)
+      microservice->Load();
+  }
+
+  void Unload()
+  {
+    LOG_DEBUG("Unloading workflow '{}'", GetName());
+    for (auto& microservice : microservices)
+      microservice->Unload();
   }
 
   void Reset()

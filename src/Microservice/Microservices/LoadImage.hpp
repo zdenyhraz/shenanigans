@@ -2,18 +2,18 @@
 #include "Microservice/Microservice.hpp"
 #include "Math/Functions.hpp"
 
-class LoadImageMicroservice : public Microservice
+class LoadImage : public Microservice
 {
   void Process() override
   {
-    LOG_FUNCTION;
-    const auto& filename = GetParameter<std::string>("file name");
-    const bool loadFloat = GetParameter<bool>("float");
+    LOG_SCOPE("LoadImage");
+    const auto& filename = GetParameter<std::string>("image path");
+    const bool loadFloat = GetParameter<bool>("convert float");
     const bool loadGrayscale = GetParameter<bool>("grayscale");
 
-    int mode = 0;
-    if (not loadGrayscale)
-      mode |= cv::IMREAD_COLOR;
+    int mode = 1;
+    if (loadGrayscale)
+      mode = cv::IMREAD_GRAYSCALE;
 
     auto image = cv::imread(GetProjectPath(filename).string(), mode);
     if (image.empty())
@@ -31,12 +31,12 @@ class LoadImageMicroservice : public Microservice
   }
 
 public:
-  LoadImageMicroservice()
+  LoadImage()
   {
     GenerateMicroserviceName();
     DefineOutputParameter<cv::Mat>("image");
-    DefineParameter<std::string>("file name", "data/ml/object_detection/datasets/cats/cats2.jpg");
-    DefineParameter<bool>("float", false);
+    DefineParameter<std::string>("image path", "data/ml/object_detection/datasets/cats/cats2.jpg");
+    DefineParameter<bool>("convert float", false);
     DefineParameter<bool>("grayscale", false);
   }
 };

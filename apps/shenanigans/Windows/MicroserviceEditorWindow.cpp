@@ -1,15 +1,16 @@
 #include "MicroserviceEditorWindow.hpp"
-#include "Microservice/Microservices/LoadImageMicroservice.hpp"
-#include "Microservice/Microservices/BlurImageMicroservice.hpp"
-#include "Microservice/Microservices/PlotImageMicroservice.hpp"
-#include "NDA/Microservice/ObjdetectSASMicroservice.hpp"
-#include "Microservice/Microservices/PlotObjectsMicroservice.hpp"
+#include "Microservice/Microservices/LoadImage.hpp"
+#include "Microservice/Microservices/SaveImage.hpp"
+#include "Microservice/Microservices/PlotImage.hpp"
+#include "Microservice/Microservices/DrawObjects.hpp"
+#include "Microservice/Microservices/OnnxDetection.hpp"
+#include "NDA/Microservice/ObjdetectSAS.hpp"
 #include "Utils/Async.hpp"
 
 void MicroserviceEditorWindow::Initialize()
 {
   editor.OnStart();
-  TestInitializeCX();
+  TestInitialize();
 }
 
 void MicroserviceEditorWindow::Render()
@@ -50,55 +51,22 @@ void MicroserviceEditorWindow::RunRepeat()
 
 void MicroserviceEditorWindow::TestInitialize()
 {
-  editor.workflow.AddMicroservice<LoadImageMicroservice>();
-  editor.workflow.AddMicroservice<BlurImageMicroservice>();
-  editor.workflow.AddMicroservice<PlotImageMicroservice>();
-  editor.workflow.AddMicroservice<ObjdetectSASMicroservice>();
-  editor.workflow.AddMicroservice<PlotObjectsMicroservice>();
+  auto& load = editor.workflow.AddMicroservice<LoadImage>();
+  auto& onnx = editor.workflow.AddMicroservice<OnnxDetection>();
+  auto& draw = editor.workflow.AddMicroservice<DrawObjects>();
+  auto& save = editor.workflow.AddMicroservice<SaveImage>();
 
-  const auto& microservices = editor.workflow.GetMicroservices();
-  auto& start = *microservices[0];
-  auto& load = *microservices[1];
-  auto& blur = *microservices[2];
-  auto& plotBlur2 = *microservices[3];
-  auto& sas = *microservices[4];
-  auto& plotSAS = *microservices[5];
+  load.SetParameter("image path", std::string("data/umbellula/interesting/0.jpg"));
+  onnx.SetParameter("model path", std::string("data/umbellula/umbellula.onnx"));
+  save.SetParameter("image path", std::string("data/umbellula/results/0.jpg"));
 
-  load.SetParameter("file name", std::string("data/sas/kd/samples/rox.tif"));
-  load.SetParameter("float", true);
-  load.SetParameter("grayscale", true);
-  blur.SetParameter("relative blur x", 0.0f);
-  blur.SetParameter("relative blur y", 0.0f);
-
-  editor.workflow.Connect(start, blur);
-  editor.workflow.Connect(load, blur, "image");
-  editor.workflow.Connect(blur, plotBlur2);
-  editor.workflow.Connect(blur, plotBlur2, "image");
-  editor.workflow.Connect(blur, sas, "image");
-  editor.workflow.Connect(blur, sas);
-  editor.workflow.Connect(sas, plotSAS);
-  editor.workflow.Connect(sas, plotSAS, "objects");
-  editor.workflow.Connect(load, plotSAS, "image");
-}
-
-void MicroserviceEditorWindow::TestInitializeCX()
-{
-  auto& load = editor.workflow.AddMicroservice<LoadImageMicroservice>();
-  auto& sas = editor.workflow.AddMicroservice<ObjdetectSASMicroservice>();
-  auto& plot = editor.workflow.AddMicroservice<PlotObjectsMicroservice>();
-
-  load.SetParameter("file name", std::string("data/sas/kd/samples/rox.tif"));
-  load.SetParameter("float", true);
-  load.SetParameter("grayscale", true);
-
-  sas.SetParameter("useAutoThreshold", false);
-  sas.SetParameter("removeShadow", false);
-
-  editor.workflow.Connect(editor.workflow.GetStart(), sas);
-  editor.workflow.Connect(load, sas, "image");
-  editor.workflow.Connect(sas, plot);
-  editor.workflow.Connect(sas, plot, "objects");
-  editor.workflow.Connect(load, plot, "image");
+  editor.workflow.Connect(editor.workflow.GetStart(), onnx);
+  editor.workflow.Connect(load, onnx, "image");
+  editor.workflow.Connect(load, draw, "image");
+  editor.workflow.Connect(onnx, save);
+  editor.workflow.Connect(onnx, draw, "objects");
+  editor.workflow.Connect(draw, save, "image");
+  editor.workflow.Load();
 }
 
 void MicroserviceEditorWindow::ShowFlow()
