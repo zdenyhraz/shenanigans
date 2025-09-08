@@ -3,6 +3,7 @@
 OnnxModel::OnnxModel(const std::filesystem::path& modelPath, const char* _name, const std::vector<const char*>& _inputNames, const std::vector<const char*>& _outputNames) :
   name(_name), inputNames(_inputNames), outputNames(_outputNames)
 {
+  logName = fmt::format("[{}/{}] ONNX", name, fmt::ptr(this));
   if (not modelPath.empty())
     Load(modelPath);
 }
@@ -11,30 +12,30 @@ void OnnxModel::VerifyInputsOutputs()
 {
   size_t inputCount = session.GetInputCount();
   if (inputNames.size() != inputCount)
-    throw EXCEPTION("ONNX model input count mismatch: Expected {} inputs, but model has {}", inputNames.size(), inputCount);
+    throw EXCEPTION("{} model input count mismatch: Expected {} inputs, but model has {}", logName, inputNames.size(), inputCount);
 
   size_t outputCount = session.GetOutputCount();
   if (outputNames.size() != outputCount)
-    throw EXCEPTION("ONNX model output count mismatch: Expected {} outputs, but model has {}", outputNames.size(), outputCount);
+    throw EXCEPTION("{} model output count mismatch: Expected {} outputs, but model has {}", logName, outputNames.size(), outputCount);
 
   Ort::AllocatorWithDefaultOptions allocator;
 
   for (size_t i = 0; i < inputCount; ++i)
     if (const auto modelInputName = session.GetInputNameAllocated(i, allocator); std::strcmp(inputNames[i], modelInputName.get()) != 0)
-      throw EXCEPTION("ONNX model input name mismatch at index {}: Expected '{}', but got '{}'", i, inputNames[i], modelInputName.get());
+      throw EXCEPTION("{} model input name mismatch at index {}: Expected '{}', but got '{}'", logName, i, inputNames[i], modelInputName.get());
 
   for (size_t i = 0; i < outputCount; ++i)
     if (const auto modelOutputName = session.GetOutputNameAllocated(i, allocator); std::strcmp(outputNames[i], modelOutputName.get()) != 0)
-      throw EXCEPTION("ONNX model output name mismatch at index {}: Expected '{}', but got '{}'", i, outputNames[i], modelOutputName.get());
+      throw EXCEPTION("{} model output name mismatch at index {}: Expected '{}', but got '{}'", logName, i, outputNames[i], modelOutputName.get());
 }
 
 void OnnxModel::Load(const std::filesystem::path& modelPath)
-try
 {
-  LOG_DEBUG("Loading model {}", modelPath);
+  LOG_DEBUG("{} loading model {}", logName, modelPath);
   if (not std::filesystem::is_regular_file(modelPath))
     throw EXCEPTION("Could not find model '{}'", modelPath.string());
 
+  LOG_DEBUG("Initializing ONNX Runtime");
   env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, name, OnnxLogFunction, nullptr);
   options = Ort::SessionOptions();
   options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
@@ -42,15 +43,11 @@ try
   session = Ort::Session(env, modelPath.c_str(), options);
   memoryInfo = Ort::MemoryInfo(Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, usesGPU ? OrtMemTypeCPUInput : OrtMemTypeDefault));
   loaded = true;
-  LOG_DEBUG("Loaded model {} | GPU: {}", modelPath, usesGPU);
-}
-catch (const std::exception& e)
-{
-  LOG_EXCEPTION(e);
+  VerifyInputsOutputs();
+  LOG_DEBUG("{} loaded model {} | GPU: {}", logName, modelPath, usesGPU);
 }
 
 void OnnxModel::Unload()
-try
 {
   memoryInfo = Ort::MemoryInfo(nullptr);
   session = Ort::Session(nullptr);
@@ -58,18 +55,14 @@ try
   env = Ort::Env(nullptr);
   usesGPU = false;
   loaded = false;
-  LOG_DEBUG("Model unloaded");
-}
-catch (const std::exception& e)
-{
-  LOG_EXCEPTION(e);
+  LOG_DEBUG("{} model unloaded", logName);
 }
 
 void OnnxModel::LoadProviders()
-try
 {
+  LOG_DEBUG("Loading ONNX providers");
   const auto providers = Ort::GetAvailableProviders();
-  LOG_DEBUG("ONNX available providers: {}", providers);
+  LOG_DEBUG("{} available providers: {}", logName, providers);
 
   if (useCUDA and std::ranges::contains(providers, "CUDAExecutionProvider"))
     try
@@ -77,11 +70,11 @@ try
       OrtCUDAProviderOptions cudaOptions;
       options.AppendExecutionProvider_CUDA(cudaOptions);
       usesGPU = true;
-      LOG_DEBUG("ONNX CUDA provider loaded");
+      LOG_DEBUG("{} CUDA provider loaded", logName);
     }
     catch (const std::exception& e)
     {
-      LOG_WARNING("ONNX CUDA provider failed to load: {}", e.what());
+      LOG_WARNING("{} CUDA provider failed to load: {}", logName, e.what());
     }
   if (useTensorRT and std::ranges::contains(providers, "TensorrtExecutionProvider"))
     try
@@ -89,20 +82,16 @@ try
       OrtTensorRTProviderOptions tensorrtOptions;
       options.AppendExecutionProvider_TensorRT(tensorrtOptions);
       usesGPU = true;
-      LOG_DEBUG("ONNX TensorRT provider loaded");
+      LOG_DEBUG("{} TensorRT provider loaded", logName);
     }
     catch (const std::exception& e)
     {
-      LOG_WARNING("ONNX TensorRT provider failed to load: {}", e.what());
+      LOG_WARNING("{} TensorRT provider failed to load: {}", logName, e.what());
     }
   if (std::ranges::contains(providers, "CPUExecutionProvider"))
   {
-    LOG_DEBUG("ONNX CPU provider loaded");
+    LOG_DEBUG("{} CPU provider loaded", logName);
   }
-}
-catch (...)
-{
-  LOG_ERROR("ONNX providers failed to load");
 }
 
 void OnnxModel::OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message)

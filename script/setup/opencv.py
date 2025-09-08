@@ -5,11 +5,16 @@ from script.log import log
 
 opencv_install_name = 'opencv_install'
 opencv_install_dir = os.path.join(utils.get_root_directory(), 'libs', opencv_install_name)
-opencv_static = True
+opencv_static = False
 opencv_cmake_args = {
     # build configuration
     'CMAKE_BUILD_TYPE': 'RELEASE',
     'BUILD_SHARED_LIBS': 'OFF' if opencv_static else 'ON',
+
+    # simd
+    'ENABLE_SIMD': 'ON',
+    'CPU_BASELINE': 'AVX2',
+    'CPU_DISPATCH': 'SSE4_1;SSE4_2;AVX;AVX2',
 
     # extra modules
     'OPENCV_EXTRA_MODULES_PATH': '',  # '../opencv_contrib/modules',
@@ -28,6 +33,7 @@ opencv_cmake_args = {
     'OPENCV_PYTHON_SKIP': 'ON',
 
     # modules
+    'BUILD_JPEG': 'ON',
     'BUILD_OPENCV_WECHAT_QRCODE': 'OFF',
     'BUILD_OPENCV_CALIB3D': 'OFF',
     'BUILD_OPENCV_DNN': 'OFF',
@@ -43,7 +49,11 @@ opencv_cmake_args = {
 
     # optional dependencies
     'WITH_CUDA': 'OFF',
+    'WITH_IPP': 'ON',
+    'WITH_OPENMP': 'ON',
     'WITH_JAVA': 'OFF',
+    'WITH_JPEG': 'ON',
+    'WITH_JPEG_TURBO': 'ON',
 }
 
 

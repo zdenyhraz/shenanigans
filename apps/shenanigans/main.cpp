@@ -3,9 +3,11 @@
 #include "Windows/AstroWindow.hpp"
 #include "Windows/RandomWindow.hpp"
 #include "Windows/MicroserviceEditorWindow.hpp"
-#include "NDA/Windows/ObjdetectColorWindow.hpp"
-#include "NDA/Windows/ObjdetectObjectnessWindow.hpp"
-#include "NDA/Windows/PipeTrackerWindow.hpp"
+#ifdef ENABLE_NDA
+#  include "NDA/Windows/ObjdetectColorWindow.hpp"
+#  include "NDA/Windows/ObjdetectObjectnessWindow.hpp"
+#  include "NDA/Windows/PipeTrackerWindow.hpp"
+#endif
 
 int main(int argc, char** argv)
 try
@@ -13,14 +15,16 @@ try
   Application app("Shenanigans");
   app.SetIniPath("data/shenanigans/imgui.ini");
   app.SetFontPath("data/shenanigans/CascadiaCode.ttf");
-  app.SetPlotWindowCount(2);
-  app.AddWindow<PipeTrackerWindow>();
-  app.AddWindow<ObjdetectObjectnessWindow>();
-  app.AddWindow<ObjdetectColorWindow>();
   app.AddWindow<MicroserviceEditorWindow>();
   app.AddWindow<IPCWindow>();
   app.AddWindow<AstroWindow>();
   app.AddWindow<RandomWindow>();
+#ifdef ENABLE_NDA
+  app.SetPlotWindowCount(2);
+  app.AddWindow<PipeTrackerWindow>();
+  app.AddWindow<ObjdetectObjectnessWindow>();
+  app.AddWindow<ObjdetectColorWindow>();
+#endif
   app.Run();
   return EXIT_SUCCESS;
 }

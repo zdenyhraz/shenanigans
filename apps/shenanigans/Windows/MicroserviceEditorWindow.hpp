@@ -4,7 +4,7 @@
 
 class MicroserviceEditorWindow : public Window
 {
-  void TestInitialize();
+  void CreateWorkflow();
   void ShowFlow();
   void Run();
   void RunRepeat();

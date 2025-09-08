@@ -15,7 +15,7 @@ option(ENABLE_SANITIZER_ADDRESS "Enable address sanitizer" OFF)
 option(ENABLE_SANITIZER_UNDEFINED "Enable undefined sanitizer" OFF)
 option(ENABLE_SANITIZER_THREAD "Enable thread sanitizer" OFF)
 option(ENABLE_SANITIZER_MEMORY "Enable memory sanitizer" OFF)
-option(ENABLE_PRIVATE "Use private submodules" ON)
+option(ENABLE_NDA "Use NDA submodules" ON)
 option(ENABLE_COVERAGE "Test coverage" OFF)
 option(CI "Continuous integration build" OFF)
 option(DEVELOP "Development build" ON)
@@ -239,20 +239,24 @@ file(GLOB_RECURSE SRC_SHENANIGANS CONFIGURE_DEPENDS
  src/Python/*.cpp
  src/Random/*.cpp
  src/Utils/*.cpp
- src/NDA/SAS/*.cpp
 )
 
 # gui soruces
 file(GLOB_RECURSE SRC_GUI CONFIGURE_DEPENDS src/Gui/*.cpp)
 
-add_subdirectory(src/NDA)
-
 # shenanigans app sources
-file(GLOB SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shenanigans/Windows/*.cpp src/NDA/Windows/*.cpp)
+file(GLOB_RECURSE SRC_SHENANIGANS_APP CONFIGURE_DEPENDS apps/shenanigans/*.cpp apps/shenanigans/Windows/*.cpp)
 target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS} ${SRC_GUI} ${SRC_SHENANIGANS_APP})
 
 # shenanigans_test app sources
-file(GLOB SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp src/Test/*.cpp)
+file(GLOB_RECURSE SRC_SHENANIGANS_TEST CONFIGURE_DEPENDS apps/shenanigans_test/*.cpp src/Test/*.cpp)
 target_sources(shenanigans_test PRIVATE ${SRC_SHENANIGANS} ${SRC_SHENANIGANS_TEST})
 gtest_discover_tests(shenanigans_test)
 
+if (ENABLE_NDA)
+  add_subdirectory(src/NDA)
+  add_compile_definitions(ENABLE_NDA)
+  file(GLOB_RECURSE SRC_SHENANIGANS_NDA CONFIGURE_DEPENDS src/NDA/SAS/*.cpp)
+  file(GLOB_RECURSE SRC_SHENANIGANS_APP_NDA CONFIGURE_DEPENDS src/NDA/Windows/*.cpp)
+  target_sources(shenanigans PRIVATE ${SRC_SHENANIGANS_NDA} ${SRC_SHENANIGANS_APP_NDA})
+endif()

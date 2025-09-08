@@ -13,7 +13,6 @@ struct MicroserviceEditor
   bool firstFrame = true;
   Workflow workflow;
   const int pinIconSize = 24;
-  const int paramSize = 200;
   const ImVec2 spacing = ImVec2(6, 6);
   const ImVec2 minNodeSize = ImVec2(100, 50);
   const float connectionThickness = 4.0f;
@@ -110,6 +109,17 @@ struct MicroserviceEditor
     return maxSize;
   }
 
+  float GetLongestParameterDisplayLength(Microservice& microservice)
+  {
+    float maxSize = 0;
+    for (const auto& [name, param] : microservice.GetParameters())
+      if (param.type == typeid(std::string))
+        if (auto textSize = ImGui::CalcTextSize(std::any_cast<std::string>(param.value).c_str()).x; textSize > maxSize)
+          maxSize = textSize;
+
+    return maxSize;
+  }
+
   void ShowLabel(const char* label, ImColor color)
   {
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
@@ -163,8 +173,6 @@ struct MicroserviceEditor
 
   void RenderParameter(Microservice::Parameter& param, const std::string& microserviceName)
   {
-    ImGui::PushItemWidth(paramSize);
-
     if (param.type == typeid(float))
       ImGui::InputFloat(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<float>(&param.value), 0.01f, 1.0f, "%.3f");
     else if (param.type == typeid(std::string))
@@ -172,8 +180,6 @@ struct MicroserviceEditor
     else if (param.type == typeid(bool))
       ImGui::Checkbox(fmt::format("{}##{}", param.name, microserviceName).c_str(), std::any_cast<bool>(&param.value));
     // else if (std::ranges::contains(param.type.name(), "enum"))
-
-    ImGui::PopItemWidth();
   }
 
   void RenderNode(Microservice& microservice)
@@ -190,7 +196,8 @@ struct MicroserviceEditor
     const auto outputSizeMin = outputMaxTextSize + pinIconSize;
     const auto ioSizeMin = inputSize + outputSizeMin;
     const auto paramsMaxTextSize = GetLongestParameterNameLength(microservice);
-    const auto paramsSizeMin = microservice.GetParameters().size() ? paramsMaxTextSize + paramSize : 0.0f;
+    const auto paramsMaxDisplaySize = GetLongestParameterDisplayLength(microservice);
+    const auto paramsSizeMin = microservice.GetParameters().size() ? paramsMaxTextSize + paramsMaxDisplaySize : 0.0f;
     const auto nameSizeMin = ImGui::CalcTextSize(microserviceName.c_str()).x;
     const auto nodeSize = std::max({paramsSizeMin, ioSizeMin, nameSizeMin, minNodeSize.x});
     const auto outputSize = nodeSize - inputSize;
@@ -223,8 +230,10 @@ struct MicroserviceEditor
     EndColumn();
 
     ImGui::Dummy(ImVec2(0, parametersVerticalOffset));
+    ImGui::PushItemWidth(paramsMaxDisplaySize);
     for (auto& [name, param] : microservice.GetParameters())
       RenderParameter(param, microserviceName);
+    ImGui::PopItemWidth();
 
     style.ItemSpacing = spacingOrig;
     ed::EndNode();

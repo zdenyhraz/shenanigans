@@ -2,6 +2,11 @@
 
 class Microservice
 {
+  // TODO: in-out parameters - dont copy on SetOutputParameter
+  // TODO: pure node: no flow pins, evaluated only on demand, never modifies input parameters
+  // TODO: impure node: has flow pins, order matters, can modify input parameters
+  // TODO: optional input / output flow (e.g. start / end only)
+
 public:
   class Exception : public std::exception
   {
@@ -200,7 +205,12 @@ protected:
     if (posSpace != std::string::npos)
       typeName = typeName.substr(posSpace + 1);
 
-    microserviceName = typeName;
+    for (size_t i = 0; i < typeName.length(); ++i)
+    {
+      if (i > 0 and std::isupper(typeName[i]))
+        microserviceName += ' ';
+      microserviceName += typeName[i];
+    }
   }
 
 public:

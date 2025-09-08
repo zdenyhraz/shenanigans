@@ -76,7 +76,7 @@ public:
   void Run()
   try
   {
-    LOG_SCOPE("Workflow");
+    LOG_SCOPE("Workflow Run");
     LOG_DEBUG("Running workflow '{}'", GetName());
 
     if (microservices.empty())
@@ -95,6 +95,7 @@ public:
 
   void Load()
   {
+    LOG_SCOPE("Workflow Load");
     LOG_DEBUG("Loading workflow '{}'", GetName());
     for (auto& microservice : microservices)
       microservice->Load();

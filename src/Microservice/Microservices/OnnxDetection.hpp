@@ -28,7 +28,10 @@ class OnnxDetection : public Microservice
     std::vector<cv::Rect> boxes;
     boxes.reserve(detections.size());
     for (const auto& det : detections)
+    {
+      LOG_DEBUG("Detection: {}, score: {}, box: [{}, {}, {}, {}]", det.label, det.score, det.box.x, det.box.y, det.box.width, det.box.height);
       boxes.push_back(det.box);
+    }
     SetOutputParameter("objects", boxes);
   }
 

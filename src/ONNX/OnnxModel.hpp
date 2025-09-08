@@ -7,13 +7,13 @@ class OnnxModel
   Ort::Session session{nullptr};
   Ort::MemoryInfo memoryInfo{nullptr};
   const char* name = "model";
+  std::string logName;
   std::vector<const char*> inputNames;
   std::vector<const char*> outputNames;
-  static constexpr bool useCUDA = true;
+  static constexpr bool useCUDA = false;
   static constexpr bool useTensorRT = false;
   bool usesGPU = false;
   bool loaded = false;
-
   cv::Mat imageTensor;
   Ort::Value inputTensor{nullptr};
 
