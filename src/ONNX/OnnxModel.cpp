@@ -111,15 +111,15 @@ void OnnxModel::OnnxLogFunction(void* param, OrtLoggingLevel severity, const cha
   }
 };
 
-void OnnxModel::Preprocess(const cv::Mat& image)
+Ort::Value OnnxModel::Preprocess(const cv::Mat& image)
 {
   cv::dnn::blobFromImage(image, imageTensor, 1.0 / 255.0);
   std::vector<int64_t> inputShape = {1, 3, image.rows, image.cols};
-  inputTensor = Ort::Value::CreateTensor<float>(memoryInfo, imageTensor.ptr<float>(0), imageTensor.total() * imageTensor.channels(), inputShape.data(), inputShape.size());
+  return Ort::Value::CreateTensor<float>(memoryInfo, imageTensor.ptr<float>(0), imageTensor.total() * imageTensor.channels(), inputShape.data(), inputShape.size());
 }
 
 std::vector<Ort::Value> OnnxModel::Run(const cv::Mat& image)
 {
-  Preprocess(image);
+  const auto inputTensor = Preprocess(image);
   return session.Run(Ort::RunOptions{nullptr}, inputNames.data(), &inputTensor, inputNames.size(), outputNames.data(), outputNames.size());
 }

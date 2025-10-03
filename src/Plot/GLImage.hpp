@@ -6,13 +6,8 @@ class GLImage
 public:
   mutable GLuint texid = 0;
 
-  GLImage() {}
-
-  ~GLImage()
-  {
-    if (texid != 0)
-      glDeleteTextures(1, &texid);
-  }
+  GLImage(){};
+  ~GLImage() { Unload(); }
 
   static GLuint GetGLDataType(const cv::Mat& z)
   {
@@ -36,12 +31,19 @@ public:
 
   void Load(const cv::Mat& z) const
   {
+    Unload();
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, z.cols, z.rows, 0, GL_BGR, GetGLDataType(z), z.data);
+  }
+
+  void Unload() const
+  {
+    glDeleteTextures(1, &texid);
+    texid = 0;
   }
 };
 #endif

@@ -10,15 +10,14 @@ class OnnxModel
   std::string logName;
   std::vector<const char*> inputNames;
   std::vector<const char*> outputNames;
-  static constexpr bool useCUDA = false;
+  static constexpr bool useCUDA = true;
   static constexpr bool useTensorRT = false;
   bool usesGPU = false;
   bool loaded = false;
   cv::Mat imageTensor;
-  Ort::Value inputTensor{nullptr};
 
   void LoadProviders();
-  void Preprocess(const cv::Mat& image);
+  Ort::Value Preprocess(const cv::Mat& image);
   static void OnnxLogFunction(void* param, OrtLoggingLevel severity, const char* category, const char* logid, const char* code_location, const char* message);
 
 public:
