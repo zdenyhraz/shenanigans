@@ -11,10 +11,10 @@ opencv_cmake_args = {
     'CMAKE_BUILD_TYPE': 'RELEASE',
     'BUILD_SHARED_LIBS': 'OFF' if opencv_static else 'ON',
 
-    # simd
-    'ENABLE_SIMD': 'ON',
-    'CPU_BASELINE': 'AVX2',
-    'CPU_DISPATCH': 'SSE4_1;SSE4_2;AVX;AVX2',
+    # # simd
+    # 'ENABLE_SIMD': 'ON',
+    # 'CPU_BASELINE': 'AVX2',
+    # 'CPU_DISPATCH': 'SSE4_1;SSE4_2;AVX;AVX2',
 
     # extra modules
     'OPENCV_EXTRA_MODULES_PATH': '',  # '../opencv_contrib/modules',
