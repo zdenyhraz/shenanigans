@@ -1,0 +1,55 @@
+name: clang-tidy
+
+on: [push, pull_request]
+
+jobs:
+  cpp_linter:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - compiler: gcc
+            build_type: Release
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: OpenCV cache
+        id: opencv-cache
+        uses: actions/cache@v4
+        with:
+          path: ./libs/opencv_install
+          key: ${{ runner.os }}-opencv-cache-v2
+
+      - name: ONNX cache
+        id: onnxruntime-cache
+        uses: actions/cache@v4
+        with:
+          path: ./libs/onnxruntime_install
+          key: ${{ runner.os }}-onnxruntime-cache-v2
+
+      - name: Configure
+        run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --configure_only
+
+      - name: Install Dependencies
+        run: sudo apt-get install -y clang-format clang-tidy
+
+      - name: C/C++ Linter
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          database: '${{ github.workspace }}/build'
+          extensions: 'c,h,cpp,hpp'
+          tidy-checks: 'bugprone-*,performance-*,readability-*,cppcoreguidelines-*'
+          extra-args: '--clang-tidy-binary=clang-tidy --clang-format-binary=clang-format'
+          file-annotations: true
+
+      - name: Fail if checks failed
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
