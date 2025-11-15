@@ -33,6 +33,9 @@ jobs:
     - name: Configure
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --configure_only
 
+    - name: List files in build directory
+      run: ls -la build
+
     - name: Run clang-tidy
       run: sudo python -m script.ci.clang-tidy
       continue-on-error: true
