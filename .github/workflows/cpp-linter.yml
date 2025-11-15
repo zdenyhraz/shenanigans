@@ -1,4 +1,4 @@
-name: clang-tidy
+name: cpp_linter
 
 on: [push, pull_request]
 
