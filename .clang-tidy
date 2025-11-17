@@ -1,10 +1,39 @@
+---
 Checks: >
-  cppcoreguidelines-*,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-pro-type-vararg,
-  performance-*,
-  bugprone-*,
-  modernize-*,
-  -modernize-use-trailing-return-type,
-  clang-analyzer-*,
-FormatStyle: 'file'
+    # Recommended Modern C++ checks (adjust to your C++ standard)
+    bugprone-*,
+    clang-analyzer-*,
+    cppcoreguidelines-*,
+    modernize-*,
+    performance-*,
+    readability-*,
+    # Exclude checks that might conflict with style or external libs
+    -cppcoreguidelines-pro-type-member-init,
+    -cppcoreguidelines-owning-memory,
+    -cppcoreguidelines-avoid-c-arrays,
+    -cppcoreguidelines-macro-usage,
+    -readability-make-member-function-const,
+    -readability-magic-numbers,
+    -readability-function-size,
+    -readability-isolate-declaration,
+    -modernize-use-trailing-return-type,
+    # Avoid checks that are often noisy or style-related
+    -google-*,
+    -llvm-*,
+    -hicpp-*,
+
+# 💡 Critical setting: Only report warnings/errors from your source files.
+# This prevents noise from libs/ submodules (e.g., OpenCV, fmt, range-v3).
+# It uses a regex that matches paths starting with 'src/' or 'apps/'.
+HeaderFilterRegex: '^(src/|apps/)'
+
+# This can help suppress issues within the ignored files even if they're transitively included.
+SystemHeaders: 'InCompilerAndSDK'
+
+# Optional: Configuration for the 'modernize-use-nullptr' check
+CheckOptions:
+  - { key: modernize-use-nullptr.NotNullMacros, value: 'NULL|nullptr' }
+
+# Define the C++ standard used in your project (Based on your CMake log, C++23 is active)
+TidyArgs:
+    - -std=c++23
