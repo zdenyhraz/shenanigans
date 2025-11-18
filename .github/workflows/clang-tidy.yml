@@ -30,7 +30,7 @@ jobs:
         path: ./libs/onnxruntime_install
         key: ${{ runner.os }}-onnxruntime-cache-v2
 
-    - name: Configure
+    - name: Build
       run: sudo python -u build.py --ci --compiler clang --build_type Release
 
     - name: List files in build directory

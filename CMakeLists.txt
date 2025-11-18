@@ -128,6 +128,13 @@ if (ENABLE_PCH)
   target_precompile_headers(shenanigans_test PRIVATE ${SRC_PRECOMPILED_SHENANIGANS})
 endif()
 
+#openmp
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(shenanigans PRIVATE OpenMP::OpenMP_CXX)
+    target_link_libraries(shenanigans_test PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
 # pybind11
 add_subdirectory(libs/pybind11)
 include_directories(libs/pybind11/include)
