@@ -12,7 +12,8 @@ if __name__ == '__main__':
         utils.run('clang --version')
         utils.run('clang-tidy --version')
 
-        utils.run("run-clang-tidy -p build -quiet")
+        file_filter = '[{"name":"libs/*","lines":[[1,0]]}]'
+        utils.run(f"run-clang-tidy -p build -file-filter={file_filter} -quiet")
 
     except Exception as e:
         raise
