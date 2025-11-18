@@ -16,7 +16,7 @@ def configure(args):
         'CMAKE_BUILD_TYPE': args.build_type,
         'OPENCV_DIR': args.opencv_dir,
         'ONNXRUNTIME_DIR': args.onnxruntime_dir,
-        **({f'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON'} if args.configure_only else {}),
+        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON',
         **({f'CI': 'ON'} if args.ci else {}),
         **({f'ENABLE_SANITIZER_{args.sanitizer.upper()}': 'ON'} if args.sanitizer else {}),
         **({f'ENABLE_COVERAGE': 'ON'} if args.coverage else {}),
