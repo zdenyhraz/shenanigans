@@ -38,7 +38,7 @@ def clang_install(version=19):
     utils.run('apt update')
     utils.run('apt install -y wget gnupg software-properties-common')
     utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash')
-    utils.run(f'apt install -y clang-{version}')
+    utils.run(f'apt install -y clang-{version} clang-tidy-{version} clang-tools-{version}')
     utils.run(f'clang-{version} --version')
     utils.run('apt install -y libc++-dev libc++abi-dev libomp-dev')
     utils.run(f'update-alternatives --install /usr/bin/cc cc /usr/bin/clang-{version} 100')
