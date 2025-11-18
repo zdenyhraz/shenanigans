@@ -7,39 +7,36 @@ Checks: >
   portability-*,
   readability-*,
 
-  # Reasonable disables — these are almost always too noisy in real codebases
+  # Commonly disabled because they’re too noisy in real projects
   -modernize-use-trailing-return-type,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
   -cppcoreguidelines-pro-type-union-access,
   -cppcoreguidelines-pro-type-reinterpret-cast,
-  -cppcoreguidelines-owning-memory,           # remove if you don’t use raw new/delete
-  -readability-identifier-length,             # optional, remove if you want short names banned
-  -readability-implicit-bool-conversion      # sometimes too aggressive with ALLOW_SHORT_IF_STATEMENTS
+  -cppcoreguidelines-owning-memory,
+  -readability-implicit-bool-conversion
 
-# Fail the build/CI on any warning (highly recommended)
+# Fail CI on any warning
 WarningsAsErrors: '*'
 
-# ONLY analyze your code + your own headers
-# Ignores everything under common external/third-party paths
-HeaderFilterRegex: '^((?!/usr/|/libs/|/external/|/third_party/|/build/|.*_deps/|/cmake/|/generated/).)*$'
+# ONLY analyze your own code and your own headers
+# This regex excludes any path containing these common external folders
+HeaderFilterRegex: '^((?!/usr/|/libs/|/external/|/third_party/|/build/|.*_deps/|/generated/|/imgui/|/imgui-nodes/).)*$'
 
-# Also ignore system headers completely (they’re never your fault)
-SystemHeaders: false
-
-# Extra safety — never emit diagnostics from external headers, even if included
-AnalyzeTemporaryDtors: false
-
-# LLVM 18+ option (works on 17 too, just ignored)
-UserDiagnosticConfig:
-  SuppressInlineHeaders: true   # suppresses warnings from headers included into your files
-
-# Use .clang-format if it exists
+# Use your .clang-format if it exists
 FormatStyle: file
 
-# Optional: be stricter on some useful things
+# Never show warnings that originate in system headers
+SystemHeaders: false   # this key is still valid in 18/19 for this exact purpose
+
+# Suppress diagnostics that come from headers included into your files (the real fix)
+InheritParentConfig: true
+
+# LLVM 17+ – this is the new recommended way (older versions just ignore it)
+Diagnostics:
+  SuppressInlineHeaders: true   # suppresses warnings from any included header
+
+# Optional: slightly stricter behavior on some checks
 CheckOptions:
-  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
-    value: 'true'
-  - key: modernize-use-nullptr.DeleteDeadInitializers
+  - key:   cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
     value: 'true'
