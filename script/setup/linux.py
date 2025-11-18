@@ -36,14 +36,17 @@ def gcc_install(version=14):
 
 def clang_install(version=18):
     utils.run('apt update')
-    utils.run('apt install -y wget gnupg software-properties-common')
-    utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash')
-    utils.run(f'apt install -y clang-{version} clang-tidy-{version} clang-tools-{version}')
+    utils.run('apt install -y wget gnupg lsb-release software-properties-common')
+    utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash -s -- all {version}')
+    utils.run('apt update')
+    utils.run(f'apt install -y clang-{version} clang-tidy-{version} clang-tools-{version} lld-{version}')
+    utils.run(f'apt install -y libomp-{version}-dev libc++-{version}-dev libc++abi-{version}-dev')
+    utils.run(f'update-alternatives --install /usr/bin/clang       clang       /usr/bin/clang-{version}       100')
+    utils.run(f'update-alternatives --install /usr/bin/clang++     clang++     /usr/bin/clang++-{version}     100')
+    utils.run(f'update-alternatives --install /usr/bin/cc          cc          /usr/bin/clang-{version}       100')
+    utils.run(f'update-alternatives --install /usr/bin/c++         c++         /usr/bin/clang++-{version}     100')
+    utils.run(f'update-alternatives --install /usr/bin/clang-tidy  clang-tidy  /usr/bin/clang-tidy-{version}  100')
     utils.run(f'clang-{version} --version')
-    utils.run('apt install -y libc++-dev libc++abi-dev libomp-dev')
-    utils.run(f'update-alternatives --install /usr/bin/cc cc /usr/bin/clang-{version} 100')
-    utils.run(f'update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-{version} 100')
-    utils.run(f'update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-{version} 100')
 
 
 def compiler_install(compiler):
