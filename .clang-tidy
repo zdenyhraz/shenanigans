@@ -16,5 +16,6 @@ Checks: >
 
 WarningsAsErrors: '*'
 HeaderFilterRegex: '^(src|apps|include|tests?)/.*'
+FileFilterRegex: '^(?!.*libs/).*$'
 FormatStyle: file
 SystemHeaders: false
