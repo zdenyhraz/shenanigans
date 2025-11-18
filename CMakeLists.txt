@@ -33,7 +33,6 @@ elseif(APPLE)
   add_compile_options(-Wall -march=native)
 else()
   add_compile_options(-Wall -march=native -fopenmp)
-  add_link_options(-fopenmp)
 endif()
 
 if(ENABLE_COVERAGE)
