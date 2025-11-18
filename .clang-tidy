@@ -31,12 +31,3 @@ SystemHeaders: false   # this key is still valid in 18/19 for this exact purpose
 
 # Suppress diagnostics that come from headers included into your files (the real fix)
 InheritParentConfig: true
-
-# LLVM 17+ – this is the new recommended way (older versions just ignore it)
-Diagnostics:
-  SuppressInlineHeaders: true   # suppresses warnings from any included header
-
-# Optional: slightly stricter behavior on some checks
-CheckOptions:
-  - key:   cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
-    value: 'true'
