@@ -6,8 +6,6 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
-
-  # Commonly disabled because they’re too noisy in real projects
   -modernize-use-trailing-return-type,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
@@ -16,18 +14,8 @@ Checks: >
   -cppcoreguidelines-owning-memory,
   -readability-implicit-bool-conversion
 
-# Fail CI on any warning
 WarningsAsErrors: '*'
-
-# ONLY analyze your own code and your own headers
-# This regex excludes any path containing these common external folders
-HeaderFilterRegex: '^((?!/usr/|/libs/|/external/|/third_party/|/build/|.*_deps/|/generated/|/imgui/|/imgui-nodes/).)*$'
-
-# Use your .clang-format if it exists
+HeaderFilterRegex: '^(src|apps|include|tests?)/.*'
+FileFilterRegex: '^(?!.*libs/).*$'
 FormatStyle: file
-
-# Never show warnings that originate in system headers
-SystemHeaders: false   # this key is still valid in 18/19 for this exact purpose
-
-# Suppress diagnostics that come from headers included into your files (the real fix)
-InheritParentConfig: true
+SystemHeaders: false
