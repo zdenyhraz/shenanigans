@@ -11,7 +11,6 @@ if __name__ == '__main__':
 
         utils.run('clang --version')
         utils.run('clang-tidy --version')
-        utils.run('run-clang-tidy --version')
 
         utils.run("run-clang-tidy -p build -header-filter='.*' -checks='*'")
 
