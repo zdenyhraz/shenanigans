@@ -31,7 +31,7 @@ jobs:
         key: ${{ runner.os }}-onnxruntime-cache-v2
 
     - name: Configure
-      run: sudo python -u build.py --ci --compiler clang --build_type Release --configure_only
+      run: sudo python -u build.py --ci --compiler clang --build_type Release
 
     - name: List files in build directory
       run: ls -la build
