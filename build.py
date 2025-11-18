@@ -16,15 +16,16 @@ def configure(args):
         'CMAKE_BUILD_TYPE': args.build_type,
         'OPENCV_DIR': args.opencv_dir,
         'ONNXRUNTIME_DIR': args.onnxruntime_dir,
-        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON',
-        **({f'CI': 'ON'} if args.ci else {}),
+        'CMAKE_EXPORT_COMPILE_COMMANDS': 'ON' if args.ci else 'OFF',
+        'ENABLE_COVERAGE': 'ON' if args.coverage else 'OFF',
+        'CI': 'ON' if args.ci else 'OFF',
         **({f'ENABLE_SANITIZER_{args.sanitizer.upper()}': 'ON'} if args.sanitizer else {}),
-        **({f'ENABLE_COVERAGE': 'ON'} if args.coverage else {}),
     }
     os.makedirs(args.build_dir, exist_ok=True)
     utils.run(f"cmake -B {args.build_dir} {utils.generate_configure_args(configure_args)} {f'-G {args.generator}' if args.generator else ''}")
     log.info(f'Target {args.targets} configured successfully')
-    args.configure_only and exit()
+    if args.configure_only:
+        exit()
 
 
 def build(args):
