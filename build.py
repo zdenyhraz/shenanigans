@@ -43,7 +43,7 @@ if __name__ == '__main__':
     parser.add_argument('--ci', help='ci mode', required=False, action='store_true', default='CI' in os.environ)
     parser.add_argument('--coverage', help='test coverage', required=False, action='store_true', default=False)
     parser.add_argument('--sanitizer', help='sanitizer', required=False, default=None)
-    parser.add_argument('--python', help='setup python', required=False, action='store_true', default=True)
+    parser.add_argument('--python', help='setup python', required=False, action='store_true', default=False)
     parser.add_argument('--opengl', help='install opengl', required=False, action='store_true', default=True)
     parser.add_argument('--configure_only', help='configure only', required=False, action='store_true', default=False)
     parser.add_argument('--opencv_dir', help='opencv dir', type=str, required=False, default=None)
@@ -60,8 +60,9 @@ if __name__ == '__main__':
     configuration.check(args)
     buildtools.setup(args.compiler, args.generator, args.opengl, args.build_type, args.sanitizer)
 
-    log.info("Setting up Python libraries")
-    args.python and python.setup(args)
+    if args.python:
+        log.info("Setting up Python libraries")
+        python.setup(args)
 
     log.info("Setting up C++ libraries")
     args.onnxruntime_dir = args.onnxruntime_dir or onnxruntime.setup(args.build_type, args.jobs)
