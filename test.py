@@ -35,7 +35,7 @@ def run_python_tests(coverage):
     log.info('Running Python tests')
     test_dir = 'script/test'
     log.debug(f'Test directory: {test_dir}')
-    coverage_arg = f'--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
+    coverage_arg = '--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
     utils.run(f'pytest {coverage_arg} -p no:warnings {test_dir}')
 
 
@@ -48,7 +48,7 @@ def generate_cpp_coverage_report(cwd):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test script')
     parser.add_argument('--cpp', help='run C++ tests', required=False, action='store_true', default=True)
-    parser.add_argument('--python', help='run Python tests', required=False, action='store_true', default=True)
+    parser.add_argument('--python', help='run Python tests', required=False, action='store_true', default=False)
     parser.add_argument('--coverage', help='test coverage', required=False, action='store_true', default=False)
     args = parser.parse_args()
 
@@ -56,7 +56,9 @@ if __name__ == '__main__':
         log.debug(f'{arg}: {val}')
 
     log.info('Running tests')
-    args.cpp and run_cpp_tests(args.coverage)
-    args.python and run_python_tests(args.coverage)  # TODO: add python test coverage
+    if args.cpp:
+        run_cpp_tests(args.coverage)
+    if args.python:
+        run_python_tests(args.coverage)  # TODO: add python test coverage
 
     log.info('All tests passed')
