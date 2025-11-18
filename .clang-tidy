@@ -27,9 +27,6 @@ Checks: >
 # It uses a regex that matches paths starting with 'src/' or 'apps/'.
 HeaderFilterRegex: '^(src/|apps/)'
 
-# This can help suppress issues within the ignored files even if they're transitively included.
-SystemHeaders: 'InCompilerAndSDK'
-
 # Optional: Configuration for the 'modernize-use-nullptr' check
 CheckOptions:
   - { key: modernize-use-nullptr.NotNullMacros, value: 'NULL|nullptr' }
