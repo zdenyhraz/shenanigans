@@ -1,36 +1,45 @@
----
 Checks: >
-    # Recommended Modern C++ checks (adjust to your C++ standard)
-    bugprone-*,
-    clang-analyzer-*,
-    cppcoreguidelines-*,
-    modernize-*,
-    performance-*,
-    readability-*,
-    # Exclude checks that might conflict with style or external libs
-    -cppcoreguidelines-pro-type-member-init,
-    -cppcoreguidelines-owning-memory,
-    -cppcoreguidelines-avoid-c-arrays,
-    -cppcoreguidelines-macro-usage,
-    -readability-make-member-function-const,
-    -readability-magic-numbers,
-    -readability-function-size,
-    -readability-isolate-declaration,
-    -modernize-use-trailing-return-type,
-    # Avoid checks that are often noisy or style-related
-    -google-*,
-    -llvm-*,
-    -hicpp-*,
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
 
-# 💡 Critical setting: Only report warnings/errors from your source files.
-# This prevents noise from libs/ submodules (e.g., OpenCV, fmt, range-v3).
-# It uses a regex that matches paths starting with 'src/' or 'apps/'.
-HeaderFilterRegex: '^(src/|apps/)'
+  # Reasonable disables — these are almost always too noisy in real codebases
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-owning-memory,           # remove if you don’t use raw new/delete
+  -readability-identifier-length,             # optional, remove if you want short names banned
+  -readability-implicit-bool-conversion      # sometimes too aggressive with ALLOW_SHORT_IF_STATEMENTS
 
-# Optional: Configuration for the 'modernize-use-nullptr' check
+# Fail the build/CI on any warning (highly recommended)
+WarningsAsErrors: '*'
+
+# ONLY analyze your code + your own headers
+# Ignores everything under common external/third-party paths
+HeaderFilterRegex: '^((?!/usr/|/libs/|/external/|/third_party/|/build/|.*_deps/|/cmake/|/generated/).)*$'
+
+# Also ignore system headers completely (they’re never your fault)
+SystemHeaders: false
+
+# Extra safety — never emit diagnostics from external headers, even if included
+AnalyzeTemporaryDtors: false
+
+# LLVM 18+ option (works on 17 too, just ignored)
+UserDiagnosticConfig:
+  SuppressInlineHeaders: true   # suppresses warnings from headers included into your files
+
+# Use .clang-format if it exists
+FormatStyle: file
+
+# Optional: be stricter on some useful things
 CheckOptions:
-  - { key: modernize-use-nullptr.NotNullMacros, value: 'NULL|nullptr' }
-
-# Define the C++ standard used in your project (Based on your CMake log, C++23 is active)
-TidyArgs:
-    - -std=c++23
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
+    value: 'true'
+  - key: modernize-use-nullptr.DeleteDeadInitializers
+    value: 'true'
