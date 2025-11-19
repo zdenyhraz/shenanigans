@@ -38,20 +38,17 @@ jobs:
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --coverage
 
     - name: Test
-      run: sudo python -u test.py --coverage
+      run: python -u test.py --coverage
 
     - name: Capture coverage report
       run: |
-        export PATH=$HOME/.local/bin:$PATH
-        export GCOV=/usr/bin/gcov-14
         cd build
         lcov --capture --directory . --output-file coverage.info --gcov-tool $GCOV
-        sudo genhtml coverage.info --output-directory coverage_html
+        genhtml coverage.info --output-directory coverage_html
 
     - name: Upload coverage to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        export PATH=$HOME/.local/bin:$PATH
         codecov -f build/coverage.info -t "${CODECOV_TOKEN}" -v
 
