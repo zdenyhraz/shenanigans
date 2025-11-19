@@ -49,9 +49,8 @@ jobs:
           database: '${{ github.workspace }}/build'
           files-changed-only: false
           ignore: 'libs'
-          tidy-checks: 'bugprone-*,performance-*,readability-*,cppcoreguidelines-*'
           file-annotations: true
-          verbosity: debug
+          #verbosity: debug
 
       - name: Fail if checks failed
         if: steps.linter.outputs.checks-failed > 0
