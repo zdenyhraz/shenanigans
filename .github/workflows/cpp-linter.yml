@@ -47,8 +47,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           database: '${{ github.workspace }}/build'
-          files-changed-only: false
           ignore: 'libs'
+          jobs: 0
+          files-changed-only: false
           file-annotations: true # In the "Files Changed" tab (Inline Code Annotations)
           thread-comments: true # Posts a summary comment on the PR
           step-summary: true # Shows a markdown summary on the Action run page
