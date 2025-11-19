@@ -46,7 +46,7 @@ jobs:
         export GCOV=/usr/bin/gcov-14
         cd build
         lcov --capture --directory . --output-file coverage.info --gcov-tool $GCOV
-        genhtml coverage.info --output-directory coverage_html
+        sudo genhtml coverage.info --output-directory coverage_html
 
     - name: Upload coverage to Codecov
       env:
