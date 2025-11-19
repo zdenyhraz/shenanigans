@@ -33,7 +33,9 @@ jobs:
           key: ${{ runner.os }}-onnxruntime-cache-v2
 
       - name: Configure
-        run: sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --configure_only
+        run: |
+          sudo python -u build.py --ci --compiler ${{ matrix.compiler }} --build_type ${{ matrix.build_type }} --configure_only
+          ls -la build
 
       - name: Install Dependencies
         run: sudo apt-get install -y clang-format clang-tidy
@@ -46,8 +48,8 @@ jobs:
         with:
           database: '${{ github.workspace }}/build'
           files-changed-only: false
+          ignore: 'libs'
           tidy-checks: 'bugprone-*,performance-*,readability-*,cppcoreguidelines-*'
-          extra-args: '--clang-tidy-binary=clang-tidy --clang-format-binary=clang-format'
           file-annotations: true
           verbosity: debug
 
