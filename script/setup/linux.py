@@ -32,6 +32,7 @@ def gcc_install(version=14):
     utils.run(f'gcc-{version} --version')
     utils.run(f'update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-{version} 100')
     utils.run(f'update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-{version} 100')
+    utils.run(f'update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-{version} 100')
 
 
 def clang_install(version=19):

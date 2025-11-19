@@ -41,6 +41,7 @@ else()
     add_link_options(-fopenmp)
 endif()
 
+# coverage
 if(ENABLE_COVERAGE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(COVERAGE_FLAGS "-O0" "-g" "--coverage" "-fprofile-arcs" "-ftest-coverage")

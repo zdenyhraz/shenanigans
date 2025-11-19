@@ -19,7 +19,7 @@ def find_test_executables(build_dir):
     return test_executables
 
 
-def run_cpp_tests(coverage):
+def run_cpp_tests():
     log.info('Running C++ tests')
     build_dir = 'build'
     log.debug(f'Build directory: {build_dir}')
@@ -27,8 +27,6 @@ def run_cpp_tests(coverage):
     log.debug(f'Test executables: {test_executables}')
     for test in test_executables:
         utils.run(test)
-    if coverage:
-        generate_cpp_coverage_report(os.path.dirname(test_executables[0]))
 
 
 def run_python_tests(coverage):
@@ -37,12 +35,6 @@ def run_python_tests(coverage):
     log.debug(f'Test directory: {test_dir}')
     coverage_arg = '--cov=script.ml --cov-report=term --cov-report=xml:coverage_py.xml' * coverage
     utils.run(f'pytest {coverage_arg} -p no:warnings {test_dir}')
-
-
-def generate_cpp_coverage_report(cwd):
-    log.info('Generating C++ coverage report')
-    utils.run("gcovr -r . --txt --verbose --gcov-ignore-errors=all", cwd=cwd)
-    utils.run("gcovr -r . --xml -o coverage_cpp.xml --verbose --gcov-ignore-errors=all", cwd=cwd)
 
 
 if __name__ == '__main__':
@@ -57,7 +49,7 @@ if __name__ == '__main__':
 
     log.info('Running tests')
     if args.cpp:
-        run_cpp_tests(args.coverage)
+        run_cpp_tests()
     if args.python:
         run_python_tests(args.coverage)  # TODO: add python test coverage
 
