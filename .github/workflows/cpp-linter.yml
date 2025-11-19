@@ -45,10 +45,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           database: '${{ github.workspace }}/build'
-          extensions: 'c,h,cpp,hpp'
+          files-changed-only: false
           tidy-checks: 'bugprone-*,performance-*,readability-*,cppcoreguidelines-*'
           extra-args: '--clang-tidy-binary=clang-tidy --clang-format-binary=clang-format'
           file-annotations: true
+          verbosity: debug
 
       - name: Fail if checks failed
         if: steps.linter.outputs.checks-failed > 0
