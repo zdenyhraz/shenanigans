@@ -43,7 +43,7 @@ jobs:
     - name: Capture coverage report
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info --gcov-tool $GCOV
+        lcov --capture --directory . --output-file coverage.info
         genhtml coverage.info --output-directory coverage_html
 
     - name: Upload coverage to Codecov
