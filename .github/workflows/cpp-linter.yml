@@ -49,6 +49,8 @@ jobs:
           database: '${{ github.workspace }}/build'
           ignore: 'libs'
           jobs: 0
+          style: file # use .clang-format file
+          tidy-checks: '' # use .clang-tidy file
           files-changed-only: false
           file-annotations: true # In the "Files Changed" tab (Inline Code Annotations)
           thread-comments: true # Posts a summary comment on the PR

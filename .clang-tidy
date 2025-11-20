@@ -1,0 +1,29 @@
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  portability-*,
+
+# Disable specific checks you explicitly don't want
+CheckOptions:
+  - key: modernize-use-trailing-return-type.UseTrailingReturnType
+    value: 'false'
+  - key: modernize-use-trailing-return-type.IgnoreMacros
+    value: 'true'
+
+  # Allow alt-tokens like 'or', 'and', 'not'
+  # (no check forbids them, but this avoids noisy bool-conversion warnings)
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: 'true'
+
+  # Optional: avoid nagging about include order
+  - key: llvm-include-order.Strict
+    value: 'false'
+
+  # Optional: allow C++17 features without forcing newer ones
+  - key: modernize-use-auto.MinTypeNameLength
+    value: '32'   # prevents “use auto” spam unless the type is very long
