@@ -38,13 +38,13 @@ jobs:
       run: sudo python -u build.py --ci --compiler gcc --build_type Debug --coverage
 
     - name: Test
-      run: python -u test.py --coverage
+      run: sudo python -u test.py --coverage
 
     - name: Capture coverage report
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info
-        genhtml coverage.info --output-directory coverage_html
+        sudo lcov --capture --directory . --output-file coverage.info
+        sudo genhtml coverage.info --output-directory coverage_html
 
     - name: Upload coverage to Codecov
       env:

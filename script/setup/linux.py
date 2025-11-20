@@ -29,6 +29,7 @@ def gcc_install(version=14):
     utils.run('add-apt-repository ppa:ubuntu-toolchain-r/test')
     utils.run('apt update')
     utils.run(f'apt install -y gcc-{version} g++-{version}')
+    utils.run('apt install -y libomp-dev')
     utils.run(f'gcc-{version} --version')
     utils.run(f'update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-{version} 100')
     utils.run(f'update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-{version} 100')
@@ -38,7 +39,7 @@ def gcc_install(version=14):
 def clang_install(version=19):
     utils.run('apt update')
     utils.run('apt install -y wget gnupg lsb-release software-properties-common')
-    utils.run('wget -O - https://apt.llvm.org/llvm.sh | bash -s -- all {version}')
+    utils.run(f"wget -O - https://apt.llvm.org/llvm.sh | bash -s -- {version}")
     utils.run('apt update')
     utils.run(f'apt install -y clang-{version} clang-tidy-{version} clang-tools-{version} lld-{version}')
     utils.run(f'apt install -y libomp-{version}-dev libc++-{version}-dev libc++abi-{version}-dev')
