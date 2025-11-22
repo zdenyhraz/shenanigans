@@ -6,6 +6,7 @@ obj/
 .cache/
 __pycache__/
 *_install/
+venv/
 
 data/*
 !data/shenanigans/
