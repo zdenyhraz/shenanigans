@@ -27,13 +27,13 @@ class IPCWindow : public Window
 
   struct IPCOptimizeParameters
   {
-    std::string imageDirectory = "../debug/ipcopt/train";
-    std::string generateDirectory = "../debug/ipcopt";
+    std::string imageDirectory = "data/ipc/images";
+    std::string generateDirectory = "data/ipc/pairs";
     std::string debugImage1Path = "data/debug/artificial1.png";
     std::string debugImage2Path = "data/debug/artificial2.png";
-    float maxShift = 2.5;
+    float maxShift = 4;
     float noiseStddev = 0.0;
-    int iters = 51;
+    int iters = 101;
     float testRatio = 0.2;
     int popSize = 18;
   };

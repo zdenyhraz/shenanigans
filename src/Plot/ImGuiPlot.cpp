@@ -32,7 +32,7 @@ void ImGuiPlot::RenderInternal(const PlotData1D& data)
     if (ImPlot::BeginPlot(data.name.c_str(), ImVec2(-1, -1)))
     {
       ImPlot::GetStyle().Colormap = ImPlotColormap_Dark;
-      static const ImPlotAxisFlags axesFlags = ImPlotAxisFlags_AutoFit;
+      static const ImPlotAxisFlags axesFlags = ImPlotAxisFlags_None; // ImPlotAxisFlags_AutoFit;
       ImPlot::SetupAxis(ImAxis_X1, data.xlabel.c_str(), axesFlags);
       if (not data.ys.empty())
         ImPlot::SetupAxis(ImAxis_Y1, data.ylabel.c_str(), axesFlags);

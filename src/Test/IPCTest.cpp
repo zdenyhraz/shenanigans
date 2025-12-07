@@ -36,9 +36,50 @@ TEST_F(IPCTest, ZeroShift)
   EXPECT_NEAR(shift.y, 0, kTolerance);
 }
 
-TEST_F(IPCTest, Shift)
+TEST_F(IPCTest, BasicShift)
 {
   const auto ipc = GetIPC();
+  const auto shift = ipc.Calculate(mImg1, mImg2);
+  EXPECT_NEAR(shift.x, mShift.x, 0.5);
+  EXPECT_NEAR(shift.y, mShift.y, 0.5);
+}
+
+TEST_F(IPCTest, GradualShift)
+{
+  IPC ipc(512, 512);
+  ipc.SetBandpassType(IPC::BandpassType::None);
+  const auto w = ipc.GetCols();
+  const auto h = ipc.GetRows();
+  ASSERT_LT(w, mImg1.cols);
+  ASSERT_LT(h, mImg1.rows);
+  const cv::Point2d maxShift(1, 0);
+  const auto tolerance = 0.1;
+  const auto iters = 51;
+  for (int i = 0; i < iters; ++i)
+  {
+    const auto targetShift = static_cast<double>(i) / (iters - 1) * maxShift;
+    const cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., targetShift.x, 0., 1., targetShift.y);
+    cv::Mat imageShifted;
+    cv::warpAffine(mImg1, imageShifted, Tmat, mImg1.size());
+    const cv::Mat image1 = RoiCropMid(mImg1, w, h);
+    const cv::Mat image2 = RoiCropMid(imageShifted, w, h);
+    const auto ipcShift = ipc.Calculate(image1, image2);
+    const auto pcShift = cv::phaseCorrelate(image1, image2);
+    const auto ipcShiftError = cv::Point2d(std::abs(ipcShift.x - targetShift.x), std::abs(ipcShift.y - targetShift.y));
+    const auto pcShiftError = cv::Point2d(std::abs(pcShift.x - targetShift.x), std::abs(pcShift.y - targetShift.y));
+    // EXPECT_LE(ipcShiftError.x, pcShiftError.x);
+    // EXPECT_LE(ipcShiftError.y, pcShiftError.y);
+    EXPECT_NEAR(ipcShift.x, targetShift.x, tolerance);
+    EXPECT_NEAR(ipcShift.y, targetShift.y, tolerance);
+  }
+}
+
+TEST_F(IPCTest, LargeShift)
+{
+  const auto ipc = GetIPC();
+  mImg2 = mImg1.clone();
+  mShift = cv::Point2d(mImg2.cols / 2 * 0.995, 0.);
+  Shift(mImg2, mShift);
   const auto shift = ipc.Calculate(mImg1, mImg2);
   EXPECT_NEAR(shift.x, mShift.x, 0.5);
   EXPECT_NEAR(shift.y, mShift.y, 0.5);
@@ -57,17 +98,6 @@ TEST_F(IPCTest, Consistency)
   const auto shift1 = ipc.Calculate(mImg1, mImg1);
   const auto shift2 = ipc.Calculate(mImg1, mImg1);
   EXPECT_EQ(shift1, shift2);
-}
-
-TEST_F(IPCTest, LargeShift)
-{
-  const auto ipc = GetIPC();
-  mImg2 = mImg1.clone();
-  mShift = cv::Point2d(mImg2.cols / 2 * 0.995, 0.);
-  Shift(mImg2, mShift);
-  const auto shift = ipc.Calculate(mImg1, mImg2);
-  EXPECT_NEAR(shift.x, mShift.x, 0.5);
-  EXPECT_NEAR(shift.y, mShift.y, 0.5);
 }
 
 TEST_F(IPCTest, UnnormalizedInputs)

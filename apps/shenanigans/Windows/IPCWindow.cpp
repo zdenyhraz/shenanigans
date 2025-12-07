@@ -2,6 +2,7 @@
 #include "ImageRegistration/ImageRegistrationDataset.hpp"
 #include "Utils/Load.hpp"
 #include "Utils/Async.hpp"
+#include "Utils/Filesystem.hpp"
 
 void IPCWindow::Initialize()
 {
@@ -81,8 +82,8 @@ void IPCWindow::Render()
         LaunchAsync(
             [&]()
             {
-              GenerateImageRegistrationDataset(mIPC, mOptimizeParameters.imageDirectory, mOptimizeParameters.generateDirectory, mOptimizeParameters.iters,
-                  mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev);
+              GenerateImageRegistrationDataset(mIPC, GetProjectPath(mOptimizeParameters.imageDirectory).string(), GetProjectPath(mOptimizeParameters.generateDirectory).string(),
+                  mOptimizeParameters.iters, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev);
             });
       ImGui::InputText("debug image1", &mOptimizeParameters.debugImage1Path);
       ImGui::InputText("debug image2", &mOptimizeParameters.debugImage2Path);

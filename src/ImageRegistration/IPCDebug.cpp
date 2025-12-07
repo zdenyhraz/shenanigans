@@ -5,6 +5,7 @@
 #include "Utils/Load.hpp"
 #include "Math/Transform.hpp"
 #include "Plot/Plot.hpp"
+#include "Math/Statistics.hpp"
 
 void IPCDebug::DebugInputImages(const IPC& ipc, const cv::Mat& image1, const cv::Mat& image2)
 {
@@ -107,12 +108,8 @@ void IPCDebug::DebugShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
   const auto image = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/debug/star.png"));
   cv::Point2d shift(Random::Rand(-1., 1.) * maxShift, Random::Rand(-1., 1.) * maxShift);
-  // cv::Point2d shift(maxShift, -maxShift);
-
   cv::Point2i point(std::clamp(Random::Rand() * image.cols, static_cast<double>(ipc.mCols), static_cast<double>(image.cols - ipc.mCols)),
       std::clamp(Random::Rand() * image.rows, static_cast<double>(ipc.mRows), static_cast<double>(image.rows - ipc.mRows)));
-  // cv::Point2i point(std::clamp(0.45 * image.cols, static_cast<double>(ipc.mCols), static_cast<double>(image.cols - ipc.mCols)),
-  //     std::clamp(0.5 * image.rows, static_cast<double>(ipc.mRows), static_cast<double>(image.rows - ipc.mRows)));
 
   cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
   cv::Mat imageShifted;
@@ -219,24 +216,89 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
 void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
   LOG_FUNCTION;
-  ipc.SetDebugDirectory("../debug/peakshift");
-  const cv::Mat image1 = LoadUnitFloatImage<IPC::Float>("../debug/AIA/171A.png");
+  // cv::Mat image1 = cv::Mat::zeros(ipc.GetRows() * 2, ipc.GetCols() * 2, CV_64F);
+  // cv::rectangle(image1, cv::Point(ipc.GetRows(), ipc.GetRows()), cv::Point(ipc.GetRows() + 200, ipc.GetRows() + 200), cv::Scalar(1), -1);
+  cv::Mat image1 = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/ipc/image.png"));
   cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
   crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
   cv::Mat image2 = image1.clone();
   cv::Mat crop2;
-  const int iters = 51;
+  const auto iters = std::max(201., maxShift * 10 + 1);
   cv::Mat noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
+  std::vector<cv::Point2d> shifts;
+  std::vector<cv::Point2d> ipcshifts;
+  std::vector<cv::Point2d> pcshifts;
 
+  // TODO: also test x only y only diag only
+  // TODO: also eval y error
+  // TODO: also test on real image
+
+  const cv::Point2d shiftOffset(25 + -maxShift * 0.5, -33 + -maxShift * 0.5);
+  // const cv::Point2d shiftOffset(-maxShift * 0.5, -maxShift * 0.5);
   for (int i = 0; i < iters; ++i)
   {
     ipc.SetDebugIndex(i);
-    const cv::Point2d shift(maxShift * i / (iters - 1), maxShift * i / (iters - 1));
+    const auto shift = cv::Point2d(maxShift * i / (iters - 1), maxShift * i / (iters - 1)) + shiftOffset;
     const cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
     cv::warpAffine(image1, image2, Tmat, image2.size());
     crop2 = RoiCropMid(image2, ipc.mCols, ipc.mRows) + noise2;
     ipc.SetDebugTrueShift(shift);
+    Plot::PlotLeft("image1", crop1);
+    Plot::PlotRight("image2", crop2);
     const auto ipcshift = ipc.Calculate(crop1, crop2);
-    LOG_INFO("Artificial shift = {} / Estimated shift = {} / Error = {}", shift, ipcshift, ipcshift - shift);
+    const auto pcshift = cv::phaseCorrelate(crop1, crop2);
+
+    shifts.push_back(shift);
+    ipcshifts.push_back(ipcshift);
+    pcshifts.push_back(pcshift);
+    LOG_DEBUG("Artificial shift = {} / Estimated shift = {} / IPC Error = {} / PC error = {}", shift, ipcshift, ipcshift - shift, pcshift - shift);
   }
+
+  std::vector<cv::Point2d> ipcErrors(ipcshifts.size());
+  std::vector<cv::Point2d> pcErrors(ipcshifts.size());
+  std::ranges::transform(ipcshifts, shifts, ipcErrors.begin(), std::minus{});
+  std::ranges::transform(pcshifts, shifts, pcErrors.begin(), std::minus{});
+
+  std::vector<double> shiftsX(shifts.size());
+  std::vector<double> shiftsY(shifts.size());
+  std::ranges::transform(shifts, shiftsX.begin(), [](cv::Point2d a) { return a.x; });
+  std::ranges::transform(shifts, shiftsY.begin(), [](cv::Point2d a) { return a.y; });
+
+  std::vector<double> ipcShiftsX(ipcshifts.size());
+  std::vector<double> pcShiftsX(ipcshifts.size());
+  std::ranges::transform(ipcshifts, ipcShiftsX.begin(), [](cv::Point2d a) { return a.x; });
+  std::ranges::transform(pcshifts, pcShiftsX.begin(), [](cv::Point2d a) { return a.x; });
+
+  std::vector<double> ipcShiftsY(ipcshifts.size());
+  std::vector<double> pcShiftsY(ipcshifts.size());
+  std::ranges::transform(ipcshifts, ipcShiftsY.begin(), [](cv::Point2d a) { return a.y; });
+  std::ranges::transform(pcshifts, pcShiftsY.begin(), [](cv::Point2d a) { return a.y; });
+
+  std::vector<double> ipcErrorsAbs(ipcshifts.size());
+  std::vector<double> pcErrorsAbs(ipcshifts.size());
+  std::ranges::transform(ipcErrors, ipcErrorsAbs.begin(), [](cv::Point2d a) { return (std::abs(a.x) + std::abs(a.y)) / 2; });
+  std::ranges::transform(pcErrors, pcErrorsAbs.begin(), [](cv::Point2d a) { return (std::abs(a.x) + std::abs(a.y)) / 2; });
+
+  Plot::Plot({
+      .name = "shifts x",
+      .x = shiftsX,
+      .ys = {shiftsX, pcShiftsX, ipcShiftsX},
+      .ylabels = {"true x", "pc x", "ipc x"},
+      .xlabel = "true shift x [px]",
+      .ylabel = "calculated shift x [px]",
+  });
+
+  Plot::Plot({
+      .name = "shifts y",
+      .x = shiftsY,
+      .ys = {shiftsY, pcShiftsY, ipcShiftsY},
+      .ylabels = {"true y", "pc y", "ipc y"},
+      .xlabel = "true shift y [px]",
+      .ylabel = "calculated shift y [px]",
+  });
+
+  Plot::Plot({.name = "errors", .x = shiftsX, .ys = {pcErrorsAbs, ipcErrorsAbs}, .ylabels = {"pc error", "ipc error"}, .xlabel = "true shift [px]", .ylabel = "error [px]"});
+
+  LOG_INFO("PC average error = {:.3f} ± {:.3f}", Mean(pcErrorsAbs), Stddev(pcErrorsAbs));
+  LOG_INFO("IPC average error = {:.3f} ± {:.3f}", Mean(ipcErrorsAbs), Stddev(ipcErrorsAbs));
 }
