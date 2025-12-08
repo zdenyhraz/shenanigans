@@ -216,9 +216,9 @@ void IPCDebug::DebugAlign(const IPC& ipc, const std::string& image1Path, const s
 void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseStdev)
 {
   LOG_FUNCTION;
-  // cv::Mat image1 = cv::Mat::zeros(ipc.GetRows() * 2, ipc.GetCols() * 2, CV_64F);
-  // cv::rectangle(image1, cv::Point(ipc.GetRows(), ipc.GetRows()), cv::Point(ipc.GetRows() + 200, ipc.GetRows() + 200), cv::Scalar(1), -1);
-  cv::Mat image1 = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/ipc/image.png"));
+  cv::Mat image1 = cv::Mat::zeros(ipc.GetRows() * 2, ipc.GetCols() * 2, CV_64F);
+  cv::rectangle(image1, cv::Point(ipc.GetRows() * 1.1, ipc.GetRows() * 0.9), cv::Point(ipc.GetRows() * 1.3, ipc.GetRows() * 1.2), cv::Scalar(1), -1);
+  //cv::Mat image1 = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/ipc/airplane.png"));
   cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
   crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
   cv::Mat image2 = image1.clone();
@@ -230,11 +230,9 @@ void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseSt
   std::vector<cv::Point2d> pcshifts;
 
   // TODO: also test x only y only diag only
-  // TODO: also eval y error
-  // TODO: also test on real image
 
-  const cv::Point2d shiftOffset(25 + -maxShift * 0.5, -33 + -maxShift * 0.5);
-  // const cv::Point2d shiftOffset(-maxShift * 0.5, -maxShift * 0.5);
+  // const cv::Point2d shiftOffset(25 + -maxShift * 0.5, -33 + -maxShift * 0.5);
+  const cv::Point2d shiftOffset(-maxShift * 0.5, -maxShift * 0.5);
   for (int i = 0; i < iters; ++i)
   {
     ipc.SetDebugIndex(i);
