@@ -71,6 +71,9 @@ void IPCWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("DebugUC"))
         LaunchAsync([&]() { IPCDebug::DebugUC(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
+      ImGui::SameLine();
+      if (ImGui::Button("DebugOptimize"))
+        LaunchAsync([&]() { IPCDebug::DebugOptimize(mIPCOptimized); });
 
       ImGui::BulletText("IPC accuracy measurement/optimization");
       if (ImGui::Button("Measure"))

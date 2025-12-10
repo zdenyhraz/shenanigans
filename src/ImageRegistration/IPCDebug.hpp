@@ -18,4 +18,5 @@ public:
   static void DebugAlign(const IPC& ipc, const std::string& image1Path, const std::string& image2Path, double noiseStdev = 0.01);
   static void DebugGradualShift(const IPC& ipc, double maxShift = 2.0, double noiseStdev = 0.01);
   static void DebugUC(const IPC& ipc, double maxShift = 2.0, double noiseStdev = 0.01);
+  static void DebugOptimize(const IPC& ipc);
 };

@@ -65,7 +65,7 @@ private:
   double mBPL = 0.01;                                  // low frequency bandpass cutoff
   double mBPH = 1.0;                                   // high frequency bandpass cutoff
   int mL2size = 7;                                     // size of the maximum correlation neighborhood L2
-  int mL2Usize = 357;                                  // size of the upsampled maximum correlation neighborhood L2U
+  int mL2Usize = 223;                                  // size of the upsampled maximum correlation neighborhood L2U
   double mL1ratio = 0.45;                              // size ratio of the L1 centroid neighborhood in relation to L2U
   double mL1ratioStep = 0.025;                         // L1 size ratio step used when reducing L1 size due to centroid divergence
   int mMaxIter = 10;                                   // maximum number of iterative refinement iterations

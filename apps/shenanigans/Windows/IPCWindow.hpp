@@ -12,13 +12,13 @@ class IPCWindow : public Window
     float BPH = 1;
     int L2size = 7;
     float L1ratio = 0.45;
-    int L2Usize = 357;
+    int L2Usize = 223;
     int MaxIter = 10;
     float CPeps = 0;
     int WinT = static_cast<int>(IPC::WindowType::Hann);
-    int BPT = static_cast<int>(IPC::BandpassType::Gaussian);
+    int BPT = static_cast<int>(IPC::BandpassType::None);
     int IntT = static_cast<int>(IPC::InterpolationType::Linear);
-    int L1WinT = static_cast<int>(IPC::L1WindowType::Circular);
+    int L1WinT = static_cast<int>(IPC::L1WindowType::None);
     static constexpr const char* WindowTypes[] = {"None", "Hann"};
     static constexpr const char* BandpassTypes[] = {"None", "Rectangular", "Gaussian"};
     static constexpr const char* InterpolationTypes[] = {"NearestNeighbor", "Linear", "Cubic"};
