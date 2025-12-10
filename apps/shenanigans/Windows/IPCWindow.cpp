@@ -68,6 +68,9 @@ void IPCWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("DebugGradual"))
         LaunchAsync([&]() { IPCDebug::DebugGradualShift(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
+      ImGui::SameLine();
+      if (ImGui::Button("DebugUC"))
+        LaunchAsync([&]() { IPCDebug::DebugUC(mIPCOptimized, mOptimizeParameters.maxShift, mOptimizeParameters.noiseStddev); });
 
       ImGui::BulletText("IPC accuracy measurement/optimization");
       if (ImGui::Button("Measure"))

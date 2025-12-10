@@ -218,7 +218,7 @@ void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseSt
   LOG_FUNCTION;
   cv::Mat image1 = cv::Mat::zeros(ipc.GetRows() * 2, ipc.GetCols() * 2, CV_64F);
   cv::rectangle(image1, cv::Point(ipc.GetRows() * 1.1, ipc.GetRows() * 0.9), cv::Point(ipc.GetRows() * 1.3, ipc.GetRows() * 1.2), cv::Scalar(1), -1);
-  //cv::Mat image1 = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/ipc/airplane.png"));
+  // cv::Mat image1 = LoadUnitFloatImage<IPC::Float>(GetProjectPath("data/ipc/airplane.png"));
   cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
   crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
   cv::Mat image2 = image1.clone();
@@ -299,4 +299,44 @@ void IPCDebug::DebugGradualShift(const IPC& ipc, double maxShift, double noiseSt
 
   LOG_INFO("PC average error = {:.3f} ± {:.3f}", Mean(pcErrorsAbs), Stddev(pcErrorsAbs));
   LOG_INFO("IPC average error = {:.3f} ± {:.3f}", Mean(ipcErrorsAbs), Stddev(ipcErrorsAbs));
+}
+
+void IPCDebug::DebugUC(const IPC& ipc, double maxShift, double noiseStdev)
+{
+  LOG_FUNCTION;
+  cv::Mat image1 = cv::Mat::zeros(ipc.GetRows() * 2, ipc.GetCols() * 2, CV_64F);
+  cv::rectangle(image1, cv::Point(ipc.GetRows() * 1.1, ipc.GetRows() * 0.9), cv::Point(ipc.GetRows() * 1.3, ipc.GetRows() * 1.2), cv::Scalar(1), -1);
+  cv::Mat crop1 = RoiCropMid(image1, ipc.mCols, ipc.mRows);
+  crop1 += GetNoise<IPC::Float>(crop1.size(), noiseStdev);
+  const int iters = std::max(101., maxShift * 10 + 1);
+  cv::Mat noise2 = GetNoise<IPC::Float>(crop1.size(), noiseStdev);
+  const cv::Point2d shiftOffset(-maxShift * 0.5, -maxShift * 0.5);
+  const int L2Ustep = 2;
+  const int L2Umin = 15;
+  const int L2Usteps = 250;
+  std::vector<double> L2Usizes(L2Usteps);
+  std::vector<double> ipcErrorsAbs(L2Usteps);
+
+#pragma omp parallel for
+  for (int l = 0; l < L2Usteps; ++l)
+  {
+    const int L2Usize = L2Umin + l * L2Ustep;
+    auto testIPC = ipc;
+    testIPC.SetL2Usize(L2Usize);
+    double error = 0;
+    cv::Mat image2 = image1.clone();
+    for (int i = 0; i < iters; ++i)
+    {
+      const auto shift = cv::Point2d(maxShift * i / (iters - 1), maxShift * i / (iters - 1)) + shiftOffset;
+      const cv::Mat Tmat = (cv::Mat_<double>(2, 3) << 1., 0., shift.x, 0., 1., shift.y);
+      cv::warpAffine(image1, image2, Tmat, image2.size());
+      const cv::Mat crop2 = RoiCropMid(image2, testIPC.mCols, testIPC.mRows) + noise2;
+      const auto ipcshift = testIPC.Calculate(crop1, crop2);
+      error += 0.5 * std::abs(ipcshift.x - shift.x) + 0.5 * std::abs(ipcshift.y - shift.y);
+    }
+    L2Usizes[l] = L2Usize;
+    ipcErrorsAbs[l] = error / iters;
+    LOG_DEBUG("{}/{} Calculating L2Usize = {}: error = {:.3f}px", l + 1, L2Usteps, L2Usize, error / iters);
+  }
+  Plot::Plot({.name = "L2Usizes", .x = L2Usizes, .ys = {ipcErrorsAbs}, .ylabels = {"error"}, .xlabel = "L2Usize [px]", .ylabel = "error [px]"});
 }
