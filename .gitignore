@@ -3,6 +3,7 @@ install/
 bin/
 obj/
 .vs/
+.idea/
 .cache/
 __pycache__/
 *_install/
