@@ -8,6 +8,7 @@ struct FormationEntity
 
 std::vector<FormationEntity> CreateFormation()
 {
+  // TODO: bigger entities
   std::vector<FormationEntity> entities;
   entities.push_back({.formationOffset = cv::Point2d(0, 0)});
 
@@ -52,10 +53,6 @@ PathData CreatePath(int mapSize, double gridSize)
     pathPoint.y = mapSize * (0.5 + 0.25 * std::sin(6.28 * t));
     pathData.path.push_back(pathPoint);
 
-    const auto gridLocation = GetEntityGridLocation(cv::Point2d(pathPoint), gridSize);
-    if (std::ranges::find(pathData.gridLocations, gridLocation) == pathData.gridLocations.end())
-      pathData.gridLocations.push_back(gridLocation);
-
     cv::Point2d pathTangent;
     pathTangent.x = -std::sin(6.28 * t);
     pathTangent.y = std::cos(6.28 * t);
@@ -69,6 +66,18 @@ PathData CreatePath(int mapSize, double gridSize)
     double width = std::clamp((1 + std::sin(6.28 * t)) * 100, 50., 200.);
     pathData.leftBoundary.push_back(cv::Point2d(pathPoint) + pathNormal * width);
     pathData.rightBoundary.push_back(cv::Point2d(pathPoint) - pathNormal * width);
+
+    // always add at least one square
+    const auto gridLocation = GetEntityGridLocation(cv::Point2d(pathPoint), gridSize);
+    if (std::ranges::find(pathData.gridLocations, gridLocation) == pathData.gridLocations.end())
+      pathData.gridLocations.push_back(gridLocation);
+    // add along normal
+    for (double normalOffset = -width + gridSize; normalOffset <= width - gridSize; normalOffset += gridSize)
+    {
+      const auto gridLocation = GetEntityGridLocation(cv::Point2d(pathPoint) + pathNormal * normalOffset, gridSize);
+      if (std::ranges::find(pathData.gridLocations, gridLocation) == pathData.gridLocations.end())
+        pathData.gridLocations.push_back(gridLocation);
+    }
   }
   return pathData;
 }
@@ -109,13 +118,29 @@ void FormationPathfinding()
     cv::line(image, pathPoint, pathPoint + pathTangent * 50, tangentColor, 2, cv::LINE_AA);
 
     // update & draw entities
+    std::vector<cv::Rect> occupiedGridLocations;
     for (auto& entity : entities)
     {
+      // desired position
       entity.position = pathPoint + pathNormal * entity.formationOffset.x + pathTangent * entity.formationOffset.y;
+      // resolve collisions
+      auto gridLocation = GetEntityGridLocation(entity.position, gridSize);
+      if (std::ranges::find(occupiedGridLocations, gridLocation) == occupiedGridLocations.end() and std::ranges::find(path.gridLocations, gridLocation) != path.gridLocations.end())
+      {
+        // grid location not occupied and reachable
+        occupiedGridLocations.push_back(gridLocation);
+      }
+      else
+      {
+        // grid location occupied or not reachable
+      }
+
       cv::circle(image, entity.position, entitySize, entityColor, -1);
       cv::circle(image, entity.position, 3, cv::Scalar(0, 0, 255), -1);
-      cv::rectangle(image, GetEntityGridLocation(entity.position, gridSize), gridColor, 1, cv::LINE_AA);
     }
+
+    for (auto& gridLocation : occupiedGridLocations)
+      cv::rectangle(image, gridLocation, cv::Scalar(0, 255, 255), 1, cv::LINE_AA);
 
     t += tstep;
     Plot::Plot({.name = "formation pathfinding", .z = image, .cmap = "gray"});
