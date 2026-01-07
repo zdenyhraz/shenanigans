@@ -4,7 +4,7 @@
 #include "Random/UnevenIllumination.hpp"
 #include "Utils/FrameAverager.hpp"
 #include "Utils/Async.hpp"
-#include "Random/FormationPathfinding.hpp"
+#include "NDA/Pathfinding/FormationPathfinding.hpp"
 
 void RandomWindow::Render()
 {
