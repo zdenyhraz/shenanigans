@@ -32,9 +32,17 @@ struct PathData
   std::vector<cv::Point> rightBoundary;
   std::vector<cv::Point2d> tangents;
   std::vector<cv::Point2d> normals;
+  std::vector<cv::Rect> gridLocations;
 };
 
-PathData CreatePath(int mapSize)
+cv::Rect GetEntityGridLocation(const cv::Point2d& position, double gridSize)
+{
+  const int gridX = static_cast<int>(position.x / gridSize) * gridSize;
+  const int gridY = static_cast<int>(position.y / gridSize) * gridSize;
+  return cv::Rect(gridX, gridY, gridSize, gridSize);
+}
+
+PathData CreatePath(int mapSize, double gridSize)
 {
   PathData pathData;
   for (double t = 0; t <= 1; t += 0.001)
@@ -43,6 +51,10 @@ PathData CreatePath(int mapSize)
     pathPoint.x = mapSize * (0.5 + 0.25 * std::cos(6.28 * t));
     pathPoint.y = mapSize * (0.5 + 0.25 * std::sin(6.28 * t));
     pathData.path.push_back(pathPoint);
+
+    const auto gridLocation = GetEntityGridLocation(cv::Point2d(pathPoint), gridSize);
+    if (std::ranges::find(pathData.gridLocations, gridLocation) == pathData.gridLocations.end())
+      pathData.gridLocations.push_back(gridLocation);
 
     cv::Point2d pathTangent;
     pathTangent.x = -std::sin(6.28 * t);
@@ -61,13 +73,6 @@ PathData CreatePath(int mapSize)
   return pathData;
 }
 
-cv::Rect GetEntityGridLocation(const FormationEntity& entity, double gridSize)
-{
-  const int gridX = static_cast<int>(entity.position.x / gridSize) * gridSize;
-  const int gridY = static_cast<int>(entity.position.y / gridSize) * gridSize;
-  return cv::Rect(gridX, gridY, gridSize, gridSize);
-}
-
 void FormationPathfinding()
 {
   LOG_FUNCTION;
@@ -82,7 +87,7 @@ void FormationPathfinding()
   const double tstep = 0.0001;
   const double gridSize = 50;
 
-  auto path = CreatePath(mapSize);
+  auto path = CreatePath(mapSize, gridSize);
   auto entities = CreateFormation();
   double t = 0;
   cv::Mat image;
@@ -92,6 +97,8 @@ void FormationPathfinding()
     cv::polylines(image, path.path, true, pathColor, 2, cv::LINE_AA);
     cv::polylines(image, path.leftBoundary, true, boundaryColor, 1, cv::LINE_AA);
     cv::polylines(image, path.rightBoundary, true, boundaryColor, 1, cv::LINE_AA);
+    for (auto& gridLocation : path.gridLocations)
+      cv::rectangle(image, gridLocation, cv::Scalar(255, 0, 0), 1, cv::LINE_AA);
 
     // update & draw path
     const int idx = static_cast<int>(t * path.path.size()) % path.path.size();
@@ -107,7 +114,7 @@ void FormationPathfinding()
       entity.position = pathPoint + pathNormal * entity.formationOffset.x + pathTangent * entity.formationOffset.y;
       cv::circle(image, entity.position, entitySize, entityColor, -1);
       cv::circle(image, entity.position, 3, cv::Scalar(0, 0, 255), -1);
-      cv::rectangle(image, GetEntityGridLocation(entity, gridSize), gridColor, 1, cv::LINE_AA);
+      cv::rectangle(image, GetEntityGridLocation(entity.position, gridSize), gridColor, 1, cv::LINE_AA);
     }
 
     t += tstep;
