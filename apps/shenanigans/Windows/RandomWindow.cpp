@@ -4,6 +4,7 @@
 #include "Random/UnevenIllumination.hpp"
 #include "Utils/FrameAverager.hpp"
 #include "Utils/Async.hpp"
+#include "Random/FormationPathfinding.hpp"
 
 void RandomWindow::Render()
 {
@@ -29,6 +30,13 @@ void RandomWindow::Render()
       ImGui::SameLine();
       if (ImGui::Button("Homomorphic"))
         LaunchAsync([&]() { UnevenIlluminationHomomorphic(); });
+    }
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Formation pathfinding"))
+    {
+      if (ImGui::Button("Formation Pathfinding"))
+        LaunchAsync([&]() { FormationPathfinding(); });
     }
     ImGui::EndTabItem();
   }
