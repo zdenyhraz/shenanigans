@@ -1,6 +1,7 @@
 import sys
+from functools import lru_cache
 
-sys.setrecursionlimit(2000)
+sys.setrecursionlimit(10000)
 
 
 def find_optimal_cutting_plan(materials_data):
@@ -18,59 +19,102 @@ def find_optimal_cutting_plan(materials_data):
 
         print(f"\nProcessing material: {name}")
 
-        # Create a flat list of all individual cuts needed.
-        # The space consumed by a cut is its length plus the kerf.
-        all_cuts_with_kerf = []
-        for length, quantity in required_cuts.items():
-            cut_size = length + saw_kerf
-            if cut_size > stock_length:
+        # Build a compact representation of required cuts by distinct length.
+        distinct_lengths = sorted(required_cuts.keys(), reverse=True)
+        demands = [required_cuts[length] for length in distinct_lengths]
+
+        for length in distinct_lengths:
+            if length > stock_length:
                 raise ValueError(
-                    f"Error: A required cut ({length} + kerf {saw_kerf}) is "
-                    f"longer than the stock length ({stock_length}) for material '{name}'."
+                    f"Error: A required cut ({length}) is longer than the stock length ({stock_length}) for material '{name}'."
                 )
-            all_cuts_with_kerf.extend([cut_size] * quantity)
 
-        # Sort cuts from largest to smallest. This is the "First Fit Decreasing"
-        # heuristic, which dramatically speeds up the search for the optimal
-        # solution by finding good solutions early and pruning bad branches.
-        all_cuts_with_kerf.sort(reverse=True)
+        patterns = []
 
-        # This dictionary will hold the best solution found so far.
-        # It's a mutable object that can be modified by the recursive function.
-        best_solution = {"plan": None, "stock_count": float('inf')}
-
-        def backtrack_solver(cuts_to_place, current_plan):
-            # If a plan is found that is already worse than our best known solution,
-            # prune this entire branch of the search tree.
-            if len(current_plan) >= best_solution["stock_count"]:
+        def generate_patterns(index, current_pattern, total_length, total_items):
+            if index == len(distinct_lengths):
+                if total_items == 0:
+                    return
+                used_length = total_length + saw_kerf * max(0, total_items - 1)
+                if used_length <= stock_length:
+                    patterns.append(tuple(current_pattern))
                 return
 
-            # If all cuts have been placed, we have found a complete, valid plan.
-            if not cuts_to_place:
-                # If this plan is the best one found so far, save it.
-                if len(current_plan) < best_solution["stock_count"]:
-                    best_solution["stock_count"] = len(current_plan)
-                    # Save a deep copy of the plan
-                    best_solution["plan"] = [list(p) for p in current_plan]
-                return
+            length = distinct_lengths[index]
+            max_count = demands[index]
+            for count in range(max_count + 1):
+                current_pattern[index] = count
+                new_total_length = total_length + count * length
+                new_total_items = total_items + count
+                if new_total_items == 0:
+                    generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
+                else:
+                    used_length = new_total_length + saw_kerf * max(0, new_total_items - 1)
+                    if used_length <= stock_length:
+                        generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
+                    else:
+                        break
+            current_pattern[index] = 0
 
-            cut_to_place = cuts_to_place[0]
-            remaining_cuts = cuts_to_place[1:]
+        generate_patterns(0, [0] * len(distinct_lengths), 0, 0)
 
-            # Try to place the current cut onto an existing stock piece
-            for i in range(len(current_plan)):
-                if sum(current_plan[i]) + cut_to_place <= stock_length:
-                    current_plan[i].append(cut_to_place)
-                    backtrack_solver(remaining_cuts, current_plan)
-                    current_plan[i].pop()  # Backtrack
+        if not patterns:
+            raise ValueError(
+                f"Error: Could not generate any valid cutting patterns for material '{name}'"
+            )
 
-            # Try to place the current cut onto a new stock piece
-            current_plan.append([cut_to_place])
-            backtrack_solver(remaining_cuts, current_plan)
-            current_plan.pop()  # Backtrack
+        patterns.sort(
+            key=lambda pat: (
+                -sum(pat),
+                -sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths)))
+            )
+        )
 
-        # Initial call to start the backtracking search
-        backtrack_solver(all_cuts_with_kerf, [])
+        pattern_used_length = [
+            sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths))) +
+            saw_kerf * max(0, sum(pat) - 1)
+            for pat in patterns
+        ]
+
+        choice = {}
+
+        @lru_cache(None)
+        def min_stock_count(state):
+            if all(v == 0 for v in state):
+                return 0
+
+            best = float('inf')
+            for pat in patterns:
+                if all(state[i] >= pat[i] for i in range(len(state))):
+                    new_state = tuple(state[i] - pat[i] for i in range(len(state)))
+                    count = min_stock_count(new_state)
+                    if count + 1 < best:
+                        best = count + 1
+                        choice[state] = pat
+                        if best == 1:
+                            break
+            return best
+
+        initial_state = tuple(demands)
+        best_stock_count = min_stock_count(initial_state)
+
+        if best_stock_count == float('inf'):
+            print(f"Could not find a solution for {name}.")
+            continue
+
+        best_solution = {"plan": [], "stock_count": best_stock_count}
+        state = initial_state
+        while any(v > 0 for v in state):
+            pat = choice.get(state)
+            if pat is None:
+                raise RuntimeError(
+                    f"Internal error reconstructing cutting plan for material '{name}'"
+                )
+            stock_piece = []
+            for i, count in enumerate(pat):
+                stock_piece.extend([distinct_lengths[i]] * count)
+            best_solution["plan"].append(stock_piece)
+            state = tuple(state[i] - pat[i] for i in range(len(state)))
 
         # --- Process and format the final results for this material ---
         plan_details = []
@@ -79,9 +123,11 @@ def find_optimal_cutting_plan(materials_data):
             continue
 
         for i, stock_piece_cuts in enumerate(best_solution["plan"]):
-            # Revert from "cut_size" back to original length for display
-            original_lengths = [round(c - saw_kerf, 2) for c in stock_piece_cuts]
-            total_cut_length_with_kerf = sum(stock_piece_cuts)
+            # stock_piece_cuts already contains original lengths (no kerf added)
+            original_lengths = stock_piece_cuts
+            total_cut_length = sum(stock_piece_cuts)
+            total_items = len(stock_piece_cuts)
+            total_cut_length_with_kerf = total_cut_length + saw_kerf * max(0, total_items - 1)
             waste = stock_length - total_cut_length_with_kerf
             plan_details.append({
                 "stock_piece_number": i + 1,
@@ -141,37 +187,15 @@ def print_cutting_plan(results):
 if __name__ == '__main__':
     user_data = [
         {
-            "name": "Hranol 80x80",
+            "name": "Hranol 40x120",
             "stock_length": 500,
-            "stock_cost": 484,
-            "saw_kerf": 1,
+            "stock_cost": 411.5,
+            "saw_kerf": 0.3,
             "required_cuts": {
-                101.5: 2,
-                84.5: 2,
-                67.5: 2,
-                25: 6,
-                32: 4,
-                22: 4,
-                12: 4
-            }
-        },
-        {
-            "name": "Prkno 18x82",
-            "stock_length": 150,
-            "stock_cost": 121,
-            "saw_kerf": 1,
-            "required_cuts": {
-                25: 16,  # 24
-            }
-        },
-        {
-            "name": "Hranol 40x80",
-            "stock_length": 200,
-            "stock_cost": 248,
-            "saw_kerf": 1,
-            "required_cuts": {
-                95: 6,
-                40: 12,
+                250: 4+4+2,
+                242: 3+3,
+                80: 4+4,
+                88: 3+3+2
             }
         },
     ]
