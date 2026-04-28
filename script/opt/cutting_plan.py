@@ -15,6 +15,53 @@ def calculate_used_length(total_length, total_items, saw_kerf, stock_length):
     return total_length + saw_kerf * total_items
 
 
+def build_feasible_patterns(stock_length, distinct_lengths, max_demands, saw_kerf, allow_empty=False):
+    patterns = []
+
+    def generate_patterns(index, current_pattern, total_length, total_items):
+        if index == len(distinct_lengths):
+            if total_items == 0:
+                if allow_empty:
+                    patterns.append(tuple(current_pattern))
+                return
+
+            used_length = calculate_used_length(total_length, total_items, saw_kerf, stock_length)
+            if used_length <= stock_length:
+                patterns.append(tuple(current_pattern))
+            return
+
+        length = distinct_lengths[index]
+        max_count = max_demands[index]
+        for count in range(max_count + 1):
+            current_pattern[index] = count
+            new_total_length = total_length + count * length
+            new_total_items = total_items + count
+            if new_total_items == 0:
+                generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
+            else:
+                used_length = calculate_used_length(
+                    new_total_length,
+                    new_total_items,
+                    saw_kerf,
+                    stock_length,
+                )
+                if used_length <= stock_length:
+                    generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
+                else:
+                    break
+        current_pattern[index] = 0
+
+    generate_patterns(0, [0] * len(distinct_lengths), 0, 0)
+    patterns.sort(
+        key=lambda pat: (
+            sum(pat) == 0,
+            -sum(pat),
+            -sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths))),
+        )
+    )
+    return patterns
+
+
 def find_optimal_cutting_plan(materials_data, verbose=True):
     full_results = {}
     grand_total_cost = 0
@@ -42,51 +89,18 @@ def find_optimal_cutting_plan(materials_data, verbose=True):
                     f"Error: A required cut ({length}) is longer than the stock length ({stock_length}) for material '{name}'."
                 )
 
-        patterns = []
-
-        def generate_patterns(index, current_pattern, total_length, total_items):
-            if index == len(distinct_lengths):
-                if total_items == 0:
-                    return
-                used_length = calculate_used_length(total_length, total_items, saw_kerf, stock_length)
-                if used_length <= stock_length:
-                    patterns.append(tuple(current_pattern))
-                return
-
-            length = distinct_lengths[index]
-            max_count = demands[index]
-            for count in range(max_count + 1):
-                current_pattern[index] = count
-                new_total_length = total_length + count * length
-                new_total_items = total_items + count
-                if new_total_items == 0:
-                    generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
-                else:
-                    used_length = calculate_used_length(
-                        new_total_length,
-                        new_total_items,
-                        saw_kerf,
-                        stock_length,
-                    )
-                    if used_length <= stock_length:
-                        generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
-                    else:
-                        break
-            current_pattern[index] = 0
-
-        generate_patterns(0, [0] * len(distinct_lengths), 0, 0)
+        patterns = build_feasible_patterns(
+            stock_length,
+            distinct_lengths,
+            demands,
+            saw_kerf,
+            allow_empty=False,
+        )
 
         if not patterns:
             raise ValueError(
                 f"Error: Could not generate any valid cutting patterns for material '{name}'"
             )
-
-        patterns.sort(
-            key=lambda pat: (
-                -sum(pat),
-                -sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths)))
-            )
-        )
 
         choice = {}
 
@@ -174,35 +188,173 @@ def find_optimal_cutting_plan(materials_data, verbose=True):
     return full_results
 
 
+def find_fixed_stock_plan(required_cuts, stock_piece_lengths, saw_kerf):
+    import numpy as np
+    from scipy.optimize import Bounds, LinearConstraint, milp
+
+    if not stock_piece_lengths:
+        return None
+
+    distinct_lengths = sorted(required_cuts.keys(), reverse=True)
+    demands = tuple(required_cuts[length] for length in distinct_lengths)
+
+    for length in distinct_lengths:
+        if length > max(stock_piece_lengths):
+            return None
+
+    stock_length_types = tuple(sorted(set(stock_piece_lengths), reverse=True))
+    stock_length_counts = tuple(
+        stock_piece_lengths.count(stock_length)
+        for stock_length in stock_length_types
+    )
+    patterns_by_stock_length = {}
+    for stock_length in stock_length_types:
+        patterns = build_feasible_patterns(
+            stock_length,
+            distinct_lengths,
+            demands,
+            saw_kerf,
+            allow_empty=False,
+        )
+        if not patterns:
+            continue
+        patterns_by_stock_length[stock_length] = patterns
+
+    variables = []
+    for stock_type_index, stock_length in enumerate(stock_length_types):
+        for pattern in patterns_by_stock_length.get(stock_length, []):
+            cut_count = sum(pattern)
+            cuts_to_make = []
+            for pattern_index, count in enumerate(pattern):
+                cuts_to_make.extend([distinct_lengths[pattern_index]] * count)
+
+            total_cut_length = sum(cuts_to_make)
+            used_length = calculate_used_length(
+                total_cut_length,
+                cut_count,
+                saw_kerf,
+                stock_length,
+            )
+            waste = stock_length - used_length
+            variables.append({
+                "stock_type_index": stock_type_index,
+                "stock_length": stock_length,
+                "pattern": pattern,
+                "cuts_to_make": tuple(sorted(cuts_to_make, reverse=True)),
+                "used_length": round(used_length, 2),
+                "waste": round(waste, 2),
+            })
+
+    if not variables:
+        return None
+
+    demand_matrix = np.array(
+        [
+            [variable["pattern"][demand_index] for variable in variables]
+            for demand_index in range(len(distinct_lengths))
+        ],
+        dtype=float,
+    )
+    demand_constraint = LinearConstraint(
+        demand_matrix,
+        lb=np.array(demands, dtype=float),
+        ub=np.array(demands, dtype=float),
+    )
+
+    stock_matrix = np.array(
+        [
+            [
+                1.0 if variable["stock_type_index"] == stock_type_index else 0.0
+                for variable in variables
+            ]
+            for stock_type_index in range(len(stock_length_types))
+        ],
+        dtype=float,
+    )
+    stock_constraint = LinearConstraint(
+        stock_matrix,
+        lb=np.zeros(len(stock_length_types)),
+        ub=np.array(stock_length_counts, dtype=float),
+    )
+
+    objective = np.array(
+        [variable["waste"] + 1e-3 for variable in variables],
+        dtype=float,
+    )
+    solution = milp(
+        c=objective,
+        constraints=[demand_constraint, stock_constraint],
+        integrality=np.ones(len(variables), dtype=int),
+        bounds=Bounds(
+            np.zeros(len(variables), dtype=float),
+            np.full(len(variables), np.inf, dtype=float),
+        ),
+    )
+
+    if not solution.success or solution.x is None:
+        return None
+
+    variable_counts = np.rint(solution.x).astype(int)
+    raw_plan = []
+    total_waste = 0.0
+    used_stock_pieces = 0
+    for variable, variable_count in zip(variables, variable_counts):
+        for _ in range(variable_count):
+            raw_plan.append((
+                variable["stock_length"],
+                variable["cuts_to_make"],
+                variable["used_length"],
+                variable["waste"],
+            ))
+            used_stock_pieces += 1
+            total_waste += variable["waste"]
+
+    plan_details = []
+    for piece_number, entry in enumerate(raw_plan, start=1):
+        stock_length, cuts_to_make, total_length_used, waste = entry
+        plan_details.append({
+            "stock_piece_number": piece_number,
+            "stock_length": stock_length,
+            "cuts_to_make": list(cuts_to_make),
+            "total_length_used": total_length_used,
+            "waste": waste,
+        })
+
+    return {
+        "used_stock_pieces": used_stock_pieces,
+        "total_waste": round(total_waste, 2),
+        "cutting_plan": plan_details,
+    }
+
+
 def print_cutting_plan(results):
-    """Formats and prints the results in a user-friendly way."""
+    """Prints the cutting plan in a compact, scan-friendly format."""
     if not results:
         print("No results to display.")
         return
 
-    print("\n-----------------------------------------")
-    print("      *** OPTIMAL CUTTING PLAN ***")
-    print("-----------------------------------------")
+    print("\nOptimal cutting plan:")
 
     for name, data in results.items():
         if name == "grand_total_cost":
             continue
 
-        print("-----------------------------------------")
-        print(f"\n## Material: {name}")
-        print(f" > Celkem potřeba: {data['total_stock_pieces_needed']} ks")
-        print(f" > Délka jednoho kusu: {data['stock_length']} cm")
-        print(f" > Náklady na materiál: {data['material_total_cost']} Kč")
-        print("\n   Řezný plán:")
+        print(f"\nMaterial: {name}")
+        print(
+            f"Stock pieces: {data['total_stock_pieces_needed']} x {data['stock_length']} cm | "
+            f"Cost: {data['material_total_cost']:.1f} CZK | "
+            f"Saw kerf: {data['saw_kerf']:.2f} cm"
+        )
+        print("Cutting plan:")
         for piece in data["cutting_plan"]:
-            print(f"   - Hranol č. {piece['stock_piece_number']}:")
-            print(f"     Nařežte díly (délky v cm): {piece['cuts_to_make']}")
-            print(f"     Celková využitá délka (vč. prořezů): {piece['total_length_used']} cm")
-            print(f"     Zbytek: {piece['waste']} cm")
+            print(
+                f"Piece {piece['stock_piece_number']:>2} -> "
+                f"cuts {piece['cuts_to_make']} | "
+                f"used {piece['total_length_used']:.2f} cm | "
+                f"waste {piece['waste']:.2f} cm"
+            )
 
-    print("\n-----------------------------------------")
-    print(f"### CELKOVÉ NÁKLADY: {results.get('grand_total_cost', 0)} Kč ###")
-    print("-----------------------------------------")
+    print(f"\nGrand total: {results.get('grand_total_cost', 0):.1f} CZK")
 
 
 if __name__ == '__main__':
