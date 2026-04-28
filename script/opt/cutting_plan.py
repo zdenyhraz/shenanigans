@@ -4,11 +4,23 @@ from functools import lru_cache
 sys.setrecursionlimit(10000)
 
 
-def find_optimal_cutting_plan(materials_data):
+def calculate_used_length(total_length, total_items, saw_kerf, stock_length):
+    if total_items == 0:
+        return 0
+
+    used_without_end_waste = total_length + saw_kerf * max(0, total_items - 1)
+    if abs(used_without_end_waste - stock_length) < 1e-9:
+        return used_without_end_waste
+
+    return total_length + saw_kerf * total_items
+
+
+def find_optimal_cutting_plan(materials_data, verbose=True):
     full_results = {}
     grand_total_cost = 0
 
-    print("Starting optimization... This may take a moment for complex plans.")
+    if verbose:
+        print("Starting optimization... This may take a moment for complex plans.")
 
     for material in materials_data:
         name = material["name"]
@@ -17,7 +29,8 @@ def find_optimal_cutting_plan(materials_data):
         saw_kerf = material["saw_kerf"]
         required_cuts = material["required_cuts"]
 
-        print(f"\nProcessing material: {name}")
+        if verbose:
+            print(f"\nProcessing material: {name}")
 
         # Build a compact representation of required cuts by distinct length.
         distinct_lengths = sorted(required_cuts.keys(), reverse=True)
@@ -35,7 +48,7 @@ def find_optimal_cutting_plan(materials_data):
             if index == len(distinct_lengths):
                 if total_items == 0:
                     return
-                used_length = total_length + saw_kerf * max(0, total_items - 1)
+                used_length = calculate_used_length(total_length, total_items, saw_kerf, stock_length)
                 if used_length <= stock_length:
                     patterns.append(tuple(current_pattern))
                 return
@@ -49,7 +62,12 @@ def find_optimal_cutting_plan(materials_data):
                 if new_total_items == 0:
                     generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
                 else:
-                    used_length = new_total_length + saw_kerf * max(0, new_total_items - 1)
+                    used_length = calculate_used_length(
+                        new_total_length,
+                        new_total_items,
+                        saw_kerf,
+                        stock_length,
+                    )
                     if used_length <= stock_length:
                         generate_patterns(index + 1, current_pattern, new_total_length, new_total_items)
                     else:
@@ -69,12 +87,6 @@ def find_optimal_cutting_plan(materials_data):
                 -sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths)))
             )
         )
-
-        pattern_used_length = [
-            sum(pat[i] * distinct_lengths[i] for i in range(len(distinct_lengths))) +
-            saw_kerf * max(0, sum(pat) - 1)
-            for pat in patterns
-        ]
 
         choice = {}
 
@@ -99,7 +111,8 @@ def find_optimal_cutting_plan(materials_data):
         best_stock_count = min_stock_count(initial_state)
 
         if best_stock_count == float('inf'):
-            print(f"Could not find a solution for {name}.")
+            if verbose:
+                print(f"Could not find a solution for {name}.")
             continue
 
         best_solution = {"plan": [], "stock_count": best_stock_count}
@@ -119,7 +132,8 @@ def find_optimal_cutting_plan(materials_data):
         # --- Process and format the final results for this material ---
         plan_details = []
         if best_solution["plan"] is None:
-            print(f"Could not find a solution for {name}.")
+            if verbose:
+                print(f"Could not find a solution for {name}.")
             continue
 
         for i, stock_piece_cuts in enumerate(best_solution["plan"]):
@@ -127,7 +141,12 @@ def find_optimal_cutting_plan(materials_data):
             original_lengths = stock_piece_cuts
             total_cut_length = sum(stock_piece_cuts)
             total_items = len(stock_piece_cuts)
-            total_cut_length_with_kerf = total_cut_length + saw_kerf * max(0, total_items - 1)
+            total_cut_length_with_kerf = calculate_used_length(
+                total_cut_length,
+                total_items,
+                saw_kerf,
+                stock_length,
+            )
             waste = stock_length - total_cut_length_with_kerf
             plan_details.append({
                 "stock_piece_number": i + 1,
@@ -146,10 +165,12 @@ def find_optimal_cutting_plan(materials_data):
             "saw_kerf": saw_kerf,
             "cutting_plan": plan_details
         }
-        print(f"Optimal plan found for {name} using {best_solution['stock_count']} stock piece(s).")
+        if verbose:
+            print(f"Optimal plan found for {name} using {best_solution['stock_count']} stock piece(s).")
 
     full_results["grand_total_cost"] = grand_total_cost
-    print("\nOptimization complete.")
+    if verbose:
+        print("\nOptimization complete.")
     return full_results
 
 
@@ -189,13 +210,13 @@ if __name__ == '__main__':
         {
             "name": "Hranol 40x120",
             "stock_length": 500,
-            "stock_cost": 411.5,
+            "stock_cost": 423.5,
             "saw_kerf": 0.3,
             "required_cuts": {
-                250: 4+4+2,
-                242: 3+3,
-                80: 4+4,
-                88: 3+3+2
+                140: 16,
+                132: 12,
+                90: 16,
+                82: 12,
             }
         },
     ]
