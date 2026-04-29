@@ -22,11 +22,13 @@ DEFAULT_WIDTH_START = 60
 DEFAULT_WIDTH_END = 100
 DEFAULT_STEP = 5
 NUM_BEDS = 2
-DEFAULT_BEAM_LENGTH = 500.0
-DEFAULT_BEAM_COST = 423.5
+DEFAULT_BEAM_LENGTH = 400.0
+DEFAULT_BEAM_THICKNESS = 6
+DEFAULT_BEAM_COST = 493.6
 DEFAULT_TRANSPORT_PATTERNS = (
-    (200.0, 200.0, 100.0),
-    (200.0, 150.0, 150.0),
+    # (200.0, 200.0, 100.0),
+    # (200.0, 150.0, 150.0),
+    (200.0, 200.0),
 )
 DEFAULT_MILL_KERF = 0.0
 
@@ -38,9 +40,9 @@ def build_required_cuts(long_length, width_length):
         required_cuts[length] = required_cuts.get(length, 0) + count
 
     add_cut(long_length, NUM_BEDS*8)
-    add_cut(long_length - 8, NUM_BEDS*6)
+    add_cut(long_length - 2*DEFAULT_BEAM_THICKNESS, NUM_BEDS*6)
     add_cut(width_length, NUM_BEDS*8)
-    add_cut(width_length - 8, NUM_BEDS*6)
+    add_cut(width_length - 2*DEFAULT_BEAM_THICKNESS, NUM_BEDS*6)
 
     return required_cuts
 
